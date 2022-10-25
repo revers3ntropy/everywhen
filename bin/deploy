@@ -1,0 +1,20 @@
+#!/bin/bash
+
+start=`date +%s`
+
+die () {
+    echo >&2 "$@"
+    exit 1
+}
+
+[ "$#" -eq 1 ] || die "1 argument required, $# provided"
+
+bin/build;
+
+node --enable-source-maps bin/upload -v --env "${@: -1}"
+
+end=`date +%s`
+
+runtime=$( echo "$end - $start" | bc -l )
+
+echo "Deployment total time: $runtime s"

@@ -1,12 +1,23 @@
+# IDE and OS etc.
 .DS_Store
+.idea
+
+# Packages
 node_modules
-/build
+package-lock.json
+
+# generated
 /.svelte-kit
 /package
-.env
-.env.*
-!.env.example
 .vercel
+
+# secrets
+.env
+*.env
+!example.env
+*.sshpass
+
+# build files
 .output
-.idea
-package-lock.json
+/build
+/misc_3-server/
