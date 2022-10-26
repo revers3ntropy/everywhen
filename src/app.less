@@ -9,14 +9,19 @@ button {
 	background: transparent;
 	border: none;
 	cursor: pointer;
-
-	&:focus:not(:focus-visible) {
-		outline: none;
-	}
+	outline: none;
 
 	&:hover svg {
 		color: @text-color-light;
 	}
+}
+
+textarea {
+	font-size: inherit;
+	font-family: inherit;
+	background: transparent;
+	border: 1px solid @border;
+	outline: none;
 }
 
 input {
@@ -30,4 +35,15 @@ input {
 
 svg {
 	color: @text-color;
+}
+
+hr {
+	border: none;
+	border-top: 1px solid @border;
+	margin: 10px;
+}
+
+:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
 }

@@ -6,7 +6,6 @@
 	import { browser } from "$app/environment";
 	import { api } from "../lib/api/apiQuery";
 
-
 	const home = $page.url.pathname.trim() === '/';
 
 	if (browser) {
@@ -28,9 +27,7 @@
 		<Header />
 	{/if}
 
-	<main>
-		<slot />
-	</main>
+	<slot />
 
 	{#if !home}
 		<footer>

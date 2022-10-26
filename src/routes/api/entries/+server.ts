@@ -2,11 +2,12 @@ import type { RequestHandler } from './$types';
 import { query } from '$lib/db/mysql';
 import { generateUUId } from "$lib/security/uuid";
 import { error } from "@sveltejs/kit";
-import { decrypt, encrypt } from "$lib/security/encryption";
+import { encrypt } from "$lib/security/encryption";
 import { getKeyFromRequest } from "$lib/security/getKeyFromRequest";
+import { decryptEntries } from "./_helper";
 
-export const GET: RequestHandler = async ({ url, request }) => {
-    const key = getKeyFromRequest(request);
+export const GET: RequestHandler = async ({ url, cookies }) => {
+    const key = getKeyFromRequest(cookies);
 
     const pageSize = parseInt(url.searchParams.get('pageSize') || '50');
     const page = parseInt(url.searchParams.get('page') || '0');
@@ -25,23 +26,33 @@ export const GET: RequestHandler = async ({ url, request }) => {
             deleted,
             label
         FROM entries
+        ORDER BY created DESC, id
         LIMIT ${pageSize}
         OFFSET ${pageSize * page}
     `;
 
-    entries.forEach((entry) => {
-        entry.entry = decrypt(entry.entry, key);
-        entry.title = decrypt(entry.title, key);
-    });
+    const numEntries = await query`
+        SELECT COUNT(*) as count
+        FROM entries
+    `;
+
+    const plaintextEntries = decryptEntries(entries, key);
+
+    const response = {
+        entries: plaintextEntries,
+        page,
+        pageSize,
+        totalPages: Math.ceil(numEntries[0].count / pageSize)
+    };
 
     return new Response(
-        JSON.stringify(entries),
+        JSON.stringify(response),
         { status: 200 }
     );
 };
 
-export const POST: RequestHandler = async ({ request }) => {
-    const key = getKeyFromRequest(request);
+export const POST: RequestHandler = async ({ request, cookies }) => {
+    const key = getKeyFromRequest(cookies);
 
     const body = await request.json();
 
@@ -54,7 +65,7 @@ export const POST: RequestHandler = async ({ request }) => {
     if (typeof body.longitude !== 'number') {
         throw error(400, 'longitude must be number');
     }
-    if (typeof body.title !== 'string' || !body.title) {
+    if (body.title && typeof body.title !== 'string') {
         throw error(400, 'invalid title');
     }
     if (typeof body.entry !== 'string' || !body.entry) {
@@ -64,7 +75,7 @@ export const POST: RequestHandler = async ({ request }) => {
         throw error(400, 'invalid label');
     }
 
-    const title = encrypt(body.title, key);
+    const title = body.title ? encrypt(body.title, key) : '';
     const entry = encrypt(body.entry, key);
 
     await query`

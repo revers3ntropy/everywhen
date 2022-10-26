@@ -34,6 +34,7 @@
 		"prettier-plugin-svelte": "^2.7.0",
 		"svelte": "^3.46.0",
 		"svelte-check": "^2.7.1",
+		"svelte-geolocation": "^0.3.0",
 		"svelte-material-icons": "^2.0.4",
 		"svelte-notifications": "^0.9.98",
 		"svelte-preprocess": "^4.10.7",

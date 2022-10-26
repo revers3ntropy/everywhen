@@ -1,1 +1,1 @@
-export const KEY_LS_KEY = '__misc_3_key_v1';
+export const KEY_COOKIE_KEY = '__misc_3_key_v1';
