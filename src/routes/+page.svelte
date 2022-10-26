@@ -2,20 +2,17 @@
     <title>Me</title>
     <meta name="description" content="Joseph Coppin's site" />
 </svelte:head>
-
-<script>
-    import sha256 from 'js-sha256';
+<script lang="ts">
     import { getNotificationsContext } from 'svelte-notifications';
     import ChevronRight from 'svelte-material-icons/ChevronRight.svelte';
-    import { PUBLIC_KEY_HASH } from '$env/static/public';
+    import { api } from "../lib/api/apiQuery";
 
     let password = '';
 
     const { addNotification } = getNotificationsContext();
 
-    function submit () {
-        if (sha256.sha256(password) === PUBLIC_KEY_HASH) {
-            sessionStorage.setItem('key', password);
+    async function submit () {
+        if (await api('GET', '/auth?key=' + password)) {
             window.location.href = '/home';
             return;
         }

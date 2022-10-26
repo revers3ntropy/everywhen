@@ -9,12 +9,24 @@ const config: mysql.ConnectionOptions = {
     password: DB_PASS,
     database: DB,
     port,
-    decimalNumbers: true
+    decimalNumbers: true,
+    supportBigNumbers: true,
 };
 
 const con = await mysql.createConnection(config);
 
-export async function query (queryParts: TemplateStringsArray, ...params: any[]): Promise<any> {
+export type queryRes
+    = mysql.RowDataPacket[][]
+    | mysql.RowDataPacket[]
+    | mysql.OkPacket
+    | mysql.OkPacket[]
+    | mysql.ResultSetHeader;
+
+export async function query
+    <Res extends queryRes = mysql.RowDataPacket[]>
+    (queryParts: TemplateStringsArray, ...params: any[]):
+    Promise<Res>
+{
     const query = queryParts.reduce((acc, cur, i) => {
         let str = acc + cur;
         if (params[i] === undefined) {
@@ -27,7 +39,7 @@ export async function query (queryParts: TemplateStringsArray, ...params: any[])
         }
     }, '');
 
-    console.log`QUERY: ${con.escape(query)} ${JSON.stringify(params)}`;
+    console.log(`QUERY: ${con.escape(query)} ${JSON.stringify(params)}`);
 
     // if it's an array, add all the elements of the array in place as params
     // Flatten 2D arrays
@@ -38,5 +50,5 @@ export async function query (queryParts: TemplateStringsArray, ...params: any[])
         }
     }
 
-    return con.query(query, params);
+    return <Res>(await con.query(query, params))[0];
 }

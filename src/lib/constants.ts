@@ -1,0 +1,1 @@
+export const KEY_LS_KEY = '__misc_3_key_v1';

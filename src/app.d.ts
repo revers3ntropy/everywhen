@@ -17,6 +17,6 @@ declare module '$env/static/private' {
 	export const DB_PASS: string;
 	export const DB: string;
 	export const DB_PORT: string;
-	export const PUBLIC_KEY_HASH: string;
+	export const KEY_HASH: string;
 	export const INIT_VECTOR: string;
 }
