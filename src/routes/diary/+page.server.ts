@@ -1,3 +1,5 @@
+export {};
+/*
 import type { PageServerLoad } from "./$types";
 import { query } from "$lib/db/mysql";
 import { decryptEntries } from "../api/entries/_helper";
@@ -30,3 +32,4 @@ export const load: PageServerLoad = async ({ cookies }) => {
         totalPages: Math.ceil(numEntries[0].count / 50)
     };
 }
+ */

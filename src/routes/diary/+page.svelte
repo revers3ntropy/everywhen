@@ -4,12 +4,14 @@
     import { api } from "$lib/api/apiQuery";
     import Geolocation from "svelte-geolocation";
     import { browser } from "$app/environment";
+    import PageCounter from '$lib/components/PageCounter.svelte';
 
     // passed from 'load' (+page.server.ts);
     export let data = { entries: [], totalPages: 0 };
-    export let entries = data.entries || [];
+    let entries = data.entries || [];
+    let labels = [];
 
-    const PAGE_LENGTH = 50;
+    const PAGE_LENGTH = 2;
     let page = 0;
     let pages = data.totalPages || 0;
 
@@ -19,7 +21,7 @@
     let currentLocation = [];
 
     async function submitEntry () {
-        await api('POST', '/entries', {
+        await api.post('/entries', {
             title: newEntryTitle,
             entry: newEntryBody,
             label: newEntryLabel,
@@ -32,7 +34,7 @@
 
     async function reloadEntries (page_=page) {
         if (!browser) return;
-        const response = await api('GET', `/entries?pageSize=${PAGE_LENGTH}&page=${page_}`);
+        const response = await api.get(`/entries?pageSize=${PAGE_LENGTH}&page=${page_}`);
         entries = response.entries;
         pages = response.totalPages;
     }
@@ -67,13 +69,13 @@
     </div>
 
     <section>
-        <div>
-            <button on:click={() => page--} disabled='{page <= 0}'>-</button>
-            Page {page+1} of {pages}
-            <button on:click={() => page++} disabled='{page >= pages-1}'>+</button>
-        </div>
+        <PageCounter pages={pages}
+                     pageLength={PAGE_LENGTH}
+                     total={entries.length}
+                     bind:page
+        />
         {#each entries as entry}
-            <Entry {...entry} />
+            <Entry {...entry} on:updated={reloadEntries} />
         {/each}
     </section>
 </main>
@@ -113,6 +115,4 @@
         padding: 10px;
         font-size: 20px
     }
-
-
 </style>

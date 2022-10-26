@@ -17,7 +17,7 @@ CREATE TABLE `entries` (
     `longitude` int(64) DEFAULT NULL,
     `title` text NOT NULL,
     `entry` text NOT NULL,
-    `deleted` int(64) DEFAULT NULL,
+    `deleted` int(1) DEFAULT 0,
     `label` varchar(128) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 

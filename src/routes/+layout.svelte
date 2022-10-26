@@ -9,7 +9,7 @@
 	const home = $page.url.pathname.trim() === '/';
 
 	if (browser) {
-		api('GET', '/auth')
+		api.get('/auth')
 			.then((res) => {
 				if (!home && res.status === 401) {
 					window.location.href = '/';

@@ -12,7 +12,7 @@
     const { addNotification } = getNotificationsContext();
 
     async function submit () {
-        if (await api('GET', '/auth?key=' + password)) {
+        if (await api.get('/auth?key=' + password)) {
             window.location.href = '/home';
             return;
         }

@@ -48,7 +48,7 @@ export async function ssApi (method: HttpMethod, path: string, body: any = null)
 
  */
 
-export async function api (method: HttpMethod, path: string, body: any = null) {
+export async function makeApiReq (method: HttpMethod, path: string, body: any = null) {
     if (!browser) {
         return;
     }
@@ -72,9 +72,13 @@ export async function api (method: HttpMethod, path: string, body: any = null) {
     } else {
         console.error('Error on client side api fetch', method, path,
             'Gave erroneous response:', response);
-        return {
-            status: response.status,
-            statusText: response.statusText
-        }
+        return response;
     }
+}
+
+export const api = {
+    get: async (path: string) => await makeApiReq('GET', path),
+    post: async (path: string, body: any) => await makeApiReq('POST', path, body),
+    put: async (path: string, body: any) => await makeApiReq('PUT', path, body),
+    delete: async (path: string, body: any) => await makeApiReq('DELETE', path, body)
 }
