@@ -7,7 +7,7 @@
     export let entries: Array<EntryType>;
 
 </script>
-<div class="entry-group">
+<div class="entry-group container">
     <div class="title">
         <slot name="title" />
     </div>
@@ -21,14 +21,9 @@
     @import '../../styles/variables.less';
 
     .entry-group {
-        margin: 1em;
-        padding: 1em 0;
-        border: 1px solid @border;
-        border-radius: 10px;
-
         .title {
             margin-bottom: 0.5rem;
-            padding: 0 1.5em;
+            padding: 0 1em;
         }
     }
 </style>

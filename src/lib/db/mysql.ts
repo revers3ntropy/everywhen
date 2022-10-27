@@ -20,7 +20,8 @@ export type queryRes
     | mysql.RowDataPacket[]
     | mysql.OkPacket
     | mysql.OkPacket[]
-    | mysql.ResultSetHeader;
+    | mysql.ResultSetHeader
+    | Record<string, any>[];
 
 export async function query
     <Res extends queryRes = mysql.RowDataPacket[]>

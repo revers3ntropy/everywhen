@@ -23,8 +23,12 @@
 <div class="entry">
     <div class="header">
         <div>
-            {moment(new Date(created * 1000)).format('h:mm A')}
-            <span class="title">{title}</span>
+            <span class="time">
+                {moment(new Date(created * 1000)).format('h:mm A')}
+            </span>
+            <span class="title">
+                {title}
+            </span>
         </div>
 
         <div>
@@ -53,7 +57,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin: .5em 1em .5em 0;
+        margin: .5em 1em 0 0;
         padding: .3em;
     }
 
@@ -61,6 +65,12 @@
         font-weight: bold;
         margin-left: 2em;
         font-size: 1.2em;
+    }
+
+    .time {
+        margin: 0 0 0 0.5rem;
+        font-size: .8em;
+        color: @text-color-light;
     }
 
     h3 {

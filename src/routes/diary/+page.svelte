@@ -1,44 +1,40 @@
 <svelte:head>
-    <title>New tab</title>
+    <title>New Tab</title>
 </svelte:head>
 <script lang="ts">
-    import type { PageData } from './$types';
     import type { Entry as EntryType } from '$lib/types';
     import moment from "moment";
     import Time from "svelte-time";
-    import Geolocation from "svelte-geolocation";
-    import Send from 'svelte-material-icons/Send.svelte';
+
+    import Sidebar from "./Sidebar.svelte";
     import EntryGroup from "$lib/components/EntryGroup.svelte";
     import PageCounter from '$lib/components/PageCounter.svelte';
     import { api } from "$lib/api/apiQuery";
-    import { browser } from "$app/environment";
     import { groupEntriesByDay } from "../api/entries/utils.client";
+    import EntryForm from "./EntryForm.svelte";
 
-    export let data: PageData;
+    export let data: Record<string, any>;
 
     // passed from 'load' (+page.server.ts);
     let entries: Record<number, EntryType[]> = {};
+    let entryTitles: Record<number, EntryType[]> = {};
     let entryCount = 0;
     let labels = [];
 
-    const PAGE_LENGTH = 4;
+    const PAGE_LENGTH = 50;
     let page = 0;
     let pages = 0;
 
-    let newEntryTitle = '';
-    let newEntryBody = '';
-    let newEntryLabel = '';
-    let currentLocation = [];
-
     let search = '';
 
-    async function submitEntry () {
+    async function submitEntry (event) {
+        const { title, entry, label, location } = event.detail;
         await api.post(data.key, '/entries', {
-            title: newEntryTitle,
-            entry: newEntryBody,
-            label: newEntryLabel,
-            latitude: currentLocation[0],
-            longitude: currentLocation[1]
+            title,
+            entry,
+            label,
+            latitude: location[0],
+            longitude: location[1]
         });
 
         await reloadEntries(page);
@@ -53,50 +49,43 @@
             entriesOptions['search'] = search;
         }
 
-        const entriesRes = await api.get(data.key,
-            `/entries?${new URLSearchParams(entriesOptions).toString()}`);
-        entries = groupEntriesByDay(entriesRes.entries);
-        pages = entriesRes.totalPages;
-        entryCount = entriesRes.totalEntries;
+        api.get(data.key, `/entries?${new URLSearchParams(entriesOptions).toString()}`)
+            .then(res => {
+                entries = groupEntriesByDay(res.entries);
+                pages = res.totalPages;
+                entryCount = res.totalEntries;
+            });
 
-        const labelsRes = await api.get(data.key, `/labels`);
-        labels = labelsRes.labels;
+        api.get(data.key, `/labels`)
+            .then(res => {
+                labels = res.labels;
+            });
+
+        api.get(data.key, '/entries/titles')
+            .then(res => {
+                entryTitles = groupEntriesByDay(res.entries);
+            });
     }
 
     $: reloadEntries(page);
 </script>
 <main>
-    {#if browser}
-        <Geolocation
-            getPosition="true"
-            let:error
-            let:notSupported
-            bind:coords={currentLocation}
-        >
-            {#if notSupported}
-                Your browser does not support the Geolocation API.
-            {:else if error}
-                An error occurred fetching geolocation data. {error.code} {error.message}
-            {/if}
-        </Geolocation>
-    {/if}
-
-    <div class="entry-form">
-        <input placeholder="Title" class=title bind:value={newEntryTitle} />
-        <input placeholder="Label" class=label bind:value={newEntryLabel} />
-        <button type="submit" on:click={submitEntry}>
-            <Send size="30" />
-        </button>
-        <hr>
-        <textarea placeholder="Entry" class=entry bind:value={newEntryBody}></textarea>
-    </div>
-
     <section>
-        <PageCounter pages={pages}
-                     pageLength={PAGE_LENGTH}
-                     total={entryCount}
-                     bind:page
+        <EntryForm
+            labels={labels}
+            on:submit={submitEntry}
         />
+    </section>
+    <section>
+        <div class="entries-menu">
+            <Sidebar titles={entryTitles} />
+            <PageCounter pages={pages}
+                         pageLength={PAGE_LENGTH}
+                         total={entryCount}
+                         bind:page
+            />
+            <div></div>
+        </div>
         {#each Object.keys(entries).sort((a, b) => b - a) as day}
             <EntryGroup entries={entries[day]}
                         on:updated={() => reloadEntries(page)}
@@ -119,43 +108,16 @@
 <style lang="less">
     @import '../../styles/variables.less';
 
-    .entry-form {
-        border: 1px solid @border;
-        margin: 30px;
-        text-align: center;
-        border-radius: 10px;
-    }
-
-    .label {
-        border: none;
-        width: 25%;
-        margin: 10px;
-        padding: 10px;
-        font-size: 20px;
-    }
-    .title {
-        border: none;
-        width: 55%;
-        margin: 10px;
-        padding: 10px;
-        font-size: 20px;
-    }
-
-    .entry {
-        border-radius: 0;
-        outline: none;
-        border: none;
-        width: 90%;
-        max-width: 1500px;
-        height: 500px;
-        margin: 10px;
-        padding: 10px;
-        font-size: 20px
-    }
-
     .entry-group-title {
         display: flex;
         justify-content: space-between;
         align-items: center;
+    }
+
+    .entries-menu {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 30px;
     }
 </style>

@@ -2,10 +2,10 @@ import type { RequestHandler } from './$types';
 import { query } from '$lib/db/mysql';
 import { generateUUId } from "$lib/security/uuid";
 import { error } from "@sveltejs/kit";
-import { decrypt, encrypt } from "$lib/security/encryption";
+import { encrypt } from "$lib/security/encryption";
 import { getKeyFromRequest } from "$lib/security/getKeyFromRequest";
-import { decryptEntries } from "./utils.server";
-import type { Entry } from "$lib/types";
+import { addLabelsToEntries, decryptEntries } from "./utils.server";
+import type { RawEntry } from "$lib/types";
 
 export const GET: RequestHandler = async ({ url, cookies }) => {
     const key = getKeyFromRequest(cookies);
@@ -18,16 +18,16 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
     if (page < 0) throw error(400, 'Invalid page number');
     if (pageSize < 0) throw error(400, 'Invalid page size');
 
-    const entries = await query`
-        SELECT 
-            entries.id,
-            entries.created,
-            entries.latitude,
-            entries.longitude,
-            entries.title,
-            entries.entry,
-            entries.deleted,
-            entries.label
+    const rawEntries = await query<RawEntry[]>`
+        SELECT
+            id,
+            created,
+            latitude,
+            longitude,
+            title,
+            entry,
+            deleted,
+            label
         FROM entries
         WHERE (deleted = 0 OR ${allowDeleted})
         LIKE ${search}
@@ -36,24 +36,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
         OFFSET ${pageSize * page}
     `;
 
-    const labels = await query`
-        SELECT
-            id,
-            name,
-            colour
-        FROM labels
-    `;
-
-    for (const entry of entries) {
-        if (!entry.label) continue;
-        const label = labels.find((label) => label.id === entry.label);
-        if (!label) continue;
-        entry.label = {
-            id: entry.label,
-            name: decrypt(label.name, key),
-            colour: label.colour
-        };
-    }
+    const entries = await addLabelsToEntries(rawEntries, key);
 
     const numEntries = await query`
         SELECT COUNT(*) as count
@@ -62,7 +45,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
         LIKE ${search}
     `;
 
-    const plaintextEntries = decryptEntries(<Entry[]>entries, key);
+    const plaintextEntries = decryptEntries(entries, key);
 
     const response = {
         entries: plaintextEntries,
