@@ -10,6 +10,12 @@ SET time_zone = "+00:00";
 
 -- --- Tables ---
 
+CREATE TABLE `ids` (
+    `id` varchar(128) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
 CREATE TABLE `entries` (
     `id` varchar(128) NOT NULL,
     `created` int(64) NOT NULL,

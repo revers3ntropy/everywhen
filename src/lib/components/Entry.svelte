@@ -73,11 +73,6 @@
         color: @text-color-light;
     }
 
-    h3 {
-        padding: 0;
-        margin: 0.5em;
-    }
-
     .body {
         margin: 0 3em;
     }

@@ -17,6 +17,12 @@
 
     let labels: Label[] = [];
 
+    export function reset () {
+        newEntryTitle = '';
+        newEntryBody = '';
+        newEntryLabel = '';
+    }
+
     function submit () {
         dispatch('submit', {
             title: newEntryTitle,
@@ -24,9 +30,6 @@
             label: newEntryLabel,
             location: currentLocation
         });
-        newEntryTitle = '';
-        newEntryBody = '';
-        newEntryLabel = '';
     }
 </script>
 <div class="container">
@@ -38,16 +41,24 @@
             bind:coords={currentLocation}
         >
             {#if notSupported}
-                Your browser does not support the Geolocation API.
+                This browser does not support the Geolocation API.
             {:else if error}
-                An error occurred fetching geolocation data. {error.code} {error.message}
+                An error occurred fetching geolocation data: {error.code} {error.message}
             {/if}
         </Geolocation>
     {/if}
 
     <div class="head">
         <input placeholder="Title" class=title bind:value={newEntryTitle} />
-        <input placeholder="Label" class=label bind:value={newEntryLabel} />
+
+        <select bind:value={newEntryLabel}>
+            <option value="">No Label</option>
+            {#each labels as label}
+                <option value={label.id}>{label.name}</option>
+            {/each}
+            <option value="*">New Label</option>
+        </select>
+
         <button on:click={submit}>
             <Send size="30" />
         </button>
@@ -66,12 +77,6 @@
         justify-content: space-between;
     }
 
-    .label {
-        border: none;
-        width: 25%;
-        font-size: 20px;
-    }
-
     .title {
         border: none;
         width: 55%;
@@ -88,5 +93,23 @@
         height: 500px;
         font-size: 20px;
         padding: 1.2em;
+    }
+
+    * :global(.margins) {
+        margin: 18px 0 24px;
+    }
+
+    * :global(.columns) {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    * :global(.columns > *) {
+        flex-basis: 0;
+        min-width: 245px;
+        margin-right: 12px;
+    }
+    * :global(.columns > *:last-child) {
+        margin-right: 0;
     }
 </style>

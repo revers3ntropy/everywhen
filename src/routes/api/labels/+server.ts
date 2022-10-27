@@ -32,7 +32,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 
     const body = await request.json();
 
-    const id = await generateUUId('label');
+    const id = await generateUUId();
     const time = Math.round(Date.now() / 1000);
 
     if (typeof body.name !== 'string' || !body.name) {

@@ -5,7 +5,6 @@
 	import Notifications from 'svelte-notifications';
 	import { page } from "$app/stores";
 
-
 	const home = $page.url.pathname.trim() === '/';
 </script>
 <Notifications>

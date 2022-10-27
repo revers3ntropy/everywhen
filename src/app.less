@@ -1,52 +1,23 @@
 @import './styles/variables.less';
 @import './styles/layout.less';
 @import './styles/text.less';
-
-input,
-button {
-	font-size: inherit;
-	font-family: inherit;
-	background: transparent;
-	border: none;
-	cursor: pointer;
-	outline: none;
-
-	&:hover svg {
-		color: @text-color-light;
-	}
-}
-
-textarea {
-	font-size: inherit;
-	font-family: inherit;
-	background: transparent;
-	border: 1px solid @border;
-	outline: none;
-}
-
-input {
-	border-bottom: 1px solid @border;
-	position: relative;
-	display: inline-block;
-	line-height: 1.2;
-	text-decoration: none;
-	outline: none;
-	cursor: text;
-}
+@import './styles/input.less';
 
 svg {
 	color: @text-color;
+}
+
+.main-stop {
+	stop-color: red;
+}
+.alt-stop {
+	stop-color: green;
 }
 
 hr {
 	border: none;
 	border-top: 1px solid @border;
 	margin: 10px;
-}
-
-:disabled {
-	opacity: 0.5;
-	cursor: not-allowed;
 }
 
 .blurred {

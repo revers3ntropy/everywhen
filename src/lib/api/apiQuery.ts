@@ -33,6 +33,9 @@ export async function makeApiReq (key: string, method: HttpMethod, path: string,
     if (response.ok) {
         return await response.json();
     } else {
+        if (response.status === 401 && browser) {
+            location.reload();
+        }
         console.error(`Error on api fetch (${browser ? 'client' : 'server'} side)`,
             method, url, 'Gave erroneous response:', response);
         return response;

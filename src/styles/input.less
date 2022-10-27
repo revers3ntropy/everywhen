@@ -1,0 +1,52 @@
+@import './variables.less';
+
+input,
+button {
+    font-size: inherit;
+    font-family: inherit;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    outline: none;
+
+    &:hover svg {
+        color: @text-color-light;
+    }
+}
+
+textarea {
+    font-size: inherit;
+    font-family: inherit;
+    background: transparent;
+    border: 1px solid @border;
+    outline: none;
+}
+
+input {
+    border-bottom: 1px solid @border;
+    position: relative;
+    display: inline-block;
+    line-height: 1.2;
+    text-decoration: none;
+    outline: none;
+    cursor: text;
+}
+
+:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+select {
+    border: 1px solid @border;
+    border-radius: 3px;
+    padding: 0.5em;
+    outline: none;
+    cursor: pointer;
+    color: @text-color;
+    background: @light-accent;
+}
+
+select:focus {
+    border: 1px solid @text-color-accent;
+}

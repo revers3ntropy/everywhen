@@ -50,10 +50,12 @@
 		"vite": "^3.1.0-beta.1"
 	},
 	"devDependencies": {
+		"@smui-extra/autocomplete": "^7.0.0-beta.0",
 		"@smui/button": "^7.0.0-beta.0",
 		"@smui/drawer": "^7.0.0-beta.0",
 		"@smui/icon-button": "^7.0.0-beta.0",
 		"@smui/list": "^7.0.0-beta.0",
+		"@smui/select": "^7.0.0-beta.0",
 		"@types/uuid": "^8.3.4"
 	}
 }
