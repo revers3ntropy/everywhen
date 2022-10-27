@@ -3,20 +3,25 @@
 </svelte:head>
 <script lang="ts">
     import type { PageData } from './$types';
-    import Send from 'svelte-material-icons/Send.svelte';
-    import Entry from "$lib/components/Entry.svelte";
-    import { api } from "$lib/api/apiQuery";
+    import type { Entry as EntryType } from '$lib/types';
+    import moment from "moment";
+    import Time from "svelte-time";
     import Geolocation from "svelte-geolocation";
-    import { browser } from "$app/environment";
+    import Send from 'svelte-material-icons/Send.svelte';
+    import EntryGroup from "$lib/components/EntryGroup.svelte";
     import PageCounter from '$lib/components/PageCounter.svelte';
+    import { api } from "$lib/api/apiQuery";
+    import { browser } from "$app/environment";
+    import { groupEntriesByDay } from "../api/entries/utils.client";
 
     export let data: PageData;
 
     // passed from 'load' (+page.server.ts);
-    let entries = [];
+    let entries: Record<number, EntryType[]> = {};
+    let entryCount = 0;
     let labels = [];
 
-    const PAGE_LENGTH = 2;
+    const PAGE_LENGTH = 4;
     let page = 0;
     let pages = 0;
 
@@ -36,12 +41,12 @@
             longitude: currentLocation[1]
         });
 
-        await reloadEntries();
+        await reloadEntries(page);
     }
 
-    async function reloadEntries (page_=page) {
+    async function reloadEntries (page) {
         const entriesOptions = {
-            page: page_,
+            page,
             pageSize: PAGE_LENGTH
         };
         if (search) {
@@ -50,8 +55,9 @@
 
         const entriesRes = await api.get(data.key,
             `/entries?${new URLSearchParams(entriesOptions).toString()}`);
-        entries = entriesRes.entries;
+        entries = groupEntriesByDay(entriesRes.entries);
         pages = entriesRes.totalPages;
+        entryCount = entriesRes.totalEntries;
 
         const labelsRes = await api.get(data.key, `/labels`);
         labels = labelsRes.labels;
@@ -88,11 +94,25 @@
     <section>
         <PageCounter pages={pages}
                      pageLength={PAGE_LENGTH}
-                     total={entries.length}
+                     total={entryCount}
                      bind:page
         />
-        {#each entries as entry}
-            <Entry {...entry} on:updated={reloadEntries} />
+        {#each Object.keys(entries).sort((a, b) => b - a) as day}
+            <EntryGroup entries={entries[day]}
+                        on:updated={() => reloadEntries(page)}
+            >
+                <div slot="title"
+                     class="entry-group-title">
+                    <h2>{moment(new Date(day * 1000)).format('dddd, MMMM Do YYYY')}</h2>
+                    {#if new Date() - new Date(day * 1000) < 86400000}
+                        <span>Today</span>
+                    {:else if new Date() - new Date(day * 1000) < 172800000}
+                        <span>Yesterday</span>
+                    {:else}
+                        <Time relative timestamp={new Date(day * 1000)} />
+                    {/if}
+                </div>
+            </EntryGroup>
         {/each}
     </section>
 </main>
@@ -131,5 +151,11 @@
         margin: 10px;
         padding: 10px;
         font-size: 20px
+    }
+
+    .entry-group-title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 </style>

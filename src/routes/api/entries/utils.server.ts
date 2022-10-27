@@ -1,6 +1,7 @@
 import { decrypt } from "$lib/security/encryption";
+import type { Entry } from '$lib/types';
 
-export function decryptEntry(entry: Record<string, any>, key: string): Record<string, any> {
+export function decryptEntry(entry: Entry, key: string): Entry {
     return {
         ...entry,
         entry: decrypt(entry.entry, key),
@@ -8,6 +9,6 @@ export function decryptEntry(entry: Record<string, any>, key: string): Record<st
     };
 }
 
-export function decryptEntries(entries: Record<string, any>[], key: string): Record<string, any>[] {
+export function decryptEntries(entries: Entry[], key: string): Entry[] {
     return entries.map((entry) => decryptEntry(entry, key));
 }

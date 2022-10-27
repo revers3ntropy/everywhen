@@ -4,7 +4,8 @@ import { generateUUId } from "$lib/security/uuid";
 import { error } from "@sveltejs/kit";
 import { decrypt, encrypt } from "$lib/security/encryption";
 import { getKeyFromRequest } from "$lib/security/getKeyFromRequest";
-import { decryptEntries } from "./helper";
+import { decryptEntries } from "./utils.server";
+import type { Entry } from "$lib/types";
 
 export const GET: RequestHandler = async ({ url, cookies }) => {
     const key = getKeyFromRequest(cookies);
@@ -61,13 +62,14 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
         LIKE ${search}
     `;
 
-    const plaintextEntries = decryptEntries(entries, key);
+    const plaintextEntries = decryptEntries(<Entry[]>entries, key);
 
     const response = {
         entries: plaintextEntries,
         page,
         pageSize,
-        totalPages: Math.ceil(numEntries[0].count / pageSize)
+        totalPages: Math.ceil(numEntries[0].count / pageSize),
+        totalEntries: numEntries[0].count
     };
 
     return new Response(

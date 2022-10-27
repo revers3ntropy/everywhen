@@ -3,6 +3,7 @@
     import { createEventDispatcher } from 'svelte';
     import { api } from "../api/apiQuery";
     import { getKey } from "../utils";
+    import moment from "moment";
     const dispatch = createEventDispatcher();
 
     export let id;
@@ -18,15 +19,11 @@
         await api.delete(getKey(), `/entries`, { id: id });
         dispatch('updated');
     }
-
-    let date: Date;
-    $: date = new Date(created * 1000);
 </script>
 <div class="entry">
     <div class="header">
         <div>
-            {date.getHours() % 12}:{date.getMinutes().toString().padStart(2, '0')}
-            {date.getHours() < 12 ? 'am' : 'pm'}
+            {moment(new Date(created * 1000)).format('h:mm A')}
             <span class="title">{title}</span>
         </div>
 
@@ -44,11 +41,11 @@
     @import '../../styles/variables.less';
 
     .entry {
-        padding: 1em;
+        padding: 1em 0;
         border-radius: 3px;
         margin: 1em 0;
         height: fit-content;
-        //border-bottom: 1px solid @border;
+        white-space: pre-wrap;
     }
 
     .header {
@@ -56,8 +53,8 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin: 0.5em;
-        padding: 0.5em;
+        margin: .5em 1em .5em 0;
+        padding: .3em;
     }
 
     .title {
