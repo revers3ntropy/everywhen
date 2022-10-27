@@ -35,7 +35,7 @@
                     </h2>
 
                     {#each titles[day] as entry}
-                        <p class="entry">
+                        <a class="entry" href="/diary/{entry.id}">
                             <span class="entry-time">
                                 {moment(new Date(entry.created * 1000)).format('h:mm A')}
                             </span>
@@ -44,7 +44,7 @@
                             {:else}
                                 <span class="entry-preview">{entry.entry}...</span>
                             {/if}
-                        </p>
+                        </a>
                     {/each}
                 </div>
             {/each}
@@ -74,8 +74,9 @@
     }
 
     .day {
-        padding: 0.3rem 0.8em 0.7em 0.2em;
+        margin: .6rem 0 .9em 0;
         border-bottom: 2px solid @border-heavy;
+
         &:last-child {
             border-bottom: none;
         }
@@ -86,7 +87,7 @@
         }
 
         h2 {
-            font-size: 1.1rem;
+            font-size: 1rem;
             padding: 0;
             margin: 0.5em 0 0.5em 2em;
         }
@@ -96,6 +97,16 @@
             grid-template-columns: 60px 1fr;
             padding: 2px 0;
             align-items: center;
+            color: @text-color;
+
+            &:after {
+                display: none;
+            }
+
+            &:hover {
+                background-color: @light-accent;
+            }
+
             .entry-time {
                 font-size: 0.7rem;
                 color: @text-color-light;

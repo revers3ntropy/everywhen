@@ -19,9 +19,19 @@ p {
 a {
     color: @text-color-accent;
     text-decoration: none;
+    cursor: pointer;
+
+    &:after {
+        content: '';
+        display: block;
+        width: 100%;
+        height: 2px;
+    }
 
     &:hover {
-        text-decoration: underline;
+        &:after {
+            background: @text-color-accent;
+        }
     }
 }
 

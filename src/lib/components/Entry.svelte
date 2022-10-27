@@ -33,7 +33,7 @@
 
         <div>
             <button on:click={del}>
-                <Bin />
+                <Bin size="25" />
             </button>
         </div>
     </div>
@@ -53,11 +53,11 @@
     }
 
     .header {
-        border-bottom: 1px solid @border-light;
+        border-bottom: 1px solid @border;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin: .5em 1em 0 0;
+        margin: .5em 2em 0 0;
         padding: .3em;
     }
 

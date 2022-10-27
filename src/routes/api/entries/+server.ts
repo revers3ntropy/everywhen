@@ -3,12 +3,12 @@ import { query } from '$lib/db/mysql';
 import { generateUUId } from "$lib/security/uuid";
 import { error } from "@sveltejs/kit";
 import { encrypt } from "$lib/security/encryption";
-import { getKeyFromRequest } from "$lib/security/getKeyFromRequest";
+import { getKeyFromCookie } from "../../../lib/security/getKeyFromCookie";
 import { addLabelsToEntries, decryptEntries } from "./utils.server";
 import type { RawEntry } from "$lib/types";
 
 export const GET: RequestHandler = async ({ url, cookies }) => {
-    const key = getKeyFromRequest(cookies);
+    const key = getKeyFromCookie(cookies);
 
     const pageSize = parseInt(url.searchParams.get('pageSize') || '50');
     const page = parseInt(url.searchParams.get('page') || '0');
@@ -62,7 +62,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 };
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
-    const key = getKeyFromRequest(cookies);
+    const key = getKeyFromCookie(cookies);
 
     const body = await request.json();
 
@@ -108,7 +108,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 };
 
 export const DELETE: RequestHandler = async ({ request, cookies }) => {
-    getKeyFromRequest(cookies);
+    getKeyFromCookie(cookies);
 
     const body = await request.json();
 

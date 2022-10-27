@@ -3,8 +3,8 @@ import { type Cookies, error } from "@sveltejs/kit";
 import { KEY_COOKIE_KEY } from "../constants";
 import { KEY_HASH } from '$env/static/private';
 
-export function getKeyFromRequest(request: Cookies): string {
-    const key = request.get(KEY_COOKIE_KEY);
+export function getKeyFromCookie(cookie: Cookies): string {
+    const key = cookie.get(KEY_COOKIE_KEY);
     if (!key || sha256(key) !== KEY_HASH) {
         throw error(401, `Invalid key`);
     }

@@ -14,6 +14,34 @@ export function decryptEntries(entries: Entry[], key: string): Entry[] {
     return entries.map((entry) => decryptEntry(entry, key));
 }
 
+export async function addLabelsToEntry (entry: RawEntry, key: string): Promise<Entry> {
+    const labels = await query`
+        SELECT
+            id,
+            name,
+            colour
+        FROM labels
+    `;
+
+    if (!entry.label) {
+        delete entry.label;
+        return entry as Entry;
+    }
+    const label = labels.find((label) => label.id === entry.label);
+    if (!label) {
+        delete entry.label;
+        return entry as Entry;
+    }
+    return {
+        ...entry,
+        label: {
+            id: entry.label,
+            name: decrypt(label.name, key),
+            colour: label.colour
+        }
+    } as Entry;
+}
+
 export async function addLabelsToEntries (entries: RawEntry[], key: string): Promise<Entry[]> {
     const labels = await query`
         SELECT

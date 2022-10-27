@@ -3,11 +3,11 @@ import { query } from '$lib/db/mysql';
 import { generateUUId } from "$lib/security/uuid";
 import { error } from "@sveltejs/kit";
 import { encrypt } from "$lib/security/encryption";
-import { getKeyFromRequest } from "$lib/security/getKeyFromRequest";
+import { getKeyFromCookie } from "../../../lib/security/getKeyFromCookie";
 import { decryptLabels } from "./utils.server";
 
 export const GET: RequestHandler = async ({ cookies }) => {
-    const key = getKeyFromRequest(cookies);
+    const key = getKeyFromCookie(cookies);
 
     const labels = await query`
         SELECT 
@@ -28,7 +28,7 @@ export const GET: RequestHandler = async ({ cookies }) => {
 };
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
-    const key = getKeyFromRequest(cookies);
+    const key = getKeyFromCookie(cookies);
 
     const body = await request.json();
 
