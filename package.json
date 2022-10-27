@@ -42,6 +42,7 @@
 		"svelte-material-icons": "^2.0.4",
 		"svelte-notifications": "^0.9.98",
 		"svelte-preprocess": "^4.10.7",
+		"svelte-simple-modal": "^1.4.1",
 		"svelte-time": "^0.7.1",
 		"ts-polyfill": "^3.8.2",
 		"tslib": "^2.3.1",
@@ -52,6 +53,7 @@
 	"devDependencies": {
 		"@smui-extra/autocomplete": "^7.0.0-beta.0",
 		"@smui/button": "^7.0.0-beta.0",
+		"@smui/dialog": "^7.0.0-beta.0",
 		"@smui/drawer": "^7.0.0-beta.0",
 		"@smui/icon-button": "^7.0.0-beta.0",
 		"@smui/list": "^7.0.0-beta.0",

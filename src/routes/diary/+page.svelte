@@ -5,7 +5,6 @@
     import type { Entry as EntryType } from '$lib/types';
     import moment from "moment";
     import Time from "svelte-time";
-
     import Sidebar from "./Sidebar.svelte";
     import EntryGroup from "$lib/components/EntryGroup.svelte";
     import PageCounter from '$lib/components/PageCounter.svelte';
@@ -19,7 +18,6 @@
     let entries: Record<number, EntryType[]> = {};
     let entryTitles: Record<number, EntryType[]> = {};
     let entryCount = 0;
-    let labels = [];
 
     const PAGE_LENGTH = 50;
     let page = 0;
@@ -56,11 +54,6 @@
                 entryCount = res.totalEntries;
             });
 
-        api.get(data.key, `/labels`)
-            .then(res => {
-                labels = res.labels;
-            });
-
         api.get(data.key, '/entries/titles')
             .then(res => {
                 entryTitles = groupEntriesByDay(res.entries);
@@ -71,10 +64,7 @@
 </script>
 <main>
     <section>
-        <EntryForm
-            labels={labels}
-            on:submit={submitEntry}
-        />
+        <EntryForm on:submit={submitEntry} />
     </section>
     <section>
         <div class="entries-menu">
