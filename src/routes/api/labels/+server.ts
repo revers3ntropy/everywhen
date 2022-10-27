@@ -4,7 +4,7 @@ import { generateUUId } from "$lib/security/uuid";
 import { error } from "@sveltejs/kit";
 import { encrypt } from "$lib/security/encryption";
 import { getKeyFromRequest } from "$lib/security/getKeyFromRequest";
-import { decryptLabels } from "./_helper";
+import { decryptLabels } from "./helper";
 
 export const GET: RequestHandler = async ({ cookies }) => {
     const key = getKeyFromRequest(cookies);

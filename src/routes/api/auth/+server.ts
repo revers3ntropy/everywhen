@@ -1,6 +1,6 @@
 import type { RequestHandler } from "@sveltejs/kit";
 import { KEY_HASH } from '$env/static/private';
-import { KEY_COOKIE_KEY } from "../../../lib/constants";
+import { KEY_COOKIE_KEY } from "$lib/constants";
 import { sha256 } from "js-sha256";
 
 export const GET: RequestHandler = async ({ url, cookies }) => {

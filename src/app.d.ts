@@ -19,4 +19,10 @@ declare module '$env/static/private' {
 	export const DB_PORT: string;
 	export const KEY_HASH: string;
 	export const INIT_VECTOR: string;
+	export const PUBLIC_SVELTEKIT_PORT: string;
+}
+
+interface String {
+	padStart(targetLength: number, padString: string): string;
+	padEnd(targetLength: number, padString: string): string;
 }

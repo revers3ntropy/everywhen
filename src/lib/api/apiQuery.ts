@@ -1,84 +1,51 @@
 import type { HttpMethod } from "@sveltejs/kit/types/private";
-import { browser } from "$app/environment";
+import { serialize } from "cookie";
+import { KEY_COOKIE_KEY } from "../constants";
+import { browser } from '$app/environment';
+import { PUBLIC_SVELTEKIT_PORT } from '$env/static/public';
 
-/*
-import { page } from '$app/stores';
+export async function makeApiReq (key: string, method: HttpMethod, path: string, body: any = null) {
 
-export async function ssApi (method: HttpMethod, path: string, body: any = null) {
-    return await new Promise((resolve) => {
-        const unsub = page.subscribe(async (page) => {
-
-            // extract protocol and host from page.url
-            path = `${page.url.href.split('/')[0]}//${page.url.host}/api${path}`;
-
-            const init: RequestInit = {
-                method,
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            };
-            if (body) {
-                init.body = JSON.stringify(body)
-            }
-
-            const response = await fetch(path, init).catch(e => {
-                console.error(path, init, e);
-            });
-
-            if (!response) {
-                console.error(`No response on path '${path}'`);
-                return;
-            }
-
-            if (response.ok) {
-                resolve(await response.json());
-            } else {
-                console.error('Error on server side api fetch', method,
-                    path + ':', response.status, await response.text());
-                resolve({
-                    status: response.status,
-                    statusText: response.statusText
-                });
-            }
-
-            unsub();
-        });
-    });
-}
-
- */
-
-export async function makeApiReq (method: HttpMethod, path: string, body: any = null) {
+    let url = `/api${path}`;
     if (!browser) {
-        return;
+        url = `http://localhost:${PUBLIC_SVELTEKIT_PORT}${url}`;
     }
-
-    path = `/api${path}`
 
     const init: RequestInit = {
         method,
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Cookie': serialize(KEY_COOKIE_KEY, key, {
+                path: '/',
+                maxAge: 60,
+                sameSite: 'strict',
+                httpOnly: true
+            })
         }
     };
     if (body) {
-        init.body = JSON.stringify(body)
+        init.body = JSON.stringify(body);
     }
 
-    const response = await fetch(path, init);
+    const response = await fetch(url, init);
 
     if (response.ok) {
         return await response.json();
     } else {
-        console.error('Error on client side api fetch', method, path,
-            'Gave erroneous response:', response);
+        console.error(`Error on api fetch (${browser ? 'client' : 'server'} side)`,
+            method, url, 'Gave erroneous response:', response);
         return response;
     }
 }
 
 export const api = {
-    get: async (path: string) => await makeApiReq('GET', path),
-    post: async (path: string, body: any) => await makeApiReq('POST', path, body),
-    put: async (path: string, body: any) => await makeApiReq('PUT', path, body),
-    delete: async (path: string, body: any) => await makeApiReq('DELETE', path, body)
+    get: async (key: string, path: string) =>
+        await makeApiReq(key, 'GET', path),
+    post: async (key: string, path: string, body: any) =>
+        await makeApiReq(key, 'POST', path, body),
+    put: async (key: string, path: string, body: any) =>
+        await makeApiReq(key, 'PUT', path, body),
+    delete: async (key: string, path: string, body: any) =>
+        await makeApiReq(key, 'DELETE', path, body)
 }

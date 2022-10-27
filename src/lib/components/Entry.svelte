@@ -2,6 +2,7 @@
     import Bin from 'svelte-material-icons/Delete.svelte';
     import { createEventDispatcher } from 'svelte';
     import { api } from "../api/apiQuery";
+    import { getKey } from "../utils";
     const dispatch = createEventDispatcher();
 
     export let id;
@@ -14,7 +15,7 @@
     export let deleted;
 
     async function del () {
-        await api.delete(`/entries`, { id: id });
+        await api.delete(getKey(), `/entries`, { id: id });
         dispatch('updated');
     }
 

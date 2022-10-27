@@ -6,13 +6,16 @@
     import { getNotificationsContext } from 'svelte-notifications';
     import ChevronRight from 'svelte-material-icons/ChevronRight.svelte';
     import { api } from "../lib/api/apiQuery";
+    import type { PageData } from './$types';
+
+    export let data: PageData;
 
     let password = '';
 
     const { addNotification } = getNotificationsContext();
 
     async function submit () {
-        if (await api.get('/auth?key=' + password)) {
+        if (await api.get(data.key, '/auth?key=' + password)) {
             window.location.href = '/home';
             return;
         }

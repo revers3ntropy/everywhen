@@ -1,4 +1,8 @@
+<svelte:head>
+    <title>New tab</title>
+</svelte:head>
 <script lang="ts">
+    import type { PageData } from './$types';
     import Send from 'svelte-material-icons/Send.svelte';
     import Entry from "$lib/components/Entry.svelte";
     import { api } from "$lib/api/apiQuery";
@@ -6,22 +10,25 @@
     import { browser } from "$app/environment";
     import PageCounter from '$lib/components/PageCounter.svelte';
 
+    export let data: PageData;
+
     // passed from 'load' (+page.server.ts);
-    export let data = { entries: [], totalPages: 0 };
-    let entries = data.entries || [];
+    let entries = [];
     let labels = [];
 
     const PAGE_LENGTH = 2;
     let page = 0;
-    let pages = data.totalPages || 0;
+    let pages = 0;
 
     let newEntryTitle = '';
     let newEntryBody = '';
     let newEntryLabel = '';
     let currentLocation = [];
 
+    let search = '';
+
     async function submitEntry () {
-        await api.post('/entries', {
+        await api.post(data.key, '/entries', {
             title: newEntryTitle,
             entry: newEntryBody,
             label: newEntryLabel,
@@ -33,13 +40,23 @@
     }
 
     async function reloadEntries (page_=page) {
-        if (!browser) return;
-        const response = await api.get(`/entries?pageSize=${PAGE_LENGTH}&page=${page_}`);
-        entries = response.entries;
-        pages = response.totalPages;
+        const entriesOptions = {
+            page: page_,
+            pageSize: PAGE_LENGTH
+        };
+        if (search) {
+            entriesOptions['search'] = search;
+        }
+
+        const entriesRes = await api.get(data.key,
+            `/entries?${new URLSearchParams(entriesOptions).toString()}`);
+        entries = entriesRes.entries;
+        pages = entriesRes.totalPages;
+
+        const labelsRes = await api.get(data.key, `/labels`);
+        labels = labelsRes.labels;
     }
 
-    // '$:' so that it is automatically called when 'page' changes
     $: reloadEntries(page);
 </script>
 <main>

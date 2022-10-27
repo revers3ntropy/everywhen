@@ -1,9 +1,4 @@
-process.on('SIGINT', function () {
-    process.exit();
-});
-
-process.on('SIGTERM', function () {
-    process.exit();
-});
+process.on('SIGINT', process.exit);
+process.on('SIGTERM', process.exit);
 
 export {};
