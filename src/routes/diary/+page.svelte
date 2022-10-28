@@ -25,15 +25,21 @@
 
     let search = '';
 
+    let clearEntryForm = () => {};
+
     async function submitEntry (event) {
         const { title, entry, label, location } = event.detail;
-        await api.post(data.key, '/entries', {
+        const res = await api.post(data.key, '/entries', {
             title,
             entry,
             label,
             latitude: location[0],
             longitude: location[1]
         });
+
+        if (res.id) {
+            clearEntryForm();
+        }
 
         await reloadEntries(page);
     }
@@ -64,7 +70,7 @@
 </script>
 <main>
     <section>
-        <EntryForm on:submit={submitEntry} />
+        <EntryForm on:submit={submitEntry} bind:reset={clearEntryForm}/>
     </section>
     <section>
         <div class="entries-menu">
