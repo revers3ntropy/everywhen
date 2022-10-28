@@ -12,7 +12,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 
     const pageSize = parseInt(url.searchParams.get('pageSize') || '50');
     const page = parseInt(url.searchParams.get('page') || '0');
-    const allowDeleted = (url.searchParams.get('deleted') || '0') === '1';
+    const deleted = url.searchParams.get('deleted') === '1';
     const search = (url.searchParams.get('search') || '').toLowerCase();
 
     if (page < 0) throw error(400, 'Invalid page number');
@@ -29,7 +29,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
             deleted,
             label
         FROM entries
-        WHERE (deleted = 0 OR ${allowDeleted})
+        WHERE deleted = ${deleted}
         ORDER BY created DESC, id
         LIMIT ${pageSize}
         OFFSET ${pageSize * page}
@@ -40,7 +40,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
     const numEntries = (await query`
         SELECT title, entry
         FROM entries
-        WHERE (deleted = 0 OR ${allowDeleted})
+        WHERE deleted = ${deleted}
     `).filter((entry) => !search ||
         // decrypt lazily for performance
            decrypt(entry.title, key).toLowerCase().includes(search)
@@ -131,20 +131,22 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 export const DELETE: RequestHandler = async ({ request, cookies }) => {
     getKeyFromCookie(cookies);
 
-    const body = await request.json();
+    const { id, restore } = await request.json();
 
-    if (typeof body.id !== 'string' || !body.id) {
+    if (typeof id !== 'string' || !id) {
         throw error(400, 'invalid id');
     }
 
+    const deleted = !restore;
+
     await query`
         UPDATE entries
-        SET deleted = 1
-        WHERE id = ${body.id}
+        SET deleted = ${deleted}
+        WHERE id = ${id}
    `;
 
     return new Response(
-        JSON.stringify({ id: body.id }),
+        JSON.stringify({ id }),
         { status: 200 }
     );
 };

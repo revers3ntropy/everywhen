@@ -21,7 +21,8 @@
         addNotification({
             text: 'Invalid Key',
             position: 'top-center',
-            type: 'error'
+            type: 'error',
+            removeAfter: 4000,
         });
     }
 </script>

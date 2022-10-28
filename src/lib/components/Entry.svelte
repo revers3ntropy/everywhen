@@ -1,11 +1,14 @@
 <script lang="ts">
     import Bin from 'svelte-material-icons/Delete.svelte';
+    import Restore from 'svelte-material-icons/DeleteRestore.svelte';
     import { createEventDispatcher } from 'svelte';
     import { api } from "../api/apiQuery";
-    import { getKey, obfuscate, randomString } from "../utils";
+    import { getKey, obfuscate } from "../utils";
     import moment from "moment";
     import Label from "./Label.svelte";
+    import { getNotificationsContext } from "svelte-notifications";
     const dispatch = createEventDispatcher();
+    const { addNotification } = getNotificationsContext();
 
     export let id = '';
     export let title = '';
@@ -25,8 +28,28 @@
     } : null;
 
     async function del () {
-        await api.delete(getKey(), `/entries`, { id: id });
-        dispatch('updated');
+        const res = await api.delete(getKey(), `/entries`, {
+            id,
+            restore: deleted
+        });
+
+        console.log(res);
+        if (res.id) {
+            addNotification({
+                removeAfter: 4000,
+                text: `Entry ${deleted ? 'restored' : 'deleted'}`,
+                type: 'success',
+                position: `top-center`
+            });
+            dispatch('updated');
+            return;
+        }
+
+        addNotification({
+            removeAfter: 4000,
+            text: `Error deleting entry ${res.body.message}`,
+            type: 'error'
+        });
     }
 
 </script>
@@ -38,17 +61,21 @@
             </span>
             <Label label={showLabel} />
         </div>
-        <div class="title">
+        <div class="title {obfuscated ? 'obfuscated' : ''}">
             {obfuscated ? obfuscate(title) : title}
         </div>
 
         <div>
             <button on:click={del}>
-                <Bin size="25" />
+                {#if deleted}
+                    <Restore size="25" />
+                {:else}
+                    <Bin size="25" />
+                {/if}
             </button>
         </div>
     </div>
-    <p class="body">
+    <p class="body {obfuscated ? 'obfuscated' : ''}">
         {@html obfuscated ? obfuscate(entry) : entry}
     </p>
 </div>
@@ -84,5 +111,6 @@
 
     .body {
         margin: 0 3em;
+        word-break: break-all;
     }
 </style>

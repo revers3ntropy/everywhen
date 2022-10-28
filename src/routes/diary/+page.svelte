@@ -12,7 +12,8 @@
     import { groupEntriesByDay } from "../api/entries/utils.client";
     import EntryForm from "./EntryForm.svelte";
     import { getNotificationsContext } from "svelte-notifications";
-    import { obfuscated } from "../../lib/constants.js";
+    import Bin from 'svelte-material-icons/Delete.svelte';
+    import { obfuscated } from "$lib/constants.js";
     const { addNotification } = getNotificationsContext();
 
     export let data: Record<string, any>;
@@ -70,7 +71,8 @@
                     addNotification({
                         text: `Cannot load entries: ${res.body.message}`,
                         position: 'top-center',
-                        type: 'error'
+                        type: 'error',
+                        removeAfter: 4000,
                     });
                     return;
                 }
@@ -86,7 +88,8 @@
                     addNotification({
                         text: `Cannot load entries: ${res.body.message}`,
                         position: 'top-center',
-                        type: 'error'
+                        type: 'error',
+                        removeAfter: 4000,
                     });
                     return;
                 }
@@ -105,12 +108,20 @@
     </section>
     <section>
         <div class="entries-menu">
-            <Sidebar titles={entryTitles} />
-            <PageCounter pages={pages}
-                         pageLength={PAGE_LENGTH}
-                         total={entryCount}
-                         bind:page
-            />
+            <div>
+                <Sidebar titles={entryTitles} />
+                <a class="primary" href="/deleted">
+                    <Bin size="30" /> Bin
+                </a>
+            </div>
+            <div>
+                <PageCounter pages={pages}
+                             pageLength={PAGE_LENGTH}
+                             total={entryCount}
+                             bind:page
+                />
+            </div>
+
             <div>
                 <input type="text"
                        bind:value={search}
@@ -156,5 +167,11 @@
         justify-content: space-between;
         align-items: center;
         margin: 30px;
+
+        div {
+            display: flex;
+            align-items: center;
+            justify-items: center;
+        }
     }
 </style>

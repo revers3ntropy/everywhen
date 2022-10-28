@@ -31,7 +31,8 @@
             addNotification({
                 text: `Error creating label: ${res.body.message}`,
                 position: 'top-center',
-                type: 'error'
+                type: 'error',
+                removeAfter: 6000
             });
             popup.set(null);
             return;
@@ -40,7 +41,8 @@
         addNotification({
             text: 'Label created',
             position: 'top-center',
-            type: 'success'
+            type: 'success',
+            removeAfter: 3000
         });
 
         dispatch('submit', {

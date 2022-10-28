@@ -30,6 +30,19 @@ input {
     text-decoration: none;
     outline: none;
     cursor: text;
+
+    &:hover {
+        border-bottom-color: @accent-color-primary;
+    }
+
+    &:focus {
+        color: @text-color;
+        border-bottom-color: @accent-color-secondary;
+    }
+
+    &[type=color] {
+        border: none;
+    }
 }
 
 :disabled {
@@ -51,6 +64,26 @@ select {
     }
 }
 
-select:focus {
-    border: 1px solid @text-color-accent;
+a {
+    &.primary {
+        border: 1px solid @border;
+        border-radius: 10px;
+        padding: 0.4em;
+        color: @text-color;
+
+        display: grid;
+        // assumed one svg icon and then text
+        grid-template-columns: 30px 1fr;
+        align-items: center;
+        justify-content: space-between;
+
+        &:after {
+            display: none;
+        }
+
+        &:hover {
+            background: @text-color-accent;
+            color: @text-color;
+        }
+    }
 }
