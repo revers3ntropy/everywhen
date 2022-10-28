@@ -2,7 +2,7 @@ import type { RequestHandler } from './$types';
 import { query } from '$lib/db/mysql';
 import { generateUUId } from "$lib/security/uuid";
 import { error } from "@sveltejs/kit";
-import { encrypt } from "$lib/security/encryption";
+import { decrypt, encrypt } from "$lib/security/encryption";
 import { getKeyFromCookie } from "../../../lib/security/getKeyFromCookie";
 import { addLabelsToEntries, decryptEntries } from "./utils.server";
 import type { RawEntry } from "$lib/types";
@@ -13,7 +13,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
     const pageSize = parseInt(url.searchParams.get('pageSize') || '50');
     const page = parseInt(url.searchParams.get('page') || '0');
     const allowDeleted = (url.searchParams.get('deleted') || '0') === '1';
-    const search = url.searchParams.get('search') || '%';
+    const search = (url.searchParams.get('search') || '').toLowerCase();
 
     if (page < 0) throw error(400, 'Invalid page number');
     if (pageSize < 0) throw error(400, 'Invalid page size');
@@ -30,7 +30,6 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
             label
         FROM entries
         WHERE (deleted = 0 OR ${allowDeleted})
-        LIKE ${search}
         ORDER BY created DESC, id
         LIMIT ${pageSize}
         OFFSET ${pageSize * page}
@@ -38,21 +37,28 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 
     const entries = await addLabelsToEntries(rawEntries, key);
 
-    const numEntries = await query`
-        SELECT COUNT(*) as count
+    const numEntries = (await query`
+        SELECT title, entry
         FROM entries
         WHERE (deleted = 0 OR ${allowDeleted})
-        LIKE ${search}
-    `;
+    `).filter((entry) => !search ||
+        // decrypt lazily for performance
+           decrypt(entry.title, key).toLowerCase().includes(search)
+        || decrypt(entry.entry, key).toLowerCase().includes(search)
+    ).length;
 
-    const plaintextEntries = decryptEntries(entries, key);
+    const plaintextEntries = decryptEntries(entries, key)
+        .filter((entry) => !search ||
+                entry.title.toLowerCase().includes(search)
+            || entry.entry.toLowerCase().includes(search)
+        );
 
     const response = {
         entries: plaintextEntries,
         page,
         pageSize,
-        totalPages: Math.ceil(numEntries[0].count / pageSize),
-        totalEntries: numEntries[0].count
+        totalPages: Math.ceil(numEntries / pageSize),
+        totalEntries: numEntries
     };
 
     return new Response(

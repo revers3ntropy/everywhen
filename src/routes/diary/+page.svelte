@@ -27,7 +27,7 @@
 
     let clearEntryForm = () => {};
 
-    async function submitEntry (event) {
+    async function submitEntry (event: CustomEvent) {
         const { title, entry, label, location } = event.detail;
         const res = await api.post(data.key, '/entries', {
             title,
@@ -41,10 +41,10 @@
             clearEntryForm();
         }
 
-        await reloadEntries(page);
+        await reloadEntries(page, search);
     }
 
-    async function reloadEntries (page) {
+    async function reloadEntries (page: number, search: string) {
         const entriesOptions = {
             page,
             pageSize: PAGE_LENGTH
@@ -66,7 +66,7 @@
             });
     }
 
-    $: reloadEntries(page);
+    $: reloadEntries(page, search);
 </script>
 <main>
     <section>
@@ -80,7 +80,12 @@
                          total={entryCount}
                          bind:page
             />
-            <div></div>
+            <div>
+                <input type="text"
+                       bind:value={search}
+                       placeholder="Search..."
+                />
+            </div>
         </div>
         {#each Object.keys(entries).sort((a, b) => b - a) as day}
             <EntryGroup entries={entries[day]}
