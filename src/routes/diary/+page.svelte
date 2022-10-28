@@ -11,6 +11,8 @@
     import { api } from "$lib/api/apiQuery";
     import { groupEntriesByDay } from "../api/entries/utils.client";
     import EntryForm from "./EntryForm.svelte";
+    import { getNotificationsContext } from "svelte-notifications";
+    const { addNotification } = getNotificationsContext();
 
     export let data: Record<string, any>;
 
@@ -39,6 +41,13 @@
 
         if (res.id) {
             clearEntryForm();
+        } else {
+            console.error(res);
+            addNotification({
+                text: `Cannot create entry: ${res.body.message}`,
+                position: 'top-center',
+                type: 'error'
+            });
         }
 
         await reloadEntries(page, search);
@@ -55,6 +64,15 @@
 
         api.get(data.key, `/entries?${new URLSearchParams(entriesOptions).toString()}`)
             .then(res => {
+                if (!res.entries || !res.totalPages || !res.totalEntries) {
+                    console.error(res);
+                    addNotification({
+                        text: `Cannot load entries: ${res.body.message}`,
+                        position: 'top-center',
+                        type: 'error'
+                    });
+                    return;
+                }
                 entries = groupEntriesByDay(res.entries);
                 pages = res.totalPages;
                 entryCount = res.totalEntries;
@@ -62,6 +80,15 @@
 
         api.get(data.key, '/entries/titles')
             .then(res => {
+                if (!res.entries) {
+                    console.error(res);
+                    addNotification({
+                        text: `Cannot load entries: ${res.body.message}`,
+                        position: 'top-center',
+                        type: 'error'
+                    });
+                    return;
+                }
                 entryTitles = groupEntriesByDay(res.entries);
             });
     }
@@ -70,7 +97,10 @@
 </script>
 <main>
     <section>
-        <EntryForm on:submit={submitEntry} bind:reset={clearEntryForm}/>
+        <EntryForm on:submit={submitEntry}
+                   bind:reset={clearEntryForm}
+                   key={data.key}
+        />
     </section>
     <section>
         <div class="entries-menu">

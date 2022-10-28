@@ -3,15 +3,14 @@
     <meta name="description" content="Joseph Coppin's site" />
 </svelte:head>
 <script lang="ts">
-    import { getNotificationsContext } from 'svelte-notifications';
     import ChevronRight from 'svelte-material-icons/ChevronRight.svelte';
     import { api } from "../lib/api/apiQuery";
+    import { getNotificationsContext } from "svelte-notifications";
+    const { addNotification } = getNotificationsContext();
 
     export let data: Record<string, any>;
 
     let password = '';
-
-    const { addNotification } = getNotificationsContext();
 
     async function submit () {
         if (await api.get(data.key, '/auth?key=' + password)) {
@@ -19,7 +18,6 @@
             return;
         }
 
-        console.error('Invalid key');
         addNotification({
             text: 'Invalid Key',
             position: 'top-center',

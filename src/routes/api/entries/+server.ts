@@ -16,7 +16,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
     const search = (url.searchParams.get('search') || '').toLowerCase();
 
     if (page < 0) throw error(400, 'Invalid page number');
-    if (pageSize < 0) throw error(400, 'Invalid page size');
+    if (!pageSize|| pageSize < 0) throw error(400, 'Invalid page size');
 
     const rawEntries = await query<RawEntry[]>`
         SELECT
@@ -82,17 +82,32 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
         throw error(400, 'longitude must be number');
     }
     if (body.title && typeof body.title !== 'string') {
-        throw error(400, 'invalid title');
+        throw error(400, 'Title must be a string');
     }
-    if (typeof body.entry !== 'string' || !body.entry) {
-        throw error(400, 'invalid entry');
+    if (!body.entry) {
+        throw error(400, 'Entry body required');
+    }
+    if (typeof body.entry !== 'string') {
+        throw error(400, 'Entry must be a string');
     }
     if (body.label && typeof body.label !== 'string') {
-        throw error(400, 'invalid label');
+        throw error(400, 'Invalid label');
     }
 
     const title = body.title ? encrypt(body.title, key) : '';
     const entry = encrypt(body.entry, key);
+
+    // check label exists
+    if (body.label) {
+        const label = await query`
+            SELECT id
+            FROM labels
+            WHERE id = ${body.label}
+        `;
+        if (!label.length) {
+            throw error(400, `Label doesn't exist`);
+        }
+    }
 
     await query`
         INSERT INTO entries VALUES (

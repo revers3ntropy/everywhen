@@ -38,7 +38,16 @@ export async function makeApiReq (key: string, method: HttpMethod, path: string,
         }
         console.error(`Error on api fetch (${browser ? 'client' : 'server'} side)`,
             method, url, 'Gave erroneous response:', response);
-        return response;
+
+        let body = await response.text();
+        try {
+            body = JSON.parse(body);
+        } catch (e) {}
+
+        return  {
+            ...response,
+            body
+        };
     }
 }
 

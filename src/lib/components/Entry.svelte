@@ -2,7 +2,7 @@
     import Bin from 'svelte-material-icons/Delete.svelte';
     import { createEventDispatcher } from 'svelte';
     import { api } from "../api/apiQuery";
-    import { getKey } from "../utils";
+    import { getKey, randomString } from "../utils";
     import moment from "moment";
     import Label from "./Label.svelte";
     const dispatch = createEventDispatcher();
@@ -16,10 +16,21 @@
     export let longitude;
     export let deleted;
 
+    export let obfuscated = false;
+
+    $: if (obfuscated) {
+        title = randomString(title.length);
+        entry = randomString(entry.length);
+        if (label) {
+            label.name = randomString(label.name.length);
+        }
+    }
+
     async function del () {
         await api.delete(getKey(), `/entries`, { id: id });
         dispatch('updated');
     }
+
 </script>
 <div class="entry">
     <div class="header">
@@ -28,9 +39,9 @@
                 {moment(new Date(created * 1000)).format('h:mm A')}
             </span>
             <Label {label} />
-            <span class="title">
-                {title}
-            </span>
+        </div>
+        <div class="title">
+            {title}
         </div>
 
         <div>
@@ -64,7 +75,6 @@
     }
 
     .title {
-        font-weight: bold;
         font-size: 1.2em;
     }
 
