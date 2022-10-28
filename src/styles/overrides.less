@@ -4,3 +4,29 @@
      background: @bg !important;
      border-radius: 10px;
  }
+
+.notification {
+    &.default-notification-style.default-notification-info {
+        background: @bg !important;
+        border-radius: 0 10px 10px 0;
+        border: 1px solid @border-heavy;
+        border-left: 5px solid @accent-color-secondary;
+
+        .notification-button.default-notification-style-button {
+            color: @text-color !important;
+            border-left: 1px solid @border-heavy;
+
+            &:hover {
+                background: @accent-color-primary !important;
+            }
+        }
+    }
+
+    &.default-notification-style.default-notification-error {
+        .notification-button.default-notification-style-button {
+            &:hover {
+                background: @accent-color-secondary !important;
+            }
+        }
+    }
+}

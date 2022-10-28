@@ -11,8 +11,8 @@
     import { api } from "$lib/api/apiQuery";
     import { groupEntriesByDay } from "../api/entries/utils.client";
     import EntryForm from "./EntryForm.svelte";
-    import { isObfuscated } from "$lib/constants";
     import { getNotificationsContext } from "svelte-notifications";
+    import { obfuscated } from "../../lib/constants.js";
     const { addNotification } = getNotificationsContext();
 
     export let data: Record<string, any>;
@@ -121,7 +121,7 @@
         {#each Object.keys(entries).sort((a, b) => b - a) as day}
             <EntryGroup entries={entries[day]}
                         on:updated={() => reloadEntries(page, search)}
-                        obfuscated={$isObfuscated}
+                        obfuscated={$obfuscated}
             >
                 <div slot="title"
                      class="entry-group-title">
@@ -131,7 +131,11 @@
                     {:else if new Date() - new Date(day * 1000) < 1.728e8}
                         <span>Yesterday</span>
                     {:else}
-                        <Time relative timestamp={new Date(day * 1000)} />
+                        <Time relative
+                              timestamp={new Date(
+                                  day * 1000 + (60 * 60 * 23 + 60 * 60 + 59) * 1000
+                              )}
+                        />
                     {/if}
                 </div>
             </EntryGroup>

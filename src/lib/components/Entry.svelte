@@ -40,7 +40,7 @@
             <span class="time">
                 {moment(new Date(created * 1000)).format('h:mm A')}
             </span>
-            <Label {showLabel} />
+            <Label label={showLabel} />
         </div>
         <div class="title">
             {showTitle}

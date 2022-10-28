@@ -7,7 +7,7 @@ export function getKey () {
     return parse(document.cookie)[KEY_COOKIE_KEY];
 }
 
-const chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ ';
+const chars = '0123456789abcdefghijklmnopqrstuvwxyz ';
 export function randomString (length: number, alphabet=chars): string {
     let result = '';
     for (let i = length; i > 0; --i) {
