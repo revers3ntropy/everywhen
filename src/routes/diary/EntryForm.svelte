@@ -15,9 +15,10 @@
 
     let newEntryTitle = (browser && localStorage.getItem('__misc_3_newEntryTitle')) || '';
     let newEntryBody = (browser && localStorage.getItem('__misc_3_newEntryBody')) || '';
-    let newEntryLabel = '';
+    let newEntryLabel = (browser && localStorage.getItem('__misc_3_newEntryLabel')) || '';
     $: browser && localStorage.setItem('__misc_3_newEntryTitle', newEntryTitle);
     $: browser && localStorage.setItem('__misc_3_newEntryBody', newEntryBody);
+    $: browser && localStorage.setItem('__misc_3_newEntryLabel', newEntryLabel);
 
     export let key: string;
     let currentLocation = [];
@@ -142,10 +143,14 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            padding: 0 0.3em;
+            aspect-ratio: 1/1;
+            border: 1px solid transparent;
 
             &:hover {
                 background: @bg;
-                border-radius: 0 10px 10px 0;
+                border-radius: 10px;
+                border: 1px solid @border;
             }
         }
     }

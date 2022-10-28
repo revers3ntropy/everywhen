@@ -4,6 +4,7 @@
     import { api } from "../api/apiQuery";
     import { getKey } from "../utils";
     import moment from "moment";
+    import Label from "./Label.svelte";
     const dispatch = createEventDispatcher();
 
     export let id;
@@ -26,6 +27,7 @@
             <span class="time">
                 {moment(new Date(created * 1000)).format('h:mm A')}
             </span>
+            <Label {label} />
             <span class="title">
                 {title}
             </span>
@@ -63,7 +65,6 @@
 
     .title {
         font-weight: bold;
-        margin-left: 2em;
         font-size: 1.2em;
     }
 
