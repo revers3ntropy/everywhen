@@ -20,13 +20,9 @@
 
     // show random string instead of text content if obfuscated
     let showLabel: Label | null;
-    let showTitle: string;
-    let showEntry: string;
     $: showLabel = label ? {
         ...label, name: obfuscated ? obfuscate(label.name) : label.name
     } : null;
-    $: showTitle = obfuscated ? obfuscate(title) : title;
-    $: showEntry = obfuscated ? obfuscate(entry) : entry;
 
     async function del () {
         await api.delete(getKey(), `/entries`, { id: id });
@@ -43,7 +39,7 @@
             <Label label={showLabel} />
         </div>
         <div class="title">
-            {showTitle}
+            {obfuscated ? obfuscate(title) : title}
         </div>
 
         <div>
@@ -53,7 +49,7 @@
         </div>
     </div>
     <p class="body">
-        {@html showEntry}
+        {@html obfuscated ? obfuscate(entry) : entry}
     </p>
 </div>
 <style lang="less">

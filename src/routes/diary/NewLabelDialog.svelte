@@ -1,7 +1,10 @@
 <script lang="ts">
     import { getNotificationsContext } from 'svelte-notifications';
     import { api } from "$lib/api/apiQuery";
+    import { popup } from "../../lib/constants";
+    import { createEventDispatcher } from "svelte";
 
+    const dispatch = createEventDispatcher();
     const { addNotification } = getNotificationsContext();
 
     let labelName = '';
@@ -26,14 +29,27 @@
 
         if (!res.id) {
             addNotification({
-                text: 'Error creating label: ' + res.toString(),
+                text: `Error creating label: ${res.body.message}`,
                 position: 'top-center',
                 type: 'error'
             });
+            popup.set(null);
             return;
         }
 
-        console.log(res);
+        addNotification({
+            text: 'Label created',
+            position: 'top-center',
+            type: 'success'
+        });
+
+        dispatch('submit', {
+            id: res.id,
+            name: labelName,
+            colour: labelColour
+        });
+
+        popup.set(null);
     }
 </script>
 <div>

@@ -7,9 +7,9 @@
     import type { Label } from "$lib/types";
     import NewLabelDialog from "./NewLabelDialog.svelte";
     import { api } from "$lib/api/apiQuery";
-    import { writable } from 'svelte/store';
-    import Modal, { bind } from 'svelte-simple-modal';
     import { onMount } from 'svelte';
+    import { popup } from "../../lib/constants";
+    import { bind } from "svelte-simple-modal";
 
     const dispatch = createEventDispatcher();
 
@@ -45,9 +45,23 @@
         });
     }
 
-    const newLabelPopup = writable<any>(null);
     function showNewLabelPopup () {
-        newLabelPopup.set(bind(NewLabelDialog, { key }));
+        const el = bind(NewLabelDialog, { key });
+        popup.set(el);
+
+        // not a very nice solution but I can't think of any other way
+        // without creating a custom popup component which would just
+        // be a pain
+        const unsubscribe = popup.subscribe(async (value) => {
+            if (value === el) return;
+
+            const res = await api.get(key, `/labels`);
+            labels = res.labels;
+            newEntryLabel = labels
+                .sort((a, b) => b.created - a.created)
+                [0].id;
+            unsubscribe();
+        });
     }
 
 </script>
@@ -66,11 +80,6 @@
             {/if}
         </Geolocation>
     {/if}
-
-    <Modal show={$newLabelPopup}
-           classContent="popup-background"
-           classWindow="popup-background"
-    />
 
     <div class="head">
         <input placeholder="Title" class=title bind:value={newEntryTitle} />
@@ -92,7 +101,10 @@
             <Send size="30" />
         </button>
     </div>
-    <textarea placeholder="Entry" class=entry bind:value={newEntryBody}></textarea>
+    <textarea placeholder="Entry"
+              class=entry
+              bind:value={newEntryBody}
+    ></textarea>
 </div>
 <style lang="less">
     @import '../../styles/variables.less';

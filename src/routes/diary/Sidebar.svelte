@@ -6,6 +6,7 @@
     import type { Entry } from "$lib/types";
 
     export let titles: Record<number, Entry[]>;
+    export let obfuscated = true;
 
     let showing = false;
 </script>
@@ -22,7 +23,7 @@
             </button>
         </div>
         <div class="content">
-            {#each Object.keys(titles) as day}
+            {#each Object.keys(titles).sort((a, b) => b - a) as day}
                 <div class="day">
                     <h2>
                         {#if new Date() - new Date(day * 1000) < 8.64e7}
@@ -39,6 +40,10 @@
                             <span class="entry-time">
                                 {moment(new Date(entry.created * 1000)).format('h:mm A')}
                             </span>
+                            <span class="entry-label-colour"
+                                  style="background: {entry.label?.colour || 'transparent'}"
+                            ></span>
+
                             {#if entry.title}
                                 {entry.title}
                             {:else}
@@ -94,7 +99,7 @@
 
         .entry {
             display: grid;
-            grid-template-columns: 60px 1fr;
+            grid-template-columns: 65px 18px 1fr;
             padding: 2px 0;
             align-items: center;
             color: @text-color;
@@ -116,6 +121,13 @@
 
             .entry-preview {
                 color: @text-color-light;
+            }
+
+            .entry-label-colour {
+                display: inline-block;
+                height: 10px;
+                width: 10px;
+                border-radius: 50%;
             }
         }
     }

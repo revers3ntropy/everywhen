@@ -11,6 +11,8 @@
 	import { INACTIVE_TIMEOUT_MS, obfuscated } from "$lib/constants";
 	import { page } from "$app/stores";
 	import Notifier from "./Notifier.svelte";
+	import Modal from 'svelte-simple-modal';
+	import { popup } from "../lib/constants.js";
 
 	const home = $page.url.pathname.trim() === '/';
 
@@ -57,6 +59,10 @@
 	{/if}
 
 	<slot />
+	<Modal show={$popup}
+		   classContent="popup-background"
+		   classWindow="popup-background"
+	/>
 
 	{#if !home}
 		<footer>

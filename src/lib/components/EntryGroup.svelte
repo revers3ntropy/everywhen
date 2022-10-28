@@ -1,8 +1,6 @@
 <script lang="ts">
     import type { Entry as EntryType } from "$lib/types";
     import Entry from '$lib/components/Entry.svelte';
-    import { createEventDispatcher } from 'svelte';
-    const dispatch = createEventDispatcher();
 
     export let obfuscated = true;
     export let entries: Array<EntryType>;
@@ -15,7 +13,7 @@
     <div class="contents">
         {#each entries as entry}
             <Entry {...entry}
-                   on:updated={dispatch('updated')}
+                   on:updated
                    {obfuscated}
             />
         {/each}

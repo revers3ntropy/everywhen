@@ -113,9 +113,9 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
         INSERT INTO entries VALUES (
                                     ${id},
                                     ${time},
-                                    ${body.latitude},
-                                    ${body.longitude},
-                                    ${title},
+                                    ${body.latitude || null},
+                                    ${body.longitude || null},
+                                    ${title || null},
                                     ${entry},
                                     0,
                                     ${body.label || null}

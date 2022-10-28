@@ -2,6 +2,7 @@ export interface Label {
     id: string;
     colour: string;
     name: string;
+    created: number;
 }
 
 export interface Entry {

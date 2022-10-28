@@ -44,6 +44,16 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 
     const name = encrypt(body.name, key);
 
+    // check name doesn't already exist
+    const label = await query`
+        SELECT id
+        FROM labels
+        WHERE name = ${name}
+    `;
+    if (label.length) {
+        throw error(400, 'Label with that name already exists');
+    }
+
     await query`
         INSERT INTO labels VALUES (
                                    ${id},

@@ -6,6 +6,3 @@
 <main>
     <Entry {...data} />
 </main>
-<style>
-
-</style>

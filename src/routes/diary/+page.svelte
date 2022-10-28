@@ -120,7 +120,7 @@
         </div>
         {#each Object.keys(entries).sort((a, b) => b - a) as day}
             <EntryGroup entries={entries[day]}
-                        on:updated={() => reloadEntries(page, search)}
+                        on:updated={() => { reloadEntries(page, search) }}
                         obfuscated={$obfuscated}
             >
                 <div slot="title"
