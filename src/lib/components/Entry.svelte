@@ -33,7 +33,6 @@
             restore: deleted
         });
 
-        console.log(res);
         if (res.id) {
             addNotification({
                 removeAfter: 4000,

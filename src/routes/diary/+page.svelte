@@ -173,5 +173,9 @@
             align-items: center;
             justify-items: center;
         }
+
+        a.primary {
+            margin: 0 1em;
+        }
     }
 </style>
