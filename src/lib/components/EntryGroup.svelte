@@ -4,6 +4,7 @@
     import { createEventDispatcher } from 'svelte';
     const dispatch = createEventDispatcher();
 
+    export let obfuscated = true;
     export let entries: Array<EntryType>;
 
 </script>
@@ -13,7 +14,10 @@
     </div>
     <div class="contents">
         {#each entries as entry}
-            <Entry {...entry} on:updated={dispatch('updated')}/>
+            <Entry {...entry}
+                   on:updated={dispatch('updated')}
+                   {obfuscated}
+            />
         {/each}
     </div>
 </div>

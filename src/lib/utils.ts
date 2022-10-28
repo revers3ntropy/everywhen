@@ -15,3 +15,10 @@ export function randomString (length: number, alphabet=chars): string {
     }
     return result;
 }
+
+export function obfuscate (str: string, alphabet=chars): string {
+    return str.replace(/./g,  (char) => {
+        if (char === '\n') return char;
+        return alphabet[Math.floor(Math.random() * alphabet.length)];
+    });
+}

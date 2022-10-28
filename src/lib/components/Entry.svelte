@@ -2,29 +2,31 @@
     import Bin from 'svelte-material-icons/Delete.svelte';
     import { createEventDispatcher } from 'svelte';
     import { api } from "../api/apiQuery";
-    import { getKey, randomString } from "../utils";
+    import { getKey, obfuscate, randomString } from "../utils";
     import moment from "moment";
     import Label from "./Label.svelte";
     const dispatch = createEventDispatcher();
 
-    export let id;
-    export let title;
-    export let entry;
+    export let id = '';
+    export let title = '';
+    export let entry = '';
     export let created = 0;
-    export let label = null;
-    export let latitude;
-    export let longitude;
-    export let deleted;
+    export let label: Label | null = null;
+    export let latitude: number | null = null;
+    export let longitude: number | null = null;
+    export let deleted = false;
 
-    export let obfuscated = false;
+    export let obfuscated = true;
 
-    $: if (obfuscated) {
-        title = randomString(title.length);
-        entry = randomString(entry.length);
-        if (label) {
-            label.name = randomString(label.name.length);
-        }
-    }
+    // show random string instead of text content if obfuscated
+    let showLabel: Label | null;
+    let showTitle: string;
+    let showEntry: string;
+    $: showLabel = label ? {
+        ...label, name: obfuscated ? obfuscate(label.name) : label.name
+    } : null;
+    $: showTitle = obfuscated ? obfuscate(title) : title;
+    $: showEntry = obfuscated ? obfuscate(entry) : entry;
 
     async function del () {
         await api.delete(getKey(), `/entries`, { id: id });
@@ -38,10 +40,10 @@
             <span class="time">
                 {moment(new Date(created * 1000)).format('h:mm A')}
             </span>
-            <Label {label} />
+            <Label {showLabel} />
         </div>
         <div class="title">
-            {title}
+            {showTitle}
         </div>
 
         <div>
@@ -51,7 +53,7 @@
         </div>
     </div>
     <p class="body">
-        {@html entry}
+        {@html showEntry}
     </p>
 </div>
 <style lang="less">
