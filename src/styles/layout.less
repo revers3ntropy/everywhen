@@ -1,36 +1,37 @@
 @import 'variables.less';
 
-#svelte, body {
-    height: fit-content;
-    min-height: 100vh;
-    margin: 0;
-    padding: 0;
-    background: @bg;
+#svelte,
+body {
+	height: fit-content;
+	min-height: 100vh;
+	margin: 0;
+	padding: 0;
+	background: @bg;
 }
 
 main:extend(#svelte) {
-    padding: 30px 0;
+	padding: 30px 0;
 }
 
 .flex-center {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
 }
 
 .page-center {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 50%;
-    margin: 0;
-    padding: 0;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 50%;
+	margin: 0;
+	padding: 0;
 }
 
 .container {
-    margin: 1em;
-    padding: 0.3em 0;
-    border: 1px solid @border;
-    border-radius: 10px;
+	margin: 1em;
+	padding: 0.3em 0;
+	border: 1px solid @border;
+	border-radius: 10px;
 }

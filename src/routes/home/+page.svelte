@@ -1,5 +1,3 @@
 <main>
-    <a href="/diary">
-        Diary
-    </a>
+	<a href="/diary"> Diary </a>
 </main>

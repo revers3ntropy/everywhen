@@ -17,8 +17,10 @@ declare module '$env/static/private' {
 	export const DB_PASS: string;
 	export const DB: string;
 	export const DB_PORT: string;
-	export const KEY_HASH: string;
 	export const INIT_VECTOR: string;
+}
+
+declare module '$env/static/public' {
 	export const PUBLIC_SVELTEKIT_PORT: string;
 }
 

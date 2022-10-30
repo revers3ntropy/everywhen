@@ -10,14 +10,17 @@ SET time_zone = "+00:00";
 
 -- --- Tables ---
 
-CREATE TABLE `ids` (
-    `id` varchar(128) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL,
+  `username` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `salt` varchar(255) NOT NULL,
+  `created` int(64) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `entries` (
     `id` varchar(128) NOT NULL,
+    `user` varchar(128) NOT NULL,
     `created` int(64) NOT NULL,
     `latitude` int(64) DEFAULT NULL,
     `longitude` int(64) DEFAULT NULL,
@@ -31,6 +34,7 @@ CREATE TABLE `entries` (
 
 CREATE TABLE `events` (
     `id` varchar(128) NOT NULL,
+    `user` varchar(128) NOT NULL,
     `name` varchar(256) NOT NULL,
     `start` int(64) NOT NULL,
     `end` int(64) NOT NULL,
@@ -41,12 +45,17 @@ CREATE TABLE `events` (
 
 CREATE TABLE `labels` (
     `id` varchar(128) NOT NULL,
+    `user` varchar(128) NOT NULL,
     `name` varchar(256) NOT NULL,
     `colour` varchar(64) NOT NULL,
     `created` int(64) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
+
+CREATE TABLE `ids` (
+    `id` varchar(128) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --- Indexes ---
 ALTER TABLE `entries`ADD PRIMARY KEY (`id`);

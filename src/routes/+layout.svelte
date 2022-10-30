@@ -1,18 +1,13 @@
-<svelte:window
-	on:keydown|nonpassive={keydown}
-	on:mousemove|passive={activity}
-	on:scrol|passive={activity}
-/>
 <script lang="ts">
 	import 'ts-polyfill';
 	import '../app.less';
 	import Header from '$lib/components/Header.svelte';
 	import Notifications from 'svelte-notifications';
-	import { INACTIVE_TIMEOUT_MS, obfuscated } from "$lib/constants";
-	import { page } from "$app/stores";
-	import Notifier from "./Notifier.svelte";
+	import { INACTIVE_TIMEOUT_MS, obfuscated } from '$lib/constants';
+	import { page } from '$app/stores';
+	import Notifier from './Notifier.svelte';
 	import Modal from 'svelte-simple-modal';
-	import { popup } from "../lib/constants.js";
+	import { popup } from '../lib/constants.js';
 
 	const home = $page.url.pathname.trim() === '/';
 
@@ -29,13 +24,13 @@
 			addNotification?.({
 				text: 'Hidden due to inactivity',
 				type: 'info',
-				removeAfter: 50000,
+				removeAfter: 50000
 			});
 			isObfuscated = true;
 		}
 	}, 1000);
 
-	function activity () {
+	function activity() {
 		lastActivity = Date.now();
 	}
 
@@ -48,10 +43,14 @@
 			}
 		}
 	}
-
 </script>
-<Notifications>
 
+<svelte:window
+	on:keydown|nonpassive={keydown}
+	on:mousemove|passive={activity}
+	on:scrol|passive={activity}
+/>
+<Notifications>
 	<Notifier bind:addNotification />
 
 	{#if !home}
@@ -59,14 +58,9 @@
 	{/if}
 
 	<slot />
-	<Modal show={$popup}
-		   classContent="popup-background"
-		   classWindow="popup-background"
-	/>
+	<Modal show={$popup} classContent="popup-background" classWindow="popup-background" />
 
 	{#if !home}
-		<footer>
-
-		</footer>
+		<footer />
 	{/if}
 </Notifications>
