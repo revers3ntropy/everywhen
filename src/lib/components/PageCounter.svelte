@@ -6,26 +6,35 @@
 	export let pages = 0;
 	export let pageLength = 0;
 	export let total = 0;
+	export let emptyText = 'No data';
 </script>
 
-<div class="page-counter">
-	<div>
-		<button on:click={() => page--} disabled={page <= 0} class="flex-center">
-			<ArrowLeft size="20" />
-		</button>
+{#if total < 1}
+	{emptyText}
+{:else}
+	<div class="page-counter">
+		<div>
+			<button on:click={() => page--} disabled={page <= 0} class="flex-center">
+				<ArrowLeft size="20" />
+			</button>
+		</div>
+		<div>
+			Page {page + 1} of {pages}
+			<span class="totals">
+				({Math.min((page + 1) * pageLength, total)} / {total})
+			</span>
+		</div>
+		<div>
+			<button
+				on:click={() => page++}
+				disabled={page >= pages - 1}
+				class="flex-center"
+			>
+				<ArrowRight size="20" />
+			</button>
+		</div>
 	</div>
-	<div>
-		Page {page + 1} of {pages}
-		<span class="totals">
-			({Math.min((page + 1) * pageLength, total)} / {total})
-		</span>
-	</div>
-	<div>
-		<button on:click={() => page++} disabled={page >= pages - 1} class="flex-center">
-			<ArrowRight size="20" />
-		</button>
-	</div>
-</div>
+{/if}
 
 <style lang="less">
 	@import '../../styles/variables.less';

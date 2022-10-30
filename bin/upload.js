@@ -17,9 +17,9 @@ export const flags = commandLineArgs([
 $.verbose = flags.verbose;
 
 async function uploadPath(localPath, remotePath, args = '') {
-	return await $`sshpass -f '${process.env.SSH_PASS_FILE}' rsync ${args.split(' ')} ${localPath} ${
-		process.env.REMOTE_ADDRESS
-	}:${remotePath}`;
+	return await $`sshpass -f '${process.env.SSH_PASS_FILE}' rsync ${args.split(
+		' '
+	)} ${localPath} ${process.env.REMOTE_ADDRESS}:${remotePath}`;
 }
 
 async function upload() {

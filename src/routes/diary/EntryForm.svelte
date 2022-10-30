@@ -13,9 +13,12 @@
 
 	const dispatch = createEventDispatcher();
 
-	let newEntryTitle = (browser && localStorage.getItem('__misc_3_newEntryTitle')) || '';
-	let newEntryBody = (browser && localStorage.getItem('__misc_3_newEntryBody')) || '';
-	let newEntryLabel = (browser && localStorage.getItem('__misc_3_newEntryLabel')) || '';
+	let newEntryTitle =
+		(browser && localStorage.getItem('__misc_3_newEntryTitle')) || '';
+	let newEntryBody =
+		(browser && localStorage.getItem('__misc_3_newEntryBody')) || '';
+	let newEntryLabel =
+		(browser && localStorage.getItem('__misc_3_newEntryLabel')) || '';
 	$: browser && localStorage.setItem('__misc_3_newEntryTitle', newEntryTitle);
 	$: browser && localStorage.setItem('__misc_3_newEntryBody', newEntryBody);
 	$: browser && localStorage.setItem('__misc_3_newEntryLabel', newEntryLabel);
@@ -65,11 +68,17 @@
 
 <div class="container">
 	{#if browser}
-		<Geolocation getPosition="true" let:error let:notSupported bind:coords={currentLocation}>
+		<Geolocation
+			getPosition="true"
+			let:error
+			let:notSupported
+			bind:coords={currentLocation}
+		>
 			{#if notSupported}
 				This browser does not support the Geolocation API.
 			{:else if error}
-				An error occurred fetching geolocation data: {error.code} {error.message}
+				An error occurred fetching geolocation data: {error.code}
+				{error.message}
 			{/if}
 		</Geolocation>
 	{/if}

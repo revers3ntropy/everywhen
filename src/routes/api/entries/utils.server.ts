@@ -14,7 +14,10 @@ export function decryptEntries(entries: Entry[], key: string): Entry[] {
 	return entries.map((entry) => decryptEntry(entry, key));
 }
 
-export async function addLabelsToEntry(entry: RawEntry, key: string): Promise<Entry> {
+export async function addLabelsToEntry(
+	entry: RawEntry,
+	key: string
+): Promise<Entry> {
 	const labels = await query`
         SELECT
             id,
@@ -42,7 +45,10 @@ export async function addLabelsToEntry(entry: RawEntry, key: string): Promise<En
 	} as Entry;
 }
 
-export async function addLabelsToEntries(entries: RawEntry[], key: string): Promise<Entry[]> {
+export async function addLabelsToEntries(
+	entries: RawEntry[],
+	key: string
+): Promise<Entry[]> {
 	const labels = await query`
         SELECT
             id,

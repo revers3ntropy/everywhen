@@ -1,0 +1,17 @@
+#!/bin/bash
+
+start=`date +%s`
+
+mysql -u root << eof
+    DROP DATABASE IF EXISTS misc_3_dev;
+    CREATE DATABASE misc_3_dev
+eof
+
+mysql -u root misc_3_dev < ./schema.sql
+
+
+end=$(date +%s)
+
+runtime=$( echo "$end - $start" | bc -l )
+
+echo "Migrated DB '$1' destructively in: $runtime s"

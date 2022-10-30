@@ -1,26 +1,34 @@
 import 'ts-polyfill';
 import type { LayoutServerLoad } from './$types';
-import { KEY_COOKIE_KEY } from '../lib/constants';
-import { sha256 } from 'js-sha256';
-import { KEY_HASH } from '$env/static/private';
+import { KEY_COOKIE_KEY, USERNAME_COOKIE_KEY } from '$lib/constants';
 import { redirect } from '@sveltejs/kit';
+import { query } from '$lib/db/mysql';
 
 export const prerender = true;
 
 export const load: LayoutServerLoad = async ({ cookies, url }) => {
-	const key = cookies.get(KEY_COOKIE_KEY);
 	const home = url.pathname.trim() === '/';
 
-	if (!key || sha256(key) !== KEY_HASH) {
-		if (!home) {
-			throw redirect(307, '/');
+	const key = cookies.get(KEY_COOKIE_KEY);
+	const username = cookies.get(USERNAME_COOKIE_KEY);
+
+	if (key && username) {
+		const res = await query`
+			SELECT * 
+			FROM users 
+			WHERE username = ${username}
+			  AND password = SHA2(CONCAT(${key}, salt), 256)
+		`;
+		if (res.length !== 0) {
+			if (home) {
+				throw redirect(307, '/home');
+			}
+
+			return { key, username };
 		}
-		return { key: '' };
 	}
 
-	if (home) {
-		throw redirect(307, '/home');
+	if (!home) {
+		throw redirect(307, '/');
 	}
-
-	return { key };
 };

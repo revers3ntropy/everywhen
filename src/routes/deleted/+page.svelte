@@ -19,19 +19,23 @@
 			search,
 			deleted: 1
 		};
-		api.get(data.key, `/entries?${new URLSearchParams(entriesOptions).toString()}`).then((res) => {
-			if (!res.entries) {
-				console.error(res);
-				addNotification({
-					text: `Cannot load entries: ${res.body.message}`,
-					position: 'top-center',
-					type: 'error',
-					removeAfter: 4000
-				});
-				return;
-			}
-			entries = res.entries;
-		});
+		api.get(
+				data.key,
+				`/entries?${new URLSearchParams(entriesOptions).toString()}`
+			)
+			.then((res) => {
+				if (!res.entries) {
+					console.error(res);
+					addNotification({
+						text: `Cannot load entries: ${res.body.message}`,
+						position: 'top-center',
+						type: 'error',
+						removeAfter: 4000
+					});
+					return;
+				}
+				entries = res.entries;
+			});
 	}
 
 	reload();

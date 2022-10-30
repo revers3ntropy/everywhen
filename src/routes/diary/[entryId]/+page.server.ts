@@ -6,22 +6,24 @@ import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
 import type { RawEntry } from '../../../lib/types';
 
 export const load: PageServerLoad = async ({ params, cookies }) => {
-	const key = getAuthFromCookies(cookies);
+	const { key, id: userId } = await getAuthFromCookies(cookies);
 	const id = params.entryId;
 	if (!id) throw error(404, 'Not found');
 
 	const entry = await query`
         SELECT
-            id,
-            title,
-            entry,
-            label,
-            longitude,
-            latitude,
-            created,
-            deleted
-        FROM entries
-        WHERE id = ${id}
+            entries.id,
+            entries.title,
+            entries.entry,
+            entries.label,
+            entries.longitude,
+            entries.latitude,
+            entries.created,
+            entries.deleted
+        FROM entries, users
+        WHERE entries.id = ${id}
+			AND entries.user = users.id
+			AND users.id = ${userId}
     `;
 
 	if (!entry.length) throw error(404, 'Not found');

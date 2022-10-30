@@ -6,19 +6,43 @@ const ALGORITHM = 'aes-256-cbc';
 export function encrypt(plainText: string, key: string): string {
 	if (!plainText) return '';
 
-	const cipher = createCipheriv(ALGORITHM, key, INIT_VECTOR);
+	let encryptedData = '';
 
-	let encryptedData = cipher.update(plainText, 'utf-8', 'hex');
-	encryptedData += cipher.final('hex');
+	try {
+		const cipher = createCipheriv(ALGORITHM, key, INIT_VECTOR);
+
+		encryptedData = cipher.update(plainText, 'utf-8', 'hex');
+		encryptedData += cipher.final('hex');
+	} catch (e) {
+		console.error(
+			'Error encrypting ',
+			typeof plainText,
+			'of length',
+			plainText.length,
+			'with key',
+			key,
+			':',
+			e
+		);
+		return '';
+	}
 	return encryptedData;
 }
 
 export function decrypt(cypherText: string, key: string): string {
 	if (!cypherText) return '';
 
-	const decipher = createDecipheriv(ALGORITHM, key, INIT_VECTOR);
+	let decryptedData = '';
 
-	let decryptedData = decipher.update(cypherText, 'hex', 'utf-8');
-	decryptedData += decipher.final('utf8');
+	try {
+		const decipher = createDecipheriv(ALGORITHM, key, INIT_VECTOR);
+
+		decryptedData = decipher.update(cypherText, 'hex', 'utf-8');
+		decryptedData += decipher.final('utf8');
+	} catch (e) {
+		console.error('Error decrypting', cypherText, 'with key', key, ':', e);
+		return '';
+	}
+
 	return decryptedData;
 }

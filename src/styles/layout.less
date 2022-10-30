@@ -29,9 +29,14 @@ main:extend(#svelte) {
 	padding: 0;
 }
 
+.bordered {
+	border: 1px solid @border;
+}
+
 .container {
+	&:extend(.bordered);
+
 	margin: 1em;
 	padding: 0.3em 0;
-	border: 1px solid @border;
 	border-radius: 10px;
 }

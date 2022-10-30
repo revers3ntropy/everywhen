@@ -21,10 +21,10 @@
 		if (isObfuscated) return;
 
 		if (Date.now() - lastActivity > INACTIVE_TIMEOUT_MS) {
-			addNotification?.({
+			addNotification({
 				text: 'Hidden due to inactivity',
 				type: 'info',
-				removeAfter: 50000
+				removeAfter: 4000
 			});
 			isObfuscated = true;
 		}
@@ -58,7 +58,11 @@
 	{/if}
 
 	<slot />
-	<Modal show={$popup} classContent="popup-background" classWindow="popup-background" />
+	<Modal
+		show={$popup}
+		classContent="popup-background"
+		classWindow="popup-background"
+	/>
 
 	{#if !home}
 		<footer />

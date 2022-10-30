@@ -4,7 +4,12 @@ import { KEY_COOKIE_KEY } from '../constants';
 import { browser } from '$app/environment';
 import { PUBLIC_SVELTEKIT_PORT } from '$env/static/public';
 
-export async function makeApiReq(key: string, method: HttpMethod, path: string, body: any = null) {
+export async function makeApiReq(
+	key: string,
+	method: HttpMethod,
+	path: string,
+	body: any = null
+) {
 	let url = `/api${path}`;
 	if (!browser) {
 		url = `http://localhost:${PUBLIC_SVELTEKIT_PORT}${url}`;
@@ -57,8 +62,10 @@ export async function makeApiReq(key: string, method: HttpMethod, path: string, 
 
 export const api = {
 	get: async (key: string, path: string) => await makeApiReq(key, 'GET', path),
-	post: async (key: string, path: string, body: any) => await makeApiReq(key, 'POST', path, body),
-	put: async (key: string, path: string, body: any) => await makeApiReq(key, 'PUT', path, body),
+	post: async (key: string, path: string, body: any) =>
+		await makeApiReq(key, 'POST', path, body),
+	put: async (key: string, path: string, body: any) =>
+		await makeApiReq(key, 'PUT', path, body),
 	delete: async (key: string, path: string, body: any) =>
 		await makeApiReq(key, 'DELETE', path, body)
 };

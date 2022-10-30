@@ -1,5 +1,9 @@
 import type { RequestHandler } from '@sveltejs/kit';
-import { KEY_COOKIE_KEY, USERNAME_COOKIE_KEY } from '$lib/constants';
+import {
+	AUTH_COOKIE_OPTIONS,
+	KEY_COOKIE_KEY,
+	USERNAME_COOKIE_KEY
+} from '$lib/constants';
 import { query } from '$lib/db/mysql';
 
 export const GET: RequestHandler = async ({ url, cookies }) => {
@@ -11,7 +15,9 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 	}
 
 	if (!key || !username) {
-		return new Response(JSON.stringify({ error: 'Invalid login' }), { status: 401 });
+		return new Response(JSON.stringify({ error: 'Invalid login' }), {
+			status: 401
+		});
 	}
 
 	const res = await query`
@@ -21,22 +27,13 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
           AND password = SHA2(CONCAT(${key}, salt), 256)
     `;
 	if (res.length === 0) {
-		return new Response(JSON.stringify({ error: 'Invalid login' }), { status: 401 });
+		return new Response(JSON.stringify({ error: 'Invalid login' }), {
+			status: 401
+		});
 	}
 
-	cookies.set(KEY_COOKIE_KEY, key, {
-		path: '/',
-		maxAge: 60 * 60, // one hour, but will be refreshed on every request
-		sameSite: 'strict',
-		httpOnly: true
-	});
-
-	cookies.set(USERNAME_COOKIE_KEY, username, {
-		path: '/',
-		maxAge: 60 * 60, // one hour, but will be refreshed on every request
-		sameSite: 'strict',
-		httpOnly: true
-	});
+	cookies.set(KEY_COOKIE_KEY, key, AUTH_COOKIE_OPTIONS);
+	cookies.set(USERNAME_COOKIE_KEY, username, AUTH_COOKIE_OPTIONS);
 
 	return new Response('{}', {
 		status: 200

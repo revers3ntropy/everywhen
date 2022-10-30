@@ -61,27 +61,36 @@
 			entriesOptions['search'] = search;
 		}
 
-		api.get(data.key, `/entries?${new URLSearchParams(entriesOptions).toString()}`).then((res) => {
-			if (!res.entries || !res.totalPages || !res.totalEntries) {
-				console.error(res);
-				addNotification({
-					text: `Cannot load entries: ${res.body.message}`,
-					position: 'top-center',
-					type: 'error',
-					removeAfter: 4000
-				});
-				return;
-			}
-			entries = groupEntriesByDay(res.entries);
-			pages = res.totalPages;
-			entryCount = res.totalEntries;
-		});
+		api
+			.get(
+				data.key,
+				`/entries?${new URLSearchParams(entriesOptions).toString()}`
+			)
+			.then((res) => {
+				if (
+					!res.entries ||
+					res.totalPages === undefined ||
+					res.totalEntries === undefined
+				) {
+					console.error(res);
+					addNotification({
+						text: `Cannot load entries: ${res.body?.message}`,
+						position: 'top-center',
+						type: 'error',
+						removeAfter: 4000
+					});
+					return;
+				}
+				entries = groupEntriesByDay(res.entries);
+				pages = res.totalPages;
+				entryCount = res.totalEntries;
+			});
 
 		api.get(data.key, '/entries/titles').then((res) => {
 			if (!res.entries) {
 				console.error(res);
 				addNotification({
-					text: `Cannot load entries: ${res.body.message}`,
+					text: `Cannot load entries: ${res.body?.message}`,
 					position: 'top-center',
 					type: 'error',
 					removeAfter: 4000
@@ -100,7 +109,11 @@
 </svelte:head>
 <main>
 	<section>
-		<EntryForm on:submit={submitEntry} bind:reset={clearEntryForm} key={data.key} />
+		<EntryForm
+			on:submit={submitEntry}
+			bind:reset={clearEntryForm}
+			key={data.key}
+		/>
 	</section>
 	<section>
 		<div class="entries-menu">
@@ -111,7 +124,12 @@
 				</a>
 			</div>
 			<div>
-				<PageCounter {pages} pageLength={PAGE_LENGTH} total={entryCount} bind:page />
+				<PageCounter
+					{pages}
+					pageLength={PAGE_LENGTH}
+					total={entryCount}
+					bind:page
+				/>
 			</div>
 
 			<div>
@@ -135,7 +153,9 @@
 					{:else}
 						<Time
 							relative
-							timestamp={new Date(day * 1000 + (60 * 60 * 23 + 60 * 60 + 59) * 1000)}
+							timestamp={new Date(
+								day * 1000 + (60 * 60 * 23 + 60 * 60 + 59) * 1000
+							)}
 						/>
 					{/if}
 				</div>

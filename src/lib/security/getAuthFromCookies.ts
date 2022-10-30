@@ -8,6 +8,8 @@ export async function getAuthFromCookies(
 	const key = cookie.get(KEY_COOKIE_KEY);
 	const username = cookie.get(USERNAME_COOKIE_KEY);
 
+	console.log(`LOGGED IN AS ${username} WITH KEY ${typeof key} LEN ${key?.length}`);
+
 	if (!key || !username) {
 		throw error(401, 'Invalid login');
 	}

@@ -7,15 +7,17 @@ import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
 import { decryptLabels } from './utils.server';
 
 export const GET: RequestHandler = async ({ cookies }) => {
-	const { key } = await getAuthFromCookies(cookies);
+	const { key, id } = await getAuthFromCookies(cookies);
 
 	const labels = await query`
         SELECT 
-            id,
-            created,
-            name,
-            colour
-        FROM labels
+            labels.id,
+            labels.created,
+            labels.name,
+            labels.colour
+        FROM labels, users
+        WHERE labels.user = users.id
+          AND users.id = ${id}
         ORDER BY name
     `;
 
@@ -28,10 +30,9 @@ export const GET: RequestHandler = async ({ cookies }) => {
 };
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
-	const { key } = await getAuthFromCookies(cookies);
+	const { key, id: userId } = await getAuthFromCookies(cookies);
 
 	const body = await request.json();
-
 	const id = await generateUUId();
 	const time = Math.round(Date.now() / 1000);
 
@@ -59,7 +60,8 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
                                    ${id},
                                    ${name},
                                    ${body.colour},
-                                   ${time}
+                                   ${time},
+                                   ${userId}
         )
    `;
 

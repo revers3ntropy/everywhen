@@ -5,23 +5,28 @@ import { addLabelsToEntries, decryptEntries } from '../utils.server';
 import type { RawEntry } from '$lib/types';
 
 export const GET: RequestHandler = async ({ cookies }) => {
-	const key = getAuthFromCookies(cookies);
+	const { key, id } = await getAuthFromCookies(cookies);
 
 	const entries = await query`
         SELECT 
-            id,
-            created,
-            title,
-            deleted,
-            label,
-            entry
-        FROM entries
+            entries.id,
+            entries.created,
+            entries.title,
+            entries.deleted,
+            entries.label,
+            entries.entry
+        FROM entries, users
         WHERE deleted = 0
+          AND entries.user = users.id
+          AND users.id = ${id}
         ORDER BY created DESC, id
     `;
 
 	const response = {
-		entries: decryptEntries(await addLabelsToEntries(entries as RawEntry[], key), key)
+		entries: decryptEntries(
+			await addLabelsToEntries(entries as RawEntry[], key),
+			key
+		)
 	};
 
 	response.entries.map((entry) => {

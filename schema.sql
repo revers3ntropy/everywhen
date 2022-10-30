@@ -11,7 +11,7 @@ SET time_zone = "+00:00";
 -- --- Tables ---
 
 CREATE TABLE `users` (
-  `id` int(11) NOT NULL,
+  `id` varchar(128) NOT NULL,
   `username` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `salt` varchar(255) NOT NULL,
@@ -58,12 +58,15 @@ CREATE TABLE `ids` (
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --- Indexes ---
+ALTER TABLE `users`
+    ADD PRIMARY KEY (`id`),
+    ADD UNIQUE KEY `username` (`username`);
+COMMIT;
 ALTER TABLE `entries`ADD PRIMARY KEY (`id`);
 ALTER TABLE `events`ADD PRIMARY KEY (`id`);
 
 ALTER TABLE `labels`
-    ADD PRIMARY KEY (`id`),
-    ADD UNIQUE KEY `name` (`name`);
+    ADD PRIMARY KEY (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

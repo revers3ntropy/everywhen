@@ -8,7 +8,7 @@ import { addLabelsToEntries, decryptEntries } from './utils.server';
 import type { RawEntry } from '$lib/types';
 
 export const GET: RequestHandler = async ({ url, cookies }) => {
-	const key = getAuthFromCookies(cookies);
+	const { key, id } = await getAuthFromCookies(cookies);
 
 	const pageSize = parseInt(url.searchParams.get('pageSize') || '50');
 	const page = parseInt(url.searchParams.get('page') || '0');
@@ -20,16 +20,18 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 
 	const rawEntries = await query<RawEntry[]>`
         SELECT
-            id,
-            created,
-            latitude,
-            longitude,
-            title,
-            entry,
-            deleted,
-            label
-        FROM entries
+            entries.id,
+            entries.created,
+            entries.latitude,
+            entries.longitude,
+            entries.title,
+            entries.entry,
+            entries.deleted,
+            entries.label
+        FROM entries, users
         WHERE deleted = ${deleted}
+          AND entries.user = users.id
+          AND users.id = ${id}
         ORDER BY created DESC, id
         LIMIT ${pageSize}
         OFFSET ${pageSize * page}
@@ -70,7 +72,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 };
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
-	const key = getAuthFromCookies(cookies);
+	const { key, id: userId } = await getAuthFromCookies(cookies);
 
 	const body = await request.json();
 
@@ -102,9 +104,11 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	// check label exists
 	if (body.label) {
 		const label = await query`
-            SELECT id
-            FROM labels
-            WHERE id = ${body.label}
+            SELECT labels.id
+            FROM labels, users
+            WHERE labels.id = ${body.label}
+				AND user = users.id
+				AND users.id = ${userId}
         `;
 		if (!label.length) {
 			throw error(400, `Label doesn't exist`);
@@ -120,7 +124,8 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
                                     ${title || null},
                                     ${entry},
                                     0,
-                                    ${body.label || null}
+                                    ${body.label || null},
+                                    ${userId}
         )
    `;
 
@@ -128,7 +133,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 };
 
 export const DELETE: RequestHandler = async ({ request, cookies }) => {
-	getAuthFromCookies(cookies);
+	const { id: userId } = await getAuthFromCookies(cookies);
 
 	const { id, restore } = await request.json();
 
@@ -139,9 +144,11 @@ export const DELETE: RequestHandler = async ({ request, cookies }) => {
 	const deleted = !restore;
 
 	await query`
-        UPDATE entries
-        SET deleted = ${deleted}
-        WHERE id = ${id}
+        UPDATE entries, users
+        SET entries.deleted = ${deleted}
+        WHERE entries.id = ${id}
+		  AND entries.user = users.id
+		  AND users.id = ${userId}
    `;
 
 	return new Response(JSON.stringify({ id }), { status: 200 });

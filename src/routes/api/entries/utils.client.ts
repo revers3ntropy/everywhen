@@ -9,7 +9,8 @@ export function groupEntriesByDay(entries: Entry[]): Record<number, Entry[]> {
 	}
 
 	entries.forEach((entry) => {
-		const day = new Date(entry.created * 1000).setHours(0, 0, 0, 0).valueOf() / 1000;
+		const day =
+			new Date(entry.created * 1000).setHours(0, 0, 0, 0).valueOf() / 1000;
 		if (!grouped[day]) {
 			grouped[day] = [];
 		}
