@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { getNotificationsContext } from 'svelte-notifications';
 	import { api } from '$lib/api/apiQuery';
-	import { popup } from '../../lib/constants';
+	import { popup } from '$lib/constants';
 	import { createEventDispatcher } from 'svelte';
+	import type { Auth } from "$lib/types";
 
 	const dispatch = createEventDispatcher();
 	const { addNotification } = getNotificationsContext();
@@ -10,7 +11,7 @@
 	let labelName = '';
 	let labelColour = '#000000';
 
-	export let key: string;
+	export let auth: Auth;
 
 	async function closeHandler() {
 		if (!labelName) {
@@ -22,7 +23,7 @@
 			return;
 		}
 
-		const res = await api.post(key, '/labels', {
+		const res = await api.post(auth, '/labels', {
 			name: labelName,
 			colour: labelColour
 		});

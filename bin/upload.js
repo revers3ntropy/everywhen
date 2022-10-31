@@ -30,7 +30,9 @@ async function upload() {
 	const paths = {
 		[`./${flags.env}.remote.package.json`]: '/package.json',
 		[`./${flags.env}.remote.env`]: '/.env',
-		[`./Dockerfile`]: '/Dockerfile'
+		[`./${flags.env}.cert.pem`]: '/cert.pem',
+		[`./${flags.env}.key.pem`]: '/key.pem',
+		[`./server.js`]: '/server.js'
 	};
 
 	await Promise.all(

@@ -27,15 +27,21 @@
 			{#each Object.keys(titles).sort((a, b) => b - a) as day}
 				<div class="day">
 					<h2>
-						{#if new Date() - new Date(day * 1000) < 8.64e7}
-							Today
-						{:else if new Date() - new Date(day * 1000) < 2 * 8.64e7}
-							Yesterday
-						{:else}
-							<Time relative timestamp={new Date(
-								day * 1000 + (60 * 60 * 23 + 60 * 60 + 59) * 1000
-								)} />
-						{/if}
+						<Time format="dddd DD/MM/YY" timestamp={new Date(day * 1000)} />
+						<span class="light">
+							{#if new Date() - new Date(day * 1000) < 8.64e7}
+								Today
+							{:else if new Date() - new Date(day * 1000) < 2 * 8.64e7}
+								Yesterday
+							{:else}
+								<Time relative
+									  timestamp={new Date(
+											day * 1000 + (60 * 60 * 23 + 60 * 60 + 59) * 1000
+										)}
+									  class="light"
+								/>
+							{/if}
+						</span>
 					</h2>
 
 					{#each titles[day] as entry}
@@ -78,8 +84,20 @@
 		transform: translateX(-100%);
 		transition: transform 0.3s ease;
 		border-right: 2px solid @border-heavy;
+		overflow-y: scroll;
+
 		&.showing {
 			transform: translateX(0);
+		}
+
+		.header {
+			padding: 0.5rem;
+			display: flex;
+			justify-content: right;
+			align-content: center;
+			position: sticky;
+			top: 0;
+			background: linear-gradient(180deg, @light-accent, transparent);
 		}
 	}
 
@@ -135,12 +153,5 @@
 				border-radius: 50%;
 			}
 		}
-	}
-
-	.header {
-		padding: 0.5rem;
-		display: flex;
-		justify-content: right;
-		align-content: center;
 	}
 </style>

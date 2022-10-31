@@ -60,6 +60,7 @@ export async function makeApiReq(
 		} catch (e) {}
 
 		return {
+			erroneous: true,
 			...response,
 			body
 		};

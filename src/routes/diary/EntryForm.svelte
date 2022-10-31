@@ -4,12 +4,11 @@
 	import Send from 'svelte-material-icons/Send.svelte';
 	import Plus from 'svelte-material-icons/Plus.svelte';
 	import { createEventDispatcher } from 'svelte';
-	import type { Label } from '$lib/types';
+	import type { Auth, Label } from "$lib/types";
 	import NewLabelDialog from './NewLabelDialog.svelte';
 	import { api } from '$lib/api/apiQuery';
 	import { onMount } from 'svelte';
-	import { popup } from '../../lib/constants';
-	import { bind } from 'svelte-simple-modal';
+	import { showPopup } from "$lib/utils";
 
 	const dispatch = createEventDispatcher();
 
@@ -23,13 +22,13 @@
 	$: browser && localStorage.setItem('__misc_3_newEntryBody', newEntryBody);
 	$: browser && localStorage.setItem('__misc_3_newEntryLabel', newEntryLabel);
 
-	export let key: string;
+	export let auth: Auth;
 	let currentLocation = [];
 
 	let labels: Label[] = [];
 
 	onMount(async () => {
-		const res = await api.get(key, `/labels`);
+		const res = await api.get(auth, `/labels`);
 		labels = res.labels;
 	});
 
@@ -49,19 +48,10 @@
 	}
 
 	function showNewLabelPopup() {
-		const el = bind(NewLabelDialog, { key });
-		popup.set(el);
-
-		// not a very nice solution but I can't think of any other way
-		// without creating a custom popup component which would just
-		// be a pain
-		const unsubscribe = popup.subscribe(async (value) => {
-			if (value === el) return;
-
-			const res = await api.get(key, `/labels`);
+		showPopup(NewLabelDialog, { auth }, async () => {
+			const res = await api.get(auth, `/labels`);
 			labels = res.labels;
 			newEntryLabel = labels.sort((a, b) => b.created - a.created)[0].id;
-			unsubscribe();
 		});
 	}
 </script>

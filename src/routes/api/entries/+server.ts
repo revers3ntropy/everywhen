@@ -77,7 +77,11 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	const body = await request.json();
 
 	const id = await generateUUId();
-	const time = Math.round(Date.now() / 1000);
+
+	if (body.created && typeof body.created !== 'number') {
+		throw error(400, 'time must be number');
+	}
+	const time = body.created || Math.round(Date.now() / 1000);
 
 	if (typeof body.latitude !== 'number') {
 		throw error(400, 'latitude must be number');

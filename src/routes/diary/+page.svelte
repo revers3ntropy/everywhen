@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Auth, Entry as EntryType } from "$lib/types";
+	import type { Data, Entry as EntryType } from "$lib/types";
 	import moment from 'moment';
 	import Time from 'svelte-time';
 	import Sidebar from './Sidebar.svelte';
@@ -7,20 +7,23 @@
 	import PageCounter from '$lib/components/PageCounter.svelte';
 	import { api } from '$lib/api/apiQuery';
 	import { groupEntriesByDay } from '../api/entries/utils.client';
-	import EntryForm from './EntryForm.svelte';
+	import EntryForm from "./EntryForm.svelte";
 	import { getNotificationsContext } from 'svelte-notifications';
 	import Bin from 'svelte-material-icons/Delete.svelte';
-	import { obfuscated } from '$lib/constants.js';
+	import TrayArrowUp from 'svelte-material-icons/TrayArrowUp.svelte';
+	import { obfuscated } from "$lib/constants.js";
+	import { showPopup } from "$lib/utils";
+	import ImportDialog from "./ImportDialog.svelte";
 	const { addNotification } = getNotificationsContext();
 
-	export let data: Auth;
+	export let data: Data;
 
 	// passed from 'load' (+page.server.ts);
 	let entries: Record<number, EntryType[]> = {};
 	let entryTitles: Record<number, EntryType[]> = {};
 	let entryCount = 0;
 
-	const PAGE_LENGTH = 50;
+	const PAGE_LENGTH = 3000;
 	let page = 0;
 	let pages = 0;
 
@@ -30,7 +33,7 @@
 
 	async function submitEntry(event: CustomEvent) {
 		const { title, entry, label, location } = event.detail;
-		const res = await api.post(data.key, '/entries', {
+		const res = await api.post(data, '/entries', {
 			title,
 			entry,
 			label,
@@ -101,6 +104,12 @@
 		});
 	}
 
+	function importPopup () {
+		showPopup(ImportDialog, { auth: data }, () => {
+			reloadEntries(page, search);
+		});
+	}
+
 	$: reloadEntries(page, search);
 </script>
 
@@ -112,7 +121,7 @@
 		<EntryForm
 			on:submit={submitEntry}
 			bind:reset={clearEntryForm}
-			key={data.key}
+			auth={data}
 		/>
 	</section>
 	<section>
@@ -122,6 +131,9 @@
 				<a class="primary" href="/deleted">
 					<Bin size="30" /> Bin
 				</a>
+				<button class="primary" on:click={importPopup}>
+					<TrayArrowUp size="30" /> Import
+				</button>
 			</div>
 			<div>
 				<PageCounter

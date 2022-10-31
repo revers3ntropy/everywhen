@@ -75,7 +75,7 @@ button {
 
 		display: grid;
 		// assumed one svg icon and then text
-		grid-template-columns: 30px 1fr;
+		grid-template-columns: 35px 1fr;
 		align-items: center;
 		justify-content: space-between;
 
@@ -87,5 +87,22 @@ button {
 			background: @text-color-accent;
 			color: @text-color;
 		}
+	}
+}
+
+.dropzone {
+	&:extend(.bordered);
+
+	border-style: dashed;
+	border-radius: 10px;
+
+	padding: 2em;
+	margin: 2em;
+
+	cursor: pointer;
+
+	&:hover {
+		border-style: double;
+		color: @text-color-light;
 	}
 }

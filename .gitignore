@@ -6,18 +6,20 @@
 node_modules
 package-lock.json
 
-# generated
+# Generated
 /.svelte-kit
 /package
 .vercel
 
-# secrets
+# Secrets
 .env
 *.env
 !example.env
 *.sshpass
+entries-example.json
+*.pem
 
-# build files
+# Build files
 .output
 /build
 /misc_3-server/

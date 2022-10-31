@@ -3,7 +3,6 @@
 	import { api } from '$lib/api/apiQuery';
 	import { getNotificationsContext } from 'svelte-notifications';
 	import { obfuscated } from '$lib/constants.js';
-
 	import Entry from '$lib/components/Entry.svelte';
 	const { addNotification } = getNotificationsContext();
 
