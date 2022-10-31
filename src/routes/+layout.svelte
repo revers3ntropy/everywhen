@@ -50,7 +50,7 @@
 <svelte:window
 	on:keydown|nonpassive={keydown}
 	on:mousemove|passive={activity}
-	on:scrol|passive={activity}
+	on:scroll|passive={activity}
 />
 <Notifications>
 	<Notifier bind:addNotification />

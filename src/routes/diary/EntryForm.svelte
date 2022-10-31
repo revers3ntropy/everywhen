@@ -9,6 +9,7 @@
 	import { api } from '$lib/api/apiQuery';
 	import { onMount } from 'svelte';
 	import { showPopup } from "$lib/utils";
+	import Dropdown from "$lib/components/Dropdown.svelte";
 
 	const dispatch = createEventDispatcher();
 
@@ -54,6 +55,8 @@
 			newEntryLabel = labels.sort((a, b) => b.created - a.created)[0].id;
 		});
 	}
+
+	let closeLabelDropDown;
 </script>
 
 <div class="container">
@@ -77,13 +80,37 @@
 		<input placeholder="Title" class="title" bind:value={newEntryTitle} />
 
 		<div class="select-label">
-			<select bind:value={newEntryLabel}>
-				<option value="">No Label</option>
-				{#each labels as label}
-					<option value={label.id}>{label.name}</option>
+			<Dropdown bind:value={newEntryLabel} bind:close={closeLabelDropDown}>
+				<span slot="button" class="select-button">
+					<span class="entry-label-colour"
+						  style="background: {labels
+						  	.find(l => l.id === newEntryLabel)?.colour || 'transparent'
+						  }"
+					></span>
+					{labels.find(l => l.id === newEntryLabel)?.name || 'No Label'}
+				</span>
+				<button on:click={() => { closeLabelDropDown(); newEntryLabel = '' }}
+						class="label-button single"
+				>
+					No Label
+				</button>
+				{#each labels as label (label.id)}
+					<button on:click={() => { closeLabelDropDown(); newEntryLabel = label.id }}
+							class="label-button"
+					>
+						<span class="entry-label-colour"
+							  style="background: {label.colour}"
+						></span>
+						{#if newEntryLabel === label.id}
+							<b>✓ {label.name}</b>
+						{:else}
+							{label.name}
+						{/if}
+					</button>
 				{/each}
-			</select>
-			<button on:click={showNewLabelPopup}>
+			</Dropdown>
+
+			<button on:click={showNewLabelPopup} class="icon-button">
 				<Plus size="25" />
 			</button>
 		</div>
@@ -92,7 +119,10 @@
 			<Send size="30" />
 		</button>
 	</div>
-	<textarea placeholder="Entry" class="entry" bind:value={newEntryBody} />
+	<textarea placeholder="Entry"
+			  class="entry"
+			  bind:value={newEntryBody}
+	></textarea>
 </div>
 
 <style lang="less">
@@ -139,20 +169,48 @@
 			border: none;
 		}
 
-		button {
-			background-color: transparent;
-			display: flex;
+		.icon-button {
+			background: transparent;
+			padding: 0.2em;
+			border-radius: 10px;
+			display: inline-flex;
 			align-items: center;
-			justify-content: space-between;
-			padding: 0 0.3em;
-			aspect-ratio: 1/1;
-			border: 1px solid transparent;
+			justify-content: center;
+			border: 1px solid @light-accent;
 
 			&:hover {
 				background: @bg;
-				border-radius: 10px;
-				border: 1px solid @border;
 			}
+		}
+
+		.select-button {
+			display: inline-grid;
+			grid-template-columns: 20px 3fr;
+			align-items: center;
+			margin: 0 1em;
+			justify-items: left;
+		}
+	}
+
+	.label-button {
+		height: 2em;
+		width: 100%;
+		padding: 0 1em;
+		margin: 0;
+		text-align: center;
+		display: inline-grid;
+		grid-template-columns: 1fr 3fr;
+		justify-content: center;
+		align-items: center;
+
+		&:hover {
+			background: @bg;
+			border-radius: 10px;
+			border: 1px solid @border;
+		}
+
+		&.single {
+			grid-template-columns: 1fr;
 		}
 	}
 </style>

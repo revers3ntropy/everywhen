@@ -145,13 +145,6 @@
 			.entry-preview {
 				color: @text-color-light;
 			}
-
-			.entry-label-colour {
-				display: inline-block;
-				height: 10px;
-				width: 10px;
-				border-radius: 50%;
-			}
 		}
 	}
 </style>
