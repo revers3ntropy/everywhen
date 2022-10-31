@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Entry as EntryType } from '$lib/types';
+	import type { Auth, Entry as EntryType } from "$lib/types";
 	import { api } from '$lib/api/apiQuery';
 	import { getNotificationsContext } from 'svelte-notifications';
 	import { obfuscated } from '$lib/constants.js';
@@ -8,7 +8,7 @@
 	const { addNotification } = getNotificationsContext();
 
 	let entries: EntryType[] = [];
-	export let data: Record<string, any>;
+	export let data: Auth;
 
 	let search = '';
 
@@ -20,7 +20,7 @@
 			deleted: 1
 		};
 		api.get(
-				data.key,
+				data,
 				`/entries?${new URLSearchParams(entriesOptions).toString()}`
 			)
 			.then((res) => {
@@ -46,7 +46,15 @@
 	{#each entries as entry}
 		<Entry {...entry} obfuscated={$obfuscated} on:updated={reload} />
 	{/each}
+
+	{#if entries.length === 0}
+		<h2><i>No deleted items.</i></h2>
+	{/if}
 </main>
 
 <style lang="less">
+	h2 {
+		width: 100%;
+		text-align: center;
+	}
 </style>

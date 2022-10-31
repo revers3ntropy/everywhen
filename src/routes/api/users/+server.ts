@@ -1,12 +1,12 @@
 import type { RequestHandler } from '@sveltejs/kit';
-import { query } from '../../../lib/db/mysql';
-import { randomString } from '../../../lib/utils';
-import { generateUUId } from '../../../lib/security/uuid';
+import { query } from '$lib/db/mysql';
+import { randomString } from '$lib/utils';
+import { generateUUId } from '$lib/security/uuid';
 import {
 	AUTH_COOKIE_OPTIONS,
 	KEY_COOKIE_KEY,
 	USERNAME_COOKIE_KEY
-} from '../../../lib/constants';
+} from '$lib/constants';
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
 	const { username, password } = await request.json();

@@ -1,19 +1,20 @@
 <script lang="ts">
 	import ChevronRight from 'svelte-material-icons/ChevronRight.svelte';
-	import { api } from '../lib/api/apiQuery';
+	import { api } from '$lib/api/apiQuery';
 	import { getNotificationsContext } from 'svelte-notifications';
-	import { GETArgs } from '../lib/utils';
+	import { GETArgs } from '$lib/utils';
 	import { sha256 } from 'js-sha256';
+	import type { Data } from "$lib/types";
 	const { addNotification } = getNotificationsContext();
 
-	export let data: Record<string, any>;
+	export let data: Data;
 
 	let password = '';
 	let username = '';
 
 	async function login() {
 		const res = await api.get(
-			data.key,
+			data,
 			`/auth${GETArgs({
 				key: sha256(password).substring(0, 32),
 				username
@@ -33,7 +34,7 @@
 	}
 
 	async function create() {
-		const res = await api.post(data.key, `/users`, {
+		const res = await api.post(data, `/users`, {
 			password: sha256(password).substring(0, 32),
 			username
 		});
@@ -55,8 +56,6 @@
 	<meta name="description" content="Diary" />
 </svelte:head>
 <section>
-	<h1>Welcome to me.revers3ntropy.com!</h1>
-
 	<form class="flex-center page-center">
 		<div>
 			<p>

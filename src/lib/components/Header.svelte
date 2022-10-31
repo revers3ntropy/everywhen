@@ -1,3 +1,6 @@
+<script lang="ts">
+	export let user = null;
+</script>
 <header>
 	<div />
 
@@ -5,7 +8,13 @@
 		<a href="/diary">diary</a>
 	</div>
 
-	<div />
+	<div>
+		{#if user}
+			<a href="/logout">Logout</a>
+		{:else}
+			<a href="/">Login</a>
+		{/if}
+	</div>
 </header>
 
 <style lang="less">

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Entry as EntryType } from '$lib/types';
+	import type { Auth, Entry as EntryType } from "$lib/types";
 	import moment from 'moment';
 	import Time from 'svelte-time';
 	import Sidebar from './Sidebar.svelte';
@@ -13,7 +13,7 @@
 	import { obfuscated } from '$lib/constants.js';
 	const { addNotification } = getNotificationsContext();
 
-	export let data: Record<string, any>;
+	export let data: Auth;
 
 	// passed from 'load' (+page.server.ts);
 	let entries: Record<number, EntryType[]> = {};
@@ -26,7 +26,7 @@
 
 	let search = '';
 
-	let clearEntryForm = () => {};
+	let clearEntryForm: () => void;
 
 	async function submitEntry(event: CustomEvent) {
 		const { title, entry, label, location } = event.detail;
@@ -63,7 +63,7 @@
 
 		api
 			.get(
-				data.key,
+				data,
 				`/entries?${new URLSearchParams(entriesOptions).toString()}`
 			)
 			.then((res) => {
@@ -86,7 +86,7 @@
 				entryCount = res.totalEntries;
 			});
 
-		api.get(data.key, '/entries/titles').then((res) => {
+		api.get(data, '/entries/titles').then((res) => {
 			if (!res.entries) {
 				console.error(res);
 				addNotification({

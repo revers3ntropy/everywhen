@@ -32,7 +32,9 @@
 						{:else if new Date() - new Date(day * 1000) < 2 * 8.64e7}
 							Yesterday
 						{:else}
-							<Time relative timestamp={new Date(day * 1000)} />
+							<Time relative timestamp={new Date(
+								day * 1000 + (60 * 60 * 23 + 60 * 60 + 59) * 1000
+								)} />
 						{/if}
 					</h2>
 

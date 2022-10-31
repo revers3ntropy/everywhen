@@ -1,10 +1,11 @@
 import { type Cookies, error } from '@sveltejs/kit';
 import { KEY_COOKIE_KEY, USERNAME_COOKIE_KEY } from '../constants';
 import { query } from '../db/mysql';
+import type { Auth } from "../types";
 
 export async function getAuthFromCookies(
 	cookie: Cookies
-): Promise<{ key: string; username: string; id: string }> {
+): Promise<Auth> {
 	const key = cookie.get(KEY_COOKIE_KEY);
 	const username = cookie.get(USERNAME_COOKIE_KEY);
 

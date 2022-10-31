@@ -9,6 +9,8 @@
 	import Modal from 'svelte-simple-modal';
 	import { popup } from '../lib/constants.js';
 
+	export let data: Record<string, any>;
+
 	const home = $page.url.pathname.trim() === '/';
 
 	let lastActivity = Date.now();
@@ -54,7 +56,7 @@
 	<Notifier bind:addNotification />
 
 	{#if !home}
-		<Header />
+		<Header user={data} />
 	{/if}
 
 	<slot />
