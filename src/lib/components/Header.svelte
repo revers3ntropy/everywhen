@@ -2,6 +2,7 @@
 	import Notebook from 'svelte-material-icons/Notebook.svelte';
 	import Logout from 'svelte-material-icons/Logout.svelte';
 	import Login from 'svelte-material-icons/Login.svelte';
+	import Home from 'svelte-material-icons/Home.svelte';
 	import { page } from '$app/stores';
 
 	export let user = null;
@@ -11,6 +12,11 @@
 
 	<div>
 		{#if user}
+			<a href="/home"
+				class="{$page.url.pathname === '/home' ? 'current' : ''}"
+				>
+				<Home size="40" />
+			</a>
 			<a href="/diary"
 			   class="{$page.url.pathname === '/diary' ? 'current' : ''}"
 			>
@@ -42,6 +48,12 @@
 		padding: 0 20px;
 		height: 60px;
 		background-color: @header-bg;
+
+		div {
+			display: flex;
+			align-items: center;
+			height: 100%;
+		}
 	}
 
 	a, button {
