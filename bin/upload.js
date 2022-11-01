@@ -29,7 +29,6 @@ async function upload() {
 
 	const paths = {
 		[`./${flags.env}.remote.package.json`]: '/package.json',
-		[`./${flags.env}.remote.env`]: '/.env',
 		[`./${flags.env}.cert.pem`]: '/cert.pem',
 		[`./${flags.env}.key.pem`]: '/key.pem',
 		[`./server.js`]: '/server.js'
@@ -44,7 +43,7 @@ async function upload() {
 		})
 	);
 
-	await $`rm -r ./${DIR}`;
+	//await $`rm -r ./${DIR}`;
 }
 
 (async () => {

@@ -56,12 +56,18 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	}
 
 	await query`
-        INSERT INTO labels VALUES (
-                                   ${id},
-                                   ${name},
-                                   ${body.colour},
-                                   ${time},
-                                   ${userId}
+        INSERT INTO labels (
+            id,
+			name,
+			colour,
+			created,
+			user
+		) VALUES (
+		   ${id},
+		   ${name},
+		   ${body.colour},
+		   ${time},
+		   ${userId}
         )
    `;
 

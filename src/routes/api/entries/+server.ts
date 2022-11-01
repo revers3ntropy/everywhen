@@ -120,16 +120,25 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	}
 
 	await query`
-        INSERT INTO entries VALUES (
-                                    ${id},
-                                    ${time},
-                                    ${body.latitude || null},
-                                    ${body.longitude || null},
-                                    ${title || null},
-                                    ${entry},
-                                    0,
-                                    ${body.label || null},
-                                    ${userId}
+        INSERT INTO entries (
+				id, 
+				created, 
+				latitude, 
+				longitude, 
+				title, entry, 
+				deleted, 
+				label,
+				user
+			) VALUES (
+				${id},
+				${time},
+				${body.latitude || null},
+				${body.longitude || null},
+				${title || null},
+				${entry},
+				0,
+				${body.label || null},
+				${userId}
         )
    `;
 

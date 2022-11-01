@@ -1,23 +1,6 @@
 import mysql from 'mysql2/promise';
 import { DB_HOST, DB_USER, DB_PASS, DB, DB_PORT } from '$env/static/private';
-
-// define defaults from .env file
-const port = DB_PORT ? parseInt(DB_PORT) : 3306;
-const config: mysql.ConnectionOptions = {
-	host: DB_HOST,
-	user: DB_USER,
-	password: DB_PASS,
-	database: DB,
-	port,
-	decimalNumbers: true,
-	supportBigNumbers: true
-};
-
-const con = await mysql.createConnection(config);
-
-setInterval(() => {
-	con.ping();
-}, 1000 * 60 * 5);
+import '../require';
 
 export type queryRes =
 	| mysql.RowDataPacket[][]
@@ -26,6 +9,23 @@ export type queryRes =
 	| mysql.OkPacket[]
 	| mysql.ResultSetHeader
 	| Record<string, any>[];
+
+// define defaults from .env file
+const port = DB_PORT ? parseInt(DB_PORT) : 3306;
+const config: mysql.ConnectionOptions = {
+	host: DB_HOST,
+	user: DB_USER,
+	password: DB_PASS,
+	database: DB,
+	port
+};
+
+console.log(`Connecting to mysql db '${DB}'...`);
+const con = await mysql.createConnection(config);
+
+setInterval(() => {
+	con.ping();
+}, 1000 * 60 * 5);
 
 export async function query<Res extends queryRes = mysql.RowDataPacket[]>(
 	queryParts: TemplateStringsArray,

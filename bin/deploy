@@ -9,9 +9,17 @@ die () {
 
 [ "$#" -eq 1 ] || die "1 argument required, $# provided"
 
+mv .env tmp.env
+mv "$1.remote.env" .env
+
 bin/build;
 
-node --enable-source-maps bin/upload -v --env "${@: -1}"
+mv .env "$1.remote.env"
+mv tmp.env .env
+
+[ -d "build" ] || die "output dir not found"
+
+node --enable-source-maps bin/upload -v --env "$1"
 
 end=`date +%s`
 

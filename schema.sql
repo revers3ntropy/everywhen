@@ -18,13 +18,15 @@ CREATE TABLE `users` (
   `created` int(64) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- --------------------------------------------------------
+
 CREATE TABLE `entries` (
     `id` varchar(128) NOT NULL,
     `user` varchar(128) NOT NULL,
     `created` int(64) NOT NULL,
     `latitude` int(64) DEFAULT NULL,
     `longitude` int(64) DEFAULT NULL,
-    `title` text NOT NULL,
+    `title` text NULL,
     `entry` text NOT NULL,
     `deleted` int(1) DEFAULT 0,
     `label` varchar(128) DEFAULT NULL
