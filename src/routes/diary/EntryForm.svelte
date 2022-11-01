@@ -189,8 +189,9 @@
 	}
 
 	.send-mobile {
-		display: none;
 		.flex-center();
+
+		display: none;
 		width: calc(100% - 1em);
 		border: 1px solid @border;
 		border-radius: 10px;

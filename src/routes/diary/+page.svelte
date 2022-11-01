@@ -200,5 +200,14 @@
 		a.primary {
 			margin: 0 1em;
 		}
+
+		@media @mobile {
+			flex-direction: column;
+			margin: 0;
+
+			div {
+				margin: 0.5em 0;
+			}
+		}
 	}
 </style>

@@ -91,6 +91,10 @@
 		margin: 1em 0;
 		height: fit-content;
 		white-space: pre-wrap;
+
+		@media @mobile {
+			padding: 0;
+		}
 	}
 
 	.header {

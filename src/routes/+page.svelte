@@ -51,30 +51,26 @@
 	}
 </script>
 
-<svelte:head>
-	<title>Me</title>
-	<meta name="description" content="Diary" />
-</svelte:head>
-<section>
+<main>
 	<form class="flex-center page-center">
-		<div>
-			<p>
+		<div class="content">
+			<label>
+				Username
 				<input
 					bind:value={username}
-					placeholder="Username"
 					autocomplete="username"
 					style="font-size: x-large"
 				/>
-			</p>
-			<p>
+			</label>
+			<label>
+				Password
 				<input
 					bind:value={password}
 					type="password"
-					placeholder="Key"
 					autocomplete="current-password"
 					style="font-size: x-large"
 				/>
-			</p>
+			</label>
 			<div class="flex-center" style="justify-content: space-between">
 				<button on:click|preventDefault={create}> Sign Up </button>
 				<button on:click|preventDefault={login} class="primary">
@@ -84,4 +80,19 @@
 			</div>
 		</div>
 	</form>
-</section>
+</main>
+
+<style lang="less">
+
+	form {
+		.content, form input {
+			max-width: 94vw;
+		}
+
+		label {
+			display: flex;
+			flex-direction: column;
+			margin: 1rem 0;
+		}
+	}
+</style>

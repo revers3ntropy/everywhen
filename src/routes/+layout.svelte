@@ -53,6 +53,11 @@
 	on:scroll|passive={activity}
 />
 
+<svelte:head>
+	<title>Diary</title>
+	<meta name="description" content="Diary" />
+</svelte:head>
+
 <Notifications>
 	<Notifier bind:addNotification />
 
