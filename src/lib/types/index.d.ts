@@ -21,7 +21,10 @@ export type RawEntry = Omit<Entry, 'label'> & { label?: string };
 export interface Auth {
 	username: string;
 	key: string;
-	id: string;
 }
 
-export type Data =Auth & Record<string, any>;
+export type User = Auth & {
+	id: string;
+};
+
+export type Data = Auth & Record<string, any>;

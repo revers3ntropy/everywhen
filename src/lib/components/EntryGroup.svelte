@@ -25,5 +25,12 @@
 			margin-bottom: 0.5rem;
 			padding: 0 1em;
 		}
+
+		@media @mobile {
+			margin: 0;
+			border: none;
+			border-radius: 0;
+			border-bottom: 1px solid @border-heavy;
+		}
 	}
 </style>

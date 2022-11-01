@@ -1,13 +1,18 @@
 import { parse } from 'cookie';
 import { browser } from '$app/environment';
-import { KEY_COOKIE_KEY, popup } from "./constants";
+import { KEY_COOKIE_KEY, popup, USERNAME_COOKIE_KEY } from "./constants";
 import type Component from "svelte/types/compiler/compile/Component";
 import { bind } from "svelte-simple-modal";
-import { api } from "./api/apiQuery";
+import type { Auth } from "./types";
 
-export function getKey() {
-	if (!browser) throw 'getKey() can only be used in the browser';
-	return parse(document.cookie)[KEY_COOKIE_KEY];
+export function getAuth (): Omit<Auth, 'id'> {
+	if (!browser) {
+		throw 'getKey() can only be used in the browser';
+	}
+	return {
+		key: parse(document.cookie)[KEY_COOKIE_KEY],
+		username: parse(document.cookie)[USERNAME_COOKIE_KEY],
+	};
 }
 
 const chars = '0123456789abcdefghijklmnopqrstuvwxyz ';

@@ -3,7 +3,7 @@
 	import Restore from 'svelte-material-icons/DeleteRestore.svelte';
 	import { createEventDispatcher } from 'svelte';
 	import { api } from '../api/apiQuery';
-	import { getKey, obfuscate } from '../utils';
+	import { getAuth, obfuscate } from '../utils';
 	import moment from 'moment';
 	import Label from './Label.svelte';
 	import { getNotificationsContext } from 'svelte-notifications';
@@ -31,7 +31,7 @@
 		: null;
 
 	async function del() {
-		const res = await api.delete(getKey(), `/entries`, {
+		const res = await api.delete(getAuth(), `/entries`, {
 			id,
 			restore: deleted
 		});
@@ -104,6 +104,10 @@
 		align-items: center;
 		margin: 0.5em 2em 0 0;
 		padding: 0.3em;
+
+		@media @mobile {
+			margin: 0;
+		}
 	}
 
 	.title {
@@ -118,6 +122,6 @@
 
 	.body {
 		margin: 0 3em;
-		word-break: break-all;
+		word-break: break-word;
 	}
 </style>
