@@ -43,6 +43,26 @@ input {
 	&[type='color'] {
 		border: none;
 	}
+
+	&.editable-text {
+		border: none;
+		border-bottom: 1px solid transparent;
+		background: transparent;
+		outline: none;
+		cursor: text;
+		display: inline-block;
+		line-height: 1.2;
+		text-decoration: none;
+
+		&:focus {
+			color: @text-color;
+			border-bottom: 1px solid @accent-color-secondary;
+		}
+
+		&:hover {
+			border-bottom: 1px solid @accent-color-primary;
+		}
+	}
 }
 
 :disabled {

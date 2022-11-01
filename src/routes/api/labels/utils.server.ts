@@ -1,9 +1,10 @@
 import { decrypt } from '$lib/security/encryption';
+import type { Label } from "$lib/types";
 
 export function decryptLabel(
-	label: Record<string, any>,
+	label: Label,
 	key: string
-): Record<string, any> {
+): Label {
 	return {
 		...label,
 		name: decrypt(label.name, key)
@@ -11,7 +12,7 @@ export function decryptLabel(
 }
 
 export function decryptLabels(
-	labels: Record<string, any>[],
+	labels: Label[],
 	key: string
 ): Record<string, any>[] {
 	return labels.map((label) => decryptLabel(label, key));

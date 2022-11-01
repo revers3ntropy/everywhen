@@ -23,12 +23,10 @@
 
 	// show random string instead of text content if obfuscated
 	let showLabel: Label | null;
-	$: showLabel = label
-		? {
+	$: showLabel = label ? {
 				...label,
 				name: obfuscated ? obfuscate(label.name) : label.name
-		  }
-		: null;
+	  } : null;
 
 	async function del() {
 		const res = await api.delete(getAuth(), `/entries`, {
