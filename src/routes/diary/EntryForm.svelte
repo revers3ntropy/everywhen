@@ -115,7 +115,7 @@
 			</button>
 		</div>
 
-		<button on:click={submit}>
+		<button on:click={submit} class="send">
 			<Send size="30" />
 		</button>
 	</div>
@@ -123,10 +123,22 @@
 			  class="entry"
 			  bind:value={newEntryBody}
 	></textarea>
+
+	<button on:click={submit} class="send-mobile">
+		<Send size="30" />
+	</button>
 </div>
 
 <style lang="less">
 	@import '../../styles/variables.less';
+	@import '../../styles/layout.less';
+
+	.container {
+		@media @mobile {
+			margin: 0;
+			border: none;
+		}
+	}
 
 	.head {
 		margin: 0;
@@ -135,6 +147,10 @@
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+
+		@media @mobile {
+			display: block;
+		}
 	}
 
 	.title {
@@ -142,17 +158,48 @@
 		width: 55%;
 		font-size: 20px;
 		margin: 0 0 0 1em;
+
+		@media @mobile {
+			width: 100%;
+			margin: 0.2em;
+		}
 	}
 
 	.entry {
 		border-radius: 0;
 		outline: none;
 		border: none;
-		width: 90%;
+		width: calc(100% - 2.4em);
 		max-width: 1500px;
 		height: 500px;
 		font-size: 20px;
 		padding: 1.2em;
+
+		@media @mobile {
+			width: calc(100% - .8em);
+			overflow-y: scroll;
+			padding: .4em;
+		}
+	}
+
+	.send {
+		@media @mobile {
+			display: none;
+		}
+	}
+
+	.send-mobile {
+		display: none;
+		.flex-center();
+		width: calc(100% - 1em);
+		border: 1px solid @border;
+		border-radius: 10px;
+		margin: 0.5em;
+		padding: 0.2em;
+
+		@media @mobile {
+			display: inline-block;
+		}
 	}
 
 	.select-label {

@@ -12,10 +12,13 @@
 		"format": "prettier --write ."
 	},
 	"dependencies": {
-		"cookie": "^0.4.2"
+		"cookie": "^0.4.2",
+		"svelte-meta-tags": "^2.6.3"
 	},
 	"devDependencies": {
+		"@fontsource/fira-mono": "^4.5.0",
 		"@rgossiaux/svelte-headlessui": "^1.0.2",
+		"@rollup/plugin-replace": "^5.0.1",
 		"@smui-extra/autocomplete": "^7.0.0-beta.0",
 		"@smui/button": "^7.0.0-beta.0",
 		"@smui/dialog": "^7.0.0-beta.0",
@@ -23,14 +26,11 @@
 		"@smui/icon-button": "^7.0.0-beta.0",
 		"@smui/list": "^7.0.0-beta.0",
 		"@smui/select": "^7.0.0-beta.0",
-		"@types/uuid": "^8.3.4",
-		"filedrop-svelte": "^0.1.2",
-		"@fontsource/fira-mono": "^4.5.0",
-		"@rollup/plugin-replace": "^5.0.1",
 		"@sveltejs/adapter-auto": "next",
 		"@sveltejs/adapter-node": "^1.0.0-next.99",
 		"@sveltejs/kit": "next",
 		"@types/cookie": "^0.5.1",
+		"@types/uuid": "^8.3.4",
 		"@typescript-eslint/eslint-plugin": "^5.27.0",
 		"@typescript-eslint/parser": "^5.27.0",
 		"autoprefixer": "^10.4.12",
@@ -38,6 +38,7 @@
 		"eslint": "^8.16.0",
 		"eslint-config-prettier": "^8.3.0",
 		"eslint-plugin-svelte3": "^4.0.0",
+		"filedrop-svelte": "^0.1.2",
 		"javascript-time-ago": "^2.5.7",
 		"js-sha256": "^0.9.0",
 		"jsonschema": "^1.4.1",

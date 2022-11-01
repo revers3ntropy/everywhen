@@ -52,6 +52,7 @@
 	on:mousemove|passive={activity}
 	on:scroll|passive={activity}
 />
+
 <Notifications>
 	<Notifier bind:addNotification />
 
