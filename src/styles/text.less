@@ -1,9 +1,12 @@
 @import 'variables.less';
 
+body, input, button {
+	color: @text-color;
+}
+
 * {
 	font-family: Roboto, Oxygen, Ubuntu, 'Segoe UI', Arial, -apple-system,
 		BlinkMacSystemFont, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-	color: @text-color;
 }
 
 h1,
@@ -57,9 +60,9 @@ pre {
 
 .obfuscated {
 	color: transparent;
-	text-shadow: 0 0 2px @text-color;
+	text-shadow: 0 0 3px @text-color;
 }
 
-.light {
-	color: @text-color-light;
+.text-light {
+	color: @text-color-light !important;
 }

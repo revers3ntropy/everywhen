@@ -10,7 +10,9 @@
 	import { onMount } from 'svelte';
 	import { showPopup } from "$lib/utils";
 	import Dropdown from "$lib/components/Dropdown.svelte";
+	import { getNotificationsContext } from "svelte-notifications";
 
+	const { addNotification } = getNotificationsContext();
 	const dispatch = createEventDispatcher();
 
 	let newEntryTitle =
@@ -39,13 +41,27 @@
 		newEntryLabel = '';
 	}
 
-	function submit() {
-		dispatch('submit', {
+	async function submit() {
+		const res = await api.post(auth, '/entries', {
 			title: newEntryTitle,
 			entry: newEntryBody,
 			label: newEntryLabel,
-			location: currentLocation
+			latitude: currentLocation[0],
+			longitude: currentLocation[1]
 		});
+
+		if (res.id) {
+			reset();
+		} else {
+			console.error(res);
+			addNotification({
+				text: `Cannot create entry: ${res.body.message}`,
+				position: 'top-center',
+				type: 'error'
+			});
+		}
+
+		dispatch('updated');
 	}
 
 	function showNewLabelPopup() {

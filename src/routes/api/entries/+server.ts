@@ -144,25 +144,3 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 
 	return new Response(JSON.stringify({ id }), { status: 201 });
 };
-
-export const DELETE: RequestHandler = async ({ request, cookies }) => {
-	const { id: userId } = await getAuthFromCookies(cookies);
-
-	const { id, restore } = await request.json();
-
-	if (typeof id !== 'string' || !id) {
-		throw error(400, 'invalid id');
-	}
-
-	const deleted = !restore;
-
-	await query`
-        UPDATE entries, users
-        SET entries.deleted = ${deleted}
-        WHERE entries.id = ${id}
-		  AND entries.user = users.id
-		  AND users.id = ${userId}
-   `;
-
-	return new Response(JSON.stringify({ id }), { status: 200 });
-};

@@ -20,17 +20,29 @@ const config: mysql.ConnectionOptions = {
 	port
 };
 
-console.log(`Connecting to mysql db '${DB}'...`);
-const con = await mysql.createConnection(config);
+let con: mysql.Connection | null = null;
 
-setInterval(() => {
-	con.ping();
+async function connect () {
+	console.log(`Connecting to mysql db '${DB}'...`);
+	con = await mysql.createConnection(config).catch((e: any) => {
+		console.log(`Error connecting to mysql db '${DB}'`);
+		console.log(e);
+		throw e;
+	});
+}
+
+setInterval(async () => {
+	if (!con) await connect();
+	con?.ping();
 }, 1000 * 60 * 5);
 
 export async function query<Res extends queryRes = mysql.RowDataPacket[]>(
 	queryParts: TemplateStringsArray,
 	...params: any[]
 ): Promise<Res> {
+
+	if (!con) await connect();
+
 	const query = queryParts.reduce((acc, cur, i) => {
 		const str = acc + cur;
 		if (params[i] === undefined) {
@@ -43,7 +55,7 @@ export async function query<Res extends queryRes = mysql.RowDataPacket[]>(
 		}
 	}, '');
 
-	console.log(`QUERY: ${con.escape(query)} ${JSON.stringify(params)}`);
+	console.log(`QUERY: ${con?.escape(query)} ${JSON.stringify(params)}`);
 
 	// if it's an array, add all the elements of the array in place as params
 	// Flatten 2D arrays
@@ -54,5 +66,5 @@ export async function query<Res extends queryRes = mysql.RowDataPacket[]>(
 		}
 	}
 
-	return <Res>(await con.query(query, params))[0];
+	return <Res>(await con?.query(query, params) || [])[0];
 }

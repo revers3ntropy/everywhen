@@ -8,7 +8,7 @@
     import PageCounter from '$lib/components/PageCounter.svelte';
     import Time from 'svelte-time';
     import type { Entry as EntryType } from "$lib/types";
-    import { showPopup } from "$lib/utils";
+    import { GETArgs, showPopup } from "$lib/utils";
     import ImportDialog from "./ImportDialog.svelte";
     import { createEventDispatcher } from "svelte";
     import { api } from "$lib/api/apiQuery";
@@ -43,11 +43,7 @@
             entriesOptions['search'] = search;
         }
 
-        api
-            .get(
-                auth,
-                `/entries?${new URLSearchParams(entriesOptions).toString()}`
-            )
+        api.get(auth, `/entries?${GETArgs(entriesOptions)}`)
             .then((res) => {
                 if (
                     !res.entries ||
@@ -83,6 +79,7 @@
         });
     }
 
+    reload(page, search);
     $: reload(page, search);
 </script>
 
@@ -116,23 +113,25 @@
         {#each Object.keys(entries).sort((a, b) => b - a) as day}
             <EntryGroup
                 entries={entries[day]}
-                on:updated={reload}
+                on:updated={() => reload(page, search)}
                 obfuscated={$obfuscated}
             >
                 <div slot="title" class="entry-group-title">
                     <h2>{moment(new Date(day * 1000)).format('dddd, Do MMMM YYYY')}</h2>
-                    {#if new Date() - new Date(day * 1000) < 8.64e7}
-                        <span>Today</span>
-                    {:else if new Date() - new Date(day * 1000) < 1.728e8}
-                        <span>Yesterday</span>
-                    {:else}
-                        <Time
-                            relative
-                            timestamp={new Date(
-								day * 1000 + (60 * 60 * 23 + 60 * 60 + 59) * 1000
-							)}
-                        />
-                    {/if}
+                    <span class="text-light">
+                        {#if new Date() - new Date(day * 1000) < 8.64e7}
+                            <span>Today</span>
+                        {:else if new Date() - new Date(day * 1000) < 1.728e8}
+                            <span>Yesterday</span>
+                        {:else}
+                            <Time
+                                relative
+                                timestamp={new Date(
+                                    day * 1000 + (60 * 60 * 23 + 60 * 60 + 59) * 1000
+                                )}
+                            />
+                        {/if}
+                    </span>
                 </div>
             </EntryGroup>
         {/each}

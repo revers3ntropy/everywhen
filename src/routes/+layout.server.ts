@@ -4,6 +4,8 @@ import { KEY_COOKIE_KEY, USERNAME_COOKIE_KEY } from '$lib/constants';
 import { redirect } from '@sveltejs/kit';
 import { query } from '$lib/db/mysql';
 
+export const prerender = true;
+
 export const load: LayoutServerLoad = async ({ cookies, url }) => {
 	const home = url.pathname.trim() === '/';
 

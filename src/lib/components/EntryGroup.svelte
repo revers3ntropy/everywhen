@@ -24,13 +24,22 @@
 		.title {
 			margin-bottom: 0.5rem;
 			padding: 0 1em;
+
+		}
+	}
+
+	@media @mobile {
+
+		.title {
+			border-radius: 10px;
+			background: @light-accent;
+			margin: 0.3em;
 		}
 
-		@media @mobile {
+		.entry-group {
 			margin: 0;
 			border: none;
 			border-radius: 0;
-			border-bottom: 1px solid @border-heavy;
 		}
 	}
 </style>

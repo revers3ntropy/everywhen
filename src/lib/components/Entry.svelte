@@ -29,8 +29,7 @@
 	  } : null;
 
 	async function del() {
-		const res = await api.delete(getAuth(), `/entries`, {
-			id,
+		const res = await api.delete(getAuth(), `/entries/${id}`, {
 			restore: deleted
 		});
 
@@ -48,7 +47,8 @@
 		addNotification({
 			removeAfter: 4000,
 			text: `Error deleting entry ${res.body.message}`,
-			type: 'error'
+			type: 'error',
+			position: `top-center`
 		});
 	}
 </script>

@@ -5,11 +5,12 @@ import { error } from '@sveltejs/kit';
 import { encrypt } from '$lib/security/encryption';
 import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
 import { decryptLabels } from './utils.server';
+import type { Label } from "$lib/types";
 
 export const GET: RequestHandler = async ({ cookies }) => {
 	const { key, id } = await getAuthFromCookies(cookies);
 
-	const labels = await query`
+	const labels = await query<Label[]>`
         SELECT 
             labels.id,
             labels.created,
@@ -18,7 +19,7 @@ export const GET: RequestHandler = async ({ cookies }) => {
         FROM labels, users
         WHERE labels.user = users.id
           AND users.id = ${id}
-        ORDER BY name
+        ORDER BY labels.name, labels.colour
     `;
 
 	return new Response(

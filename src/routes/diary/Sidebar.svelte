@@ -28,7 +28,7 @@
 				<div class="day">
 					<h2>
 						<Time format="dddd DD/MM/YY" timestamp={new Date(day * 1000)} />
-						<span class="light">
+						<span class="text-light">
 							{#if new Date() - new Date(day * 1000) < 8.64e7}
 								Today
 							{:else if new Date() - new Date(day * 1000) < 2 * 8.64e7}
@@ -38,7 +38,7 @@
 									  timestamp={new Date(
 											day * 1000 + (60 * 60 * 23 + 60 * 60 + 59) * 1000
 										)}
-									  class="light"
+									  class="text-light"
 								/>
 							{/if}
 						</span>

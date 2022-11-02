@@ -7,7 +7,7 @@
 	import { page } from '$app/stores';
 	import Notifier from './Notifier.svelte';
 	import Modal from 'svelte-simple-modal';
-	import { popup } from '../lib/constants.js';
+	import { popup } from '$lib/constants.js';
 
 	export let data: Record<string, any>;
 

@@ -36,6 +36,20 @@ export const PUT: RequestHandler = async ({ cookies, request, params }) => {
     const { key, id } = await getAuthFromCookies(cookies);
     const body = await request.json();
 
+    if (!params.labelId || typeof params.labelId !== 'string') {
+        throw error(400, 'Invalid label id');
+    }
+
+    // check label exists
+    const label = await query<Label[]>`
+        SELECT id
+        FROM labels
+        WHERE id = ${params.labelId}
+    `;
+    if (!label.length) {
+        throw error(404, 'Label with that id not found');
+    }
+
     if (body.name) {
         body.name = encrypt(body.name, key);
 

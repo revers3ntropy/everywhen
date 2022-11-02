@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Label } from '../types';
+	import type { Label } from '$lib/types';
 
 	export let label: Label = null;
 </script>

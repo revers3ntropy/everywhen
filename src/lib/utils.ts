@@ -31,7 +31,7 @@ export function obfuscate(str: string, alphabet = chars): string {
 	});
 }
 
-export function GETArgs(args: Record<string, string>): string {
+export function GETArgs(args: Record<string, any>): string {
 	return '?' + Object.keys(args)
 		.map((key) => `${key}=${args[key]}`)
 		.join('&');
