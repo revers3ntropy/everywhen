@@ -34,12 +34,14 @@
 			border-radius: 10px;
 			background: @light-accent;
 			margin: 0.3em;
+			position: sticky;
+			top: 0.3em;
 		}
 
 		.entry-group {
 			margin: 0;
 			border: none;
-			border-radius: 0;
+			border-radius: 0
 		}
 	}
 </style>
