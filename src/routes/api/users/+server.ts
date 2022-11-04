@@ -7,6 +7,7 @@ import {
 	KEY_COOKIE_KEY,
 	USERNAME_COOKIE_KEY
 } from '$lib/constants';
+import { error } from "@sveltejs/kit";
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
 	const { username, password } = await request.json();
@@ -14,17 +15,13 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	if (!username || username.length < 3 || typeof username !== 'string') {
 		return new Response(
 			JSON.stringify({ error: 'Username must be at least 3 characters' }),
-			{
-				status: 400
-			}
+			{ status: 400 }
 		);
 	}
 	if (!password || password.length < 8 || typeof password !== 'string') {
 		return new Response(
 			JSON.stringify({ error: 'Password must be at least 8 characters' }),
-			{
-				status: 400
-			}
+			{ status: 400 }
 		);
 	}
 
@@ -34,9 +31,10 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		WHERE username = ${username}
 	`;
 	if (existingUsers.length !== 0) {
-		return new Response(JSON.stringify({ error: 'Username already exists' }), {
-			status: 400
-		});
+		return new Response(
+			JSON.stringify({ error: 'Username already exists' }),
+			{ status: 400 }
+		);
 	}
 
 	let salt = '';

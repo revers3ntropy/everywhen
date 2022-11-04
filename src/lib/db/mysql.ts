@@ -55,7 +55,12 @@ export async function query<Res extends queryRes = mysql.RowDataPacket[]>(
 		}
 	}, '');
 
-	console.log(`QUERY: ${con?.escape(query)} ${JSON.stringify(params)}`);
+	// logs query but without whitespace
+	// const queryToLog = con?.escape(queryParts)
+	// 	.replace(/\s+/g, ' ')
+	// 	.replace('\\n', '')
+	// 	.replace('\n', '');
+	// console.log(`QUERY: ${queryToLog} ${JSON.stringify(params)}`);
 
 	// if it's an array, add all the elements of the array in place as params
 	// Flatten 2D arrays

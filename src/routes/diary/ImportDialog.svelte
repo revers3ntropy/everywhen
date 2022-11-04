@@ -111,7 +111,7 @@
                     });
                     const createLabelRes = await api.post(auth, `/labels`, {
                         name,
-                        colour: 'black'
+                        colour: '#000000'
                     });
 
                     if (typeof createLabelRes.id !== 'string') {

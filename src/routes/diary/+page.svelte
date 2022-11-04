@@ -12,7 +12,7 @@
 <main>
 	<EntryForm
 		auth={data}
-		on:submit={reloadEntries}
+		on:updated={reloadEntries}
 		bind:reset={clearEntryForm}
 	/>
 	<Entries

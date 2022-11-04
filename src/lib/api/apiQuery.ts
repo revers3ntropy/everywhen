@@ -4,6 +4,7 @@ import { KEY_COOKIE_KEY, USERNAME_COOKIE_KEY } from "../constants";
 import { browser } from '$app/environment';
 import { PUBLIC_SVELTEKIT_PORT } from '$env/static/public';
 import type { Auth } from "../types";
+import { page } from '$app/stores';
 
 export async function makeApiReq(
 	auth: Auth,
@@ -44,7 +45,9 @@ export async function makeApiReq(
 		return await response.json();
 	} else {
 		if (response.status === 401 && browser) {
-			location.reload();
+			if (window.location.pathname.trim() !== '/') {
+				window.location.href = '/';
+			}
 		}
 		console.error(
 			`Error on api fetch (${browser ? 'client' : 'server'} side)`,
@@ -70,10 +73,10 @@ export async function makeApiReq(
 export const api = {
 	get: async (auth: Auth, path: string) =>
 		await makeApiReq(auth, 'GET', path),
-	post: async (auth: Auth, path: string, body: any) =>
+	post: async (auth: Auth, path: string, body: any = {}) =>
 		await makeApiReq(auth, 'POST', path, body),
-	put: async (auth: Auth, path: string, body: any) =>
+	put: async (auth: Auth, path: string, body: any = {}) =>
 		await makeApiReq(auth, 'PUT', path, body),
-	delete: async (auth: Auth, path: string, body: any) =>
+	delete: async (auth: Auth, path: string, body: any = {}) =>
 		await makeApiReq(auth, 'DELETE', path, body)
 };

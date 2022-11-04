@@ -14,6 +14,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 	const page = parseInt(url.searchParams.get('page') || '0');
 	const deleted = url.searchParams.get('deleted') === '1';
 	const search = (url.searchParams.get('search') || '').toLowerCase();
+	const labelId = url.searchParams.get('labelId');
 
 	if (page < 0) throw error(400, 'Invalid page number');
 	if (!pageSize || pageSize < 0) throw error(400, 'Invalid page size');
@@ -32,6 +33,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
         WHERE deleted = ${deleted}
           AND entries.user = users.id
           AND users.id = ${id}
+          AND (entries.label = ${labelId} OR ${!labelId})
         ORDER BY created DESC, id
         LIMIT ${pageSize}
         OFFSET ${pageSize * page}
@@ -44,8 +46,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
         SELECT title, entry
         FROM entries
         WHERE deleted = ${deleted}
-    `
-	).filter(
+    `).filter(
 		(entry) =>
 			!search ||
 			// decrypt lazily for performance

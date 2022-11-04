@@ -42,9 +42,11 @@ export const PUT: RequestHandler = async ({ cookies, request, params }) => {
 
     // check label exists
     const label = await query<Label[]>`
-        SELECT id
-        FROM labels
-        WHERE id = ${params.labelId}
+        SELECT labels.id
+        FROM labels, users
+        WHERE labels.id = ${params.labelId}
+            AND labels.user = users.id
+            AND users.id = ${id}
     `;
     if (!label.length) {
         throw error(404, 'Label with that id not found');
@@ -80,6 +82,49 @@ export const PUT: RequestHandler = async ({ cookies, request, params }) => {
             WHERE id = ${params.labelId}
         `;
     }
+
+    return new Response(
+        JSON.stringify({}),
+        { status: 200 }
+    );
+}
+
+export let DELETE: RequestHandler = async ({ cookies, params}) => {
+    const { id } = await getAuthFromCookies(cookies);
+
+    if (!params.labelId || typeof params.labelId !== 'string') {
+        throw error(400, 'Invalid label id');
+    }
+
+    // check label exists
+    const label = await query<Label[]>`
+        SELECT labels.id
+        FROM labels, users
+        WHERE labels.id = ${params.labelId}
+            AND labels.user = users.id
+            AND users.id = ${id}
+    `;
+    if (!label.length) {
+        throw error(404, 'Label with that id not found');
+    }
+
+    const entriesWithLabel = await query`
+        SELECT entries.id
+        FROM entries, users, labels
+        WHERE entries.user = users.id
+            AND users.id = ${id}
+            AND entries.label = labels.id
+            AND labels.id = ${params.labelId}
+    `;
+
+    if (entriesWithLabel.length) {
+        throw error(400, 'Label is in use');
+    }
+
+    await query`
+        DELETE FROM labels
+        WHERE id = ${params.labelId}
+    `;
 
     return new Response(
         JSON.stringify({}),

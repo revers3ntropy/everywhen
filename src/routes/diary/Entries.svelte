@@ -31,7 +31,7 @@
     let search = '';
 
     function importPopup () {
-        showPopup(ImportDialog, { auth }, () => dispatch('updated'));
+        showPopup(ImportDialog, { auth }, () => reload(page, search));
     }
 
     export async function reload(page: number, search: string) {

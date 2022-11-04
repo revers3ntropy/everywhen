@@ -18,7 +18,8 @@
             addNotification({
                 text: 'Invalid Name',
                 position: 'top-center',
-                type: 'error'
+                type: 'error',
+                removeAfter: 6000
             });
             return;
         }
@@ -45,6 +46,8 @@
             type: 'success',
             removeAfter: 3000
         });
+
+        labelName = '';
 
         dispatch('submit');
     }

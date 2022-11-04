@@ -66,13 +66,15 @@
 		</div>
 
 		<div>
-			<button on:click={del}>
-				{#if deleted}
-					<Restore size="25" />
-				{:else}
-					<Bin size="25" />
-				{/if}
-			</button>
+			{#if !obfuscated}
+				<button on:click={del}>
+					{#if deleted}
+						<Restore size="25" />
+					{:else}
+						<Bin size="25" />
+					{/if}
+				</button>
+			{/if}
 		</div>
 	</div>
 	<p class="body {obfuscated ? 'obfuscated' : ''}">

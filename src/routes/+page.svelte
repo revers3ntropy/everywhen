@@ -20,17 +20,16 @@
 				username
 			})}`
 		);
-		if (!res?.body?.message) {
-			window.location.href = '/home';
-			return;
-		}
 
-		addNotification({
-			text: res?.body?.message,
-			position: 'top-center',
-			type: 'error',
-			removeAfter: 4000
-		});
+		if (res?.body?.error) {
+			return void addNotification({
+				text: res?.body?.error,
+				position: 'top-center',
+				type: 'error',
+				removeAfter: 4000
+			});
+		}
+		window.location.href = '/home';
 	}
 
 	async function create() {
@@ -38,21 +37,21 @@
 			password: sha256(password).substring(0, 32),
 			username
 		});
+
 		if (res.body?.error) {
-			addNotification({
+			return void addNotification({
 				text: res.body?.error,
 				position: 'top-center',
 				type: 'error',
 				removeAfter: 4000
 			});
-			return;
 		}
 		window.location.href = '/home';
 	}
 </script>
 
 <main>
-	<form class="flex-center page-center">
+	<div class="flex-center page-center form">
 		<div class="content">
 			<label>
 				Username
@@ -72,19 +71,28 @@
 				/>
 			</label>
 			<div class="flex-center" style="justify-content: space-between">
-				<button on:click|preventDefault={create}> Sign Up </button>
-				<button on:click|preventDefault={login} class="primary">
+				<button
+					type='button'
+					on:click|preventDefault={create}
+				>
+					Sign Up
+				</button>
+				<button
+					type='button'
+					on:click|preventDefault={login}
+					class="primary"
+				>
 					<ChevronRight size="30" />
 					Log In
 				</button>
 			</div>
 		</div>
-	</form>
+	</div>
 </main>
 
 <style lang="less">
 
-	form {
+	.form {
 		.content, form input {
 			max-width: 94vw;
 		}

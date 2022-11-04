@@ -64,8 +64,9 @@ ALTER TABLE `users`
     ADD PRIMARY KEY (`id`),
     ADD UNIQUE KEY `username` (`username`);
 COMMIT;
-ALTER TABLE `entries`ADD PRIMARY KEY (`id`);
-ALTER TABLE `events`ADD PRIMARY KEY (`id`);
+ALTER TABLE `entries` ADD PRIMARY KEY (`id`);
+ALTER TABLE `events` ADD PRIMARY KEY (`id`);
+ALTER TABLE `ids` ADD PRIMARY KEY (`id`);
 
 ALTER TABLE `labels`
     ADD PRIMARY KEY (`id`);
