@@ -24,6 +24,11 @@
     async function loadLabels() {
         const res = await api.get(auth, `/labels`) as { labels: Label[] };
         labels = res.labels;
+
+        // if we delete a label while it was selected, unselect
+        if (!labels.find(l => l.id === value)) {
+            value = "";
+        }
     }
 
     $: loadLabels();
@@ -38,13 +43,13 @@
                     .find(l => l.id === value)?.colour || 'transparent'
                   }"
             ></span>
-            {labels.find(l => l.id === value)?.name || 'No Label'}
+            {labels.find(l => l.id === value)?.name || '(No Label)'}
         </span>
         <button
             on:click={() => { closeLabelDropDown(); value = '' }}
             class="label-button single"
         >
-            No Label
+            <i>(No Label)</i>
         </button>
         {#each labels.filter(filter) as label (label.id)}
             <button

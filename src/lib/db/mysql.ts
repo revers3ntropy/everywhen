@@ -62,14 +62,16 @@ export async function query<Res extends queryRes = mysql.RowDataPacket[]>(
 	// 	.replace('\n', '');
 	// console.log(`QUERY: ${queryToLog} ${JSON.stringify(params)}`);
 
-	// if it's an array, add all the elements of the array in place as params
-	// Flatten 2D arrays
-	for (let i = 0; i < params.length; i++) {
-		if (Array.isArray(params[i])) {
-			// insert the contents of the sub array into the array at it's index
-			params.splice(i, 1, ...params[i]);
-		}
-	}
+    // if it's an array, add all the elements of the array in place as params
+    // Flatten 2D arrays
+    for (let i = 0; i < params.length; i++) {
+        if (Array.isArray(params[i])) {
+            // insert the contents of the sub array into the array at it's index
+            params.splice(i, 1, ...params[i]);
+        }
+    }
 
-	return <Res>(await con?.query(query, params) || [])[0];
+    console.log(`[QUERY] ${ query } ${ JSON.stringify(params) }`);
+
+    return <Res>(await con?.query(query, params) || [])[0];
 }

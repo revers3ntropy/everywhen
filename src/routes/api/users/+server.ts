@@ -7,7 +7,6 @@ import {
 	KEY_COOKIE_KEY,
 	USERNAME_COOKIE_KEY
 } from '$lib/constants';
-import { error } from "@sveltejs/kit";
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
 	const { username, password } = await request.json();

@@ -1,5 +1,6 @@
 <script lang="ts">
-    window.location.assign('/');
+    console.log("Signing out so redirecting to /");
+    window.location.assign("/");
 </script>
 
 <main>

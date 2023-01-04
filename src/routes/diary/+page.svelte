@@ -5,7 +5,7 @@
 
 	export let data: Data;
 	let clearEntryForm: () => void;
-	let reloadEntries = () => {};
+    let reloadEntries;
 
 </script>
 

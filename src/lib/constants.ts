@@ -8,8 +8,8 @@ export const obfuscated = writable(false);
 export const popup = writable<any>(null);
 
 export const AUTH_COOKIE_OPTIONS = Object.freeze({
-	path: '/',
-	maxAge: 60 * 60, // one hour, but will be refreshed on every request
-	sameSite: 'strict',
-	httpOnly: true
+    path: "/",
+    maxAge: 60 * 60 // one hour, but will be refreshed on every request
+    //sameSite: 'strict',
+    //httpOnly: true
 });

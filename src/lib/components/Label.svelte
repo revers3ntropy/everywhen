@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { Label } from '$lib/types';
 
-	export let label: Label = null;
+	export let label: Label | null = null;
 </script>
 
 {#if label}

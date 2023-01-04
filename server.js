@@ -31,5 +31,8 @@ app.get('/healthcheck', (req, res) => {
     res.end('ok');
 });
 
-// let SvelteKit handle everything else, including serving pre-rendered pages and static assets
-app.use(handler);
+app.use((req, res, next) => {
+    console.log(`EXPRESS [${req.method}] ${req.url}`);
+    // let SvelteKit handle everything else, including serving pre-rendered pages and static assets
+    return handler(req, res, next);
+});

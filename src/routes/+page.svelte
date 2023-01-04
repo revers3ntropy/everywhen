@@ -12,13 +12,13 @@
 	let password = '';
 	let username = '';
 
-	async function login() {
+	async function login (): Promise<void> {
 		const res = await api.get(
 			data,
-			`/auth${GETArgs({
+			`/auth${ GETArgs({
 				key: sha256(password).substring(0, 32),
 				username
-			})}`
+			}) }`
 		);
 
 		if (res?.body?.error) {
@@ -29,10 +29,11 @@
 				removeAfter: 4000
 			});
 		}
-		window.location.href = '/home';
+		console.log(`Logging in so redirecting to /home`);
+		window.location.href = "/home";
 	}
 
-	async function create() {
+	async function create (): Promise<void> {
 		const res = await api.post(data, `/users`, {
 			password: sha256(password).substring(0, 32),
 			username
@@ -41,12 +42,13 @@
 		if (res.body?.error) {
 			return void addNotification({
 				text: res.body?.error,
-				position: 'top-center',
-				type: 'error',
+				position: "top-center",
+				type: "error",
 				removeAfter: 4000
 			});
 		}
-		window.location.href = '/home';
+		console.log(`Logged in from creating account so redirecting to /home`);
+		window.location.href = "/home";
 	}
 </script>
 

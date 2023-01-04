@@ -1,17 +1,20 @@
 <script lang="ts">
-	import 'ts-polyfill';
-	import '../app.less';
-	import Header from '$lib/components/Header.svelte';
-	import Notifications from 'svelte-notifications';
-	import { INACTIVE_TIMEOUT_MS, obfuscated } from '$lib/constants';
-	import { page } from '$app/stores';
-	import Notifier from './Notifier.svelte';
-	import Modal from 'svelte-simple-modal';
-	import { popup } from '$lib/constants.js';
+	import "ts-polyfill";
+	import "../app.less";
+	import Header from "$lib/components/Header.svelte";
+	import Notifications from "svelte-notifications";
+	import { INACTIVE_TIMEOUT_MS, obfuscated } from "$lib/constants";
+	import { page } from "$app/stores";
+	import Notifier from "./Notifier.svelte";
+	import Modal from "svelte-simple-modal";
+	import { popup } from "$lib/constants.js";
+
+	export const ssr = true;
+	export const prerender = true;
 
 	export let data: Record<string, any>;
 
-	const home = $page.url.pathname.trim() === '/';
+	const home = $page.url.pathname.trim() === "/";
 
 	let lastActivity = Date.now();
 
@@ -73,6 +76,6 @@
 	/>
 
 	{#if !home}
-		<footer />
+		<footer></footer>
 	{/if}
 </Notifications>
