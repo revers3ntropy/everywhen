@@ -1,8 +1,8 @@
 <script lang="ts">
 	import Notebook from "svelte-material-icons/Notebook.svelte";
 
-	export const ssr = true;
-	export const prerender = true;
+	export const ssr = false;
+	export const prerender = false;
 </script>
 
 <main>

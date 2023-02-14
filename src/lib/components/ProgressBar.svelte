@@ -2,7 +2,6 @@
     export let progress: number = 0;
     export let max = 1;
     export let color: string = "blue";
-
 </script>
 <div class="outer">
     <div class="inner" style="width: {progress/max}%"></div>

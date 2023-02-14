@@ -9,8 +9,8 @@
 	import Modal from "svelte-simple-modal";
 	import { popup } from "$lib/constants.js";
 
-	export const ssr = true;
-	export const prerender = true;
+	export const ssr = false;
+	export const prerender = false;
 
 	export let data: Record<string, any>;
 
