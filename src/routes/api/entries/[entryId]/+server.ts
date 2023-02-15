@@ -1,7 +1,7 @@
 import { getAuthFromCookies } from "$lib/security/getAuthFromCookies";
 import { error } from "@sveltejs/kit";
 import { query } from "$lib/db/mysql";
-import type { RequestHandler } from './$types';
+import type { RequestHandler } from "./$types";
 import type { RawEntry } from "$lib/types";
 
 export const DELETE: RequestHandler = async ({ request, params, cookies }) => {
@@ -9,8 +9,8 @@ export const DELETE: RequestHandler = async ({ request, params, cookies }) => {
     const id = params.entryId;
     const { restore } = await request.json();
 
-    if (typeof id !== 'string' || !id) {
-        throw error(400, 'invalid id');
+    if (typeof id !== "string" || !id) {
+        throw error(400, "invalid id");
     }
 
     const entry = await query`
@@ -28,12 +28,12 @@ export const DELETE: RequestHandler = async ({ request, params, cookies }) => {
 
     await query`
         UPDATE entries, users
-        SET entries.deleted = ${!restore},
-            entries.label=${null}
-        WHERE entries.id = ${id}
-		  AND entries.user = users.id
-		  AND users.id = ${userId}
-   `;
+        SET entries.deleted = ${ !restore },
+            entries.label=${ null }
+        WHERE entries.id = ${ id }
+          AND entries.user = users.id
+          AND users.id = ${ userId }
+    `;
 
     return new Response(JSON.stringify({ id }), { status: 200 });
 };
@@ -41,7 +41,7 @@ export const DELETE: RequestHandler = async ({ request, params, cookies }) => {
 export const PUT: RequestHandler = async ({ request, params, cookies }) => {
     const { id: userId } = await getAuthFromCookies(cookies);
     const id = params.entryId;
-    const { label } = <{label: null | string }>await request.json();
+    const { label } = <{ label: null | string }>await request.json();
 
     if (typeof id !== 'string' || !id) {
         throw error(400, 'invalid id');
@@ -52,10 +52,11 @@ export const PUT: RequestHandler = async ({ request, params, cookies }) => {
 
     const entry = await query<RawEntry[]>`
         SELECT entries.label, entries.deleted
-        FROM entries, users
-        WHERE entries.id = ${id}
-            AND entries.user = users.id
-            AND users.id = ${userId}
+        FROM entries,
+             users
+        WHERE entries.id = ${ id }
+          AND entries.user = users.id
+          AND users.id = ${ userId }
     `;
 
     if (!entry.length) {
@@ -71,10 +72,11 @@ export const PUT: RequestHandler = async ({ request, params, cookies }) => {
     if (label !== null) {
         const labelExists = await query`
             SELECT labels.id
-            FROM labels, users
-            WHERE labels.id = ${label}
-                AND labels.user = users.id
-                AND users.id = ${userId}
+            FROM labels,
+                 users
+            WHERE labels.id = ${ label }
+              AND labels.user = users.id
+              AND users.id = ${ userId }
         `;
         if (!labelExists.length) {
             throw error(404, 'Label not found');
@@ -83,11 +85,11 @@ export const PUT: RequestHandler = async ({ request, params, cookies }) => {
 
     await query`
         UPDATE entries, users
-        SET entries.label = ${label}
-        WHERE entries.id = ${id}
+        SET entries.label = ${ label }
+        WHERE entries.id = ${ id }
           AND entries.user = users.id
-          AND users.id = ${userId}
-   `;
+          AND users.id = ${ userId }
+    `;
 
     return new Response(JSON.stringify({ id }), { status: 200 });
-}
+};

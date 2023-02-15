@@ -9,4 +9,5 @@ export const load: PageServerLoad = async ({ cookies }) => {
     // leading to header bar persisting on '/',
     // even with `status: 303` (no cache)
     // throw redirect(303, '/');
+    // instead allow the page to load and redirect in the browser
 }

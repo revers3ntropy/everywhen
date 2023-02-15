@@ -2,7 +2,7 @@
     import { getNotificationsContext } from 'svelte-notifications';
     import { api } from '$lib/api/apiQuery';
     import { popup } from '$lib/constants';
-    import { createEventDispatcher } from 'svelte';
+    import { createEventDispatcher } from "svelte";
     import type { Auth } from "$lib/types";
 
     const dispatch = createEventDispatcher();
@@ -13,12 +13,12 @@
 
     export let auth: Auth;
 
-    async function closeHandler() {
+    async function closeHandler () {
         if (!labelName) {
             addNotification({
-                text: 'Invalid Name',
-                position: 'top-center',
-                type: 'error',
+                text: "Invalid Name",
+                position: "top-center",
+                type: "error",
                 removeAfter: 6000
             });
             return;
@@ -58,11 +58,11 @@
         <h1>Create New Label</h1>
     </div>
     <div class="content">
-        <input type="text" bind:value={labelName} placeholder="Name" />
-        <input type="color" bind:value={labelColour} />
+        <input bind:value={labelName} placeholder="Name" type="text" />
+        <input bind:value={labelColour} type="color" />
     </div>
     <div class="actions">
-        <button on:click={closeHandler}> Create </button>
+        <button on:click={closeHandler}> Create</button>
     </div>
 </div>
 

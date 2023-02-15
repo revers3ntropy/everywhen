@@ -6,13 +6,13 @@
 
 {#if label}
 	<a class="label has-label" href="/labels/{label.id}">
-		<span class="colour" style="background: {label.colour}" />
+		<span class="colour" style="background: {label.colour}"></span>
 		<span class="name">
 			{label.name}
 		</span>
 	</a>
 {:else}
-	<span style="margin: 0 .5em" />
+    <span style="margin: 0 .5em"></span>
 {/if}
 
 <style lang="less">

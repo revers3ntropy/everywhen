@@ -1,18 +1,18 @@
-<svelte:window on:mousedown={globalMouseDown}/>
+<svelte:window on:mousedown={globalMouseDown} />
 <script lang="ts">
-    import MenuDown from 'svelte-material-icons/MenuDown.svelte';
-    export let value;
+    import MenuDown from "svelte-material-icons/MenuDown.svelte";
+    //export let value;
     export let open = false;
 
     export let close = () => {
-    	open = false;
+        open = false;
     };
 
     function globalMouseDown (evt: MouseEvent) {
-    	if (open && !(evt.target as Element).closest('.dropdown')) {
-    		close();
+        if (open && !(evt.target as Element).closest(".dropdown")) {
+            close();
             evt.preventDefault();
-    	}
+        }
     }
 </script>
 <div class="dropdown">

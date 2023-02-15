@@ -1,22 +1,20 @@
 <script lang="ts">
     import { obfuscated } from "$lib/constants.js";
-    import EntryGroup from '$lib/components/EntryGroup.svelte';
-    import moment from 'moment';
-    import Bin from 'svelte-material-icons/Delete.svelte';
-    import TrayArrowUp from 'svelte-material-icons/TrayArrowUp.svelte';
-    import Sidebar from './Sidebar.svelte';
-    import PageCounter from '$lib/components/PageCounter.svelte';
-    import Time from 'svelte-time';
+    import EntryGroup from "$lib/components/EntryGroup.svelte";
+    import moment from "moment";
+    import Bin from "svelte-material-icons/Delete.svelte";
+    import TrayArrowUp from "svelte-material-icons/TrayArrowUp.svelte";
+    import Sidebar from "./Sidebar.svelte";
+    import PageCounter from "$lib/components/PageCounter.svelte";
+    import Time from "svelte-time";
     import type { Entry as EntryType } from "$lib/types";
     import { GETArgs, showPopup } from "$lib/utils";
     import ImportDialog from "./ImportDialog.svelte";
-    import { createEventDispatcher } from "svelte";
     import { api } from "$lib/api/apiQuery";
     import { groupEntriesByDay } from "../api/entries/utils.client";
     import { getNotificationsContext } from "svelte-notifications";
 
     const { addNotification } = getNotificationsContext();
-    const dispatch = createEventDispatcher();
 
     export let auth;
 
@@ -34,16 +32,16 @@
         showPopup(ImportDialog, { auth }, () => reload(page, search));
     }
 
-    export async function reload(page: number, search: string) {
+    export async function reload (page: number, search: string) {
         const entriesOptions = {
             page,
             pageSize: PAGE_LENGTH
         };
         if (search) {
-            entriesOptions['search'] = search;
+            entriesOptions["search"] = search;
         }
 
-        api.get(auth, `/entries?${GETArgs(entriesOptions)}`)
+        api.get(auth, `/entries?${ GETArgs(entriesOptions) }`)
             .then((res) => {
                 if (
                     !res.entries ||
@@ -89,23 +87,25 @@
             <div>
                 <Sidebar titles={entryTitles} />
                 <a class="primary" href="/deleted">
-                    <Bin size="30" /> Bin
+                    <Bin size="30" />
+                    Bin
                 </a>
                 <button class="primary" on:click={importPopup}>
-                    <TrayArrowUp size="30" /> Import
+                    <TrayArrowUp size="30" />
+                    Import
                 </button>
             </div>
             <div>
                 <PageCounter
-                    {pages}
-                    pageLength={PAGE_LENGTH}
-                    total={entryCount}
                     bind:page
+                    pageLength={PAGE_LENGTH}
+                    {pages}
+                    total={entryCount}
                 />
             </div>
 
             <div>
-                <input type="text" bind:value={search} placeholder="Search..." />
+                <input bind:value={search} placeholder="Search..." type="text" />
             </div>
         </div>
     </div>

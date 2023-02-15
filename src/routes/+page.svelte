@@ -29,7 +29,6 @@
 				removeAfter: 4000
 			});
 		}
-		console.log(`Logging in so redirecting to /home`);
 		window.location.href = "/home";
 	}
 
@@ -47,7 +46,6 @@
 				removeAfter: 4000
 			});
 		}
-		console.log(`Logged in from creating account so redirecting to /home`);
 		window.location.href = "/home";
 	}
 </script>

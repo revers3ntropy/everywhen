@@ -1,28 +1,28 @@
 <script lang="ts">
-    import Plus from 'svelte-material-icons/Plus.svelte';
+    import Plus from "svelte-material-icons/Plus.svelte";
     import Dropdown from "$lib/components/Dropdown.svelte";
     import { showPopup } from "$lib/utils";
-    import NewLabelDialog from "./NewLabelDialog.svelte";
+    import NewLabelDialog from "./dialogs/NewLabelDialog.svelte";
     import { api } from "$lib/api/apiQuery";
     import type { Label } from "$lib/types";
 
     let closeLabelDropDown;
 
     let labels = [];
-    export let value = '';
+    export let value = "";
     export let auth;
     export let filter: (l: Label) => boolean = () => true;
 
-    function showNewLabelPopup() {
+    function showNewLabelPopup () {
         showPopup(NewLabelDialog, { auth }, async () => {
-            const res = await api.get(auth, `/labels`) as { labels: Label[] };
+            const res = await api.get(auth, "/labels") as { labels: Label[] };
             labels = res.labels;
             value = labels.sort((a, b) => b.created - a.created)[0].id;
         });
     }
 
     async function loadLabels() {
-        const res = await api.get(auth, `/labels`) as { labels: Label[] };
+        const res = await api.get(auth, "/labels") as { labels: Label[] };
         labels = res.labels;
 
         // if we delete a label while it was selected, unselect
@@ -56,10 +56,10 @@
                 on:click={() => { closeLabelDropDown(); value = label.id }}
                 class="label-button"
             >
-						<span
-                            class="entry-label-colour"
-                            style="background: {label.colour}"
-                        ></span>
+                <span
+                    class="entry-label-colour"
+                    style="background: {label.colour}"
+                ></span>
                 {#if label === label.id}
                     <b>✓ {label.name}</b>
                 {:else}

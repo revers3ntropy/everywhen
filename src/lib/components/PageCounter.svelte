@@ -1,51 +1,51 @@
 <script lang="ts">
-	import ArrowRight from 'svelte-material-icons/ArrowRight.svelte';
-	import ArrowLeft from 'svelte-material-icons/ArrowLeft.svelte';
+    import ArrowRight from "svelte-material-icons/ArrowRight.svelte";
+    import ArrowLeft from "svelte-material-icons/ArrowLeft.svelte";
 
-	export let page = 0;
-	export let pages = 0;
-	export let pageLength = 0;
-	export let total = 0;
-	export let emptyText = 'No data';
+    export let page = 0;
+    export let pages = 0;
+    export let pageLength = 0;
+    export let total = 0;
+    export let emptyText = "No data";
 </script>
 
 {#if total < 1}
-	{emptyText}
+    {emptyText}
 {:else}
-	<div class="page-counter">
-		<div>
-			<button on:click={() => page--} disabled={page <= 0} class="flex-center">
-				<ArrowLeft size="20" />
-			</button>
-		</div>
-		<div>
-			Page {page + 1} of {pages}
-			<span class="totals">
+    <div class="page-counter">
+        <div>
+            <button on:click={() => page--} disabled={page <= 0} class="flex-center">
+                <ArrowLeft size="20" />
+            </button>
+        </div>
+        <div>
+            Page {page + 1} of {pages}
+            <span class="totals">
 				({Math.min((page + 1) * pageLength, total)} / {total})
 			</span>
-		</div>
-		<div>
-			<button
-				on:click={() => page++}
-				disabled={page >= pages - 1}
-				class="flex-center"
-			>
-				<ArrowRight size="20" />
-			</button>
-		</div>
-	</div>
+        </div>
+        <div>
+            <button
+                on:click={() => page++}
+                disabled={page >= pages - 1}
+                class="flex-center"
+            >
+                <ArrowRight size="20" />
+            </button>
+        </div>
+    </div>
 {/if}
 
 <style lang="less">
-	@import '../../styles/variables.less';
+    @import '../../styles/variables.less';
 
-	.page-counter {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
+    .page-counter {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
-	.totals {
-		color: @text-color-light;
-	}
+    .totals {
+        color: @text-color-light;
+    }
 </style>

@@ -1,81 +1,81 @@
 <script lang="ts">
-	import "ts-polyfill";
-	import "../app.less";
-	import Header from "$lib/components/Header.svelte";
-	import Notifications from "svelte-notifications";
-	import { INACTIVE_TIMEOUT_MS, obfuscated } from "$lib/constants";
-	import { page } from "$app/stores";
-	import Notifier from "./Notifier.svelte";
-	import Modal from "svelte-simple-modal";
-	import { popup } from "$lib/constants.js";
+    import "ts-polyfill";
+    import "../app.less";
+    import Header from "$lib/components/Header.svelte";
+    import Notifications from "svelte-notifications";
+    import { INACTIVE_TIMEOUT_MS, obfuscated } from "$lib/constants";
+    import { page } from "$app/stores";
+    import Notifier from "./Notifier.svelte";
+    import Modal from "svelte-simple-modal";
+    import { popup } from "$lib/constants.js";
 
-	export const ssr = false;
-	export const prerender = false;
+    export const ssr = false;
+    export const prerender = false;
 
-	export let data: Record<string, any>;
+    export let data: Record<string, any>;
 
-	const home = $page.url.pathname.trim() === "/";
+    const home = $page.url.pathname.trim() === "/";
 
-	let lastActivity = Date.now();
+    let lastActivity = Date.now();
 
-	let addNotification;
-	let isObfuscated = true;
-	$: obfuscated.update(() => isObfuscated);
+    let addNotification;
+    let isObfuscated = true;
+    $: obfuscated.update(() => isObfuscated);
 
-	setInterval(() => {
-		if (isObfuscated) return;
+    setInterval(() => {
+        if (isObfuscated) return;
 
-		if (Date.now() - lastActivity > INACTIVE_TIMEOUT_MS) {
-			addNotification({
-				text: 'Hidden due to inactivity',
-				type: 'info',
-				removeAfter: 4000
-			});
-			isObfuscated = true;
-		}
-	}, 1000);
+        if (Date.now() - lastActivity > INACTIVE_TIMEOUT_MS) {
+            addNotification({
+                text: "Hidden due to inactivity",
+                type: "info",
+                removeAfter: 4000
+            });
+            isObfuscated = true;
+        }
+    }, 1000);
 
-	function activity() {
-		lastActivity = Date.now();
-	}
+    function activity () {
+        lastActivity = Date.now();
+    }
 
-	function keydown(e: KeyboardEvent) {
-		lastActivity = Date.now();
-		if (e.key === 'Escape') {
-			if (e.ctrlKey) {
-				isObfuscated = !isObfuscated;
-				e.preventDefault();
-			}
-		}
-	}
+    function keydown (e: KeyboardEvent) {
+        lastActivity = Date.now();
+        if (e.key === "Escape") {
+            if (e.ctrlKey) {
+                isObfuscated = !isObfuscated;
+                e.preventDefault();
+            }
+        }
+    }
 </script>
 
 <svelte:window
-	on:keydown|nonpassive={keydown}
-	on:mousemove|passive={activity}
-	on:scroll|passive={activity}
+    on:keydown|nonpassive={keydown}
+    on:mousemove|passive={activity}
+    on:scroll|passive={activity}
 />
 
 <svelte:head>
-	<title>Diary</title>
-	<meta name="description" content="Diary" />
+    <title>Diary</title>
+    <meta content="Diary" name="description" />
 </svelte:head>
 
 <Notifications>
-	<Notifier bind:addNotification />
+    <Notifier bind:addNotification />
 
-	{#if !home}
-		<Header user={data} />
-	{/if}
+    {#if !home}
+        <Header user={data} />
+    {/if}
 
-	<slot />
-	<Modal
-		show={$popup}
-		classContent="popup-background"
-		classWindow="popup-background"
-	/>
+    <slot />
+    <Modal
+        classContent="popup-background"
+        classWindow="popup-background"
+        show={$popup}
+    />
 
-	{#if !home}
-		<footer></footer>
-	{/if}
+    {#if !home}
+        <footer></footer>
+    {/if}
 </Notifications>

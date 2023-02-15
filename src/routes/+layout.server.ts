@@ -8,13 +8,10 @@ export const ssr = void 0;
 export const prerender = void 0;
 
 export const load: LayoutServerLoad = async ({ cookies, url }) => {
-	console.log(`Layout: ${ url.pathname.trim() }`);
 	const home = url.pathname.trim() === "/";
 
 	const key = cookies.get(KEY_COOKIE_KEY);
 	const username = cookies.get(USERNAME_COOKIE_KEY);
-
-	await query`SELECT 1`;
 
 	console.log(key, username);
 	if (key && username) {
@@ -29,9 +26,6 @@ export const load: LayoutServerLoad = async ({ cookies, url }) => {
 				console.log(`User '${ username }' is logged in, Redirecting to /home`);
 				throw redirect(307, "/home");
 			}
-			console.log(`Logged in ${ JSON.stringify({
-				key, username, id: res[0].id
-			}) }`);
 			return { key, username, id: res[0].id };
 		}
 	}
