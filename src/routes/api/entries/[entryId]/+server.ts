@@ -23,7 +23,7 @@ export const DELETE: RequestHandler = async ({ request, params, cookies }) => {
         throw error(404, "Entry not found");
     }
     if (!!entry[0].deleted === !restore) {
-        throw error(400, 'Entry is already in that state');
+        throw error(400, "Entry is already in that state");
     }
 
     await query`
@@ -43,11 +43,11 @@ export const PUT: RequestHandler = async ({ request, params, cookies }) => {
     const id = params.entryId;
     const { label } = <{ label: null | string }>await request.json();
 
-    if (typeof id !== 'string' || !id) {
-        throw error(400, 'invalid id');
+    if (typeof id !== "string" || !id) {
+        throw error(400, "invalid id");
     }
-    if (label !== null && typeof label !== 'string') {
-        throw error(400, 'invalid label');
+    if (label !== null && typeof label !== "string") {
+        throw error(400, "invalid label");
     }
 
     const entry = await query<RawEntry[]>`
@@ -60,13 +60,13 @@ export const PUT: RequestHandler = async ({ request, params, cookies }) => {
     `;
 
     if (!entry.length) {
-        throw error(404, 'Entry not found');
+        throw error(404, "Entry not found");
     }
     if (entry[0].deleted) {
-        throw error(400, 'Entry is deleted');
+        throw error(400, "Entry is deleted");
     }
     if (entry[0].label === label || (!label && !entry[0].label)) {
-        throw error(400, 'Entry already has that label');
+        throw error(400, "Entry already has that label");
     }
 
     if (label !== null) {
@@ -79,7 +79,7 @@ export const PUT: RequestHandler = async ({ request, params, cookies }) => {
               AND users.id = ${ userId }
         `;
         if (!labelExists.length) {
-            throw error(404, 'Label not found');
+            throw error(404, "Label not found");
         }
     }
 

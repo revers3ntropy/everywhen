@@ -5,7 +5,7 @@ import { addLabelsToEntries, decryptEntries } from '../utils.server';
 import type { RawEntry } from '$lib/types';
 
 export const GET: RequestHandler = async ({ cookies }) => {
-    const { key, id } = await getAuthFromCookies(cookies);
+	const { key, id } = await getAuthFromCookies(cookies);
 
     const entries = await query`
         SELECT entries.id,

@@ -40,7 +40,6 @@ export async function query<Res extends queryRes = mysql.RowDataPacket[]> (
     queryParts: TemplateStringsArray,
     ...params: any[]
 ): Promise<Res> {
-
     if (!con) await connect();
 
     const query = queryParts.reduce((acc, cur, i) => {
@@ -73,5 +72,5 @@ export async function query<Res extends queryRes = mysql.RowDataPacket[]> (
 
     console.log(`[QUERY] ${ query } ${ JSON.stringify(params) }`);
 
-    return <Res>(await con?.query(query, params) || [])[0];
+    return <Res>((await con?.query(query, params)) || [])[0];
 }

@@ -1,10 +1,7 @@
 import { decrypt } from "$lib/security/encryption";
 import type { Label } from "$lib/types";
 
-export function decryptLabel (
-    label: Label,
-    key: string
-): Label {
+export function decryptLabel (label: Label, key: string): Label {
     return {
         ...label,
         name: decrypt(label.name, key)
