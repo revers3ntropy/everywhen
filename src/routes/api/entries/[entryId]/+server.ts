@@ -16,11 +16,11 @@ export const DELETE: RequestHandler = async ({ request, params, cookies }) => {
     const entry = await query`
         SELECT deleted
         FROM entries
-        WHERE id = ${id}
+        WHERE id = ${ id }
     `;
 
     if (!entry.length) {
-        throw error(404, 'Entry not found');
+        throw error(404, "Entry not found");
     }
     if (!!entry[0].deleted === !restore) {
         throw error(400, 'Entry is already in that state');

@@ -1,11 +1,11 @@
-import type { RequestHandler } from './$types';
-import { query } from '$lib/db/mysql';
-import { generateUUId } from '$lib/security/uuid';
-import { error } from '@sveltejs/kit';
+import type { RequestHandler } from "./$types";
+import { query } from "$lib/db/mysql";
+import { generateUUId } from "$lib/security/uuid";
+import { error } from "@sveltejs/kit";
 import { decrypt, encrypt } from "$lib/security/encryption";
 import { getAuthFromCookies } from "$lib/security/getAuthFromCookies";
 import { addLabelsToEntries, decryptEntries } from "./utils.server";
-import type { RawEntry } from '$lib/types';
+import type { RawEntry } from "$lib/types";
 
 export const GET: RequestHandler = async ({ url, cookies }) => {
     const { key, id } = await getAuthFromCookies(cookies);

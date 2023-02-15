@@ -1,4 +1,4 @@
-import type { HttpMethod } from '@sveltejs/kit/types/private';
+import type { HttpMethod } from "@sveltejs/kit/types/private";
 import { serialize } from "cookie";
 import { AUTH_COOKIE_OPTIONS, KEY_COOKIE_KEY, USERNAME_COOKIE_KEY } from "../constants";
 import { browser } from "$app/environment";

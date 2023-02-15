@@ -1,9 +1,9 @@
-import type { RequestHandler } from './$types';
-import { query } from '$lib/db/mysql';
-import { generateUUId } from '$lib/security/uuid';
-import { error } from '@sveltejs/kit';
-import { encrypt } from '$lib/security/encryption';
-import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
+import type { RequestHandler } from "./$types";
+import { query } from "$lib/db/mysql";
+import { generateUUId } from "$lib/security/uuid";
+import { error } from "@sveltejs/kit";
+import { encrypt } from "$lib/security/encryption";
+import { getAuthFromCookies } from "../../../lib/security/getAuthFromCookies";
 import { decryptLabels } from "./utils.server";
 import type { Label } from "$lib/types";
 

@@ -1,5 +1,5 @@
-import { type Cookies, error } from '@sveltejs/kit';
-import { KEY_COOKIE_KEY, USERNAME_COOKIE_KEY } from '../constants';
+import { type Cookies, error } from "@sveltejs/kit";
+import { KEY_COOKIE_KEY, USERNAME_COOKIE_KEY } from "../constants";
 import { query } from "../db/mysql";
 import type { User } from "../types";
 
