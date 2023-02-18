@@ -36,8 +36,6 @@
         canvasStore.set(canvas);
         contextStore.set(context);
 
-        console.log("setup canvas");
-
         // setup entities
         listeners.forEach(async entity => {
             if (entity.setup) {

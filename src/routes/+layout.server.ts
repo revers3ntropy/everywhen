@@ -10,7 +10,6 @@ export const load: LayoutServerLoad = async ({ cookies, url }) => {
 	const key = cookies.get(KEY_COOKIE_KEY);
 	const username = cookies.get(USERNAME_COOKIE_KEY);
 
-	console.log(key, username);
 	if (key && username) {
 		const res = await query`
 			SELECT id
@@ -20,7 +19,6 @@ export const load: LayoutServerLoad = async ({ cookies, url }) => {
 		`;
 		if (res.length !== 0) {
 			if (home) {
-				console.log(`User '${ username }' is logged in, Redirecting to /home`);
 				throw redirect(307, "/home");
 			}
 			return { key, username, id: res[0].id };
@@ -28,7 +26,6 @@ export const load: LayoutServerLoad = async ({ cookies, url }) => {
 	}
 
 	if (!home) {
-		console.log(`User '${ username }' failed to authenticate`);
 		throw redirect(307, '/');
 	}
 

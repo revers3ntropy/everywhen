@@ -23,10 +23,9 @@ const config: mysql.ConnectionOptions = {
 let con: mysql.Connection | null = null;
 
 async function connect () {
-	console.log(`Connecting to mysql db '${ DB }'...`);
 	con = await mysql.createConnection(config).catch((e: any) => {
-		console.log(`Error connecting to mysql db '${ DB }'`);
-		console.log(e);
+		console.error(`Error connecting to mysql db '${ DB }'`);
+		console.error(e);
 		throw e;
 	});
 }
@@ -69,8 +68,6 @@ export async function query<Res extends queryRes = mysql.RowDataPacket[]> (
 			params.splice(i, 1, ...params[i]);
 		}
 	}
-
-	// console.log(`[QUERY] ${query} ${JSON.stringify(params)}`);
 
 	return <Res>((await con?.query(query, params)) || [])[0];
 }

@@ -191,7 +191,6 @@ export const renderable = (
             element.render = render.render;
         }
         if (render.setup) {
-            console.log("setup");
             element.setup = render.setup;
         }
     }
