@@ -50,9 +50,8 @@
 								{moment(new Date(entry.created * 1000)).format('h:mm A')}
 							</span>
 							<span
-								class="entry-label-colour"
-								style="background: {entry.label?.colour || 'transparent'}"
-							/>
+                                class="entry-label-colour"
+                                style="background: {entry.label?.colour || 'transparent'}"></span>
 
 							{#if entry.title}
 								{entry.title}

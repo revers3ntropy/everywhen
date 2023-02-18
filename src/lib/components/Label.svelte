@@ -1,13 +1,15 @@
 <script lang="ts">
-	import type { Label } from '$lib/types';
+    import type { Label } from "$lib/types";
 
-	export let label: Label | null = null;
+    export let label: Label | null = null;
+
+    export let obfuscated = true;
 </script>
 
 {#if label}
 	<a class="label has-label" href="/labels/{label.id}">
 		<span class="colour" style="background: {label.colour}"></span>
-		<span class="name">
+        <span class="name {obfuscated ? 'obfuscated' : ''}">
 			{label.name}
 		</span>
 	</a>

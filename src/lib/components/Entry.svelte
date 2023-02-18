@@ -77,7 +77,7 @@
 			<span class="time">
 				{moment(new Date(created * 1000)).format('h:mm A')}
 			</span>
-            <Label label={showLabel} />
+            <Label label={showLabel} obfuscated={obfuscated} />
         </div>
         <div class="title {obfuscated ? 'obfuscated' : ''}">
             {obfuscated ? obfuscate(title) : title}

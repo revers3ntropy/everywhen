@@ -1,5 +1,5 @@
-import { getAuthFromCookies } from '../../../../lib/security/getAuthFromCookies';
-import { query } from '$lib/db/mysql';
+import { getAuthFromCookies } from "$lib/security/getAuthFromCookies";
+import { query } from "$lib/db/mysql";
 import type { RequestHandler } from '@sveltejs/kit';
 import { addLabelsToEntries, decryptEntries } from '../utils.server';
 import type { RawEntry } from '$lib/types';

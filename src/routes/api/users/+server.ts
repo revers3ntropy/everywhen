@@ -12,17 +12,17 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 	const { username, password } = await request.json();
 
 	if (!username || username.length < 3 || typeof username !== "string") {
-		return new Response(
-			JSON.stringify({ error: "Username must be at least 3 characters" }),
-			{ status: 400 }
-		);
-	}
-	if (!password || password.length < 8 || typeof password !== "string") {
-		return new Response(
-			JSON.stringify({ error: "Password must be at least 8 characters" }),
-			{ status: 400 }
-		);
-	}
+        return new Response(
+            JSON.stringify({ error: "Username must be at least 3 characters" }),
+            { status: 400 }
+        );
+    }
+    if (!password || password.length < 8 || typeof password !== "string") {
+        return new Response(
+            JSON.stringify({ error: "Password must be at least 8 characters" }),
+            { status: 400 }
+        );
+    }
 
 	const existingUsers = await query`
 		SELECT *
@@ -30,12 +30,12 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 		WHERE username = ${ username }
 	`;
 	if (existingUsers.length !== 0) {
-		return new Response(JSON.stringify({ error: "Username already exists" }), {
-			status: 400
-		});
+        return new Response(JSON.stringify({ error: "Username already exists" }), {
+            status: 400
+        });
 	}
 
-	let salt = "";
+    let salt = "";
 	while (true) {
 		salt = randomString(10);
 		const existingSalts = await query`

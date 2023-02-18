@@ -116,9 +116,11 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
             WHERE id = ${ id }
         `;
 
+        const entryName = encrypt(name, key);
+
         await query`
             INSERT INTO labels (id, created, user, name, colour)
-            VALUES (${ id }, ${ created }, ${ userId }, ${ name }, ${ colour })
+            VALUES (${ id }, ${ created }, ${ userId }, ${ entryName }, ${ colour })
         `;
     }
 

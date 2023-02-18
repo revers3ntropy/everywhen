@@ -7,11 +7,10 @@ import commandLineArgs from 'command-line-args';
 import * as dotenv from 'dotenv';
 import fs from 'fs';
 
-const DIR = 'misc_3-server';
-
 export const flags = commandLineArgs([
-	{ name: 'verbose', type: Boolean, alias: 'v', defaultValue: false },
-	{ name: 'env', type: String, alias: 'e', defaultValue: 'prod' }
+    { name: "verbose", type: Boolean, alias: "v", defaultValue: false },
+    { name: "env", type: String, alias: "e", defaultValue: "prod" },
+    { name: "dir", type: String, defaultValue: "misc_3-server" }
 ]);
 
 $.verbose = flags.verbose;
@@ -23,22 +22,22 @@ async function uploadPath(localPath, remotePath, args = '') {
 }
 
 async function upload() {
-	await $`mv ./build ./${DIR}`;
-	console.log(c.green('Uploading...'));
-	await uploadPath(DIR, '~/', '-r');
+    await $`mv ./build ./${flags.dir}`;
+    console.log(c.green("Uploading..."));
+    await uploadPath(flags.dir, "~/", "-r");
 
 	const paths = {
 		[`./${flags.env}.remote.package.json`]: '/package.json',
 		[`./${flags.env}.cert.pem`]: '/cert.pem',
 		[`./${flags.env}.key.pem`]: '/key.pem',
-		[`./server.js`]: '/server.js'
+        ["./server.js"]: "/server.js"
 	};
 
 	await Promise.all(
 		Object.keys(paths).map(async (path) => {
 			if (fs.existsSync(path)) {
-				console.log(c.yellow(path));
-				await uploadPath(path, '~/' + DIR + paths[path]);
+                console.log(c.yellow(path));
+                await uploadPath(path, "~/" + flags.dir + paths[path]);
 			}
 		})
 	);

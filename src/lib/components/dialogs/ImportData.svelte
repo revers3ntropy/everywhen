@@ -51,8 +51,8 @@
     }
 </script>
 
-<main>
+<div>
     <FileDrop on:filedrop={onFileDrop}>
         Upload files
     </FileDrop>
-</main>
+</div>

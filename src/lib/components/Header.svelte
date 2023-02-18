@@ -4,6 +4,7 @@
     import Login from "svelte-material-icons/Login.svelte";
     import Home from "svelte-material-icons/Home.svelte";
     import LabelOutline from "svelte-material-icons/LabelOutline.svelte";
+    import ChartTimeline from "svelte-material-icons/ChartTimeline.svelte";
     import { page } from "$app/stores";
 
     export let user = null;
@@ -27,6 +28,11 @@
                class="{$page.url.pathname === '/labels' ? 'current' : ''}"
             >
                 <LabelOutline size="40" />
+            </a>
+            <a href="/timeline"
+               class="{$page.url.pathname === '/timeline' ? 'current' : ''}"
+            >
+                <ChartTimeline size="40" />
             </a>
         {/if}
     </div>
@@ -63,6 +69,8 @@
     }
 
     a, button {
+        margin: 0 4px;
+
         &.current {
             &:after {
                 background-color: @accent-color-secondary;
