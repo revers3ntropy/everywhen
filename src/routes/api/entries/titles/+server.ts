@@ -1,11 +1,11 @@
 import { getAuthFromCookies } from "$lib/security/getAuthFromCookies";
 import { query } from "$lib/db/mysql";
-import type { RequestHandler } from '@sveltejs/kit';
-import { addLabelsToEntries, decryptEntries } from '../utils.server';
-import type { RawEntry } from '$lib/types';
+import type { RequestHandler } from "@sveltejs/kit";
+import { addLabelsToEntries, decryptEntries } from "../utils.server";
+import type { RawEntry } from "$lib/types";
 
 export const GET: RequestHandler = async ({ cookies }) => {
-	const { key, id } = await getAuthFromCookies(cookies);
+    const { key, id } = await getAuthFromCookies(cookies);
 
     const entries = await query`
         SELECT entries.id,

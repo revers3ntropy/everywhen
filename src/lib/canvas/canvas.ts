@@ -56,17 +56,20 @@ export class CtxProps {
 
     public timeToRenderPos (t: number): number {
         t = now() - t + this.cameraOffset;
-        t = this.zoomScaledPosition(t);
+        t = this.zoomScaledPosition(t, this.zoom, this.cameraOffset);
         return this.width - t;
     }
 
     public renderPosToTime (pos: number) {
-        pos = this.width - pos;
-        pos = this.zoomScaledPosition(pos, 1 / this.zoom, this.cameraOffset);
+        pos = this.zoomScaledPosition(
+            this.width - pos,
+            1 / this.zoom,
+            this.cameraOffset
+        );
         return Math.round(now() - pos - this.cameraOffset);
     }
 
-    public getMousePosRaw (event: MouseEvent): number {
+    public getMousePosRaw (event: MouseEvent | TouchEvent): number {
         const rect = this.canvas.getBoundingClientRect();
 
         if (
@@ -83,10 +86,28 @@ export class CtxProps {
         }
 
         return this.zoomScaledPosition(
-            (event.pageX - rect.left) * this.canvas.width / rect.width,
+            ((event as MouseEvent).pageX - rect.left) * this.canvas.width / rect.width,
             1 / this.zoom,
             this.width / 2
         );
+    }
+
+    getMouseYRaw (event: MouseEvent | TouchEvent): number {
+        let rect = this.canvas.getBoundingClientRect();
+
+        if (
+            event.type === "touchstart" ||
+            event.type === "touchmove" ||
+            event.type === "touchend" ||
+            event.type === "touchcancel"
+        ) {
+            const evt = (typeof (event as any).originalEvent === "undefined")
+                ? event
+                : (event as any).originalEvent;
+            event = evt.touches[0] || evt.changedTouches[0];
+        }
+
+        return ((event as MouseEvent).pageY - rect.top) * this.canvas.height / rect.height;
     }
 
     public rect (
@@ -151,11 +172,11 @@ export const props = deriveObject({
 
 export const key = Symbol();
 
-export type RenderCallback = (props: CtxProps, dt: number) => void;
+export type RenderCallback = (props: Readonly<CtxProps>, dt: number) => void;
 
 export const renderable = (
-    render: RenderCallback
-        | { render: RenderCallback, setup: RenderCallback }
+    render?: RenderCallback
+        | { render?: RenderCallback, setup?: RenderCallback }
 ) => {
     const api: any = getContext(key);
     const element = {
@@ -170,6 +191,7 @@ export const renderable = (
             element.render = render.render;
         }
         if (render.setup) {
+            console.log("setup");
             element.setup = render.setup;
         }
     }

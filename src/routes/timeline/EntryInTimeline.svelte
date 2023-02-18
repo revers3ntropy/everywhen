@@ -11,10 +11,8 @@
     export let label: Label | null = null;
 
     renderable(props => {
-        const { width } = props;
-
         const renderPos = props.timeToRenderPos(created);
-        if (renderPos < 0 || renderPos > width) return;
+        if (renderPos < 0 || renderPos > props.width) return;
 
         const size = Math.max(wordCount(entry) * 0.1, 5);
 

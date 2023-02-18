@@ -16,7 +16,14 @@
     export let killLoopOnError = true;
     export let attributes = {};
 
-    let listeners = [];
+    interface Listener {
+        setup?: (props: CtxProps) => void | Promise<void>;
+        render?: (props: CtxProps, dt: number) => void;
+        ready: boolean;
+        mounted: boolean;
+    }
+
+    let listeners: Listener[] = [];
     let canvas;
     let context;
     let frame;
@@ -120,7 +127,8 @@
     bind:this={canvas}
     width={$width * $pixelRatio}
     height={$height * $pixelRatio}
-    style="width: {$width}px; height: {$height}px;"></canvas>
+    style="width: {$width}px; height: {$height}px;"
+></canvas>
 <svelte:window on:resize|passive={handleResize} />
 <slot></slot>
 

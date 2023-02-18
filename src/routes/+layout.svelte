@@ -1,13 +1,13 @@
 <script lang="ts">
     import "ts-polyfill";
     import "../app.less";
-    import Header from "$lib/components/Header.svelte";
+    import Header from "../lib/components/Header.svelte";
     import Notifications from "svelte-notifications";
-    import { INACTIVE_TIMEOUT_MS, obfuscated } from "$lib/constants";
+    import { INACTIVE_TIMEOUT_MS, obfuscated } from "../lib/constants";
     import { page } from "$app/stores";
     import Notifier from "./Notifier.svelte";
     import Modal from "svelte-simple-modal";
-    import { popup } from "$lib/constants.js";
+    import { popup } from "../lib/constants.js";
 
     export const ssr = false;
     export const prerender = false;

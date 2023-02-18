@@ -12,5 +12,4 @@
     });
 </script>
 
-<!-- The following allows this component to nest children -->
 <slot></slot>

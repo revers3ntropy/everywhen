@@ -1,11 +1,8 @@
 import "ts-polyfill";
 import type { LayoutServerLoad } from "./$types";
-import { KEY_COOKIE_KEY, USERNAME_COOKIE_KEY } from "$lib/constants";
+import { KEY_COOKIE_KEY, USERNAME_COOKIE_KEY } from "../lib/constants";
 import { redirect } from "@sveltejs/kit";
-import { query } from "$lib/db/mysql";
-
-export const ssr = void 0;
-export const prerender = void 0;
+import { query } from "../lib/db/mysql";
 
 export const load: LayoutServerLoad = async ({ cookies, url }) => {
 	const home = url.pathname.trim() === "/";

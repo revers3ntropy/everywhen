@@ -1,3 +1,5 @@
+import type { Event } from "../../lib/types";
+
 export function now (): number {
     return Date.now() / 1000;
 }
@@ -30,4 +32,13 @@ function isLightColour (color: string): boolean {
         0.114 * (b * b)
     );
     return hsp > 127.5;
+}
+
+export function eventsOverlap (evt1: Event, evt2: Event): boolean {
+    return evt1.start <= evt2.start && evt1.end >= evt2.start ||
+        evt2.start <= evt1.start && evt2.end >= evt1.start;
+}
+
+export function eventDuration (e: Event): number {
+    return e.end - e.start;
 }

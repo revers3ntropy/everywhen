@@ -16,7 +16,16 @@ export interface Entry {
     label?: Label;
 }
 
-export type RawEntry = Omit<Entry, 'label'> & { label?: string };
+export interface Event {
+    id: number;
+    name: string;
+    start: number;
+    end: number;
+    label?: Label;
+}
+
+export type RawEntry = Omit<Entry, "label"> & { label?: string };
+export type RawEvent = Omit<Event, "label"> & { label?: string };
 
 export interface Auth {
     username: string;
