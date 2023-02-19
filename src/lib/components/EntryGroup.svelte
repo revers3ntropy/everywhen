@@ -4,6 +4,7 @@
 
     export let obfuscated = true;
     export let entries: Array<EntryType>;
+    export let showLabels = true;
 </script>
 
 <div class="entry-group container">
@@ -12,7 +13,12 @@
     </div>
     <div class="contents">
         {#each entries as entry}
-            <Entry {...entry} on:updated {obfuscated} />
+            <Entry
+                {...entry}
+                on:updated
+                {obfuscated}
+                {showLabels}
+            />
         {/each}
     </div>
 </div>
@@ -21,10 +27,11 @@
     @import '../../styles/variables.less';
 
     .entry-group {
+        margin: 1em 0;
+
         .title {
             margin-bottom: 0.5rem;
             padding: 0 1em;
-
         }
     }
 

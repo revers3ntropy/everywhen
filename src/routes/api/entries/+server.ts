@@ -20,20 +20,18 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
     if (!pageSize || pageSize < 0) throw error(400, "Invalid page size");
 
     const rawEntries = await query<RawEntry[]>`
-        SELECT entries.id,
-               entries.created,
-               entries.latitude,
-               entries.longitude,
-               entries.title,
-               entries.entry,
-               entries.deleted,
-               entries.label
-        FROM entries,
-             users
+        SELECT id,
+               created,
+               latitude,
+               longitude,
+               title,
+               entry,
+               deleted,
+               label
+        FROM entries
         WHERE deleted = ${ deleted }
-          AND entries.user = users.id
-          AND users.id = ${ id }
-          AND (entries.label = ${ labelId } OR ${ !labelId })
+          AND user = ${ id }
+          AND (label = ${ labelId } OR ${ !labelId })
         ORDER BY created DESC, id
         LIMIT ${ pageSize } OFFSET ${ pageSize * page }
     `;
@@ -45,12 +43,14 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
             SELECT title, entry
             FROM entries
             WHERE deleted = ${ deleted }
-        `).filter(
-        (entry) =>
-            !search ||
-            // decrypt lazily for performance
-            decrypt(entry.title, key).toLowerCase().includes(search) ||
-            decrypt(entry.entry, key).toLowerCase().includes(search)
+              AND user = ${ id }
+              AND (label = ${ labelId } OR ${ !labelId })
+        `
+    ).filter((entry) =>
+        !search ||
+        // decrypt lazily for performance
+        decrypt(entry.title, key).toLowerCase().includes(search) ||
+        decrypt(entry.entry, key).toLowerCase().includes(search)
     ).length;
 
     const plaintextEntries = decryptEntries(entries, key).filter(

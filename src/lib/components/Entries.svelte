@@ -4,21 +4,30 @@
     import moment from "moment";
     import Bin from "svelte-material-icons/Delete.svelte";
     import TrayArrowUp from "svelte-material-icons/TrayArrowUp.svelte";
-    import Sidebar from "./Sidebar.svelte";
+    import Sidebar from "../../routes/diary/Sidebar.svelte";
     import PageCounter from "$lib/components/PageCounter.svelte";
     import Time from "svelte-time";
     import type { Entry as EntryType } from "$lib/types";
     import { GETArgs, showPopup } from "$lib/utils";
-    import ImportDialog from "./ImportDialog.svelte";
+    import ImportDialog from "../../routes/diary/ImportDialog.svelte";
     import { api } from "$lib/api/apiQuery";
-    import { groupEntriesByDay } from "../api/entries/utils.client";
+    import { groupEntriesByDay } from "../../routes/api/entries/utils.client";
     import { getNotificationsContext } from "svelte-notifications";
 
     const { addNotification } = getNotificationsContext();
 
     export let auth;
 
+    export let showSidebar = false;
+    export let showBin = false;
+    export let showImport = false;
+    export let showSearch = true;
+    export let showLabels = true;
+
+    export let options = {};
+
     let entries: Record<number, EntryType[]> = {};
+
     let entryTitles: Record<number, EntryType[]> = {};
     let entryCount = 0;
 
@@ -35,6 +44,7 @@
     export async function reload (page: number, search: string) {
         const entriesOptions = {
             page,
+            ...options,
             pageSize: PAGE_LENGTH
         };
         if (search) {
@@ -85,15 +95,21 @@
     <div>
         <div class="entries-menu">
             <div>
-                <Sidebar titles={entryTitles} />
-                <a class="primary" href="/deleted">
-                    <Bin size="30" />
-                    Bin
-                </a>
-                <button class="primary" on:click={importPopup}>
-                    <TrayArrowUp size="30" />
-                    Import
-                </button>
+                {#if showSidebar}
+                    <Sidebar titles={entryTitles} />
+                {/if}
+                {#if showBin}
+                    <a class="primary" href="/deleted">
+                        <Bin size="30" />
+                        Bin
+                    </a>
+                {/if}
+                {#if showImport}
+                    <button class="primary" on:click={importPopup}>
+                        <TrayArrowUp size="30" />
+                        Import
+                    </button>
+                {/if}
             </div>
             <div>
                 <PageCounter
@@ -105,7 +121,13 @@
             </div>
 
             <div>
-                <input bind:value={search} placeholder="Search..." type="text" />
+                {#if showSearch}
+                    <input
+                        bind:value={search}
+                        placeholder="Search..."
+                        type="text"
+                    />
+                {/if}
             </div>
         </div>
     </div>
@@ -115,6 +137,7 @@
                 entries={entries[day]}
                 on:updated={() => reload(page, search)}
                 obfuscated={$obfuscated}
+                {showLabels}
             >
                 <div slot="title" class="entry-group-title">
                     <h2>{moment(new Date(day * 1000)).format('dddd, Do MMMM YYYY')}</h2>

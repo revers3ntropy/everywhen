@@ -102,8 +102,9 @@
     @import '../../styles/layout.less';
 
     .container {
+        margin: 0;
+
         @media @mobile {
-            margin: 0;
             border: none;
         }
     }

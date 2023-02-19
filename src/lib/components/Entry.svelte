@@ -25,10 +25,11 @@
     export let deleted = false;
 
     export let obfuscated = true;
+    export let showLabels = true;
 
     // show random string instead of text content if obfuscated
-    let showLabel: Label | null;
-    $: showLabel = label ? {
+    export let showLabel: Label | null;
+    $: showLabel = showLabels && label ? {
         ...label,
         name: obfuscated ? obfuscate(label.name) : label.name
     } : null;

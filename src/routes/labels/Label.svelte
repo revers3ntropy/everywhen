@@ -63,9 +63,9 @@
         ></div>
         <div>{name}</div>
     {/if}
-    <div class="text-light">
+    <a class="text-light" href="/labels/{id}">
         {numEntries} {numEntries === 1 ? 'entry' : 'entries'}
-    </div>
+    </a>
     <div>
         <button on:click={deleteLabel}>
             <Delete size="25" />
