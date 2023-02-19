@@ -1,6 +1,6 @@
 <script lang="ts">
     import { renderable, START_ZOOM } from "../../lib/canvas/canvas";
-    import { now } from "./utils";
+    import { nowS } from "./utils";
 
 
     renderable(props => {

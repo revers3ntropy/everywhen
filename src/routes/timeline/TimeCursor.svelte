@@ -2,6 +2,7 @@
     import { renderable, START_ZOOM } from "../../lib/canvas/canvas";
 
     renderable(props => {
+        console.log("TimeCursor before");
         // center screen
         let centerTime = props.renderPosToTime(props.width / 2);
         let centerTimeDate = new Date(centerTime * 1000);
@@ -28,6 +29,8 @@
             40,
             "#6FA"
         );
+
+        console.log("TimeCursor after");
     });
 </script>
 

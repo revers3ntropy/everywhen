@@ -1,9 +1,11 @@
 <script lang="ts">
     import { renderable } from "../../lib/canvas/canvas";
-    import { now } from "./utils";
+    import { nowS } from "./utils";
 
     renderable(props => {
-        props.rect(props.timeToRenderPos(now()), 0, 1, props.height, "#5AA");
+        console.log("NowLine before");
+        props.rect(props.timeToRenderPos(nowS()), 0, 1, props.height, "#5AA");
+        console.log("NowLine after");
     });
 </script>
 

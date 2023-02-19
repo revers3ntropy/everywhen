@@ -1,7 +1,8 @@
 import { getContext, onMount } from "svelte";
 import { writable, derived } from "svelte/store";
+import type { Readable } from "svelte/store";
 import { browser } from "$app/environment";
-import { now } from "../../routes/timeline/utils";
+import { nowS } from "../../routes/timeline/utils";
 
 export const START_ZOOM = 1 / (60 * 60);
 
@@ -14,6 +15,33 @@ export const canvas = writable();
 export const time = writable(0);
 export const cameraOffset = writable(0);
 export const zoom = writable(START_ZOOM);
+
+export interface ICanvasListeners {
+    mousemove: Function[],
+    mouseup: Function[],
+    mousedown: Function[],
+    touchstart: Function[],
+    touchmove: Function[],
+    touchend: Function[],
+    wheel: Function[],
+}
+
+export const canvasEventListeners = writable<ICanvasListeners>({
+    mousemove: [],
+    mouseup: [],
+    mousedown: [],
+    touchstart: [],
+    touchmove: [],
+    touchend: [],
+    wheel: []
+});
+
+export function listenOnCanvas (event: keyof ICanvasListeners, callback: Function) {
+    canvasEventListeners.update((listeners) => {
+        listeners[event].push(callback);
+        return listeners;
+    });
+}
 
 export class CtxProps {
     static c_Primary = "#DDD";
@@ -48,14 +76,12 @@ export class CtxProps {
         return this.height * 3 / 4;
     }
 
-    public zoomScaledPosition (pos: number, zoom?: number, center?: number): number {
-        return (pos - this.center)
-            * (zoom ?? this.zoom)
-            + (center ?? this.center);
+    public zoomScaledPosition (pos: number, zoom: number, center: number): number {
+        return (pos - this.center) * zoom + center;
     }
 
     public timeToRenderPos (t: number): number {
-        t = now() - t + this.cameraOffset;
+        t = nowS() - t + this.cameraOffset;
         t = this.zoomScaledPosition(t, this.zoom, this.cameraOffset);
         return this.width - t;
     }
@@ -66,7 +92,7 @@ export class CtxProps {
             1 / this.zoom,
             this.cameraOffset
         );
-        return Math.round(now() - pos - this.cameraOffset);
+        return Math.round(nowS() - pos - this.cameraOffset);
     }
 
     public getMousePosRaw (event: MouseEvent | TouchEvent): number {
@@ -92,7 +118,8 @@ export class CtxProps {
         );
     }
 
-    getMouseYRaw (event: MouseEvent | TouchEvent): number {
+    public getMouseYRaw (event: MouseEvent | TouchEvent): number {
+        console.log("getMouseYRaw");
         let rect = this.canvas.getBoundingClientRect();
 
         if (
@@ -123,16 +150,14 @@ export class CtxProps {
         this.ctx.fill();
     }
 
-    text (txt: string, x: number, y: number, {
+    public text (txt: string, x: number, y: number, {
         c = CtxProps.c_Text,
         mWidth = undefined,
-        align = "left",
-        addToQ = true
+        align = "left"
     }: {
         c?: string,
         mWidth?: number,
-        align?: CanvasTextAlign,
-        addToQ?: boolean
+        align?: CanvasTextAlign
     } = {}) {
         this.ctx.beginPath();
         this.ctx.textAlign = align;
@@ -152,10 +177,6 @@ export class CtxProps {
         this.ctx.arc(x, y, r, 0, 2 * Math.PI);
         this.ctx.fill();
     }
-
-    public centerLine () {
-        this.rect(0, this.centerLnY - 1, this.width, 3);
-    }
 }
 
 // A more convenient store for grabbing all game props
@@ -168,7 +189,7 @@ export const props = deriveObject({
     time,
     cameraOffset,
     zoom
-});
+}) as Readable<CtxProps>;
 
 export const key = Symbol();
 

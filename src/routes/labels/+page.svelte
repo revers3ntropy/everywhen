@@ -3,6 +3,7 @@
     import type { Auth } from "$lib/types";
     import Label from "./Label.svelte";
     import NewLabelForm from "$lib/components/NewLabelForm.svelte";
+    import { onMount } from "svelte";
 
     export let data: Auth;
 
@@ -13,7 +14,7 @@
         labels = res.labels;
     }
 
-    reload();
+    onMount(reload);
 </script>
 
 <main>

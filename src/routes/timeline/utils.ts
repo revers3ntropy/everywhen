@@ -1,6 +1,6 @@
 import type { Event } from "../../lib/types";
 
-export function now (): number {
+export function nowS (): number {
     return Date.now() / 1000;
 }
 

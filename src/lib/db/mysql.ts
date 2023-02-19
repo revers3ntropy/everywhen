@@ -23,6 +23,7 @@ const config: mysql.ConnectionOptions = {
 let con: mysql.Connection | null = null;
 
 async function connect () {
+	console.log(`Connecting to database...`);
 	con = await mysql.createConnection(config).catch((e: any) => {
 		console.error(`Error connecting to mysql db '${ DB }'`);
 		console.error(e);
@@ -33,7 +34,7 @@ async function connect () {
 setInterval(async () => {
 	if (!con) await connect();
 	con?.ping();
-}, 1000 * 60 * 5);
+}, 1000 * 60);
 
 export async function query<Res extends queryRes = mysql.RowDataPacket[]> (
 	queryParts: TemplateStringsArray,

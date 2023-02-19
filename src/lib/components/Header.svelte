@@ -54,12 +54,15 @@
     @import '../../styles/variables';
 
     header {
+        position: relative;
+        width: 100%;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 0 20px;
+        padding: 0;
         height: 60px;
         background-color: @header-bg;
+        z-index: 10;
 
         div {
             display: flex;

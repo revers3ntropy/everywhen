@@ -1,15 +1,17 @@
 <script lang="ts">
-    import { cameraOffset, props, renderable, zoom } from "../../lib/canvas/canvas";
+    import { cameraOffset, listenOnCanvas, props, renderable, zoom } from "../../lib/canvas/canvas";
     import { CtxProps } from "../../lib/canvas/canvas.js";
 
     renderable({
-        setup ({ canvas }) {
+        setup () {
 
             let dragging = false;
             let dragStart = 0;
             let dragEnd = 0;
             let dragYStart = 0;
             let dragYEnd = 0;
+
+            console.log("setup Controls", dragStart, dragEnd);
 
             // mobile hide and show
             let timer = performance.now();
@@ -50,57 +52,66 @@
             });
 
             function doZoom (deltaZ) {
-                let centerTime = $props.renderPosToTime($props.width / 2);
+                console.log("zoom", deltaZ);
+                let centerTime = new CtxProps($props)
+                    .renderPosToTime($props.width / 2);
 
-                zoom.update(z => z * deltaZ);
+                zoom.set($props.zoom * deltaZ);
 
-                let newCenterTime = $props.renderPosToTime($props.width / 2);
+                let newCenterTime = new CtxProps($props)
+                    .renderPosToTime($props.width / 2);
 
-                cameraOffset.update(v => v - (newCenterTime - centerTime) * $props.doZoom);
+                cameraOffset.update(o => o - ((newCenterTime - centerTime) * $props.zoom));
             }
 
-            canvas.onwheel = evt => {
+            listenOnCanvas("wheel", evt => {
                 evt.preventDefault();
                 doZoom(1 + (evt.deltaY * -0.001));
-            };
+            });
 
             // desktop
-            canvas.addEventListener("mousedown", event => {
-                dragStart = (new CtxProps($props)).getMousePosRaw(event);
+            listenOnCanvas("mousedown", event => {
+                console.log("canvas:", $props.canvas);
+                dragStart = (new CtxProps($props))
+                    .getMousePosRaw(event);
                 dragging = true;
             });
 
-            canvas.addEventListener("mouseup", () => {
+            listenOnCanvas("mouseup", () => {
                 dragging = false;
             });
 
-            canvas.addEventListener("mousemove", evt => {
+            listenOnCanvas("mousemove", evt => {
                 if (dragging) {
-                    dragEnd = $props.getMousePosRaw(evt);
-                    cameraOffset.update(o => o - (dragEnd - dragStart) * $props.zoom);
+                    dragEnd = new CtxProps($props).getMousePosRaw(evt);
+                    const zoom = $props.zoom;
+                    cameraOffset.update(o => o - (dragEnd - dragStart) * zoom);
                     dragStart = dragEnd;
                 }
             });
 
             // mobile
-            canvas.addEventListener("touchstart", event => {
-                dragStart = $props.getMousePosRaw(event);
-                dragYStart = $props.getMouseYRaw(event);
+            listenOnCanvas("touchstart", event => {
+                console.log("Touch event!");
+                dragStart = new CtxProps($props).getMousePosRaw(event);
+                dragYStart = new CtxProps($props).getMouseYRaw(event);
                 dragging = true;
             });
 
-            canvas.addEventListener("touchend", () => {
+            listenOnCanvas("touchend", () => {
+                console.log("Touch event!");
                 dragging = false;
             });
 
-            canvas.addEventListener("touchmove", evt => {
+            listenOnCanvas("touchmove", evt => {
+                console.log("Touch event!");
                 evt.preventDefault();
                 if (dragging) {
-                    dragEnd = $props.getMousePosRaw(evt);
-                    cameraOffset.update(v => v - (dragEnd - dragStart) * $props.doZoom);
+                    dragEnd = new CtxProps($props).getMousePosRaw(evt);
+                    cameraOffset.update(v => v - (dragEnd - dragStart) * $props.zoom);
                     dragStart = dragEnd;
 
-                    dragYEnd = $props.getMouseYRaw(evt);
+                    dragYEnd = new CtxProps($props).getMouseYRaw(evt);
                     let mod = 1 + (dragYEnd - dragYStart) / 1000;
                     if (mod > 0 && mod < 2) {
                         doZoom(mod);
