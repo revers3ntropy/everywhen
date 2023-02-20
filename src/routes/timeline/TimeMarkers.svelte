@@ -1,15 +1,18 @@
 <script lang="ts">
     import { renderable, START_ZOOM } from "../../lib/canvas/canvas";
-    import { nowS } from "./utils";
-
 
     renderable(props => {
         let date = new Date(2005, 0, 1);
 
+        let years = 0;
         // Years
         while (true) {
             let renderPos = props.timeToRenderPos(date.getTime() / 1000);
             if (renderPos > props.width) {
+                break;
+            }
+            years++;
+            if (years > 100) {
                 break;
             }
 

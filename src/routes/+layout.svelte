@@ -9,9 +9,6 @@
     import Modal from "svelte-simple-modal";
     import { popup } from "../lib/constants.js";
 
-    export const ssr = false;
-    export const prerender = false;
-
     export let data: Record<string, any>;
 
     const home = $page.url.pathname.trim() === "/";

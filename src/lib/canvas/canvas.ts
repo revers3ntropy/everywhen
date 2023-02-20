@@ -1,20 +1,9 @@
 import { getContext, onMount } from "svelte";
-import { writable, derived } from "svelte/store";
-import type { Readable } from "svelte/store";
+import { writable } from "svelte/store";
 import { browser } from "$app/environment";
 import { nowS } from "../../routes/timeline/utils";
 
 export const START_ZOOM = 1 / (60 * 60);
-
-// Some props for the app
-export const width = writable(browser ? window.innerWidth : 0);
-export const height = writable(browser ? window.innerHeight : 0);
-export const pixelRatio = writable(browser ? window.devicePixelRatio : 0);
-export const ctx = writable();
-export const canvas = writable();
-export const time = writable(0);
-export const cameraOffset = writable(0);
-export const zoom = writable(START_ZOOM);
 
 export interface ICanvasListeners {
     mousemove: Function[],
@@ -26,38 +15,61 @@ export interface ICanvasListeners {
     wheel: Function[],
 }
 
-export const canvasEventListeners = writable<ICanvasListeners>({
-    mousemove: [],
-    mouseup: [],
-    mousedown: [],
-    touchstart: [],
-    touchmove: [],
-    touchend: [],
-    wheel: []
-});
-
-export function listenOnCanvas (event: keyof ICanvasListeners, callback: Function) {
-    canvasEventListeners.update((listeners) => {
-        listeners[event].push(callback);
-        return listeners;
-    });
+export interface ICanvasState extends ICanvasListeners {
+    width: number,
+    height: number,
+    pixelRatio: number,
+    ctx: null | CanvasRenderingContext2D,
+    canvas: null | HTMLCanvasElement,
+    time: number,
+    cameraOffset: number,
+    zoom: number
 }
 
-export class CtxProps {
+export class CanvasState implements ICanvasListeners {
     static c_Primary = "#DDD";
     static c_Text = "#FFF";
     static c_Secondary = "#CCC";
 
-    readonly width: number;
-    readonly height: number;
-    readonly cameraOffset: number;
-    readonly zoom: number;
-    readonly ctx: CanvasRenderingContext2D;
-    readonly canvas: HTMLCanvasElement;
-    readonly pixelRatio: number;
-    readonly time: number;
+    static empty (): CanvasState {
+        return new CanvasState({
+            width: browser ? window.innerWidth : 0,
+            height: browser ? window.innerHeight : 0,
+            pixelRatio: browser ? window.devicePixelRatio : 0,
+            ctx: null,
+            canvas: null,
+            time: 0,
+            cameraOffset: 0,
+            zoom: START_ZOOM,
 
-    public constructor (props: Required<CtxProps>) {
+            mousemove: [],
+            mouseup: [],
+            mousedown: [],
+            touchstart: [],
+            touchmove: [],
+            touchend: [],
+            wheel: []
+        } as unknown as CanvasState);
+    }
+
+    width: number;
+    height: number;
+    cameraOffset: number;
+    zoom: number;
+    ctx: CanvasRenderingContext2D | null;
+    canvas: HTMLCanvasElement | null;
+    pixelRatio: number;
+    time: number;
+
+    readonly mousemove: Function[];
+    readonly mouseup: Function[];
+    readonly mousedown: Function[];
+    readonly touchstart: Function[];
+    readonly touchmove: Function[];
+    readonly touchend: Function[];
+    readonly wheel: Function[];
+
+    public constructor (props: Required<CanvasState>) {
         this.width = props.width;
         this.height = props.height;
         this.cameraOffset = props.cameraOffset;
@@ -66,18 +78,30 @@ export class CtxProps {
         this.canvas = props.canvas;
         this.pixelRatio = props.pixelRatio;
         this.time = props.time;
+
+        this.mousemove = props.mousemove;
+        this.mouseup = props.mouseup;
+        this.mousedown = props.mousedown;
+        this.touchstart = props.touchstart;
+        this.touchmove = props.touchmove;
+        this.touchend = props.touchend;
+        this.wheel = props.wheel;
     }
 
-    public get center (): number {
+    public listen (event: keyof ICanvasListeners, callback: Function) {
+        this[event].push(callback);
+    }
+
+    public center (): number {
         return this.width / 2;
     }
 
-    public get centerLnY (): number {
+    public centerLnY (): number {
         return this.height * 3 / 4;
     }
 
     public zoomScaledPosition (pos: number, zoom: number, center: number): number {
-        return (pos - this.center) * zoom + center;
+        return (pos - center) * zoom + center;
     }
 
     public timeToRenderPos (t: number): number {
@@ -87,15 +111,13 @@ export class CtxProps {
     }
 
     public renderPosToTime (pos: number) {
-        pos = this.zoomScaledPosition(
-            this.width - pos,
-            1 / this.zoom,
-            this.cameraOffset
-        );
+        pos = this.width - pos;
+        pos = this.zoomScaledPosition(pos, 1 / this.zoom, this.cameraOffset);
         return Math.round(nowS() - pos - this.cameraOffset);
     }
 
     public getMousePosRaw (event: MouseEvent | TouchEvent): number {
+        if (!this.canvas) throw new Error("Canvas not set");
         const rect = this.canvas.getBoundingClientRect();
 
         if (
@@ -119,7 +141,7 @@ export class CtxProps {
     }
 
     public getMouseYRaw (event: MouseEvent | TouchEvent): number {
-        console.log("getMouseYRaw");
+        if (!this.canvas) throw new Error("Canvas not set");
         let rect = this.canvas.getBoundingClientRect();
 
         if (
@@ -142,8 +164,9 @@ export class CtxProps {
         y: number,
         w: number,
         h: number,
-        colour = CtxProps.c_Primary
+        colour = CanvasState.c_Primary
     ) {
+        if (!this.ctx) throw new Error("Canvas not set");
         this.ctx.beginPath();
         this.ctx.fillStyle = colour;
         this.ctx.rect(x, y, w, h);
@@ -151,7 +174,7 @@ export class CtxProps {
     }
 
     public text (txt: string, x: number, y: number, {
-        c = CtxProps.c_Text,
+        c = CanvasState.c_Text,
         mWidth = undefined,
         align = "left"
     }: {
@@ -159,6 +182,7 @@ export class CtxProps {
         mWidth?: number,
         align?: CanvasTextAlign
     } = {}) {
+        if (!this.ctx) throw new Error("Canvas not set");
         this.ctx.beginPath();
         this.ctx.textAlign = align;
         this.ctx.fillStyle = c;
@@ -170,8 +194,9 @@ export class CtxProps {
         x: number,
         y: number,
         r: number,
-        colour = CtxProps.c_Primary
+        colour = CanvasState.c_Primary
     ) {
+        if (!this.ctx) throw new Error("Canvas not set");
         this.ctx.beginPath();
         this.ctx.fillStyle = colour;
         this.ctx.arc(x, y, r, 0, 2 * Math.PI);
@@ -179,21 +204,13 @@ export class CtxProps {
     }
 }
 
-// A more convenient store for grabbing all game props
-export const props = deriveObject({
-    ctx,
-    canvas,
-    width,
-    height,
-    pixelRatio,
-    time,
-    cameraOffset,
-    zoom
-}) as Readable<CtxProps>;
-
+export const canvasState = writable(CanvasState.empty());
 export const key = Symbol();
 
-export type RenderCallback = (props: Readonly<CtxProps>, dt: number) => void;
+type renderProps = Omit<Readonly<CanvasState>, "ctx"> & {
+    ctx: CanvasRenderingContext2D
+};
+export type RenderCallback = (props: renderProps, dt: number) => void | Promise<void>;
 
 export const renderable = (
     render?: RenderCallback
@@ -225,16 +242,3 @@ export const renderable = (
         };
     });
 };
-
-function deriveObject (obj: any) {
-    const keys = Object.keys(obj);
-    const list = keys.map(key => {
-        return obj[key];
-    });
-    return derived(list, (array) => {
-        return array.reduce<any>((dict, value, i) => {
-            dict[keys[i]] = value;
-            return dict;
-        }, {});
-    });
-}

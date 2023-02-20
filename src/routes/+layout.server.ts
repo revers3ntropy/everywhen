@@ -5,7 +5,6 @@ import { redirect } from "@sveltejs/kit";
 import { query } from "../lib/db/mysql";
 
 export const ssr = false;
-export const prerender = false;
 
 export const load: LayoutServerLoad = async ({ cookies, url }) => {
 	const home = url.pathname.trim() === "/";

@@ -1,69 +1,63 @@
 <script lang="ts">
     import { onMount, setContext } from "svelte";
-
-    import {
-        key,
-        width,
-        height,
-        canvas,
-        ctx,
-        pixelRatio,
-        props,
-        time, canvasEventListeners
-    } from "./canvas";
-    import type { ICanvasListeners } from "./canvas";
-    import { CtxProps } from "./canvas";
+    import { key, canvasState } from "./canvas";
+    import type { ICanvasState } from "./canvas";
+    import { CanvasState } from "./canvas";
 
     export let killLoopOnError = true;
-    export let attributes = {};
+    export let attributes: CanvasRenderingContext2DSettings = {};
 
     interface Listener {
-        setup?: (props: CtxProps) => void | Promise<void>;
-        render?: (props: CtxProps, dt: number) => void;
+        setup?: (props: CanvasState) => void | Promise<void>;
+        render?: (props: CanvasState, dt: number) => void;
         ready: boolean;
         mounted: boolean;
     }
 
     let listeners: Listener[] = [];
     let frame;
+    let canvas: HTMLCanvasElement;
 
     let setupCanvas = false;
 
-    $: ctx.set($canvas?.getContext("2d", attributes));
+    onMount(async () => {
+        const empty = CanvasState.empty();
+        empty.canvas = canvas;
+        empty.ctx = canvas.getContext("2d", attributes);
+        canvasState.set(empty);
 
-    onMount(() => {
         // setup entities
-        listeners.forEach(async entity => {
+        for (const entity of listeners) {
             if (entity.setup) {
-                let p = entity.setup(new CtxProps($props));
+                let p = entity.setup($canvasState);
                 if (p && p.then) await p;
             }
             entity.ready = true;
-        });
+        }
 
         setupCanvas = true;
 
         // start game loop
         return createLoop((elapsed, dt) => {
-            time.set(elapsed);
+            canvasState.update(s => {
+                s.time = elapsed;
+                return s;
+            });
             render(dt);
-            console.log("after Render");
         });
     });
 
     setContext(key, {
-        add (fn) {
-            (async () => {
-                if (setupCanvas) {
-                    if (fn.setup) {
-                        let p = fn.setup(new CtxProps($props as Required<CtxProps>));
-                        if (p && p.then) await p;
-                    }
-                    fn.ready = true;
+        async add (fn) {
+            if (setupCanvas) {
+                if (fn.setup) {
+                    let p = fn.setup($canvasState);
+                    if (p && p.then) await p;
                 }
-                this.remove(fn);
-                listeners.push(fn);
-            })();
+                fn.ready = true;
+            }
+            this.remove(fn);
+            listeners.push(fn);
         },
         remove (fn) {
             const idx = listeners.indexOf(fn);
@@ -74,12 +68,13 @@
     });
 
     function render (dt) {
-        $ctx.save();
-        $ctx.scale($pixelRatio, $pixelRatio);
-        listeners.forEach(entity => {
+        if (!$canvasState.ctx) throw "Canvas context not initialized";
+        $canvasState.ctx.save();
+        $canvasState.ctx.scale($canvasState.pixelRatio, $canvasState.pixelRatio);
+        for (const entity of listeners) {
             try {
                 if (entity.mounted && entity.ready && entity.render) {
-                    entity.render(new CtxProps($props as Required<CtxProps>), dt);
+                    entity.render($canvasState, dt);
                 }
             } catch (err) {
                 console.error(err);
@@ -88,61 +83,57 @@
                     console.warn("Animation loop stopped due to an error");
                 }
             }
-        });
-        $ctx.restore();
+        }
+        $canvasState.ctx.restore();
     }
 
     function handleResize () {
-        width.set(window.innerWidth);
-        height.set(window.innerHeight);
-        pixelRatio.set(window.devicePixelRatio);
+        canvasState.update(s => {
+            s.width = window.innerWidth;
+            s.height = window.innerHeight;
+            s.pixelRatio = window.devicePixelRatio;
+            return s;
+        });
     }
 
     function createLoop (fn) {
-
         let elapsed = 0;
         let lastTime = performance.now();
 
-        let timeout;
-
         function loop () {
-            timeout = setTimeout(() => {
-                frame = requestAnimationFrame(loop);
-                const beginTime = performance.now();
-                const dt = (beginTime - lastTime) / 1000;
-                lastTime = beginTime;
-                elapsed += dt;
-                fn(elapsed, dt);
-            }, 300);
+            frame = requestAnimationFrame(loop);
+            const beginTime = performance.now();
+            const dt = (beginTime - lastTime) / 1000;
+            lastTime = beginTime;
+            elapsed += dt;
+            fn(elapsed, dt);
         }
 
         loop();
         return () => {
-            clearTimeout(timeout);
             cancelAnimationFrame(frame);
         };
     }
 
-    function executeListeners (event: Event, fn: keyof ICanvasListeners) {
-        for (const listener of $canvasEventListeners[fn]) {
+    function executeListeners (event: Event, fn: keyof ICanvasState) {
+        for (const listener of $canvasState[fn]) {
             listener(event);
         }
     }
 
-    function canvasListener (fn: keyof ICanvasListeners) {
+    function canvasListener (fn: keyof ICanvasState) {
         return (event: Event) => {
             executeListeners(event, fn);
         };
     }
-
-    console.log("RENDERED CANVAS");
 </script>
 
 <canvas
-    bind:this={$canvas}
-    width={$width * $pixelRatio}
-    height={$height * $pixelRatio}
-    style="width: {$width}px; height: {$height}px;"
+    bind:this={canvas}
+
+    width={$canvasState.width * $canvasState.pixelRatio}
+    height={$canvasState.height * $canvasState.pixelRatio}}
+    style="width: {$canvasState.width}px; height: {$canvasState.height}px;"
 
     on:mousedown={canvasListener('mousedown')}
     on:mouseup={canvasListener('mouseup')}

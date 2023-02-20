@@ -12,5 +12,5 @@ export function decryptLabels (
     labels: Label[],
     key: string
 ): Record<string, any>[] {
-    return labels.map((label) => decryptLabel(label, key));
+    return labels.map(label => decryptLabel(label, key));
 }
