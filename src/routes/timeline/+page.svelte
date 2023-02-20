@@ -34,8 +34,11 @@
         <NowLine />
         <TimeCursor />
 
-        {#each entries as entry}
-            <EntryInTimeline {...entry} />
+        {#each entries as entry, i}
+            <EntryInTimeline
+                {...entry}
+                entryTextParityHeight={i % 2 === 0}
+            />
         {/each}
 
     </Canvas>
