@@ -1,22 +1,40 @@
 <script lang="ts">
     import type { Data, Label } from "../../../lib/types";
     import Entries from "../../../lib/components/Entries.svelte";
+    import { api } from "../../../lib/api/apiQuery";
 
     export let data: Data & {
         label: Label,
         entryCount: number
     };
+
+    async function updateName () {
+        await api.put(data, `/labels/${ data.label.id }`, {
+            name: data.label.name
+        });
+    }
+
+    async function updateColour () {
+        await api.put(data, `/labels/${ data.label.id }`, {
+            colour: data.label.colour
+        });
+    }
 </script>
 
 <main>
     <div class="colour-select" style="border-color: {data.label.colour}">
         {data.label.colour}
         <input
-            value={data.label.colour}
             type="color"
+            bind:value={data.label.colour}
+            on:change={updateColour}
         >
     </div>
-    <input class="name editable-text" value={data.label.name}>
+    <input
+        class="name editable-text"
+        bind:value={data.label.name}
+        on:change={updateName}
+    >
 
     <p>
         Has {data.entryCount} {data.entryCount === 1 ? "entry" : "entries"}
