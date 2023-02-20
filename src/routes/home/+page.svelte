@@ -71,9 +71,16 @@
 
 <style lang="less">
     @import '../../styles/variables.less';
+    @import '../../styles/layout.less';
 
     .buttons {
         display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+
+        @media @mobile {
+            flex-direction: column;
+        }
 
         a, button {
             display: grid;
@@ -90,14 +97,21 @@
             color: @accent-color-primary;
 
             &:after {
-                display: none
+                display: none;
             }
 
             &:hover {
                 background: @light-accent;
                 color: @accent-color-secondary;
                 text-decoration: none;
+            }
 
+            @media @mobile {
+                .bordered();
+
+                padding: 0.5em;
+                margin: 0.2em;
+                text-align: center;
             }
         }
     }
@@ -108,5 +122,9 @@
         padding: 0.5em;
         border-bottom: 1px solid @light-accent;
         text-align: start;
+
+        @media @mobile {
+            font-size: 1.2rem;
+        }
     }
 </style>
