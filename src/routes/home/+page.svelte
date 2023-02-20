@@ -1,12 +1,15 @@
 <script lang="ts">
+    import moment from "moment";
     import Notebook from "svelte-material-icons/Notebook.svelte";
     import Download from "svelte-material-icons/Download.svelte";
     import Upload from "svelte-material-icons/Upload.svelte";
-    import { api } from "$lib/api/apiQuery";
-    import { download as downloadFile, showPopup } from "$lib/utils";
-    import type { Auth } from "$lib/types";
-    import moment from "moment";
-    import ImportData from "$lib/components/dialogs/ImportData.svelte";
+    import ChartTimeline from "svelte-material-icons/ChartTimeline.svelte";
+    import Logout from "svelte-material-icons/Logout.svelte";
+    import ImportData from "../../lib/components/dialogs/ImportData.svelte";
+    import LabelOutline from "svelte-material-icons/LabelOutline.svelte";
+    import { api } from "../../lib/api/apiQuery";
+    import { download as downloadFile, showPopup } from "../../lib/utils";
+    import type { Auth } from "../../lib/types";
 
     export let data: Auth;
 
@@ -24,21 +27,45 @@
 </script>
 
 <main>
-    <section class="buttons">
-        <a class="primary" href="/diary">
-            <Notebook size="30" />
-            Diary
-        </a>
+    <section>
+        <div class="buttons">
+            <a class="primary" href="/diary">
+                <Notebook size="30" />
+                Diary
+            </a>
+            <a class="primary" href="/labels">
+                <LabelOutline size="30" />
+                Labels
+            </a>
+            <a class="primary" href="/labels">
+                <ChartTimeline size="30" />
+                Timeline
+            </a>
+        </div>
     </section>
-    <section class="buttons">
-        <button on:click={download}>
-            <Download size="30" />
-            Download Data
-        </button>
-        <button on:click={upload}>
-            <Upload size="30" />
-            Import Data
-        </button>
+    <section>
+        <h1>My Data</h1>
+
+        <div class="buttons">
+            <button on:click={download}>
+                <Download size="30" />
+                Download Data
+            </button>
+            <button on:click={upload}>
+                <Upload size="30" />
+                Import Data
+            </button>
+        </div>
+    </section>
+    <section>
+        <h1>My Account</h1>
+
+        <div class="buttons">
+            <a href="/logout">
+                <Logout size="30" />
+                Log Out
+            </a>
+        </div>
     </section>
 </main>
 
@@ -57,7 +84,6 @@
             font-size: 1.2rem;
             padding: .7em 1.2em;
             margin: 1em;
-            border: 1px solid #ccc;
             border-radius: 5px;
             text-decoration: none;
             transition: all 0.2s ease;
@@ -74,5 +100,13 @@
 
             }
         }
+    }
+
+    h1 {
+        font-size: 1.5rem;
+        margin: 1em;
+        padding: 0.5em;
+        border-bottom: 1px solid @light-accent;
+        text-align: start;
     }
 </style>

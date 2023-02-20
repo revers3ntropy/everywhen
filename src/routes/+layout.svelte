@@ -11,7 +11,7 @@
 
     export let data: Record<string, any>;
 
-    const home = $page.url.pathname.trim() === "/";
+    $: home = $page.url.pathname.trim() === "/";
 
     let lastActivity = Date.now();
 
