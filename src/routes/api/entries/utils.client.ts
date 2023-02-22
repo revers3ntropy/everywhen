@@ -1,4 +1,4 @@
-import type { Entry } from '$lib/types';
+import type { Entry } from "../../../lib/types";
 
 export function groupEntriesByDay (entries: Entry[]): Record<number, Entry[]> {
     const grouped: Record<number, Entry[]> = [];

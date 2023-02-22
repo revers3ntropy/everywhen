@@ -1,18 +1,19 @@
 <script lang="ts">
-    import { obfuscated } from "$lib/constants.js";
-    import EntryGroup from "$lib/components/EntryGroup.svelte";
     import moment from "moment";
+    import Time from "svelte-time";
+    import { getNotificationsContext } from "svelte-notifications";
     import Bin from "svelte-material-icons/Delete.svelte";
     import TrayArrowUp from "svelte-material-icons/TrayArrowUp.svelte";
+    import Spinner from "../../lib/components/Spinner.svelte";
+    import { obfuscated } from "../constants";
+    import EntryGroup from "../../lib/components/EntryGroup.svelte";
     import Sidebar from "../../routes/diary/Sidebar.svelte";
-    import PageCounter from "$lib/components/PageCounter.svelte";
-    import Time from "svelte-time";
-    import type { Entry as EntryType } from "$lib/types";
-    import { GETArgs, showPopup } from "$lib/utils";
-    import ImportDialog from "../../routes/diary/ImportDialog.svelte";
-    import { api } from "$lib/api/apiQuery";
+    import PageCounter from "../../lib/components/PageCounter.svelte";
+    import type { Entry as EntryType } from "../../lib/types";
+    import { showPopup } from "../utils";
+    import { api } from "../api/apiQuery";
     import { groupEntriesByDay } from "../../routes/api/entries/utils.client";
-    import { getNotificationsContext } from "svelte-notifications";
+    import ImportDialog from "./dialogs/ImportDialog.svelte";
 
     const { addNotification } = getNotificationsContext();
 
@@ -35,13 +36,17 @@
     let page = 0;
     let pages = 0;
 
-    let search = '';
+    let search = "";
+
+    let loading = true;
 
     function importPopup () {
         showPopup(ImportDialog, { auth }, () => reload(page, search));
     }
 
     export async function reload (page: number, search: string) {
+        loading = true;
+
         const entriesOptions = {
             page,
             ...options,
@@ -51,7 +56,7 @@
             entriesOptions["search"] = search;
         }
 
-        api.get(auth, `/entries?${ GETArgs(entriesOptions) }`)
+        api.get(auth, `/entries`, entriesOptions)
             .then((res) => {
                 if (
                     !res.entries ||
@@ -60,9 +65,9 @@
                 ) {
                     console.error(res);
                     addNotification({
-                        text: `Cannot load entries: ${res.body?.message}`,
-                        position: 'top-center',
-                        type: 'error',
+                        text: `Cannot load entries: ${ res.body?.message }`,
+                        position: "top-center",
+                        type: "error",
                         removeAfter: 4000
                     });
                     return;
@@ -70,24 +75,24 @@
                 entries = groupEntriesByDay(res.entries);
                 pages = res.totalPages;
                 entryCount = res.totalEntries;
+
+                loading = false;
             });
 
-        api.get(auth, '/entries/titles').then((res) => {
-            if (!res.entries) {
-                console.error(res);
-                addNotification({
-                    text: `Cannot load entries: ${res.body?.message}`,
-                    position: 'top-center',
-                    type: 'error',
-                    removeAfter: 4000
-                });
-                return;
-            }
-            entryTitles = groupEntriesByDay(res.entries);
-        });
+        const res = await api.get(auth, "/entries/titles");
+        if (!res.entries) {
+            console.error(res);
+            addNotification({
+                text: `Cannot load entries: ${ res.body?.message }`,
+                position: "top-center",
+                type: "error",
+                removeAfter: 4000
+            });
+            return;
+        }
+        entryTitles = groupEntriesByDay(res.entries);
     }
 
-    reload(page, search);
     $: reload(page, search);
 </script>
 
@@ -132,32 +137,36 @@
         </div>
     </div>
     <div>
-        {#each Object.keys(entries).sort((a, b) => b - a) as day}
-            <EntryGroup
-                entries={entries[day]}
-                on:updated={() => reload(page, search)}
-                obfuscated={$obfuscated}
-                {showLabels}
-            >
-                <div slot="title" class="entry-group-title">
-                    <h2>{moment(new Date(day * 1000)).format('dddd, Do MMMM YYYY')}</h2>
-                    <span class="text-light">
-                        {#if new Date() - new Date(day * 1000) < 8.64e7}
-                            <span>Today</span>
-                        {:else if new Date() - new Date(day * 1000) < 1.728e8}
-                            <span>Yesterday</span>
-                        {:else}
-                            <Time
-                                relative
-                                timestamp={new Date(
-                                    day * 1000 + (60 * 60 * 23 + 60 * 60 + 59) * 1000
-                                )}
-                            />
-                        {/if}
-                    </span>
-                </div>
-            </EntryGroup>
-        {/each}
+        {#if loading}
+            <Spinner />
+        {:else}
+            {#each Object.keys(entries).sort((a, b) => b - a) as day}
+                <EntryGroup
+                    entries={entries[day]}
+                    on:updated={() => reload(page, search)}
+                    obfuscated={$obfuscated}
+                    {showLabels}
+                >
+                    <div slot="title" class="entry-group-title">
+                        <h2>{moment(new Date(day * 1000)).format('dddd, Do MMMM YYYY')}</h2>
+                        <span class="text-light">
+                            {#if new Date() - new Date(day * 1000) < 8.64e7}
+                                <span>Today</span>
+                            {:else if new Date() - new Date(day * 1000) < 1.728e8}
+                                <span>Yesterday</span>
+                            {:else}
+                                <Time
+                                    relative
+                                    timestamp={new Date(
+                                        day * 1000 + (60 * 60 * 23 + 60 * 60 + 59) * 1000
+                                    )}
+                                />
+                            {/if}
+                        </span>
+                    </div>
+                </EntryGroup>
+            {/each}
+        {/if}
     </div>
 </div>
 

@@ -117,13 +117,55 @@ button {
 	border-style: dashed;
 	border-radius: 10px;
 
-	padding: 2em;
-	margin: 2em;
+    padding: 2em;
+    margin: 2em;
 
-	cursor: pointer;
+    cursor: pointer;
 
-	&:hover {
-		border-style: double;
-		color: @text-color-light;
-	}
+    &:hover {
+        border-style: double;
+        color: @text-color-light;
+    }
 }
+
+
+/*
+<VirtualHost 77.72.5.9:443>
+	ServerName me.revers3ntropy.com
+
+	ProxyRequests Off
+	<Proxy *>
+		Order deny,allow
+		Allow from all
+	</Proxy>
+
+	ProxyPass / https://localhost:18890/
+	ProxyPassReverse / https://localhost:18890/
+	<Location />
+		Order allow,deny
+		Allow from all
+	</Location>
+</VirtualHost>
+
+<VirtualHost 77.72.5.9:80>
+	ServerName me.revers3ntropy.com
+
+	ProxyRequests Off
+	<Proxy *>
+		Order deny,allow
+		Allow from all
+	</Proxy>
+
+	ProxyPass / http://localhost:18891/
+	ProxyPassReverse / http://localhost:18891/
+	<Location />
+		Order allow,deny
+		Allow from all
+	</Location>
+</VirtualHost>
+
+sudo nano /etc/apache2/conf.d/includes/pre_virtualhost_2.conf
+sudo systemctl restart httpd
+sudo systemctl restart httpd.service
+
+ */

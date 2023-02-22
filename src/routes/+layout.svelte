@@ -1,7 +1,7 @@
 <script lang="ts">
     import "ts-polyfill";
     import "../app.less";
-    import Header from "../lib/components/Header.svelte";
+    import Header from "../lib/components/Nav.svelte";
     import Notifications from "svelte-notifications";
     import { INACTIVE_TIMEOUT_MS, obfuscated } from "../lib/constants";
     import { page } from "$app/stores";

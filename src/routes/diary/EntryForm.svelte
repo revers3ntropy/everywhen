@@ -1,13 +1,13 @@
 <script lang="ts">
-    import { browser } from "$app/environment";
+    import { onMount } from "svelte";
+    import { createEventDispatcher } from "svelte";
+    import { getNotificationsContext } from "svelte-notifications";
     import Geolocation from "svelte-geolocation";
     import Send from "svelte-material-icons/Send.svelte";
-    import { createEventDispatcher } from "svelte";
-    import type { Auth, Label } from "$lib/types";
-    import { api } from "$lib/api/apiQuery";
-    import { onMount } from "svelte";
-    import { getNotificationsContext } from "svelte-notifications";
-    import LabelSelect from "$lib/components/LabelSelect.svelte";
+    import { browser } from "$app/environment";
+    import type { Auth, Label } from "../../lib/types";
+    import { api } from "../../lib/api/apiQuery";
+    import LabelSelect from "../../lib/components/LabelSelect.svelte";
 
     const { addNotification } = getNotificationsContext();
     const dispatch = createEventDispatcher();

@@ -13,3 +13,5 @@ export const AUTH_COOKIE_OPTIONS = Object.freeze({
     sameSite: "strict",
     httpOnly: true
 });
+
+export const OBFUSCATE_CHARS = "0123456789abcdefghijklmnopqrstuvwxyz ";

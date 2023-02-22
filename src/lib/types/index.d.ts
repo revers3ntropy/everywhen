@@ -1,3 +1,5 @@
+import { Position } from "svelte-notifications";
+
 export interface Label {
     id: string;
     colour: string;
@@ -37,3 +39,11 @@ export type User = Auth & {
 };
 
 export type Data = Auth & Record<string, any>;
+
+export interface NotificationOptions {
+    id?: string;
+    text?: string;
+    position: Position;
+    type?: string;
+    removeAfter?: number;
+}

@@ -1,16 +1,16 @@
 <script lang="ts">
+    import { createEventDispatcher } from "svelte";
+    import { getNotificationsContext } from "svelte-notifications";
+    import DomPurify from "dompurify";
+    import moment from "moment";
+    import { marked } from "marked";
     import Bin from "svelte-material-icons/Delete.svelte";
     import Eye from "svelte-material-icons/Eye.svelte";
     import EyeOff from "svelte-material-icons/EyeOff.svelte";
     import Restore from "svelte-material-icons/DeleteRestore.svelte";
-    import { createEventDispatcher } from "svelte";
     import { api } from "../api/apiQuery";
     import { getAuth, obfuscate } from "../utils";
-    import moment from "moment";
     import Label from "./Label.svelte";
-    import { getNotificationsContext } from "svelte-notifications";
-    import { marked } from "marked";
-    import DomPurify from "dompurify";
 
     const dispatch = createEventDispatcher();
     const { addNotification } = getNotificationsContext();

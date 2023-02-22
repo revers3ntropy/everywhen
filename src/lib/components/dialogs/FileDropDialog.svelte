@@ -1,15 +1,20 @@
 <script lang="ts">
-    import FileDrop from "filedrop-svelte";
-    import type { Files } from "filedrop-svelte";
     import { popup } from "../../constants";
     import { getNotificationsContext } from "svelte-notifications";
     import { getFileContents } from "../../utils";
-    import { api } from "../../api/apiQuery";
-    import type { Auth } from "../../types";
+    import { type FileDropOptions, type Files, filedrop } from "filedrop-svelte";
+    import { Result } from "postcss";
 
     const { addNotification } = getNotificationsContext();
 
-    export let auth: Auth;
+    export const fileOptions: FileDropOptions = {
+        fileLimit: 1,
+        windowDrop: false
+    };
+
+    export let message: string;
+    export let readEncoding = "utf-8";
+    export let withContents: <T>(body: Result<T, string>) => Promise<void> | void;
 
     async function onFileDrop (e: CustomEvent<{ files: Files }>) {
         const files = e.detail.files;
@@ -34,25 +39,18 @@
             return;
         }
         const file = files.accepted[0];
-        const contents = await getFileContents(file);
-        const res = await api.post(auth, "/backups", {
-            data: contents
-        });
+        const contents = await getFileContents(file, readEncoding);
 
-        if (res.erroneous) {
-            addNotification({
-                removeAfter: 4000,
-                text: "Error uploading file: " + res.body.message,
-                type: "error",
-                position: "top-center"
-            });
-        }
+        await withContents(contents);
+
         popup.set(null);
     }
 </script>
 
-<div>
-    <FileDrop on:filedrop={onFileDrop}>
-        Upload files
-    </FileDrop>
+<div
+    use:filedrop={fileOptions}
+    on:filedrop={onFileDrop}
+    class="dropzone"
+>
+    {message}
 </div>

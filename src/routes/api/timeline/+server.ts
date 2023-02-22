@@ -2,8 +2,8 @@ import type { RequestHandler } from "@sveltejs/kit";
 import { getAuthFromCookies } from "../../../lib/security/getAuthFromCookies";
 import { query } from "../../../lib/db/mysql";
 import { decryptEntries } from "../entries/utils.server";
-import { wordCount } from "../../timeline/utils";
 import type { RawEntry } from "../../../lib/types";
+import { wordCount } from "../../../lib/utils";
 
 export const GET: RequestHandler = async ({ cookies }) => {
 	const auth = await getAuthFromCookies(cookies);

@@ -1,18 +1,19 @@
-import { v4 as UUIdv4 } from 'uuid';
-import { query } from '$lib/db/mysql';
+import { v4 as UUIdv4 } from "uuid";
+import { query } from "$lib/db/mysql";
+
+async function uuidExists (id: string) {
+    const res = await query`
+        SELECT id
+        FROM ids
+        WHERE id = ${ id }
+    `;
+    return res.length > 0;
+}
 
 export async function generateUUId (): Promise<string> {
     let id = UUIdv4();
 
-    while (
-        (
-            await query`
-        SELECT id
-        FROM ids
-        WHERE id = ${ id }
-    `
-        ).length
-        ) {
+    while (await uuidExists(id)) {
         id = UUIdv4();
     }
 

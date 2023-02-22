@@ -1,9 +1,47 @@
 import { parse } from "cookie";
 import { browser } from "$app/environment";
-import { KEY_COOKIE_KEY, popup, USERNAME_COOKIE_KEY } from "./constants";
+import { KEY_COOKIE_KEY, OBFUSCATE_CHARS, popup, USERNAME_COOKIE_KEY } from "./constants";
 import { bind } from "svelte-simple-modal";
 import type { Auth } from "./types";
 import type { SvelteComponentDev } from "svelte/internal";
+
+class Result<T, E> {
+    private constructor (
+        private readonly value: T | null = null,
+        private readonly error: E | null = null
+    ) {
+    }
+
+    public get err (): E | null {
+        return this.error;
+    }
+
+    public get val (): T | null {
+        return this.value;
+    }
+
+    public static ok<T, E> (value: T): Result<T, E> {
+        return new Result<T, E>(value, null);
+    }
+
+    public static err<T, E> (error: E): Result<T, E> {
+        return new Result<T, E>(null, error);
+    }
+
+    public unwrap (): T {
+        if (this.value === null) {
+            throw this.error;
+        }
+        return this.value;
+    }
+
+    public map<U> (f: (value: T) => U): Result<U, E> {
+        if (this.value === null) {
+            return Result.err(this.error as E);
+        }
+        return Result.ok(f(this.value));
+    }
+}
 
 export function getAuth (): Omit<Auth, "id"> {
     if (!browser) {
@@ -15,17 +53,7 @@ export function getAuth (): Omit<Auth, "id"> {
     };
 }
 
-const chars = "0123456789abcdefghijklmnopqrstuvwxyz ";
-
-export function randomString (length: number, alphabet = chars): string {
-    let result = "";
-    for (let i = length; i > 0; --i) {
-        result += alphabet[Math.floor(Math.random() * alphabet.length)];
-    }
-    return result;
-}
-
-export function obfuscate (str: string, alphabet = chars): string {
+export function obfuscate (str: string, alphabet = OBFUSCATE_CHARS): string {
     return str.replace(/./g, (char) => {
         if (char === "\n") return char;
         return alphabet[Math.floor(Math.random() * alphabet.length)];
@@ -41,7 +69,7 @@ export function GETArgs (args: Record<string, any>): string {
 export function showPopup<T> (
     el: typeof SvelteComponentDev,
     props: Record<string, any>,
-    onClose: () => T
+    onClose: (() => T | void) = (() => void 0)
 ) {
     const boundEl = bind(el, props);
     popup.set(boundEl);
@@ -57,20 +85,21 @@ export function showPopup<T> (
     });
 }
 
-export async function getFileContents (file: File, encoding = 'UTF-8'): Promise<string> {
+export async function getFileContents (file: File, encoding = "UTF-8")
+    : Promise<Result<string, string>> {
     const reader = new FileReader();
     reader.readAsText(file, encoding);
 
-    return await new Promise((resolve, reject) => {
+    return await new Promise((resolve) => {
         reader.onload = evt => {
             const res = evt.target?.result?.toString?.();
             if (!res && res !== "") {
-                reject("Error reading file");
+                resolve(Result.err("Error reading file"));
             }
-            resolve(res || "");
+            resolve(Result.ok(res || ""));
         };
         reader.onerror = async () => {
-            reject("Error reading file");
+            resolve(Result.err("Error reading file"));
         };
     });
 }
@@ -87,4 +116,8 @@ export function download (filename: string, text: string) {
     element.click();
 
     document.body.removeChild(element);
+}
+
+export function wordCount (text: string): number {
+    return text.split(/[\s,.\-:;!"*()=+\[\]{}?|]+/).filter(Boolean).length;
 }

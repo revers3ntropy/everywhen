@@ -1,10 +1,10 @@
 import type { RequestHandler } from "./$types";
-import { getAuthFromCookies } from "$lib/security/getAuthFromCookies";
-import { addLabelsToEntries, decryptEntries } from "../entries/utils.server";
-import { query } from "$lib/db/mysql";
+import { getAuthFromCookies } from "../../../lib/security/getAuthFromCookies";
+import { decryptEntries } from "../entries/utils.server";
+import { query } from "../../../lib/db/mysql";
 import type { Label, RawEntry } from "$lib/types";
 import { decryptLabels } from "../labels/utils.server";
-import { decrypt, encrypt } from "$lib/security/encryption";
+import { decrypt, encrypt } from "../../../lib/security/encryption";
 import { error } from "@sveltejs/kit";
 
 export const GET: RequestHandler = async ({ cookies }) => {

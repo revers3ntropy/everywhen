@@ -23,12 +23,12 @@ const config: mysql.ConnectionOptions = {
 let con: mysql.Connection | null = null;
 
 async function connect () {
-	console.log(`Connecting to database...`);
 	con = await mysql.createConnection(config).catch((e: any) => {
-		console.error(`Error connecting to mysql db '${ DB }'`);
-		console.error(e);
-		throw e;
-	});
+        console.error(`Error connecting to mysql db '${ DB }'`);
+        console.error(e);
+        throw e;
+    });
+    console.log(`Connected to database`);
 }
 
 setInterval(async () => {

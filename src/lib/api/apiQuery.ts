@@ -4,6 +4,7 @@ import { AUTH_COOKIE_OPTIONS, KEY_COOKIE_KEY, USERNAME_COOKIE_KEY } from "../con
 import { browser } from "$app/environment";
 import { PUBLIC_SVELTEKIT_PORT } from "$env/static/public";
 import type { Auth } from "../types";
+import { GETArgs } from "../utils";
 
 export async function makeApiReq<T extends object> (
     auth: Auth,
@@ -59,8 +60,8 @@ export async function makeApiReq<T extends object> (
 }
 
 export const api = {
-    get: async (auth: Auth, path: string) =>
-        await makeApiReq(auth, "GET", path),
+    get: async (auth: Auth, path: string, args: object | null = null) =>
+        await makeApiReq(auth, "GET", path + (args ? GETArgs(args) : "")),
     post: async (auth: Auth, path: string, body: any = {}) =>
         await makeApiReq(auth, "POST", path, body),
     put: async (auth: Auth, path: string, body: any = {}) =>

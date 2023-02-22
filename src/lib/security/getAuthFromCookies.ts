@@ -12,7 +12,7 @@ export async function getAuthFromCookies (cookie: Cookies): Promise<User> {
 	}
 
 	const res = await query`
-		SELECT *
+		SELECT id
 		FROM users
 		WHERE username = ${ username }
 		  AND password = SHA2(CONCAT(${ key }, salt), 256)

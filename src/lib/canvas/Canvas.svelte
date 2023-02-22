@@ -148,3 +148,9 @@
 <svelte:window on:resize|passive={handleResize} />
 <slot></slot>
 
+<style lang="less">
+    canvas {
+        z-index: -1;
+    }
+</style>
+

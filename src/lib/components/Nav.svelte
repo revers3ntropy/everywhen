@@ -62,7 +62,7 @@
         padding: 0;
         height: 60px;
         background-color: @header-bg;
-        z-index: 10;
+        z-index: 0;
 
         div {
             display: flex;

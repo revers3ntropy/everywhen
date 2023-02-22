@@ -5,11 +5,14 @@
     import Upload from "svelte-material-icons/Upload.svelte";
     import ChartTimeline from "svelte-material-icons/ChartTimeline.svelte";
     import Logout from "svelte-material-icons/Logout.svelte";
-    import ImportData from "../../lib/components/dialogs/ImportData.svelte";
+    import FileDropDialog from "../../lib/components/dialogs/FileDropDialog.svelte";
     import LabelOutline from "svelte-material-icons/LabelOutline.svelte";
     import { api } from "../../lib/api/apiQuery";
     import { download as downloadFile, showPopup } from "../../lib/utils";
     import type { Auth } from "../../lib/types";
+    import { getNotificationsContext } from "svelte-notifications";
+
+    const { addNotification } = getNotificationsContext();
 
     export let data: Auth;
 
@@ -20,8 +23,40 @@
     }
 
     function upload () {
-        showPopup(ImportData, { auth: data }, () => {
-            window.location.reload();
+        showPopup(FileDropDialog, {
+            auth: data,
+            message: "Drop encrypted .json file here",
+            withContents: async ({ val: contents, err }) => {
+                if (err) {
+                    addNotification({
+                        removeAfter: 10_000,
+                        text: `Error uploading file: ${ err }`,
+                        type: "error",
+                        position: "top-center"
+                    });
+                    return;
+                }
+
+                const res = await api.post(data, "/backups", {
+                    data: contents
+                });
+
+                if (res.erroneous) {
+                    addNotification({
+                        removeAfter: 10_000,
+                        text: `Error uploading file: ${ res.body.message }`,
+                        type: "error",
+                        position: "top-center"
+                    });
+                } else {
+                    addNotification({
+                        removeAfter: 4_000,
+                        text: "File uploaded successfully",
+                        type: "success",
+                        position: "top-center"
+                    });
+                }
+            }
         });
     }
 </script>
