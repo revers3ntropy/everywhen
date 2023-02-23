@@ -5,14 +5,16 @@ import { nowS } from "../../routes/timeline/utils";
 
 export const START_ZOOM = 1 / (60 * 60);
 
+type CanvasListener<T= MouseEvent & TouchEvent & WheelEvent> = (event: T) => void;
+
 export interface ICanvasListeners {
-    mousemove: Function[],
-    mouseup: Function[],
-    mousedown: Function[],
-    touchstart: Function[],
-    touchmove: Function[],
-    touchend: Function[],
-    wheel: Function[],
+    mousemove: CanvasListener[],
+    mouseup: CanvasListener[],
+    mousedown: CanvasListener[],
+    touchstart: CanvasListener[],
+    touchmove: CanvasListener[],
+    touchend: CanvasListener[],
+    wheel: CanvasListener[],
 }
 
 export interface ICanvasState extends ICanvasListeners {
@@ -61,13 +63,13 @@ export class CanvasState implements ICanvasListeners {
     pixelRatio: number;
     time: number;
 
-    readonly mousemove: Function[];
-    readonly mouseup: Function[];
-    readonly mousedown: Function[];
-    readonly touchstart: Function[];
-    readonly touchmove: Function[];
-    readonly touchend: Function[];
-    readonly wheel: Function[];
+    readonly mousemove: CanvasListener[];
+    readonly mouseup: CanvasListener[];
+    readonly mousedown: CanvasListener[];
+    readonly touchstart: CanvasListener[];
+    readonly touchmove: CanvasListener[];
+    readonly touchend: CanvasListener[];
+    readonly wheel: CanvasListener[];
 
     public constructor (props: Required<CanvasState>) {
         this.width = props.width;
@@ -88,7 +90,7 @@ export class CanvasState implements ICanvasListeners {
         this.wheel = props.wheel;
     }
 
-    public listen (event: keyof ICanvasListeners, callback: Function) {
+    public listen <EvtT extends keyof ICanvasListeners>(event: EvtT, callback: CanvasListener<WindowEventMap[EvtT]>) {
         this[event].push(callback);
     }
 

@@ -1,7 +1,6 @@
 <script lang="ts">
     import {
         canvasState,
-        CanvasState,
         renderable
     } from "../../lib/canvas/canvas";
 
@@ -14,45 +13,7 @@
             let dragYStart = 0;
             let dragYEnd = 0;
 
-            // mobile hide and show
-            let timer = performance.now();
-            const touchDuration = 300;
-            let moved = false;
-
-            function toggleText () {
-                // showText = !showText;
-                // render(data);
-            }
-
-            window.addEventListener("keydown", event => {
-                if (event.code === "Tab") {
-                    toggleText();
-                    return false;
-                }
-            });
-
-            window.addEventListener("touchstart", () => {
-                timer = performance.now();
-                moved = false;
-            });
-            window.addEventListener("touchmove", () => {
-                moved = true;
-            });
-            window.addEventListener("touchend", (evt) => {
-                if (!moved && performance.now() - timer >= touchDuration) {
-                    evt.preventDefault();
-                    toggleText();
-                }
-                moved = false;
-            });
-
-            window.addEventListener("contextmenu", (evt) => {
-                if (timer) {
-                    evt.preventDefault();
-                }
-            });
-
-            function doZoom (deltaZ) {
+            function doZoom (deltaZ: number) {
                 canvasState.update(s => {
                     let centerTime = s.renderPosToTime(s.width / 2);
                     s.zoom *= deltaZ;
@@ -65,6 +26,7 @@
             }
 
             $canvasState.listen("wheel", evt => {
+                console.log('hi')
                 evt.preventDefault();
                 doZoom(1 + (evt.deltaY * -0.001));
             });

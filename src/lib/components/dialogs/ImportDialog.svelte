@@ -3,7 +3,7 @@
     import type { Auth } from "../../types";
     import { entries } from "./importEntries.js";
     import { getNotificationsContext } from "svelte-notifications";
-    import Spinner from "$lib/components/Spinner.svelte";
+    import Spinner from "../../../lib/components/BookSpinner.svelte";
     import { onMount } from "svelte";
     import { api } from "../../api/apiQuery";
 

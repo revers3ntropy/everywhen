@@ -4,7 +4,7 @@
     import { getNotificationsContext } from "svelte-notifications";
     import Bin from "svelte-material-icons/Delete.svelte";
     import TrayArrowUp from "svelte-material-icons/TrayArrowUp.svelte";
-    import Spinner from "../../lib/components/Spinner.svelte";
+    import Spinner from "./BookSpinner.svelte";
     import { obfuscated } from "../constants";
     import EntryGroup from "../../lib/components/EntryGroup.svelte";
     import Sidebar from "../../routes/diary/Sidebar.svelte";
@@ -44,6 +44,28 @@
         showPopup(ImportDialog, { auth }, () => reload(page, search));
     }
 
+    function handleEntries (res) {
+        if (
+            !res.entries ||
+            res.totalPages === undefined ||
+            res.totalEntries === undefined
+        ) {
+            console.error(res);
+            addNotification({
+                text: `Cannot load entries: ${ res.body?.message }`,
+                position: "top-center",
+                type: "error",
+                removeAfter: 4000
+            });
+            return;
+        }
+        entries = groupEntriesByDay(res.entries);
+        pages = res.totalPages;
+        entryCount = res.totalEntries;
+
+        loading = false;
+    }
+
     export async function reload (page: number, search: string) {
         loading = true;
 
@@ -57,27 +79,7 @@
         }
 
         api.get(auth, `/entries`, entriesOptions)
-            .then((res) => {
-                if (
-                    !res.entries ||
-                    res.totalPages === undefined ||
-                    res.totalEntries === undefined
-                ) {
-                    console.error(res);
-                    addNotification({
-                        text: `Cannot load entries: ${ res.body?.message }`,
-                        position: "top-center",
-                        type: "error",
-                        removeAfter: 4000
-                    });
-                    return;
-                }
-                entries = groupEntriesByDay(res.entries);
-                pages = res.totalPages;
-                entryCount = res.totalEntries;
-
-                loading = false;
-            });
+            .then(handleEntries);
 
         const res = await api.get(auth, "/entries/titles");
         if (!res.entries) {

@@ -13,7 +13,7 @@
 
     export let data: Auth;
 
-    let entries: Entry[] = [];
+    let entries: (Entry & { wordCount: number })[] = [];
     let events: Event[] = [];
 
     onMount(async () => {

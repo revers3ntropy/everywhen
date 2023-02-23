@@ -5,7 +5,7 @@
     export let id: string;
     export let created: number;
     export let title: string;
-    export let wordCount: string;
+    export let wordCount: number;
     export let entryTextParityHeight: boolean;
 
     renderable(state => {

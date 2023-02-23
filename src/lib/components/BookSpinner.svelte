@@ -21,7 +21,7 @@
             <div class="right"></div>
         </div>
         <ul>
-            {#each { length: 17 } as _, i}
+            {#each { length: 17 } as _, __}
                 <li></li>
             {/each}
         </ul>
@@ -36,6 +36,17 @@
     justify-content: center;
     align-items: center;
     width: 100%;
+
+    box-sizing: border-box;
+
+    * {
+      box-sizing: inherit;
+
+      &:before,
+      &:after {
+        box-sizing: inherit;
+      }
+    }
   }
 
   .book {
@@ -205,15 +216,6 @@
     }
     96% {
       transform: rotateZ(-90deg)
-    }
-  }
-
-  * {
-    box-sizing: inherit;
-
-    &:before,
-    &:after {
-      box-sizing: inherit;
     }
   }
 </style>

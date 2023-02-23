@@ -8,7 +8,7 @@ export interface Label {
 }
 
 export interface Entry {
-    id: number;
+    id: string;
     title: string;
     entry: string;
     created: number;
