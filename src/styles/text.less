@@ -57,10 +57,18 @@ pre {
 }
 
 .obfuscated, .obfuscated * {
-    color: transparent;
-    text-shadow: 0 0 3px @text-color;
+	color: transparent;
+	text-shadow: 0 0 3px @text-color;
 }
 
 .text-light {
 	color: @text-color-light !important;
+}
+
+code {
+	background-color: @light-accent;
+	border-radius: 3px;
+	padding: 0.5em;
+	overflow-x: auto;
+	color: var(--text-color);
 }
