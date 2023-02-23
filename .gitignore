@@ -23,3 +23,7 @@ entries-example.json
 .output
 /build
 /misc_3-server/
+
+# Cypress
+/cypress/videos/
+/cypress/screenshots/
