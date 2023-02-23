@@ -1,9 +1,9 @@
 <script lang="ts">
-    import type { Data } from "$lib/types";
     import EntryForm from "./EntryForm.svelte";
     import Entries from "../../lib/components/Entries.svelte";
+    import type { PageData } from './$types';
 
-    export let data: Data;
+    export let data: PageData;
     let clearEntryForm: () => void;
     let reloadEntries;
 

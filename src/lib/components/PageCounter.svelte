@@ -6,7 +6,7 @@
     export let pages = 0;
     export let pageLength = 0;
     export let total = 0;
-    export let emptyText = "No data";
+    export let emptyText = "";
 </script>
 
 {#if total < 1}
@@ -14,7 +14,11 @@
 {:else}
     <div class="page-counter">
         <div>
-            <button on:click={() => page--} disabled={page <= 0} class="flex-center">
+            <button
+                on:click={() => page--}
+                disabled={page <= 0}
+                class="flex-center"
+            >
                 <ArrowLeft size="20" />
             </button>
         </div>

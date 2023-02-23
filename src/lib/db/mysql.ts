@@ -1,6 +1,5 @@
-import mysql from 'mysql2/promise';
-import { DB_HOST, DB_USER, DB_PASS, DB, DB_PORT } from '$env/static/private';
-import '../require';
+import type mysql from 'mysql2/promise';
+import { browser } from "$app/environment";
 
 export type queryRes =
 	| mysql.RowDataPacket[][]
@@ -10,21 +9,35 @@ export type queryRes =
 	| mysql.ResultSetHeader
 	| Record<string, any>[];
 
-// define defaults from .env file
-const port = DB_PORT ? parseInt(DB_PORT) : 3306;
-const config: mysql.ConnectionOptions = {
-	host: DB_HOST,
-	user: DB_USER,
-	password: DB_PASS,
-	database: DB,
-	port
-};
+async function getConfig() {
+	const { DB_HOST, DB_USER, DB_PASS, DB, DB_PORT } =
+		await import('$env/static/private');
+	// define defaults from .env file
+	const port = DB_PORT ? parseInt(DB_PORT) : 3306;
+	const config: mysql.ConnectionOptions = {
+		host: DB_HOST,
+		user: DB_USER,
+		password: DB_PASS,
+		database: DB,
+		port
+	};
+	return config;
+}
 
 let con: mysql.Connection | null = null;
+let mysqlModule: typeof mysql;
 
 async function connect () {
-	con = await mysql.createConnection(config).catch((e: any) => {
-        console.error(`Error connecting to mysql db '${ DB }'`);
+
+	// import dynamically so that it won't throw an error if it gets imported
+	// in the browser
+
+	mysqlModule = await import('mysql2/promise');
+	await import('../require');
+
+	const config = await getConfig();
+	con = await mysqlModule.createConnection(config).catch((e: any) => {
+        console.error(`Error connecting to mysql db '${ config.database }'`);
         console.error(e);
         throw e;
     });
@@ -40,7 +53,12 @@ export async function query<Res extends queryRes = mysql.RowDataPacket[]> (
 	queryParts: TemplateStringsArray,
 	...params: any[]
 ): Promise<Res> {
-	if (!con) await connect();
+	if (browser) {
+		throw new Error("Cannot query database from browser");
+	}
+	if (!con) {
+		await connect();
+	}
 
 	const query = queryParts.reduce((acc, cur, i) => {
 		const str = acc + cur;

@@ -9,11 +9,11 @@
     import EntryGroup from "../../lib/components/EntryGroup.svelte";
     import Sidebar from "../../routes/diary/Sidebar.svelte";
     import PageCounter from "../../lib/components/PageCounter.svelte";
-    import type { Entry as EntryType } from "../../lib/types";
     import { showPopup } from "../utils";
     import { api } from "../api/apiQuery";
-    import { groupEntriesByDay } from "../../routes/api/entries/utils.client";
     import ImportDialog from "./dialogs/ImportDialog.svelte";
+    import { Entry } from "../controllers/entry";
+    import { onMount } from "svelte";
 
     const { addNotification } = getNotificationsContext();
 
@@ -27,9 +27,9 @@
 
     export let options = {};
 
-    let entries: Record<number, EntryType[]> = {};
+    let entries: Record<number, Entry[]> = {};
 
-    let entryTitles: Record<number, EntryType[]> = {};
+    let entryTitles: Record<number, Entry[]> = {};
     let entryCount = 0;
 
     const PAGE_LENGTH = 3000;
@@ -59,7 +59,7 @@
             });
             return;
         }
-        entries = groupEntriesByDay(res.entries);
+        entries = Entry.groupEntriesByDay(res.entries);
         pages = res.totalPages;
         entryCount = res.totalEntries;
 
@@ -92,10 +92,12 @@
             });
             return;
         }
-        entryTitles = groupEntriesByDay(res.entries);
+        entryTitles = Entry.groupEntriesByDay(res.entries);
     }
 
-    $: reload(page, search);
+    onMount(() => {
+        reload(page, search);
+    })
 </script>
 
 <div>

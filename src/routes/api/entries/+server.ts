@@ -5,7 +5,7 @@ import { error } from "@sveltejs/kit";
 import { decrypt, encrypt } from "../../../lib/security/encryption";
 import { getAuthFromCookies } from "../../../lib/security/getAuthFromCookies";
 import { addLabelsToEntries, decryptEntries } from "./utils.server";
-import type { RawEntry } from "../../../lib/types";
+import type { RawEntry } from "../../../lib/controllers/entry";
 
 export const GET: RequestHandler = async ({ url, cookies }) => {
     const { key, id } = await getAuthFromCookies(cookies);

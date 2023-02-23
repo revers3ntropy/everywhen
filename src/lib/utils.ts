@@ -2,10 +2,10 @@ import { parse } from "cookie";
 import { browser } from "$app/environment";
 import { KEY_COOKIE_KEY, OBFUSCATE_CHARS, popup, USERNAME_COOKIE_KEY } from "./constants";
 import { bind } from "svelte-simple-modal";
-import type { Auth } from "./types";
 import type { SvelteComponentDev } from "svelte/internal";
+import type { Auth } from "./controllers/user";
 
-class Result<T, E> {
+export class Result<T, E=string> {
     private constructor (
         private readonly value: T | null = null,
         private readonly error: E | null = null
@@ -28,11 +28,26 @@ class Result<T, E> {
         return new Result<T, E>(null, error);
     }
 
+    public get isOk (): boolean {
+        return this.value !== null;
+    }
+
+    public get isErr (): boolean {
+        return this.error !== null;
+    }
+
     public unwrap (): T {
         if (this.value === null) {
             throw this.error;
         }
         return this.value;
+    }
+
+    public unwrapErr (): E {
+        if (this.error === null) {
+            throw this.value;
+        }
+        return this.error;
     }
 
     public map<U> (f: (value: T) => U): Result<U, E> {
@@ -43,7 +58,7 @@ class Result<T, E> {
     }
 }
 
-export function getAuth (): Omit<Auth, "id"> {
+export function getAuth (): Auth {
     if (!browser) {
         throw "getKey() can only be used in the browser";
     }
