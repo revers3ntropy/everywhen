@@ -136,7 +136,7 @@
     $delay: $i * 1.86;
     $delay-after: $i * 1.74;
     @keyframes page-#{$i} {
-    #{4 + $delay} % {
+    #{4 + $delay}% {
     transform: rotateZ(0deg) translateX(-18px);
   }
     #{13 + $delay-after}%,
