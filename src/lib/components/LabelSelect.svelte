@@ -1,10 +1,10 @@
 <script lang="ts">
     import Plus from "svelte-material-icons/Plus.svelte";
-    import Dropdown from "$lib/components/Dropdown.svelte";
-    import { showPopup } from "$lib/utils";
+    import Dropdown from "../../lib/components/Dropdown.svelte";
+    import { showPopup } from '../utils';
+    import { Label } from '../controllers/label';
     import NewLabelDialog from "./dialogs/NewLabelDialog.svelte";
-    import { api } from "$lib/api/apiQuery";
-    import type { Label } from "$lib/types";
+    import { api } from '../api/apiQuery';
 
     let closeLabelDropDown;
 

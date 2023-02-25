@@ -1,8 +1,6 @@
-import { getAuthFromCookies } from "$lib/security/getAuthFromCookies";
-import { query } from "$lib/db/mysql";
-import type { RequestHandler } from "@sveltejs/kit";
-import { addLabelsToEntries, decryptEntries } from "../utils.server";
-import type { RawEntry } from "$lib/types";
+import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
+import { query } from '$lib/db/mysql';
+import type { RequestHandler } from '@sveltejs/kit';
 
 export const GET: RequestHandler = async ({ cookies }) => {
     const { key, id } = await getAuthFromCookies(cookies);
@@ -18,7 +16,7 @@ export const GET: RequestHandler = async ({ cookies }) => {
              users
         WHERE deleted = 0
           AND entries.user = users.id
-          AND users.id = ${ id }
+          AND users.id = ${id}
         ORDER BY created DESC, id
     `;
 
@@ -30,7 +28,7 @@ export const GET: RequestHandler = async ({ cookies }) => {
     };
 
     response.entries.map((entry) => {
-        entry.entry = entry.entry.substring(0, 25).replace(/[^0-9a-z ]/gi, "");
+        entry.entry = entry.entry.substring(0, 25).replace(/[^0-9a-z ]/gi, '');
     });
 
     return new Response(JSON.stringify(response), { status: 200 });

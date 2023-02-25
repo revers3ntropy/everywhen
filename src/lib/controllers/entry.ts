@@ -1,31 +1,48 @@
-import { Label } from './label';
-import { Result } from '../utils';
+import type { Writeable } from '../utils';
 import { query } from '../db/mysql';
+import { decrypt, encrypt } from '../security/encryption';
+import { generateUUId } from '../security/uuid';
+import { Result } from '../utils';
+import { Label } from './label';
+import type { User } from './user';
 
-type RawEntry = Omit<Entry, 'label'> & {
-    label?: string
+
+// RawEntry is the raw data from the database,
+// Entry is the data after decryption and links to labels
+export type RawEntry = Omit<Entry, 'label' | 'decrypted'> & {
+    label?: string,
+    decrypted: false
+};
+
+export type DecryptedRawEntry = Omit<RawEntry, 'decrypted'> & {
+    decrypted: true
 };
 
 export class Entry {
     public label?: Label;
+    public readonly decrypted = true;
 
     private constructor (
-        public id: string,
-        public title: string,
-        public entry: string,
-        public created: number,
-        public deleted: boolean,
-        public latitude?: number,
-        public longitude?: number
+        public readonly id: string,
+        public readonly title: string,
+        public readonly entry: string,
+        public readonly created: number,
+        public readonly deleted: boolean,
+        public readonly latitude?: number,
+        public readonly longitude?: number
     ) {
     }
 
-    public static async delete (userId: string, id: string, restore: boolean): Promise<Result> {
+    public static async delete (
+        auth: User,
+        id: string,
+        restore: boolean
+    ): Promise<Result> {
         const entry = await query`
             SELECT deleted
             FROM entries
             WHERE id = ${id}
-              AND user = ${userId}
+              AND user = ${auth.id}
         `;
 
         if (!entry.length) {
@@ -40,13 +57,78 @@ export class Entry {
             SET deleted = ${!restore},
                 label=${null}
             WHERE entries.id = ${id}
-              AND user = ${userId}
+              AND user = ${auth.id}
         `;
 
         return Result.ok(null);
     }
 
-    public static groupEntriesByDay (entries: Entry[]): Record<number, Entry[]> {
+    public static async purgeWithId (auth: User, id: string): Promise<void> {
+        await query`
+            DELETE
+            FROM entries
+            WHERE entries.id = ${id}
+              AND user = ${auth.id}
+        `;
+
+    }
+
+    public static async allRaw (auth: User, deleted = false)
+        : Promise<RawEntry[]> {
+        return await query<RawEntry[]>`
+            SELECT id,
+                   created,
+                   title,
+                   deleted,
+                   label,
+                   entry
+            FROM entries
+            WHERE deleted = ${deleted}
+              AND entries.user = ${auth.id}
+            ORDER BY created DESC, id
+        `;
+    }
+
+    public static async all (auth: User, deleted = false)
+        : Promise<Result<Entry[]>> {
+        const rawEntries = await Entry.allRaw(auth, deleted);
+
+        const entries = [];
+
+        for (const rawEntry of rawEntries) {
+            const { err, val } = await Entry.fromRaw(auth, rawEntry);
+            if (err) {
+                return Result.err(err);
+            }
+            entries.push(val);
+        }
+
+        return Result.ok(entries);
+    }
+
+    public static async fromRaw (
+        auth: User,
+        rawEntry: RawEntry
+    ): Promise<Result<Entry>> {
+        const entry = new Entry(
+            rawEntry.id,
+            decrypt(auth.key, rawEntry.title),
+            decrypt(auth.key, rawEntry.entry),
+            rawEntry.created,
+            rawEntry.deleted
+        );
+
+        if (rawEntry.label) {
+            const { err } = await entry.addLabel(auth, rawEntry.label);
+            if (err) return Result.err(err);
+        }
+
+        return Result.ok(entry);
+    }
+
+    public static groupEntriesByDay (
+        entries: Entry[]
+    ): Record<number, Entry[]> {
         const grouped: Record<number, Entry[]> = [];
 
         if (!Array.isArray(entries)) {
@@ -75,12 +157,23 @@ export class Entry {
         return grouped;
     }
 
-    public static async fromId (userId: string, id: string, mustNotBeDeleted = true): Promise<Result<Entry>> {
+    public static async fromId (
+        auth: User,
+        id: string,
+        mustNotBeDeleted = true
+    ): Promise<Result<Entry>> {
         const entries = await query<RawEntry[]>`
-            SELECT label, deleted
+            SELECT label,
+                   deleted,
+                   id,
+                   created,
+                   title,
+                   entry,
+                   latitude,
+                   longitude
             FROM entries
             WHERE id = ${id}
-              AND user = ${userId}
+              AND user = ${auth.id}
         `;
 
         if (entries.length !== 1) {
@@ -90,31 +183,96 @@ export class Entry {
             return Result.err('Entry is deleted');
         }
 
-        let entry = new Entry(
-            id,
-            entries[0].title,
-            entries[0].entry,
-            entries[0].created,
-            entries[0].deleted,
-            entries[0].latitude,
-            entries[0].longitude
+        return await Entry.fromRaw(auth, entries[0]);
+    }
+
+    public static async decryptRaw<T extends RawEntry | RawEntry[]> (
+        auth: User,
+        raw: T
+    ): Promise<Result<T extends RawEntry ? DecryptedRawEntry : DecryptedRawEntry[]>> {
+        if (Array.isArray(raw)) {
+            const decrypted = [];
+
+            for (const entry of raw as RawEntry[]) {
+                const { val, err } = await Entry.decryptRaw(auth, entry);
+                if (err) return Result.err(err);
+                decrypted.push(val);
+            }
+
+            return Result.ok(decrypted as T extends RawEntry ? DecryptedRawEntry : DecryptedRawEntry[]);
+        }
+        return Result.ok({
+            ...raw,
+            title: decrypt(auth.key, raw.title),
+            entry: decrypt(auth.key, raw.entry),
+            decrypted: true
+        } as unknown as T extends RawEntry ? DecryptedRawEntry : DecryptedRawEntry[]);
+    }
+
+    public static jsonIsRawEntry<T extends RawEntry | DecryptedRawEntry> (
+        json: unknown
+    ): json is T {
+        return typeof json === 'object'
+            && json !== null
+            && (!('deleted' in json) || typeof json.deleted === 'boolean')
+            && 'title' in json
+            && typeof json.title !== 'string'
+            && 'entry' in json
+            && typeof json.entry !== 'string'
+            && 'latitude' in json
+            && typeof json.latitude !== 'number'
+            && 'longitude' in json
+            && typeof json.longitude !== 'number'
+            && (
+                !('label' in json)
+                || typeof json.label === 'string'
+                || json.label !== null
+            )
+            && 'created' in json
+            && typeof json.created !== 'number'
+            && 'id' in json
+            && typeof json.id !== 'string';
+    }
+
+    public static async create (
+        auth: User,
+        json: Omit<DecryptedRawEntry, 'id'>
+              & Partial<Writeable<Pick<DecryptedRawEntry, 'id'>>>
+    ): Promise<Result<Entry>> {
+        if (!json.id) {
+            json.id = await generateUUId();
+        }
+        const entry = new Entry(
+            json.id,
+            json.title,
+            json.entry,
+            json.created,
+            json.deleted
         );
 
-        if (entries[0].label) {
-            const {
-                val: newEntry,
-                err
-            } = (await entry.addLabel(userId, entries[0].label)).resolve();
-            if (err) {
-                return Result.err(err);
-            }
-            entry = newEntry;
+        if (json.label) {
+            const { err } = await entry.addLabel(auth, json.label);
+            if (err) return Result.err(err);
         }
+
+        await query`
+            INSERT INTO entries
+                (id, user, title, entry, created, deleted, label, latitude, longitude)
+            VALUES (${entry.id},
+                    ${auth.id},
+                    ${encrypt(auth.key, entry.title)},
+                    ${encrypt(auth.key, entry.entry)},
+                    ${entry.created},
+                    ${entry.deleted},
+                    ${entry.label?.id ?? null},
+                    ${entry.latitude},
+                    ${entry.longitude})
+        `;
 
         return Result.ok(entry);
     }
 
-    public async removeLabel (userId: string): Promise<Result<Entry>> {
+    public async removeLabel (auth: User): Promise<Result<Entry>> {
         if (!this.label) {
             return Result.err('Entry does not have a label to remove');
         }
@@ -123,16 +281,16 @@ export class Entry {
             UPDATE entries
             SET label = ${null}
             WHERE entries.id = ${this.id}
-              AND user = ${userId}
+              AND user = ${auth.id}
         `;
 
         this.label = undefined;
         return Result.ok(this);
     }
 
-    public async updateLabel (userId: string, label: Label | string | null): Promise<Result<Entry>> {
+    public async updateLabel (auth: User, label: Label | string | null): Promise<Result<Entry>> {
         if (label == null) {
-            return this.removeLabel(userId);
+            return this.removeLabel(auth);
         }
         if (label instanceof Label) {
             label = label.id;
@@ -146,24 +304,33 @@ export class Entry {
             UPDATE entries
             SET label = ${label}
             WHERE id = ${this.id}
-              AND user = ${userId}
+              AND user = ${auth.id}
         `;
 
-        const res = await this.addLabel(userId, label);
-        if (res.isErr) {
-            return Result.err(res.unwrapErr());
-        }
-
-        return Result.ok(res.unwrap());
+        return await this.addLabel(auth, label);
     }
 
-    private async addLabel (userId: string, label: Label | string): Promise<Result<Entry>> {
+    public clone (): Entry {
+        const entry = new Entry(
+            this.id,
+            this.title,
+            this.entry,
+            this.created,
+            this.deleted,
+            this.latitude,
+            this.longitude
+        );
+        entry.label = this.label;
+        return entry;
+    }
+
+    private async addLabel (auth: User, label: Label | string): Promise<Result<Entry>> {
         if (typeof label === 'string') {
-            const res = await Label.fromId(userId, label);
-            if (res.isErr) {
-                return Result.err(res.unwrapErr());
+            const { val, err } = await Label.fromId(auth, label);
+            if (err) {
+                return Result.err(err);
             }
-            this.label = res.unwrap();
+            this.label = val;
         } else {
             this.label = label;
         }

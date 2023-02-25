@@ -1,78 +1,55 @@
 import { Label } from '../../../../lib/controllers/label';
 import { getAuthFromCookies } from '../../../../lib/security/getAuthFromCookies';
 import { error } from '@sveltejs/kit';
+import { getUnwrappedReqBody } from '../../../../lib/utils';
 import type { RequestHandler } from './$types';
 import { Entry } from '../../../../lib/controllers/entry';
-import { extractBody } from '../../../../lib/utils';
 
 export const DELETE: RequestHandler = async ({ request, params, cookies }) => {
-    const { id: userId } = await getAuthFromCookies(cookies);
+    const auth = await getAuthFromCookies(cookies);
+    if (!params.entryId) throw error(400, 'invalid id');
 
-    const { entryId } = params;
-    if (!entryId) {
-        throw error(400, 'invalid id');
-    }
-
-    const bodyRes = await extractBody(request, {
-        restore: void 0
+    const body = await getUnwrappedReqBody(request, {
+        restore: 'boolean'
     });
-    let { val: body, err: bodyErr } = bodyRes.resolve();
-    if (bodyErr) {
-        throw error(400, bodyErr);
-    }
 
-    if (typeof body.restore !== 'boolean') {
-        throw error(400, 'invalid \'restore\' in body');
-    }
-
-    let deleteRes = await Entry.delete(userId, entryId, body.restore);
-    if (deleteRes.isErr) {
-        throw error(400, deleteRes.unwrapErr());
-    }
+    let { err: deleteErr } = await Entry.delete(auth, params.entryId, body.restore);
+    if (deleteErr) throw error(400, deleteErr);
 
     return new Response(JSON.stringify({
-        id: entryId
+        id: params.entryId
     }), { status: 200 });
 };
 
 export const PUT: RequestHandler = async ({ request, params, cookies }) => {
-    const { id: userId } = await getAuthFromCookies(cookies);
+    const auth = await getAuthFromCookies(cookies);
 
     if (!params.entryId) {
         throw error(400, 'invalid id');
     }
 
-    const bodyRes = await extractBody(request, {
-        label: void 0
+    const body = await getUnwrappedReqBody(request, {
+        label: 'string'
+    }, {
+        label: ''
     });
-    let { val: body, err: bodyErr } = bodyRes.resolve();
-    if (bodyErr) {
-        throw error(400, bodyErr);
-    }
 
-    if (body.label !== null && typeof body.label !== 'string') {
-        throw error(400, 'invalid label');
-    }
-
-    const entryResult = await Entry.fromId(userId, params.entryId);
-    const { val: entry, err: entryErr } = entryResult.resolve();
-    if (entryErr) {
-        throw error(400, entryErr);
-    }
+    const { err: entryErr, val: entry } = await Entry.fromId(auth, params.entryId);
+    if (entryErr) throw error(400, entryErr);
 
     if (entry.label?.id === body.label || (!body.label && !entry.label)) {
         throw error(400, 'Entry already has that label');
     }
 
-    if (body.label !== null) {
-        if (!await Label.userHasLabel(userId, body.label)) {
+    if (body.label) {
+        if (!await Label.userHasLabelWithId(auth, body.label)) {
             throw error(404, 'Label not found');
         }
     }
 
-    const updateRes = await entry.updateLabel(userId, body.label);
-    if (updateRes.isErr) {
-        throw error(400, updateRes.unwrapErr());
+    const updateRes = await entry.updateLabel(auth, body.label);
+    if (updateRes.err) {
+        throw error(400, updateRes.err);
     }
 
     return new Response(JSON.stringify({}), { status: 200 });

@@ -1,23 +1,23 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
-    import { getNotificationsContext } from "svelte-notifications";
-    import DomPurify from "dompurify";
-    import moment from "moment";
-    import { marked } from "marked";
-    import Bin from "svelte-material-icons/Delete.svelte";
-    import Eye from "svelte-material-icons/Eye.svelte";
-    import EyeOff from "svelte-material-icons/EyeOff.svelte";
-    import Restore from "svelte-material-icons/DeleteRestore.svelte";
-    import { api } from "../api/apiQuery";
-    import { getAuth, obfuscate } from "../utils";
-    import Label from "./Label.svelte";
+    import { createEventDispatcher } from 'svelte';
+    import { getNotificationsContext } from 'svelte-notifications';
+    import DomPurify from 'dompurify';
+    import moment from 'moment';
+    import { marked } from 'marked';
+    import Bin from 'svelte-material-icons/Delete.svelte';
+    import Eye from 'svelte-material-icons/Eye.svelte';
+    import EyeOff from 'svelte-material-icons/EyeOff.svelte';
+    import Restore from 'svelte-material-icons/DeleteRestore.svelte';
+    import { api } from '../api/apiQuery';
+    import { getAuthFromCookies, obfuscate } from '../utils';
+    import Label from './Label.svelte';
 
     const dispatch = createEventDispatcher();
     const { addNotification } = getNotificationsContext();
 
-    export let id = "";
-    export let title = "";
-    export let entry = "";
+    export let id = '';
+    export let title = '';
+    export let entry = '';
     export let created = 0;
     export let label: Label | null = null;
     export let latitude: number | null = null;
@@ -35,30 +35,30 @@
     } : null;
 
     async function deleteSelf () {
-        if (!confirm(`Are you sure you want to ${ deleted ? "restore" : "delete" } this entry?`)) {
+        if (!confirm(`Are you sure you want to ${deleted ? 'restore' : 'delete'} this entry?`)) {
             return;
         }
 
-        const res = await api.delete(getAuth(), `/entries/${ id }`, {
+        const res = await api.delete(getAuthFromCookies(), `/entries/${id}`, {
             restore: deleted
         });
 
         if (res.id) {
             addNotification({
                 removeAfter: 4000,
-                text: `Entry ${ deleted ? "restored" : "deleted" }`,
-                type: "success",
-                position: "top-center"
+                text: `Entry ${deleted ? 'restored' : 'deleted'}`,
+                type: 'success',
+                position: 'top-center'
             });
-            dispatch("updated");
+            dispatch('updated');
             return;
         }
 
         addNotification({
             removeAfter: 4000,
-            text: `Error deleting entry ${ res.body.message }`,
-            type: "error",
-            position: "top-center"
+            text: `Error deleting entry ${res.body.message}`,
+            type: 'error',
+            position: 'top-center'
         });
     }
 

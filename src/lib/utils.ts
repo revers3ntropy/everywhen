@@ -1,10 +1,11 @@
+import { error } from '@sveltejs/kit';
 import { parse } from 'cookie';
 import { browser } from '$app/environment';
 import { KEY_COOKIE_KEY, OBFUSCATE_CHARS, popup, USERNAME_COOKIE_KEY } from './constants';
 import { bind } from 'svelte-simple-modal';
 import type { SvelteComponentDev } from 'svelte/internal';
-import type { Auth } from './controllers/user';
 import type { Position } from 'svelte-notifications';
+import type { RawAuth } from './controllers/user';
 
 export interface NotificationOptions {
     id?: string;
@@ -14,9 +15,13 @@ export interface NotificationOptions {
     removeAfter?: number;
 }
 
+export type Writeable<T> = {
+    -readonly [P in keyof T]: T[P]
+};
+
 const NULL = Symbol();
 
-export class Result<T = null, E = string> {
+export class Result<T = null, E extends {} = string> {
 
     public static readonly NULL = NULL;
 
@@ -26,11 +31,17 @@ export class Result<T = null, E = string> {
     ) {
     }
 
-    public get err (): E | typeof NULL {
+    public get err (): E | null {
+        if (this.error === NULL) {
+            return null;
+        }
         return this.error;
     }
 
-    public get val (): T | typeof NULL {
+    public get val (): T {
+        if (this.value === NULL) {
+            throw `Got error when unwrapping Result: '${String(this.error)}'`;
+        }
         return this.value;
     }
 
@@ -42,26 +53,12 @@ export class Result<T = null, E = string> {
         return this.error !== NULL;
     }
 
-    public static ok<T, E> (value: T): Result<T, E> {
+    public static ok<T, E extends {}> (value: T): Result<T, E> {
         return new Result<T, E>(value, NULL);
     }
 
-    public static err<T, E> (error: E): Result<T, E> {
+    public static err<T, E extends {}> (error: E): Result<T, E> {
         return new Result<T, E>(NULL, error);
-    }
-
-    public unwrap (): T {
-        if (this.value === NULL) {
-            throw this.error;
-        }
-        return this.value;
-    }
-
-    public unwrapErr (): E {
-        if (this.error === NULL) {
-            throw this.value;
-        }
-        return this.error;
     }
 
     public map<U> (f: (value: T) => U): Result<U, E> {
@@ -70,19 +67,9 @@ export class Result<T = null, E = string> {
         }
         return Result.ok(f(this.value));
     }
-
-    /**
-     * Must not use `val` unless checked that `err` is null
-     */
-    public resolve (): { err: E | null, val: T } {
-        return {
-            err: this.error === NULL ? null : this.error as E,
-            val: this.value as T
-        };
-    }
 }
 
-export function getAuth (): Auth {
+export function getAuthFromCookies (): RawAuth {
     if (!browser) {
         throw 'getKey() can only be used in the browser';
     }
@@ -167,23 +154,68 @@ export function wordCount (text: string): number {
         .length;
 }
 
-export async function extractBody<T extends Record<string, void>> (request: Request, schema: T)
-    : Promise<Result<Record<keyof T, unknown>>> {
+
+type typeMap = {
+    string: string;
+    number: number;
+    boolean: boolean;
+    object: object;
+};
+
+export async function bodyFromReq<T extends Record<string, keyof typeMap>> (
+    request: Request,
+    valueType: T,
+    defaults: { [P in keyof T]?: typeMap[T[P]] } = {}
+): Promise<Result<Readonly<{ [P in keyof T]: typeMap[T[P]] }>>> {
+    if (request.method === 'GET') {
+        throw 'GET requests are not supported in bodyFromReq()';
+    }
+
     const contentType = request.headers.get('content-type');
     if (contentType !== 'application/json') {
         return Result.err('Invalid content type on body');
     }
 
-    const body = await request.json();
+    const body = await request.json() as Record<string, unknown> | null;
     if (typeof body !== 'object' || body === null) {
         return Result.err('Invalid body: not JSON');
     }
 
-    const objectsSame = Object.keys(schema)
-                              .every((key) => key in Object.keys(body));
-    if (!objectsSame) {
-        return Result.err('Invalid body: invalid keys');
+    for (const key in defaults) {
+        body[key] ??= defaults[key];
     }
 
-    return Result.ok(body as Record<keyof T, unknown>);
+    const bodyKeys = Object.keys(body);
+    const expectedKeys = Object.keys(valueType);
+
+    // allow extra keys, but err on missing keys
+    const missingKeys = expectedKeys.filter((key) => !bodyKeys.includes(key));
+
+    if (missingKeys.length > 0) {
+        return Result.err(`Invalid body: Missing keys ${missingKeys.join(', ')}`);
+    }
+
+    for (const key in body) {
+        const value = body[key];
+        const type = valueType[key];
+        if (typeof value !== type) {
+            return Result.err(`Invalid body: key '${key}' is not of type '${type}'`);
+        }
+    }
+
+    return Result.ok(Object.freeze(
+        body as { [P in keyof T]: typeMap[T[P]] }
+    ));
+}
+
+export async function getUnwrappedReqBody<T extends Record<string, keyof typeMap>> (
+    request: Request,
+    valueType: T,
+    defaults: { [P in keyof T]?: typeMap[T[P]] } = {}
+): Promise<Readonly<{ [P in keyof T]: typeMap[T[P]] }>> {
+    const res = await bodyFromReq(request, valueType, defaults);
+    if (res.err) {
+        throw error(400, res.err);
+    }
+    return res.val;
 }

@@ -1,17 +1,17 @@
 <script lang="ts">
-    import "ts-polyfill";
-    import "../app.less";
-    import Header from "../lib/components/Nav.svelte";
-    import Notifications from "svelte-notifications";
-    import { INACTIVE_TIMEOUT_MS, obfuscated } from "../lib/constants";
-    import { page } from "$app/stores";
-    import Notifier from "./Notifier.svelte";
-    import Modal from "svelte-simple-modal";
-    import { popup } from "../lib/constants.js";
-
+    import 'ts-polyfill';
+    import '../app.less';
+    import Header from '../lib/components/Nav.svelte';
+    import Notifications from 'svelte-notifications';
+    import { INACTIVE_TIMEOUT_MS, obfuscated } from '../lib/constants';
+    import { page } from '$app/stores';
+    import Notifier from './Notifier.svelte';
+    import Modal from 'svelte-simple-modal';
+    import { popup } from '../lib/constants.js';
+    
     export let data: Record<string, any>;
 
-    $: home = $page.url.pathname.trim() === "/";
+    $: home = $page.url.pathname.trim() === '/';
 
     let lastActivity = Date.now();
 
@@ -20,12 +20,14 @@
     $: obfuscated.update(() => isObfuscated);
 
     setInterval(() => {
-        if (isObfuscated) return;
+        if (isObfuscated) {
+            return;
+        }
 
         if (Date.now() - lastActivity > INACTIVE_TIMEOUT_MS) {
             addNotification({
-                text: "Hidden due to inactivity",
-                type: "info",
+                text: 'Hidden due to inactivity',
+                type: 'info',
                 removeAfter: 4000
             });
             isObfuscated = true;
@@ -38,7 +40,7 @@
 
     function keydown (e: KeyboardEvent) {
         lastActivity = Date.now();
-        if (e.key === "Escape") {
+        if (e.key === 'Escape') {
             if (e.ctrlKey) {
                 isObfuscated = !isObfuscated;
                 e.preventDefault();
