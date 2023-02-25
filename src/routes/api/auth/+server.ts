@@ -4,7 +4,7 @@ import {
 	KEY_COOKIE_KEY,
 	USERNAME_COOKIE_KEY
 } from '$lib/constants';
-import { query } from '$lib/db/mysql';
+import { User } from "../../../lib/controllers/user";
 
 export const GET: RequestHandler = async ({ url, cookies }) => {
     let key: string | undefined | null = url.searchParams.get("key");
@@ -20,14 +20,10 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
         });
     }
 
-	const res = await query`
-		SELECT id
-		FROM users
-		WHERE username = ${ username }
-		  AND password = SHA2(CONCAT(${ key }, salt), 256)
-	`;
-	if (res.length !== 1) {
-        return new Response(JSON.stringify({ error: "Invalid login" }), {
+	const { err, val: _ } = await User.authenticate(username, key);
+
+	if (err) {
+        return new Response(JSON.stringify({ error: err }), {
             status: 401
         });
 	}

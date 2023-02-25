@@ -1,95 +1,79 @@
-import { getAuthFromCookies } from "$lib/security/getAuthFromCookies";
-import { error } from "@sveltejs/kit";
-import { query } from "$lib/db/mysql";
-import type { RequestHandler } from "./$types";
-import type { RawEntry } from "$lib/types";
+import { Label } from '../../../../lib/controllers/label';
+import { getAuthFromCookies } from '../../../../lib/security/getAuthFromCookies';
+import { error } from '@sveltejs/kit';
+import type { RequestHandler } from './$types';
+import { Entry } from '../../../../lib/controllers/entry';
+import { extractBody } from '../../../../lib/utils';
 
 export const DELETE: RequestHandler = async ({ request, params, cookies }) => {
     const { id: userId } = await getAuthFromCookies(cookies);
-    const id = params.entryId;
-    const { restore } = await request.json();
 
-    if (typeof id !== "string" || !id) {
-        throw error(400, "invalid id");
+    const { entryId } = params;
+    if (!entryId) {
+        throw error(400, 'invalid id');
     }
 
-    const entry = await query`
-        SELECT deleted
-        FROM entries
-        WHERE id = ${ id }
-    `;
-
-    if (!entry.length) {
-        throw error(404, "Entry not found");
-    }
-    if (!!entry[0].deleted === !restore) {
-        throw error(400, "Entry is already in that state");
+    const bodyRes = await extractBody(request, {
+        restore: void 0
+    });
+    let { val: body, err: bodyErr } = bodyRes.resolve();
+    if (bodyErr) {
+        throw error(400, bodyErr);
     }
 
-    await query`
-        UPDATE entries, users
-        SET entries.deleted = ${ !restore },
-            entries.label=${ null }
-        WHERE entries.id = ${ id }
-          AND entries.user = users.id
-          AND users.id = ${ userId }
-    `;
+    if (typeof body.restore !== 'boolean') {
+        throw error(400, 'invalid \'restore\' in body');
+    }
 
-    return new Response(JSON.stringify({ id }), { status: 200 });
+    let deleteRes = await Entry.delete(userId, entryId, body.restore);
+    if (deleteRes.isErr) {
+        throw error(400, deleteRes.unwrapErr());
+    }
+
+    return new Response(JSON.stringify({
+        id: entryId
+    }), { status: 200 });
 };
 
 export const PUT: RequestHandler = async ({ request, params, cookies }) => {
     const { id: userId } = await getAuthFromCookies(cookies);
-    const id = params.entryId;
-    const { label } = <{ label: null | string }>await request.json();
 
-    if (typeof id !== "string" || !id) {
-        throw error(400, "invalid id");
-    }
-    if (label !== null && typeof label !== "string") {
-        throw error(400, "invalid label");
+    if (!params.entryId) {
+        throw error(400, 'invalid id');
     }
 
-    const entry = await query<RawEntry[]>`
-        SELECT entries.label, entries.deleted
-        FROM entries,
-             users
-        WHERE entries.id = ${ id }
-          AND entries.user = users.id
-          AND users.id = ${ userId }
-    `;
-
-    if (!entry.length) {
-        throw error(404, "Entry not found");
-    }
-    if (entry[0].deleted) {
-        throw error(400, "Entry is deleted");
-    }
-    if (entry[0].label === label || (!label && !entry[0].label)) {
-        throw error(400, "Entry already has that label");
+    const bodyRes = await extractBody(request, {
+        label: void 0
+    });
+    let { val: body, err: bodyErr } = bodyRes.resolve();
+    if (bodyErr) {
+        throw error(400, bodyErr);
     }
 
-    if (label !== null) {
-        const labelExists = await query`
-            SELECT labels.id
-            FROM labels,
-                 users
-            WHERE labels.id = ${ label }
-              AND labels.user = users.id
-              AND users.id = ${ userId }
-        `;
-        if (!labelExists.length) {
-            throw error(404, "Label not found");
+    if (body.label !== null && typeof body.label !== 'string') {
+        throw error(400, 'invalid label');
+    }
+
+    const entryResult = await Entry.fromId(userId, params.entryId);
+    const { val: entry, err: entryErr } = entryResult.resolve();
+    if (entryErr) {
+        throw error(400, entryErr);
+    }
+
+    if (entry.label?.id === body.label || (!body.label && !entry.label)) {
+        throw error(400, 'Entry already has that label');
+    }
+
+    if (body.label !== null) {
+        if (!await Label.userHasLabel(userId, body.label)) {
+            throw error(404, 'Label not found');
         }
     }
 
-    await query`
-        UPDATE entries, users
-        SET entries.label = ${ label }
-        WHERE entries.id = ${ id }
-          AND entries.user = users.id
-          AND users.id = ${ userId }
-    `;
+    const updateRes = await entry.updateLabel(userId, body.label);
+    if (updateRes.isErr) {
+        throw error(400, updateRes.unwrapErr());
+    }
 
-    return new Response(JSON.stringify({ id }), { status: 200 });
+    return new Response(JSON.stringify({}), { status: 200 });
 };

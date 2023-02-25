@@ -20,7 +20,8 @@
 		"noImplicitReturns": true,
 		"noImplicitOverride": true,
 		"strictPropertyInitialization": true,
-		"alwaysStrict": true
+		"alwaysStrict": true,
+		"importHelpers": true
 	}
 	// Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias
 	//

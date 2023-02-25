@@ -1,23 +1,25 @@
-import { query } from "../db/mysql";
-import { Result } from "../utils";
+import { query } from '../db/mysql';
+import { Result } from '../utils';
 
 export class Label {
     public constructor (
         public id: string,
         public colour: string,
         public name: string,
-        public created: number,
-    ) {}
+        public created: number
+    ) {
+    }
 
-    public static async fromId (id: string): Promise<Result<Label>> {
+    public static async fromId (userId: string, id: string): Promise<Result<Label>> {
         const res = await query<Required<Label>[]>`
             SELECT id, colour, name, created
             FROM labels
             WHERE id = ${id}
+              AND user = ${userId}
         `;
 
         if (res.length === 0) {
-            return Result.err("Label not found");
+            return Result.err('Label not found');
         }
 
         return Result.ok(new Label(
@@ -26,5 +28,9 @@ export class Label {
             res[0].name,
             res[0].created
         ));
+    }
+
+    public static async userHasLabel (userId: string, id: string): Promise<boolean> {
+        return (await Label.fromId(userId, id)).isOk;
     }
 }

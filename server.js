@@ -1,5 +1,6 @@
 import { handler } from './handler.js';
 import express from 'express';
+import compression from 'compression';
 import fs from 'fs';
 import https from 'https';
 import http from 'http';
@@ -12,6 +13,8 @@ const credentials = {
 };
 
 const app = express();
+app.use(compression());
+
 const httpsServer = https.createServer(credentials, app);
 const httpServer = http.createServer(app);
 
