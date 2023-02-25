@@ -1,4 +1,4 @@
-import type { Writeable } from '../utils';
+import type { PickOptionalAndMutable } from '../utils';
 import { query } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { generateUUId } from '../security/uuid';
@@ -9,10 +9,17 @@ import type { User } from './user';
 
 // RawEntry is the raw data from the database,
 // Entry is the data after decryption and links to labels
-export type RawEntry = Omit<Entry, 'label' | 'decrypted'> & {
-    label?: string,
-    decrypted: false
-};
+export type RawEntry =
+    Omit<
+        Entry, 'label'
+               | 'decrypted'
+               | 'clone'
+               | 'removeLabel'
+               | 'updateLabel'
+    > & {
+        label?: string,
+        decrypted: false
+    };
 
 export type DecryptedRawEntry = Omit<RawEntry, 'decrypted'> & {
     decrypted: true
@@ -81,7 +88,9 @@ export class Entry {
                    title,
                    deleted,
                    label,
-                   entry
+                   entry,
+                   latitude,
+                   longitude
             FROM entries
             WHERE deleted = ${deleted}
               AND entries.user = ${auth.id}
@@ -89,7 +98,7 @@ export class Entry {
         `;
     }
 
-    public static async all (auth: User, deleted = false)
+    public static async getAll (auth: User, deleted = false)
         : Promise<Result<Entry[]>> {
         const rawEntries = await Entry.allRaw(auth, deleted);
 
@@ -104,6 +113,39 @@ export class Entry {
         }
 
         return Result.ok(entries);
+    }
+
+    public static async getPage (
+        auth: User,
+        page: number,
+        pageSize: number,
+        deleted = false,
+        labelId?: string,
+        search?: Lowercase<string>
+    ): Promise<Result<[ Entry[], number ]>> {
+        const rawEntries = await Entry.allRaw(auth, deleted);
+
+        let { val: entries, err } = await Result.awaitCollect(
+            rawEntries.map((e) => Entry.fromRaw(auth, e))
+        );
+        if (err) return Result.err(err);
+
+        if (labelId) {
+            entries = entries.filter((e) => e.label?.id === labelId);
+        }
+        if (search) {
+            entries = entries.filter((e) => {
+                return e.title.toLowerCase().includes(search)
+                    || e.entry.toLowerCase().includes(search);
+            });
+        }
+
+        const start = (page - 1) * pageSize;
+        const end = start + pageSize;
+        return Result.ok([
+            entries.slice(start, end),
+            entries.length
+        ]);
     }
 
     public static async fromRaw (
@@ -236,8 +278,12 @@ export class Entry {
 
     public static async create (
         auth: User,
-        json: Omit<DecryptedRawEntry, 'id'>
-              & Partial<Writeable<Pick<DecryptedRawEntry, 'id'>>>
+        json: PickOptionalAndMutable<
+            DecryptedRawEntry,
+            'id'
+            | 'deleted'
+            | 'decrypted'
+        >
     ): Promise<Result<Entry>> {
         if (!json.id) {
             json.id = await generateUUId();
@@ -247,7 +293,7 @@ export class Entry {
             json.title,
             json.entry,
             json.created,
-            json.deleted
+            json.deleted ?? false
         );
 
         if (json.label) {

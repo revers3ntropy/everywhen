@@ -1,20 +1,20 @@
 <script lang="ts">
-    import FileDrop from "./FileDropDialog.svelte";
-    import type { Auth } from "../../types";
-    import { entries } from "./importEntries.js";
-    import { getNotificationsContext } from "svelte-notifications";
-    import Spinner from "../../../lib/components/BookSpinner.svelte";
-    import { onMount } from "svelte";
-    import { api } from "../../api/apiQuery";
+    import { User } from '../../controllers/user';
+    import FileDrop from './FileDropDialog.svelte';
+    import { entries } from './importEntries.js';
+    import { getNotificationsContext } from 'svelte-notifications';
+    import Spinner from '../../../lib/components/BookSpinner.svelte';
+    import { onMount } from 'svelte';
+    import { api } from '../../api/apiQuery';
 
     const { addNotification } = getNotificationsContext();
 
-    export let auth: Auth;
+    export let auth: User;
 
     let labels = [];
 
     onMount(async () => {
-        const labelRes = await api.get(auth, "/labels");
+        const labelRes = await api.get(auth, '/labels');
         labels = labelRes.labels;
     });
 

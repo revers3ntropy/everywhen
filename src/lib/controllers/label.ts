@@ -1,6 +1,6 @@
 import { query } from '../db/mysql';
 import { generateUUId } from '../security/uuid';
-import { Result, type Writeable } from '../utils';
+import { Result, type Mutable } from '../utils';
 import { decrypt } from '../security/encryption';
 import type { User } from './user';
 
@@ -80,7 +80,7 @@ export class Label {
     public static async create (
         auth: User,
         json: Omit<Label, 'id'>
-              & Partial<Writeable<Pick<Label, 'id'>>>
+              & Partial<Mutable<Pick<Label, 'id'>>>
     ): Promise<Result<Label>> {
         if (!json.id) {
             json.id = await generateUUId();

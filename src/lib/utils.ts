@@ -15,54 +15,81 @@ export interface NotificationOptions {
     removeAfter?: number;
 }
 
-export type Writeable<T> = {
+export type Mutable<T> = {
     -readonly [P in keyof T]: T[P]
 };
 
-const NULL = Symbol();
+export type PickOptionalAndMutable<A, B extends keyof A> =
+    Omit<Required<Readonly<A>>, B>
+    & Partial<Mutable<Pick<A, B>>>;
+
+export type PickOptional<A, B extends keyof A> =
+    Omit<A, B>
+    & Partial<Pick<A, B>>;
+
+const RESULT_NULL = Symbol();
 
 export class Result<T = null, E extends {} = string> {
 
-    public static readonly NULL = NULL;
+    public static readonly NULL = RESULT_NULL;
 
     private constructor (
-        private readonly value: T | typeof NULL = NULL,
-        private readonly error: E | typeof NULL = NULL
+        private readonly value: T | typeof RESULT_NULL = RESULT_NULL,
+        private readonly error: E | typeof RESULT_NULL = RESULT_NULL
     ) {
     }
 
     public get err (): E | null {
-        if (this.error === NULL) {
+        if (this.error === RESULT_NULL) {
             return null;
         }
         return this.error;
     }
 
     public get val (): T {
-        if (this.value === NULL) {
+        if (this.value === RESULT_NULL) {
             throw `Got error when unwrapping Result: '${String(this.error)}'`;
         }
         return this.value;
     }
 
     public get isOk (): boolean {
-        return this.value !== NULL;
+        return this.value !== RESULT_NULL;
     }
 
     public get isErr (): boolean {
-        return this.error !== NULL;
+        return this.error !== RESULT_NULL;
+    }
+
+    public static collect<T, E extends {}> (
+        iter: Result<T, E>[]
+    ): Result<T[], E> {
+        const results: T[] = [];
+        for (const result of iter) {
+            if (result.err) {
+                return Result.err(result.err);
+            }
+            results.push(result.val);
+        }
+        return Result.ok(results);
+    }
+
+    public static async awaitCollect<T, E extends {}> (
+        iter: Promise<Result<T, E>>[]
+    ): Promise<Result<T[], E>> {
+        return Result.collect(await Promise.all(iter));
     }
 
     public static ok<T, E extends {}> (value: T): Result<T, E> {
-        return new Result<T, E>(value, NULL);
+        return new Result<T, E>(value, RESULT_NULL);
     }
 
     public static err<T, E extends {}> (error: E): Result<T, E> {
-        return new Result<T, E>(NULL, error);
+        return new Result<T, E>(RESULT_NULL, error);
     }
 
     public map<U> (f: (value: T) => U): Result<U, E> {
-        if (this.value === NULL) {
+        if (this.value === RESULT_NULL) {
             return this as unknown as Result<U, E>;
         }
         return Result.ok(f(this.value));
@@ -162,9 +189,45 @@ type typeMap = {
     object: object;
 };
 
+export function objectMatchesSchema<T extends Record<string, keyof typeMap>> (
+    obj: Record<string, unknown>,
+    schema: T,
+    defaults: { [P in keyof T]?: typeMap[T[P]] } = {}
+): obj is { [P in keyof T]: typeMap[T[P]] } {
+
+    // clone so can safely mutate (adding defaults)
+    obj = { ...obj };
+    for (const key in defaults) {
+        obj[key] ??= defaults[key];
+    }
+
+    for (const key in schema) {
+        if (typeof obj[key] !== schema[key]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+export function objectMatchesSchemaStrict<T extends Record<string, keyof typeMap>> (
+    obj: Record<string, unknown>,
+    schema: T,
+    defaults: { [P in keyof T]?: typeMap[T[P]] } = {}
+): obj is { [P in keyof T]: typeMap[T[P]] } {
+
+    // add defaults so can check length of list of keys properly
+    obj = { ...obj };
+    for (const key in defaults) {
+        obj[key] ??= defaults[key];
+    }
+
+    return Object.keys(obj).length === Object.keys(schema).length &&
+        objectMatchesSchema(obj, schema);
+}
+
 export async function bodyFromReq<T extends Record<string, keyof typeMap>> (
     request: Request,
-    valueType: T,
+    schema: T,
     defaults: { [P in keyof T]?: typeMap[T[P]] } = {}
 ): Promise<Result<Readonly<{ [P in keyof T]: typeMap[T[P]] }>>> {
     if (request.method === 'GET') {
@@ -181,26 +244,8 @@ export async function bodyFromReq<T extends Record<string, keyof typeMap>> (
         return Result.err('Invalid body: not JSON');
     }
 
-    for (const key in defaults) {
-        body[key] ??= defaults[key];
-    }
-
-    const bodyKeys = Object.keys(body);
-    const expectedKeys = Object.keys(valueType);
-
-    // allow extra keys, but err on missing keys
-    const missingKeys = expectedKeys.filter((key) => !bodyKeys.includes(key));
-
-    if (missingKeys.length > 0) {
-        return Result.err(`Invalid body: Missing keys ${missingKeys.join(', ')}`);
-    }
-
-    for (const key in body) {
-        const value = body[key];
-        const type = valueType[key];
-        if (typeof value !== type) {
-            return Result.err(`Invalid body: key '${key}' is not of type '${type}'`);
-        }
+    if (!objectMatchesSchema(body, schema, defaults)) {
+        return Result.err(`Invalid body: does not match schema`);
     }
 
     return Result.ok(Object.freeze(

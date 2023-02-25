@@ -1,13 +1,16 @@
-import type { Auth, Entry, Label, NotificationOptions } from "../../types";
-import { api } from "../../api/apiQuery";
+import { api } from '../../api/apiQuery';
+import type { Entry } from '../../controllers/entry';
+import type { Label } from '../../controllers/label';
+import type { User } from '../../controllers/user';
+import type { Mutable, NotificationOptions } from '../../utils';
 
-export async function entries (contents: string, labels: Label[], auth: Auth)
+export async function entries (contents: string, labels: Label[], auth: User)
     : Promise<undefined | NotificationOptions | NotificationOptions[]> {
     if (!labels) {
         return {
             text: `Failed to load labels`,
-            position: "top-center",
-            type: "error",
+            position: 'top-center',
+            type: 'error',
             removeAfter: 4000
         };
     }
@@ -19,8 +22,8 @@ export async function entries (contents: string, labels: Label[], auth: Auth)
 
     if (!contents) return {
         text: `Failed to load file`,
-        position: "top-center",
-        type: "error",
+        position: 'top-center',
+        type: 'error',
         removeAfter: 4000
     };
 
@@ -31,8 +34,8 @@ export async function entries (contents: string, labels: Label[], auth: Auth)
     } catch (e: unknown) {
         return {
             text: `File was not valid JSON`,
-            position: "top-center",
-            type: "error",
+            position: 'top-center',
+            type: 'error',
             removeAfter: 4000
         };
     }
@@ -40,28 +43,32 @@ export async function entries (contents: string, labels: Label[], auth: Auth)
     if (!Array.isArray(json)) {
         return {
             text: `Incorrect JSON structure, expected array`,
-            position: "top-center",
-            type: "error",
+            position: 'top-center',
+            type: 'error',
             removeAfter: 4000
         };
     }
 
-    let errors: [number, string][] = [];
+    let errors: [ number, string ][] = [];
 
     let notifications: NotificationOptions[] = [];
 
     let i = -1;
     for (let entryJSON of json) {
         i++;
-        if (typeof entryJSON !== "object" || Array.isArray(entryJSON)) {
-            errors.push([i, `entry is not object`]);
+        if (
+            typeof entryJSON !== 'object'
+            || Array.isArray(entryJSON)
+            || entryJSON === null
+        ) {
+            errors.push([ i, `entry is not object` ]);
             continue;
         }
 
-        const postBody: Partial<Entry> = {};
+        const postBody: Mutable<Partial<Entry>> = {};
 
         postBody.entry = entryJSON.entry;
-        postBody.title = entryJSON.title || "";
+        postBody.title = entryJSON.title || '';
         postBody.created = parseInt(entryJSON.time) || entryJSON.created;
         postBody.latitude = parseFloat(entryJSON.latitude || entryJSON.location[0]) || 0;
         postBody.longitude = parseFloat(entryJSON.longitude || entryJSON.location[1]) || 0;
@@ -70,18 +77,18 @@ export async function entries (contents: string, labels: Label[], auth: Auth)
             const name = entryJSON.types[0] as string;
             if (!labelHashMap.has(name)) {
                 notifications.push({
-                    text: `Creating label ${ name }`,
-                    position: "top-center",
-                    type: "info",
+                    text: `Creating label ${name}`,
+                    position: 'top-center',
+                    type: 'info',
                     removeAfter: 10000
                 });
                 const createLabelRes = await api.post(auth, `/labels`, {
                     name,
-                    colour: "#000000"
+                    colour: '#000000'
                 });
 
-                if (typeof createLabelRes.id !== "string") {
-                    errors.push([i, `failed to create label ${ name }`]);
+                if (typeof createLabelRes.id !== 'string') {
+                    errors.push([ i, `failed to create label ${name}` ]);
                     continue;
                 }
 
@@ -102,19 +109,19 @@ export async function entries (contents: string, labels: Label[], auth: Auth)
     if (errors.length < 0) {
         return {
             text: `Successfully uploaded entries`,
-            position: "top-center",
-            type: "success",
+            position: 'top-center',
+            type: 'success',
             removeAfter: 4000
         };
     }
 
     for (let error of errors) {
-        const text = "#" + error[0] + ": " + error[1];
+        const text = '#' + error[0] + ': ' + error[1];
         console.error(text);
         notifications.push({
             text,
-            position: "top-center",
-            type: "error",
+            position: 'top-center',
+            type: 'error',
             removeAfter: 4000
         });
     }
