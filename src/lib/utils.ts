@@ -20,7 +20,7 @@ export type Mutable<T> = {
 };
 
 export type PickOptionalAndMutable<A, B extends keyof A> =
-    Omit<Required<Readonly<A>>, B>
+    Omit<Readonly<A>, B>
     & Partial<Mutable<Pick<A, B>>>;
 
 export type PickOptional<A, B extends keyof A> =

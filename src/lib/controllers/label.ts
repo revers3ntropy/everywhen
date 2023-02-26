@@ -1,7 +1,7 @@
 import { query } from '../db/mysql';
 import { generateUUId } from '../security/uuid';
 import { Result, type Mutable } from '../utils';
-import { decrypt } from '../security/encryption';
+import { decrypt, encrypt } from '../security/encryption';
 import type { User } from './user';
 
 export class Label {
@@ -33,11 +33,35 @@ export class Label {
         ));
     }
 
+    public static async fromName (
+        auth: User,
+        nameDecrypted: string
+    ): Promise<Result<Label>> {
+        const res = await query<Required<Label>[]>`
+            SELECT id, colour, name, created
+            FROM labels
+            WHERE name = ${encrypt(nameDecrypted, auth.key)}
+              AND user = ${auth.id}
+        `;
+
+        if (res.length !== 1) {
+            return Result.err('Label not found');
+        }
+
+        return Result.ok(new Label(
+            res[0].id,
+            res[0].colour,
+            nameDecrypted,
+            res[0].created
+        ));
+    }
+
     public static async all (auth: User): Promise<Label[]> {
         const res = await query<Required<Label>[]>`
             SELECT id, colour, name, created
             FROM labels
             WHERE user = ${auth.id}
+            ORDER BY name
         `;
 
         return res.map(label => new Label(
@@ -53,6 +77,13 @@ export class Label {
         id: string
     ): Promise<boolean> {
         return (await Label.fromId(auth, id)).isOk;
+    }
+
+    public static async userHasLabelWithName (
+        auth: User,
+        nameDecrypted: string
+    ): Promise<boolean> {
+        return (await Label.fromName(auth, nameDecrypted)).isOk;
     }
 
     public static jsonIsRawLabel (label: unknown): label is Required<Label> {
@@ -98,5 +129,33 @@ export class Label {
             json.name,
             json.created
         ));
+    }
+
+    public async updateName (auth: User, name: string): Promise<Result<Label>> {
+        if (await Label.userHasLabelWithName(auth, name)) {
+            return Result.err('Label with that name already exists');
+        }
+
+        await query`
+            UPDATE labels
+            SET name = ${encrypt(name, auth.key)}
+            WHERE id = ${this.id}
+        `;
+
+        this.name = name;
+
+        return Result.ok(this);
+    }
+
+    public async updateColour (colour: string): Promise<Result<Label>> {
+        await query`
+            UPDATE labels
+            SET colour = ${colour}
+            WHERE id = ${this.id}
+        `;
+
+        this.colour = colour;
+
+        return Result.ok(this);
     }
 }

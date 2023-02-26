@@ -70,18 +70,22 @@ export class Entry {
         return Result.ok(null);
     }
 
-    public static async purgeWithId (auth: User, id: string): Promise<void> {
+    public static async purgeWithId (
+        auth: User,
+        id: string
+    ): Promise<void> {
         await query`
             DELETE
             FROM entries
             WHERE entries.id = ${id}
               AND user = ${auth.id}
         `;
-
     }
 
-    public static async allRaw (auth: User, deleted = false)
-        : Promise<RawEntry[]> {
+    public static async allRaw (
+        auth: User,
+        deleted: boolean | 'both' = false
+    ): Promise<RawEntry[]> {
         return await query<RawEntry[]>`
             SELECT id,
                    created,
@@ -92,14 +96,16 @@ export class Entry {
                    latitude,
                    longitude
             FROM entries
-            WHERE deleted = ${deleted}
+            WHERE (deleted = ${deleted} OR ${deleted} = 'both')
               AND entries.user = ${auth.id}
             ORDER BY created DESC, id
         `;
     }
 
-    public static async getAll (auth: User, deleted = false)
-        : Promise<Result<Entry[]>> {
+    public static async getAll (
+        auth: User,
+        deleted = false
+    ): Promise<Result<Entry[]>> {
         const rawEntries = await Entry.allRaw(auth, deleted);
 
         const entries = [];
@@ -119,9 +125,15 @@ export class Entry {
         auth: User,
         page: number,
         pageSize: number,
-        deleted = false,
-        labelId?: string,
-        search?: Lowercase<string>
+        {
+            deleted = false,
+            labelId = undefined,
+            search = undefined
+        }: {
+            deleted?: boolean | 'both',
+            labelId?: string,
+            search?: Lowercase<string>
+        } = {}
     ): Promise<Result<[ Entry[], number ]>> {
         const rawEntries = await Entry.allRaw(auth, deleted);
 

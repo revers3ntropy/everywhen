@@ -1,133 +1,75 @@
-import { getAuthFromCookies } from "$lib/security/getAuthFromCookies";
-import { query } from "$lib/db/mysql";
-import { decryptLabel } from "../utils.server";
-import type { RequestHandler } from "@sveltejs/kit";
-import { error } from "@sveltejs/kit";
-import type { Label } from "$lib/types";
-import { encrypt } from "../../../../lib/security/encryption";
+import { error } from '@sveltejs/kit';
+import { Entry } from '../../../../lib/controllers/entry';
+import { getUnwrappedReqBody } from '../../../../lib/utils';
+import type { RequestHandler } from './$types';
+import { getAuthFromCookies } from '../../../../lib/security/getAuthFromCookies';
+import { Label } from '../../../../lib/controllers/label';
 
 export const GET: RequestHandler = async ({ cookies, params }) => {
-    const { key, id } = await getAuthFromCookies(cookies);
+    const auth = await getAuthFromCookies(cookies);
 
-    const labels = await query<Label[]>`
-        SELECT 
-            labels.id,
-            labels.created,
-            labels.name,
-            labels.colour
-        FROM labels, users
-        WHERE labels.user = users.id
-          AND users.id = ${id}
-          AND labels.id LIKE ${params.labelId}
-        ORDER BY name
-    `;
-
-    if (!labels.length) {
-        throw error(404, 'Label with that id not found');
-    }
+    const { val: label, err } = await Label.fromId(auth, params.labelId);
+    if (err) throw error(404, err);
 
     return new Response(
-        JSON.stringify(decryptLabel(labels[0], key)),
+        JSON.stringify(label),
         { status: 200 }
     );
 };
 
 export const PUT: RequestHandler = async ({ cookies, request, params }) => {
-    const { key, id } = await getAuthFromCookies(cookies);
-    const body = await request.json();
+    const auth = await getAuthFromCookies(cookies);
+    const body = await getUnwrappedReqBody(request, {
+        name: 'string',
+        colour: 'string'
+    }, {
+        name: '',
+        colour: ''
+    });
 
-    if (!params.labelId || typeof params.labelId !== 'string') {
-        throw error(400, 'Invalid label id');
-    }
-
-    // check label exists
-    const label = await query<Label[]>`
-        SELECT labels.id
-        FROM labels, users
-        WHERE labels.id = ${params.labelId}
-            AND labels.user = users.id
-            AND users.id = ${id}
-    `;
-    if (!label.length) {
-        throw error(404, 'Label with that id not found');
-    }
+    let { val: label, err } = await Label.fromId(auth, params.labelId);
+    if (err) throw error(400, err);
 
     if (body.name) {
-        body.name = encrypt(body.name, key);
-
-        // check name doesn't already exist
-        const label = await query`
-            SELECT labels.id
-            FROM labels, users
-            WHERE name = ${body.name}
-                AND labels.user = users.id
-                AND users.id = ${id}
-        `;
-        if (label.length) {
-            throw error(400, 'Label with that name already exists');
-        }
-
-        // update name
-        await query`
-            UPDATE labels
-            SET name = ${body.name}
-            WHERE id = ${params.labelId}
-        `;
+        const { err, val } = await label.updateName(auth, body.name);
+        if (err) throw error(400, err);
+        label = val;
     }
 
     if (body.colour) {
-        await query`
-            UPDATE labels
-            SET colour = ${body.colour}
-            WHERE id = ${params.labelId}
-        `;
+        const { err } = await label.updateColour(body.colour);
+        if (err) throw error(400, err);
     }
 
     return new Response(
         JSON.stringify({}),
         { status: 200 }
     );
-}
+};
 
-export let DELETE: RequestHandler = async ({ cookies, params}) => {
-    const { id } = await getAuthFromCookies(cookies);
+export let DELETE: RequestHandler = async ({ cookies, params }) => {
+    const auth = await getAuthFromCookies(cookies);
 
-    if (!params.labelId || typeof params.labelId !== 'string') {
-        throw error(400, 'Invalid label id');
-    }
-
-    // check label exists
-    const label = await query<Label[]>`
-        SELECT labels.id
-        FROM labels, users
-        WHERE labels.id = ${params.labelId}
-            AND labels.user = users.id
-            AND users.id = ${id}
-    `;
-    if (!label.length) {
+    if (!await Label.userHasLabelWithId(auth, params.labelId)) {
         throw error(404, 'Label with that id not found');
     }
 
-    const entriesWithLabel = await query`
-        SELECT entries.id
-        FROM entries, users, labels
-        WHERE entries.user = users.id
-            AND users.id = ${id}
-            AND entries.label = labels.id
-            AND labels.id = ${params.labelId}
-    `;
+    const { val: [ _, entriesWithLabel ], err } = await Entry.getPage(
+        auth, 0, 1, {
+            labelId: params.labelId,
+            deleted: 'both'
+        });
 
-    if (entriesWithLabel.length) {
+    if (err) throw error(500, err);
+    if (entriesWithLabel !== 0) {
         throw error(400, 'Label is in use');
     }
 
-    await query`
-        DELETE FROM labels
-        WHERE id = ${params.labelId}
-    `;
+    // TODO: don't actually delete, just mark as deleted
+    await Label.purgeWithId(auth, params.labelId);
 
     return new Response(
         JSON.stringify({}),
         { status: 200 }
     );
-}
+};

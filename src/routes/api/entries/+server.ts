@@ -17,7 +17,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
     if (!pageSize || pageSize < 0) throw error(400, 'Invalid page size');
 
     const { val, err } = await Entry.getPage(
-        auth, page, pageSize, deleted, labelId, search);
+        auth, page, pageSize, { deleted, labelId, search });
     if (err) throw error(400, err);
     const [ entries, numEntries ] = val;
 
