@@ -1,6 +1,6 @@
 import { Entry } from '../../../lib/controllers/entry';
 import { Label } from '../../../lib/controllers/label';
-import { getUnwrappedReqBody } from '../../../lib/utils';
+import { getUnwrappedReqBody, nowS } from '../../../lib/utils';
 import type { RequestHandler } from './$types';
 import { error } from '@sveltejs/kit';
 import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
@@ -26,7 +26,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
         page,
         pageSize,
         totalPages: Math.ceil(numEntries / pageSize),
-        totalEntries: numEntries
+        totalEntries: numEntries,
     };
 
     return new Response(JSON.stringify(response), { status: 200 });
@@ -41,13 +41,13 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
         longitude: 'number',
         title: 'string',
         entry: 'string',
-        label: 'string'
+        label: 'string',
     }, {
         title: '',
         label: '',
         latitude: 0,
         longitude: 0,
-        created: Math.round(Date.now() / 1000)
+        created: nowS(),
     });
 
     // check label exists
@@ -57,10 +57,11 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
         }
     }
 
-    const { val: id, err } = await Entry.create(auth, {
-        ...body
-    });
+    const { val: id, err } = await Entry.create(auth, body);
     if (err) throw error(400, err);
 
-    return new Response(JSON.stringify({ id }), { status: 201 });
+    return new Response(
+        JSON.stringify({ id }),
+        { status: 201 },
+    );
 };

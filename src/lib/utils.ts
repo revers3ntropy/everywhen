@@ -1,10 +1,10 @@
-import { error } from '@sveltejs/kit';
-import { parse } from 'cookie';
 import { browser } from '$app/environment';
-import { KEY_COOKIE_KEY, OBFUSCATE_CHARS, popup, USERNAME_COOKIE_KEY } from './constants';
+import { parse } from 'cookie';
+import { error } from '@sveltejs/kit';
+import type { Position } from 'svelte-notifications';
 import { bind } from 'svelte-simple-modal';
 import type { SvelteComponentDev } from 'svelte/internal';
-import type { Position } from 'svelte-notifications';
+import { KEY_COOKIE_KEY, OBFUSCATE_CHARS, popup, USERNAME_COOKIE_KEY } from './constants';
 import type { RawAuth } from './controllers/user';
 
 export interface NotificationOptions {
@@ -19,13 +19,18 @@ export type Mutable<T> = {
     -readonly [P in keyof T]: T[P]
 };
 
+type NonFunctionPropertyNames<T> = {
+    [K in keyof T]: T[K] extends Function ? never : K;
+}[keyof T];
+export type NonFunctionProperties<T> = Pick<T, NonFunctionPropertyNames<T>>;
+
 export type PickOptionalAndMutable<A, B extends keyof A> =
-    Omit<Readonly<A>, B>
-    & Partial<Mutable<Pick<A, B>>>;
+    NonFunctionProperties<Omit<Readonly<A>, B>
+                          & Partial<Mutable<Pick<A, B>>>>;
 
 export type PickOptional<A, B extends keyof A> =
-    Omit<A, B>
-    & Partial<Pick<A, B>>;
+    NonFunctionProperties<Omit<A, B>
+                          & Partial<Pick<A, B>>>;
 
 const RESULT_NULL = Symbol();
 
@@ -35,7 +40,7 @@ export class Result<T = null, E extends {} = string> {
 
     private constructor (
         private readonly value: T | typeof RESULT_NULL = RESULT_NULL,
-        private readonly error: E | typeof RESULT_NULL = RESULT_NULL
+        private readonly error: E | typeof RESULT_NULL = RESULT_NULL,
     ) {
     }
 
@@ -62,7 +67,7 @@ export class Result<T = null, E extends {} = string> {
     }
 
     public static collect<T, E extends {}> (
-        iter: Result<T, E>[]
+        iter: Result<T, E>[],
     ): Result<T[], E> {
         const results: T[] = [];
         for (const result of iter) {
@@ -75,7 +80,7 @@ export class Result<T = null, E extends {} = string> {
     }
 
     public static async awaitCollect<T, E extends {}> (
-        iter: Promise<Result<T, E>>[]
+        iter: Promise<Result<T, E>>[],
     ): Promise<Result<T[], E>> {
         return Result.collect(await Promise.all(iter));
     }
@@ -102,7 +107,7 @@ export function getAuthFromCookies (): RawAuth {
     }
     return {
         key: parse(document.cookie)[KEY_COOKIE_KEY],
-        username: parse(document.cookie)[USERNAME_COOKIE_KEY]
+        username: parse(document.cookie)[USERNAME_COOKIE_KEY],
     };
 }
 
@@ -124,7 +129,7 @@ export function GETArgs (args: Record<string, any>): string {
 export function showPopup<T> (
     el: typeof SvelteComponentDev,
     props: Record<string, any>,
-    onClose: (() => T | void) = (() => void 0)
+    onClose: (() => T | void) = (() => void 0),
 ) {
     const boundEl = bind(el, props);
     popup.set(boundEl);
@@ -187,22 +192,32 @@ type typeMap = {
     number: number;
     boolean: boolean;
     object: object;
+    undefined: undefined;
+    function: Function;
 };
 
+function typesMatch (a: unknown, b: keyof typeMap): boolean {
+    return typeof a === b;
+}
+
 export function objectMatchesSchema<T extends Record<string, keyof typeMap>> (
-    obj: Record<string, unknown>,
+    obj: unknown,
     schema: T,
-    defaults: { [P in keyof T]?: typeMap[T[P]] } = {}
+    defaults: { [P in keyof T]?: typeMap[T[P]] } = {},
 ): obj is { [P in keyof T]: typeMap[T[P]] } {
 
+    if (typeof obj !== 'object' || obj === null) {
+        return false;
+    }
+
     // clone so can safely mutate (adding defaults)
-    obj = { ...obj };
+    let objClone: Record<string, unknown> = { ...obj };
     for (const key in defaults) {
-        obj[key] ??= defaults[key];
+        objClone[key] ??= defaults[key];
     }
 
     for (const key in schema) {
-        if (typeof obj[key] !== schema[key]) {
+        if (!typesMatch(objClone[key], schema[key])) {
             return false;
         }
     }
@@ -210,25 +225,29 @@ export function objectMatchesSchema<T extends Record<string, keyof typeMap>> (
 }
 
 export function objectMatchesSchemaStrict<T extends Record<string, keyof typeMap>> (
-    obj: Record<string, unknown>,
+    obj: unknown,
     schema: T,
-    defaults: { [P in keyof T]?: typeMap[T[P]] } = {}
+    defaults: { [P in keyof T]?: typeMap[T[P]] } = {},
 ): obj is { [P in keyof T]: typeMap[T[P]] } {
 
-    // add defaults so can check length of list of keys properly
-    obj = { ...obj };
-    for (const key in defaults) {
-        obj[key] ??= defaults[key];
+    if (typeof obj !== 'object' || obj === null) {
+        return false;
     }
 
-    return Object.keys(obj).length === Object.keys(schema).length &&
-        objectMatchesSchema(obj, schema);
+    // add defaults here so can check length of list of keys properly
+    let objClone: Record<string, unknown> = { ...obj };
+    for (const key in defaults) {
+        objClone[key] ??= defaults[key];
+    }
+
+    return Object.keys(objClone).length === Object.keys(schema).length &&
+        objectMatchesSchema(objClone, schema);
 }
 
 export async function bodyFromReq<T extends Record<string, keyof typeMap>> (
     request: Request,
     schema: T,
-    defaults: { [P in keyof T]?: typeMap[T[P]] } = {}
+    defaults: { [P in keyof T]?: typeMap[T[P]] } = {},
 ): Promise<Result<Readonly<{ [P in keyof T]: typeMap[T[P]] }>>> {
     if (request.method === 'GET') {
         throw 'GET requests are not supported in bodyFromReq()';
@@ -244,23 +263,27 @@ export async function bodyFromReq<T extends Record<string, keyof typeMap>> (
         return Result.err('Invalid body: not JSON');
     }
 
-    if (!objectMatchesSchema(body, schema, defaults)) {
+    if (!objectMatchesSchemaStrict(body, schema, defaults)) {
         return Result.err(`Invalid body: does not match schema`);
     }
 
     return Result.ok(Object.freeze(
-        body as { [P in keyof T]: typeMap[T[P]] }
+        body as { [P in keyof T]: typeMap[T[P]] },
     ));
 }
 
 export async function getUnwrappedReqBody<T extends Record<string, keyof typeMap>> (
     request: Request,
     valueType: T,
-    defaults: { [P in keyof T]?: typeMap[T[P]] } = {}
+    defaults: { [P in keyof T]?: typeMap[T[P]] } = {},
 ): Promise<Readonly<{ [P in keyof T]: typeMap[T[P]] }>> {
     const res = await bodyFromReq(request, valueType, defaults);
     if (res.err) {
         throw error(400, res.err);
     }
     return res.val;
+}
+
+export function nowS (): number {
+    return Math.floor(Date.now() / 1000);
 }

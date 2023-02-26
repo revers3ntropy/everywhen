@@ -1,6 +1,4 @@
-export function nowS (): number {
-    return Date.now() / 1000;
-}
+export {};
 
 // src: https://awik.io/determine-color-bright-dark-using-javascript/
 // function isLightColour (color: string): boolean {

@@ -1,6 +1,6 @@
 import { query } from '../db/mysql';
 import { generateUUId } from '../security/uuid';
-import { Result, type Mutable } from '../utils';
+import { nowS, type PickOptional, Result } from '../utils';
 import { decrypt, encrypt } from '../security/encryption';
 import type { User } from './user';
 
@@ -9,7 +9,7 @@ export class Label {
         public id: string,
         public colour: string,
         public name: string,
-        public created: number
+        public created: number,
     ) {
     }
 
@@ -29,13 +29,13 @@ export class Label {
             res[0].id,
             res[0].colour,
             decrypt(auth.key, res[0].name),
-            res[0].created
+            res[0].created,
         ));
     }
 
     public static async fromName (
         auth: User,
-        nameDecrypted: string
+        nameDecrypted: string,
     ): Promise<Result<Label>> {
         const res = await query<Required<Label>[]>`
             SELECT id, colour, name, created
@@ -52,7 +52,7 @@ export class Label {
             res[0].id,
             res[0].colour,
             nameDecrypted,
-            res[0].created
+            res[0].created,
         ));
     }
 
@@ -68,20 +68,20 @@ export class Label {
             label.id,
             label.colour,
             decrypt(auth.key, label.name),
-            label.created
+            label.created,
         ));
     }
 
     public static async userHasLabelWithId (
         auth: User,
-        id: string
+        id: string,
     ): Promise<boolean> {
         return (await Label.fromId(auth, id)).isOk;
     }
 
     public static async userHasLabelWithName (
         auth: User,
-        nameDecrypted: string
+        nameDecrypted: string,
     ): Promise<boolean> {
         return (await Label.fromName(auth, nameDecrypted)).isOk;
     }
@@ -110,12 +110,16 @@ export class Label {
 
     public static async create (
         auth: User,
-        json: Omit<Label, 'id'>
-              & Partial<Mutable<Pick<Label, 'id'>>>
+        json: PickOptional<Label, 'id' | 'created'>,
     ): Promise<Result<Label>> {
-        if (!json.id) {
-            json.id = await generateUUId();
+
+        if (await Label.userHasLabelWithName(auth, json.name)) {
+            return Result.err('Label with that name already exists');
         }
+
+        json = { ...json };
+        json.id ??= await generateUUId();
+        json.created ??= nowS();
 
         await query`
             INSERT INTO labels (id, user, name, colour, created)
@@ -127,7 +131,7 @@ export class Label {
             json.id,
             json.colour,
             json.name,
-            json.created
+            json.created,
         ));
     }
 

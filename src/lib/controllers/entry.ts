@@ -2,7 +2,7 @@ import type { PickOptionalAndMutable } from '../utils';
 import { query } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { generateUUId } from '../security/uuid';
-import { Result } from '../utils';
+import { nowS, Result } from '../utils';
 import { Label } from './label';
 import type { User } from './user';
 
@@ -36,14 +36,14 @@ export class Entry {
         public readonly created: number,
         public readonly deleted: boolean,
         public readonly latitude?: number,
-        public readonly longitude?: number
+        public readonly longitude?: number,
     ) {
     }
 
     public static async delete (
         auth: User,
         id: string,
-        restore: boolean
+        restore: boolean,
     ): Promise<Result> {
         const entry = await query`
             SELECT deleted
@@ -72,7 +72,7 @@ export class Entry {
 
     public static async purgeWithId (
         auth: User,
-        id: string
+        id: string,
     ): Promise<void> {
         await query`
             DELETE
@@ -84,7 +84,7 @@ export class Entry {
 
     public static async allRaw (
         auth: User,
-        deleted: boolean | 'both' = false
+        deleted: boolean | 'both' = false,
     ): Promise<RawEntry[]> {
         return await query<RawEntry[]>`
             SELECT id,
@@ -104,7 +104,7 @@ export class Entry {
 
     public static async getAll (
         auth: User,
-        deleted = false
+        deleted = false,
     ): Promise<Result<Entry[]>> {
         const rawEntries = await Entry.allRaw(auth, deleted);
 
@@ -128,17 +128,17 @@ export class Entry {
         {
             deleted = false,
             labelId = undefined,
-            search = undefined
+            search = undefined,
         }: {
             deleted?: boolean | 'both',
             labelId?: string,
             search?: Lowercase<string>
-        } = {}
+        } = {},
     ): Promise<Result<[ Entry[], number ]>> {
         const rawEntries = await Entry.allRaw(auth, deleted);
 
         let { val: entries, err } = await Result.awaitCollect(
-            rawEntries.map((e) => Entry.fromRaw(auth, e))
+            rawEntries.map((e) => Entry.fromRaw(auth, e)),
         );
         if (err) return Result.err(err);
 
@@ -156,20 +156,20 @@ export class Entry {
         const end = start + pageSize;
         return Result.ok([
             entries.slice(start, end),
-            entries.length
+            entries.length,
         ]);
     }
 
     public static async fromRaw (
         auth: User,
-        rawEntry: RawEntry
+        rawEntry: RawEntry,
     ): Promise<Result<Entry>> {
         const entry = new Entry(
             rawEntry.id,
             decrypt(auth.key, rawEntry.title),
             decrypt(auth.key, rawEntry.entry),
             rawEntry.created,
-            rawEntry.deleted
+            rawEntry.deleted,
         );
 
         if (rawEntry.label) {
@@ -181,7 +181,7 @@ export class Entry {
     }
 
     public static groupEntriesByDay (
-        entries: Entry[]
+        entries: Entry[],
     ): Record<number, Entry[]> {
         const grouped: Record<number, Entry[]> = [];
 
@@ -214,7 +214,7 @@ export class Entry {
     public static async fromId (
         auth: User,
         id: string,
-        mustNotBeDeleted = true
+        mustNotBeDeleted = true,
     ): Promise<Result<Entry>> {
         const entries = await query<RawEntry[]>`
             SELECT label,
@@ -242,7 +242,7 @@ export class Entry {
 
     public static async decryptRaw<T extends RawEntry | RawEntry[]> (
         auth: User,
-        raw: T
+        raw: T,
     ): Promise<Result<T extends RawEntry ? DecryptedRawEntry : DecryptedRawEntry[]>> {
         if (Array.isArray(raw)) {
             const decrypted = [];
@@ -255,16 +255,17 @@ export class Entry {
 
             return Result.ok(decrypted as T extends RawEntry ? DecryptedRawEntry : DecryptedRawEntry[]);
         }
+        
         return Result.ok({
             ...raw,
             title: decrypt(auth.key, raw.title),
             entry: decrypt(auth.key, raw.entry),
-            decrypted: true
+            decrypted: true,
         } as unknown as T extends RawEntry ? DecryptedRawEntry : DecryptedRawEntry[]);
     }
 
     public static jsonIsRawEntry<T extends RawEntry | DecryptedRawEntry> (
-        json: unknown
+        json: unknown,
     ): json is T {
         return typeof json === 'object'
             && json !== null
@@ -295,17 +296,18 @@ export class Entry {
             'id'
             | 'deleted'
             | 'decrypted'
-        >
+            | 'created'
+        >,
     ): Promise<Result<Entry>> {
-        if (!json.id) {
-            json.id = await generateUUId();
-        }
+        json.id ??= await generateUUId();
+        json.created ??= nowS();
+
         const entry = new Entry(
             json.id,
             json.title,
             json.entry,
             json.created,
-            json.deleted ?? false
+            json.deleted ?? false,
         );
 
         if (json.label) {
@@ -376,7 +378,7 @@ export class Entry {
             this.created,
             this.deleted,
             this.latitude,
-            this.longitude
+            this.longitude,
         );
         entry.label = this.label;
         return entry;

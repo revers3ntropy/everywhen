@@ -1,11 +1,11 @@
-import { getContext, onMount } from "svelte";
-import { writable } from "svelte/store";
-import { browser } from "$app/environment";
-import { nowS } from "../../routes/timeline/utils";
+import { getContext, onMount } from 'svelte';
+import { writable } from 'svelte/store';
+import { browser } from '$app/environment';
+import { nowS } from '../utils';
 
 export const START_ZOOM = 1 / (60 * 60);
 
-type CanvasListener<T= MouseEvent & TouchEvent & WheelEvent> = (event: T) => void;
+type CanvasListener<T = MouseEvent & TouchEvent & WheelEvent> = (event: T) => void;
 
 export interface ICanvasListeners {
     mousemove: CanvasListener[],
@@ -29,31 +29,9 @@ export interface ICanvasState extends ICanvasListeners {
 }
 
 export class CanvasState implements ICanvasListeners {
-    static c_Primary = "#DDD";
-    static c_Text = "#FFF";
-    static c_Secondary = "#CCC";
-
-    static empty (): CanvasState {
-        return new CanvasState({
-            width: browser ? window.innerWidth : 0,
-            height: browser ? window.innerHeight : 0,
-            pixelRatio: browser ? window.devicePixelRatio : 0,
-            ctx: null,
-            canvas: null,
-            time: 0,
-            cameraOffset: 0,
-            zoom: START_ZOOM,
-
-            mousemove: [],
-            mouseup: [],
-            mousedown: [],
-            touchstart: [],
-            touchmove: [],
-            touchend: [],
-            wheel: []
-        } as unknown as CanvasState);
-    }
-
+    static c_Primary = '#DDD';
+    static c_Text = '#FFF';
+    static c_Secondary = '#CCC';
     width: number;
     height: number;
     cameraOffset: number;
@@ -62,7 +40,6 @@ export class CanvasState implements ICanvasListeners {
     canvas: HTMLCanvasElement | null;
     pixelRatio: number;
     time: number;
-
     readonly mousemove: CanvasListener[];
     readonly mouseup: CanvasListener[];
     readonly mousedown: CanvasListener[];
@@ -90,7 +67,28 @@ export class CanvasState implements ICanvasListeners {
         this.wheel = props.wheel;
     }
 
-    public listen <EvtT extends keyof ICanvasListeners>(event: EvtT, callback: CanvasListener<WindowEventMap[EvtT]>) {
+    static empty (): CanvasState {
+        return new CanvasState({
+            width: browser ? window.innerWidth : 0,
+            height: browser ? window.innerHeight : 0,
+            pixelRatio: browser ? window.devicePixelRatio : 0,
+            ctx: null,
+            canvas: null,
+            time: 0,
+            cameraOffset: 0,
+            zoom: START_ZOOM,
+
+            mousemove: [],
+            mouseup: [],
+            mousedown: [],
+            touchstart: [],
+            touchmove: [],
+            touchend: [],
+            wheel: [],
+        } as unknown as CanvasState);
+    }
+
+    public listen<EvtT extends keyof ICanvasListeners> (event: EvtT, callback: CanvasListener<WindowEventMap[EvtT]>) {
         this[event].push(callback);
     }
 
@@ -119,17 +117,17 @@ export class CanvasState implements ICanvasListeners {
     }
 
     public getMousePosRaw (event: MouseEvent | TouchEvent): number {
-        if (!this.canvas) throw new Error("Canvas not set");
+        if (!this.canvas) throw new Error('Canvas not set');
         const rect = this.canvas.getBoundingClientRect();
 
         if (
-            event.type === "touchstart" ||
-            event.type === "touchmove" ||
-            event.type === "touchend" ||
-            event.type === "touchcancel"
+            event.type === 'touchstart' ||
+            event.type === 'touchmove' ||
+            event.type === 'touchend' ||
+            event.type === 'touchcancel'
         ) {
             const evt = (
-                typeof (event as any).originalEvent === "undefined")
+                typeof (event as any).originalEvent === 'undefined')
                 ? event
                 : (event as any).originalEvent;
             event = evt.touches[0] || evt.changedTouches[0];
@@ -138,21 +136,21 @@ export class CanvasState implements ICanvasListeners {
         return this.zoomScaledPosition(
             ((event as MouseEvent).pageX - rect.left) * this.canvas.width / rect.width,
             1 / this.zoom,
-            this.width / 2
+            this.width / 2,
         );
     }
 
     public getMouseYRaw (event: MouseEvent | TouchEvent): number {
-        if (!this.canvas) throw new Error("Canvas not set");
+        if (!this.canvas) throw new Error('Canvas not set');
         let rect = this.canvas.getBoundingClientRect();
 
         if (
-            event.type === "touchstart" ||
-            event.type === "touchmove" ||
-            event.type === "touchend" ||
-            event.type === "touchcancel"
+            event.type === 'touchstart' ||
+            event.type === 'touchmove' ||
+            event.type === 'touchend' ||
+            event.type === 'touchcancel'
         ) {
-            const evt = (typeof (event as any).originalEvent === "undefined")
+            const evt = (typeof (event as any).originalEvent === 'undefined')
                 ? event
                 : (event as any).originalEvent;
             event = evt.touches[0] || evt.changedTouches[0];
@@ -166,9 +164,9 @@ export class CanvasState implements ICanvasListeners {
         y: number,
         w: number,
         h: number,
-        colour = CanvasState.c_Primary
+        colour = CanvasState.c_Primary,
     ) {
-        if (!this.ctx) throw new Error("Canvas not set");
+        if (!this.ctx) throw new Error('Canvas not set');
         this.ctx.beginPath();
         this.ctx.fillStyle = colour;
         this.ctx.rect(x, y, w, h);
@@ -178,13 +176,13 @@ export class CanvasState implements ICanvasListeners {
     public text (txt: string, x: number, y: number, {
         c = CanvasState.c_Text,
         mWidth = undefined,
-        align = "left"
+        align = 'left',
     }: {
         c?: string,
         mWidth?: number,
         align?: CanvasTextAlign
     } = {}) {
-        if (!this.ctx) throw new Error("Canvas not set");
+        if (!this.ctx) throw new Error('Canvas not set');
         this.ctx.beginPath();
         this.ctx.textAlign = align;
         this.ctx.fillStyle = c;
@@ -196,9 +194,9 @@ export class CanvasState implements ICanvasListeners {
         x: number,
         y: number,
         r: number,
-        colour = CanvasState.c_Primary
+        colour = CanvasState.c_Primary,
     ) {
-        if (!this.ctx) throw new Error("Canvas not set");
+        if (!this.ctx) throw new Error('Canvas not set');
         this.ctx.beginPath();
         this.ctx.fillStyle = colour;
         this.ctx.arc(x, y, r, 0, 2 * Math.PI);
@@ -209,22 +207,22 @@ export class CanvasState implements ICanvasListeners {
 export const canvasState = writable(CanvasState.empty());
 export const key = Symbol();
 
-type renderProps = Omit<Readonly<CanvasState>, "ctx"> & {
+type renderProps = Omit<Readonly<CanvasState>, 'ctx'> & {
     ctx: CanvasRenderingContext2D
 };
 export type RenderCallback = (props: renderProps, dt: number) => void | Promise<void>;
 
 export const renderable = (
     render?: RenderCallback
-        | { render?: RenderCallback, setup?: RenderCallback }
+             | { render?: RenderCallback, setup?: RenderCallback },
 ) => {
     const api: any = getContext(key);
     const element = {
         ready: false,
-        mounted: false
+        mounted: false,
     } as any;
 
-    if (typeof render === "function") {
+    if (typeof render === 'function') {
         element.render = render;
     } else if (render) {
         if (render.render) {

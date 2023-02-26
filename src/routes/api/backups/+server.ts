@@ -1,6 +1,6 @@
 import { type DecryptedRawEntry, Entry } from '../../../lib/controllers/entry';
 import { Label } from '../../../lib/controllers/label';
-import { getUnwrappedReqBody } from '../../../lib/utils';
+import { getUnwrappedReqBody, objectMatchesSchema } from '../../../lib/utils';
 import type { RequestHandler } from './$types';
 import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
 import { decrypt, encrypt } from '../../../lib/security/encryption';
@@ -13,12 +13,12 @@ export const GET: RequestHandler = async ({ cookies }) => {
     // that will be downloaded to the user's device
     const encryptedResponse = encrypt(JSON.stringify({
         entries: await Entry.decryptRaw(auth, await Entry.allRaw(auth)),
-        labels: await Label.all(auth)
+        labels: await Label.all(auth),
     }), auth.key);
 
     return new Response(
         JSON.stringify({ data: encryptedResponse }),
-        { status: 200 }
+        { status: 200 },
     );
 };
 
@@ -26,7 +26,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
 
     const body = await getUnwrappedReqBody(request, {
-        data: 'string'
+        data: 'string',
     });
 
     let decryptedData: unknown;
@@ -36,14 +36,14 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
         throw error(400, 'data must be a valid JSON string');
     }
 
-    if (
-        typeof decryptedData !== 'object'
-        || decryptedData === null
-        || !('entries' in decryptedData)
-        || !('labels' in decryptedData)
-    ) {
-        throw error(400,
-            'data must be an object with entries and labels properties');
+    if (!objectMatchesSchema(decryptedData, {
+        entries: 'object',
+        labels: 'object',
+    })) {
+        throw error(
+            400,
+            'data must be an object with entries and labels properties',
+        );
     }
 
     const { entries, labels } = decryptedData;
@@ -73,6 +73,6 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 
     return new Response(
         JSON.stringify({}),
-        { status: 200 }
+        { status: 200 },
     );
 };
