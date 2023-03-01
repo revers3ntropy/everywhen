@@ -1,8 +1,5 @@
 <script lang="ts">
-    import {
-        canvasState,
-        renderable
-    } from "../../lib/canvas/canvas";
+    import { canvasState, renderable } from '../../lib/canvas/canvas';
 
     renderable({
         setup () {
@@ -25,24 +22,23 @@
                 });
             }
 
-            $canvasState.listen("wheel", evt => {
-                console.log('hi')
+            $canvasState.listen('wheel', evt => {
                 evt.preventDefault();
                 doZoom(1 + (evt.deltaY * -0.001));
             });
 
             // desktop
-            $canvasState.listen("mousedown", event => {
+            $canvasState.listen('mousedown', event => {
                 dragStart = $canvasState
                     .getMousePosRaw(event);
                 dragging = true;
             });
 
-            $canvasState.listen("mouseup", () => {
+            $canvasState.listen('mouseup', () => {
                 dragging = false;
             });
 
-            $canvasState.listen("mousemove", evt => {
+            $canvasState.listen('mousemove', evt => {
                 if (dragging) {
                     canvasState.update(s => {
                         dragEnd = s.getMousePosRaw(evt);
@@ -54,17 +50,17 @@
             });
 
             // mobile
-            $canvasState.listen("touchstart", event => {
+            $canvasState.listen('touchstart', event => {
                 dragStart = $canvasState.getMousePosRaw(event);
                 dragYStart = $canvasState.getMouseYRaw(event);
                 dragging = true;
             });
 
-            $canvasState.listen("touchend", () => {
+            $canvasState.listen('touchend', () => {
                 dragging = false;
             });
 
-            $canvasState.listen("touchmove", evt => {
+            $canvasState.listen('touchmove', evt => {
                 evt.preventDefault();
                 if (!dragging) return;
 
@@ -84,7 +80,7 @@
 
                 dragYStart = dragYEnd;
             });
-        }
+        },
     });
 </script>
 

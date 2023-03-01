@@ -1,8 +1,8 @@
 <script lang="ts">
+    import type { App } from '../../app';
+    import { Entry } from '../../lib/controllers/entry';
 
-    import type { Data, Entry } from "../../lib/types";
-
-    export let data: Data & {
+    export let data: App.PageData & {
         entries: Entry[],
         entryCount: number,
         wordCount: number,

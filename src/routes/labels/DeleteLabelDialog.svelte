@@ -1,19 +1,20 @@
 <script lang="ts">
-    import type { Auth } from "$lib/types";
-    import { popup } from "$lib/constants";
-    import { api } from "$lib/api/apiQuery";
-    import LabelSelect from "$lib/components/LabelSelect.svelte";
+    import { api } from '../../lib/api/apiQuery';
+    import LabelSelect from '../../lib/components/LabelSelect.svelte';
+    import { popup } from '../../lib/constants';
+    import { User } from '../../lib/controllers/user';
 
-    export let auth: Auth;
+    export let auth: User;
     export let id: string;
     export let colour: string;
     export let name: string;
+
     let entries = [];
     $: api.get(auth, `/entries?labelId=${id}`)
-        .then((data) => {
-            entries = data.entries;
-        })
-        .catch(console.log);
+          .then((data) => {
+              entries = data.entries;
+          })
+          .catch(console.trace);
     let changeLabelId;
 
     async function delAndEntries () {
@@ -27,7 +28,7 @@
     async function delAndRmLabel () {
         await Promise.all(entries.map(entry => {
             api.put(auth, `/entries/${entry.id}`, {
-                label: null
+                label: null,
             });
         }));
         await api.delete(auth, `/labels/${id}`);
@@ -37,7 +38,7 @@
     async function delAndReassign () {
         await Promise.all(entries.map(entry => {
             api.put(auth, `/entries/${entry.id}`, {
-                label: changeLabelId
+                label: changeLabelId,
             });
         }));
         await api.delete(auth, `/labels/${id}`);
@@ -106,6 +107,7 @@
 
             &.cancel {
                 border: none;
+
                 &:hover {
                     background: @accent-color-primary;
                 }

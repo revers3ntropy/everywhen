@@ -1,9 +1,10 @@
 <script lang="ts">
-    import type { Data, Label } from "../../../lib/types";
-    import Entries from "../../../lib/components/Entries.svelte";
-    import { api } from "../../../lib/api/apiQuery";
+    import { App } from '../../../app';
+    import { api } from '../../../lib/api/apiQuery';
+    import Entries from '../../../lib/components/Entries.svelte';
+    import { Label } from '../../../lib/controllers/label';
 
-    export let data: Data & {
+    export let data: App.PageData & {
         label: Label,
         entryCount: number
     };

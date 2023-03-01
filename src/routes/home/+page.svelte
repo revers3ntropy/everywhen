@@ -1,62 +1,62 @@
 <script lang="ts">
-    import moment from "moment";
-    import Notebook from "svelte-material-icons/Notebook.svelte";
-    import Download from "svelte-material-icons/Download.svelte";
-    import Upload from "svelte-material-icons/Upload.svelte";
-    import ChartTimeline from "svelte-material-icons/ChartTimeline.svelte";
-    import Logout from "svelte-material-icons/Logout.svelte";
-    import FileDropDialog from "../../lib/components/dialogs/FileDropDialog.svelte";
-    import LabelOutline from "svelte-material-icons/LabelOutline.svelte";
-    import { api } from "../../lib/api/apiQuery";
-    import { download as downloadFile, showPopup } from "../../lib/utils";
-    import type { Auth } from "../../lib/types";
-    import { getNotificationsContext } from "svelte-notifications";
+    import moment from 'moment';
+    import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
+    import Download from 'svelte-material-icons/Download.svelte';
+    import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
+    import Logout from 'svelte-material-icons/Logout.svelte';
+    import Notebook from 'svelte-material-icons/Notebook.svelte';
+    import Upload from 'svelte-material-icons/Upload.svelte';
+    import { getNotificationsContext } from 'svelte-notifications';
+    import type { App } from '../../app';
+    import { api } from '../../lib/api/apiQuery';
+    import FileDropDialog from '../../lib/components/dialogs/FileDropDialog.svelte';
+    import { download as downloadFile, showPopup } from '../../lib/utils';
 
     const { addNotification } = getNotificationsContext();
 
-    export let data: Auth;
+    export let data: App.PageData;
 
     async function download () {
-        const { data: backupData } = await api.get(data, "/backups");
-        const dateFmt = moment(new Date()).format("D-MM-YYYY");
-        downloadFile(`${ dateFmt }.backup.json`, backupData);
+        const { data: backupData } = await api.get(data, '/backups');
+        const dateFmt = moment(new Date()).format('D-MM-YYYY');
+        downloadFile(`${dateFmt}.backup.json`, backupData);
     }
 
     function upload () {
         showPopup(FileDropDialog, {
             auth: data,
-            message: "Drop encrypted .json file here",
+            message: 'Drop encrypted .json file here',
             withContents: async ({ val: contents, err }) => {
                 if (err) {
                     addNotification({
                         removeAfter: 10_000,
-                        text: `Error uploading file: ${ err }`,
-                        type: "error",
-                        position: "top-center"
+                        text: `Error uploading file: ${err}`,
+                        type: 'error',
+                        position: 'top-center',
                     });
                     return;
                 }
 
-                const res = await api.post(data, "/backups", {
-                    data: contents
+                const res = await api.post(data, '/backups', {
+                    data: contents,
                 });
 
                 if (res.erroneous) {
                     addNotification({
                         removeAfter: 10_000,
-                        text: `Error uploading file: ${ res.body.message }`,
-                        type: "error",
-                        position: "top-center"
+                        text: `Error uploading file: ${res.body.message}`,
+                        type: 'error',
+                        position: 'top-center',
                     });
                 } else {
                     addNotification({
                         removeAfter: 4_000,
-                        text: "File uploaded successfully",
-                        type: "success",
-                        position: "top-center"
+                        text: 'File uploaded successfully',
+                        type: 'success',
+                        position: 'top-center',
                     });
                 }
-            }
+            },
         });
     }
 </script>

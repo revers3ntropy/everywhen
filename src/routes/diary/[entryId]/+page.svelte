@@ -1,9 +1,9 @@
 <script lang="ts">
-    import Entry from "$lib/components/Entry.svelte";
-    import type { Auth } from "$lib/types";
-    import { obfuscated } from "$lib/constants.js";
+    import type { App } from '../../../app';
+    import Entry from '../../../lib/components/Entry.svelte';
+    import { obfuscated } from '../../../lib/constants.js';
 
-    export let data: Auth;
+    export let data: App.PageData;
 </script>
 
 <main>

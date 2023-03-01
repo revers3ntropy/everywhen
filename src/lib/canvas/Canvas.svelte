@@ -1,8 +1,7 @@
 <script lang="ts">
-    import { onMount, setContext } from "svelte";
-    import { key, canvasState } from "./canvas";
-    import type { ICanvasState } from "./canvas";
-    import { CanvasState } from "./canvas";
+    import { onMount, setContext } from 'svelte';
+    import type { ICanvasState } from './canvas';
+    import { canvasState, CanvasState, key } from './canvas';
 
     export let killLoopOnError = true;
     export let attributes: CanvasRenderingContext2DSettings = {};
@@ -123,7 +122,6 @@
 
     function canvasListener (fn: keyof ICanvasState) {
         return (event: Event) => {
-            console.log(event);
             executeListeners(event, fn);
         };
     }

@@ -7,7 +7,7 @@
     import { api } from '../../lib/api/apiQuery';
     import LabelSelect from '../../lib/components/LabelSelect.svelte';
     import { Label } from '../../lib/controllers/label';
-    import type { PageData } from './$types';
+    import { User } from '../../lib/controllers/user';
 
     const { addNotification } = getNotificationsContext();
     const dispatch = createEventDispatcher();
@@ -22,7 +22,7 @@
     $: browser && localStorage.setItem('__misc_3_newEntryBody', newEntryBody);
     $: browser && localStorage.setItem('__misc_3_newEntryLabel', newEntryLabel);
 
-    export let auth: PageData;
+    export let auth: User;
     let currentLocation = [];
 
     let labels: Label[] = [];

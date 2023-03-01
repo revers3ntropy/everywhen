@@ -3,12 +3,12 @@
     import { sha256 } from 'js-sha256';
     import ChevronRight from 'svelte-material-icons/ChevronRight.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
+    import type { App } from '../app';
     import { api } from '../lib/api/apiQuery';
-    import type { PageData } from './$types';
 
     const { addNotification } = getNotificationsContext();
 
-    export let data: PageData;
+    export let data: App.PageData;
 
     let password = '';
     let username = '';

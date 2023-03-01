@@ -1,41 +1,39 @@
 <script lang="ts">
-    import type { Auth, Entry as EntryType } from "$lib/types";
-    import { api } from "$lib/api/apiQuery";
-    import { getNotificationsContext } from "svelte-notifications";
-    import { obfuscated } from "$lib/constants.js";
-    import Entry from "$lib/components/Entry.svelte";
+    import { getNotificationsContext } from 'svelte-notifications';
+    import { App } from '../../app';
+    import { api } from '../../lib/api/apiQuery';
+    import Entry from '../../lib/components/Entry.svelte';
+    import { obfuscated } from '../../lib/constants.js';
+    import { Entry as EntryType } from '../../lib/controllers/entry';
 
     const { addNotification } = getNotificationsContext();
 
-    let entries: EntryType[] = [];
-    export let data: Auth;
+    export let data: App.PageData;
 
-    let search = "";
+    let search = '';
+    let entries: EntryType[] = [];
 
     function reload () {
         const entriesOptions = {
             page: 0,
             pageSize: 10e10,
             search,
-            deleted: 1
+            deleted: 1,
         };
-        api.get(
-            data,
-            `/entries?${ new URLSearchParams(entriesOptions).toString() }`
-        )
-            .then((res) => {
-                if (!res.entries) {
-                    console.error(res);
-                    addNotification({
-                        text: `Cannot load entries: ${ res.body.message }`,
-                        position: "top-center",
-                        type: "error",
-                        removeAfter: 4000
-                    });
-                    return;
-                }
-                entries = res.entries;
-            });
+        api.get(data, `/entries`, entriesOptions)
+           .then((res) => {
+               if (!res.entries) {
+                   console.error(res);
+                   addNotification({
+                       text: `Cannot load entries: ${res.body.message}`,
+                       position: 'top-center',
+                       type: 'error',
+                       removeAfter: 4000,
+                   });
+                   return;
+               }
+               entries = res.entries;
+           });
     }
 
     reload();
