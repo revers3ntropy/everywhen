@@ -1,6 +1,7 @@
 import { browser } from '$app/environment';
-import { parse } from 'cookie';
 import { error } from '@sveltejs/kit';
+import { parse } from 'cookie';
+import * as crypto from 'crypto';
 import type { Position } from 'svelte-notifications';
 import { bind } from 'svelte-simple-modal';
 import type { SvelteComponentDev } from 'svelte/internal';
@@ -264,7 +265,7 @@ export async function bodyFromReq<T extends Record<string, keyof typeMap>> (
     }
 
     if (!objectMatchesSchemaStrict(body, schema, defaults)) {
-        return Result.err(`Invalid body: does not match schema`);
+        return Result.err(`Invalid body: does not match expected schema`);
     }
 
     return Result.ok(Object.freeze(
@@ -286,4 +287,10 @@ export async function getUnwrappedReqBody<T extends Record<string, keyof typeMap
 
 export function nowS (): number {
     return Math.floor(Date.now() / 1000);
+}
+
+export function cryptoRandomStr (length = 32): string {
+    return crypto
+        .randomBytes(length)
+        .toString('base64url');
 }

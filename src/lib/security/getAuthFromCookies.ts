@@ -22,8 +22,8 @@ export async function getAuthFromCookies (cookie: Cookies): Promise<User> {
     }
 
     return new User(
-        res[0].i,
+        res[0].id,
         username,
-        key
+        key,
     );
 }

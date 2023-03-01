@@ -1,14 +1,14 @@
 <script lang="ts">
-    import ChevronRight from 'svelte-material-icons/ChevronRight.svelte';
-    import { api } from '$lib/api/apiQuery';
-    import { getNotificationsContext } from 'svelte-notifications';
     import { GETArgs } from '$lib/utils';
     import { sha256 } from 'js-sha256';
-    import type { Data } from '$lib/types';
+    import ChevronRight from 'svelte-material-icons/ChevronRight.svelte';
+    import { getNotificationsContext } from 'svelte-notifications';
+    import { api } from '../lib/api/apiQuery';
+    import type { PageData } from './$types';
 
     const { addNotification } = getNotificationsContext();
 
-    export let data: Data;
+    export let data: PageData;
 
     let password = '';
     let username = '';
@@ -18,8 +18,8 @@
             data,
             `/auth${GETArgs({
                 key: sha256(password).substring(0, 32),
-                username
-            })}`
+                username,
+            })}`,
         );
 
         if (res?.body?.error) {
@@ -27,7 +27,7 @@
                 text: res?.body?.error,
                 position: 'top-center',
                 type: 'error',
-                removeAfter: 4000
+                removeAfter: 4000,
             });
         }
         window.location.href = '/home';
@@ -36,7 +36,7 @@
     async function create (): Promise<void> {
         const res = await api.post(data, `/users`, {
             password: sha256(password).substring(0, 32),
-            username
+            username,
         });
 
         if (res.body?.error) {
@@ -44,7 +44,7 @@
                 text: res.body?.error,
                 position: 'top-center',
                 type: 'error',
-                removeAfter: 4000
+                removeAfter: 4000,
             });
         }
         window.location.href = '/home';
@@ -92,7 +92,6 @@
 </main>
 
 <style lang="less">
-
     .form {
         .content, form input {
             max-width: 94vw;

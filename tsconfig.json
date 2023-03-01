@@ -23,7 +23,9 @@
         "alwaysStrict": true,
         "importHelpers": true,
         "allowUmdGlobalAccess": true,
-        "types": ["jest"]
+        "types": [
+            "jest"
+        ]
     },
     "ts-node": {
         "esm": true,
@@ -31,7 +33,8 @@
     },
     "include": [
         "./src/**/*",
-        "./test/unit/**/*"
+        "./test/unit/**/*",
+        ".svelte-kit/ambient.d.ts"
     ]
     // Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias
     //

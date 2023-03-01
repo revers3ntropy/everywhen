@@ -1,19 +1,19 @@
 <script lang="ts">
-    import moment from "moment";
-    import Time from "svelte-time";
-    import { getNotificationsContext } from "svelte-notifications";
-    import Bin from "svelte-material-icons/Delete.svelte";
-    import TrayArrowUp from "svelte-material-icons/TrayArrowUp.svelte";
-    import Spinner from "./BookSpinner.svelte";
-    import { obfuscated } from "../constants";
-    import EntryGroup from "../../lib/components/EntryGroup.svelte";
-    import Sidebar from "../../routes/diary/Sidebar.svelte";
-    import PageCounter from "../../lib/components/PageCounter.svelte";
-    import { showPopup } from "../utils";
-    import { api } from "../api/apiQuery";
-    import ImportDialog from "./dialogs/ImportDialog.svelte";
-    import { Entry } from "../controllers/entry";
-    import { onMount } from "svelte";
+    import moment from 'moment';
+    import { onMount } from 'svelte';
+    import Bin from 'svelte-material-icons/Delete.svelte';
+    import TrayArrowUp from 'svelte-material-icons/TrayArrowUp.svelte';
+    import { getNotificationsContext } from 'svelte-notifications';
+    import Time from 'svelte-time';
+    import EntryGroup from '../../lib/components/EntryGroup.svelte';
+    import PageCounter from '../../lib/components/PageCounter.svelte';
+    import Sidebar from '../../routes/diary/Sidebar.svelte';
+    import { api } from '../api/apiQuery';
+    import { obfuscated } from '../constants';
+    import { Entry } from '../controllers/entry';
+    import { showPopup } from '../utils';
+    import Spinner from './BookSpinner.svelte';
+    import ImportDialog from './dialogs/ImportDialog.svelte';
 
     const { addNotification } = getNotificationsContext();
 
@@ -36,7 +36,7 @@
     let page = 0;
     let pages = 0;
 
-    let search = "";
+    let search = '';
 
     let loading = true;
 
@@ -52,10 +52,10 @@
         ) {
             console.error(res);
             addNotification({
-                text: `Cannot load entries: ${ res.body?.message }`,
-                position: "top-center",
-                type: "error",
-                removeAfter: 4000
+                text: `Cannot load entries: ${res.body?.message}`,
+                position: 'top-center',
+                type: 'error',
+                removeAfter: 4000,
             });
             return;
         }
@@ -72,23 +72,23 @@
         const entriesOptions = {
             page,
             ...options,
-            pageSize: PAGE_LENGTH
+            pageSize: PAGE_LENGTH,
         };
         if (search) {
-            entriesOptions["search"] = search;
+            entriesOptions['search'] = search;
         }
 
         api.get(auth, `/entries`, entriesOptions)
-            .then(handleEntries);
+           .then(handleEntries);
 
-        const res = await api.get(auth, "/entries/titles");
+        const res = await api.get(auth, '/entries/titles');
         if (!res.entries) {
             console.error(res);
             addNotification({
-                text: `Cannot load entries: ${ res.body?.message }`,
-                position: "top-center",
-                type: "error",
-                removeAfter: 4000
+                text: `Cannot load entries: ${res.body?.message}`,
+                position: 'top-center',
+                type: 'error',
+                removeAfter: 4000,
             });
             return;
         }
@@ -97,7 +97,7 @@
 
     onMount(() => {
         reload(page, search);
-    })
+    });
 </script>
 
 <div>

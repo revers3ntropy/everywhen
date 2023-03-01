@@ -1,28 +1,28 @@
 <script lang="ts">
-    import { onMount } from "svelte";
-    import { createEventDispatcher } from "svelte";
-    import { getNotificationsContext } from "svelte-notifications";
-    import Geolocation from "svelte-geolocation";
-    import Send from "svelte-material-icons/Send.svelte";
-    import { browser } from "$app/environment";
-    import type { Auth, Label } from "../../lib/types";
-    import { api } from "../../lib/api/apiQuery";
-    import LabelSelect from "../../lib/components/LabelSelect.svelte";
+    import { browser } from '$app/environment';
+    import { createEventDispatcher, onMount } from 'svelte';
+    import Geolocation from 'svelte-geolocation';
+    import Send from 'svelte-material-icons/Send.svelte';
+    import { getNotificationsContext } from 'svelte-notifications';
+    import { api } from '../../lib/api/apiQuery';
+    import LabelSelect from '../../lib/components/LabelSelect.svelte';
+    import { Label } from '../../lib/controllers/label';
+    import type { PageData } from './$types';
 
     const { addNotification } = getNotificationsContext();
     const dispatch = createEventDispatcher();
 
     let newEntryTitle =
-        (browser && localStorage.getItem("__misc_3_newEntryTitle")) || "";
+        (browser && localStorage.getItem('__misc_3_newEntryTitle')) || '';
     let newEntryBody =
-        (browser && localStorage.getItem("__misc_3_newEntryBody")) || "";
+        (browser && localStorage.getItem('__misc_3_newEntryBody')) || '';
     let newEntryLabel =
-        (browser && localStorage.getItem("__misc_3_newEntryLabel")) || "";
-    $: browser && localStorage.setItem("__misc_3_newEntryTitle", newEntryTitle);
-    $: browser && localStorage.setItem("__misc_3_newEntryBody", newEntryBody);
-    $: browser && localStorage.setItem("__misc_3_newEntryLabel", newEntryLabel);
+        (browser && localStorage.getItem('__misc_3_newEntryLabel')) || '';
+    $: browser && localStorage.setItem('__misc_3_newEntryTitle', newEntryTitle);
+    $: browser && localStorage.setItem('__misc_3_newEntryBody', newEntryBody);
+    $: browser && localStorage.setItem('__misc_3_newEntryLabel', newEntryLabel);
 
-    export let auth: Auth;
+    export let auth: PageData;
     let currentLocation = [];
 
     let labels: Label[] = [];
@@ -33,18 +33,18 @@
     });
 
     export function reset () {
-        newEntryTitle = "";
-        newEntryBody = "";
-        newEntryLabel = "";
+        newEntryTitle = '';
+        newEntryBody = '';
+        newEntryLabel = '';
     }
 
     async function submit () {
-        const res = await api.post(auth, "/entries", {
+        const res = await api.post(auth, '/entries', {
             title: newEntryTitle,
             entry: newEntryBody,
             label: newEntryLabel,
             latitude: currentLocation[0],
-            longitude: currentLocation[1]
+            longitude: currentLocation[1],
         });
 
         if (res.id) {
@@ -52,13 +52,13 @@
         } else {
             console.error(res);
             addNotification({
-                text: `Cannot create entry: ${ res.body.message }`,
-                position: "top-center",
-                type: "error"
+                text: `Cannot create entry: ${res.body.message}`,
+                position: 'top-center',
+                type: 'error',
             });
         }
 
-        dispatch("updated");
+        dispatch('updated');
     }
 
 </script>

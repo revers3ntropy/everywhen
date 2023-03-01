@@ -1,7 +1,7 @@
 import { query } from '../db/mysql';
+import { decrypt, encrypt } from '../security/encryption';
 import { generateUUId } from '../security/uuid';
 import { nowS, type PickOptional, Result } from '../utils';
-import { decrypt, encrypt } from '../security/encryption';
 import type { User } from './user';
 
 export class Label {
@@ -28,7 +28,7 @@ export class Label {
         return Result.ok(new Label(
             res[0].id,
             res[0].colour,
-            decrypt(auth.key, res[0].name),
+            decrypt(res[0].name, auth.key),
             res[0].created,
         ));
     }
@@ -67,7 +67,7 @@ export class Label {
         return res.map(label => new Label(
             label.id,
             label.colour,
-            decrypt(auth.key, label.name),
+            decrypt(label.name, auth.key),
             label.created,
         ));
     }

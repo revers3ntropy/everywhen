@@ -1,16 +1,16 @@
 <script lang="ts">
-    import { api } from "$lib/api/apiQuery";
-    import type { Auth } from "$lib/types";
-    import Label from "./Label.svelte";
-    import NewLabelForm from "$lib/components/NewLabelForm.svelte";
-    import { onMount } from "svelte";
+    import { onMount } from 'svelte';
+    import type { App } from '../../app';
+    import { api } from '../../lib/api/apiQuery';
+    import NewLabelForm from '../../lib/components/NewLabelForm.svelte';
+    import Label from './Label.svelte';
 
-    export let data: Auth;
+    export let data: App.PageData;
 
     let labels = [];
 
     async function reload () {
-        const res = await api.get(data, "/labels");
+        const res = await api.get(data, '/labels');
         labels = res.labels;
     }
 

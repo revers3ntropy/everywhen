@@ -1,15 +1,16 @@
 <script lang="ts">
+    import { page } from '$app/stores';
+    import Notifications from 'svelte-notifications';
+    import Modal from 'svelte-simple-modal';
     import 'ts-polyfill';
+    import type { App } from '../app';
     import '../app.less';
     import Header from '../lib/components/Nav.svelte';
-    import Notifications from 'svelte-notifications';
     import { INACTIVE_TIMEOUT_MS, obfuscated } from '../lib/constants';
-    import { page } from '$app/stores';
-    import Notifier from './Notifier.svelte';
-    import Modal from 'svelte-simple-modal';
     import { popup } from '../lib/constants.js';
-    
-    export let data: Record<string, any>;
+    import Notifier from './Notifier.svelte';
+
+    export let data: App.PageData;
 
     $: home = $page.url.pathname.trim() === '/';
 
@@ -28,7 +29,7 @@
             addNotification({
                 text: 'Hidden due to inactivity',
                 type: 'info',
-                removeAfter: 4000
+                removeAfter: 4000,
             });
             isObfuscated = true;
         }

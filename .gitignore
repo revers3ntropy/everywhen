@@ -24,6 +24,7 @@ entries-example.json
 /build
 /misc_3-server/
 
-# Cypress
+# Testing
 /cypress/videos/
 /cypress/screenshots/
+/coverage/

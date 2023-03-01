@@ -1,12 +1,13 @@
-import 'ts-polyfill';
-import type { LayoutServerLoad } from './$types';
-import { KEY_COOKIE_KEY, USERNAME_COOKIE_KEY } from '../lib/constants';
 import { redirect } from '@sveltejs/kit';
+import 'ts-polyfill';
+import { KEY_COOKIE_KEY, USERNAME_COOKIE_KEY } from '../lib/constants';
+import type { User } from '../lib/controllers/user';
 import { query } from '../lib/db/mysql';
+import type { LayoutServerLoad } from './$types';
 
 export const prerender = false;
 
-export const load: LayoutServerLoad = async ({ cookies, url }) => {
+export const load: LayoutServerLoad = async ({ cookies, url }): Promise<User> => {
     const home = url.pathname.trim() === '/';
 
     const key = cookies.get(KEY_COOKIE_KEY);
@@ -32,5 +33,9 @@ export const load: LayoutServerLoad = async ({ cookies, url }) => {
     }
 
     // on home page and not logged in
-    return null;
+    return {
+        key: '',
+        username: '',
+        id: '',
+    };
 };

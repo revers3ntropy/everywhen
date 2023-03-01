@@ -1,20 +1,19 @@
 <script lang="ts">
-    import { popup } from "../../constants";
-    import { getNotificationsContext } from "svelte-notifications";
-    import { getFileContents } from "../../utils";
-    import { type FileDropOptions, type Files, filedrop } from "filedrop-svelte";
-    import { Result } from "postcss";
+    import { filedrop, type FileDropOptions, type Files } from 'filedrop-svelte';
+    import { getNotificationsContext } from 'svelte-notifications';
+    import { popup } from '../../constants';
+    import { getFileContents, Result } from '../../utils';
 
     const { addNotification } = getNotificationsContext();
 
     export const fileOptions: FileDropOptions = {
         fileLimit: 1,
-        windowDrop: false
+        windowDrop: false,
     };
 
     export let message: string;
-    export let readEncoding = "utf-8";
-    export let withContents: <T>(body: Result<T, string>) => Promise<void> | void;
+    export let readEncoding = 'utf-8';
+    export let withContents: <T>(body: Result<T>) => Promise<void> | void;
 
     async function onFileDrop (e: CustomEvent<{ files: Files }>) {
         const files = e.detail.files;
@@ -22,9 +21,9 @@
             popup.set(null);
             addNotification({
                 removeAfter: 4000,
-                text: "File could not be read, please try again",
-                type: "error",
-                position: "top-center"
+                text: 'File could not be read, please try again',
+                type: 'error',
+                position: 'top-center',
             });
             return;
         }
@@ -32,9 +31,9 @@
             popup.set(null);
             addNotification({
                 removeAfter: 4000,
-                text: "Please select exactly one file",
-                type: "error",
-                position: "top-center"
+                text: 'Please select exactly one file',
+                type: 'error',
+                position: 'top-center',
             });
             return;
         }
@@ -48,9 +47,9 @@
 </script>
 
 <div
-    use:filedrop={fileOptions}
-    on:filedrop={onFileDrop}
     class="dropzone"
+    on:filedrop={onFileDrop}
+    use:filedrop={fileOptions}
 >
     {message}
 </div>

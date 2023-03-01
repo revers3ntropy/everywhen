@@ -1,34 +1,24 @@
-import type { RequestHandler } from "@sveltejs/kit";
-import { getAuthFromCookies } from "../../../lib/security/getAuthFromCookies";
-import { query } from "../../../lib/db/mysql";
-import { decryptEntries } from "../entries/utils.server";
-import { wordCount } from "../../../lib/utils";
+import { error } from '@sveltejs/kit';
+import { Entry } from '../../../lib/controllers/entry';
+import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
+import { wordCount } from '../../../lib/utils';
+import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ cookies }) => {
-	const auth = await getAuthFromCookies(cookies);
+    const auth = await getAuthFromCookies(cookies);
 
-	let entries: any[] = await query<RawEntry[]>`
-		SELECT id,
-			   created,
-			   title,
-			   entry,
-			   deleted,
-			   label
-		FROM entries
-		WHERE deleted = false
-		  AND user = ${ auth.id }
-		ORDER BY created DESC, id
-	`;
+    let { val: entries, err } = await Entry.getAll(auth);
+    if (err) throw error(400, err);
 
-	entries = decryptEntries(entries, auth.key);
-	entries = entries.map(e => ({
-		id: e.id,
-		created: e.created,
-		title: e.title,
-		wordCount: wordCount(e.entry)
-	}));
+    let response = entries.map(e => ({
+        id: e.id,
+        created: e.created,
+        title: e.title,
+        wordCount: wordCount(e.entry),
+    }));
 
-	return new Response(JSON.stringify({
-		entries
-	}), { status: 200 });
+    return new Response(
+        JSON.stringify({ entries: response }),
+        { status: 200 },
+    );
 };

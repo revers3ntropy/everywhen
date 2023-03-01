@@ -1,7 +1,7 @@
-import type { PickOptionalAndMutable } from '../utils';
 import { query } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { generateUUId } from '../security/uuid';
+import type { PickOptionalAndMutable } from '../utils';
 import { nowS, Result } from '../utils';
 import { Label } from './label';
 import type { User } from './user';
@@ -152,8 +152,9 @@ export class Entry {
             });
         }
 
-        const start = (page - 1) * pageSize;
+        const start = page * pageSize;
         const end = start + pageSize;
+
         return Result.ok([
             entries.slice(start, end),
             entries.length,
@@ -166,8 +167,8 @@ export class Entry {
     ): Promise<Result<Entry>> {
         const entry = new Entry(
             rawEntry.id,
-            decrypt(auth.key, rawEntry.title),
-            decrypt(auth.key, rawEntry.entry),
+            decrypt(rawEntry.title, auth.key),
+            decrypt(rawEntry.entry, auth.key),
             rawEntry.created,
             rawEntry.deleted,
         );
@@ -211,6 +212,9 @@ export class Entry {
         return grouped;
     }
 
+    /**
+     * Returns a decrypted `Entry` with (optional) decrypted `Label`.
+     */
     public static async fromId (
         auth: User,
         id: string,
@@ -255,11 +259,11 @@ export class Entry {
 
             return Result.ok(decrypted as T extends RawEntry ? DecryptedRawEntry : DecryptedRawEntry[]);
         }
-        
+
         return Result.ok({
             ...raw,
-            title: decrypt(auth.key, raw.title),
-            entry: decrypt(auth.key, raw.entry),
+            title: decrypt(raw.title, auth.key),
+            entry: decrypt(raw.entry, auth.key),
             decrypted: true,
         } as unknown as T extends RawEntry ? DecryptedRawEntry : DecryptedRawEntry[]);
     }

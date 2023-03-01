@@ -2,8 +2,8 @@ import { api } from '../../api/apiQuery';
 import type { Entry } from '../../controllers/entry';
 import type { Label } from '../../controllers/label';
 import type { User } from '../../controllers/user';
-import { objectMatchesSchema } from '../../utils';
 import type { Mutable, NotificationOptions } from '../../utils';
+import { objectMatchesSchema } from '../../utils';
 
 export async function entries (contents: string, labels: Label[], auth: User)
     : Promise<undefined | NotificationOptions | NotificationOptions[]> {
@@ -60,11 +60,14 @@ export async function entries (contents: string, labels: Label[], auth: User)
         if (!objectMatchesSchema(entryJSON, {
             entry: 'string',
             title: 'string',
-            time: 'number',
+            time: 'string',
             created: 'number',
             latitude: 'number',
             longitude: 'number',
-            location: 'array',
+            location: 'object',
+        }, {
+            time: '0',
+            location: [],
         })) {
             errors.push([ i, `entry is not object` ]);
             continue;
