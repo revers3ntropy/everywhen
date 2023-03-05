@@ -1,10 +1,10 @@
 <script lang="ts">
-    import { GETArgs } from '$lib/utils';
     import { sha256 } from 'js-sha256';
     import ChevronRight from 'svelte-material-icons/ChevronRight.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../app';
     import { api } from '../lib/api/apiQuery';
+    import { GETArgs } from '../lib/utils';
 
     const { addNotification } = getNotificationsContext();
 

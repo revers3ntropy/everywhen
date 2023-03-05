@@ -1,10 +1,12 @@
+import { error } from '@sveltejs/kit';
+import schemion from 'schemion';
 import { type DecryptedRawEntry, Entry } from '../../../lib/controllers/entry';
 import { Label } from '../../../lib/controllers/label';
-import { getUnwrappedReqBody, objectMatchesSchema } from '../../../lib/utils';
-import type { RequestHandler } from './$types';
-import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
+import { query } from '../../../lib/db/mysql';
 import { decrypt, encrypt } from '../../../lib/security/encryption';
-import { error } from '@sveltejs/kit';
+import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
+import { getUnwrappedReqBody } from '../../../lib/utils';
+import type { RequestHandler } from './$types';
 
 export const GET: RequestHandler = async ({ cookies }) => {
     const auth = await getAuthFromCookies(cookies);
@@ -12,8 +14,8 @@ export const GET: RequestHandler = async ({ cookies }) => {
     // encrypt response as this is the data
     // that will be downloaded to the user's device
     const encryptedResponse = encrypt(JSON.stringify({
-        entries: await Entry.decryptRaw(auth, await Entry.allRaw(auth)),
-        labels: await Label.all(auth),
+        entries: await Entry.decryptRaw(auth, await Entry.allRaw(query, auth)),
+        labels: await Label.all(query, auth),
     }), auth.key);
 
     return new Response(
@@ -36,7 +38,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
         throw error(400, 'data must be a valid JSON string');
     }
 
-    if (!objectMatchesSchema(decryptedData, {
+    if (!schemion.matches(decryptedData, {
         entries: 'object',
         labels: 'object',
     })) {
@@ -56,8 +58,8 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
             throw error(400, 'Invalid entry format in JSON');
         }
 
-        await Entry.purgeWithId(auth, entry.id);
-        const { err } = await Entry.create(auth, entry);
+        await Entry.purgeWithId(query, auth, entry.id);
+        const { err } = await Entry.create(query, auth, entry);
         if (err) throw error(400, err);
     }
 
@@ -66,8 +68,8 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
             throw error(400, 'Invalid label format in JSON');
         }
 
-        await Label.purgeWithId(auth, label.id);
-        const { err } = await Label.create(auth, label);
+        await Label.purgeWithId(query, auth, label.id);
+        const { err } = await Label.create(query, auth, label);
         if (err) throw error(400, err);
     }
 

@@ -1,9 +1,9 @@
 <script lang="ts">
-	import Time from 'svelte-time';
+	import type { Entry } from '$lib/types';
 	import moment from 'moment';
 	import Close from 'svelte-material-icons/Close.svelte';
 	import Menu from 'svelte-material-icons/Menu.svelte';
-	import type { Entry } from '$lib/types';
+	import Time from 'svelte-time';
 
 	export let titles: Record<number, Entry[]>;
 	export let obfuscated = true;
@@ -106,11 +106,6 @@
 
 		&:last-child {
 			border-bottom: none;
-		}
-		p {
-			font-size: 0.9rem;
-			margin: 0;
-			padding: 0;
 		}
 
 		h2 {

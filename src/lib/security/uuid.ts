@@ -1,8 +1,7 @@
-import { browser } from '$app/environment';
 import { v4 as UUIdv4 } from 'uuid';
-import { query } from '../db/mysql';
+import type { QueryFunc } from '../db/mysql';
 
-async function uuidExists (id: string) {
+async function uuidExists (query: QueryFunc, id: string) {
     const res = await query`
         SELECT id
         FROM ids
@@ -11,12 +10,10 @@ async function uuidExists (id: string) {
     return res.length > 0;
 }
 
-export async function generateUUId (): Promise<string> {
+export async function generateUUId (query: QueryFunc): Promise<string> {
     let id = UUIdv4();
 
-    if (browser) return id;
-
-    while (await uuidExists(id)) {
+    while (await uuidExists(query, id)) {
         id = UUIdv4();
     }
 

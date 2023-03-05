@@ -1,4 +1,4 @@
-import { query } from '../db/mysql';
+import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { generateUUId } from '../security/uuid';
 import { nowS, type PickOptional, Result } from '../utils';
@@ -13,7 +13,11 @@ export class Label {
     ) {
     }
 
-    public static async fromId (auth: User, id: string): Promise<Result<Label>> {
+    public static async fromId (
+        query: QueryFunc,
+        auth: User,
+        id: string,
+    ): Promise<Result<Label>> {
         const res = await query<Required<Label>[]>`
             SELECT id, colour, name, created
             FROM labels
@@ -34,6 +38,7 @@ export class Label {
     }
 
     public static async fromName (
+        query: QueryFunc,
         auth: User,
         nameDecrypted: string,
     ): Promise<Result<Label>> {
@@ -56,7 +61,10 @@ export class Label {
         ));
     }
 
-    public static async all (auth: User): Promise<Label[]> {
+    public static async all (
+        query: QueryFunc,
+        auth: User,
+    ): Promise<Label[]> {
         const res = await query<Required<Label>[]>`
             SELECT id, colour, name, created
             FROM labels
@@ -73,17 +81,19 @@ export class Label {
     }
 
     public static async userHasLabelWithId (
+        query: QueryFunc,
         auth: User,
         id: string,
     ): Promise<boolean> {
-        return (await Label.fromId(auth, id)).isOk;
+        return (await Label.fromId(query, auth, id)).isOk;
     }
 
     public static async userHasLabelWithName (
+        query: QueryFunc,
         auth: User,
         nameDecrypted: string,
     ): Promise<boolean> {
-        return (await Label.fromName(auth, nameDecrypted)).isOk;
+        return (await Label.fromName(query, auth, nameDecrypted)).isOk;
     }
 
     public static jsonIsRawLabel (label: unknown): label is Required<Label> {
@@ -99,7 +109,11 @@ export class Label {
             && typeof label.created === 'number';
     }
 
-    public static async purgeWithId (auth: User, id: string): Promise<void> {
+    public static async purgeWithId (
+        query: QueryFunc,
+        auth: User,
+        id: string,
+    ): Promise<void> {
         await query`
             DELETE
             FROM labels
@@ -109,16 +123,17 @@ export class Label {
     }
 
     public static async create (
+        query: QueryFunc,
         auth: User,
         json: PickOptional<Label, 'id' | 'created'>,
     ): Promise<Result<Label>> {
 
-        if (await Label.userHasLabelWithName(auth, json.name)) {
+        if (await Label.userHasLabelWithName(query, auth, json.name)) {
             return Result.err('Label with that name already exists');
         }
 
         json = { ...json };
-        json.id ??= await generateUUId();
+        json.id ??= await generateUUId(query);
         json.created ??= nowS();
 
         await query`
@@ -135,8 +150,12 @@ export class Label {
         ));
     }
 
-    public async updateName (auth: User, name: string): Promise<Result<Label>> {
-        if (await Label.userHasLabelWithName(auth, name)) {
+    public async updateName (
+        query: QueryFunc,
+        auth: User,
+        name: string,
+    ): Promise<Result<Label>> {
+        if (await Label.userHasLabelWithName(query, auth, name)) {
             return Result.err('Label with that name already exists');
         }
 
@@ -151,7 +170,10 @@ export class Label {
         return Result.ok(this);
     }
 
-    public async updateColour (colour: string): Promise<Result<Label>> {
+    public async updateColour (
+        query: QueryFunc,
+        colour: string,
+    ): Promise<Result<Label>> {
         await query`
             UPDATE labels
             SET colour = ${colour}

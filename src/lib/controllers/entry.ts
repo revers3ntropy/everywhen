@@ -1,4 +1,4 @@
-import { query } from '../db/mysql';
+import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { generateUUId } from '../security/uuid';
 import type { PickOptionalAndMutable } from '../utils';
@@ -41,6 +41,7 @@ export class Entry {
     }
 
     public static async delete (
+        query: QueryFunc,
         auth: User,
         id: string,
         restore: boolean,
@@ -71,6 +72,7 @@ export class Entry {
     }
 
     public static async purgeWithId (
+        query: QueryFunc,
         auth: User,
         id: string,
     ): Promise<void> {
@@ -83,6 +85,7 @@ export class Entry {
     }
 
     public static async allRaw (
+        query: QueryFunc,
         auth: User,
         deleted: boolean | 'both' = false,
     ): Promise<RawEntry[]> {
@@ -103,15 +106,16 @@ export class Entry {
     }
 
     public static async getAll (
+        query: QueryFunc,
         auth: User,
         deleted = false,
     ): Promise<Result<Entry[]>> {
-        const rawEntries = await Entry.allRaw(auth, deleted);
+        const rawEntries = await Entry.allRaw(query, auth, deleted);
 
         const entries = [];
 
         for (const rawEntry of rawEntries) {
-            const { err, val } = await Entry.fromRaw(auth, rawEntry);
+            const { err, val } = await Entry.fromRaw(query, auth, rawEntry);
             if (err) {
                 return Result.err(err);
             }
@@ -122,6 +126,7 @@ export class Entry {
     }
 
     public static async getPage (
+        query: QueryFunc,
         auth: User,
         page: number,
         pageSize: number,
@@ -135,10 +140,10 @@ export class Entry {
             search?: Lowercase<string>
         } = {},
     ): Promise<Result<[ Entry[], number ]>> {
-        const rawEntries = await Entry.allRaw(auth, deleted);
+        const rawEntries = await Entry.allRaw(query, auth, deleted);
 
         let { val: entries, err } = await Result.awaitCollect(
-            rawEntries.map((e) => Entry.fromRaw(auth, e)),
+            rawEntries.map((e) => Entry.fromRaw(query, auth, e)),
         );
         if (err) return Result.err(err);
 
@@ -162,6 +167,7 @@ export class Entry {
     }
 
     public static async fromRaw (
+        query: QueryFunc,
         auth: User,
         rawEntry: RawEntry,
     ): Promise<Result<Entry>> {
@@ -174,7 +180,8 @@ export class Entry {
         );
 
         if (rawEntry.label) {
-            const { err } = await entry.addLabel(auth, rawEntry.label);
+            const { err } = await entry.addLabel(
+                query, auth, rawEntry.label);
             if (err) return Result.err(err);
         }
 
@@ -216,6 +223,7 @@ export class Entry {
      * Returns a decrypted `Entry` with (optional) decrypted `Label`.
      */
     public static async fromId (
+        query: QueryFunc,
         auth: User,
         id: string,
         mustNotBeDeleted = true,
@@ -241,7 +249,7 @@ export class Entry {
             return Result.err('Entry is deleted');
         }
 
-        return await Entry.fromRaw(auth, entries[0]);
+        return await Entry.fromRaw(query, auth, entries[0]);
     }
 
     public static async decryptRaw<T extends RawEntry | RawEntry[]> (
@@ -257,7 +265,11 @@ export class Entry {
                 decrypted.push(val);
             }
 
-            return Result.ok(decrypted as T extends RawEntry ? DecryptedRawEntry : DecryptedRawEntry[]);
+            return Result.ok(
+                decrypted as T extends RawEntry
+                    ? DecryptedRawEntry
+                    : DecryptedRawEntry[],
+            );
         }
 
         return Result.ok({
@@ -294,8 +306,9 @@ export class Entry {
     }
 
     public static async create (
+        query: QueryFunc,
         auth: User,
-        json: PickOptionalAndMutable<
+        json_: PickOptionalAndMutable<
             DecryptedRawEntry,
             'id'
             | 'deleted'
@@ -303,7 +316,8 @@ export class Entry {
             | 'created'
         >,
     ): Promise<Result<Entry>> {
-        json.id ??= await generateUUId();
+        const json = { ...json_ };
+        json.id ??= await generateUUId(query);
         json.created ??= nowS();
 
         const entry = new Entry(
@@ -315,7 +329,7 @@ export class Entry {
         );
 
         if (json.label) {
-            const { err } = await entry.addLabel(auth, json.label);
+            const { err } = await entry.addLabel(query, auth, json.label);
             if (err) return Result.err(err);
         }
 
@@ -324,19 +338,22 @@ export class Entry {
                 (id, user, title, entry, created, deleted, label, latitude, longitude)
             VALUES (${entry.id},
                     ${auth.id},
-                    ${encrypt(auth.key, entry.title)},
-                    ${encrypt(auth.key, entry.entry)},
+                    ${encrypt(entry.title, auth.key)},
+                    ${encrypt(entry.entry, auth.key)},
                     ${entry.created},
                     ${entry.deleted},
                     ${entry.label?.id ?? null},
-                    ${entry.latitude},
-                    ${entry.longitude})
+                    ${entry.latitude ?? null},
+                    ${entry.longitude ?? null})
         `;
 
         return Result.ok(entry);
     }
 
-    public async removeLabel (auth: User): Promise<Result<Entry>> {
+    public async removeLabel (
+        query: QueryFunc,
+        auth: User,
+    ): Promise<Result<Entry>> {
         if (!this.label) {
             return Result.err('Entry does not have a label to remove');
         }
@@ -352,9 +369,13 @@ export class Entry {
         return Result.ok(this);
     }
 
-    public async updateLabel (auth: User, label: Label | string | null): Promise<Result<Entry>> {
+    public async updateLabel (
+        query: QueryFunc,
+        auth: User,
+        label: Label | string | null,
+    ): Promise<Result<Entry>> {
         if (label == null) {
-            return this.removeLabel(auth);
+            return this.removeLabel(query, auth);
         }
         if (label instanceof Label) {
             label = label.id;
@@ -371,7 +392,7 @@ export class Entry {
               AND user = ${auth.id}
         `;
 
-        return await this.addLabel(auth, label);
+        return await this.addLabel(query, auth, label);
     }
 
     public clone (): Entry {
@@ -388,9 +409,9 @@ export class Entry {
         return entry;
     }
 
-    private async addLabel (auth: User, label: Label | string): Promise<Result<Entry>> {
+    private async addLabel (query: QueryFunc, auth: User, label: Label | string): Promise<Result<Entry>> {
         if (typeof label === 'string') {
-            const { val, err } = await Label.fromId(auth, label);
+            const { val, err } = await Label.fromId(query, auth, label);
             if (err) {
                 return Result.err(err);
             }

@@ -1,9 +1,10 @@
+import { error } from '@sveltejs/kit';
 import { Entry } from '../../../lib/controllers/entry';
 import { Label } from '../../../lib/controllers/label';
+import { query } from '../../../lib/db/mysql';
+import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
 import { getUnwrappedReqBody, nowS } from '../../../lib/utils';
 import type { RequestHandler } from './$types';
-import { error } from '@sveltejs/kit';
-import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
 
 export const GET: RequestHandler = async ({ url, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
@@ -17,7 +18,10 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
     if (!pageSize || pageSize < 0) throw error(400, 'Invalid page size');
 
     const { val, err } = await Entry.getPage(
-        auth, page, pageSize, { deleted, labelId, search });
+        query, auth,
+        page, pageSize,
+        { deleted, labelId, search },
+    );
     if (err) throw error(400, err);
     const [ entries, numEntries ] = val;
 
@@ -52,12 +56,12 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 
     // check label exists
     if (body.label) {
-        if (!await Label.userHasLabelWithId(auth, body.label)) {
+        if (!await Label.userHasLabelWithId(query, auth, body.label)) {
             throw error(400, `Label doesn't exist`);
         }
     }
 
-    const { val: id, err } = await Entry.create(auth, body);
+    const { val: id, err } = await Entry.create(query, auth, body);
     if (err) throw error(400, err);
 
     return new Response(

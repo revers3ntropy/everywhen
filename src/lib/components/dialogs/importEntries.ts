@@ -1,12 +1,15 @@
+import { matches } from 'schemion';
 import { api } from '../../api/apiQuery';
 import type { Entry } from '../../controllers/entry';
 import type { Label } from '../../controllers/label';
 import type { User } from '../../controllers/user';
 import type { Mutable, NotificationOptions } from '../../utils';
-import { objectMatchesSchema } from '../../utils';
 
-export async function entries (contents: string, labels: Label[], auth: User)
-    : Promise<undefined | NotificationOptions | NotificationOptions[]> {
+export async function entries (
+    contents: string,
+    labels: Label[],
+    auth: User,
+): Promise<undefined | NotificationOptions | NotificationOptions[]> {
     if (!labels) {
         return {
             text: `Failed to load labels`,
@@ -57,7 +60,7 @@ export async function entries (contents: string, labels: Label[], auth: User)
     let i = -1;
     for (let entryJSON of json) {
         i++;
-        if (!objectMatchesSchema(entryJSON, {
+        if (!matches(entryJSON, {
             entry: 'string',
             title: 'string',
             time: 'string',
@@ -65,9 +68,13 @@ export async function entries (contents: string, labels: Label[], auth: User)
             latitude: 'number',
             longitude: 'number',
             location: 'object',
+            types: 'object',
+            label: 'string',
         }, {
             time: '0',
             location: [],
+            types: [],
+            label: '',
         })) {
             errors.push([ i, `entry is not object` ]);
             continue;
@@ -75,13 +82,18 @@ export async function entries (contents: string, labels: Label[], auth: User)
 
         const postBody: Mutable<Partial<Entry>> = {};
 
+        if (entryJSON.location && !Array.isArray(entryJSON.location)) {
+            errors.push([ i, `location is not array` ]);
+            continue;
+        }
+
         postBody.entry = entryJSON.entry;
         postBody.title = entryJSON.title || '';
         postBody.created = parseInt(entryJSON.time) || entryJSON.created;
-        postBody.latitude = parseFloat(entryJSON.latitude || entryJSON.location[0]) || 0;
-        postBody.longitude = parseFloat(entryJSON.longitude || entryJSON.location[1]) || 0;
+        postBody.latitude = parseFloat((entryJSON.latitude || entryJSON.location[0]) as string) || 0;
+        postBody.longitude = parseFloat((entryJSON.longitude || entryJSON.location[1]) as string) || 0;
 
-        if (entryJSON.types && entryJSON.types.length) {
+        if (entryJSON.types && Array.isArray(entryJSON.types) && entryJSON.types.length) {
             const name = entryJSON.types[0] as string;
             if (!labelHashMap.has(name)) {
                 notifications.push({
@@ -106,7 +118,7 @@ export async function entries (contents: string, labels: Label[], auth: User)
                 postBody.label = labelHashMap.get(name) as unknown as Label;
             }
         }
-        postBody.label ||= entryJSON.label as Label;
+        postBody.label ||= entryJSON.label as unknown as Label;
 
         const res = await api.post(auth, `/entries`, postBody);
         if (res.erroneous) {

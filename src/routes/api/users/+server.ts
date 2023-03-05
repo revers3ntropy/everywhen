@@ -6,6 +6,7 @@ import {
     USERNAME_COOKIE_KEY,
 } from '../../../lib/constants';
 import { User } from '../../../lib/controllers/user';
+import { query } from '../../../lib/db/mysql';
 import { getUnwrappedReqBody } from '../../../lib/utils';
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
@@ -14,7 +15,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
         password: 'string',
     });
 
-    const { err } = await User.create(body.username, body.password);
+    const { err } = await User.create(query, body.username, body.password);
     if (err) throw error(400, err);
 
     cookies.set(KEY_COOKIE_KEY, body.password, AUTH_COOKIE_OPTIONS);

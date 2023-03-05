@@ -1,5 +1,7 @@
-import type mysql from 'mysql2/promise';
 import { browser } from '$app/environment';
+import { DB, DB_HOST, DB_PASS, DB_PORT, DB_USER } from '$env/static/private';
+import mysql from 'mysql2/promise';
+import '../require';
 
 export type queryRes =
     | mysql.RowDataPacket[][]
@@ -10,8 +12,6 @@ export type queryRes =
     | Record<string, any>[];
 
 async function getConfig () {
-    const { DB_HOST, DB_USER, DB_PASS, DB, DB_PORT } =
-        await import('$env/static/private');
     // define defaults from .env file
     const port = DB_PORT ? parseInt(DB_PORT) : 3306;
     const config: mysql.ConnectionOptions = {
@@ -19,24 +19,16 @@ async function getConfig () {
         user: DB_USER,
         password: DB_PASS,
         database: DB,
-        port
+        port,
     };
     return config;
 }
 
 let con: mysql.Connection | null = null;
-let mysqlModule: typeof mysql;
 
 async function connect () {
-
-    // import dynamically so that it won't throw an error if it gets imported
-    // in the browser
-
-    mysqlModule = await import('mysql2/promise');
-    await import('../require');
-
     const config = await getConfig();
-    con = await mysqlModule.createConnection(config).catch((e: any) => {
+    con = await mysql.createConnection(config).catch((e: any) => {
         console.error(`Error connecting to mysql db '${config.database}'`);
         console.error(e);
         throw e;
@@ -50,6 +42,11 @@ if (browser) {
         con?.ping();
     }, 1000 * 60);
 }
+
+export type QueryFunc = <Res extends queryRes = mysql.RowDataPacket[]>(
+    queryParts: TemplateStringsArray,
+    ...params: any[]
+) => Promise<Res>;
 
 export async function query<Res extends queryRes = mysql.RowDataPacket[]> (
     queryParts: TemplateStringsArray,

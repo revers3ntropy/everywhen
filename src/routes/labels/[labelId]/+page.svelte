@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { App } from '../../../app';
+    import type { App } from '../../../app';
     import { api } from '../../../lib/api/apiQuery';
     import Entries from '../../../lib/components/Entries.svelte';
-    import { Label } from '../../../lib/controllers/label';
+    import type { Label } from '../../../lib/controllers/label';
 
     export let data: App.PageData & {
         label: Label,

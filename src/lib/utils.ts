@@ -2,6 +2,8 @@ import { browser } from '$app/environment';
 import { error } from '@sveltejs/kit';
 import { parse } from 'cookie';
 import * as crypto from 'crypto';
+import type { Schema, SchemaResult } from 'schemion';
+import schemion from 'schemion';
 import type { Position } from 'svelte-notifications';
 import { bind } from 'svelte-simple-modal';
 import type { SvelteComponentDev } from 'svelte/internal';
@@ -149,7 +151,7 @@ export function showPopup<T> (
 }
 
 export async function getFileContents (file: File, encoding = 'UTF-8')
-    : Promise<Result<string, string>> {
+    : Promise<Result<string>> {
     const reader = new FileReader();
     reader.readAsText(file, encoding);
 
@@ -187,69 +189,11 @@ export function wordCount (text: string): number {
         .length;
 }
 
-
-type typeMap = {
-    string: string;
-    number: number;
-    boolean: boolean;
-    object: object;
-    undefined: undefined;
-    function: Function;
-};
-
-function typesMatch (a: unknown, b: keyof typeMap): boolean {
-    return typeof a === b;
-}
-
-export function objectMatchesSchema<T extends Record<string, keyof typeMap>> (
-    obj: unknown,
-    schema: T,
-    defaults: { [P in keyof T]?: typeMap[T[P]] } = {},
-): obj is { [P in keyof T]: typeMap[T[P]] } {
-
-    if (typeof obj !== 'object' || obj === null) {
-        return false;
-    }
-
-    // clone so can safely mutate (adding defaults)
-    let objClone: Record<string, unknown> = { ...obj };
-    for (const key in defaults) {
-        objClone[key] ??= defaults[key];
-    }
-
-    for (const key in schema) {
-        if (!typesMatch(objClone[key], schema[key])) {
-            return false;
-        }
-    }
-    return true;
-}
-
-export function objectMatchesSchemaStrict<T extends Record<string, keyof typeMap>> (
-    obj: unknown,
-    schema: T,
-    defaults: { [P in keyof T]?: typeMap[T[P]] } = {},
-): obj is { [P in keyof T]: typeMap[T[P]] } {
-
-    if (typeof obj !== 'object' || obj === null) {
-        return false;
-    }
-
-    // add defaults here so can check length of list of keys properly
-    let objClone: Record<string, unknown> = { ...obj };
-    for (const key in defaults) {
-        objClone[key] ??= defaults[key];
-    }
-
-    return Object.keys(objClone).length === Object.keys(schema).length &&
-        objectMatchesSchema(objClone, schema);
-}
-
-export async function bodyFromReq<T extends Record<string, keyof typeMap>> (
+export async function bodyFromReq<T extends Schema & object> (
     request: Request,
     schema: T,
-    defaults: { [P in keyof T]?: typeMap[T[P]] } = {},
-): Promise<Result<Readonly<{ [P in keyof T]: typeMap[T[P]] }>>> {
+    defaults: { [P in keyof T]?: SchemaResult<T[P]> | undefined; } = {},
+): Promise<Result<Readonly<SchemaResult<T>>>> {
     if (request.method === 'GET') {
         throw 'GET requests are not supported in bodyFromReq()';
     }
@@ -264,20 +208,25 @@ export async function bodyFromReq<T extends Record<string, keyof typeMap>> (
         return Result.err('Invalid body: not JSON');
     }
 
-    if (!objectMatchesSchemaStrict(body, schema, defaults)) {
+    if (!schemion.matches(
+        body,
+        schema,
+        defaults as T extends object ? { [P in keyof T]?: SchemaResult<T[P]> | undefined; } | null : null,
+        { strict: true },
+    )) {
         return Result.err(`Invalid body: does not match expected schema`);
     }
 
     return Result.ok(Object.freeze(
-        body as { [P in keyof T]: typeMap[T[P]] },
+        body as SchemaResult<T>,
     ));
 }
 
-export async function getUnwrappedReqBody<T extends Record<string, keyof typeMap>> (
+export async function getUnwrappedReqBody<T extends Schema & object> (
     request: Request,
     valueType: T,
-    defaults: { [P in keyof T]?: typeMap[T[P]] } = {},
-): Promise<Readonly<{ [P in keyof T]: typeMap[T[P]] }>> {
+    defaults: { [P in keyof T]?: SchemaResult<T[P]> } = {},
+): Promise<Readonly<SchemaResult<T>>> {
     const res = await bodyFromReq(request, valueType, defaults);
     if (res.err) {
         throw error(400, res.err);

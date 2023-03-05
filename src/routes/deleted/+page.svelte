@@ -1,6 +1,6 @@
 <script lang="ts">
     import { getNotificationsContext } from 'svelte-notifications';
-    import { App } from '../../app';
+    import type { App } from '../../app';
     import { api } from '../../lib/api/apiQuery';
     import Entry from '../../lib/components/Entry.svelte';
     import { obfuscated } from '../../lib/constants.js';
