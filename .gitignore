@@ -4,7 +4,6 @@
 
 # Packages
 node_modules
-package-lock.json
 
 # Generated
 /.svelte-kit
@@ -25,6 +24,6 @@ entries-example.json
 /misc_3-server/
 
 # Testing
-/cypress/videos/
-/cypress/screenshots/
-/coverage/
+/test-results/
+/playwright-report/
+/playwright/.cache/
