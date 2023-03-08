@@ -15,12 +15,12 @@
 
     <section class="stats">
         <div>
-            <span>{data.charCount}</span>
-            Characters
-        </div>
-        <div>
             <span>{data.wordCount}</span>
             Words
+        </div>
+        <div>
+            <span>{data.charCount}</span>
+            Characters
         </div>
         <div>
             <span>{Math.round(data.wordCount / data.entryCount)}</span>

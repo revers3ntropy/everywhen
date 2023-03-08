@@ -1,15 +1,17 @@
 <script lang="ts">
-    import { createEventDispatcher } from 'svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
+    import { browser } from '$app/environment';
     import DomPurify from 'dompurify';
-    import moment from 'moment';
     import { marked } from 'marked';
+    import moment from 'moment';
+    import { createEventDispatcher } from 'svelte';
     import Bin from 'svelte-material-icons/Delete.svelte';
+    import Restore from 'svelte-material-icons/DeleteRestore.svelte';
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
-    import Restore from 'svelte-material-icons/DeleteRestore.svelte';
+    import { getNotificationsContext } from 'svelte-notifications';
     import { api } from '../api/apiQuery';
-    import { getAuthFromCookies, obfuscate } from '../utils';
+    import { User } from '../controllers/user';
+    import { obfuscate } from '../utils';
     import Label from './Label.svelte';
 
     const dispatch = createEventDispatcher();
@@ -27,11 +29,13 @@
     export let obfuscated = true;
     export let showLabels = true;
 
+    export let auth: User;
+
     // show random string instead of text content if obfuscated
     export let showLabel: Label | null;
-    $: showLabel = showLabels && label ? {
+    $: showLabel = (showLabels && label) ? {
         ...label,
-        name: obfuscated ? obfuscate(label.name) : label.name
+        name: obfuscated ? obfuscate(label.name) : label.name,
     } : null;
 
     async function deleteSelf () {
@@ -39,8 +43,8 @@
             return;
         }
 
-        const res = await api.delete(getAuthFromCookies(), `/entries/${id}`, {
-            restore: deleted
+        const res = await api.delete(auth, `/entries/${id}`, {
+            restore: deleted,
         });
 
         if (res.id) {
@@ -48,7 +52,7 @@
                 removeAfter: 4000,
                 text: `Entry ${deleted ? 'restored' : 'deleted'}`,
                 type: 'success',
-                position: 'top-center'
+                position: 'top-center',
             });
             dispatch('updated');
             return;
@@ -58,7 +62,7 @@
             removeAfter: 4000,
             text: `Error deleting entry ${res.body.message}`,
             type: 'error',
-            position: 'top-center'
+            position: 'top-center',
         });
     }
 
@@ -66,10 +70,10 @@
         obfuscated = !obfuscated;
     }
 
-    $: entryHtml = DomPurify.sanitize(
+    $: entryHtml = browser ? DomPurify.sanitize(
         marked(obfuscated ? obfuscate(entry) : entry),
-        { USE_PROFILES: { html: true } }
-    );
+        { USE_PROFILES: { html: true } },
+    ) : '';
 </script>
 
 <div class="entry">

@@ -7,5 +7,5 @@
 </script>
 
 <main>
-    <Entry {...data} obfuscated={$obfuscated} />
+    <Entry {...data} auth={data} obfuscated={$obfuscated} />
 </main>

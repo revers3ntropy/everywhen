@@ -1,8 +1,9 @@
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { generateUUId } from '../security/uuid';
-import type { PickOptionalAndMutable } from '../utils';
+import type { NonFunctionProperties, PickOptionalAndMutable } from '../utils';
 import { nowS, Result } from '../utils';
+import { Controller } from './controller';
 import { Label } from './label';
 import type { User } from './user';
 
@@ -25,7 +26,7 @@ export type DecryptedRawEntry = Omit<RawEntry, 'decrypted'> & {
     decrypted: true
 };
 
-export class Entry {
+export class Entry extends Controller {
     public label?: Label;
     public readonly decrypted = true;
 
@@ -38,6 +39,7 @@ export class Entry {
         public readonly latitude?: number,
         public readonly longitude?: number,
     ) {
+        super();
     }
 
     public static async delete (
@@ -348,6 +350,13 @@ export class Entry {
         `;
 
         return Result.ok(entry);
+    }
+
+    public override json (): NonFunctionProperties<Entry> {
+        return {
+            ...this,
+            label: this.label?.json(),
+        };
     }
 
     public async removeLabel (

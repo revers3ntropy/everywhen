@@ -2,15 +2,17 @@ import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { generateUUId } from '../security/uuid';
 import { nowS, type PickOptional, Result } from '../utils';
+import { Controller } from './controller';
 import type { User } from './user';
 
-export class Label {
+export class Label extends Controller {
     private constructor (
         public id: string,
         public colour: string,
         public name: string,
         public created: number,
     ) {
+        super();
     }
 
     public static async fromId (

@@ -1,13 +1,15 @@
 import type { QueryFunc } from '../db/mysql';
 import { generateUUId } from '../security/uuid';
-import { cryptoRandomStr, nowS, Result } from '../utils';
+import { cryptoRandomStr, type NonFunctionProperties, nowS, Result } from '../utils';
+import { Controller } from './controller';
 
-export class User {
+export class User extends Controller {
     public constructor (
         public id: string,
         public username: string,
         public key: string,
     ) {
+        super();
     }
 
     public static async authenticate (
@@ -98,4 +100,5 @@ export class User {
     }
 }
 
-export type RawAuth = Omit<User, 'id'>;
+export type RawAuth = NonFunctionProperties<Omit<User, 'id'>>;
+export type Auth = NonFunctionProperties<User>;

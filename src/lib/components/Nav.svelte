@@ -1,11 +1,11 @@
 <script lang="ts">
-    import Notebook from "svelte-material-icons/Notebook.svelte";
-    import Logout from "svelte-material-icons/Logout.svelte";
-    import Login from "svelte-material-icons/Login.svelte";
-    import Home from "svelte-material-icons/Home.svelte";
-    import LabelOutline from "svelte-material-icons/LabelOutline.svelte";
-    import ChartTimeline from "svelte-material-icons/ChartTimeline.svelte";
-    import { page } from "$app/stores";
+    import { page } from '$app/stores';
+    import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
+    import Home from 'svelte-material-icons/Home.svelte';
+    import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
+    import Login from 'svelte-material-icons/Login.svelte';
+    import Logout from 'svelte-material-icons/Logout.svelte';
+    import Notebook from 'svelte-material-icons/Notebook.svelte';
 
     export let user = null;
 </script>
@@ -31,6 +31,11 @@
             </a>
             <a href="/timeline"
                class="{$page.url.pathname === '/timeline' ? 'current' : ''}"
+            >
+                <ChartTimeline size="40" />
+            </a>
+            <a href="/stats"
+               class="{$page.url.pathname === '/stats' ? 'current' : ''}"
             >
                 <ChartTimeline size="40" />
             </a>

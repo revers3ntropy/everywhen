@@ -1,13 +1,13 @@
 import { redirect } from '@sveltejs/kit';
 import 'ts-polyfill';
 import { KEY_COOKIE_KEY, USERNAME_COOKIE_KEY } from '../lib/constants';
-import type { User } from '../lib/controllers/user';
+import type { Auth } from '../lib/controllers/user';
 import { query } from '../lib/db/mysql';
 import type { LayoutServerLoad } from './$types';
 
 export const prerender = false;
 
-export const load: LayoutServerLoad = async ({ cookies, url }): Promise<User> => {
+export const load: LayoutServerLoad = async ({ cookies, url }): Promise<Auth> => {
     const home = url.pathname.trim() === '/';
 
     const key = cookies.get(KEY_COOKIE_KEY);
