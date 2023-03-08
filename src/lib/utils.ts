@@ -183,10 +183,13 @@ export function download (filename: string, text: string) {
     document.body.removeChild(element);
 }
 
-export function wordCount (text: string): number {
+export function splitText (text: string): string[] {
     return text.split(/[\s,.\-:;!"*()=+\[\]{}?|]+/)
-               .filter(Boolean)
-        .length;
+               .filter(Boolean);
+}
+
+export function wordCount (text: string): number {
+    return splitText(text).length;
 }
 
 export async function bodyFromReq<T extends Schema & object> (
