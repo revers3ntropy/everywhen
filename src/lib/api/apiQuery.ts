@@ -3,11 +3,11 @@ import { PUBLIC_SVELTEKIT_PORT } from '$env/static/public';
 import type { HttpMethod } from '@sveltejs/kit/types/private';
 import { serialize } from 'cookie';
 import { AUTH_COOKIE_OPTIONS, KEY_COOKIE_KEY, USERNAME_COOKIE_KEY } from '../constants';
-import type { User } from '../controllers/user';
+import type { Auth } from '../controllers/user';
 import { GETArgs } from '../utils';
 
 export async function makeApiReq<T extends object> (
-    auth: User,
+    auth: Auth,
     method: HttpMethod,
     path: string,
     body: T | null = null,
@@ -76,12 +76,12 @@ export async function makeApiReq<T extends object> (
 }
 
 export const api = {
-    get: async (auth: User, path: string, args: object | null = null) =>
+    get: async (auth: Auth, path: string, args: object | null = null) =>
         await makeApiReq(auth, 'GET', path + (args ? GETArgs(args) : '')),
-    post: async (auth: User, path: string, body: any = {}) =>
+    post: async (auth: Auth, path: string, body: any = {}) =>
         await makeApiReq(auth, 'POST', path, body),
-    put: async (auth: User, path: string, body: any = {}) =>
+    put: async (auth: Auth, path: string, body: any = {}) =>
         await makeApiReq(auth, 'PUT', path, body),
-    delete: async (auth: User, path: string, body: any = {}) =>
+    delete: async (auth: Auth, path: string, body: any = {}) =>
         await makeApiReq(auth, 'DELETE', path, body),
 };

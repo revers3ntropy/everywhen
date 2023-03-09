@@ -23,6 +23,13 @@
 
     $: reloadChart(entries, by);
 
+    const showMonths = 6;
+    const currentMonth = new Date().getMonth();
+    const lastJanInCurrentYear = currentMonth <= showMonths;
+    const lastJanYear = lastJanInCurrentYear
+        ? new Date().getFullYear()
+        : new Date().getFullYear() - 1;
+
 </script>
 
 <SvelteHeatmap
@@ -32,11 +39,18 @@
     colors={['#95eab0', '#52d8bd', '#3397bd', '#0051cf']}
     {data}
     dayLabelWidth={20}
-    emptyColor={'#c7c7c7'}
+    emptyColor={'#dfdfdf'}
     endDate={moment().toDate()}
+    fontColor={'#9c9c9c'}
     fontSize="12"
     monthGap={20}
     monthLabelHeight={20}
-    startDate={moment().subtract(6, 'months').toDate()}
+    monthLabels={[
+        `Jan ${lastJanYear}`, 'Feb',
+        'Mar', 'Apr', 'May', 'Jun',
+        'Jul', 'Aug', 'Sep',
+        'Oct', 'Nov', 'Dec',
+    ]}
+    startDate={moment().subtract(showMonths, 'months').toDate()}
     view={'monthly'}
 />

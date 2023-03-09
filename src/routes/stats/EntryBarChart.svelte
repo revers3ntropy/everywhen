@@ -97,27 +97,6 @@
     <Bar
         {data}
         height="400"
-        options={{
-            chartPadding: {
-                // Remove all padding
-                top: 0,
-                right: 0,
-                bottom: 0,
-                left: 0
-              },
-            axisY: {
-                offset: 0, // Remove any offset
-                position: "start", // Remove any bottom margin
-                showGrid: false,
-                showLabel: false
-              },
-            axisX: {
-                offset: 0, // Remove any offset
-                position: "start", // Remove any left margin
-                showGrid: false,
-                showLabel: false
-            }
-        }}
         width={browser ? document.body.clientWidth : 1000}
     />
     <div>
