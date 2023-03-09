@@ -95,15 +95,18 @@
             return;
         }
         const file = files.accepted[0];
-        const contents = await getFileContents(file);
-        console.log(contents);
+        const content = displayNotifOnErr(addNotification,
+            await getFileContents(file, 'b64'),
+        );
 
-        displayNotifOnErr(addNotification,
+        const { id } = displayNotifOnErr(addNotification,
             await api.post(auth, '/assets', {
                 fileName: file.name,
-                contents,
+                content,
             }),
         );
+
+        newEntryBody += `![${file.name}](/api/assets/${id})`;
     }
 
 </script>
@@ -122,7 +125,9 @@
         >
             {#if notSupported}
                 This browser does not support the Geolocation API.
-            {:else if error}
+
+                <!-- Error code '1' means the user has denied location services, so ignore -->
+            {:else if error && error.code !== 1 }
                 An error occurred fetching geolocation data: {error.code}
                 {error.message}
             {/if}

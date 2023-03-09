@@ -111,7 +111,7 @@ export class Result<T = null, E extends {} = string> {
     }
 }
 
-export function getAuthFromCookies (): RawAuth {
+export function getRawAuthFromCookies (): RawAuth {
     if (!browser) {
         throw 'getKey() can only be used in the browser';
     }
@@ -157,14 +157,28 @@ export function showPopup<T> (
     });
 }
 
+function readFileAsB64 (file: File): Promise<Result<string>> {
+    return new Promise(resolve => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            resolve(Result.ok(reader.result?.toString() || ''));
+        };
+        reader.onerror = () => {
+            resolve(Result.err('Error reading file'));
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
 export async function getFileContents (
     file: File,
-    encoding = 'UTF-8',
+    encoding: 'UTF-8' | 'b64' = 'UTF-8',
 ): Promise<Result<string>> {
-    const reader = new FileReader();
-    reader.readAsText(file, encoding);
-
+    if (encoding === 'b64') {
+        return await readFileAsB64(file);
+    }
     return await new Promise((resolve) => {
+        const reader = new FileReader();
         reader.onload = evt => {
             const res = evt.target?.result?.toString?.();
             if (!res && res !== '') {
@@ -175,6 +189,7 @@ export async function getFileContents (
         reader.onerror = async () => {
             resolve(Result.err('Error reading file'));
         };
+        reader.readAsText(file, encoding);
     });
 }
 

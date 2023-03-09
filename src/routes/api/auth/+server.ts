@@ -1,4 +1,5 @@
 import type { RequestHandler } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import {
     AUTH_COOKIE_OPTIONS,
     KEY_COOKIE_KEY,
@@ -16,18 +17,12 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
     }
 
     if (!key || !username) {
-        return new Response(JSON.stringify({ error: 'Invalid login' }), {
-            status: 401,
-        });
+        throw error(401, 'Invalid login');
     }
 
     const { err } = await User.authenticate(query, username, key);
 
-    if (err) {
-        return new Response(JSON.stringify({ error: err }), {
-            status: 401,
-        });
-    }
+    if (err) throw error(401, err);
 
     cookies.set(KEY_COOKIE_KEY, key, AUTH_COOKIE_OPTIONS);
     cookies.set(USERNAME_COOKIE_KEY, username, AUTH_COOKIE_OPTIONS);

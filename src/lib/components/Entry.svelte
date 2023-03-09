@@ -128,6 +128,11 @@
         @media @mobile {
             padding: 0;
         }
+
+        :global(img) {
+            max-width: 100%;
+            max-height: 50vh;
+        }
     }
 
     .header {
