@@ -1,40 +1,43 @@
 <script lang="ts">
-    import { getNotificationsContext } from "svelte-notifications";
-    import { api } from "$lib/api/apiQuery";
-    import { popup } from "$lib/constants";
-    import { createEventDispatcher } from "svelte";
-    import type { Auth } from "$lib/types";
+    import { createEventDispatcher } from 'svelte';
+    import { getNotificationsContext } from 'svelte-notifications';
+    import type { App } from '../../app';
+    import { api } from '../api/apiQuery';
+    import { popup } from '../constants';
+    import { displayNotifOnErr } from '../utils';
 
     const dispatch = createEventDispatcher();
     const { addNotification } = getNotificationsContext();
 
-    let labelName = "";
-    let labelColour = "#000000";
+    let labelName = '';
+    let labelColour = '#000000';
 
-    export let auth: Auth;
+    export let auth: App.PageData;
 
     async function closeHandler () {
         if (!labelName) {
             addNotification({
-                text: "Invalid Name",
-                position: "top-center",
-                type: "error",
-                removeAfter: 6000
+                text: 'Invalid Name',
+                position: 'top-center',
+                type: 'error',
+                removeAfter: 6000,
             });
             return;
         }
 
-        const res = await api.post(auth, '/labels', {
-            name: labelName,
-            colour: labelColour
-        });
+        const res = displayNotifOnErr(addNotification,
+            await api.post(auth, '/labels', {
+                name: labelName,
+                colour: labelColour,
+            }),
+        );
 
         if (!res.id) {
             addNotification({
                 text: `Error creating label: ${res.body.message}`,
                 position: 'top-center',
                 type: 'error',
-                removeAfter: 6000
+                removeAfter: 6000,
             });
             popup.set(null);
             return;
@@ -44,7 +47,7 @@
             text: 'Label created',
             position: 'top-center',
             type: 'success',
-            removeAfter: 3000
+            removeAfter: 3000,
         });
 
         labelName = '';

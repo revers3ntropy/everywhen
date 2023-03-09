@@ -1,10 +1,13 @@
 <script lang="ts">
-    import Plus from "svelte-material-icons/Plus.svelte";
-    import Dropdown from "../../lib/components/Dropdown.svelte";
-    import { showPopup } from '../utils';
-    import { Label } from '../controllers/label';
-    import NewLabelDialog from "./dialogs/NewLabelDialog.svelte";
+    import Plus from 'svelte-material-icons/Plus.svelte';
+    import { getNotificationsContext } from 'svelte-notifications';
+    import Dropdown from '../../lib/components/Dropdown.svelte';
     import { api } from '../api/apiQuery';
+    import { Label } from '../controllers/label';
+    import { displayNotifOnErr, showPopup } from '../utils';
+    import NewLabelDialog from './dialogs/NewLabelDialog.svelte';
+
+    const { addNotification } = getNotificationsContext();
 
     let closeLabelDropDown;
 
@@ -15,19 +18,23 @@
 
     function showNewLabelPopup () {
         showPopup(NewLabelDialog, { auth }, async () => {
-            const res = await api.get(auth, "/labels") as { labels: Label[] };
+            const res = displayNotifOnErr(addNotification,
+                await api.get(auth, '/labels'),
+            );
             labels = res.labels;
             value = labels.sort((a, b) => b.created - a.created)[0].id;
         });
     }
 
     async function loadLabels() {
-        const res = await api.get(auth, "/labels") as { labels: Label[] };
+        const res = displayNotifOnErr(addNotification,
+            await api.get(auth, '/labels'),
+        );
         labels = res.labels;
 
         // if we delete a label while it was selected, unselect
         if (!labels.find(l => l.id === value)) {
-            value = "";
+            value = '';
         }
     }
 

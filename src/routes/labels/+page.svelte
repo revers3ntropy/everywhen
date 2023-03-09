@@ -1,16 +1,22 @@
 <script lang="ts">
     import { onMount } from 'svelte';
+    import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../../app';
     import { api } from '../../lib/api/apiQuery';
     import NewLabelForm from '../../lib/components/NewLabelForm.svelte';
+    import { displayNotifOnErr } from '../../lib/utils';
     import Label from './Label.svelte';
+
+    const { addNotification } = getNotificationsContext();
 
     export let data: App.PageData;
 
     let labels = [];
 
     async function reload () {
-        const res = await api.get(data, '/labels');
+        const res = displayNotifOnErr(addNotification,
+            await api.get(data, '/labels'),
+        );
         labels = res.labels;
     }
 

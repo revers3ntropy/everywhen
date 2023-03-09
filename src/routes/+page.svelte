@@ -4,7 +4,7 @@
     import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../app';
     import { api } from '../lib/api/apiQuery';
-    import { GETArgs } from '../lib/utils';
+    import { displayNotifOnErr } from '../lib/utils.js';
 
     const { addNotification } = getNotificationsContext();
 
@@ -14,39 +14,22 @@
     let username = '';
 
     async function login (): Promise<void> {
-        const res = await api.get(
-            data,
-            `/auth${GETArgs({
+        displayNotifOnErr(addNotification,
+            await api.get(data, `/auth`, {
                 key: sha256(password).substring(0, 32),
                 username,
-            })}`,
+            }),
         );
-
-        if (res?.body?.error) {
-            return void addNotification({
-                text: res?.body?.error,
-                position: 'top-center',
-                type: 'error',
-                removeAfter: 4000,
-            });
-        }
         window.location.href = '/home';
     }
 
     async function create (): Promise<void> {
-        const res = await api.post(data, `/users`, {
-            password: sha256(password).substring(0, 32),
-            username,
-        });
-
-        if (res.body?.error) {
-            return void addNotification({
-                text: res.body?.error,
-                position: 'top-center',
-                type: 'error',
-                removeAfter: 4000,
-            });
-        }
+        displayNotifOnErr(addNotification,
+            await api.post(data, `/users`, {
+                password: sha256(password).substring(0, 32),
+                username,
+            }),
+        );
         window.location.href = '/home';
     }
 </script>

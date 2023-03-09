@@ -1,5 +1,4 @@
 <script lang="ts">
-
     import type { App } from '../../app';
     import { Entry } from '../../lib/controllers/entry';
     import EntryBarChart from './EntryBarChart.svelte';

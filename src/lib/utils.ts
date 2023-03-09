@@ -31,7 +31,7 @@ export type PickOptionalAndMutable<A, B extends keyof A> =
     NonFunctionProperties<Omit<Readonly<A>, B>
                           & Partial<Mutable<Pick<A, B>>>>;
 
-export type PickOptional<A, B extends keyof A> =
+export type PickOptional<A, B extends keyof A = keyof A> =
     NonFunctionProperties<Omit<A, B>
                           & Partial<Pick<A, B>>>;
 
@@ -150,8 +150,10 @@ export function showPopup<T> (
     });
 }
 
-export async function getFileContents (file: File, encoding = 'UTF-8')
-    : Promise<Result<string>> {
+export async function getFileContents (
+    file: File,
+    encoding = 'UTF-8',
+): Promise<Result<string>> {
     const reader = new FileReader();
     reader.readAsText(file, encoding);
 
@@ -245,4 +247,22 @@ export function cryptoRandomStr (length = 32): string {
     return crypto
         .randomBytes(length)
         .toString('base64url');
+}
+
+export function displayNotifOnErr<T> (
+    addNotification: (notification: NotificationOptions) => void,
+    { err, val }: Result<T>,
+    options: PickOptional<NotificationOptions> = {},
+): T {
+    if (err) {
+        addNotification({
+            removeAfter: 4000,
+            text: err,
+            type: 'error',
+            position: 'top-center',
+            ...options,
+        });
+        throw err;
+    }
+    return val;
 }

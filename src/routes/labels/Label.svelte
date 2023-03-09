@@ -1,10 +1,15 @@
 <script lang="ts">
-    import { createEventDispatcher } from "svelte";
-    import type { Auth, Entry } from "$lib/types";
-    import { api } from "$lib/api/apiQuery";
-    import { showPopup } from "$lib/utils";
-    import DeleteLabelDialog from "./DeleteLabelDialog.svelte";
+    import { createEventDispatcher } from 'svelte';
     import Delete from 'svelte-material-icons/Delete.svelte';
+    import { getNotificationsContext } from 'svelte-notifications';
+    import { api } from '../../lib/api/apiQuery';
+    import { Entry } from '../../lib/controllers/entry';
+    import type { Auth } from '../../lib/controllers/user';
+    import { showPopup } from '../../lib/utils';
+    import { displayNotifOnErr } from '../../lib/utils.js';
+    import DeleteLabelDialog from './DeleteLabelDialog.svelte';
+
+    const { addNotification } = getNotificationsContext();
 
     const dispatch = createEventDispatcher();
 
@@ -16,13 +21,17 @@
     export let created;
 
     async function put (changes: any) {
-        await api.put(auth, `/labels/${id}`, changes);
+        displayNotifOnErr(addNotification,
+            await api.put(auth, `/labels/${id}`, changes),
+        );
         dispatch('updated');
     }
 
     async function deleteLabel () {
         if (numEntries === 0) {
-            await api.delete(auth, `/labels/${id}`);
+            displayNotifOnErr(addNotification,
+                await api.delete(auth, `/labels/${id}`),
+            );
             dispatch('updated');
             return;
         }
@@ -40,9 +49,10 @@
     let numEntries = -1;
 
     $: api.get(auth, `/entries?labelId=${id}`)
-            .then((entries: { entries: Entry[] }) => {
-                numEntries = entries.entries.length;
-            });
+          .then(res => displayNotifOnErr(addNotification, res))
+          .then((entries: { entries: Entry[] }) => {
+              numEntries = entries.entries.length;
+          });
 </script>
 <div class="label {editable ? 'editable' : ''}">
     {#if editable}

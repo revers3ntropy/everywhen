@@ -11,7 +11,7 @@
     import { getNotificationsContext } from 'svelte-notifications';
     import { api } from '../api/apiQuery';
     import { User } from '../controllers/user';
-    import { obfuscate } from '../utils';
+    import { displayNotifOnErr, obfuscate } from '../utils';
     import Label from './Label.svelte';
 
     const dispatch = createEventDispatcher();
@@ -43,9 +43,11 @@
             return;
         }
 
-        const res = await api.delete(auth, `/entries/${id}`, {
-            restore: deleted,
-        });
+        const res = displayNotifOnErr(addNotification,
+            await api.delete(auth, `/entries/${id}`, {
+                restore: deleted,
+            }),
+        );
 
         if (res.id) {
             addNotification({

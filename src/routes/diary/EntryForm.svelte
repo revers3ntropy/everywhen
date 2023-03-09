@@ -1,5 +1,6 @@
 <script lang="ts">
     import { browser } from '$app/environment';
+    import { filedrop, type FileDropOptions, type Files } from 'filedrop-svelte';
     import { createEventDispatcher, onMount } from 'svelte';
     import Geolocation from 'svelte-geolocation';
     import Send from 'svelte-material-icons/Send.svelte';
@@ -8,6 +9,7 @@
     import LabelSelect from '../../lib/components/LabelSelect.svelte';
     import { Label } from '../../lib/controllers/label';
     import { User } from '../../lib/controllers/user';
+    import { displayNotifOnErr, getFileContents } from '../../lib/utils';
 
     const { addNotification } = getNotificationsContext();
     const dispatch = createEventDispatcher();
@@ -28,7 +30,9 @@
     let labels: Label[] = [];
 
     onMount(async () => {
-        const res = await api.get(auth, `/labels`);
+        const res = displayNotifOnErr(addNotification,
+            await api.get(auth, `/labels`),
+        );
         labels = res.labels;
     });
 
@@ -39,13 +43,15 @@
     }
 
     async function submit () {
-        const res = await api.post(auth, '/entries', {
-            title: newEntryTitle,
-            entry: newEntryBody,
-            label: newEntryLabel,
-            latitude: currentLocation[0],
-            longitude: currentLocation[1],
-        });
+        const res = displayNotifOnErr(addNotification,
+            await api.post(auth, '/entries', {
+                title: newEntryTitle,
+                entry: newEntryBody,
+                label: newEntryLabel,
+                latitude: currentLocation[0],
+                longitude: currentLocation[1],
+            }),
+        );
 
         if (res.id) {
             reset();
@@ -61,9 +67,52 @@
         dispatch('updated');
     }
 
+    const fileOptions: FileDropOptions = {
+        fileLimit: 1,
+        windowDrop: false,
+        hideInput: true,
+        clickToUpload: false,
+    };
+
+    async function onFileDrop (e: CustomEvent<{ files: Files }>) {
+        const files = e.detail.files;
+        if (files.rejected.length > 0) {
+            addNotification({
+                removeAfter: 4000,
+                text: 'File could not be read, please try again',
+                type: 'error',
+                position: 'top-center',
+            });
+            return;
+        }
+        if (files.accepted.length !== 1) {
+            addNotification({
+                removeAfter: 4000,
+                text: 'Please select exactly one file',
+                type: 'error',
+                position: 'top-center',
+            });
+            return;
+        }
+        const file = files.accepted[0];
+        const contents = await getFileContents(file);
+        console.log(contents);
+
+        displayNotifOnErr(addNotification,
+            await api.post(auth, '/assets', {
+                fileName: file.name,
+                contents,
+            }),
+        );
+    }
+
 </script>
 
-<div class="container">
+<div
+    class="container"
+    on:filedrop={onFileDrop}
+    use:filedrop={fileOptions}
+>
     {#if browser}
         <Geolocation
             getPosition="true"

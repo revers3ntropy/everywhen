@@ -4,14 +4,14 @@ import type { HttpMethod } from '@sveltejs/kit/types/private';
 import { serialize } from 'cookie';
 import { AUTH_COOKIE_OPTIONS, KEY_COOKIE_KEY, USERNAME_COOKIE_KEY } from '../constants';
 import type { Auth } from '../controllers/user';
-import { GETArgs } from '../utils';
+import { GETArgs, Result } from '../utils';
 
 export async function makeApiReq<T extends object> (
     auth: Auth,
     method: HttpMethod,
     path: string,
     body: T | null = null,
-): Promise<{ erroneous: boolean } & Record<string, any>> {
+): Promise<Result<Record<string, any>>> {
     let url = `/api${path}`;
     if (!browser) {
         url = `http://localhost:${PUBLIC_SVELTEKIT_PORT}${url}`;
@@ -44,16 +44,9 @@ export async function makeApiReq<T extends object> (
                 'Gave non-object response:',
                 response,
             );
-            return {
-                erroneous: true,
-                ...response,
-                body: res,
-            };
+            return Result.err(`Invalid response from server`);
         }
-        return {
-            ...res,
-            erroneous: false,
-        };
+        return Result.ok(res);
     }
     console.error(
         `Error on api fetch (${browser ? 'client' : 'server'} side)`,
@@ -64,15 +57,10 @@ export async function makeApiReq<T extends object> (
     );
 
     try {
-        body = JSON.parse(await response.text()) as any;
+        return Result.err(await response.text());
     } catch (e) {
+        return Result.err('An unknown error has occurred');
     }
-
-    return {
-        erroneous: true,
-        ...response,
-        body,
-    };
 }
 
 export const api = {

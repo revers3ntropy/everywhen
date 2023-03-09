@@ -10,14 +10,16 @@
     import type { App } from '../../app';
     import { api } from '../../lib/api/apiQuery';
     import FileDropDialog from '../../lib/components/dialogs/FileDropDialog.svelte';
-    import { download as downloadFile, showPopup } from '../../lib/utils';
+    import { displayNotifOnErr, download as downloadFile, Result, showPopup } from '../../lib/utils';
 
     const { addNotification } = getNotificationsContext();
 
     export let data: App.PageData;
 
     async function download () {
-        const { data: backupData } = await api.get(data, '/backups');
+        const { data: backupData } = displayNotifOnErr(addNotification,
+            await api.get(data, '/backups'),
+        );
         const dateFmt = moment(new Date()).format('D-MM-YYYY');
         downloadFile(`${dateFmt}.backup.json`, backupData);
     }
@@ -26,36 +28,21 @@
         showPopup(FileDropDialog, {
             auth: data,
             message: 'Drop encrypted .json file here',
-            withContents: async ({ val: contents, err }) => {
-                if (err) {
-                    addNotification({
-                        removeAfter: 10_000,
-                        text: `Error uploading file: ${err}`,
-                        type: 'error',
-                        position: 'top-center',
-                    });
-                    return;
-                }
+            withContents: async (res: Result<string>) => {
+                const contents = displayNotifOnErr(addNotification, res);
 
-                const res = await api.post(data, '/backups', {
-                    data: contents,
+                displayNotifOnErr(addNotification,
+                    await api.post(data, '/backups', {
+                        data: contents,
+                    }),
+                );
+
+                addNotification({
+                    removeAfter: 4_000,
+                    text: 'File uploaded successfully',
+                    type: 'success',
+                    position: 'top-center',
                 });
-
-                if (res.erroneous) {
-                    addNotification({
-                        removeAfter: 10_000,
-                        text: `Error uploading file: ${res.body.message}`,
-                        type: 'error',
-                        position: 'top-center',
-                    });
-                } else {
-                    addNotification({
-                        removeAfter: 4_000,
-                        text: 'File uploaded successfully',
-                        type: 'success',
-                        position: 'top-center',
-                    });
-                }
             },
         });
     }

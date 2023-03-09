@@ -11,7 +11,7 @@
     import { api } from '../api/apiQuery';
     import { obfuscated } from '../constants';
     import { Entry } from '../controllers/entry';
-    import { showPopup } from '../utils';
+    import { displayNotifOnErr, Result, showPopup } from '../utils';
     import Spinner from './BookSpinner.svelte';
     import ImportDialog from './dialogs/ImportDialog.svelte';
 
@@ -44,7 +44,17 @@
         showPopup(ImportDialog, { auth }, () => reload(page, search));
     }
 
-    function handleEntries (res) {
+    function handleEntries ({ err, val: res }: Result) {
+        if (err) {
+            console.error(res);
+            addNotification({
+                text: `Cannot load entries: ${err}`,
+                position: 'top-center',
+                type: 'error',
+                removeAfter: 4000,
+            });
+            return;
+        }
         if (
             !res.entries ||
             res.totalPages === undefined ||
@@ -81,7 +91,9 @@
         api.get(auth, `/entries`, entriesOptions)
            .then(handleEntries);
 
-        const res = await api.get(auth, '/entries/titles');
+        const res = displayNotifOnErr(addNotification,
+            await api.get(auth, '/entries/titles'),
+        );
         if (!res.entries) {
             console.error(res);
             addNotification({

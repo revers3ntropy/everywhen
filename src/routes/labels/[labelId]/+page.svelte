@@ -1,8 +1,12 @@
 <script lang="ts">
+    import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../../../app';
     import { api } from '../../../lib/api/apiQuery';
     import Entries from '../../../lib/components/Entries.svelte';
     import type { Label } from '../../../lib/controllers/label';
+    import { displayNotifOnErr } from '../../../lib/utils';
+
+    const { addNotification } = getNotificationsContext();
 
     export let data: App.PageData & {
         label: Label,
@@ -10,15 +14,19 @@
     };
 
     async function updateName () {
-        await api.put(data, `/labels/${ data.label.id }`, {
-            name: data.label.name
-        });
+        displayNotifOnErr(addNotification,
+            await api.put(data, `/labels/${data.label.id}`, {
+                name: data.label.name,
+            }),
+        );
     }
 
     async function updateColour () {
-        await api.put(data, `/labels/${ data.label.id }`, {
-            colour: data.label.colour
-        });
+        displayNotifOnErr(addNotification,
+            await api.put(data, `/labels/${data.label.id}`, {
+                colour: data.label.colour,
+            }),
+        );
     }
 </script>
 

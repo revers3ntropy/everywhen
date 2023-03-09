@@ -1,8 +1,12 @@
 <script lang="ts">
+    import { getNotificationsContext } from 'svelte-notifications';
     import { api } from '../../lib/api/apiQuery';
     import LabelSelect from '../../lib/components/LabelSelect.svelte';
     import { popup } from '../../lib/constants';
     import { User } from '../../lib/controllers/user';
+    import { displayNotifOnErr } from '../../lib/utils';
+
+    const { addNotification } = getNotificationsContext();
 
     export let auth: User;
     export let id: string;
@@ -11,6 +15,9 @@
 
     let entries = [];
     $: api.get(auth, `/entries?labelId=${id}`)
+          .then((res) => (
+              displayNotifOnErr(addNotification, res)
+          ))
           .then((data) => {
               entries = data.entries;
           })
@@ -18,30 +25,42 @@
     let changeLabelId;
 
     async function delAndEntries () {
-        await Promise.all(entries.map(entry => {
-            api.delete(auth, `/entries/${entry.id}`);
+        await Promise.all(entries.map(async entry => {
+            displayNotifOnErr(addNotification,
+                await api.delete(auth, `/entries/${entry.id}`),
+            );
         }));
-        await api.delete(auth, `/labels/${id}`);
+        displayNotifOnErr(addNotification,
+            await api.delete(auth, `/labels/${id}`),
+        );
         popup.set(null);
     }
 
     async function delAndRmLabel () {
-        await Promise.all(entries.map(entry => {
-            api.put(auth, `/entries/${entry.id}`, {
-                label: null,
-            });
+        await Promise.all(entries.map(async entry => {
+            displayNotifOnErr(addNotification,
+                await api.put(auth, `/entries/${entry.id}`, {
+                    label: null,
+                }),
+            );
         }));
-        await api.delete(auth, `/labels/${id}`);
+        displayNotifOnErr(addNotification,
+            await api.delete(auth, `/labels/${id}`),
+        );
         popup.set(null);
     }
 
     async function delAndReassign () {
-        await Promise.all(entries.map(entry => {
-            api.put(auth, `/entries/${entry.id}`, {
-                label: changeLabelId,
-            });
+        await Promise.all(entries.map(async entry => {
+            displayNotifOnErr(addNotification,
+                await api.put(auth, `/entries/${entry.id}`, {
+                    label: changeLabelId,
+                }),
+            );
         }));
-        await api.delete(auth, `/labels/${id}`);
+        displayNotifOnErr(addNotification,
+            await api.delete(auth, `/labels/${id}`),
+        );
         popup.set(null);
     }
 
