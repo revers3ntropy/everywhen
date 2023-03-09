@@ -56,7 +56,7 @@ export class Result<T = null, E extends {} = string> {
 
     public get val (): T {
         if (this.value === RESULT_NULL) {
-            throw `Got error when unwrapping Result: '${String(this.error)}'`;
+            return undefined as T;
         }
         return this.value;
     }
@@ -94,6 +94,13 @@ export class Result<T = null, E extends {} = string> {
 
     public static err<T, E extends {}> (error: E): Result<T, E> {
         return new Result<T, E>(RESULT_NULL, error);
+    }
+
+    public unwrap (): T {
+        if (this.value === RESULT_NULL) {
+            throw `Got error when unwrapping Result: '${String(this.error)}'`;
+        }
+        return this.value;
     }
 
     public map<U> (f: (value: T) => U): Result<U, E> {
@@ -255,9 +262,14 @@ export function displayNotifOnErr<T> (
     options: PickOptional<NotificationOptions> = {},
 ): T {
     if (err) {
+        try {
+            err = (JSON.parse(err) as any)?.message
+                || err;
+        } catch (e) {
+        }
         addNotification({
-            removeAfter: 4000,
-            text: err,
+            removeAfter: 8000,
+            text: err || 'Unknown error',
             type: 'error',
             position: 'top-center',
             ...options,

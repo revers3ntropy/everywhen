@@ -1,51 +1,53 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../../app';
     import { api } from '../../lib/api/apiQuery';
     import Entry from '../../lib/components/Entry.svelte';
     import { obfuscated } from '../../lib/constants.js';
     import { Entry as EntryType } from '../../lib/controllers/entry';
+    import { displayNotifOnErr } from '../../lib/utils';
 
     const { addNotification } = getNotificationsContext();
 
     export let data: App.PageData;
 
     let search = '';
+    let loaded = false;
     let entries: EntryType[] = [];
 
-    function reload () {
+    async function reload () {
         const entriesOptions = {
             page: 0,
             pageSize: 10e10,
             search,
             deleted: 1,
         };
-        api.get(data, `/entries`, entriesOptions)
-           .then((res) => {
-               if (!res.entries) {
-                   console.error(res);
-                   addNotification({
-                       text: `Cannot load entries: ${res.body.message}`,
-                       position: 'top-center',
-                       type: 'error',
-                       removeAfter: 4000,
-                   });
-                   return;
-               }
-               entries = res.entries;
-           });
+        const res = await api
+            .get(data, `/entries`, entriesOptions)
+            .then(res => displayNotifOnErr(addNotification, res));
+
+        entries = res.entries;
+        loaded = true;
     }
 
-    reload();
+    onMount(reload);
 </script>
 
 <main>
     <h1>Bin</h1>
     {#each entries as entry}
-        <Entry {...entry} obfuscated={$obfuscated} on:updated={reload} />
+        <Entry
+            {...entry}
+            obfuscated={$obfuscated}
+            on:updated={reload}
+            auth={data}
+        />
     {/each}
 
-    {#if entries.length === 0}
+    {#if !loaded}
+        <h2><i>Loading...</i></h2>
+    {:else if entries.length === 0}
         <h2><i>No deleted items.</i></h2>
     {/if}
 </main>

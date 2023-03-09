@@ -45,7 +45,7 @@
 
         const res = displayNotifOnErr(addNotification,
             await api.delete(auth, `/entries/${id}`, {
-                restore: deleted,
+                restore: !!deleted,
             }),
         );
 

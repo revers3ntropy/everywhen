@@ -118,9 +118,7 @@ export class Entry extends Controller {
 
         for (const rawEntry of rawEntries) {
             const { err, val } = await Entry.fromRaw(query, auth, rawEntry);
-            if (err) {
-                return Result.err(err);
-            }
+            if (err) return Result.err(err);
             entries.push(val);
         }
 
