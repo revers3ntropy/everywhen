@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import Dropdown from '../../lib/components/Dropdown.svelte';
@@ -38,7 +39,7 @@
         }
     }
 
-    $: loadLabels();
+    onMount(loadLabels);
 
 </script>
 <div class="select-label">

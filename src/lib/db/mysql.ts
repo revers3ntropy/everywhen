@@ -24,9 +24,9 @@ async function getConfig () {
     return config;
 }
 
-let con: mysql.Connection | null = null;
+export let con: mysql.Connection | null = null;
 
-async function connect () {
+export async function connect () {
     const config = await getConfig();
     con = await mysql.createConnection(config).catch((e: any) => {
         console.error(`Error connecting to mysql db '${config.database}'`);
@@ -34,13 +34,6 @@ async function connect () {
         throw e;
     });
     console.log(`Connected to database`);
-}
-
-if (browser) {
-    setInterval(async () => {
-        if (!con) await connect();
-        con?.ping();
-    }, 1000 * 60);
 }
 
 export type QueryFunc = <Res extends queryRes = mysql.RowDataPacket[]>(

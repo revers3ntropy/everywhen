@@ -1,6 +1,7 @@
 <script lang="ts">
     import { page } from '$app/stores';
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
+    import Counter from 'svelte-material-icons/Counter.svelte';
     import Home from 'svelte-material-icons/Home.svelte';
     import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
     import Login from 'svelte-material-icons/Login.svelte';
@@ -37,7 +38,7 @@
             <a href="/stats"
                class="{$page.url.pathname === '/stats' ? 'current' : ''}"
             >
-                <ChartTimeline size="40" />
+                <Counter size="40" />
             </a>
         {/if}
     </div>

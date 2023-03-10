@@ -11,10 +11,16 @@ import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async ({ cookies }) => {
     const auth = await getAuthFromCookies(cookies);
 
+    const {
+        val: entries,
+        err,
+    } = await Entry.decryptRaw(auth, await Entry.allRaw(query, auth));
+    if (err) throw error(500, err);
+
     // encrypt response as this is the data
     // that will be downloaded to the user's device
     const encryptedResponse = encrypt(JSON.stringify({
-        entries: await Entry.decryptRaw(auth, await Entry.allRaw(query, auth)),
+        entries,
         labels: await Label.all(query, auth),
     }), auth.key);
 

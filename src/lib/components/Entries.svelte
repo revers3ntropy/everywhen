@@ -25,26 +25,23 @@
     export let showSearch = true;
     export let showLabels = true;
 
+    const PAGE_LENGTH = 100;
+
     export let options = {};
 
     let entries: Record<number, Entry[]> = {};
-
     let entryTitles: Record<number, Entry[]> = {};
     let entryCount = 0;
-
-    const PAGE_LENGTH = 3000;
     let page = 0;
     let pages = 0;
-
     let search = '';
-
     let loading = true;
 
     function importPopup () {
-        showPopup(ImportDialog, { auth }, () => reload(page, search));
+        showPopup(ImportDialog, { auth }, () => reloadEntries(page, search));
     }
 
-    function handleEntries ({ err, val: res }: Result) {
+    function handleEntries ({ err, val: res }: Result<Record<string, any>>) {
         if (err) {
             console.error(res);
             addNotification({
@@ -76,7 +73,7 @@
         loading = false;
     }
 
-    export async function reload (page: number, search: string) {
+    export async function reloadEntries (page: number, search: string) {
         loading = true;
 
         const entriesOptions = {
@@ -107,8 +104,10 @@
         entryTitles = Entry.groupEntriesByDay(res.entries);
     }
 
+    export const reload = () => reloadEntries(page, search);
+
     onMount(() => {
-        reload(page, search);
+        reloadEntries(page, search);
     });
 </script>
 
@@ -159,9 +158,10 @@
             {#each Object.keys(entries).sort((a, b) => b - a) as day}
                 <EntryGroup
                     entries={entries[day]}
-                    on:updated={() => reload(page, search)}
+                    on:updated={() => reloadEntries(page, search)}
                     obfuscated={$obfuscated}
                     {showLabels}
+                    {auth}
                 >
                     <div slot="title" class="entry-group-title">
                         <h2>{moment(new Date(day * 1000)).format('dddd, Do MMMM YYYY')}</h2>

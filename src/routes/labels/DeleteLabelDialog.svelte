@@ -1,9 +1,10 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import { api } from '../../lib/api/apiQuery';
     import LabelSelect from '../../lib/components/LabelSelect.svelte';
     import { popup } from '../../lib/constants';
-    import { User } from '../../lib/controllers/user';
+    import { type Auth, User } from '../../lib/controllers/user';
     import { displayNotifOnErr } from '../../lib/utils';
 
     const { addNotification } = getNotificationsContext();
@@ -14,14 +15,17 @@
     export let name: string;
 
     let entries = [];
-    $: api.get(auth, `/entries?labelId=${id}`)
-          .then((res) => (
-              displayNotifOnErr(addNotification, res)
-          ))
-          .then((data) => {
-              entries = data.entries;
-          })
-          .catch(console.trace);
+
+    async function reloadEntries (auth: Auth, id: string) {
+        const data = await api
+            .get(auth, `/entries?labelId=${id}`)
+            .then((res) => (
+                displayNotifOnErr(addNotification, res)
+            ));
+        entries = data.entries;
+    }
+
+    onMount(() => reloadEntries(auth, id));
     let changeLabelId;
 
     async function delAndEntries () {

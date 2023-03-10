@@ -140,8 +140,11 @@ export class Label extends Controller {
 
         await query`
             INSERT INTO labels (id, user, name, colour, created)
-            VALUES (${json.id}, ${auth.id}, ${json.name},
-                    ${json.colour}, ${json.created})
+            VALUES (${json.id},
+                    ${auth.id},
+                    ${encrypt(json.name, auth.key)},
+                    ${json.colour},
+                    ${json.created})
         `;
 
         return Result.ok(new Label(

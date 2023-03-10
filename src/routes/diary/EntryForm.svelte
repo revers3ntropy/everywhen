@@ -14,27 +14,26 @@
     const { addNotification } = getNotificationsContext();
     const dispatch = createEventDispatcher();
 
-    let newEntryTitle =
-        (browser && localStorage.getItem('__misc_3_newEntryTitle')) || '';
-    let newEntryBody =
-        (browser && localStorage.getItem('__misc_3_newEntryBody')) || '';
-    let newEntryLabel =
-        (browser && localStorage.getItem('__misc_3_newEntryLabel')) || '';
-    $: browser && localStorage.setItem('__misc_3_newEntryTitle', newEntryTitle);
-    $: browser && localStorage.setItem('__misc_3_newEntryBody', newEntryBody);
-    $: browser && localStorage.setItem('__misc_3_newEntryLabel', newEntryLabel);
+    let mounted = false;
+
+    let newEntryTitle = '';
+    let newEntryBody = '';
+    let newEntryLabel = '';
+    $: mounted && browser ? localStorage.setItem('__misc_3_newEntryTitle', newEntryTitle) : 0;
+    $: mounted && browser ? localStorage.setItem('__misc_3_newEntryBody', newEntryBody) : 0;
+    $: mounted && browser ? localStorage.setItem('__misc_3_newEntryLabel', newEntryLabel) : 0;
+
+    onMount(() => {
+        newEntryTitle = localStorage.getItem('__misc_3_newEntryTitle') || '';
+        newEntryBody = localStorage.getItem('__misc_3_newEntryBody') || '';
+        newEntryLabel = localStorage.getItem('__misc_3_newEntryLabel') || '';
+        mounted = true;
+    });
 
     export let auth: User;
     let currentLocation = [];
 
     let labels: Label[] = [];
-
-    onMount(async () => {
-        const res = displayNotifOnErr(addNotification,
-            await api.get(auth, `/labels`),
-        );
-        labels = res.labels;
-    });
 
     export function reset () {
         newEntryTitle = '';
@@ -58,7 +57,7 @@
         } else {
             console.error(res);
             addNotification({
-                text: `Cannot create entry: ${res.body.message}`,
+                text: `Cannot create entry: ${JSON.stringify(res)}`,
                 position: 'top-center',
                 type: 'error',
             });
@@ -72,6 +71,10 @@
         windowDrop: false,
         hideInput: true,
         clickToUpload: false,
+        tabIndex: -1,
+        multiple: false,
+        accept: 'image/*',
+        id: 'entry-file-drop',
     };
 
     async function onFileDrop (e: CustomEvent<{ files: Files }>) {
@@ -109,10 +112,30 @@
         newEntryBody += `![${file.name}](/api/assets/${id})`;
     }
 
+    async function stopSpaceAndEnterBeingInterceptedByFileDrop () {
+        while (!document.getElementsByClassName('entry-file-drop')) {
+            await new Promise(r => setTimeout(r, 100));
+        }
+        // https://stackoverflow.com/questions/19469881
+        document.getElementsByClassName('entry-file-drop')[0]
+            .addEventListener('keydown', event => {
+                event.stopImmediatePropagation();
+            }, true);
+    }
+
+    onMount(async () => {
+        const res = displayNotifOnErr(addNotification,
+            await api.get(auth, `/labels`),
+        );
+        labels = res.labels;
+
+        await stopSpaceAndEnterBeingInterceptedByFileDrop();
+    });
+
 </script>
 
 <div
-    class="container"
+    class="container entry-file-drop"
     on:filedrop={onFileDrop}
     use:filedrop={fileOptions}
 >
@@ -126,7 +149,10 @@
             {#if notSupported}
                 This browser does not support the Geolocation API.
 
-                <!-- Error code '1' means the user has denied location services, so ignore -->
+                <!--
+                    Error code '1' means the user has denied location
+                    services, so don't show any error message
+                -->
             {:else if error && error.code !== 1 }
                 An error occurred fetching geolocation data: {error.code}
                 {error.message}
@@ -135,15 +161,20 @@
     {/if}
 
     <div class="head">
-        <input bind:value={newEntryTitle} class="title" placeholder="Title" />
+        <input
+            bind:value={newEntryTitle}
+            class="title"
+            placeholder="Title"
+        />
         <LabelSelect {auth} bind:value={newEntryLabel} />
         <button class="send" on:click={submit}>
             <Send size="30" />
         </button>
     </div>
-    <textarea bind:value={newEntryBody}
-              class="entry"
-              placeholder="Entry"
+    <textarea
+        bind:value={newEntryBody}
+        class="entry"
+        placeholder="Entry"
     ></textarea>
 
     <button class="send-mobile" on:click={submit}>
@@ -226,5 +257,7 @@
         }
     }
 
-
+    input, textarea {
+        z-index: 10;
+    }
 </style>

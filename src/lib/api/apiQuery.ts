@@ -14,6 +14,7 @@ export async function makeApiReq<T extends object> (
 ): Promise<Result<Record<string, any>>> {
     let url = `/api${path}`;
     if (!browser) {
+        console.trace('fetch from backend');
         url = `http://localhost:${PUBLIC_SVELTEKIT_PORT}${url}`;
     }
 

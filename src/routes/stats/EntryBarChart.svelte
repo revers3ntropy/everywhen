@@ -90,7 +90,6 @@
     }
 
     $: reloadChart(entries, bucketSize, by);
-
 </script>
 
 <div>

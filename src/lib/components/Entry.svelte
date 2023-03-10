@@ -78,7 +78,7 @@
     ) : '';
 </script>
 
-<div class="entry">
+<div class="entry {obfuscated ? '' : 'visible'}">
     <div class="header">
         <div>
 			<span class="time">
@@ -119,11 +119,15 @@
     @import '../../styles/variables.less';
 
     .entry {
-        padding: 1em 0;
-        border-radius: 3px;
-        margin: 1em 0;
+        padding: .8em 0;
+        margin: 0;
         height: fit-content;
         white-space: pre-wrap;
+
+        &.visible {
+            border-left: 1px solid @border-heavy;
+            background: #2D2D2D
+        }
 
         @media @mobile {
             padding: 0;
@@ -133,33 +137,44 @@
             max-width: 100%;
             max-height: 50vh;
         }
-    }
 
-    .header {
-        border-bottom: 1px solid @border;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin: 0.5em 2em 0 0;
-        padding: 0.3em;
+        .header {
+            border-bottom: 1px solid @border;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 0.5em 2em 0 0;
+            padding: 0.3em;
 
-        @media @mobile {
-            margin: 0;
+            @media @mobile {
+                margin: 0;
+            }
+
+            :global(svg) {
+                color: @text-color-light;
+            }
         }
-    }
 
-    .title {
-        font-size: 1.2em;
-    }
+        .title {
+            font-size: 1.2em;
+        }
 
-    .time {
-        margin: 0 0 0 0.5rem;
-        font-size: 0.8em;
-        color: @text-color-light;
-    }
+        .time {
+            margin: 0 0 0 0.5rem;
+            font-size: 0.8em;
+            color: @text-color-light;
+        }
 
-    .body {
-        margin: 0 3em;
-        word-break: break-word;
+        .body {
+            margin: 0 2em;
+            word-break: break-word;
+
+            // inner <p> element is created when using @html
+            :global(p) {
+                margin: 0;
+                padding: 0;
+                border: none;
+            }
+        }
     }
 </style>

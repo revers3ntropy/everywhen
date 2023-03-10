@@ -101,7 +101,7 @@ export class Entry extends Controller {
                    latitude,
                    longitude
             FROM entries
-            WHERE (deleted = ${deleted} OR ${deleted} = 'both')
+            WHERE (deleted = ${deleted ? 1 : 0} OR ${deleted === 'both'})
               AND entries.user = ${auth.id}
             ORDER BY created DESC, id
         `;
@@ -285,24 +285,28 @@ export class Entry extends Controller {
     ): json is T {
         return typeof json === 'object'
             && json !== null
-            && (!('deleted' in json) || typeof json.deleted === 'boolean')
+            && (
+                !('deleted' in json)
+                || typeof json.deleted === 'boolean'
+                || typeof json.deleted === 'number'
+            )
             && 'title' in json
-            && typeof json.title !== 'string'
+            && typeof json.title === 'string'
             && 'entry' in json
-            && typeof json.entry !== 'string'
+            && typeof json.entry === 'string'
             && 'latitude' in json
-            && typeof json.latitude !== 'number'
+            && typeof json.latitude === 'number'
             && 'longitude' in json
-            && typeof json.longitude !== 'number'
+            && typeof json.longitude === 'number'
             && (
                 !('label' in json)
                 || typeof json.label === 'string'
-                || json.label !== null
+                || !json.label
             )
             && 'created' in json
-            && typeof json.created !== 'number'
+            && typeof json.created === 'number'
             && 'id' in json
-            && typeof json.id !== 'string';
+            && typeof json.id === 'string';
     }
 
     public static async create (
@@ -325,7 +329,7 @@ export class Entry extends Controller {
             json.title,
             json.entry,
             json.created,
-            json.deleted ?? false,
+            !!json.deleted,
         );
 
         if (json.label) {

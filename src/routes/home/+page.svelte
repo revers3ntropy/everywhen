@@ -1,6 +1,7 @@
 <script lang="ts">
     import moment from 'moment';
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
+    import Counter from 'svelte-material-icons/Counter.svelte';
     import Download from 'svelte-material-icons/Download.svelte';
     import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
     import Logout from 'svelte-material-icons/Logout.svelte';
@@ -21,7 +22,7 @@
             await api.get(data, '/backups'),
         );
         const dateFmt = moment(new Date()).format('D-MM-YYYY');
-        downloadFile(`${dateFmt}.backup.json`, backupData);
+        downloadFile(`${dateFmt}-${data.username}.backup.encrypted.json`, backupData);
     }
 
     function upload () {
@@ -31,6 +32,12 @@
             withContents: async (res: Result<string>) => {
                 const contents = displayNotifOnErr(addNotification, res);
 
+                if (!confirm(
+                    'Are you sure you want to restore from this backup?'
+                    + ' This will overwrite all your existing data.',
+                )) {
+                    return;
+                }
                 displayNotifOnErr(addNotification,
                     await api.post(data, '/backups', {
                         data: contents,
@@ -59,9 +66,13 @@
                 <LabelOutline size="30" />
                 Labels
             </a>
-            <a class="primary" href="/labels">
+            <a class="primary" href="/timeline">
                 <ChartTimeline size="30" />
                 Timeline
+            </a>
+            <a class="primary" href="/stats">
+                <Counter size="30" />
+                Stats
             </a>
         </div>
     </section>
@@ -71,11 +82,11 @@
         <div class="buttons">
             <button on:click={download}>
                 <Download size="30" />
-                Download Data
+                Download Backup
             </button>
             <button on:click={upload}>
                 <Upload size="30" />
-                Import Data
+                Restore from Backup
             </button>
         </div>
     </section>

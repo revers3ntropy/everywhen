@@ -102,10 +102,14 @@ export async function entries (
                     type: 'info',
                     removeAfter: 10000,
                 });
-                const createLabelRes = await api.post(auth, `/labels`, {
+                const { err, val: createLabelRes } = await api.post(auth, `/labels`, {
                     name,
                     colour: '#000000',
                 });
+                if (err) {
+                    errors.push([ i, `failed to create label ${name}` ]);
+                    continue;
+                }
 
                 if (typeof createLabelRes.id !== 'string') {
                     errors.push([ i, `failed to create label ${name}` ]);
@@ -120,9 +124,9 @@ export async function entries (
         }
         postBody.label ||= entryJSON.label as unknown as Label;
 
-        const res = await api.post(auth, `/entries`, postBody);
-        if (res.erroneous) {
-            errors.push(res.body?.message);
+        const { err } = await api.post(auth, `/entries`, postBody);
+        if (err) {
+            errors.push([ i, err ]);
         }
     }
 
