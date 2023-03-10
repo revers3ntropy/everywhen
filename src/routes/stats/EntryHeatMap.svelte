@@ -46,11 +46,11 @@
     monthGap={20}
     monthLabelHeight={20}
     monthLabels={[
-        `Jan ${lastJanYear}`, 'Feb',
-        'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep',
-        'Oct', 'Nov', 'Dec',
-    ]}
+    `Jan ${lastJanYear}`, 'Feb',
+    'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep',
+    'Oct', 'Nov', 'Dec',
+]}
     startDate={moment().subtract(showMonths, 'months').toDate()}
     view={'monthly'}
 />

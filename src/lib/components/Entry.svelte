@@ -126,13 +126,14 @@
 
         &.visible {
             border-left: 1px solid @border-heavy;
-            background: #2D2D2D
+            //background: #2D2D2D
         }
 
         @media @mobile {
             padding: 0;
         }
 
+        // so images don't appear too large
         :global(img) {
             max-width: 100%;
             max-height: 50vh;

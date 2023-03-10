@@ -43,7 +43,11 @@
 
 </script>
 <div class="select-label">
-    <Dropdown bind:value={value} bind:close={closeLabelDropDown}>
+    <Dropdown
+        bind:value={value}
+        bind:close={closeLabelDropDown}
+        rounded
+    >
         <span slot="button" class="select-button">
             <span
                 class="entry-label-colour"

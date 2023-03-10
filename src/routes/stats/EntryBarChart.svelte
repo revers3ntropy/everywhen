@@ -4,6 +4,9 @@
     import moment from 'moment';
     // https://www.npmjs.com/package/svelte-chartjs
     import { Bar } from 'svelte-chartjs';
+    import ToggleSwitch from 'svelte-material-icons/ToggleSwitch.svelte';
+    import ToggleSwitchOff from 'svelte-material-icons/ToggleSwitchOff.svelte';
+    import Select from '../../lib/components/Select.svelte';
     import { Entry } from '../../lib/controllers/entry';
     import { nowS, splitText, wordCount } from '../../lib/utils';
     import { By } from './helpers';
@@ -16,6 +19,10 @@
     let data;
     let filter = '';
     let filterCaseSensitive = false;
+
+    function toggleBy () {
+        by = (by === By.Entries) ? By.Words : By.Entries;
+    }
 
     function bucketiseTime (time: number, bucketSize: number): number {
         return Math.floor(time / bucketSize) * bucketSize;
@@ -89,46 +96,63 @@
         }
     }
 
+    // no data fetching so top level
     $: reloadChart(entries, bucketSize, by);
 </script>
 
-<div>
-    <Bar
-        {data}
-        height="400"
-        width={browser ? document.body.clientWidth : 1000}
-    />
+<Bar
+    {data}
+    height="400"
+    width={browser ? document.body.clientWidth : 1000}
+/>
+
+<div class="options">
+    <div class="flex-center">
+        <div>Group by</div>
+        <Select
+            bind:value={bucketSize}
+            key="Week"
+            options={{
+                Year: 60 * 60 * 24 * 365,
+                Month: 60 * 60 * 24 * 30,
+                Week: 60 * 60 * 24 * 7,
+                Day: 60 * 60 * 24,
+            }}
+        />
+    </div>
     <div>
-        Group by
-        <select
-            on:change={e => bucketSize = parseInt(e.target.value)}
-            value={bucketSize}
+        <button
+            class="primary"
+            on:click={toggleBy}
+            style="
+                /* Stop the button changing size when toggled */
+                width: 10rem
+            "
         >
-            <option value={60 * 60 * 24 * 365}>Year</option>
-            <option value={60 * 60 * 24 * 30}>Month</option>
-            <option value={60 * 60 * 24 * 7}>Week</option>
-            <option value={60 * 60 * 24}>Day</option>
-        </select>
+            {#if by === By.Entries}
+                <ToggleSwitch size="30" />
+                By Words
+            {:else}
+                <ToggleSwitchOff size="30" />
+                By Entries
+            {/if}
+        </button>
     </div>
 </div>
 
 <style lang="less">
-    :global(:root) {
-        --bar-width: 10px;
+    @import '../../styles/variables.less';
+
+    .options {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0;
     }
 
-    :global(.ct-series-a .ct-bar) {
-        stroke: var(--color-primary);
-        stroke-width: var(--bar-width);
-    }
-
-    :global(.ct-chart > *, .ct-chart, .ct-label, .ct-grids) {
-        color: white !important;
-        stroke: white;
-    }
-
-    :global(.ct-horizontal, .ct-vertical) {
-        stroke: #6b6b6b;
+    .container {
+        margin: 0;
+        padding: 0.3em;
     }
 
 </style>
