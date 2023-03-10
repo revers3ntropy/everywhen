@@ -3,6 +3,7 @@
     import { filedrop, type FileDropOptions, type Files } from 'filedrop-svelte';
     import { createEventDispatcher, onMount } from 'svelte';
     import Geolocation from 'svelte-geolocation';
+    import ImageArea from 'svelte-material-icons/ImageArea.svelte';
     import Send from 'svelte-material-icons/Send.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import { api } from '../../lib/api/apiQuery';
@@ -113,6 +114,7 @@
     }
 
     async function stopSpaceAndEnterBeingInterceptedByFileDrop () {
+        // TODO do this properly
         while (!document.getElementsByClassName('entry-file-drop')) {
             await new Promise(r => setTimeout(r, 100));
         }
@@ -121,6 +123,11 @@
             .addEventListener('keydown', event => {
                 event.stopImmediatePropagation();
             }, true);
+    }
+
+    function triggerFileDrop () {
+        // bit hacky... TODO make less hacky
+        document.querySelector('.entry-file-drop > input').click();
     }
 
     onMount(async () => {
@@ -166,6 +173,9 @@
             class="title"
             placeholder="Title"
         />
+        <button on:click={triggerFileDrop}>
+            <ImageArea size="30" />
+        </button>
         <LabelSelect {auth} bind:value={newEntryLabel} />
         <button class="send" on:click={submit}>
             <Send size="30" />
