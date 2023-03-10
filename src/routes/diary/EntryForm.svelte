@@ -121,12 +121,17 @@
         // https://stackoverflow.com/questions/19469881
         document.getElementsByClassName('entry-file-drop')[0]
             .addEventListener('keydown', event => {
-                event.stopImmediatePropagation();
+                // same check as lib uses
+                // @ts-ignore
+                if (event.key === ' ' || event.key === 'Enter') {
+                    event.stopImmediatePropagation();
+                }
             }, true);
     }
 
     function triggerFileDrop () {
         // bit hacky... TODO make less hacky
+        // @ts-ignore
         document.querySelector('.entry-file-drop > input').click();
     }
 

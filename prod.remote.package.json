@@ -1,14 +1,15 @@
 {
-	"type": "module",
-	"scripts": {
-		"start": "screen -S misc_3 -d -m node server",
-		"stop": "screen -S misc_3 -X quit",
-		"restart": "npm run stop; npm run start",
-		"setup": "npm i"
-	},
-	"dependencies": {
-		"cookie": "^0.4.1",
-		"express": "^4.18.2",
-		"compression": "^1.7.4"
-	}
+    "type": "module",
+    "scripts": {
+        "start": "screen -S misc_3 -d -m node server",
+        "stop": "screen -S misc_3 -X quit",
+        "restart": "npm run stop; npm run start",
+        "setup": "npm i"
+    },
+    "dependencies": {
+        "cookie": "^0.4.1",
+        "express": "^4.18.2",
+        "compression": "^1.7.4",
+        "chart.js": "^4.2.1"
+    }
 }
