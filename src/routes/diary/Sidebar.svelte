@@ -62,6 +62,14 @@
 					{/each}
 				</div>
 			{/each}
+
+			{#if Object.keys(titles).length === 0}
+				<div class="day">
+					<h2>
+						<i>No entries yet</i>
+					</h2>
+				</div>
+			{/if}
 		</div>
 	</div>
 </div>
@@ -84,6 +92,7 @@
 		transition: transform 0.3s ease;
 		border-right: 2px solid @border-heavy;
 		overflow-y: scroll;
+		padding: 0;
 
 		&.showing {
 			transform: translateX(0);

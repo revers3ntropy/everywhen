@@ -38,6 +38,7 @@
 
         &:hover {
             background-color: @accent-color-primary;
+            color: black;
         }
     }
 

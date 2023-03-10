@@ -86,14 +86,14 @@
     function reloadChart (entries, bucketSize, by) {
         data = getGraphData(entries, bucketSize, by);
 
-        if (browser) {
-            let size = Math.min(Math.max(
-                Math.ceil(document.body.clientWidth * 0.005), 1), 20);
-            if (bucketSize < 60 * 60 * 24 + 1) {
-                size = Math.min(size, 2);
-            }
-            document.body.style.setProperty('--bar-width', `${size}px`);
-        }
+        // if (browser) {
+        //     let size = Math.min(Math.max(
+        //         Math.ceil(document.body.clientWidth * 0.005), 1), 20);
+        //     if (bucketSize < 60 * 60 * 24 + 1) {
+        //         size = Math.min(size, 2);
+        //     }
+        //     document.body.style.setProperty('--bar-width', `${size}px`);
+        // }
     }
 
     // no data fetching so top level
