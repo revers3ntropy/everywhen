@@ -12,6 +12,7 @@
         entryCount: number,
         wordCount: number,
         charCount: number,
+        commonWords: [ string, number ][]
     };
 </script>
 
@@ -45,6 +46,25 @@
             <EntryHeatMap {by} entries={data.entries} />
         </div>
     </section>
+
+    <section class="common-words">
+        {#each data.commonWords as [word, count], i}
+            <div class="common-word">
+                <span style="min-width: 40px">
+                    #{i + 1}
+                </span>
+                <span style="min-width: min(20rem, 25%)">
+                    <b>{word}</b>
+                </span>
+                <span style="min-width: 25%">
+                    {count}
+                </span>
+                <span style="min-width: 25%">
+                    {(count / data.entryCount).toPrecision(3)} / entry
+                </span>
+            </div>
+        {/each}
+    </section>
 </main>
 
 <style lang="less">
@@ -73,6 +93,30 @@
     .charts {
         & > * {
             margin: 2em 0.5em;
+        }
+    }
+
+    .common-words {
+        margin: 50px 20px;
+        padding: 50px 20px;
+        border-top: 1px solid @border-light;
+
+        .common-word {
+            border-bottom: 1px solid var(--border);
+            padding: 4px 20px;
+
+            span {
+                display: inline-block;
+            }
+        }
+
+        @media @mobile {
+            margin: 10px 0;
+            padding: 10px 2px;
+
+            .common-word {
+                padding: 4px;
+            }
         }
     }
 </style>
