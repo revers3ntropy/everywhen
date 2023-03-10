@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { browser } from '$app/environment';
     import moment from 'moment';
     import { onMount } from 'svelte';
     import Bin from 'svelte-material-icons/Delete.svelte';
@@ -104,11 +105,13 @@
         entryTitles = Entry.groupEntriesByDay(res.entries);
     }
 
-    export const reload = () => reloadEntries(page, search);
+    export let reload;
+    $: reload = () => reloadEntries(page, search);
 
     onMount(() => {
         reloadEntries(page, search);
     });
+    $: browser ? reloadEntries(page, search) : 0;
 </script>
 
 <div>

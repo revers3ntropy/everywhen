@@ -1,12 +1,12 @@
 <script lang="ts">
-    import ArrowRight from "svelte-material-icons/ArrowRight.svelte";
-    import ArrowLeft from "svelte-material-icons/ArrowLeft.svelte";
+    import ArrowLeft from 'svelte-material-icons/ArrowLeft.svelte';
+    import ArrowRight from 'svelte-material-icons/ArrowRight.svelte';
 
     export let page = 0;
     export let pages = 0;
     export let pageLength = 0;
     export let total = 0;
-    export let emptyText = "";
+    export let emptyText = '';
 </script>
 
 {#if total < 1}
@@ -25,7 +25,7 @@
         <div>
             Page {page + 1} of {pages}
             <span class="totals">
-				({Math.min((page + 1) * pageLength, total)} / {total})
+				(showing {Math.min((page + 1) * pageLength, total)} / {total})
 			</span>
         </div>
         <div>
