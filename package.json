@@ -14,7 +14,7 @@
         "@playwright/test": "^1.31.2",
         "@rollup/plugin-replace": "^5.0.2",
         "@sveltejs/adapter-node": "^1.2.0",
-        "@sveltejs/kit": "^1.10.0",
+        "@sveltejs/kit": "^1.11.0",
         "@sveltejs/pancake": "^0.0.18",
         "@sveltejs/vite-plugin-svelte": "^2.0.3",
         "@total-typescript/ts-reset": "^0.3.7",
