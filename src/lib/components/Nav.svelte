@@ -15,28 +15,38 @@
 
     <div>
         {#if user}
-            <a href="/home"
-               class="{$page.url.pathname === '/home' ? 'current' : ''}"
+            <a
+                href="/home"
+                class="{$page.url.pathname === '/home' ? 'current' : ''}"
+                aria-label="home"
             >
                 <Home size="40" />
             </a>
-            <a href="/diary"
-               class="{$page.url.pathname === '/diary' ? 'current' : ''}"
+            <a
+                href="/diary"
+                class="{$page.url.pathname === '/diary' ? 'current' : ''}"
+                aria-label="diary"
             >
                 <Notebook size="40" />
             </a>
-            <a href="/labels"
-               class="{$page.url.pathname === '/labels' ? 'current' : ''}"
+            <a
+                href="/labels"
+                class="{$page.url.pathname === '/labels' ? 'current' : ''}"
+                aria-label="labels"
             >
                 <LabelOutline size="40" />
             </a>
-            <a href="/timeline"
-               class="{$page.url.pathname === '/timeline' ? 'current' : ''}"
+            <a
+                href="/timeline"
+                class="{$page.url.pathname === '/timeline' ? 'current' : ''}"
+                aria-label="timeline"
             >
                 <ChartTimeline size="40" />
             </a>
-            <a href="/stats"
-               class="{$page.url.pathname === '/stats' ? 'current' : ''}"
+            <a
+                href="/stats"
+                class="{$page.url.pathname === '/stats' ? 'current' : ''}"
+                aria-label="statistics"
             >
                 <Counter size="40" />
             </a>
