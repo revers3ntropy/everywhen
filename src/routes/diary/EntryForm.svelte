@@ -9,7 +9,7 @@
     import { api } from '../../lib/api/apiQuery';
     import LabelSelect from '../../lib/components/LabelSelect.svelte';
     import { Label } from '../../lib/controllers/label';
-    import { User } from '../../lib/controllers/user';
+    import type { Auth } from '../../lib/controllers/user';
     import { displayNotifOnErr, getFileContents } from '../../lib/utils';
 
     const { addNotification } = getNotificationsContext();
@@ -31,7 +31,7 @@
         mounted = true;
     });
 
-    export let auth: User;
+    export let auth: Auth;
     let currentLocation = [];
 
     let labels: Label[] = [];

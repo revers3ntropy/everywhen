@@ -7,11 +7,11 @@ import { getAuthFromCookies } from '../../../../lib/security/getAuthFromCookies'
 export const GET: RequestHandler = async ({ params, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
 
-    const { err, val: asset } = await Asset.fromId(
+    const { err, val: asset } = await Asset.fromPublicId(
         query, auth,
         params.asset || '',
     );
-    if (err) throw error(400, err);
+    if (err) throw error(404, err);
 
     const imgB64 = asset
         .content

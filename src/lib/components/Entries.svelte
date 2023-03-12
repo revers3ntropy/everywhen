@@ -12,13 +12,14 @@
     import { api } from '../api/apiQuery';
     import { obfuscated } from '../constants';
     import { Entry } from '../controllers/entry';
+    import type { Auth } from '../controllers/user';
     import { displayNotifOnErr, Result, showPopup } from '../utils';
     import Spinner from './BookSpinner.svelte';
     import ImportDialog from './dialogs/ImportDialog.svelte';
 
     const { addNotification } = getNotificationsContext();
 
-    export let auth;
+    export let auth: Auth;
 
     export let showSidebar = false;
     export let showBin = false;
@@ -42,7 +43,9 @@
         showPopup(ImportDialog, { auth }, () => reloadEntries(page, search));
     }
 
-    function handleEntries ({ err, val: res }: Result<Record<string, any>>) {
+    function handleEntries (
+        { err, val: res }: Result<Record<string, any>>,
+    ): void {
         if (err) {
             console.error(res);
             addNotification({

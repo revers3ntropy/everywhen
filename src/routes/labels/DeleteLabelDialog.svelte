@@ -4,17 +4,18 @@
     import { api } from '../../lib/api/apiQuery';
     import LabelSelect from '../../lib/components/LabelSelect.svelte';
     import { popup } from '../../lib/constants';
-    import { type Auth, User } from '../../lib/controllers/user';
+    import type { Entry } from '../../lib/controllers/entry';
+    import type { Auth } from '../../lib/controllers/user';
     import { displayNotifOnErr } from '../../lib/utils';
 
     const { addNotification } = getNotificationsContext();
 
-    export let auth: User;
+    export let auth: Auth;
     export let id: string;
     export let colour: string;
     export let name: string;
 
-    let entries = [];
+    let entries: Entry[] = [];
 
     async function reloadEntries (auth: Auth, id: string) {
         const data = await api
@@ -26,7 +27,7 @@
     }
 
     onMount(() => reloadEntries(auth, id));
-    let changeLabelId;
+    let changeLabelId: string;
 
     async function delAndEntries () {
         await Promise.all(entries.map(async entry => {

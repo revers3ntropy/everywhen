@@ -2,13 +2,13 @@
     import moment from 'moment';
     // @ts-ignore
     import SvelteHeatmap from 'svelte-heatmap';
-    import { Entry } from '../../lib/controllers/entry';
+    import type { Entry } from '../../lib/controllers/entry';
     import { wordCount } from '../../lib/utils.js';
     import { By } from './helpers';
 
     export let entries: Entry[];
     export let by: By;
-    let data;
+    let data: { date: Date, value: number }[] = [];
 
     function reloadChart (entries: Entry[], by: By) {
         data = entries.map((entry) => {

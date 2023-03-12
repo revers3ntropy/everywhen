@@ -124,6 +124,17 @@ export class Label extends Controller {
         `;
     }
 
+    public static async purgeAll (
+        query: QueryFunc,
+        auth: User,
+    ): Promise<void> {
+        await query`
+            DELETE
+            FROM labels
+            WHERE user = ${auth.id}
+        `;
+    }
+
     public static async create (
         query: QueryFunc,
         auth: User,

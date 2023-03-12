@@ -10,7 +10,7 @@
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import { api } from '../api/apiQuery';
-    import { User } from '../controllers/user';
+    import { Auth } from '../controllers/user';
     import { displayNotifOnErr, obfuscate } from '../utils';
     import Label from './Label.svelte';
 
@@ -29,7 +29,7 @@
     export let obfuscated = true;
     export let showLabels = true;
 
-    export let auth: User;
+    export let auth: Auth;
 
     // show random string instead of text content if obfuscated
     export let showLabel: Label | null;

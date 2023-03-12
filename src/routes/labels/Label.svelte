@@ -3,7 +3,7 @@
     import Delete from 'svelte-material-icons/Delete.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import { api } from '../../lib/api/apiQuery';
-    import { Entry } from '../../lib/controllers/entry';
+    import type { Entry } from '../../lib/controllers/entry';
     import type { Auth } from '../../lib/controllers/user';
     import { showPopup } from '../../lib/utils';
     import { displayNotifOnErr } from '../../lib/utils.js';
@@ -18,7 +18,7 @@
     export let colour: string;
     export let id: string;
     export let editable = true;
-    export let created;
+    export let created: number;
 
     async function put (changes: any) {
         displayNotifOnErr(addNotification,

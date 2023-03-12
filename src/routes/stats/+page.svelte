@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { App } from '../../app';
-    import { Entry } from '../../lib/controllers/entry';
-    import CommoWordsList from './CommoWordsList.svelte';
+    import type { Entry } from '../../lib/controllers/entry';
+    import CommonWordsList from './CommoWordsList.svelte';
     import EntryBarChart from './EntryBarChart.svelte';
     import EntryHeatMap from './EntryHeatMap.svelte';
     import { By } from './helpers';
@@ -61,7 +61,7 @@
         </section>
 
         <section class="container">
-            <CommoWordsList
+            <CommonWordsList
                 entryCount={data.entryCount}
                 words={data.commonWords}
             />

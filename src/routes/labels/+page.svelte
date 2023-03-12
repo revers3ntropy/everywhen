@@ -11,7 +11,7 @@
 
     export let data: App.PageData;
 
-    let labels = [];
+    let labels: Label[] = [];
 
     async function reload () {
         const res = displayNotifOnErr(addNotification,

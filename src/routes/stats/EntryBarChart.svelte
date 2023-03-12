@@ -7,16 +7,23 @@
     import ToggleSwitch from 'svelte-material-icons/ToggleSwitch.svelte';
     import ToggleSwitchOff from 'svelte-material-icons/ToggleSwitchOff.svelte';
     import Select from '../../lib/components/Select.svelte';
-    import { Entry } from '../../lib/controllers/entry';
+    import type { Entry } from '../../lib/controllers/entry';
     import { nowS, splitText, wordCount } from '../../lib/utils';
     import { By } from './helpers';
 
     export let entries: Entry[];
     export let by: By;
 
+    interface ChartData {
+        datasets: {
+            data: number[], label: string
+        }[],
+        labels: string[]
+    }
+
     let bucketSize = 60 * 60 * 24 * 7;
 
-    let data;
+    let data: ChartData;
     let filter = '';
     let filterCaseSensitive = false;
 
@@ -28,7 +35,11 @@
         return Math.floor(time / bucketSize) * bucketSize;
     }
 
-    function getGraphData (entries: Entry[], bucketSize: number, by: By) {
+    function getGraphData (
+        entries: Entry[],
+        bucketSize: number,
+        by: By,
+    ): ChartData {
         let filteredWords = splitText(filter);
         if (!filterCaseSensitive) {
             filteredWords = filteredWords.map(w => w.toLowerCase());
@@ -83,7 +94,7 @@
         };
     }
 
-    function reloadChart (entries, bucketSize, by) {
+    function reloadChart (entries: Entry[], bucketSize: number, by: By) {
         data = getGraphData(entries, bucketSize, by);
 
         // if (browser) {

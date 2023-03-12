@@ -1,7 +1,7 @@
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { generateUUId } from '../security/uuid';
-import { nowS, Result } from '../utils';
+import { type NonFunctionProperties, nowS, Result } from '../utils';
 import { Controller } from './controller';
 import type { Auth } from './user';
 
@@ -16,6 +16,7 @@ export class Asset extends Controller {
 
     public constructor (
         public id: string,
+        public publicId: string,
         public content: string,
         public fileName: string,
         public contentType: string,
@@ -27,11 +28,14 @@ export class Asset extends Controller {
     public static async create (
         query: QueryFunc,
         auth: Auth,
-        fileName: string,
+        fileNamePlainText: string,
         contentsPlainText: string,
+        created?: number,
+        publicId?: string,
     ): Promise<Result<string>> {
+        publicId ??= await generateUUId(query);
         const id = await generateUUId(query);
-        const fileExt = fileName.split('.').pop();
+        const fileExt = fileNamePlainText.split('.').pop();
         if (!fileExt) {
             return Result.err('Invalid file extension');
         }
@@ -42,13 +46,14 @@ export class Asset extends Controller {
         }
 
         const encryptedContents = encrypt(contentsPlainText, auth.key);
-        const encryptedFileName = encrypt(fileName, auth.key);
+        const encryptedFileName = encrypt(fileNamePlainText, auth.key);
 
         await query`
-            INSERT INTO assets (id, user, created, fileName, contentType, content)
+            INSERT INTO assets (id, publicId, user, created, fileName, contentType, content)
             VALUES (${id},
+                    ${publicId},
                     ${auth.id},
-                    ${nowS()},
+                    ${created ?? nowS()},
                     ${encryptedFileName},
                     ${contentType},
                     ${encryptedContents})
@@ -57,16 +62,16 @@ export class Asset extends Controller {
         return Result.ok(id);
     }
 
-    public static async fromId (
+    public static async fromPublicId (
         query: QueryFunc,
         auth: Auth,
-        id: string,
+        publicId: string,
     ): Promise<Result<Asset>> {
 
         const res = await query`
-            SELECT id, content, created, fileName, contentType
+            SELECT id, publicId, content, created, fileName, contentType
             FROM assets
-            WHERE id = ${id}
+            WHERE publicId = ${publicId}
               AND user = ${auth.id}
         `;
 
@@ -77,10 +82,56 @@ export class Asset extends Controller {
         const [ row ] = res;
         return Result.ok(new Asset(
             row.id,
+            row.publicId,
             decrypt(row.content, auth.key),
             decrypt(row.fileName, auth.key),
             row.contentType,
             row.created,
         ));
+    }
+
+    public static async all (
+        query: QueryFunc,
+        auth: Auth,
+    ): Promise<Asset[]> {
+        const res = await query<Asset[]>`
+            SELECT id, publicId, content, created, fileName, contentType
+            FROM assets
+            WHERE user = ${auth.id}
+        `;
+
+        return res.map(row => new Asset(
+            row.id,
+            row.publicId,
+            decrypt(row.content, auth.key),
+            decrypt(row.fileName, auth.key),
+            row.contentType,
+            row.created,
+        ));
+    }
+
+    public static async purgeAll (query: QueryFunc, auth: Auth): Promise<void> {
+        query`
+            DELETE
+            FROM assets
+            WHERE user = ${auth.id}
+        `;
+    }
+
+    public static jsonIsRawAsset (
+        json: unknown,
+    ): json is NonFunctionProperties<Asset> {
+        return typeof json === 'object' &&
+            json !== null &&
+            'publicId' in json &&
+            typeof json.publicId === 'string' &&
+            'content' in json &&
+            typeof json.content === 'string' &&
+            'fileName' in json &&
+            typeof json.fileName === 'string' &&
+            'contentType' in json &&
+            typeof json.contentType === 'string' &&
+            'created' in json &&
+            typeof json.created === 'number';
     }
 }

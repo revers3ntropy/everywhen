@@ -86,6 +86,17 @@ export class Entry extends Controller {
         `;
     }
 
+    public static async purgeAll (
+        query: QueryFunc,
+        auth: User,
+    ): Promise<void> {
+        await query`
+            DELETE
+            FROM entries
+            WHERE user = ${auth.id}
+        `;
+    }
+
     public static async allRaw (
         query: QueryFunc,
         auth: User,
@@ -288,16 +299,23 @@ export class Entry extends Controller {
             && (
                 !('deleted' in json)
                 || typeof json.deleted === 'boolean'
-                || typeof json.deleted === 'number'
+                || json.deleted === 1
+                || json.deleted === 0
             )
             && 'title' in json
             && typeof json.title === 'string'
             && 'entry' in json
             && typeof json.entry === 'string'
-            && 'latitude' in json
-            && typeof json.latitude === 'number'
-            && 'longitude' in json
-            && typeof json.longitude === 'number'
+            && (
+                !('latitude' in json)
+                || typeof json.latitude === 'number'
+                || json.latitude === null
+            )
+            && (
+                !('longitude' in json)
+                || typeof json.longitude === 'number'
+                || json.longitude === null
+            )
             && (
                 !('label' in json)
                 || typeof json.label === 'string'
@@ -320,8 +338,10 @@ export class Entry extends Controller {
             | 'created'
         >,
     ): Promise<Result<Entry>> {
-        const json = { ...json_ };
-        json.id ??= await generateUUId(query);
+        const json = {
+            ...json_,
+            id: await generateUUId(query),
+        };
         json.created ??= nowS();
 
         const entry = new Entry(

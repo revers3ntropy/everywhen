@@ -1,4 +1,5 @@
 import '@total-typescript/ts-reset';
+import type { Auth } from './lib/controllers/user';
 
 
 declare module '$env/static/private' {
@@ -17,11 +18,7 @@ declare module '$env/static/public' {
 // See https://kit.svelte.dev/docs/types#app
 declare namespace App {
 
-    interface PageData {
-        key: string;
-        username: string;
-        id: string;
-    }
+    interface PageData extends Auth {}
 
     // interface Error {}
     // interface Locals {}

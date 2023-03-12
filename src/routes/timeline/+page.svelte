@@ -5,7 +5,7 @@
     import { api } from '../../lib/api/apiQuery';
     import Background from '../../lib/canvas/Background.svelte';
     import Canvas from '../../lib/canvas/Canvas.svelte';
-    import { Entry } from '../../lib/controllers/entry';
+    import type { Entry } from '../../lib/controllers/entry';
     import { displayNotifOnErr } from '../../lib/utils';
     import CenterLine from './CenterLine.svelte';
     import Controls from './Controls.svelte';

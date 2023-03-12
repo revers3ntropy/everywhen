@@ -66,6 +66,11 @@ CREATE TABLE `labels`
 CREATE TABLE `assets`
 (
     `id`          varchar(128) NOT NULL,
+    # publicId is unique per user and allows same
+    # public id to be used for different users
+    # (for instance when importing a backup into a different
+    # account, which will duplicate IDs)
+    `publicId`    varchar(128) NOT NULL,
     `user`        varchar(128) NOT NULL,
     `created`     int(64)      NOT NULL,
     `fileName`    varchar(256) NOT NULL,
@@ -87,15 +92,17 @@ ALTER TABLE `users`
     ADD PRIMARY KEY (`id`),
     ADD UNIQUE KEY `username` (`username`);
 COMMIT;
+ALTER TABLE `assets`
+    ADD PRIMARY KEY (`id`);
 ALTER TABLE `entries`
     ADD PRIMARY KEY (`id`);
 ALTER TABLE `events`
     ADD PRIMARY KEY (`id`);
 ALTER TABLE `ids`
     ADD PRIMARY KEY (`id`);
-
 ALTER TABLE `labels`
     ADD PRIMARY KEY (`id`);
+
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT = @OLD_CHARACTER_SET_CLIENT */;
