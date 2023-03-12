@@ -118,10 +118,10 @@ export class Entry extends Controller {
         `;
     }
 
-    public static async getAll (
+    public static async all (
         query: QueryFunc,
         auth: User,
-        deleted = false,
+        deleted: boolean | 'both' = false,
     ): Promise<Result<Entry[]>> {
         const rawEntries = await Entry.allRaw(query, auth, deleted);
 
@@ -291,17 +291,14 @@ export class Entry extends Controller {
         } as unknown as T extends RawEntry ? DecryptedRawEntry : DecryptedRawEntry[]);
     }
 
-    public static jsonIsRawEntry<T extends RawEntry | DecryptedRawEntry> (
+
+    public static jsonIsRawEntry (
         json: unknown,
-    ): json is T {
+    ): json is Omit<NonFunctionProperties<Entry>, 'id' | 'label'> & {
+        label?: string
+    } {
         return typeof json === 'object'
             && json !== null
-            && (
-                !('deleted' in json)
-                || typeof json.deleted === 'boolean'
-                || json.deleted === 1
-                || json.deleted === 0
-            )
             && 'title' in json
             && typeof json.title === 'string'
             && 'entry' in json
@@ -322,9 +319,7 @@ export class Entry extends Controller {
                 || !json.label
             )
             && 'created' in json
-            && typeof json.created === 'number'
-            && 'id' in json
-            && typeof json.id === 'string';
+            && typeof json.created === 'number';
     }
 
     public static async create (

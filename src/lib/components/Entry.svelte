@@ -10,7 +10,7 @@
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import { api } from '../api/apiQuery';
-    import { Auth } from '../controllers/user';
+    import type { Auth } from '../controllers/user';
     import { displayNotifOnErr, obfuscate } from '../utils';
     import Label from './Label.svelte';
 

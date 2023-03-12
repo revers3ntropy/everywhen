@@ -8,7 +8,7 @@
     import { getNotificationsContext } from 'svelte-notifications';
     import { api } from '../../lib/api/apiQuery';
     import LabelSelect from '../../lib/components/LabelSelect.svelte';
-    import { Label } from '../../lib/controllers/label';
+    import type { Label } from '../../lib/controllers/label';
     import type { Auth } from '../../lib/controllers/user';
     import { displayNotifOnErr, getFileContents } from '../../lib/utils';
 

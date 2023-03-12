@@ -1,31 +1,73 @@
 import { error } from '@sveltejs/kit';
 import schemion from 'schemion';
 import { Asset } from '../../../lib/controllers/asset';
-import { type DecryptedRawEntry, Entry } from '../../../lib/controllers/entry';
+import { Entry } from '../../../lib/controllers/entry';
 import { Label } from '../../../lib/controllers/label';
 import { query } from '../../../lib/db/mysql';
 import { decrypt, encrypt } from '../../../lib/security/encryption';
 import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
-import { getUnwrappedReqBody } from '../../../lib/utils';
+import { getUnwrappedReqBody, nowS } from '../../../lib/utils';
 import type { RequestHandler } from './$types';
+
+interface Backup {
+    entries: {
+        label?: string; // label's name
+        entry: string;
+        created: number;
+        latitude?: number;
+        longitude?: number;
+        title: string;
+    }[];
+    labels: {
+        name: string;
+        colour: string;
+        created: number;
+    }[];
+    assets: {
+        publicId: string;
+        fileName: string;
+        content: string;
+        created: number;
+        contentType: string;
+    }[];
+    created: number;
+}
 
 export const GET: RequestHandler = async ({ cookies }) => {
     const auth = await getAuthFromCookies(cookies);
 
     // use allRaw to keep the label as a string (it's Id)
-    const {
-        val: entries,
-        err,
-    } = await Entry.decryptRaw(auth, await Entry.allRaw(query, auth));
-    if (err) throw error(500, err);
+    const { err, val: entries } = await Entry.all(query, auth);
+    if (err) throw error(400, err);
 
     const labels = await Label.all(query, auth);
     const assets = await Asset.all(query, auth);
 
-    const response = {
-        entries,
-        labels,
-        assets,
+    const response: Backup = {
+        entries: entries.map((entry) => ({
+            // replace the label with the label's name
+            // can't use ID as will change when labels are restored
+            label: entry.label?.name,
+            entry: entry.entry,
+            created: entry.created,
+            // not `null`
+            latitude: entry.latitude ?? undefined,
+            longitude: entry.longitude ?? undefined,
+            title: entry.title,
+        })),
+        labels: labels.map((label) => ({
+            name: label.name,
+            colour: label.colour,
+            created: label.created,
+        })),
+        assets: assets.map((asset) => ({
+            publicId: asset.publicId,
+            fileName: asset.fileName,
+            content: asset.content,
+            created: asset.created,
+            contentType: asset.contentType,
+        })),
+        created: nowS(),
     };
 
     // encrypt response as this is the data
@@ -72,18 +114,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
         throw error(400, 'data must be an object with entries and labels properties');
     }
 
-    await Entry.purgeAll(query, auth);
-
-    for (const entry of entries) {
-        if (!Entry.jsonIsRawEntry<DecryptedRawEntry>(entry)) {
-            console.log(entry);
-            throw error(400, 'Invalid entry format in JSON');
-        }
-
-        const { err } = await Entry.create(query, auth, entry);
-        if (err) throw error(400, err);
-    }
-
+    // set up labels first
     await Label.purgeAll(query, auth);
 
     for (const label of labels) {
@@ -92,6 +123,23 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
         }
 
         const { err } = await Label.create(query, auth, label);
+        if (err) throw error(400, err);
+    }
+
+    await Entry.purgeAll(query, auth);
+
+    for (const entry of entries) {
+        if (!Entry.jsonIsRawEntry(entry)) {
+            throw error(400, 'Invalid entry format in JSON');
+        }
+
+        if (entry.label) {
+            const { err, val } = await Label.getIdFromName(query, auth, entry.label);
+            if (err) throw error(400, err);
+            entry.label = val;
+        }
+
+        const { err } = await Entry.create(query, auth, entry);
         if (err) throw error(400, err);
     }
 
@@ -107,7 +155,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
             asset.fileName, asset.content,
             // make sure to preserve id as this is
             // card coded into entries
-            asset.created, asset.id,
+            asset.created, asset.publicId,
         );
         if (err) throw error(400, err);
     }

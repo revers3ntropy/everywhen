@@ -18,7 +18,7 @@ function commonWordsFromText (txt: string): [ string, number ][] {
 export const load: PageServerLoad = async ({ cookies }) => {
     const auth = await getAuthFromCookies(cookies);
 
-    const { val: entries, err } = await Entry.getAll(query, auth, false);
+    const { val: entries, err } = await Entry.all(query, auth, false);
     if (err) throw error(400, err);
 
     const entryText = entries.map((entry: Entry) => entry.entry);

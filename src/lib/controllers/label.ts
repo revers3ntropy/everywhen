@@ -1,7 +1,7 @@
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { generateUUId } from '../security/uuid';
-import { nowS, type PickOptional, Result } from '../utils';
+import { type NonFunctionProperties, nowS, type PickOptional, Result } from '../utils';
 import { Controller } from './controller';
 import type { User } from './user';
 
@@ -37,6 +37,25 @@ export class Label extends Controller {
             decrypt(res[0].name, auth.key),
             res[0].created,
         ));
+    }
+
+    public static async getIdFromName (
+        query: QueryFunc,
+        auth: User,
+        nameDecrypted: string,
+    ): Promise<Result<string>> {
+        const res = await query<Required<Label>[]>`
+            SELECT id
+            FROM labels
+            WHERE name = ${encrypt(nameDecrypted, auth.key)}
+              AND user = ${auth.id}
+        `;
+
+        if (res.length !== 1) {
+            return Result.err('No Label with that name');
+        }
+
+        return Result.ok(res[0].id);
     }
 
     public static async fromName (
@@ -98,11 +117,11 @@ export class Label extends Controller {
         return (await Label.fromName(query, auth, nameDecrypted)).isOk;
     }
 
-    public static jsonIsRawLabel (label: unknown): label is Required<Label> {
+    public static jsonIsRawLabel (
+        label: unknown,
+    ): label is Omit<NonFunctionProperties<Label>, 'id'> {
         return typeof label === 'object'
             && label !== null
-            && 'id' in label
-            && typeof label.id === 'string'
             && 'colour' in label
             && typeof label.colour === 'string'
             && 'name' in label

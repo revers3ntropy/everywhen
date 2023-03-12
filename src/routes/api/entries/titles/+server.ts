@@ -8,7 +8,7 @@ import type { Mutable } from '../../../../lib/utils';
 export const GET: RequestHandler = async ({ cookies }) => {
     const auth = await getAuthFromCookies(cookies);
 
-    const { val: entries, err } = await Entry.getAll(query, auth);
+    const { val: entries, err } = await Entry.all(query, auth);
     if (err) throw error(400, err);
 
     entries.map((entry: Mutable<Entry>) => {

@@ -59,7 +59,7 @@ export class Asset extends Controller {
                     ${encryptedContents})
         `;
 
-        return Result.ok(id);
+        return Result.ok(publicId);
     }
 
     public static async fromPublicId (
@@ -120,7 +120,7 @@ export class Asset extends Controller {
 
     public static jsonIsRawAsset (
         json: unknown,
-    ): json is NonFunctionProperties<Asset> {
+    ): json is Omit<NonFunctionProperties<Asset>, 'id'> {
         return typeof json === 'object' &&
             json !== null &&
             'publicId' in json &&

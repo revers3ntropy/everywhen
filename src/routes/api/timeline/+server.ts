@@ -8,7 +8,7 @@ import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async ({ cookies }) => {
     const auth = await getAuthFromCookies(cookies);
 
-    let { val: entries, err } = await Entry.getAll(query, auth);
+    let { val: entries, err } = await Entry.all(query, auth);
     if (err) throw error(400, err);
 
     let response = entries.map(e => ({
