@@ -7,6 +7,7 @@
     import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
     import Logout from 'svelte-material-icons/Logout.svelte';
     import Notebook from 'svelte-material-icons/Notebook.svelte';
+    import Skull from 'svelte-material-icons/Skull.svelte';
     import Upload from 'svelte-material-icons/Upload.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../../app';
@@ -18,12 +19,17 @@
 
     export let data: App.PageData;
 
+    function downloadBackup (data: string, username: string) {
+        const dateFmt = moment(new Date()).format('D-MM-YYYY');
+        downloadFile(`${dateFmt}-${username}.backup.encrypted.json`, data);
+
+    }
+
     async function download () {
         const { data: backupData } = displayNotifOnErr(addNotification,
             await api.get(data, '/backups'),
         );
-        const dateFmt = moment(new Date()).format('D-MM-YYYY');
-        downloadFile(`${dateFmt}-${data.username}.backup.encrypted.json`, backupData);
+        downloadBackup(backupData, data.username);
     }
 
     function upload () {
@@ -53,6 +59,20 @@
                 });
             },
         });
+    }
+
+    async function deleteAccount () {
+        if (!confirm(
+            'Are you sure you want to delete your account?'
+            + ' A backup of your data will be downloaded.',
+        )) {
+            return;
+        }
+        const { backup: backupData } = displayNotifOnErr(addNotification,
+            await api.delete(data, '/users'),
+        );
+        downloadBackup(backupData, data.username);
+        window.location.assign('/');
     }
 </script>
 
@@ -103,6 +123,13 @@
                 <Logout size="30" />
                 Log Out
             </a>
+            <button
+                class="danger"
+                on:click={deleteAccount}
+            >
+                <Skull size="30" />
+                Delete Account and Erase Data
+            </button>
         </div>
     </section>
 </main>

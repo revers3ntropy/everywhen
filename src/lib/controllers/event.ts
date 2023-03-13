@@ -155,6 +155,17 @@ export class Event extends Controller {
         return Result.ok(event);
     }
 
+    public static async purgeAll (
+        query: QueryFunc,
+        auth: Auth,
+    ): Promise<void> {
+        await query`
+            DELETE
+            FROM events
+            WHERE user = ${auth.id}
+        `;
+    }
+
     public override json (): NonFunctionProperties<Event> {
         return {
             ...this,

@@ -1,7 +1,11 @@
 import type { QueryFunc } from '../db/mysql';
 import { generateUUId } from '../security/uuid';
 import { cryptoRandomStr, type NonFunctionProperties, nowS, Result } from '../utils';
+import { Asset } from './asset';
 import { Controller } from './controller';
+import { Entry } from './entry';
+import { Event } from './event';
+import { Label } from './label';
 
 export class User extends Controller {
     public constructor (
@@ -81,6 +85,19 @@ export class User extends Controller {
         `;
 
         return Result.ok(new User(id, username, password));
+    }
+
+    public static async purge (query: QueryFunc, auth: Auth): Promise<void> {
+        await Label.purgeAll(query, auth);
+        await Entry.purgeAll(query, auth);
+        await Asset.purgeAll(query, auth);
+        await Event.purgeAll(query, auth);
+
+        await query`
+            DELETE
+            FROM users
+            WHERE id = ${auth.id}
+        `;
     }
 
     private static async generateSalt (query: QueryFunc): Promise<string> {

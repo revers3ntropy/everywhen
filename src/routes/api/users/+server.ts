@@ -5,8 +5,10 @@ import {
     KEY_COOKIE_KEY,
     USERNAME_COOKIE_KEY,
 } from '../../../lib/constants';
+import { Backup } from '../../../lib/controllers/backup';
 import { User } from '../../../lib/controllers/user';
 import { query } from '../../../lib/db/mysql';
+import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
 import { getUnwrappedReqBody } from '../../../lib/utils';
 
 export const POST: RequestHandler = async ({ request, cookies }) => {
@@ -22,4 +24,20 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     cookies.set(USERNAME_COOKIE_KEY, body.username, AUTH_COOKIE_OPTIONS);
 
     return new Response(JSON.stringify({}), { status: 200 });
+};
+
+export const DELETE: RequestHandler = async ({ cookies }) => {
+    const auth = await getAuthFromCookies(cookies);
+
+    const { err, val: backup } = await Backup.generate(query, auth);
+    if (err) throw error(400, err);
+
+    await User.purge(query, auth);
+
+    cookies.delete(KEY_COOKIE_KEY, AUTH_COOKIE_OPTIONS);
+    cookies.delete(USERNAME_COOKIE_KEY, AUTH_COOKIE_OPTIONS);
+
+    return new Response(JSON.stringify({
+        backup: backup.asEncryptedString(auth),
+    }), { status: 200 });
 };
