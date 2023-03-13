@@ -23,28 +23,28 @@
 
     let nameInput: HTMLInputElement;
 
-    async function updateName ({ target }: Event) {
+    async function updateEvent (changes) {
         displayNotifOnErr(addNotification,
-            await api.put(auth, `/events/${event.id}`, {
-                name: target.value,
-            }),
+            await api.put(auth, `/events/${event.id}`, changes),
         );
+    }
+
+    async function updateName ({ target }: Event) {
+        await updateEvent({
+            name: target.value,
+        });
     }
 
     async function updateStart ({ target }: Event) {
-        displayNotifOnErr(addNotification,
-            await api.put(auth, `/events/${event.id}`, {
-                start: parseTimestampFromInput(target.value),
-            }),
-        );
+        await updateEvent({
+            start: parseTimestampFromInput(target.value),
+        });
     }
 
     async function updateEnd ({ target }: Event) {
-        displayNotifOnErr(addNotification,
-            await api.put(auth, `/events/${event.id}`, {
-                end: parseTimestampFromInput(target.value),
-            }),
-        );
+        await updateEvent({
+            end: parseTimestampFromInput(target.value),
+        });
     }
 
     async function deleteEvent () {
@@ -73,6 +73,16 @@
         event.id = id;
     }
 
+    async function makeDurationEvent () {
+        const newEnd = event.end + 60 * 60;
+        await updateEnd({
+            target: {
+                value: fmtTimestampForInput(newEnd),
+            },
+        } as Event);
+        event.end = newEnd;
+    }
+
     const createdFmt = moment(new Date(event.start * 1000))
         .format('hh:mm DD/MM/YYYY');
 
@@ -83,7 +93,9 @@
         }
     });
 
-    $: browser && selectNameId === event.id && nameInput ? nameInput.focus() : null;
+    $: if (browser && selectNameId === event.id && nameInput) {
+        nameInput.focus();
+    }
 
 </script>
 
@@ -117,26 +129,45 @@
         value={event.name}
     >
     <div class="from-to-menu">
-        <div>
-            <i>from</i>
-            <input
-                class="editable-text"
-                on:change={updateStart}
-                placeholder="Start"
-                type="datetime-local"
-                value={fmtTimestampForInput(event.start)}
+        {#if event.start === event.end}
+            <div>
+                <i>at</i>
+                <input
+                    class="editable-text"
+                    on:change={(e) => (updateStart(e), updateEnd(e))}
+                    placeholder="Start"
+                    type="datetime-local"
+                    value={fmtTimestampForInput(event.start)}
+                >
+            </div>
+            <button
+                class="link"
+                on:click={makeDurationEvent}
             >
-        </div>
-        <div>
-            <i>to</i>
-            <input
-                class="editable-text"
-                on:change={updateEnd}
-                placeholder="End"
-                type="datetime-local"
-                value={fmtTimestampForInput(event.end)}
-            >
-        </div>
+                Make duration event
+            </button>
+        {:else}
+            <div>
+                <i>from</i>
+                <input
+                    class="editable-text"
+                    on:change={updateStart}
+                    placeholder="Start"
+                    type="datetime-local"
+                    value={fmtTimestampForInput(event.start)}
+                >
+            </div>
+            <div>
+                <i>to</i>
+                <input
+                    class="editable-text"
+                    on:change={updateEnd}
+                    placeholder="End"
+                    type="datetime-local"
+                    value={fmtTimestampForInput(event.end)}
+                >
+            </div>
+        {/if}
     </div>
 {/if}
 
