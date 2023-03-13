@@ -48,7 +48,7 @@ export class Event extends Controller {
                    label
             FROM events
             WHERE user = ${auth.id}
-            ORDER BY start DESC
+            ORDER BY created DESC
         `;
     }
 

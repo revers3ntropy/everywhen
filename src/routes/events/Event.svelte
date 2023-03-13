@@ -15,7 +15,7 @@
 
     export let event: Event;
     export let auth: Auth;
-    export let selectName: boolean = false;
+    export let selectNameId: string;
     export let changeEventCount: (by: number) => void;
 
     // for an undo button to replace the event when deleted
@@ -77,12 +77,13 @@
         .format('hh:mm DD/MM/YYYY');
 
     onMount(() => {
-        if (selectName) {
+        if (selectNameId === event.id) {
             nameInput.focus();
+            nameInput.select();
         }
     });
 
-    $: browser && selectName && nameInput ? nameInput.focus() : null;
+    $: browser && selectNameId === event.id && nameInput ? nameInput.focus() : null;
 
 </script>
 
@@ -115,22 +116,28 @@
         placeholder="Event Name"
         value={event.name}
     >
-    <i>from</i>
-    <input
-        class="editable-text"
-        on:change={updateStart}
-        placeholder="Start"
-        type="datetime-local"
-        value={fmtTimestampForInput(event.start)}
-    >
-    <i>to</i>
-    <input
-        class="editable-text"
-        on:change={updateEnd}
-        placeholder="End"
-        type="datetime-local"
-        value={fmtTimestampForInput(event.end)}
-    >
+    <div class="from-to-menu">
+        <div>
+            <i>from</i>
+            <input
+                class="editable-text"
+                on:change={updateStart}
+                placeholder="Start"
+                type="datetime-local"
+                value={fmtTimestampForInput(event.start)}
+            >
+        </div>
+        <div>
+            <i>to</i>
+            <input
+                class="editable-text"
+                on:change={updateEnd}
+                placeholder="End"
+                type="datetime-local"
+                value={fmtTimestampForInput(event.end)}
+            >
+        </div>
+    </div>
 {/if}
 
 <style lang="less">
@@ -159,5 +166,21 @@
         display: block;
         text-align: center;
         margin: 0.4em;
+    }
+
+    .from-to-menu {
+
+        display: flex;
+        flex-direction: row;
+        justify-content: start;
+        align-items: center;
+
+        @media @mobile {
+            display: block;
+        }
+
+        * {
+            margin: 0 0.3em;
+        }
     }
 </style>

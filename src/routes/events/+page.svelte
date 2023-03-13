@@ -4,6 +4,7 @@
     import type { App } from '../../app';
     import { api } from '../../lib/api/apiQuery';
     import type { Event as EventController } from '../../lib/controllers/event';
+    import type { Label } from '../../lib/controllers/label';
     import { displayNotifOnErr, nowS } from '../../lib/utils.js';
     import Event from './Event.svelte';
 
@@ -13,48 +14,44 @@
 
     export let data: App.PageData & {
         events: EventController[];
+        labels: Label[];
     };
 
     let events = data.events;
-    $: events = data.events;
 
     async function reloadEvents () {
+        let oldEvents = events;
         events = displayNotifOnErr(addNotification,
             await api.get(data, '/events'),
         ).events;
     }
 
     async function newEvent () {
+        const now = nowS();
         displayNotifOnErr(addNotification,
             await api.post(data, '/events', {
                 name: NEW_EVENT_NAME,
-                start: nowS(),
-                end: nowS(),
+                start: now,
+                end: now,
             }),
         );
 
         await reloadEvents();
     }
 
-    let eventCount = events.length;
+    let eventCount: number;
     $: eventCount = events.length;
 
+    let selectNameId: string;
+    $: selectNameId = events[
+        events.findIndex(e => e.name === NEW_EVENT_NAME)
+        ]?.id || '';
 </script>
 
 <main>
     <h1>Events ({eventCount})</h1>
 
     <ul>
-        {#each events as event}
-            <li>
-                <Event
-                    {event}
-                    auth={data}
-                    selectName={event.name === NEW_EVENT_NAME}
-                    changeEventCount={(by) => eventCount += by}
-                />
-            </li>
-        {/each}
         <li>
             <button
                 class="primary unbordered"
@@ -64,6 +61,16 @@
                 New Event
             </button>
         </li>
+        {#each events as event, i}
+            <li>
+                <Event
+                    {event}
+                    auth={data}
+                    {selectNameId}
+                    changeEventCount={(by) => eventCount += by}
+                />
+            </li>
+        {/each}
     </ul>
 </main>
 
@@ -79,6 +86,7 @@
 
         @media @mobile {
             grid-template-columns: 100%;
+            margin: 0;
         }
 
         li {
@@ -87,9 +95,17 @@
             padding: .4em;
             border-radius: 10px;
 
-            &:last-child {
+            &:first-child {
                 .flex-center();
                 border: none;
+            }
+
+            @media @mobile {
+                margin: .3rem 0;
+                padding: 0.5em 0 1em 0;
+                border-radius: 0;
+                border: none;
+                border-top: 1px solid @border;
             }
         }
     }
