@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type { NonFunctionProperties } from '$lib/utils.js';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../../app';
@@ -17,10 +18,9 @@
         labels: Label[];
     };
 
-    let events = data.events;
+    let events: (EventController & { deleted?: true })[] = data.events;
 
     async function reloadEvents () {
-        let oldEvents = events;
         events = displayNotifOnErr(addNotification,
             await api.get(data, '/events'),
         ).events;
@@ -39,12 +39,28 @@
         await reloadEvents();
     }
 
+    async function handleDeleteEvent (
+        { detail: event }: CustomEvent<NonFunctionProperties<EventController>>,
+    ) {
+        await reloadEvents();
+
+        const deletedEvent: EventController & { deleted?: true } = {
+            ...(event as EventController),
+            deleted: true,
+        };
+
+        events = [
+            ...events,
+            deletedEvent,
+        ].sort((a, b) => b.created - a.created);
+    }
+
     let eventCount: number;
     $: eventCount = events.length;
 
     let selectNameId: string;
     $: selectNameId = events[
-        events.findIndex(e => e.name === NEW_EVENT_NAME)
+        events.findIndex(e => e.name === NEW_EVENT_NAME && !e.deleted)
         ]?.id || '';
 </script>
 
@@ -68,6 +84,8 @@
                     auth={data}
                     {selectNameId}
                     changeEventCount={(by) => eventCount += by}
+                    on:update={reloadEvents}
+                    on:delete={handleDeleteEvent}
                 />
             </li>
         {/each}

@@ -1,9 +1,13 @@
 <script lang="ts">
     import { browser } from '$app/environment';
+    // @ts-ignore
+    import { tooltip } from '@svelte-plugins/tooltips';
     import moment from 'moment';
-    import { onMount } from 'svelte';
+    import { createEventDispatcher, onMount } from 'svelte';
     import Bin from 'svelte-material-icons/Delete.svelte';
     import Restore from 'svelte-material-icons/Restore.svelte';
+    import TimelineClockOutline from 'svelte-material-icons/TimelineClockOutline.svelte';
+    import TimelineOutline from 'svelte-material-icons/TimelineOutline.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import { api } from '../../lib/api/apiQuery';
     import { Event } from '../../lib/controllers/event';
@@ -12,14 +16,12 @@
     import { fmtTimestampForInput } from '../../lib/utils.js';
 
     const { addNotification } = getNotificationsContext();
+    const dispatch = createEventDispatcher();
 
-    export let event: Event;
+    export let event: Event & { deleted?: true };
     export let auth: Auth;
     export let selectNameId: string;
     export let changeEventCount: (by: number) => void;
-
-    // for an undo button to replace the event when deleted
-    let deleted = false;
 
     let nameInput: HTMLInputElement;
 
@@ -27,6 +29,7 @@
         displayNotifOnErr(addNotification,
             await api.put(auth, `/events/${event.id}`, changes),
         );
+        dispatch('update');
     }
 
     async function updateName ({ target }: Event) {
@@ -51,15 +54,14 @@
         if (!confirm('Are you sure you want to delete this event?')) {
             return;
         }
-        deleted = true;
         changeEventCount(-1);
         displayNotifOnErr(addNotification,
             await api.delete(auth, `/events/${event.id}`),
         );
+        dispatch('delete', event);
     }
 
     async function restoreEvent () {
-        deleted = false;
         changeEventCount(1);
         const { id } = displayNotifOnErr(addNotification,
             await api.post(auth, `/events`, {
@@ -71,16 +73,26 @@
             }),
         );
         event.id = id;
+        dispatch('update');
     }
 
     async function makeDurationEvent () {
         const newEnd = event.end + 60 * 60;
+        event.end = newEnd;
         await updateEnd({
             target: {
                 value: fmtTimestampForInput(newEnd),
             },
         } as Event);
-        event.end = newEnd;
+    }
+
+    async function makeInstantEvent () {
+        event.end = event.start;
+        await updateEnd({
+            target: {
+                value: fmtTimestampForInput(event.start),
+            },
+        } as Event);
     }
 
     const createdFmt = moment(new Date(event.start * 1000))
@@ -99,7 +111,7 @@
 
 </script>
 
-{#if deleted}
+{#if event.deleted}
     <div class="restore-menu">
         <i>'{event.name}' has been deleted</i>
         <button
@@ -143,8 +155,9 @@
             <button
                 class="link"
                 on:click={makeDurationEvent}
+                use:tooltip={{ content: 'Give this event a duration' }}
             >
-                Make duration event
+                <TimelineOutline size="30" />
             </button>
         {:else}
             <div>
@@ -166,6 +179,15 @@
                     type="datetime-local"
                     value={fmtTimestampForInput(event.end)}
                 >
+            </div>
+            <div>
+                <button
+                    class="link"
+                    on:click={makeInstantEvent}
+                    use:tooltip={{ content: 'Make this event instantaneous' }}
+                >
+                    <TimelineClockOutline size="30" />
+                </button>
             </div>
         {/if}
     </div>
