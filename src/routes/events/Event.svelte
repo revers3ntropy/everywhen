@@ -180,6 +180,11 @@
                     value={fmtTimestampForInput(event.end)}
                 >
             </div>
+            <p>
+                <i>
+                    ({moment.duration(event.end - event.start, 'seconds').humanize()})
+                </i>
+            </p>
             <div>
                 <button
                     class="link"
@@ -227,6 +232,7 @@
         flex-direction: row;
         justify-content: start;
         align-items: center;
+        flex-wrap: wrap;
 
         @media @mobile {
             display: block;

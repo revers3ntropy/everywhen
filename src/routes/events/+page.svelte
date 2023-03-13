@@ -56,7 +56,7 @@
     }
 
     let eventCount: number;
-    $: eventCount = events.length;
+    $: eventCount = events.filter(e => !e.deleted).length;
 
     let selectNameId: string;
     $: selectNameId = events[

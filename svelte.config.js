@@ -13,6 +13,7 @@ const config = {
 
     onwarn: (warning, handler) => {
         const { code } = warning;
+
         if (code === 'css-unused-selector')
             return;
 
