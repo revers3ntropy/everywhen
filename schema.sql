@@ -40,12 +40,13 @@ CREATE TABLE `entries`
 
 CREATE TABLE `events`
 (
-    `id`    varchar(128) NOT NULL,
-    `user`  varchar(128) NOT NULL,
-    `name`  varchar(256) NOT NULL,
-    `start` int(64)      NOT NULL,
-    `end`   int(64)      NOT NULL,
-    `label` varchar(128) NOT NULL
+    `id`      varchar(128) NOT NULL,
+    `user`    varchar(128) NOT NULL,
+    `name`    varchar(256) NOT NULL,
+    `start`   int(64)      NOT NULL,
+    `end`     int(64)      NOT NULL,
+    `label`   varchar(128) DEFAULT NULL,
+    `created` int(64)      NOT NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
 

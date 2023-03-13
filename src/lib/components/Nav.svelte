@@ -1,9 +1,9 @@
 <script lang="ts">
     import { page } from '$app/stores';
+    import Calendar from 'svelte-material-icons/Calendar.svelte';
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
     import Home from 'svelte-material-icons/Home.svelte';
-    import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
     import Login from 'svelte-material-icons/Login.svelte';
     import Logout from 'svelte-material-icons/Logout.svelte';
     import Notebook from 'svelte-material-icons/Notebook.svelte';
@@ -30,11 +30,11 @@
                 <Notebook size="40" />
             </a>
             <a
-                href="/labels"
-                class="{$page.url.pathname === '/labels' ? 'current' : ''}"
-                aria-label="labels"
+                href="/events"
+                class="{$page.url.pathname === '/events' ? 'current' : ''}"
+                aria-label="events"
             >
-                <LabelOutline size="40" />
+                <Calendar size="40" />
             </a>
             <a
                 href="/timeline"

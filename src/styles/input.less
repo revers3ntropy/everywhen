@@ -3,119 +3,129 @@
 
 input,
 button {
-	font-size: inherit;
-	font-family: inherit;
-	background: transparent;
-	border: none;
-	cursor: pointer;
-	outline: none;
+    font-size: inherit;
+    font-family: inherit;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    outline: none;
 
-	&:hover svg {
-		color: @text-color-light;
-	}
+    &:hover svg {
+        color: @text-color-light;
+    }
+}
+
+.danger:hover {
+    svg {
+        color: @accent-color-danger;
+    }
 }
 
 textarea {
-	font-size: inherit;
-	font-family: inherit;
-	background: transparent;
-	border: 1px solid @border;
-	outline: none;
+    font-size: inherit;
+    font-family: inherit;
+    background: transparent;
+    border: 1px solid @border;
+    outline: none;
 }
 
 input {
-	border-bottom: 1px solid @border;
-	position: relative;
-	display: inline-block;
-	line-height: 1.2;
-	text-decoration: none;
-	outline: none;
-	cursor: text;
+    border-bottom: 1px solid @border;
+    position: relative;
+    display: inline-block;
+    line-height: 1.2;
+    text-decoration: none;
+    outline: none;
+    cursor: text;
 
-	&:hover {
-		border-bottom-color: @accent-color-primary;
-	}
+    &:hover {
+        border-bottom-color: @accent-color-primary;
+    }
 
-	&:focus {
-		color: @text-color;
-		border-bottom-color: @accent-color-secondary;
-	}
+    &:focus {
+        color: @text-color;
+        border-bottom-color: @accent-color-secondary;
+    }
 
-	&[type='color'] {
-		border: none;
-	}
+    &[type='color'] {
+        border: none;
+    }
 
-	&.editable-text {
-		border: none;
-		border-bottom: 1px solid transparent;
-		background: transparent;
-		outline: none;
-		cursor: text;
-		display: inline-block;
-		line-height: 1.2;
-		text-decoration: none;
+    &.editable-text {
+        border: none;
+        border-bottom: 1px solid transparent;
+        background: transparent;
+        outline: none;
+        cursor: text;
+        display: inline-block;
+        line-height: 1.2;
+        text-decoration: none;
 
-		&:focus {
-			color: @text-color;
-			border-bottom: 1px solid @accent-color-secondary;
-		}
+        &:focus {
+            color: @text-color;
+            border-bottom: 1px solid @accent-color-secondary;
+        }
 
-		&:hover {
-			border-bottom: 1px solid @accent-color-primary;
-		}
-	}
+        &:hover {
+            border-bottom: 1px solid @accent-color-primary;
+        }
+    }
 }
 
 :disabled {
-	opacity: 0.6;
-	cursor: not-allowed;
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 select {
-	border: 1px solid @border;
-	border-radius: 3px;
-	padding: 0.5em;
-	outline: none;
-	cursor: pointer;
-	color: @text-color;
-	background: @light-accent;
+    border: 1px solid @border;
+    border-radius: 3px;
+    padding: 0.5em;
+    outline: none;
+    cursor: pointer;
+    color: @text-color;
+    background: @light-accent;
 
-	* {
-		color: black;
-	}
+    * {
+        color: black;
+    }
 }
 
 a,
 button {
-	&.primary {
-		border: 1px solid @border;
-		border-radius: 10px;
-		padding: 0.4em 0.8em 0.4em 0.4em;
-		margin: 0.5em;
-		color: @text-color;
+    &.primary {
+        border: 1px solid @border;
+        border-radius: 10px;
+        padding: 0.4em 0.8em 0.4em 0.4em;
+        margin: 0.5em;
+        color: @text-color;
 
-		display: grid;
-		// assumed one svg icon and then text
-		grid-template-columns: 35px 1fr;
-		align-items: center;
-		justify-content: space-between;
+        display: grid;
+        // assumed one icon (svg) and then text
+        grid-template-columns: 35px 1fr;
+        align-items: center;
+        justify-content: space-between;
 
-		&:after {
-			display: none;
-		}
+        &:after {
+            display: none;
+        }
 
-		&:hover {
-			background: @text-color-accent;
-			color: @text-color;
-		}
-	}
+        &:hover {
+            background: @accent-color-primary;
+            color: @text-color-invert;
+        }
+
+        &.unbordered {
+            border: none;
+        }
+    }
 }
 
 .dropzone {
-	.bordered();
+    .bordered();
 
-	border-style: dashed;
-	border-radius: 10px;
+    border-style: dashed;
+    border-radius: 10px;
 
     padding: 2em;
     margin: 2em;

@@ -3,7 +3,7 @@ import { decrypt, encrypt } from '../security/encryption';
 import { generateUUId } from '../security/uuid';
 import { type NonFunctionProperties, nowS, type PickOptional, Result } from '../utils';
 import { Controller } from './controller';
-import type { User } from './user';
+import type { Auth } from './user';
 
 export class Label extends Controller {
     private constructor (
@@ -17,7 +17,7 @@ export class Label extends Controller {
 
     public static async fromId (
         query: QueryFunc,
-        auth: User,
+        auth: Auth,
         id: string,
     ): Promise<Result<Label>> {
         const res = await query<Required<Label>[]>`
@@ -41,7 +41,7 @@ export class Label extends Controller {
 
     public static async getIdFromName (
         query: QueryFunc,
-        auth: User,
+        auth: Auth,
         nameDecrypted: string,
     ): Promise<Result<string>> {
         const res = await query<Required<Label>[]>`
@@ -60,7 +60,7 @@ export class Label extends Controller {
 
     public static async fromName (
         query: QueryFunc,
-        auth: User,
+        auth: Auth,
         nameDecrypted: string,
     ): Promise<Result<Label>> {
         const res = await query<Required<Label>[]>`
@@ -84,7 +84,7 @@ export class Label extends Controller {
 
     public static async all (
         query: QueryFunc,
-        auth: User,
+        auth: Auth,
     ): Promise<Label[]> {
         const res = await query<Required<Label>[]>`
             SELECT id, colour, name, created
@@ -103,7 +103,7 @@ export class Label extends Controller {
 
     public static async userHasLabelWithId (
         query: QueryFunc,
-        auth: User,
+        auth: Auth,
         id: string,
     ): Promise<boolean> {
         return (await Label.fromId(query, auth, id)).isOk;
@@ -111,7 +111,7 @@ export class Label extends Controller {
 
     public static async userHasLabelWithName (
         query: QueryFunc,
-        auth: User,
+        auth: Auth,
         nameDecrypted: string,
     ): Promise<boolean> {
         return (await Label.fromName(query, auth, nameDecrypted)).isOk;
@@ -132,7 +132,7 @@ export class Label extends Controller {
 
     public static async purgeWithId (
         query: QueryFunc,
-        auth: User,
+        auth: Auth,
         id: string,
     ): Promise<void> {
         await query`
@@ -145,7 +145,7 @@ export class Label extends Controller {
 
     public static async purgeAll (
         query: QueryFunc,
-        auth: User,
+        auth: Auth,
     ): Promise<void> {
         await query`
             DELETE
@@ -156,7 +156,7 @@ export class Label extends Controller {
 
     public static async create (
         query: QueryFunc,
-        auth: User,
+        auth: Auth,
         json: PickOptional<Label, 'id' | 'created'>,
     ): Promise<Result<Label>> {
 
@@ -187,7 +187,7 @@ export class Label extends Controller {
 
     public async updateName (
         query: QueryFunc,
-        auth: User,
+        auth: Auth,
         name: string,
     ): Promise<Result<Label>> {
         if (await Label.userHasLabelWithName(query, auth, name)) {

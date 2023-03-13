@@ -5,7 +5,7 @@ import type { NonFunctionProperties, PickOptionalAndMutable } from '../utils';
 import { nowS, Result } from '../utils';
 import { Controller } from './controller';
 import { Label } from './label';
-import type { User } from './user';
+import type { Auth } from './user';
 
 
 // RawEntry is the raw data from the database,
@@ -44,7 +44,7 @@ export class Entry extends Controller {
 
     public static async delete (
         query: QueryFunc,
-        auth: User,
+        auth: Auth,
         id: string,
         restore: boolean,
     ): Promise<Result> {
@@ -73,22 +73,9 @@ export class Entry extends Controller {
         return Result.ok(null);
     }
 
-    public static async purgeWithId (
-        query: QueryFunc,
-        auth: User,
-        id: string,
-    ): Promise<void> {
-        await query`
-            DELETE
-            FROM entries
-            WHERE entries.id = ${id}
-              AND user = ${auth.id}
-        `;
-    }
-
     public static async purgeAll (
         query: QueryFunc,
-        auth: User,
+        auth: Auth,
     ): Promise<void> {
         await query`
             DELETE
@@ -99,7 +86,7 @@ export class Entry extends Controller {
 
     public static async allRaw (
         query: QueryFunc,
-        auth: User,
+        auth: Auth,
         deleted: boolean | 'both' = false,
     ): Promise<RawEntry[]> {
         return await query<RawEntry[]>`
@@ -113,14 +100,14 @@ export class Entry extends Controller {
                    longitude
             FROM entries
             WHERE (deleted = ${deleted ? 1 : 0} OR ${deleted === 'both'})
-              AND entries.user = ${auth.id}
+              AND user = ${auth.id}
             ORDER BY created DESC, id
         `;
     }
 
     public static async all (
         query: QueryFunc,
-        auth: User,
+        auth: Auth,
         deleted: boolean | 'both' = false,
     ): Promise<Result<Entry[]>> {
         const rawEntries = await Entry.allRaw(query, auth, deleted);
@@ -138,7 +125,7 @@ export class Entry extends Controller {
 
     public static async getPage (
         query: QueryFunc,
-        auth: User,
+        auth: Auth,
         page: number,
         pageSize: number,
         {
@@ -179,7 +166,7 @@ export class Entry extends Controller {
 
     public static async fromRaw (
         query: QueryFunc,
-        auth: User,
+        auth: Auth,
         rawEntry: RawEntry,
     ): Promise<Result<Entry>> {
         const entry = new Entry(
@@ -235,7 +222,7 @@ export class Entry extends Controller {
      */
     public static async fromId (
         query: QueryFunc,
-        auth: User,
+        auth: Auth,
         id: string,
         mustNotBeDeleted = true,
     ): Promise<Result<Entry>> {
@@ -264,7 +251,7 @@ export class Entry extends Controller {
     }
 
     public static async decryptRaw<T extends RawEntry | RawEntry[]> (
-        auth: User,
+        auth: Auth,
         raw: T,
     ): Promise<Result<T extends RawEntry ? DecryptedRawEntry : DecryptedRawEntry[]>> {
         if (Array.isArray(raw)) {
@@ -324,7 +311,7 @@ export class Entry extends Controller {
 
     public static async create (
         query: QueryFunc,
-        auth: User,
+        auth: Auth,
         json_: PickOptionalAndMutable<
             DecryptedRawEntry,
             'id'
@@ -333,7 +320,7 @@ export class Entry extends Controller {
             | 'created'
         >,
     ): Promise<Result<Entry>> {
-        const json = {
+        const json: typeof json_ & { id: string } = {
             ...json_,
             id: await generateUUId(query),
         };
@@ -378,7 +365,7 @@ export class Entry extends Controller {
 
     public async removeLabel (
         query: QueryFunc,
-        auth: User,
+        auth: Auth,
     ): Promise<Result<Entry>> {
         if (!this.label) {
             return Result.err('Entry does not have a label to remove');
@@ -397,7 +384,7 @@ export class Entry extends Controller {
 
     public async updateLabel (
         query: QueryFunc,
-        auth: User,
+        auth: Auth,
         label: Label | string | null,
     ): Promise<Result<Entry>> {
         if (label == null) {
@@ -435,7 +422,11 @@ export class Entry extends Controller {
         return entry;
     }
 
-    private async addLabel (query: QueryFunc, auth: User, label: Label | string): Promise<Result<Entry>> {
+    private async addLabel (
+        query: QueryFunc,
+        auth: Auth,
+        label: Label | string,
+    ): Promise<Result<Entry>> {
         if (typeof label === 'string') {
             const { val, err } = await Label.fromId(query, auth, label);
             if (err) {

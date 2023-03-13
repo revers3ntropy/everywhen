@@ -1,5 +1,6 @@
 <script lang="ts">
     import moment from 'moment';
+    import Calendar from 'svelte-material-icons/Calendar.svelte';
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
     import Download from 'svelte-material-icons/Download.svelte';
@@ -61,6 +62,10 @@
             <a class="primary" href="/diary">
                 <Notebook size="30" />
                 Diary
+            </a>
+            <a class="primary" href="/events">
+                <Calendar size="30" />
+                Events
             </a>
             <a class="primary" href="/labels">
                 <LabelOutline size="30" />

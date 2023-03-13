@@ -35,6 +35,8 @@ export type PickOptional<A, B extends keyof A = keyof A> =
     NonFunctionProperties<Omit<A, B>
                           & Partial<Pick<A, B>>>;
 
+export type Seconds = number;
+
 const RESULT_NULL = Symbol();
 
 export class Result<T = null, E extends {} = string> {
@@ -261,7 +263,7 @@ export async function getUnwrappedReqBody<T extends Schema & object> (
     return res.val;
 }
 
-export function nowS (): number {
+export function nowS (): Seconds {
     return Math.floor(Date.now() / 1000);
 }
 
@@ -292,4 +294,14 @@ export function displayNotifOnErr<T> (
         throw err;
     }
     return val;
+}
+
+export function fmtTimestampForInput (timestamp: Seconds): string {
+    return new Date(timestamp * 1000)
+        .toISOString()
+        .split('.')[0];
+}
+
+export function parseTimestampFromInput (timestamp: string): Seconds {
+    return Math.floor(Date.parse(timestamp) / 1000);
 }
