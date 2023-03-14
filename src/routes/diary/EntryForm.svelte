@@ -2,15 +2,16 @@
     import { browser } from '$app/environment';
     import { filedrop, type FileDropOptions, type Files } from 'filedrop-svelte';
     import { createEventDispatcher, onMount } from 'svelte';
-    import Geolocation from 'svelte-geolocation';
     import ImageArea from 'svelte-material-icons/ImageArea.svelte';
     import Send from 'svelte-material-icons/Send.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import { api } from '../../lib/api/apiQuery';
     import LabelSelect from '../../lib/components/LabelSelect.svelte';
+    import { enabledLocation } from '../../lib/constants';
     import type { Label } from '../../lib/controllers/label';
     import type { Auth } from '../../lib/controllers/user';
     import { displayNotifOnErr, getFileContents } from '../../lib/utils';
+    import LocationToggle from './LocationToggle.svelte';
 
     const { addNotification } = getNotificationsContext();
     const dispatch = createEventDispatcher();
@@ -20,9 +21,9 @@
     let newEntryTitle = '';
     let newEntryBody = '';
     let newEntryLabel = '';
-    $: mounted && browser ? localStorage.setItem('__misc_3_newEntryTitle', newEntryTitle) : 0;
-    $: mounted && browser ? localStorage.setItem('__misc_3_newEntryBody', newEntryBody) : 0;
-    $: mounted && browser ? localStorage.setItem('__misc_3_newEntryLabel', newEntryLabel) : 0;
+    $: if (mounted && browser) localStorage.setItem('__misc_3_newEntryTitle', newEntryTitle);
+    $: if (mounted && browser) localStorage.setItem('__misc_3_newEntryBody', newEntryBody);
+    $: if (mounted && browser) localStorage.setItem('__misc_3_newEntryLabel', newEntryLabel);
 
     onMount(() => {
         newEntryTitle = localStorage.getItem('__misc_3_newEntryTitle') || '';
@@ -32,7 +33,6 @@
     });
 
     export let auth: Auth;
-    let currentLocation = [];
 
     let labels: Label[] = [];
 
@@ -42,7 +42,37 @@
         newEntryLabel = '';
     }
 
+    async function getLocation (): Promise<[ number | null, number | null ]> {
+        let currentLocation = [ null, null ];
+        if ($enabledLocation) {
+            currentLocation = await new Promise((resolve) => {
+                navigator.geolocation.getCurrentPosition(
+                    pos => {
+                        resolve([
+                            pos.coords.latitude,
+                            pos.coords.longitude,
+                        ]);
+                    },
+                    err => {
+                        addNotification({
+                            text: `Cannot get location: ${err.message}`,
+                            removeAfter: 8000,
+                            type: 'error',
+                            position: 'top-center',
+                        });
+                        resolve([ null, null ]);
+                    },
+                );
+            });
+        }
+        return currentLocation;
+    }
+
     async function submit () {
+        const currentLocation = await getLocation();
+
+        console.log(currentLocation);
+
         const res = displayNotifOnErr(addNotification,
             await api.post(auth, '/entries', {
                 title: newEntryTitle,
@@ -136,12 +166,15 @@
     }
 
     onMount(async () => {
-        const res = displayNotifOnErr(addNotification,
-            await api.get(auth, `/labels`),
-        );
-        labels = res.labels;
-
-        await stopSpaceAndEnterBeingInterceptedByFileDrop();
+        await Promise.all([
+            stopSpaceAndEnterBeingInterceptedByFileDrop(),
+            async () => {
+                const res = displayNotifOnErr(addNotification,
+                    await api.get(auth, `/labels`),
+                );
+                labels = res.labels;
+            },
+        ]);
     });
 
 </script>
@@ -151,36 +184,19 @@
     on:filedrop={onFileDrop}
     use:filedrop={fileOptions}
 >
-    {#if browser}
-        <Geolocation
-            getPosition="true"
-            let:error
-            let:notSupported
-            bind:coords={currentLocation}
-        >
-            {#if notSupported}
-                This browser does not support the Geolocation API.
-
-                <!--
-                    Error code '1' means the user has denied location
-                    services, so don't show any error message
-                -->
-            {:else if error && error.code !== 1 }
-                An error occurred fetching geolocation data: {error.code}
-                {error.message}
-            {/if}
-        </Geolocation>
-    {/if}
-
     <div class="head">
         <input
             bind:value={newEntryTitle}
             class="title"
             placeholder="Title"
         />
-        <button on:click={triggerFileDrop}>
+        <button
+            on:click={triggerFileDrop}
+        >
             <ImageArea size="30" />
         </button>
+        <LocationToggle />
+
         <LabelSelect {auth} bind:value={newEntryLabel} />
         <button class="send" on:click={submit}>
             <Send size="30" />

@@ -7,6 +7,8 @@ import schemion from 'schemion';
 import type { Position } from 'svelte-notifications';
 import { bind } from 'svelte-simple-modal';
 import type { SvelteComponentDev } from 'svelte/internal';
+import type { Writable } from 'svelte/store';
+import { writable } from 'svelte/store';
 import { KEY_COOKIE_KEY, OBFUSCATE_CHARS, popup, USERNAME_COOKIE_KEY } from './constants';
 import type { RawAuth } from './controllers/user';
 
@@ -36,6 +38,7 @@ export type PickOptional<A, B extends keyof A = keyof A> =
                           & Partial<Pick<A, B>>>;
 
 export type Seconds = number;
+export type Milliseconds = number;
 
 const RESULT_NULL = Symbol();
 
@@ -304,4 +307,64 @@ export function fmtTimestampForInput (timestamp: Seconds): string {
 
 export function parseTimestampFromInput (timestamp: string): Seconds {
     return Math.floor(Date.parse(timestamp) / 1000);
+}
+
+export function localStorageWritable<T> (
+    lsKey: string,
+    initial: T extends Function ? never : T,
+): Writable<T> {
+
+    if (typeof initial === 'function') {
+        throw new Error('localStorageWritable does not support setting a function');
+    }
+
+    if (browser) {
+        const lsVal = localStorage.getItem(lsKey);
+        if (lsVal !== null) {
+            try {
+                initial = JSON.parse(lsVal) as T extends Function ? never : T;
+            } catch (e) {
+                console.error('Error parsing localStorage value', e);
+            }
+        }
+
+        localStorage.setItem(lsKey, JSON.stringify(initial));
+    }
+
+    const store = writable<T>(initial);
+
+    const { subscribe, set, update } = store;
+
+    return {
+        subscribe,
+        set: (value) => {
+            if (typeof value === 'function') {
+                throw new Error('localStorageWritable does not support setting a function');
+            }
+            set(value);
+            if (!browser) return;
+            if (value === null || value === undefined) {
+                localStorage.removeItem(lsKey);
+                return;
+            }
+            localStorage.setItem(lsKey, JSON.stringify(value));
+        },
+        update: (fn) => {
+            update((value) => {
+                const newValue = fn(value);
+
+                if (typeof newValue === 'function') {
+                    throw new Error('localStorageWritable does not support setting a function');
+                }
+
+                if (!browser) return newValue;
+                if (newValue === null || newValue === undefined) {
+                    localStorage.removeItem(lsKey);
+                } else {
+                    localStorage.setItem(lsKey, JSON.stringify(newValue));
+                }
+                return newValue;
+            });
+        },
+    };
 }
