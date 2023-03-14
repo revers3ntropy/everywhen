@@ -237,6 +237,17 @@ export class Event extends Controller {
         auth: Auth,
         labelId: string,
     ): Promise<Result<Event>> {
+        if (!labelId) {
+            delete this.label;
+            await query`
+                UPDATE events
+                SET label = NULL
+                WHERE id = ${this.id}
+                  AND user = ${auth.id}
+            `;
+            return Result.ok(this);
+        }
+        
         const { err } = await this.addLabel(query, auth, labelId);
         if (err) return Result.err(err);
 

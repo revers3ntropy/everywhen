@@ -10,7 +10,9 @@
     import TimelineOutline from 'svelte-material-icons/TimelineOutline.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import { api } from '../../lib/api/apiQuery';
+    import LabelSelect from '../../lib/components/LabelSelect.svelte';
     import { Event } from '../../lib/controllers/event';
+    import { Label } from '../../lib/controllers/label';
     import type { Auth } from '../../lib/controllers/user';
     import { displayNotifOnErr, parseTimestampFromInput } from '../../lib/utils';
     import { fmtTimestampForInput } from '../../lib/utils.js';
@@ -24,8 +26,17 @@
     export let changeEventCount: (by: number) => void;
 
     let nameInput: HTMLInputElement;
+    let labels: Label[] = [];
+    let label: string = event.label?.id || '';
 
-    async function updateEvent (changes) {
+    async function updateEvent (
+        changes: {
+            name?: string;
+            start?: number;
+            end?: number;
+            label?: Label['id'];
+        },
+    ) {
         displayNotifOnErr(addNotification,
             await api.put(auth, `/events/${event.id}`, changes),
         );
@@ -41,6 +52,13 @@
     async function updateStart ({ target }: Event) {
         await updateEvent({
             start: parseTimestampFromInput(target.value),
+        });
+    }
+
+    async function updateStartAndEnd ({ target }: Event) {
+        await updateEvent({
+            start: parseTimestampFromInput(target.value),
+            end: parseTimestampFromInput(target.value),
         });
     }
 
@@ -95,6 +113,18 @@
         } as Event);
     }
 
+    async function updateLabel (
+        { detail: { id } }: CustomEvent<{ id: string }>,
+    ) {
+        if (id === (event.label?.id || '')) {
+            return;
+        }
+        event.label = labels.find(l => l.id === id) || undefined;
+        await updateEvent({
+            label: id,
+        });
+    }
+
     const createdFmt = moment(new Date(event.start * 1000))
         .format('hh:mm DD/MM/YYYY');
 
@@ -108,7 +138,6 @@
     $: if (browser && selectNameId === event.id && nameInput) {
         nameInput.focus();
     }
-
 </script>
 
 {#if event.deleted}
@@ -125,6 +154,12 @@
 {:else}
     <div class="header">
         <i>Created {createdFmt}</i>
+        <LabelSelect
+            on:change={updateLabel}
+            value={event.label?.id || ''}
+            bind:labels={labels}
+            {auth}
+        />
         <button
             class="danger"
             on:click={deleteEvent}
@@ -146,7 +181,7 @@
                 <i>at</i>
                 <input
                     class="editable-text"
-                    on:change={(e) => (updateStart(e), updateEnd(e))}
+                    on:change={(e) => updateStartAndEnd(e)}
                     placeholder="Start"
                     type="datetime-local"
                     value={fmtTimestampForInput(event.start)}

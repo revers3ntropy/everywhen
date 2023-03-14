@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
+    import { createEventDispatcher, onMount } from 'svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import Dropdown from '../../lib/components/Dropdown.svelte';
@@ -8,14 +8,19 @@
     import { displayNotifOnErr, showPopup } from '../utils';
     import NewLabelDialog from './dialogs/NewLabelDialog.svelte';
 
+    const dispatch = createEventDispatcher();
+
     const { addNotification } = getNotificationsContext();
 
-    let closeLabelDropDown;
-
-    let labels = [];
-    export let value = "";
+    export let labels = [];
+    export let value = '';
     export let auth;
+    export let showAddButton = true;
     export let filter: (l: Label) => boolean = () => true;
+
+    let closeDropDown;
+
+    $: dispatch('change', { id: value });
 
     function showNewLabelPopup () {
         showPopup(NewLabelDialog, { auth }, async () => {
@@ -23,6 +28,7 @@
                 await api.get(auth, '/labels'),
             );
             labels = res.labels;
+            // set to last created label
             value = labels.sort((a, b) => b.created - a.created)[0].id;
         });
     }
@@ -34,7 +40,8 @@
         labels = res.labels;
 
         // if we delete a label while it was selected, unselect
-        if (!labels.find(l => l.id === value)) {
+        if (!labels.find(l => l.id === value) && value !== '') {
+            console.error(`Label ${value} not found`);
             value = '';
         }
     }
@@ -44,8 +51,7 @@
 </script>
 <div class="select-label">
     <Dropdown
-        bind:value={value}
-        bind:close={closeLabelDropDown}
+        bind:close={closeDropDown}
         rounded
     >
         <span slot="button" class="select-button">
@@ -58,14 +64,14 @@
             {labels.find(l => l.id === value)?.name || '(No Label)'}
         </span>
         <button
-            on:click={() => { closeLabelDropDown(); value = '' }}
+            on:click={() => { closeDropDown(); value = '' }}
             class="label-button single"
         >
             <i>(No Label)</i>
         </button>
         {#each labels.filter(filter) as label (label.id)}
             <button
-                on:click={() => { closeLabelDropDown(); value = label.id }}
+                on:click={() => { closeDropDown(); value = label.id }}
                 class="label-button"
             >
                 <span
@@ -80,10 +86,11 @@
             </button>
         {/each}
     </Dropdown>
-
-    <button on:click={showNewLabelPopup} class="icon-button">
-        <Plus size="25" />
-    </button>
+    {#if showAddButton}
+        <button on:click={showNewLabelPopup} class="icon-button">
+            <Plus size="25" />
+        </button>
+    {/if}
 </div>
 <style lang="less">
     @import '../../styles/variables.less';

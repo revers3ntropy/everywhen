@@ -18,7 +18,9 @@ export const PUT: RequestHandler = async ({ request, params, cookies }) => {
         name: '',
         start: 0,
         end: 0,
-        label: '',
+        // not a very nice solution, make sure this
+        // can't be used as a valid ID
+        label: 'NO_CHANGE',
     });
 
     const { err, val: event } = await Event.fromId(query, auth, params.eventId);
@@ -39,7 +41,7 @@ export const PUT: RequestHandler = async ({ request, params, cookies }) => {
         if (err) throw error(400, err);
     }
 
-    if (body.label) {
+    if (body.label !== 'NO_CHANGE') {
         const { err } = await event.updateLabel(query, auth, body.label);
         if (err) throw error(400, err);
     }

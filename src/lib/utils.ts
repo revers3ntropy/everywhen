@@ -116,9 +116,16 @@ export class Result<T = null, E extends {} = string> {
     }
 }
 
+export const ERR_NOTIF_CONFIG = Object.freeze({
+    removeAfter: 8000,
+    text: 'An error has occurred',
+    type: 'error',
+    position: 'top-center',
+});
+
 export function getRawAuthFromCookies (): RawAuth {
     if (!browser) {
-        throw 'getKey() can only be used in the browser';
+        throw 'getRawAuthFromCookies() can only be used in the browser';
     }
     return {
         key: parse(document.cookie)[KEY_COOKIE_KEY],
