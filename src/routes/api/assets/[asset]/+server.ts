@@ -22,13 +22,16 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
 
     const img = Buffer.from(imgB64, 'base64');
 
-    return new Response(img, {
-        status: 200,
-        headers: {
-            'Content-Type': asset.contentType,
-            'Cache-Control': 'max-age=31536000, immutable',
-            'Content-Length': img.length,
-            // doesn't like Content-Length for some reason
-        } as unknown as HeadersInit,
-    });
+    return new Response(
+        img,
+        {
+            status: 200,
+            headers: {
+                'Content-Type': asset.contentType,
+                'Cache-Control': 'max-age=31536000, immutable',
+                'Content-Length': img.length,
+                // doesn't like Content-Length for some reason
+            } as unknown as HeadersInit,
+        },
+    );
 };

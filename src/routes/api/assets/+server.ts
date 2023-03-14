@@ -19,7 +19,9 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     );
     if (err) throw error(400, err);
 
-    return new Response(JSON.stringify({
-        id: val,
-    }), { status: 200 });
+    return new Response(
+        JSON.stringify({ id: val }),
+        {
+            status: 200,
+        });
 };

@@ -27,7 +27,8 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
     cookies.set(KEY_COOKIE_KEY, key, AUTH_COOKIE_OPTIONS);
     cookies.set(USERNAME_COOKIE_KEY, username, AUTH_COOKIE_OPTIONS);
 
-    return new Response('{}', {
-        status: 200,
-    });
+    return new Response(
+        '{}',
+        { status: 200 },
+    );
 };

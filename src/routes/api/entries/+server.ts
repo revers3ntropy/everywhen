@@ -33,7 +33,10 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
         totalEntries: numEntries,
     };
 
-    return new Response(JSON.stringify(response), { status: 200 });
+    return new Response(
+        JSON.stringify(response),
+        { status: 200 },
+    );
 };
 
 export const POST: RequestHandler = async ({ request, cookies }) => {

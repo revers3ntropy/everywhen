@@ -20,9 +20,10 @@ export const DELETE: RequestHandler = async ({ request, params, cookies }) => {
     );
     if (deleteErr) throw error(400, deleteErr);
 
-    return new Response(JSON.stringify({
-        id: params.entryId,
-    }), { status: 200 });
+    return new Response(
+        JSON.stringify({ id: params.entryId }),
+        { status: 200 },
+    );
 };
 
 export const PUT: RequestHandler = async ({ request, params, cookies }) => {
@@ -59,5 +60,8 @@ export const PUT: RequestHandler = async ({ request, params, cookies }) => {
         throw error(400, updateRes.err);
     }
 
-    return new Response(JSON.stringify({}), { status: 200 });
+    return new Response(
+        JSON.stringify({}),
+        { status: 200 },
+    );
 };

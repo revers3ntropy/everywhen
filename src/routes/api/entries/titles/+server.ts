@@ -17,7 +17,8 @@ export const GET: RequestHandler = async ({ cookies }) => {
                            .replace(/[^0-9a-z ]/gi, '');
     });
 
-    return new Response(JSON.stringify({
-        entries,
-    }), { status: 200 });
+    return new Response(
+        JSON.stringify({ entries }),
+        { status: 200 },
+    );
 };
