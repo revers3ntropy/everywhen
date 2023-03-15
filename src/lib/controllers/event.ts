@@ -166,6 +166,29 @@ export class Event extends Controller {
         `;
     }
 
+    public static jsonIsRawEvent (
+        json: unknown,
+    ): json is Omit<NonFunctionProperties<Event>, 'id' | 'label'> & {
+        label?: string
+    } {
+        return typeof json === 'object'
+            && json !== null
+            && 'name' in json
+            && typeof json.name === 'string'
+            && 'start' in json
+            && typeof json.start === 'number'
+            && 'end' in json
+            && typeof json.end === 'number'
+            && 'created' in json
+            && typeof json.created === 'number'
+            && (
+                !('label' in json)
+                || typeof json.label === 'string'
+                || json.label === null
+                || json.label === undefined
+            );
+    }
+
     public override json (): NonFunctionProperties<Event> {
         return {
             ...this,
@@ -247,7 +270,7 @@ export class Event extends Controller {
             `;
             return Result.ok(this);
         }
-        
+
         const { err } = await this.addLabel(query, auth, labelId);
         if (err) return Result.err(err);
 

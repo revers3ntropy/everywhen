@@ -23,6 +23,11 @@
     onMount(reload);
 </script>
 
+<svelte:head>
+    <title>Labels</title>
+    <meta content="Labels" name="description" />
+</svelte:head>
+
 <main>
     <div class="labels">
         <NewLabelForm auth={data} on:submit={reload} />

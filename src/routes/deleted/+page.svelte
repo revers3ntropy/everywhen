@@ -34,6 +34,11 @@
     onMount(reload);
 </script>
 
+<svelte:head>
+    <title>Deleted</title>
+    <meta content="Deleted" name="description" />
+</svelte:head>
+
 <main>
     <h1>Bin</h1>
     {#each entries as entry}

@@ -30,6 +30,11 @@
     }
 </script>
 
+<svelte:head>
+    <title>{data.label.name} - Label</title>
+    <meta content="Label" name="description" />
+</svelte:head>
+
 <main>
     <div class="colour-select" style="border-color: {data.label.colour}">
         {data.label.colour}

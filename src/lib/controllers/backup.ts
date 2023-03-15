@@ -5,18 +5,19 @@ import { nowS, Result } from '../utils';
 import { Asset } from './asset';
 import { Controller } from './controller';
 import { Entry } from './entry';
+import { Event } from './event';
 import { Label } from './label';
 import type { Auth } from './user';
 
 export class Backup extends Controller {
     public constructor (
         public entries: {
+            title: string;
             label?: string; // label's name
             entry: string;
-            created: number;
             latitude?: number;
             longitude?: number;
-            title: string;
+            created: number;
         }[],
         public labels: {
             name: string;
@@ -27,8 +28,15 @@ export class Backup extends Controller {
             publicId: string;
             fileName: string;
             content: string;
-            created: number;
             contentType: string;
+            created: number;
+        }[],
+        public events: {
+            name: string,
+            label?: string, // label's name
+            start: number,
+            end: number,
+            created: number,
         }[],
         public created: number,
     ) {
@@ -40,9 +48,10 @@ export class Backup extends Controller {
         auth: Auth,
     ): Promise<Result<Backup>> {
         // use allRaw to keep the label as a string (it's Id)
-        const { err, val: entries } = await Entry.all(query, auth);
-        if (err) return Result.err(err);
-
+        const { err: entryErr, val: entries } = await Entry.all(query, auth);
+        if (entryErr) return Result.err(entryErr);
+        const { err: eventsErr, val: events } = await Event.all(query, auth);
+        if (eventsErr) return Result.err(eventsErr);
         const labels = await Label.all(query, auth);
         const assets = await Asset.all(query, auth);
 
@@ -70,6 +79,13 @@ export class Backup extends Controller {
                 created: asset.created,
                 contentType: asset.contentType,
             })),
+            events.map((event) => ({
+                name: event.name,
+                label: event.label?.name,
+                start: event.start,
+                end: event.end,
+                created: event.created,
+            })),
             nowS(),
         ));
     }
@@ -90,17 +106,19 @@ export class Backup extends Controller {
             entries: 'object',
             labels: 'object',
             assets: 'object',
+            events: 'object',
         })) {
             return Result.err(
                 'data must be an object with entries and labels properties',
             );
         }
 
-        const { entries, labels, assets } = decryptedData;
+        const { entries, labels, assets, events } = decryptedData;
         if (
             !Array.isArray(entries)
             || !Array.isArray(labels)
             || !Array.isArray(assets)
+            || !Array.isArray(events)
         ) {
             return Result.err(
                 'data must be an object with entries and labels properties',
@@ -136,6 +154,34 @@ export class Backup extends Controller {
             }
 
             const { err } = await Entry.create(query, auth, entry);
+            if (err) return Result.err(err);
+        }
+
+        await Event.purgeAll(query, auth);
+
+        for (const event of events) {
+            if (!Event.jsonIsRawEvent(event)) {
+                console.log(event);
+                return Result.err('Invalid event format in JSON');
+            }
+
+            if (event.label) {
+                const { err, val } = await Label.getIdFromName(
+                    query, auth,
+                    event.label,
+                );
+                if (err) return Result.err(err);
+                event.label = val;
+            }
+
+            const { err } = await Event.create(
+                query, auth,
+                event.name,
+                event.start,
+                event.end,
+                event.label,
+                event.created,
+            );
             if (err) return Result.err(err);
         }
 

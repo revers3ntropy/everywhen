@@ -17,6 +17,11 @@
     };
 </script>
 
+<svelte:head>
+    <title>Analytics</title>
+    <meta content="Analytics" name="description" />
+</svelte:head>
+
 <main>
     {#if data.entries.length === 0}
         <section class="container unbordered">

@@ -6,6 +6,11 @@
     export let data: App.PageData;
 </script>
 
+<svelte:head>
+    <title>View Entry</title>
+    <meta content="View Entry" name="description" />
+</svelte:head>
+
 <main>
     <Entry {...data} auth={data} obfuscated={$obfuscated} />
 </main>

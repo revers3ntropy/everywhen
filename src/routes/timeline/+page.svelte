@@ -30,6 +30,11 @@
     });
 </script>
 
+<svelte:head>
+    <title>Timeline</title>
+    <meta content="Timeline" name="description" />
+</svelte:head>
+
 <main>
     <Canvas>
         <Controls />

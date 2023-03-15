@@ -64,6 +64,11 @@
         ]?.id || '';
 </script>
 
+<svelte:head>
+    <title>Events</title>
+    <meta content="Events" name="description" />
+</svelte:head>
+
 <main>
     <h1>Events ({eventCount})</h1>
 
