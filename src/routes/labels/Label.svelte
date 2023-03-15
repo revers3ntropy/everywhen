@@ -1,9 +1,8 @@
 <script lang="ts">
-    import { createEventDispatcher } from 'svelte';
+    import { createEventDispatcher, onMount } from 'svelte';
     import Delete from 'svelte-material-icons/Delete.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
-    import { api } from '../../lib/api/apiQuery';
-    import type { Entry } from '../../lib/controllers/entry';
+    import { api, apiPath } from '../../lib/api/apiQuery';
     import type { Auth } from '../../lib/controllers/user';
     import { showPopup } from '../../lib/utils';
     import { displayNotifOnErr } from '../../lib/utils.js';
@@ -20,9 +19,14 @@
     export let editable = true;
     export let created: number;
 
-    async function put (changes: any) {
+    async function put (
+        changes: {
+            name?: string;
+            colour?: string;
+        },
+    ) {
         displayNotifOnErr(addNotification,
-            await api.put(auth, `/labels/${id}`, changes),
+            await api.put(auth, apiPath(`/labels/`, id), changes),
         );
         dispatch('updated');
     }
@@ -30,7 +34,7 @@
     async function deleteLabel () {
         if (numEntries === 0) {
             displayNotifOnErr(addNotification,
-                await api.delete(auth, `/labels/${id}`),
+                await api.delete(auth, apiPath(`/labels/`, id)),
             );
             dispatch('updated');
             return;
@@ -40,7 +44,7 @@
             auth,
             id,
             colour,
-            name
+            name,
         }, () => {
             dispatch('updated');
         });
@@ -48,11 +52,11 @@
 
     let numEntries = -1;
 
-    $: api.get(auth, `/entries?labelId=${id}`)
-          .then(res => displayNotifOnErr(addNotification, res))
-          .then((entries: { entries: Entry[] }) => {
-              numEntries = entries.entries.length;
-          });
+    onMount(async () => {
+        const entries = await api.get(auth, `/entries`, { labelId: id })
+                                 .then(res => displayNotifOnErr(addNotification, res));
+        numEntries = entries.entries.length;
+    });
 </script>
 <div class="label {editable ? 'editable' : ''}">
     {#if editable}

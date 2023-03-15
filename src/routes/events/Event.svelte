@@ -9,7 +9,7 @@
     import TimelineClockOutline from 'svelte-material-icons/TimelineClockOutline.svelte';
     import TimelineOutline from 'svelte-material-icons/TimelineOutline.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
-    import { api } from '../../lib/api/apiQuery';
+    import { api, apiPath } from '../../lib/api/apiQuery';
     import LabelSelect from '../../lib/components/LabelSelect.svelte';
     import { Event } from '../../lib/controllers/event';
     import { Label } from '../../lib/controllers/label';
@@ -27,7 +27,7 @@
 
     let nameInput: HTMLInputElement;
     let labels: Label[] = [];
-    let label: string = event.label?.id || '';
+    let label = event.label?.id || '';
 
     async function updateEvent (
         changes: {
@@ -38,7 +38,7 @@
         },
     ) {
         displayNotifOnErr(addNotification,
-            await api.put(auth, `/events/${event.id}`, changes),
+            await api.put(auth, apiPath('/events/', event.id), changes),
         );
         dispatch('update');
     }
@@ -74,7 +74,7 @@
         }
         changeEventCount(-1);
         displayNotifOnErr(addNotification,
-            await api.delete(auth, `/events/${event.id}`),
+            await api.delete(auth, apiPath('/events/', event.id)),
         );
         dispatch('delete', event);
     }

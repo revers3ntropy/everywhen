@@ -1,7 +1,7 @@
 <script lang="ts">
     import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../../../app';
-    import { api } from '../../../lib/api/apiQuery';
+    import { api, apiPath } from '../../../lib/api/apiQuery';
     import Entries from '../../../lib/components/Entries.svelte';
     import type { Label } from '../../../lib/controllers/label';
     import { displayNotifOnErr } from '../../../lib/utils';
@@ -15,7 +15,7 @@
 
     async function updateName () {
         displayNotifOnErr(addNotification,
-            await api.put(data, `/labels/${data.label.id}`, {
+            await api.put(data, apiPath('/labels/', data.label.id), {
                 name: data.label.name,
             }),
         );
@@ -23,7 +23,7 @@
 
     async function updateColour () {
         displayNotifOnErr(addNotification,
-            await api.put(data, `/labels/${data.label.id}`, {
+            await api.put(data, apiPath('/labels/', data.label.id), {
                 colour: data.label.colour,
             }),
         );

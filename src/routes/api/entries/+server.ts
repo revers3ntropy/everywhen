@@ -3,10 +3,10 @@ import { Entry } from '../../../lib/controllers/entry';
 import { Label } from '../../../lib/controllers/label';
 import { query } from '../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
-import { getUnwrappedReqBody, nowS } from '../../../lib/utils';
+import { apiResponse, getUnwrappedReqBody, nowS } from '../../../lib/utils';
 import type { RequestHandler } from './$types';
 
-export const GET: RequestHandler = async ({ url, cookies }) => {
+export const GET = (async ({ url, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
 
     const pageSize = parseInt(url.searchParams.get('pageSize') || '50');
@@ -25,21 +25,16 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
     if (err) throw error(400, err);
     const [ entries, numEntries ] = val;
 
-    const response = {
+    return apiResponse({
         entries,
         page,
         pageSize,
         totalPages: Math.ceil(numEntries / pageSize),
         totalEntries: numEntries,
-    };
+    });
+}) satisfies RequestHandler;
 
-    return new Response(
-        JSON.stringify(response),
-        { status: 200 },
-    );
-};
-
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST = (async ({ request, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
 
     const body = await getUnwrappedReqBody(request, {
@@ -67,8 +62,5 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     const { val: id, err } = await Entry.create(query, auth, body);
     if (err) throw error(400, err);
 
-    return new Response(
-        JSON.stringify({ id }),
-        { status: 201 },
-    );
-};
+    return apiResponse({ id });
+}) satisfies RequestHandler;

@@ -3,22 +3,19 @@ import { Entry } from '../../../../lib/controllers/entry';
 import { Label } from '../../../../lib/controllers/label';
 import { query } from '../../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../../lib/security/getAuthFromCookies';
-import { getUnwrappedReqBody } from '../../../../lib/utils';
+import { apiResponse, getUnwrappedReqBody } from '../../../../lib/utils';
 import type { RequestHandler } from './$types';
 
-export const GET: RequestHandler = async ({ cookies, params }) => {
+export const GET = (async ({ cookies, params }) => {
     const auth = await getAuthFromCookies(cookies);
 
     const { val: label, err } = await Label.fromId(query, auth, params.labelId);
     if (err) throw error(404, err);
 
-    return new Response(
-        JSON.stringify(label),
-        { status: 200 },
-    );
-};
+    return apiResponse(label.json());
+}) satisfies RequestHandler;
 
-export const PUT: RequestHandler = async ({ cookies, request, params }) => {
+export const PUT = (async ({ cookies, request, params }) => {
     const auth = await getAuthFromCookies(cookies);
     const body = await getUnwrappedReqBody(request, {
         name: 'string',
@@ -42,13 +39,10 @@ export const PUT: RequestHandler = async ({ cookies, request, params }) => {
         if (err) throw error(400, err);
     }
 
-    return new Response(
-        JSON.stringify({}),
-        { status: 200 },
-    );
-};
+    return apiResponse({});
+}) satisfies RequestHandler;
 
-export let DELETE: RequestHandler = async ({ cookies, params }) => {
+export let DELETE = (async ({ cookies, params }) => {
     const auth = await getAuthFromCookies(cookies);
 
     if (!await Label.userHasLabelWithId(query, auth, params.labelId)) {
@@ -72,8 +66,5 @@ export let DELETE: RequestHandler = async ({ cookies, params }) => {
     // TODO: don't actually delete, just mark as deleted
     await Label.purgeWithId(query, auth, params.labelId);
 
-    return new Response(
-        JSON.stringify({}),
-        { status: 200 },
-    );
-};
+    return apiResponse({});
+}) satisfies RequestHandler;

@@ -1,25 +1,25 @@
 import { error } from '@sveltejs/kit';
 import { Entry } from '../../../lib/controllers/entry';
+import { Event } from '../../../lib/controllers/event';
 import { query } from '../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
-import { wordCount } from '../../../lib/utils';
+import { apiResponse, wordCount } from '../../../lib/utils';
 import type { RequestHandler } from './$types';
 
-export const GET: RequestHandler = async ({ cookies }) => {
+export const GET = (async ({ cookies }) => {
     const auth = await getAuthFromCookies(cookies);
 
     let { val: entries, err } = await Entry.all(query, auth);
     if (err) throw error(400, err);
 
-    let response = entries.map(e => ({
-        id: e.id,
-        created: e.created,
-        title: e.title,
-        wordCount: wordCount(e.entry),
-    }));
+    let { val: events, err: eventsErr } = await Event.all(query, auth);
+    if (eventsErr) throw error(400, eventsErr);
 
-    return new Response(
-        JSON.stringify({ entries: response }),
-        { status: 200 },
-    );
-};
+    return apiResponse({
+        entries: entries.map(e => ({
+            ...e,
+            wordCount: wordCount(e.entry),
+        })),
+        events,
+    });
+}) satisfies RequestHandler;

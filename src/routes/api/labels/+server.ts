@@ -2,21 +2,18 @@ import { error } from '@sveltejs/kit';
 import { Label } from '../../../lib/controllers/label';
 import { query } from '../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
-import { getUnwrappedReqBody } from '../../../lib/utils';
+import { apiResponse, getUnwrappedReqBody } from '../../../lib/utils';
 import type { RequestHandler } from './$types';
 
-export const GET: RequestHandler = async ({ cookies }) => {
+export const GET = (async ({ cookies }) => {
     const auth = await getAuthFromCookies(cookies);
 
     const labels = await Label.all(query, auth);
 
-    return new Response(
-        JSON.stringify({ labels }),
-        { status: 200 },
-    );
-};
+    return apiResponse({ labels });
+}) satisfies RequestHandler;
 
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST = (async ({ request, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
 
     const body = await getUnwrappedReqBody(request, {
@@ -33,4 +30,4 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
         JSON.stringify({ id: label.id }),
         { status: 201 },
     );
-};
+}) satisfies RequestHandler;

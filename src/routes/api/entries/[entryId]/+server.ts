@@ -3,10 +3,10 @@ import { Entry } from '../../../../lib/controllers/entry';
 import { Label } from '../../../../lib/controllers/label';
 import { query } from '../../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../../lib/security/getAuthFromCookies';
-import { getUnwrappedReqBody } from '../../../../lib/utils';
+import { apiResponse, getUnwrappedReqBody } from '../../../../lib/utils';
 import type { RequestHandler } from './$types';
 
-export const DELETE: RequestHandler = async ({ request, params, cookies }) => {
+export const DELETE = (async ({ request, params, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
     if (!params.entryId) throw error(400, 'invalid id');
 
@@ -20,13 +20,10 @@ export const DELETE: RequestHandler = async ({ request, params, cookies }) => {
     );
     if (deleteErr) throw error(400, deleteErr);
 
-    return new Response(
-        JSON.stringify({ id: params.entryId }),
-        { status: 200 },
-    );
-};
+    return apiResponse({ id: params.entryId });
+}) satisfies RequestHandler;
 
-export const PUT: RequestHandler = async ({ request, params, cookies }) => {
+export const PUT = (async ({ request, params, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
 
     if (!params.entryId) {
@@ -60,8 +57,5 @@ export const PUT: RequestHandler = async ({ request, params, cookies }) => {
         throw error(400, updateRes.err);
     }
 
-    return new Response(
-        JSON.stringify({}),
-        { status: 200 },
-    );
-};
+    return apiResponse({});
+}) satisfies RequestHandler;

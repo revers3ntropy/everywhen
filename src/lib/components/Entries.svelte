@@ -95,16 +95,6 @@
         const res = displayNotifOnErr(addNotification,
             await api.get(auth, '/entries/titles'),
         );
-        if (!res.entries) {
-            console.error(res);
-            addNotification({
-                text: `Cannot load entries: ${res.body?.message}`,
-                position: 'top-center',
-                type: 'error',
-                removeAfter: 4000,
-            });
-            return;
-        }
         entryTitles = Entry.groupEntriesByDay(res.entries);
     }
 

@@ -3,22 +3,19 @@ import { Event } from '../../../lib/controllers/event';
 import { Label } from '../../../lib/controllers/label';
 import { query } from '../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
-import { getUnwrappedReqBody, nowS } from '../../../lib/utils';
+import { apiResponse, getUnwrappedReqBody, nowS } from '../../../lib/utils';
 import type { RequestHandler } from './$types';
 
-export const GET: RequestHandler = async ({ cookies }) => {
+export const GET = (async ({ cookies }) => {
     const auth = await getAuthFromCookies(cookies);
 
     const { err, val: events } = await Event.all(query, auth);
     if (err) throw error(400, err);
 
-    return new Response(
-        JSON.stringify({ events }),
-        { status: 200 },
-    );
-};
+    return apiResponse({ events });
+}) satisfies RequestHandler;
 
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST = (async ({ request, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
 
     const body = await getUnwrappedReqBody(request, {
@@ -49,9 +46,5 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     );
     if (err) throw error(400, err);
 
-    return new Response(
-        JSON.stringify({ id: event.id }),
-        { status: 201 },
-    );
-
-};
+    return apiResponse({ id: event.id });
+}) satisfies RequestHandler;

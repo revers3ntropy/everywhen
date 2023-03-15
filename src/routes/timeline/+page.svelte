@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type { NonFunctionProperties } from '$lib/utils.js';
     import { onMount } from 'svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../../app';
@@ -6,6 +7,7 @@
     import Background from '../../lib/canvas/Background.svelte';
     import Canvas from '../../lib/canvas/Canvas.svelte';
     import type { Entry } from '../../lib/controllers/entry';
+    import type { Event } from '../../lib/controllers/event';
     import { displayNotifOnErr } from '../../lib/utils';
     import CenterLine from './CenterLine.svelte';
     import Controls from './Controls.svelte';
@@ -18,15 +20,19 @@
 
     export let data: App.PageData;
 
-    let entries: (Entry & { wordCount: number })[] = [];
+    let timeline: {
+        entries: (NonFunctionProperties<Entry> & { wordCount: number })[],
+        events: NonFunctionProperties<Event>[],
+    } = {
+        entries: [],
+        events: [],
+    };
     let events: Event[] = [];
 
     onMount(async () => {
-        let res = displayNotifOnErr(addNotification,
+        timeline = displayNotifOnErr(addNotification,
             await api.get(data, '/timeline'),
         );
-        entries = res.entries;
-        events = res.events;
     });
 </script>
 
@@ -46,7 +52,7 @@
         <NowLine />
         <TimeCursor />
 
-        {#each entries as entry, i}
+        {#each timeline.entries as entry, i}
             <EntryInTimeline
                 {...entry}
                 entryTextParityHeight={i % 2 === 0}

@@ -3,9 +3,9 @@ import { error } from '@sveltejs/kit';
 import { Asset } from '../../../lib/controllers/asset';
 import { query } from '../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
-import { getUnwrappedReqBody } from '../../../lib/utils';
+import { apiResponse, getUnwrappedReqBody } from '../../../lib/utils';
 
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST = (async ({ request, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
 
     const body = await getUnwrappedReqBody(request, {
@@ -19,9 +19,5 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     );
     if (err) throw error(400, err);
 
-    return new Response(
-        JSON.stringify({ id: val }),
-        {
-            status: 200,
-        });
-};
+    return apiResponse({ id: val });
+}) satisfies RequestHandler;

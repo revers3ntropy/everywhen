@@ -2,10 +2,10 @@ import { error } from '@sveltejs/kit';
 import { Event } from '../../../../lib/controllers/event';
 import { query } from '../../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../../lib/security/getAuthFromCookies';
-import { getUnwrappedReqBody } from '../../../../lib/utils';
+import { apiResponse, getUnwrappedReqBody } from '../../../../lib/utils';
 import type { RequestHandler } from './$types';
 
-export const PUT: RequestHandler = async ({ request, params, cookies }) => {
+export const PUT = (async ({ request, params, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
     if (!params.eventId) throw error(400, 'invalid event id');
 
@@ -46,13 +46,10 @@ export const PUT: RequestHandler = async ({ request, params, cookies }) => {
         if (err) throw error(400, err);
     }
 
-    return new Response(
-        JSON.stringify({ event: event.json() }),
-        { status: 200 },
-    );
-};
+    return apiResponse({ event: event.json() });
+}) satisfies RequestHandler;
 
-export const DELETE: RequestHandler = async ({ params, cookies }) => {
+export const DELETE = (async ({ params, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
     if (!params.eventId) throw error(400, 'invalid event id');
 
@@ -61,8 +58,5 @@ export const DELETE: RequestHandler = async ({ params, cookies }) => {
     const { err: deleteErr } = await event.delete(query, auth);
     if (deleteErr) throw error(400, deleteErr);
 
-    return new Response(
-        JSON.stringify({}),
-        { status: 200 },
-    );
-};
+    return apiResponse({});
+}) satisfies RequestHandler;

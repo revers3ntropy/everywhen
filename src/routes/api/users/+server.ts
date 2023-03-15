@@ -9,9 +9,9 @@ import { Backup } from '../../../lib/controllers/backup';
 import { User } from '../../../lib/controllers/user';
 import { query } from '../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
-import { getUnwrappedReqBody } from '../../../lib/utils';
+import { apiResponse, getUnwrappedReqBody } from '../../../lib/utils';
 
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST = (async ({ request, cookies }) => {
     const body = await getUnwrappedReqBody(request, {
         username: 'string',
         password: 'string',
@@ -23,13 +23,10 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
     cookies.set(KEY_COOKIE_KEY, body.password, AUTH_COOKIE_OPTIONS);
     cookies.set(USERNAME_COOKIE_KEY, body.username, AUTH_COOKIE_OPTIONS);
 
-    return new Response(
-        JSON.stringify({}),
-        { status: 200 },
-    );
-};
+    return apiResponse({});
+}) satisfies RequestHandler;
 
-export const DELETE: RequestHandler = async ({ cookies }) => {
+export const DELETE = (async ({ cookies }) => {
     const auth = await getAuthFromCookies(cookies);
 
     const { err, val: backup } = await Backup.generate(query, auth);
@@ -40,10 +37,7 @@ export const DELETE: RequestHandler = async ({ cookies }) => {
     cookies.delete(KEY_COOKIE_KEY, AUTH_COOKIE_OPTIONS);
     cookies.delete(USERNAME_COOKIE_KEY, AUTH_COOKIE_OPTIONS);
 
-    return new Response(
-        JSON.stringify({
-            backup: backup.asEncryptedString(auth),
-        }),
-        { status: 200 },
-    );
-};
+    return apiResponse({
+        backup: backup.asEncryptedString(auth),
+    });
+}) satisfies RequestHandler;

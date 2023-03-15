@@ -7,8 +7,9 @@ import {
 } from '../../../lib/constants';
 import { User } from '../../../lib/controllers/user';
 import { query } from '../../../lib/db/mysql';
+import { apiResponse } from '../../../lib/utils';
 
-export const GET: RequestHandler = async ({ url, cookies }) => {
+export const GET = (async ({ url, cookies }) => {
     let key: string | undefined | null = url.searchParams.get('key');
     const username: string | undefined | null = url.searchParams.get('username');
 
@@ -27,8 +28,5 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
     cookies.set(KEY_COOKIE_KEY, key, AUTH_COOKIE_OPTIONS);
     cookies.set(USERNAME_COOKIE_KEY, username, AUTH_COOKIE_OPTIONS);
 
-    return new Response(
-        '{}',
-        { status: 200 },
-    );
-};
+    return apiResponse({});
+}) satisfies RequestHandler;

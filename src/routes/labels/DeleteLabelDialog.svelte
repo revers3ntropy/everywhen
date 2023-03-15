@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { getNotificationsContext } from 'svelte-notifications';
-    import { api } from '../../lib/api/apiQuery';
+    import { api, apiPath } from '../../lib/api/apiQuery';
     import LabelSelect from '../../lib/components/LabelSelect.svelte';
     import { popup } from '../../lib/constants';
     import type { Entry } from '../../lib/controllers/entry';
@@ -19,7 +19,7 @@
 
     async function reloadEntries (auth: Auth, id: string) {
         const data = await api
-            .get(auth, `/entries?labelId=${id}`)
+            .get(auth, `/entries`, { labelId: id })
             .then((res) => (
                 displayNotifOnErr(addNotification, res)
             ));
@@ -29,14 +29,14 @@
     onMount(() => reloadEntries(auth, id));
     let changeLabelId: string;
 
-    async function delAndEntries () {
+    async function delAndDelEntries () {
         await Promise.all(entries.map(async entry => {
             displayNotifOnErr(addNotification,
-                await api.delete(auth, `/entries/${entry.id}`),
+                await api.delete(auth, apiPath('/entries/', entry.id)),
             );
         }));
         displayNotifOnErr(addNotification,
-            await api.delete(auth, `/labels/${id}`),
+            await api.delete(auth, apiPath('/labels/', id)),
         );
         popup.set(null);
     }
@@ -44,13 +44,13 @@
     async function delAndRmLabel () {
         await Promise.all(entries.map(async entry => {
             displayNotifOnErr(addNotification,
-                await api.put(auth, `/entries/${entry.id}`, {
+                await api.put(auth, apiPath(`/entries/`, entry.id), {
                     label: null,
                 }),
             );
         }));
         displayNotifOnErr(addNotification,
-            await api.delete(auth, `/labels/${id}`),
+            await api.delete(auth, apiPath(`/labels/`, id)),
         );
         popup.set(null);
     }
@@ -58,13 +58,13 @@
     async function delAndReassign () {
         await Promise.all(entries.map(async entry => {
             displayNotifOnErr(addNotification,
-                await api.put(auth, `/entries/${entry.id}`, {
+                await api.put(auth, apiPath('/entries/', entry.id), {
                     label: changeLabelId,
                 }),
             );
         }));
         displayNotifOnErr(addNotification,
-            await api.delete(auth, `/labels/${id}`),
+            await api.delete(auth, apiPath('/labels/', id)),
         );
         popup.set(null);
     }
@@ -85,7 +85,7 @@
             </button>
         </div>
         <div>
-            <button on:click={delAndEntries}>
+            <button on:click={delAndDelEntries}>
                 Delete Entries with this Label
             </button>
         </div>
