@@ -13,5 +13,5 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
     );
     if (err) throw redirect(307, '/diary');
 
-    return entry.json();
+    return { ...entry, label: { ...entry.label } };
 };

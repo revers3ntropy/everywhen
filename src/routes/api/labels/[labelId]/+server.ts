@@ -12,7 +12,7 @@ export const GET = (async ({ cookies, params }) => {
     const { val: label, err } = await Label.fromId(query, auth, params.labelId);
     if (err) throw error(404, err);
 
-    return apiResponse(label.json());
+    return apiResponse(label);
 }) satisfies RequestHandler;
 
 export const PUT = (async ({ cookies, request, params }) => {
@@ -29,13 +29,13 @@ export const PUT = (async ({ cookies, request, params }) => {
     if (err) throw error(400, err);
 
     if (body.name) {
-        const { err, val } = await label.updateName(query, auth, body.name);
+        const { err, val } = await Label.updateName(query, auth, label, body.name);
         if (err) throw error(400, err);
         label = val;
     }
 
     if (body.colour) {
-        const { err } = await label.updateColour(query, body.colour);
+        const { err } = await Label.updateColour(query, label, body.colour);
         if (err) throw error(400, err);
     }
 

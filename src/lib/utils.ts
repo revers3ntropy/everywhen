@@ -1,6 +1,5 @@
 import { browser } from '$app/environment';
 import { error } from '@sveltejs/kit';
-import { parse } from 'cookie';
 import * as crypto from 'crypto';
 import type { Schema, SchemaResult } from 'schemion';
 import schemion from 'schemion';
@@ -9,8 +8,7 @@ import { bind } from 'svelte-simple-modal';
 import type { SvelteComponentDev } from 'svelte/internal';
 import type { Writable } from 'svelte/store';
 import { writable } from 'svelte/store';
-import { KEY_COOKIE_KEY, OBFUSCATE_CHARS, popup, USERNAME_COOKIE_KEY } from './constants';
-import type { RawAuth } from './controllers/user';
+import { OBFUSCATE_CHARS, popup } from './constants';
 
 export interface NotificationOptions {
     id?: string;
@@ -71,10 +69,6 @@ export class Result<T = null, E extends {} = string> {
         return this.value !== RESULT_NULL;
     }
 
-    public get isErr (): boolean {
-        return this.error !== RESULT_NULL;
-    }
-
     public static collect<T, E extends {}> (
         iter: Result<T, E>[],
     ): Result<T[], E> {
@@ -117,22 +111,26 @@ export class Result<T = null, E extends {} = string> {
     }
 }
 
-export const ERR_NOTIF_CONFIG = Object.freeze({
+export const INFO_NOTIFICATION = Object.freeze({
+    removeAfter: 4000,
+    type: 'info',
+    position: 'top-center',
+} as const);
+
+export const ERR_NOTIFICATION = Object.freeze({
     removeAfter: 8000,
     text: 'An error has occurred',
     type: 'error',
     position: 'top-center',
-});
+} as const);
 
-export function getRawAuthFromCookies (): RawAuth {
-    if (!browser) {
-        throw 'getRawAuthFromCookies() can only be used in the browser';
-    }
-    return {
-        key: parse(document.cookie)[KEY_COOKIE_KEY],
-        username: parse(document.cookie)[USERNAME_COOKIE_KEY],
-    };
-}
+export const SUCCESS_NOTIFICATION = Object.freeze({
+    removeAfter: 4000,
+    text: 'Success',
+    type: 'success',
+    position: 'top-center',
+} as const);
+
 
 export function obfuscate (str: string, alphabet = OBFUSCATE_CHARS): string {
     return str.replace(/./g, (char) => {
@@ -296,10 +294,8 @@ export function displayNotifOnErr<T> (
         } catch (e) {
         }
         addNotification({
-            removeAfter: 8000,
+            ...ERR_NOTIFICATION,
             text: err || 'Unknown error',
-            type: 'error',
-            position: 'top-center',
             ...options,
         });
         throw err;
@@ -387,7 +383,7 @@ export class GenericResponse<T extends Record<string, unknown>> extends Response
     }
 }
 
-export function apiResponse<T extends Record<string, unknown>> (
+export function apiResponse<T extends {}> (
     body: T,
     init: ResponseInit = {},
 ): GenericResponse<T> {

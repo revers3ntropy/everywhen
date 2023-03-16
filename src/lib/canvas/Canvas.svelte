@@ -14,7 +14,7 @@
     }
 
     let listeners: Listener[] = [];
-    let frame;
+    let frame: number;
     let canvas: HTMLCanvasElement;
 
     let setupCanvas = false;
@@ -29,7 +29,7 @@
         for (const entity of listeners) {
             if (entity.setup) {
                 let p = entity.setup($canvasState);
-                if (p && p.then) await p;
+                if (p && (p as any).then) await p;
             }
             entity.ready = true;
         }
@@ -47,27 +47,27 @@
     });
 
     setContext(key, {
-        async add (fn) {
+        async add (fn: Listener) {
             if (setupCanvas) {
                 if (fn.setup) {
                     let p = fn.setup($canvasState);
-                    if (p && p.then) await p;
+                    if (p && (p as any).then) await p;
                 }
                 fn.ready = true;
             }
             this.remove(fn);
             listeners.push(fn);
         },
-        remove (fn) {
+        remove (fn: Listener) {
             const idx = listeners.indexOf(fn);
             if (idx >= 0) {
                 listeners.splice(idx, 1);
             }
-        }
+        },
     });
 
-    function render (dt) {
-        if (!$canvasState.ctx) throw "Canvas context not initialized";
+    function render (dt: number) {
+        if (!$canvasState.ctx) throw 'Canvas context not initialized';
         $canvasState.ctx.save();
         $canvasState.ctx.scale($canvasState.pixelRatio, $canvasState.pixelRatio);
         for (const entity of listeners) {
@@ -95,7 +95,7 @@
         });
     }
 
-    function createLoop (fn) {
+    function createLoop (fn: (elapsed: number, dt: number) => void) {
         let elapsed = 0;
         let lastTime = performance.now();
 
@@ -115,8 +115,15 @@
     }
 
     function executeListeners (event: Event, fn: keyof ICanvasState) {
-        for (const listener of $canvasState[fn]) {
-            listener(event);
+        const listeners = $canvasState[fn];
+        if (!listeners) throw `No listeners found for ${fn}`;
+        if (!Array.isArray(listeners)) throw `Listeners for ${fn} is not an array`;
+        for (const listener of listeners) {
+            if (!listener || typeof listener !== 'function') {
+                console.error(`Invalid listener for ${fn}`, listener);
+                throw new Error();
+            }
+            listener(event as MouseEvent & TouchEvent & WheelEvent);
         }
     }
 

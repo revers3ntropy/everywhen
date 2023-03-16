@@ -26,8 +26,5 @@ export const POST = (async ({ request, cookies }) => {
     const { val: label, err } = await Label.create(query, auth, body);
     if (err) throw error(400, err);
 
-    return new Response(
-        JSON.stringify({ id: label.id }),
-        { status: 201 },
-    );
+    return apiResponse({ id: label.id });
 }) satisfies RequestHandler;

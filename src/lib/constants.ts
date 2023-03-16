@@ -1,3 +1,4 @@
+import type { SvelteComponentDev } from 'svelte/internal';
 import { writable } from 'svelte/store';
 import { localStorageWritable, type Milliseconds } from './utils';
 
@@ -8,7 +9,7 @@ export const enabledLocation = localStorageWritable(
     '__misc_3_enabled_location', false);
 export const obfuscated = writable(false);
 
-export const popup = writable<unknown>(null);
+export const popup = writable<typeof SvelteComponentDev | null | undefined>(null);
 
 export const AUTH_COOKIE_OPTIONS = Object.freeze({
     path: '/',

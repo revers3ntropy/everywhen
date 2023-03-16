@@ -1,9 +1,8 @@
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { generateUUId } from '../security/uuid';
-import type { NonFunctionProperties, PickOptionalAndMutable } from '../utils';
+import type { PickOptionalAndMutable } from '../utils';
 import { nowS, Result } from '../utils';
-import { Controller } from './controller';
 import { Label } from './label';
 import type { Auth } from './user';
 
@@ -26,7 +25,7 @@ export type DecryptedRawEntry = Omit<RawEntry, 'decrypted'> & {
     decrypted: true
 };
 
-export class Entry extends Controller {
+export class Entry {
     public label?: Label;
     public readonly decrypted = true;
 
@@ -39,7 +38,6 @@ export class Entry extends Controller {
         public readonly latitude?: number,
         public readonly longitude?: number,
     ) {
-        super();
     }
 
     public static async delete (
@@ -178,23 +176,19 @@ export class Entry extends Controller {
         );
 
         if (rawEntry.label) {
-            const { err } = await entry.addLabel(
-                query, auth, rawEntry.label);
+            const { err } = await Entry.addLabel(
+                query, auth, entry, rawEntry.label,
+            );
             if (err) return Result.err(err);
         }
 
         return Result.ok(entry);
     }
 
-    public static groupEntriesByDay (
-        entries: Entry[],
-    ): Record<number, Entry[]> {
-        const grouped: Record<number, Entry[]> = [];
-
-        if (!Array.isArray(entries)) {
-            console.error('groupEntriesByDay: entries is not an array:', entries);
-            return {};
-        }
+    public static groupEntriesByDay<T extends { created: number } = Entry> (
+        entries: T[],
+    ): Record<number, T[]> {
+        const grouped: Record<number, T[]> = [];
 
         entries.forEach((entry) => {
             const day =
@@ -281,7 +275,7 @@ export class Entry extends Controller {
 
     public static jsonIsRawEntry (
         json: unknown,
-    ): json is Omit<NonFunctionProperties<Entry>, 'id' | 'label'> & {
+    ): json is Omit<Entry, 'id' | 'label'> & {
         label?: string
     } {
         return typeof json === 'object'
@@ -335,7 +329,7 @@ export class Entry extends Controller {
         );
 
         if (json.label) {
-            const { err } = await entry.addLabel(query, auth, json.label);
+            const { err } = await Entry.addLabel(query, auth, entry, json.label);
             if (err) return Result.err(err);
         }
 
@@ -356,75 +350,71 @@ export class Entry extends Controller {
         return Result.ok(entry);
     }
 
-    public override json (): NonFunctionProperties<Entry> {
-        return {
-            ...this,
-            label: this.label?.json(),
-        };
-    }
-
-    public async removeLabel (
+    public static async removeLabel (
         query: QueryFunc,
         auth: Auth,
+        self: Entry,
     ): Promise<Result<Entry>> {
-        if (!this.label) {
+        if (!self.label) {
             return Result.err('Entry does not have a label to remove');
         }
 
         await query`
             UPDATE entries
             SET label = ${null}
-            WHERE entries.id = ${this.id}
+            WHERE entries.id = ${self.id}
               AND user = ${auth.id}
         `;
 
-        this.label = undefined;
-        return Result.ok(this);
+        self.label = undefined;
+        return Result.ok(self);
     }
 
-    public async updateLabel (
+    public static async updateLabel (
         query: QueryFunc,
         auth: Auth,
+        self: Entry,
         label: Label | string | null,
     ): Promise<Result<Entry>> {
         if (label == null) {
-            return this.removeLabel(query, auth);
+            return Entry.removeLabel(query, auth, self);
         }
         if (label instanceof Label) {
             label = label.id;
         }
 
-        if (this.label?.id === label) {
+        if (self.label?.id === label) {
             return Result.err('Entry already has that label');
         }
 
         await query`
             UPDATE entries
             SET label = ${label}
-            WHERE id = ${this.id}
+            WHERE id = ${self.id}
               AND user = ${auth.id}
         `;
 
-        return await this.addLabel(query, auth, label);
+        return await Entry.addLabel(query, auth, self, label);
     }
 
-    public clone (): Entry {
+    public static clone (self: Entry): Entry {
         const entry = new Entry(
-            this.id,
-            this.title,
-            this.entry,
-            this.created,
-            this.deleted,
-            this.latitude,
-            this.longitude,
+            self.id,
+            self.title,
+            self.entry,
+            self.created,
+            self.deleted,
+            self.latitude,
+            self.longitude,
         );
-        entry.label = this.label;
+        entry.label = self.label;
         return entry;
     }
 
-    private async addLabel (
+    private static async addLabel (
         query: QueryFunc,
         auth: Auth,
+        self: Entry,
         label: Label | string,
     ): Promise<Result<Entry>> {
         if (typeof label === 'string') {
@@ -432,11 +422,11 @@ export class Entry extends Controller {
             if (err) {
                 return Result.err(err);
             }
-            this.label = val;
+            self.label = val;
         } else {
-            this.label = label;
+            self.label = label;
         }
 
-        return Result.ok(this);
+        return Result.ok(self);
     }
 }

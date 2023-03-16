@@ -1,11 +1,10 @@
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { generateUUId } from '../security/uuid';
-import { type NonFunctionProperties, nowS, Result } from '../utils';
-import { Controller } from './controller';
+import { nowS, Result } from '../utils';
 import type { Auth } from './user';
 
-export class Asset extends Controller {
+export class Asset {
 
     public static readonly fileExtToContentType: Readonly<Record<string, string>> =
         Object.freeze({
@@ -22,7 +21,6 @@ export class Asset extends Controller {
         public contentType: string,
         public created: number,
     ) {
-        super();
     }
 
     public static async create (
@@ -120,7 +118,7 @@ export class Asset extends Controller {
 
     public static jsonIsRawAsset (
         json: unknown,
-    ): json is Omit<NonFunctionProperties<Asset>, 'id'> {
+    ): json is Omit<Asset, 'id'> {
         return typeof json === 'object' &&
             json !== null &&
             'publicId' in json &&

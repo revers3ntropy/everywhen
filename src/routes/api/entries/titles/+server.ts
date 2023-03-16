@@ -1,8 +1,8 @@
-import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
 import { Entry } from '../../../../lib/controllers/entry';
 import { query } from '../../../../lib/db/mysql';
+import { getAuthFromCookies } from '../../../../lib/security/getAuthFromCookies';
 import type { Mutable } from '../../../../lib/utils';
 import { apiResponse } from '../../../../lib/utils';
 

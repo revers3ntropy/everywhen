@@ -21,7 +21,7 @@
             <div class="right"></div>
         </div>
         <ul>
-            {#each { length: 17 } as _, __}
+            {#each { length: 17 } as _}
                 <li></li>
             {/each}
         </ul>

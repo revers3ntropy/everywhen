@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { renderable } from "./canvas";
+    import { renderable } from './canvas';
 
-    export let color = null;
+    export let color: string | null = null;
 
     renderable(({ ctx, width, height }) => {
         ctx.clearRect(0, 0, width, height);

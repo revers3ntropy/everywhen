@@ -2,14 +2,14 @@
     import Dropdown from '../../lib/components/Dropdown.svelte';
 
     export let options: Record<string, any>;
-    export let key;
+    export let key: string;
 
     export let value;
     $: value = options[key];
 
     $: if (!(key in options)) key = Object.keys(options)[0];
 
-    let close;
+    let close: () => void;
 </script>
 
 <Dropdown bind:close>

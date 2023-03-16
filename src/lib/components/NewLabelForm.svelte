@@ -3,8 +3,7 @@
     import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../../app';
     import { api } from '../api/apiQuery';
-    import { popup } from '../constants';
-    import { displayNotifOnErr } from '../utils';
+    import { displayNotifOnErr, ERR_NOTIFICATION, SUCCESS_NOTIFICATION } from '../utils';
 
     const dispatch = createEventDispatcher();
     const { addNotification } = getNotificationsContext();
@@ -17,37 +16,22 @@
     async function closeHandler () {
         if (!labelName) {
             addNotification({
+                ...ERR_NOTIFICATION,
                 text: 'Invalid Name',
-                position: 'top-center',
-                type: 'error',
-                removeAfter: 6000,
             });
             return;
         }
 
-        const res = displayNotifOnErr(addNotification,
+        displayNotifOnErr(addNotification,
             await api.post(auth, '/labels', {
                 name: labelName,
                 colour: labelColour,
             }),
         );
 
-        if (!res.id) {
-            addNotification({
-                text: `Error creating label: ${res.body.message}`,
-                position: 'top-center',
-                type: 'error',
-                removeAfter: 6000,
-            });
-            popup.set(null);
-            return;
-        }
-
         addNotification({
+            ...SUCCESS_NOTIFICATION,
             text: 'Label created',
-            position: 'top-center',
-            type: 'success',
-            removeAfter: 3000,
         });
 
         labelName = '';

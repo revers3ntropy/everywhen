@@ -7,7 +7,7 @@
     import Canvas from '../../lib/canvas/Canvas.svelte';
     import type { Entry } from '../../lib/controllers/entry';
     import { Event } from '../../lib/controllers/event';
-    import { displayNotifOnErr, type NonFunctionProperties } from '../../lib/utils';
+    import { displayNotifOnErr } from '../../lib/utils';
     import CenterLine from './CenterLine.svelte';
     import Controls from './Controls.svelte';
     import EntryInTimeline from './EntryInTimeline.svelte';
@@ -21,17 +21,17 @@
     export let data: App.PageData;
 
     let timeline: {
-        entries: (NonFunctionProperties<Entry> & { wordCount: number })[],
-        events: NonFunctionProperties<Event>[],
+        entries: (Entry & { wordCount: number })[],
+        events: Event[],
     } = {
         entries: [],
         events: [],
     };
-    let events: ({ yLevel: number } & NonFunctionProperties<Event>)[];
+    let events: ({ yLevel: number } & Event)[];
 
     const eventBaseY = 4;
 
-    function updateEvents (rawEvents: NonFunctionProperties<Event>[]) {
+    function updateEvents (rawEvents: Event[]) {
         const evts: (typeof events) = rawEvents.sort((e1, e2) => {
             return Event.duration(e1) - Event.duration(e2);
         }).map(e => ({ ...e, yLevel: 0 }));

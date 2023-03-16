@@ -1,9 +1,10 @@
 <script lang="ts">
-	import type { Entry } from '$lib/types';
 	import moment from 'moment';
 	import Close from 'svelte-material-icons/Close.svelte';
 	import Menu from 'svelte-material-icons/Menu.svelte';
 	import Time from 'svelte-time';
+	import type { Entry } from '../../lib/controllers/entry';
+	import { nowS } from '../../lib/utils.js';
 
 	export let titles: Record<number, Entry[]>;
 	export let obfuscated = true;
@@ -30,19 +31,25 @@
             </button>
         </div>
 		<div class="content">
-			{#each Object.keys(titles).sort((a, b) => b - a) as day}
+			{#each Object.keys(titles)
+				.sort((a, b) => parseInt(b) - parseInt(a)) as day}
 				<div class="day">
 					<h2>
-						<Time format="dddd DD/MM/YY" timestamp={new Date(day * 1000)} />
+						<Time
+							format="dddd DD/MM/YY"
+							timestamp={new Date(parseInt(day) * 1000)}
+						/>
 						<span class="text-light">
-							{#if new Date() - new Date(day * 1000) < 8.64e7}
+							{#if nowS() - parseInt(day) < 8.64e4}
 								Today
-							{:else if new Date() - new Date(day * 1000) < 2 * 8.64e7}
+							{:else if nowS() - parseInt(day) < 2 * 8.64e4}
 								Yesterday
 							{:else}
 								<Time relative
 									  timestamp={new Date(
-											day * 1000 + (60 * 60 * 23 + 60 * 60 + 59) * 1000
+											parseInt(day) * 1000 + (
+												60 * 60 * 23 + 60 * 60 + 59
+											) * 1000
 										)}
 									  class="text-light"
 								/>
@@ -50,10 +57,11 @@
 						</span>
 					</h2>
 
-					{#each titles[day] as entry}
+					{#each titles[parseInt(day)] as entry}
 						<a class="entry" href="/diary/{entry.id}">
 							<span class="entry-time">
-								{moment(new Date(entry.created * 1000)).format('h:mm A')}
+								{moment(new Date(entry.created * 1000))
+									.format('h:mm A')}
 							</span>
 							<span
                                 class="entry-label-colour"
@@ -62,7 +70,9 @@
 							{#if entry.title}
 								{entry.title}
 							{:else}
-								<span class="entry-preview">{entry.entry}...</span>
+								<span class="entry-preview">
+									{entry.entry}...
+								</span>
 							{/if}
 						</a>
 					{/each}

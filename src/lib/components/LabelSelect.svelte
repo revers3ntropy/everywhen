@@ -4,7 +4,8 @@
     import { getNotificationsContext } from 'svelte-notifications';
     import Dropdown from '../../lib/components/Dropdown.svelte';
     import { api } from '../api/apiQuery';
-    import { Label } from '../controllers/label';
+    import type { Label } from '../controllers/label';
+    import type { Auth } from '../controllers/user';
     import { displayNotifOnErr, showPopup } from '../utils';
     import NewLabelDialog from './dialogs/NewLabelDialog.svelte';
 
@@ -12,13 +13,14 @@
 
     const { addNotification } = getNotificationsContext();
 
-    export let labels = [];
+    export let labels: Label[] = [];
     export let value = '';
-    export let auth;
+    export let auth: Auth;
     export let showAddButton = true;
-    export let filter: (l: Label) => boolean = () => true;
+    export let filter: (l: Label, i: number, arr: Label[]) => boolean
+        = () => true;
 
-    let closeDropDown;
+    let closeDropDown: () => void;
 
     $: dispatch('change', { id: value });
 
@@ -81,8 +83,8 @@
                     class="entry-label-colour"
                     style="background: {label.colour}"
                 ></span>
-                {#if label === label.id}
-                    <b>✓ {label.name}</b>
+                {#if value === label.id}
+                    <b>{label.name}</b>
                 {:else}
                     {label.name}
                 {/if}
@@ -110,11 +112,6 @@
         background-color: @light-accent;
         border-radius: 10px;
         border: none;
-
-        select {
-            background-color: transparent;
-            border: none;
-        }
 
         .icon-button {
             background: transparent;

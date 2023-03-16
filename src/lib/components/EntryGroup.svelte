@@ -1,10 +1,10 @@
 <script lang="ts">
     import Entry from '../../lib/components/Entry.svelte';
-    import type { Entry as EntryType } from '../../lib/controllers/entry';
+    import type { Entry as EntryController } from '../../lib/controllers/entry';
     import type { Auth } from '../controllers/user';
 
     export let obfuscated = true;
-    export let entries: EntryType[];
+    export let entries: EntryController[];
     export let showLabels = true;
     export let auth: Auth;
 </script>

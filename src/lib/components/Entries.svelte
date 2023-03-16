@@ -13,7 +13,7 @@
     import { obfuscated } from '../constants';
     import { Entry } from '../controllers/entry';
     import type { Auth } from '../controllers/user';
-    import { displayNotifOnErr, showPopup } from '../utils';
+    import { displayNotifOnErr, nowS, showPopup } from '../utils';
     import Spinner from './BookSpinner.svelte';
     import ImportDialog from './dialogs/ImportDialog.svelte';
 
@@ -131,26 +131,32 @@
         {#if loading}
             <Spinner />
         {:else}
-            {#each Object.keys(entries).sort((a, b) => b - a) as day}
+            {#each Object.keys(entries)
+                .sort((a, b) => parseInt(b) - parseInt(a)) as day}
                 <EntryGroup
-                    entries={entries[day]}
-                    on:updated={() => reloadEntries(page, search)}
+                    entries={entries[parseInt(day)]}
+                    on:updated={() => reloadEntries()}
                     obfuscated={$obfuscated}
                     {showLabels}
                     {auth}
                 >
                     <div slot="title" class="entry-group-title">
-                        <h2>{moment(new Date(day * 1000)).format('dddd, Do MMMM YYYY')}</h2>
+                        <h2>
+                            {moment(new Date(parseInt(day) * 1000))
+                                .format('dddd, Do MMMM YYYY')}
+                        </h2>
                         <span class="text-light">
-                            {#if new Date() - new Date(day * 1000) < 8.64e7}
+                            {#if nowS() - parseInt(day) < 8.64e4}
                                 <span>Today</span>
-                            {:else if new Date() - new Date(day * 1000) < 1.728e8}
+                            {:else if nowS() - parseInt(day) < 1.728e5}
                                 <span>Yesterday</span>
                             {:else}
                                 <Time
                                     relative
                                     timestamp={new Date(
-                                        day * 1000 + (60 * 60 * 23 + 60 * 60 + 59) * 1000
+                                        parseInt(day) * 1000 + (
+                                            60 * 60 * 23 + 60 * 60 + 59
+                                        ) * 1000
                                     )}
                                 />
                             {/if}

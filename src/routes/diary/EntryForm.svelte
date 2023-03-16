@@ -10,11 +10,11 @@
     import { api } from '../../lib/api/apiQuery';
     import LabelSelect from '../../lib/components/LabelSelect.svelte';
     import { enabledLocation } from '../../lib/constants';
-    import type { Label } from '../../lib/controllers/label';
     import type { Auth } from '../../lib/controllers/user';
     import { displayNotifOnErr, getFileContents } from '../../lib/utils';
     import LocationToggle from './LocationToggle.svelte';
 
+    type OptionalCoords = [ number, number ] | [ null, null ];
 
     const { addNotification } = getNotificationsContext();
     const dispatch = createEventDispatcher();
@@ -37,16 +37,14 @@
 
     export let auth: Auth;
 
-    let labels: Label[] = [];
-
     export function reset () {
         newEntryTitle = '';
         newEntryBody = '';
         newEntryLabel = '';
     }
 
-    async function getLocation (): Promise<[ number | null, number | null ]> {
-        let currentLocation = [ null, null ];
+    async function getLocation (): Promise<OptionalCoords> {
+        let currentLocation: OptionalCoords = [ null, null ];
         if ($enabledLocation) {
             currentLocation = await new Promise((resolve) => {
                 navigator.geolocation.getCurrentPosition(
@@ -167,15 +165,7 @@
     }
 
     onMount(async () => {
-        await Promise.all([
-            stopSpaceAndEnterBeingInterceptedByFileDrop(),
-            async () => {
-                const res = displayNotifOnErr(addNotification,
-                    await api.get(auth, `/labels`),
-                );
-                labels = res.labels;
-            },
-        ]);
+        await stopSpaceAndEnterBeingInterceptedByFileDrop();
     });
 
 </script>

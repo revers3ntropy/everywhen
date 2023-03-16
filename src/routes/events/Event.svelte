@@ -11,27 +11,21 @@
     import { getNotificationsContext } from 'svelte-notifications';
     import { api, apiPath } from '../../lib/api/apiQuery';
     import LabelSelect from '../../lib/components/LabelSelect.svelte';
-    import { Event as EventController } from '../../lib/controllers/event';
-    import { Label } from '../../lib/controllers/label';
+    import type { Event as EventController } from '../../lib/controllers/event';
+    import type { Label } from '../../lib/controllers/label';
     import type { Auth } from '../../lib/controllers/user';
-    import {
-        displayNotifOnErr,
-        fmtTimestampForInput,
-        type NonFunctionProperties,
-        parseTimestampFromInput,
-    } from '../../lib/utils';
+    import { displayNotifOnErr, fmtTimestampForInput, parseTimestampFromInput } from '../../lib/utils';
 
     const { addNotification } = getNotificationsContext();
     const dispatch = createEventDispatcher();
 
-    export let event: NonFunctionProperties<EventController> & { deleted?: true };
+    export let event: EventController & { deleted?: true };
     export let auth: Auth;
     export let selectNameId: string;
     export let changeEventCount: (by: number) => void;
 
     let nameInput: HTMLInputElement;
     let labels: Label[] = [];
-    let label = event.label?.id || '';
 
     type OnChangeEvent = Event & { currentTarget: EventTarget & HTMLInputElement } | {
         target: { value: string }

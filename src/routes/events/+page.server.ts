@@ -14,7 +14,10 @@ export const load: PageServerLoad = async ({ cookies }) => {
     const labels = await Label.all(query, auth);
 
     return {
-        events: events.map((event) => event.json()),
-        labels: labels.map((label) => label.json()),
+        events: events.map((event) => ({
+            ...event,
+            label: { ...event.label },
+        })),
+        labels: labels.map((label) => ({ ...label })),
     };
 };

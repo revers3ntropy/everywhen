@@ -28,7 +28,10 @@ export const load: PageServerLoad = async ({ cookies }) => {
     const commonWords = commonWordsFromText(entryText.join(' '));
 
     return {
-        entries: entries.map((entry: Entry) => entry.json()),
+        entries: entries.map((entry: Entry) => ({
+            ...entry,
+            label: { ...entry.label },
+        })),
         entryCount: entries.length,
         commonWords: commonWords.slice(0, 100),
         wordCount,

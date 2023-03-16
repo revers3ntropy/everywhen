@@ -2,13 +2,13 @@ import { matches } from 'schemion';
 import { api } from '../../api/apiQuery';
 import type { Entry } from '../../controllers/entry';
 import type { Label } from '../../controllers/label';
-import type { User } from '../../controllers/user';
+import type { Auth } from '../../controllers/user';
 import type { Mutable, NotificationOptions } from '../../utils';
 
 export async function entries (
     contents: string,
     labels: Label[],
-    auth: User,
+    auth: Auth,
 ): Promise<undefined | NotificationOptions | NotificationOptions[]> {
     if (!labels) {
         return {
@@ -107,11 +107,6 @@ export async function entries (
                     colour: '#000000',
                 });
                 if (err) {
-                    errors.push([ i, `failed to create label ${name}` ]);
-                    continue;
-                }
-
-                if (typeof createLabelRes.id !== 'string') {
                     errors.push([ i, `failed to create label ${name}` ]);
                     continue;
                 }

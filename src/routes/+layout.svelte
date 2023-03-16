@@ -3,20 +3,18 @@
     import Notifications from 'svelte-notifications';
     import Modal from 'svelte-simple-modal';
     import 'ts-polyfill';
-    import type { App } from '../app';
     import '../app.less';
-    import Header from '../lib/components/Nav.svelte';
+    import Nav from '../lib/components/Nav.svelte';
     import { INACTIVE_TIMEOUT_MS, obfuscated } from '../lib/constants';
     import { popup } from '../lib/constants.js';
+    import { INFO_NOTIFICATION, type NotificationOptions } from '../lib/utils';
     import Notifier from './Notifier.svelte';
-
-    export let data: App.PageData;
 
     $: home = $page.url.pathname.trim() === '/';
 
     let lastActivity = Date.now();
 
-    let addNotification;
+    let addNotification: <T>(props: Record<string, T> | NotificationOptions) => void;
     let isObfuscated = true;
     $: obfuscated.update(() => isObfuscated);
 
@@ -27,9 +25,8 @@
 
         if (Date.now() - lastActivity > INACTIVE_TIMEOUT_MS) {
             addNotification({
+                ...INFO_NOTIFICATION,
                 text: 'Hidden due to inactivity',
-                type: 'info',
-                removeAfter: 4000,
             });
             isObfuscated = true;
         }
@@ -65,7 +62,7 @@
     <Notifier bind:addNotification />
 
     {#if !home}
-        <Header user={data} />
+        <Nav />
     {/if}
 
     <slot />

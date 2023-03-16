@@ -4,65 +4,54 @@
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
     import Home from 'svelte-material-icons/Home.svelte';
-    import Login from 'svelte-material-icons/Login.svelte';
     import Logout from 'svelte-material-icons/Logout.svelte';
     import Notebook from 'svelte-material-icons/Notebook.svelte';
-
-    export let user = null;
 </script>
 <header>
     <div></div>
 
     <div>
-        {#if user}
-            <a
-                href="/home"
-                class="{$page.url.pathname === '/home' ? 'current' : ''}"
-                aria-label="home"
-            >
-                <Home size="40" />
-            </a>
-            <a
-                href="/diary"
-                class="{$page.url.pathname === '/diary' ? 'current' : ''}"
-                aria-label="diary"
-            >
-                <Notebook size="40" />
-            </a>
-            <a
-                href="/events"
-                class="{$page.url.pathname === '/events' ? 'current' : ''}"
-                aria-label="events"
-            >
-                <Calendar size="40" />
-            </a>
-            <a
-                href="/timeline"
-                class="{$page.url.pathname === '/timeline' ? 'current' : ''}"
-                aria-label="timeline"
-            >
-                <ChartTimeline size="40" />
-            </a>
-            <a
-                href="/stats"
-                class="{$page.url.pathname === '/stats' ? 'current' : ''}"
-                aria-label="statistics"
-            >
-                <Counter size="40" />
-            </a>
-        {/if}
+        <a
+            aria-label="home"
+            class="{$page.url.pathname === '/home' ? 'current' : ''}"
+            href="/home"
+        >
+            <Home size="40" />
+        </a>
+        <a
+            aria-label="diary"
+            class="{$page.url.pathname === '/diary' ? 'current' : ''}"
+            href="/diary"
+        >
+            <Notebook size="40" />
+        </a>
+        <a
+            aria-label="events"
+            class="{$page.url.pathname === '/events' ? 'current' : ''}"
+            href="/events"
+        >
+            <Calendar size="40" />
+        </a>
+        <a
+            aria-label="timeline"
+            class="{$page.url.pathname === '/timeline' ? 'current' : ''}"
+            href="/timeline"
+        >
+            <ChartTimeline size="40" />
+        </a>
+        <a
+            aria-label="statistics"
+            class="{$page.url.pathname === '/stats' ? 'current' : ''}"
+            href="/stats"
+        >
+            <Counter size="40" />
+        </a>
     </div>
 
     <div>
-        {#if user}
-            <a href="/logout">
-                <Logout size="40" />
-            </a>
-        {:else}
-            <a href="/">
-                <Login size="40" />
-            </a>
-        {/if}
+        <a aria-label="log out" href="/logout">
+            <Logout size="40" />
+        </a>
     </div>
 </header>
 

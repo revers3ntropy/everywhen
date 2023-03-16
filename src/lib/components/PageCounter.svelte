@@ -18,6 +18,7 @@
                 on:click={() => page--}
                 disabled={page <= 0}
                 class="flex-center"
+                aria-label="Previous page"
             >
                 <ArrowLeft size="20" />
             </button>
@@ -33,6 +34,7 @@
                 on:click={() => page++}
                 disabled={page >= pages - 1}
                 class="flex-center"
+                aria-label="Next page"
             >
                 <ArrowRight size="20" />
             </button>

@@ -22,7 +22,8 @@
     export let title = '';
     export let entry = '';
     export let created = 0;
-    export let label: LabelController | null = null;
+    export let label: LabelController | null | undefined =
+        undefined as LabelController | null | undefined;
     export let latitude: number | null = null;
     export let longitude: number | null = null;
     export let deleted = false;
@@ -33,14 +34,12 @@
     export let auth: Auth;
 
     // show random string instead of text content if obfuscated
-    export let showLabel: LabelController | null;
+    export let showLabel: LabelController | null | undefined = label;
     $: if (showLabels && ((l): l is LabelController => !!l)(label)) {
         showLabel = {
             ...label,
             name: obfuscated ? obfuscate(label.name) : label.name,
         };
-    } else {
-        showLabel = null;
     }
 
     async function deleteSelf () {

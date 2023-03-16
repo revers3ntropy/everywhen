@@ -5,7 +5,7 @@
     import { api } from '../../lib/api/apiQuery';
     import Entry from '../../lib/components/Entry.svelte';
     import { obfuscated } from '../../lib/constants.js';
-    import { Entry as EntryType } from '../../lib/controllers/entry';
+    import type { Entry as EntryController } from '../../lib/controllers/entry';
     import { displayNotifOnErr } from '../../lib/utils';
 
     const { addNotification } = getNotificationsContext();
@@ -14,7 +14,7 @@
 
     let search = '';
     let loaded = false;
-    let entries: EntryType[] = [];
+    let entries: EntryController[] = [];
 
     async function reload () {
         const entriesOptions = {

@@ -1,18 +1,16 @@
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { generateUUId } from '../security/uuid';
-import { type NonFunctionProperties, nowS, type PickOptional, Result } from '../utils';
-import { Controller } from './controller';
+import { nowS, type PickOptional, Result } from '../utils';
 import type { Auth } from './user';
 
-export class Label extends Controller {
+export class Label {
     private constructor (
         public id: string,
         public colour: string,
         public name: string,
         public created: number,
     ) {
-        super();
     }
 
     public static async fromId (
@@ -119,7 +117,7 @@ export class Label extends Controller {
 
     public static jsonIsRawLabel (
         label: unknown,
-    ): label is Omit<NonFunctionProperties<Label>, 'id'> {
+    ): label is Omit<Label, 'id'> {
         return typeof label === 'object'
             && label !== null
             && 'colour' in label
@@ -185,9 +183,10 @@ export class Label extends Controller {
         ));
     }
 
-    public async updateName (
+    public static async updateName (
         query: QueryFunc,
         auth: Auth,
+        label: Label,
         name: string,
     ): Promise<Result<Label>> {
         if (await Label.userHasLabelWithName(query, auth, name)) {
@@ -197,26 +196,27 @@ export class Label extends Controller {
         await query`
             UPDATE labels
             SET name = ${encrypt(name, auth.key)}
-            WHERE id = ${this.id}
+            WHERE id = ${label.id}
         `;
 
-        this.name = name;
+        label.name = name;
 
-        return Result.ok(this);
+        return Result.ok(label);
     }
 
-    public async updateColour (
+    public static async updateColour (
         query: QueryFunc,
+        label: Label,
         colour: string,
     ): Promise<Result<Label>> {
         await query`
             UPDATE labels
             SET colour = ${colour}
-            WHERE id = ${this.id}
+            WHERE id = ${label.id}
         `;
 
-        this.colour = colour;
+        label.colour = colour;
 
-        return Result.ok(this);
+        return Result.ok(label);
     }
 }

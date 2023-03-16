@@ -1,7 +1,8 @@
 <script lang="ts">
-    import type { Label } from "$lib/types";
 
-    export let label: Label | null = null;
+	import type { Label } from '../controllers/label';
+
+	export let label: Label | null = null;
 
     export let obfuscated = true;
 </script>

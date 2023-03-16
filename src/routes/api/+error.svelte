@@ -1,4 +1,4 @@
 <script>
     import { page } from '$app/stores';
 </script>
-{$page.status}: {$page.error.message}
+{$page.status}: {$page.error?.message || 'Error in API request'}

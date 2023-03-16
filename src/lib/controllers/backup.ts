@@ -3,13 +3,12 @@ import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { nowS, Result } from '../utils';
 import { Asset } from './asset';
-import { Controller } from './controller';
 import { Entry } from './entry';
 import { Event } from './event';
 import { Label } from './label';
 import type { Auth } from './user';
 
-export class Backup extends Controller {
+export class Backup {
     public constructor (
         public entries: {
             title: string;
@@ -40,7 +39,6 @@ export class Backup extends Controller {
         }[],
         public created: number,
     ) {
-        super();
     }
 
     public static async generate (

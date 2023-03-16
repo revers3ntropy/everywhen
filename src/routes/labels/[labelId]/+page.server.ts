@@ -21,7 +21,7 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
     if (entriesErr) throw error(400, entriesErr);
 
     return {
-        label: label.json(),
+        label: { ...label },
         entryCount: entries[1],
     };
 };

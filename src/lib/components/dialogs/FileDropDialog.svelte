@@ -2,7 +2,7 @@
     import { filedrop, type FileDropOptions, type Files } from 'filedrop-svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import { popup } from '../../constants';
-    import { getFileContents, Result } from '../../utils';
+    import { ERR_NOTIFICATION, getFileContents, Result } from '../../utils';
 
     const { addNotification } = getNotificationsContext();
 
@@ -12,28 +12,24 @@
     };
 
     export let message: string;
-    export let readEncoding = 'utf-8';
-    export let withContents: <T>(body: Result<T>) => Promise<void> | void;
+    export let readEncoding: 'UTF-8' | 'b64' = 'UTF-8';
+    export let withContents: (body: Result<string>) => Promise<void> | void;
 
     async function onFileDrop (e: CustomEvent<{ files: Files }>) {
         const files = e.detail.files;
         if (files.rejected.length > 0) {
             popup.set(null);
             addNotification({
-                removeAfter: 4000,
+                ...ERR_NOTIFICATION,
                 text: 'File could not be read, please try again',
-                type: 'error',
-                position: 'top-center',
             });
             return;
         }
         if (files.accepted.length !== 1) {
             popup.set(null);
             addNotification({
-                removeAfter: 4000,
+                ...ERR_NOTIFICATION,
                 text: 'Please select exactly one file',
-                type: 'error',
-                position: 'top-center',
             });
             return;
         }

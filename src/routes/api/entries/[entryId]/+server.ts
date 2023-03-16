@@ -52,7 +52,7 @@ export const PUT = (async ({ request, params, cookies }) => {
         }
     }
 
-    const updateRes = await entry.updateLabel(query, auth, body.label);
+    const updateRes = await Entry.updateLabel(query, auth, entry, body.label);
     if (updateRes.err) {
         throw error(400, updateRes.err);
     }

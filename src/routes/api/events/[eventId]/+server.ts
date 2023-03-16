@@ -27,26 +27,26 @@ export const PUT = (async ({ request, params, cookies }) => {
     if (err) throw error(404, err);
 
     if (body.name) {
-        const { err } = await event.updateName(query, auth, body.name);
+        const { err } = await Event.updateName(query, auth, event, body.name);
         if (err) throw error(400, err);
     }
 
     if (body.start) {
-        const { err } = await event.updateStart(query, auth, body.start);
+        const { err } = await Event.updateStart(query, auth, event, body.start);
         if (err) throw error(400, err);
     }
 
     if (body.end) {
-        const { err } = await event.updateEnd(query, auth, body.end);
+        const { err } = await Event.updateEnd(query, auth, event, body.end);
         if (err) throw error(400, err);
     }
 
     if (body.label !== 'NO_CHANGE') {
-        const { err } = await event.updateLabel(query, auth, body.label);
+        const { err } = await Event.updateLabel(query, auth, event, body.label);
         if (err) throw error(400, err);
     }
 
-    return apiResponse({ event: event.json() });
+    return apiResponse({ event });
 }) satisfies RequestHandler;
 
 export const DELETE = (async ({ params, cookies }) => {
@@ -55,7 +55,7 @@ export const DELETE = (async ({ params, cookies }) => {
 
     const { err, val: event } = await Event.fromId(query, auth, params.eventId);
     if (err) throw error(404, err);
-    const { err: deleteErr } = await event.delete(query, auth);
+    const { err: deleteErr } = await Event.purge(query, auth, event);
     if (deleteErr) throw error(400, deleteErr);
 
     return apiResponse({});

@@ -1,9 +1,8 @@
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { generateUUId } from '../security/uuid';
-import type { NonFunctionProperties, Seconds, TimestampSecs } from '../utils';
+import type { Seconds, TimestampSecs } from '../utils';
 import { nowS, Result } from '../utils';
-import { Controller } from './controller';
 import { Label } from './label';
 import type { Auth } from './user';
 
@@ -22,7 +21,7 @@ export type DecryptedRawEvent = Omit<RawEvent, 'decrypted'> & {
     decrypted: true
 };
 
-export class Event extends Controller {
+export class Event {
     public label?: Label;
     public readonly decrypted = true;
 
@@ -33,7 +32,6 @@ export class Event extends Controller {
         public end: TimestampSecs,
         public created: TimestampSecs,
     ) {
-        super();
     }
 
     public static async allRaw (
@@ -107,8 +105,8 @@ export class Event extends Controller {
         );
 
         if (rawEvent.label) {
-            const { err } = await event.addLabel(
-                query, auth, rawEvent.label);
+            const { err } = await Event.addLabel(
+                query, auth, event, rawEvent.label);
             if (err) return Result.err(err);
         }
 
@@ -136,7 +134,7 @@ export class Event extends Controller {
         );
 
         if (label) {
-            const { err } = await event.addLabel(query, auth, label);
+            const { err } = await Event.addLabel(query, auth, event, label);
             if (err) return Result.err(err);
         }
 
@@ -168,7 +166,7 @@ export class Event extends Controller {
 
     public static jsonIsRawEvent (
         json: unknown,
-    ): json is Omit<NonFunctionProperties<Event>, 'id' | 'label'> & {
+    ): json is Omit<Event, 'id' | 'label'> & {
         label?: string
     } {
         return typeof json === 'object'
@@ -205,117 +203,116 @@ export class Event extends Controller {
             && evt2.end >= evt1.start;
     }
 
-    public override json (): NonFunctionProperties<Event> {
-        return {
-            ...this,
-            label: this.label?.json(),
-        };
-    }
-
-    async updateName (
+    public static async updateName (
         query: QueryFunc,
         auth: Auth,
+        self: Event,
         namePlaintext: string,
     ): Promise<Result<Event>> {
         if (!namePlaintext) {
             return Result.err('Event name cannot be empty');
         }
-        this.name = namePlaintext;
+        self.name = namePlaintext;
         await query`
             UPDATE events
             SET name = ${encrypt(namePlaintext, auth.key)}
-            WHERE id = ${this.id}
+            WHERE id = ${self.id}
         `;
-        return Result.ok(this);
+        return Result.ok(self);
     }
 
-    async updateStart (
+    public static async updateStart (
         query: QueryFunc,
         auth: Auth,
+        self: Event,
         start: TimestampSecs,
     ): Promise<Result<Event>> {
-        if (start > this.end) {
+        if (start > self.end) {
             return Result.err('Start time cannot be after end time');
         }
         if (start < 0) {
             return Result.err('Start time cannot be negative');
         }
-        this.start = start;
+        self.start = start;
         await query`
             UPDATE events
             SET start = ${start}
-            WHERE id = ${this.id}
+            WHERE id = ${self.id}
               AND user = ${auth.id}
         `;
-        return Result.ok(this);
+        return Result.ok(self);
     }
 
-    async updateEnd (
+    public static async updateEnd (
         query: QueryFunc,
         auth: Auth,
+        self: Event,
         end: TimestampSecs,
     ): Promise<Result<Event>> {
-        if (end < this.start) {
+        if (end < self.start) {
             return Result.err('End time cannot be before start time');
         }
         if (end < 0) {
             return Result.err('End time cannot be negative');
         }
-        this.end = end;
+        self.end = end;
         await query`
             UPDATE events
             SET end = ${end}
-            WHERE id = ${this.id}
+            WHERE id = ${self.id}
               AND user = ${auth.id}
         `;
-        return Result.ok(this);
+        return Result.ok(self);
     }
 
-    async updateLabel (
+    public static async updateLabel (
         query: QueryFunc,
         auth: Auth,
+        self: Event,
         labelId: string,
     ): Promise<Result<Event>> {
         if (!labelId) {
-            delete this.label;
+            delete self.label;
             await query`
                 UPDATE events
                 SET label = NULL
-                WHERE id = ${this.id}
+                WHERE id = ${self.id}
                   AND user = ${auth.id}
             `;
-            return Result.ok(this);
+            return Result.ok(self);
         }
 
-        const { err } = await this.addLabel(query, auth, labelId);
+        const { err } = await Event.addLabel(query, auth, self, labelId);
         if (err) return Result.err(err);
 
         await query`
             UPDATE events
             SET label = ${labelId}
-            WHERE id = ${this.id}
+            WHERE id = ${self.id}
               AND user = ${auth.id}
         `;
 
-        return Result.ok(this);
+        return Result.ok(self);
     }
 
-    public async delete (
+    public static async purge (
         query: QueryFunc,
         auth: Auth,
+        self: Event,
     ): Promise<Result> {
         await query`
             DELETE
             FROM events
-            WHERE id = ${this.id}
+            WHERE id = ${self.id}
               AND user = ${auth.id}
         `;
         return Result.ok(null);
     }
 
-    private async addLabel (
+    private static async addLabel (
         query: QueryFunc,
         auth: Auth,
+        self: Event,
         label: Label | string,
     ): Promise<Result<Event>> {
         if (typeof label === 'string') {
@@ -323,11 +320,11 @@ export class Event extends Controller {
             if (err) {
                 return Result.err(err);
             }
-            this.label = val;
+            self.label = val;
         } else {
-            this.label = label;
+            self.label = label;
         }
 
-        return Result.ok(this);
+        return Result.ok(self);
     }
 }

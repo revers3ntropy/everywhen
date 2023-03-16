@@ -5,7 +5,7 @@
     import { api } from '../../lib/api/apiQuery';
     import type { Event as EventController } from '../../lib/controllers/event';
     import type { Label } from '../../lib/controllers/label';
-    import { displayNotifOnErr, type NonFunctionProperties, nowS } from '../../lib/utils.js';
+    import { displayNotifOnErr, nowS } from '../../lib/utils.js';
     import Event from './Event.svelte';
 
     const NEW_EVENT_NAME = 'New Event';
@@ -17,7 +17,7 @@
         labels: Label[];
     };
 
-    type EventData = NonFunctionProperties<EventController> & { deleted?: true };
+    type EventData = EventController & { deleted?: true };
 
     let events: EventData[] = data.events;
 
@@ -41,7 +41,7 @@
     }
 
     async function handleDeleteEvent (
-        { detail: event }: CustomEvent<NonFunctionProperties<EventController>>,
+        { detail: event }: CustomEvent<EventController>,
     ) {
         await reloadEvents();
 

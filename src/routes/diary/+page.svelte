@@ -6,7 +6,7 @@
     export let data: App.PageData;
 
     let clearEntryForm: () => void;
-    let reloadEntries;
+    let reloadEntries: () => Promise<void>;
 
 </script>
 
