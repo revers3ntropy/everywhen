@@ -1,32 +1,69 @@
 <script lang="ts">
-    import { renderable, START_ZOOM } from '../../lib/canvas/canvas';
-    import { obfuscated } from '../../lib/constants';
+    import { CanvasState, renderable, START_ZOOM } from '../../lib/canvas/canvas';
+    import { Label } from '../../lib/controllers/label';
+    import { isLightColour } from './utils';
 
     export let id: string;
-    export let created: number;
+    export let start: number;
+    export let end: number;
     export let name: string;
-    export let wordCount: number;
-    export let entryTextParityHeight: boolean;
+    export let label: Label | undefined;
+    export let yLevel: number;
+    export let eventTextParityHeight: boolean;
+    export let options = {
+        h: 20,
+        yMargin: 2,
+        textXOffset: 1,
+        radius: 5,
+    };
 
     renderable(state => {
-        const renderPos = state.timeToRenderPos(created);
-        if (renderPos < 0 || renderPos > state.width) return;
 
-        const size = Math.max(wordCount * 0.1, 5);
+        const duration = end - start;
+        const x = state.timeToRenderPos(start);
+        const y = state.centerLnY() - yLevel * (options.h + options.yMargin);
+        const width = duration * state.zoom;
+        const colour = label ? label.colour : CanvasState.c_Primary;
 
-        state.rect(renderPos, state.centerLnY(), 5, size, 'rgb(100, 100, 100)');
+        const isSingleEvent = duration < 60;
 
-        if (state.zoom > START_ZOOM * 2 && !$obfuscated) {
-            let y = state.centerLnY();
-
-            if (size < 10) {
-                y += entryTextParityHeight ? 15 : -10;
-            } else {
-                y += size + 12;
-            }
-
-            state.text(name, renderPos - 5, y, { align: 'center' });
+        if (isSingleEvent) {
+            state.circle(x, y + options.radius * 4,
+                options.radius, colour);
+            const h = state.centerLnY() - (y + options.radius * 4);
+            state.rect(x, y + options.radius * 4, 1, h, colour);
+        } else {
+            state.rect(x, y, width, options.h, colour);
         }
+
+        let textColour = '#fff';
+        if (isLightColour(colour)) {
+            textColour = '#000';
+        }
+
+        if (x + width <= 0) {
+            // not on screen
+            return;
+        }
+
+        if (width > 50 && !isSingleEvent) {
+            state.text(
+                name,
+                Math.max(5, x + options.textXOffset),
+                y + options.h / 2 + 5,
+                { c: textColour, width },
+            );
+        } else if (isSingleEvent && state.zoom > START_ZOOM / 2) {
+            state.text(
+                name,
+                x + options.radius,
+                y + options.h / 2 + (
+                    eventTextParityHeight ? options.radius * 2 + 18 : 0
+                ),
+                { c: '#fff', align: 'center' },
+            );
+        }
+
     });
 </script>
 

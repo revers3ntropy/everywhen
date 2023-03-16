@@ -38,6 +38,7 @@ export type PickOptional<A, B extends keyof A = keyof A> =
                           & Partial<Pick<A, B>>>;
 
 export type Seconds = number;
+export type TimestampSecs = number;
 export type Milliseconds = number;
 
 const RESULT_NULL = Symbol();

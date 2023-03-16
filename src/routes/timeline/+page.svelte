@@ -1,5 +1,4 @@
 <script lang="ts">
-    import type { NonFunctionProperties } from '$lib/utils.js';
     import { onMount } from 'svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../../app';
@@ -7,11 +6,12 @@
     import Background from '../../lib/canvas/Background.svelte';
     import Canvas from '../../lib/canvas/Canvas.svelte';
     import type { Entry } from '../../lib/controllers/entry';
-    import type { Event } from '../../lib/controllers/event';
-    import { displayNotifOnErr } from '../../lib/utils';
+    import { Event } from '../../lib/controllers/event';
+    import { displayNotifOnErr, type NonFunctionProperties } from '../../lib/utils';
     import CenterLine from './CenterLine.svelte';
     import Controls from './Controls.svelte';
     import EntryInTimeline from './EntryInTimeline.svelte';
+    import EventInTimeline from './EventInTimeline.svelte';
     import NowLine from './NowLine.svelte';
     import TimeCursor from './TimeCursor.svelte';
     import TimeMarkers from './TimeMarkers.svelte';
@@ -27,7 +27,37 @@
         entries: [],
         events: [],
     };
-    let events: Event[] = [];
+    let events: ({ yLevel: number } & NonFunctionProperties<Event>)[];
+
+    const eventBaseY = 4;
+
+    function updateEvents (rawEvents: NonFunctionProperties<Event>[]) {
+        const evts: (typeof events) = rawEvents.sort((e1, e2) => {
+            return Event.duration(e1) - Event.duration(e2);
+        }).map(e => ({ ...e, yLevel: 0 }));
+
+        for (const event of evts) {
+            if (Event.duration(event) < 60) {
+                continue;
+            }
+
+            let overlappedLargerEvents = evts.filter(e => {
+                return Event.intersects(event, e)
+                    && Event.duration(e) > Event.duration(event)
+                    && e !== event;
+            });
+
+            for (const e of overlappedLargerEvents) {
+                console.log(Math.max(e.yLevel, event.yLevel + 1));
+                e.yLevel = Math.max(e.yLevel, event.yLevel + 1);
+            }
+        }
+
+        events = evts;
+    }
+
+    $: updateEvents(timeline.events);
+
 
     onMount(async () => {
         timeline = displayNotifOnErr(addNotification,
@@ -56,6 +86,17 @@
             <EntryInTimeline
                 {...entry}
                 entryTextParityHeight={i % 2 === 0}
+            />
+        {/each}
+
+        {#each events as event, i}
+            <EventInTimeline
+                {...event}
+                yLevel={Event.duration(event) < 60
+                    ? eventBaseY
+                    : eventBaseY + 1 + event.yLevel
+                }
+                eventTextParityHeight={i % 2 === 0}
             />
         {/each}
 

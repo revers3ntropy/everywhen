@@ -1,7 +1,7 @@
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { generateUUId } from '../security/uuid';
-import type { NonFunctionProperties } from '../utils';
+import type { NonFunctionProperties, Seconds, TimestampSecs } from '../utils';
 import { nowS, Result } from '../utils';
 import { Controller } from './controller';
 import { Label } from './label';
@@ -29,9 +29,9 @@ export class Event extends Controller {
     public constructor (
         public id: string,
         public name: string,
-        public start: number,
-        public end: number,
-        public created: number,
+        public start: TimestampSecs,
+        public end: TimestampSecs,
+        public created: TimestampSecs,
     ) {
         super();
     }
@@ -119,10 +119,10 @@ export class Event extends Controller {
         query: QueryFunc,
         auth: Auth,
         name: string,
-        start: number,
-        end: number,
+        start: TimestampSecs,
+        end: TimestampSecs,
         label?: string,
-        created?: number,
+        created?: TimestampSecs,
     ): Promise<Result<Event>> {
         const id = await generateUUId(query);
         created ??= nowS();
@@ -189,6 +189,22 @@ export class Event extends Controller {
             );
     }
 
+    public static duration (
+        evt: { start: TimestampSecs, end: TimestampSecs },
+    ): Seconds {
+        return evt.end - evt.start;
+    }
+
+    public static intersects (
+        evt1: { start: TimestampSecs, end: TimestampSecs },
+        evt2: { start: TimestampSecs, end: TimestampSecs },
+    ): boolean {
+        return evt1.start <= evt2.start
+            && evt1.end >= evt2.start
+            || evt2.start <= evt1.start
+            && evt2.end >= evt1.start;
+    }
+
     public override json (): NonFunctionProperties<Event> {
         return {
             ...this,
@@ -216,7 +232,7 @@ export class Event extends Controller {
     async updateStart (
         query: QueryFunc,
         auth: Auth,
-        start: number,
+        start: TimestampSecs,
     ): Promise<Result<Event>> {
         if (start > this.end) {
             return Result.err('Start time cannot be after end time');
@@ -237,7 +253,7 @@ export class Event extends Controller {
     async updateEnd (
         query: QueryFunc,
         auth: Auth,
-        end: number,
+        end: TimestampSecs,
     ): Promise<Result<Event>> {
         if (end < this.start) {
             return Result.err('End time cannot be before start time');
