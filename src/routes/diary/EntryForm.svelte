@@ -11,7 +11,7 @@
     import LabelSelect from '../../lib/components/LabelSelect.svelte';
     import { enabledLocation } from '../../lib/constants';
     import type { Auth } from '../../lib/controllers/user';
-    import { displayNotifOnErr, getFileContents } from '../../lib/utils';
+    import { displayNotifOnErr, ERR_NOTIFICATION, getFileContents } from '../../lib/utils';
     import LocationToggle from './LocationToggle.svelte';
 
     type OptionalCoords = [ number, number ] | [ null, null ];
@@ -111,19 +111,16 @@
         const files = e.detail.files;
         if (files.rejected.length > 0) {
             addNotification({
-                removeAfter: 4000,
+                ...ERR_NOTIFICATION,
                 text: 'File could not be read, please try again',
-                type: 'error',
-                position: 'top-center',
             });
             return;
         }
+        if (files.accepted.length < 1) return;
         if (files.accepted.length !== 1) {
             addNotification({
-                removeAfter: 4000,
+                ...ERR_NOTIFICATION,
                 text: 'Please select exactly one file',
-                type: 'error',
-                position: 'top-center',
             });
             return;
         }
