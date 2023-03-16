@@ -58,6 +58,7 @@
         use:tooltip={{
             content: 'Location will be recorded, click to turn off location'
         }}
+        aria-label="Turn off Location"
     >
         <MapMarkerOutline size="25" />
     </button>
@@ -67,6 +68,7 @@
         use:tooltip={{
             content: 'Location is disabled, click to record location with entry'
         }}
+        aria-label="Turn on Location"
     >
         <MapMarkerOffOutline size="25" />
     </button>

@@ -6,13 +6,13 @@ import { AUTH_COOKIE_OPTIONS, KEY_COOKIE_KEY, USERNAME_COOKIE_KEY } from '../con
 import type { Auth } from '../controllers/user';
 import { GenericResponse, GETArgs, Result } from '../utils';
 
-type ResType<T> = T extends (props: any) =>
+export type ResType<T> = T extends (props: any) =>
     Promise<GenericResponse<infer R>> ? R : never;
 
-type GET<T extends { GET: unknown }> = ResType<T['GET']>;
-type POST<T extends { POST: unknown }> = ResType<T['POST']>;
-type PUT<T extends { PUT: unknown }> = ResType<T['PUT']>;
-type DELETE<T extends { DELETE: unknown }> = ResType<T['DELETE']>;
+export type GET<T extends { GET: unknown }> = ResType<T['GET']>;
+export type POST<T extends { POST: unknown }> = ResType<T['POST']>;
+export type PUT<T extends { PUT: unknown }> = ResType<T['PUT']>;
+export type DELETE<T extends { DELETE: unknown }> = ResType<T['DELETE']>;
 
 interface ApiResponse {
     'GET': {

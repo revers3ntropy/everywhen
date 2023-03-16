@@ -1,12 +1,11 @@
 <script lang="ts">
-    import type { NonFunctionProperties } from '$lib/utils.js';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../../app';
     import { api } from '../../lib/api/apiQuery';
     import type { Event as EventController } from '../../lib/controllers/event';
     import type { Label } from '../../lib/controllers/label';
-    import { displayNotifOnErr, nowS } from '../../lib/utils.js';
+    import { displayNotifOnErr, type NonFunctionProperties, nowS } from '../../lib/utils.js';
     import Event from './Event.svelte';
 
     const NEW_EVENT_NAME = 'New Event';
@@ -18,7 +17,9 @@
         labels: Label[];
     };
 
-    let events: (EventController & { deleted?: true })[] = data.events;
+    type EventData = NonFunctionProperties<EventController> & { deleted?: true };
+
+    let events: EventData[] = data.events;
 
     async function reloadEvents () {
         events = displayNotifOnErr(addNotification,
@@ -44,8 +45,8 @@
     ) {
         await reloadEvents();
 
-        const deletedEvent: EventController & { deleted?: true } = {
-            ...(event as EventController),
+        const deletedEvent: EventData = {
+            ...event,
             deleted: true,
         };
 
@@ -82,7 +83,7 @@
                 New Event
             </button>
         </li>
-        {#each events as event, i}
+        {#each events as event}
             <li>
                 <Event
                     {event}

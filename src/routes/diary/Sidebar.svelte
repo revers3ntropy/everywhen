@@ -13,16 +13,22 @@
 
 <div>
 	<div class="floating-button">
-		<button on:click={() => (showing = !showing)}>
-			<Menu size="40" />
-		</button>
-	</div>
+        <button
+            aria-label="Show sidebar menu"
+            on:click={() => (showing = !showing)}
+        >
+            <Menu size="40" />
+        </button>
+    </div>
 	<div class="sidebar {showing ? 'showing' : ''}">
-		<div class="header">
-			<button on:click={() => (showing = !showing)}>
-				<Close size="30" />
-			</button>
-		</div>
+        <div class="header">
+            <button
+                on:click={() => (showing = !showing)}
+                aria-label="Close sidebar menu"
+            >
+                <Close size="30" />
+            </button>
+        </div>
 		<div class="content">
 			{#each Object.keys(titles).sort((a, b) => b - a) as day}
 				<div class="day">

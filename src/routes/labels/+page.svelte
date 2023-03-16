@@ -4,6 +4,7 @@
     import type { App } from '../../app';
     import { api } from '../../lib/api/apiQuery';
     import NewLabelForm from '../../lib/components/NewLabelForm.svelte';
+    import type { Label as LabelController } from '../../lib/controllers/label';
     import { displayNotifOnErr } from '../../lib/utils';
     import Label from './Label.svelte';
 
@@ -11,7 +12,7 @@
 
     export let data: App.PageData;
 
-    let labels: Label[] = [];
+    let labels: LabelController[] = [];
 
     async function reload () {
         const res = displayNotifOnErr(addNotification,

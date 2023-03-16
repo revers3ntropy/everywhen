@@ -13,7 +13,7 @@
     import { obfuscated } from '../constants';
     import { Entry } from '../controllers/entry';
     import type { Auth } from '../controllers/user';
-    import { displayNotifOnErr, Result, showPopup } from '../utils';
+    import { displayNotifOnErr, showPopup } from '../utils';
     import Spinner from './BookSpinner.svelte';
     import ImportDialog from './dialogs/ImportDialog.svelte';
 
@@ -29,7 +29,15 @@
 
     const PAGE_LENGTH = 100;
 
-    export let options = {};
+    interface IOptions {
+        pageSize?: number;
+        page?: number;
+        search?: string;
+        labelId?: string;
+        deleted?: boolean;
+    }
+
+    export let options: IOptions = {};
 
     let entries: Record<number, Entry[]> = {};
     let entryTitles: Record<number, Entry[]> = {};
@@ -40,57 +48,30 @@
     let loading = true;
 
     function importPopup () {
-        showPopup(ImportDialog, { auth }, () => reloadEntries(page, search));
+        showPopup(ImportDialog, { auth }, () => reloadEntries());
     }
 
-    function handleEntries (
-        { err, val: res }: Result<Record<string, any>>,
-    ): void {
-        if (err) {
-            console.error(res);
-            addNotification({
-                text: `Cannot load entries: ${err}`,
-                position: 'top-center',
-                type: 'error',
-                removeAfter: 4000,
-            });
-            return;
-        }
-        if (
-            !res.entries ||
-            res.totalPages === undefined ||
-            res.totalEntries === undefined
-        ) {
-            console.error(res);
-            addNotification({
-                text: `Cannot load entries: ${res.body?.message}`,
-                position: 'top-center',
-                type: 'error',
-                removeAfter: 4000,
-            });
-            return;
-        }
-        entries = Entry.groupEntriesByDay(res.entries);
-        pages = res.totalPages;
-        entryCount = res.totalEntries;
-
-        loading = false;
-    }
-
-    export async function reloadEntries (page: number, search: string) {
+    export async function reloadEntries () {
         loading = true;
 
-        const entriesOptions = {
+        const entriesOptions: IOptions = {
             page,
             ...options,
             pageSize: PAGE_LENGTH,
         };
         if (search) {
-            entriesOptions['search'] = search;
+            entriesOptions.search = search;
         }
 
         api.get(auth, `/entries`, entriesOptions)
-           .then(handleEntries);
+           .then(res => displayNotifOnErr(addNotification, res))
+           .then(res => {
+               entries = Entry.groupEntriesByDay(res.entries);
+               pages = res.totalPages;
+               entryCount = res.totalEntries;
+
+               loading = false;
+           });
 
         const res = displayNotifOnErr(addNotification,
             await api.get(auth, '/entries/titles'),
@@ -98,13 +79,12 @@
         entryTitles = Entry.groupEntriesByDay(res.entries);
     }
 
-    export let reload;
-    $: reload = () => reloadEntries(page, search);
+    export const reload = () => reloadEntries();
 
     onMount(() => {
-        reloadEntries(page, search);
+        reloadEntries();
     });
-    $: browser ? reloadEntries(page, search) : 0;
+    $: [ page, search, browser ? reloadEntries() : 0 ];
 </script>
 
 <div>

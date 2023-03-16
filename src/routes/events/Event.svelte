@@ -11,16 +11,20 @@
     import { getNotificationsContext } from 'svelte-notifications';
     import { api, apiPath } from '../../lib/api/apiQuery';
     import LabelSelect from '../../lib/components/LabelSelect.svelte';
-    import { Event } from '../../lib/controllers/event';
+    import { Event as EventController } from '../../lib/controllers/event';
     import { Label } from '../../lib/controllers/label';
     import type { Auth } from '../../lib/controllers/user';
-    import { displayNotifOnErr, parseTimestampFromInput } from '../../lib/utils';
-    import { fmtTimestampForInput } from '../../lib/utils.js';
+    import {
+        displayNotifOnErr,
+        fmtTimestampForInput,
+        type NonFunctionProperties,
+        parseTimestampFromInput,
+    } from '../../lib/utils';
 
     const { addNotification } = getNotificationsContext();
     const dispatch = createEventDispatcher();
 
-    export let event: Event & { deleted?: true };
+    export let event: NonFunctionProperties<EventController> & { deleted?: true };
     export let auth: Auth;
     export let selectNameId: string;
     export let changeEventCount: (by: number) => void;
@@ -28,6 +32,10 @@
     let nameInput: HTMLInputElement;
     let labels: Label[] = [];
     let label = event.label?.id || '';
+
+    type OnChangeEvent = Event & { currentTarget: EventTarget & HTMLInputElement } | {
+        target: { value: string }
+    };
 
     async function updateEvent (
         changes: {
@@ -43,26 +51,30 @@
         dispatch('update');
     }
 
-    async function updateName ({ target }: Event) {
+    async function updateName ({ target }: OnChangeEvent) {
+        if (!target || !('value' in target)) throw target;
         await updateEvent({
             name: target.value,
         });
     }
 
-    async function updateStart ({ target }: Event) {
+    async function updateStart ({ target }: OnChangeEvent) {
+        if (!target || !('value' in target)) throw target;
         await updateEvent({
             start: parseTimestampFromInput(target.value),
         });
     }
 
-    async function updateStartAndEnd ({ target }: Event) {
+    async function updateStartAndEnd ({ target }: OnChangeEvent) {
+        if (!target || !('value' in target)) throw target;
         await updateEvent({
             start: parseTimestampFromInput(target.value),
             end: parseTimestampFromInput(target.value),
         });
     }
 
-    async function updateEnd ({ target }: Event) {
+    async function updateEnd ({ target }: OnChangeEvent) {
+        if (!target || !('value' in target)) throw target;
         await updateEvent({
             end: parseTimestampFromInput(target.value),
         });
@@ -101,7 +113,7 @@
             target: {
                 value: fmtTimestampForInput(newEnd),
             },
-        } as Event);
+        } as OnChangeEvent);
     }
 
     async function makeInstantEvent () {
@@ -110,7 +122,7 @@
             target: {
                 value: fmtTimestampForInput(event.start),
             },
-        } as Event);
+        } as OnChangeEvent);
     }
 
     async function updateLabel (
@@ -181,7 +193,7 @@
                 <i>at</i>
                 <input
                     class="editable-text"
-                    on:change={(e) => updateStartAndEnd(e)}
+                    on:change={updateStartAndEnd}
                     placeholder="Start"
                     type="datetime-local"
                     value={fmtTimestampForInput(event.start)}

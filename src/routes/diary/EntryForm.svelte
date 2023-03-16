@@ -1,5 +1,7 @@
 <script lang="ts">
     import { browser } from '$app/environment';
+    // @ts-ignore
+    import { tooltip } from '@svelte-plugins/tooltips';
     import { filedrop, type FileDropOptions, type Files } from 'filedrop-svelte';
     import { createEventDispatcher, onMount } from 'svelte';
     import ImageArea from 'svelte-material-icons/ImageArea.svelte';
@@ -12,6 +14,7 @@
     import type { Auth } from '../../lib/controllers/user';
     import { displayNotifOnErr, getFileContents } from '../../lib/utils';
     import LocationToggle from './LocationToggle.svelte';
+
 
     const { addNotification } = getNotificationsContext();
     const dispatch = createEventDispatcher();
@@ -70,8 +73,6 @@
 
     async function submit () {
         const currentLocation = await getLocation();
-
-        console.log(currentLocation);
 
         const res = displayNotifOnErr(addNotification,
             await api.post(auth, '/entries', {
@@ -186,19 +187,26 @@
 >
     <div class="head">
         <input
+            aria-label="Entry Title"
             bind:value={newEntryTitle}
             class="title"
             placeholder="Title"
         />
         <button
+            aria-label="Insert Image"
             on:click={triggerFileDrop}
+            use:tooltip={{ content: 'Insert Image' }}
         >
             <ImageArea size="30" />
         </button>
         <LocationToggle />
 
         <LabelSelect {auth} bind:value={newEntryLabel} />
-        <button class="send" on:click={submit}>
+        <button
+            aria-label="Submit Entry"
+            class="send"
+            on:click={submit}
+        >
             <Send size="30" />
         </button>
     </div>

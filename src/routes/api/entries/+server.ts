@@ -3,7 +3,12 @@ import { Entry } from '../../../lib/controllers/entry';
 import { Label } from '../../../lib/controllers/label';
 import { query } from '../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
-import { apiResponse, getUnwrappedReqBody, nowS } from '../../../lib/utils';
+import {
+    apiResponse,
+    GETParamIsTruthy,
+    getUnwrappedReqBody,
+    nowS,
+} from '../../../lib/utils';
 import type { RequestHandler } from './$types';
 
 export const GET = (async ({ url, cookies }) => {
@@ -11,7 +16,7 @@ export const GET = (async ({ url, cookies }) => {
 
     const pageSize = parseInt(url.searchParams.get('pageSize') || '50');
     const page = parseInt(url.searchParams.get('page') || '0');
-    const deleted = url.searchParams.get('deleted') === '1';
+    const deleted = GETParamIsTruthy(url.searchParams.get('deleted'));
     const search = (url.searchParams.get('search') || '').toLowerCase();
     const labelId = url.searchParams.get('labelId') || undefined;
     if (page < 0) throw error(400, 'Invalid page number');

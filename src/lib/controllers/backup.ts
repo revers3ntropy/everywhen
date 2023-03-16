@@ -161,7 +161,6 @@ export class Backup extends Controller {
 
         for (const event of events) {
             if (!Event.jsonIsRawEvent(event)) {
-                console.log(event);
                 return Result.err('Invalid event format in JSON');
             }
 

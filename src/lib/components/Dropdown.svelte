@@ -3,6 +3,7 @@
 
     export let open = false;
     export let rounded = false;
+    export let ariaLabel = '';
 
     export let close = () => {
         open = false;
@@ -19,7 +20,7 @@
 <svelte:window on:mousedown={globalMouseDown} />
 
 <div class="dropdown {open ? 'open' : ''} {rounded ? 'rounded' : ''}">
-    <button on:click={() => open = !open}>
+    <button aria-label={ariaLabel || 'Open popup'} on:click={() => open = !open}>
         <slot name="button"></slot>
         <MenuDown size="30" />
     </button>

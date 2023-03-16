@@ -53,6 +53,7 @@
     <Dropdown
         bind:close={closeDropDown}
         rounded
+        ariaLabel="Select label"
     >
         <span slot="button" class="select-button">
             <span
@@ -66,6 +67,7 @@
         <button
             on:click={() => { closeDropDown(); value = '' }}
             class="label-button single"
+            aria-label="Remove label"
         >
             <i>(No Label)</i>
         </button>
@@ -73,6 +75,7 @@
             <button
                 on:click={() => { closeDropDown(); value = label.id }}
                 class="label-button"
+                aria-label="Select label {label.name}"
             >
                 <span
                     class="entry-label-colour"
@@ -87,7 +90,11 @@
         {/each}
     </Dropdown>
     {#if showAddButton}
-        <button on:click={showNewLabelPopup} class="icon-button">
+        <button
+            on:click={showNewLabelPopup}
+            class="icon-button"
+            aria-label="Create new label"
+        >
             <Plus size="25" />
         </button>
     {/if}

@@ -1,13 +1,13 @@
 <script lang="ts">
     import { CanvasState, renderable, START_ZOOM } from '../../lib/canvas/canvas';
-    import { Label } from '../../lib/controllers/label';
+    import type { Label } from '../../lib/controllers/label';
     import { isLightColour } from './utils';
 
     export let id: string;
     export let start: number;
     export let end: number;
     export let name: string;
-    export let label: Label | undefined;
+    export let label: Label | undefined = undefined;
     export let yLevel: number;
     export let eventTextParityHeight: boolean;
     export let options = {
@@ -51,7 +51,7 @@
                 name,
                 Math.max(5, x + options.textXOffset),
                 y + options.h / 2 + 5,
-                { c: textColour, width },
+                { c: textColour, mWidth: width },
             );
         } else if (isSingleEvent && state.zoom > START_ZOOM / 2) {
             state.text(

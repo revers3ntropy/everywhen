@@ -48,7 +48,6 @@
             });
 
             for (const e of overlappedLargerEvents) {
-                console.log(Math.max(e.yLevel, event.yLevel + 1));
                 e.yLevel = Math.max(e.yLevel, event.yLevel + 1);
             }
         }

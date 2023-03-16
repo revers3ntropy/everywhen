@@ -399,3 +399,7 @@ export function apiResponse<T extends Record<string, unknown>> (
         },
     ) as GenericResponse<T>;
 }
+
+export function GETParamIsTruthy (val: string | null = null): boolean {
+    return val && val === 'true' || val === '1';
+}

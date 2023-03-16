@@ -9,7 +9,8 @@
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
-    import { api } from '../api/apiQuery';
+    import { api, apiPath } from '../api/apiQuery';
+    import type { Label as LabelController } from '../controllers/label';
     import type { Auth } from '../controllers/user';
     import { displayNotifOnErr, obfuscate } from '../utils';
     import Label from './Label.svelte';
@@ -21,7 +22,7 @@
     export let title = '';
     export let entry = '';
     export let created = 0;
-    export let label: Label | null = null;
+    export let label: LabelController | null = null;
     export let latitude: number | null = null;
     export let longitude: number | null = null;
     export let deleted = false;
@@ -32,40 +33,34 @@
     export let auth: Auth;
 
     // show random string instead of text content if obfuscated
-    export let showLabel: Label | null;
-    $: showLabel = (showLabels && label) ? {
-        ...label,
-        name: obfuscated ? obfuscate(label.name) : label.name,
-    } : null;
+    export let showLabel: LabelController | null;
+    $: if (showLabels && ((l): l is LabelController => !!l)(label)) {
+        showLabel = {
+            ...label,
+            name: obfuscated ? obfuscate(label.name) : label.name,
+        };
+    } else {
+        showLabel = null;
+    }
 
     async function deleteSelf () {
         if (!confirm(`Are you sure you want to ${deleted ? 'restore' : 'delete'} this entry?`)) {
             return;
         }
 
-        const res = displayNotifOnErr(addNotification,
-            await api.delete(auth, `/entries/${id}`, {
+        displayNotifOnErr(addNotification,
+            await api.delete(auth, apiPath('/entries/', id), {
                 restore: !!deleted,
             }),
         );
 
-        if (res.id) {
-            addNotification({
-                removeAfter: 4000,
-                text: `Entry ${deleted ? 'restored' : 'deleted'}`,
-                type: 'success',
-                position: 'top-center',
-            });
-            dispatch('updated');
-            return;
-        }
-
         addNotification({
             removeAfter: 4000,
-            text: `Error deleting entry ${res.body.message}`,
-            type: 'error',
+            text: `Entry ${deleted ? 'restored' : 'deleted'}`,
+            type: 'success',
             position: 'top-center',
         });
+        dispatch('updated');
     }
 
     function toggleObfuscation () {
@@ -92,7 +87,10 @@
 
         <div>
             {#if !obfuscated}
-                <button on:click={deleteSelf}>
+                <button
+                    on:click={deleteSelf}
+                    aria-label={deleted ? 'Restore' : 'Delete'}
+                >
                     {#if deleted}
                         <Restore size="25" />
                     {:else}
@@ -101,7 +99,10 @@
                 </button>
             {/if}
 
-            <button on:click={toggleObfuscation}>
+            <button
+                aria-label={obfuscated ? 'Show entry' : 'Hide entry'}
+                on:click={toggleObfuscation}
+            >
                 {#if obfuscated}
                     <Eye size="25" />
                 {:else}
