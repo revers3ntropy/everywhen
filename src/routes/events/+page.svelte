@@ -3,6 +3,9 @@
     import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../../app';
     import { api } from '../../lib/api/apiQuery';
+    import Select from '../../lib/components/Select.svelte';
+    import type { EventsSortKey } from '../../lib/constants';
+    import { eventsSortKey } from '../../lib/constants';
     import type { Event as EventController } from '../../lib/controllers/event';
     import type { Label } from '../../lib/controllers/label';
     import { displayNotifOnErr, nowS } from '../../lib/utils.js';
@@ -21,11 +24,32 @@
 
     let events: EventData[] = data.events;
 
-    async function reloadEvents () {
-        events = displayNotifOnErr(addNotification,
-            await api.get(data, '/events'),
-        ).events;
+    function sortEvents<T extends Event | EventData> (
+        events: T[],
+        key: EventsSortKey,
+    ): T[] {
+        if (events.length === 0) return [];
+        if (typeof events[0][key] === 'string') {
+            return events.sort((a, b) => {
+                return a[key]
+                    .toString()
+                    .localeCompare(b[key]?.toString());
+            });
+        } else if (typeof events[0][key] === 'number') {
+            return events.sort((a, b) => {
+                return b[key] - a[key];
+            });
+        }
+        throw new Error('Invalid sort key');
     }
+
+    async function reloadEvents () {
+        events = sortEvents(displayNotifOnErr(addNotification,
+            await api.get(data, '/events'),
+        ).events, $eventsSortKey);
+    }
+
+    $: events = sortEvents(events, $eventsSortKey);
 
     async function newEvent () {
         const now = nowS();
@@ -72,18 +96,33 @@
 
 <main>
     <h1>Events ({eventCount})</h1>
-
-    <ul>
-        <li>
+    <div class="menu">
+        <div>
             <button
-                class="primary unbordered"
+                class="primary"
                 on:click={newEvent}
             >
                 <Plus size="30" />
                 New Event
             </button>
-        </li>
-        {#each events as event}
+        </div>
+
+        <div class="flex-center">
+            Sort by
+            <Select
+                bind:key={$eventsSortKey}
+                options={{
+                    'created': 'created',
+                    'start': 'start',
+                    'end': 'end',
+                    'name': 'name',
+                }}
+            />
+        </div>
+
+    </div>
+    <ul>
+        {#each events as event, i}
             <li>
                 <Event
                     {event}
@@ -119,17 +158,30 @@
             padding: .4em;
             border-radius: 10px;
 
-            &:first-child {
-                .flex-center();
-                border: none;
-            }
-
             @media @mobile {
                 margin: .3rem 0;
                 padding: 0.5em 0 1em 0;
                 border-radius: 0;
                 border: none;
                 border-top: 1px solid @border;
+            }
+        }
+    }
+
+    .menu {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1em;
+
+        @media @mobile {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        button {
+            @media @mobile {
+                margin-bottom: 1em;
             }
         }
     }

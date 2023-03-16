@@ -131,9 +131,6 @@
         });
     }
 
-    const createdFmt = moment(new Date(event.start * 1000))
-        .format('hh:mm DD/MM/YYYY');
-
     onMount(() => {
         if (selectNameId === event.id) {
             nameInput.focus();
@@ -159,7 +156,11 @@
     </div>
 {:else}
     <div class="header">
-        <i>Created {createdFmt}</i>
+        <i>
+            Created
+            {moment(new Date(event.created * 1000))
+                .format('hh:mm DD/MM/YYYY')}
+        </i>
         <LabelSelect
             on:change={updateLabel}
             value={event.label?.id || ''}
@@ -173,16 +174,25 @@
             <Bin size="25" />
         </button>
     </div>
-
-    <input
-        bind:this={nameInput}
-        class="editable-text event-name-inp"
-        on:change={updateName}
-        placeholder="Event Name"
-        value={event.name}
-    >
+    <div class="middle-row">
+        <input
+            bind:this={nameInput}
+            class="editable-text event-name-inp"
+            on:change={updateName}
+            placeholder="Event Name"
+            value={event.name}
+        >
+        <p>
+            {#if event.end - event.start > 60}
+                <i>
+                    ({moment.duration(event.end - event.start, 's')
+                    .humanize()})
+                </i>
+            {/if}
+        </p>
+    </div>
     <div class="from-to-menu">
-        {#if event.start === event.end}
+        {#if event.end - event.start < 60}
             <div>
                 <i>at</i>
                 <input
@@ -221,11 +231,6 @@
                     value={fmtTimestampForInput(event.end)}
                 >
             </div>
-            <p>
-                <i>
-                    ({moment.duration(event.end - event.start, 'seconds').humanize()})
-                </i>
-            </p>
             <div>
                 <button
                     class="link"
@@ -259,6 +264,10 @@
         flex-direction: row;
         justify-content: space-between;
         align-items: center;
+
+        @media @mobile {
+            display: block;
+        }
     }
 
     .restore-menu {
@@ -281,6 +290,18 @@
 
         * {
             margin: 0 0.3em;
+        }
+    }
+
+    .middle-row {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 1em 0 0;
+
+        @media @mobile {
+            display: block;
         }
     }
 </style>

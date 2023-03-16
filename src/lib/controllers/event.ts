@@ -17,10 +17,6 @@ export type RawEvent =
         decrypted: false
     };
 
-export type DecryptedRawEvent = Omit<RawEvent, 'decrypted'> & {
-    decrypted: true
-};
-
 export class Event {
     public label?: Label;
     public readonly decrypted = true;
