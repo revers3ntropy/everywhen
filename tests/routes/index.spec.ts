@@ -8,7 +8,7 @@ test.describe('/', () => {
         await expect(page).toHaveTitle(/Diary/);
     });
 
-    test('Can create account', async ({ page }) => {
+    test('Can create account with form', async ({ page }) => {
         await page.goto('/');
 
         const auth = {
@@ -16,15 +16,41 @@ test.describe('/', () => {
             password: randStr(),
         };
 
-        await page.locator('input[aria-label="Username"]')
-                  .fill(auth.username);
-        await page.locator('input[aria-label="Password"]')
-                  .fill(auth.password);
+        expect(await page.isVisible('input[aria-label="Password"]'))
+            .toBe(true);
+        expect(await page.isVisible('input[aria-label="Username"]'))
+            .toBe(true);
+        expect(await page.isVisible('button[aria-label="Create Account"]'))
+            .toBe(true);
+        expect(await page.isVisible('button[aria-label="Log In"]'))
+            .toBe(true);
 
-        await page.locator('button[aria-label="Log In"]')
+        await page.getByLabel('Username').fill(auth.username);
+        await page.getByLabel('Password').fill(auth.password);
+
+        await page.getByRole('button', { name: 'Log In' }).click();
+
+        // haven't been signed in with random credentials
+        await expect(page).toHaveURL('/');
+
+        await page.getByRole('button', { name: 'Create Account' })
                   .click();
 
-        await expect(page).toHaveURL('/');
+        await page.goto('/home', { waitUntil: 'domcontentloaded' });
+
+        await expect(page).toHaveURL('/home');
+
+        expect(await page.isVisible('button[aria-label="Delete Account"]'))
+            .toBe(true);
+
+        await page.getByLabel('Delete Account').click();
+
+        await page.getByLabel('Username').fill(auth.username);
+        await page.getByLabel('Password').fill(auth.password);
+
+        await page.getByRole('button', { name: 'Log In' }).click();
+        await expect(await page.locator('.default-notification-error'))
+            .toHaveCount(1);
     });
 });
 

@@ -23,6 +23,7 @@ export function displayNotifOnErr<T> (
     addNotification: (notification: NotificationOptions) => void,
     { err, val }: Result<T>,
     options: PickOptional<NotificationOptions> = {},
+    onErr: (err: string | null) => any = () => 0,
 ): T {
     if (err) {
         try {
@@ -30,6 +31,7 @@ export function displayNotifOnErr<T> (
                 || err;
         } catch (e) {
         }
+        onErr(err);
         addNotification({
             ...ERR_NOTIFICATION,
             text: err || 'Unknown error',

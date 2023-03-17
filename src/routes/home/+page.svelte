@@ -122,11 +122,15 @@
         <h1>My Account</h1>
 
         <div class="buttons">
-            <a href="/logout">
+            <a
+                aria-label="Log Out"
+                href="/logout"
+            >
                 <Logout size="30" />
                 Log Out
             </a>
             <button
+                aria-label="Delete Account"
                 class="danger"
                 on:click={deleteAccount}
             >

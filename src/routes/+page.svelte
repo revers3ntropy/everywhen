@@ -13,24 +13,32 @@
     let password = '';
     let username = '';
 
+    let actionPending = false;
+
     async function login (): Promise<void> {
+        actionPending = true;
         displayNotifOnErr(addNotification,
             await api.get(data, `/auth`, {
                 key: sha256(password).substring(0, 32),
                 username,
             }),
+            {},
+            () => actionPending = false,
         );
-        window.location.href = '/home';
+        window.location.assign('/home');
     }
 
     async function create (): Promise<void> {
+        actionPending = true;
         displayNotifOnErr(addNotification,
             await api.post(data, `/users`, {
                 password: sha256(password).substring(0, 32),
                 username,
             }),
+            {},
+            () => actionPending = false,
         );
-        window.location.href = '/home';
+        window.location.assign('/home');
     }
 </script>
 
@@ -43,6 +51,7 @@
                     aria-label="Username"
                     autocomplete="username"
                     bind:value={username}
+                    disabled={actionPending}
                     style="font-size: x-large"
                 />
             </label>
@@ -52,13 +61,15 @@
                     aria-label="Password"
                     autocomplete="current-password"
                     bind:value={password}
+                    disabled={actionPending}
                     style="font-size: x-large"
                     type="password"
                 />
             </label>
             <div class="flex-center" style="justify-content: space-between">
                 <button
-                    aria-label="Sign Up"
+                    aria-label="Create Account"
+                    disabled={actionPending}
                     on:click|preventDefault={create}
                     type="button"
                 >
@@ -67,6 +78,7 @@
                 <button
                     aria-label="Log In"
                     class="primary"
+                    disabled={actionPending}
                     on:click|preventDefault={login}
                     type="button"
                 >
