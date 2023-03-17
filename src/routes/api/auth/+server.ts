@@ -26,7 +26,14 @@ export const GET = (async ({ url, cookies }) => {
     if (err) throw error(401, err);
 
     cookies.set(KEY_COOKIE_KEY, key, AUTH_COOKIE_OPTIONS);
-    cookies.set(USERNAME_COOKIE_KEY, username, AUTH_COOKIE_OPTIONS);
+    // allow the username cookie to be read by the client
+    // so that it can check the auth is still valid
+    // but keep the key cookie httpOnly, to prevent XSS
+    // https://owasp.org/www-community/HttpOnly
+    cookies.set(USERNAME_COOKIE_KEY, username, {
+        ...AUTH_COOKIE_OPTIONS,
+        httpOnly: false,
+    });
 
     return apiResponse({
         key, username, id: user.id,

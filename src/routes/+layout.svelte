@@ -1,11 +1,13 @@
 <script lang="ts">
+    import { browser } from '$app/environment';
     import { page } from '$app/stores';
+    import { parse } from 'cookie';
     import Notifications from 'svelte-notifications';
     import Modal from 'svelte-simple-modal';
     import 'ts-polyfill';
     import '../app.less';
     import Nav from '../lib/components/Nav.svelte';
-    import { INACTIVE_TIMEOUT_MS, obfuscated } from '../lib/constants';
+    import { INACTIVE_TIMEOUT_MS, obfuscated, USERNAME_COOKIE_KEY } from '../lib/constants';
     import { popup } from '../lib/constants.js';
     import { INFO_NOTIFICATION, type NotificationOptions } from '../lib/utils';
     import Notifier from './Notifier.svelte';
@@ -18,7 +20,7 @@
     let isObfuscated = true;
     $: obfuscated.update(() => isObfuscated);
 
-    setInterval(() => {
+    function checkObfuscatedTimeout () {
         if (isObfuscated) {
             return;
         }
@@ -30,6 +32,25 @@
             });
             isObfuscated = true;
         }
+    }
+
+    function checkCookies () {
+        if (!browser) return;
+        if (window.location.pathname === '/') return;
+
+        const cookies = parse(document.cookie);
+
+        // the key cookie is HttpOnly, so we can't read it from JS
+        // https://owasp.org/www-community/HttpOnly
+        if (!cookies[USERNAME_COOKIE_KEY]) {
+            console.error('Cookies have expired');
+            window.location.assign('/');
+        }
+    }
+
+    setInterval(() => {
+        checkObfuscatedTimeout();
+        checkCookies();
     }, 1000);
 
     function activity () {
