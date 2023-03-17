@@ -7,9 +7,10 @@
     import 'ts-polyfill';
     import '../app.less';
     import Nav from '../lib/components/Nav.svelte';
-    import { INACTIVE_TIMEOUT_MS, obfuscated, USERNAME_COOKIE_KEY } from '../lib/constants';
-    import { popup } from '../lib/constants.js';
-    import { INFO_NOTIFICATION, type NotificationOptions } from '../lib/utils';
+    import { INACTIVE_TIMEOUT_MS, USERNAME_COOKIE_KEY } from '../lib/constants';
+    import { obfuscated, popup } from '../lib/stores';
+    import { INFO_NOTIFICATION } from '../lib/utils/notifications';
+    import type { NotificationOptions } from '../lib/utils/types';
     import Notifier from './Notifier.svelte';
 
     $: home = $page.url.pathname.trim() === '/';

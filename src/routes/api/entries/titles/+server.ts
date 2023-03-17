@@ -3,8 +3,8 @@ import { error } from '@sveltejs/kit';
 import { Entry } from '../../../../lib/controllers/entry';
 import { query } from '../../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../../lib/security/getAuthFromCookies';
-import type { Mutable } from '../../../../lib/utils';
-import { apiResponse } from '../../../../lib/utils';
+import { apiResponse } from '../../../../lib/utils/apiResponse';
+import type { Mutable } from '../../../../lib/utils/types';
 
 export const GET = (async ({ cookies }) => {
     const auth = await getAuthFromCookies(cookies);

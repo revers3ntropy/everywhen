@@ -3,8 +3,8 @@ import { api } from '../../api/apiQuery';
 import type { Event } from '../../controllers/event';
 import type { Label } from '../../controllers/label';
 import type { Auth } from '../../controllers/user';
-import type { NotificationOptions } from '../../utils';
-import { type Mutable, nowS } from '../../utils';
+import { nowS } from '../../utils/time';
+import type { Mutable, NotificationOptions } from '../../utils/types';
 
 export async function importEvents (
     contents: string,

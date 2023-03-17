@@ -3,7 +3,8 @@ import { error } from '@sveltejs/kit';
 import { Asset } from '../../../lib/controllers/asset';
 import { query } from '../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
-import { apiResponse, getUnwrappedReqBody } from '../../../lib/utils';
+import { apiResponse } from '../../../lib/utils/apiResponse';
+import { getUnwrappedReqBody } from '../../../lib/utils/requestBody';
 
 export const POST = (async ({ request, cookies }) => {
     const auth = await getAuthFromCookies(cookies);

@@ -4,8 +4,8 @@
     import { getNotificationsContext } from 'svelte-notifications';
     import { api, apiPath } from '../../lib/api/apiQuery';
     import type { Auth } from '../../lib/controllers/user';
-    import { showPopup } from '../../lib/utils';
-    import { displayNotifOnErr } from '../../lib/utils.js';
+    import { displayNotifOnErr } from '../../lib/utils/notifications';
+    import { showPopup } from '../../lib/utils/popups';
     import DeleteLabelDialog from './DeleteLabelDialog.svelte';
 
     const { addNotification } = getNotificationsContext();

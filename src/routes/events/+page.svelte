@@ -6,11 +6,13 @@
     import { api } from '../../lib/api/apiQuery';
     import ImportDialog from '../../lib/components/dialogs/ImportDialog.svelte';
     import Select from '../../lib/components/Select.svelte';
-    import type { EventsSortKey } from '../../lib/constants';
-    import { eventsSortKey } from '../../lib/constants';
     import type { Event as EventController } from '../../lib/controllers/event';
     import type { Label } from '../../lib/controllers/label';
-    import { displayNotifOnErr, nowS, showPopup } from '../../lib/utils.js';
+    import { eventsSortKey } from '../../lib/stores';
+    import { displayNotifOnErr } from '../../lib/utils/notifications';
+    import { showPopup } from '../../lib/utils/popups';
+    import { nowS } from '../../lib/utils/time';
+    import type { EventsSortKey } from '../../lib/utils/types';
     import Event from './Event.svelte';
 
     const NEW_EVENT_NAME = 'New Event';
@@ -138,7 +140,7 @@
 
     </div>
     <ul>
-        {#each events as event, i}
+        {#each events as event}
             <li>
                 <Event
                     {event}

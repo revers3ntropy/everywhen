@@ -6,7 +6,8 @@
     import { api } from '../api/apiQuery';
     import type { Label } from '../controllers/label';
     import type { Auth } from '../controllers/user';
-    import { displayNotifOnErr, showPopup } from '../utils';
+    import { displayNotifOnErr } from '../utils/notifications';
+    import { showPopup } from '../utils/popups';
     import NewLabelDialog from './dialogs/NewLabelDialog.svelte';
 
     const dispatch = createEventDispatcher();

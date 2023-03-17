@@ -1,7 +1,6 @@
 import '@total-typescript/ts-reset';
 import type { Auth } from './lib/controllers/user';
 
-
 declare module '$env/static/private' {
     export const DB_HOST: string;
     export const DB_USER: string;
@@ -33,7 +32,7 @@ declare global {
     // See https://kit.svelte.dev/docs/types#app
     namespace App {
 
-        interface PageData {
+        interface PageData extends Auth {
             key: string;
             username: string;
             id: string;

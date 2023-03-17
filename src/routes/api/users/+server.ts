@@ -9,7 +9,8 @@ import { Backup } from '../../../lib/controllers/backup';
 import { User } from '../../../lib/controllers/user';
 import { query } from '../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
-import { apiResponse, getUnwrappedReqBody } from '../../../lib/utils';
+import { apiResponse } from '../../../lib/utils/apiResponse';
+import { getUnwrappedReqBody } from '../../../lib/utils/requestBody';
 
 export const POST = (async ({ request, cookies }) => {
     const body = await getUnwrappedReqBody(request, {

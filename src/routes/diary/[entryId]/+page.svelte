@@ -1,8 +1,8 @@
 <script lang="ts">
     import type { App } from '../../../app';
     import Entry from '../../../lib/components/Entry.svelte';
-    import { obfuscated } from '../../../lib/constants.js';
     import type { Entry as EntryController } from '../../../lib/controllers/entry';
+    import { obfuscated } from '../../../lib/stores';
 
     export let data: App.PageData & EntryController;
 </script>

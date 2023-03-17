@@ -10,10 +10,12 @@
     import PageCounter from '../../lib/components/PageCounter.svelte';
     import Sidebar from '../../routes/diary/Sidebar.svelte';
     import { api } from '../api/apiQuery';
-    import { obfuscated } from '../constants';
     import { Entry } from '../controllers/entry';
     import type { Auth } from '../controllers/user';
-    import { displayNotifOnErr, nowS, showPopup } from '../utils';
+    import { obfuscated } from '../stores';
+    import { displayNotifOnErr } from '../utils/notifications';
+    import { showPopup } from '../utils/popups';
+    import { nowS } from '../utils/time';
     import Spinner from './BookSpinner.svelte';
     import ImportDialog from './dialogs/ImportDialog.svelte';
 

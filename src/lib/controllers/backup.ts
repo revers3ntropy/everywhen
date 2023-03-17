@@ -1,7 +1,8 @@
 import schemion from 'schemion';
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
-import { nowS, Result } from '../utils';
+import { Result } from '../utils/result';
+import { nowS } from '../utils/time';
 import { Asset } from './asset';
 import { Entry } from './entry';
 import { Event } from './event';

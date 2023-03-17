@@ -1,7 +1,8 @@
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { generateUUId } from '../security/uuid';
-import { nowS, Result } from '../utils';
+import { Result } from '../utils/result';
+import { nowS } from '../utils/time';
 import type { Auth } from './user';
 
 export class Asset {

@@ -4,9 +4,9 @@
     import type { App } from '../../app';
     import { api } from '../../lib/api/apiQuery';
     import Entry from '../../lib/components/Entry.svelte';
-    import { obfuscated } from '../../lib/constants.js';
     import type { Entry as EntryController } from '../../lib/controllers/entry';
-    import { displayNotifOnErr } from '../../lib/utils';
+    import { obfuscated } from '../../lib/stores';
+    import { displayNotifOnErr } from '../../lib/utils/notifications';
 
     const { addNotification } = getNotificationsContext();
 

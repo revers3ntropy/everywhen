@@ -3,7 +3,7 @@ import { api } from '../../api/apiQuery';
 import type { Entry } from '../../controllers/entry';
 import type { Label } from '../../controllers/label';
 import type { Auth } from '../../controllers/user';
-import type { Mutable, NotificationOptions } from '../../utils';
+import type { Mutable, NotificationOptions } from '../../utils/types';
 
 export async function importEntries (
     contents: string,

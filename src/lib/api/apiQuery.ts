@@ -4,7 +4,9 @@ import type { HttpMethod } from '@sveltejs/kit/types/private';
 import { serialize } from 'cookie';
 import { AUTH_COOKIE_OPTIONS, KEY_COOKIE_KEY, USERNAME_COOKIE_KEY } from '../constants';
 import type { Auth } from '../controllers/user';
-import { GenericResponse, GETArgs, Result } from '../utils';
+import type { GenericResponse } from '../utils/apiResponse';
+import { GETArgs } from '../utils/GETArgs';
+import { Result } from '../utils/result';
 
 export type ResType<T> = T extends (props: any) =>
     Promise<GenericResponse<infer R>> ? R : never;

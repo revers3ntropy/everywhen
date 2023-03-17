@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { obfuscated } from "../../lib/constants";
-    import { renderable, START_ZOOM } from "../../lib/canvas/canvas";
+    import { renderable, START_ZOOM } from '../../lib/canvas/canvas';
+    import { obfuscated } from '../../lib/stores';
 
     export let id: string;
     export let created: number;
@@ -14,7 +14,7 @@
 
         const size = Math.max(wordCount * 0.1, 5);
 
-        state.rect(renderPos, state.centerLnY(), 5, size, "rgb(100, 100, 100)");
+        state.rect(renderPos, state.centerLnY(), 5, size, 'rgb(100, 100, 100)');
 
         if (state.zoom > START_ZOOM * 2 && !$obfuscated) {
             let y = state.centerLnY();
@@ -25,7 +25,7 @@
                 y += size + 12;
             }
 
-            state.text(title, renderPos - 5, y, { align: "center" });
+            state.text(title, renderPos - 5, y, { align: 'center' });
         }
     });
 </script>

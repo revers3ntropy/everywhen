@@ -4,7 +4,7 @@
     import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../app';
     import { api } from '../lib/api/apiQuery';
-    import { displayNotifOnErr } from '../lib/utils.js';
+    import { displayNotifOnErr } from '../lib/utils/notifications';
 
     const { addNotification } = getNotificationsContext();
 
@@ -40,6 +40,7 @@
             <label>
                 Username
                 <input
+                    aria-label="Username"
                     autocomplete="username"
                     bind:value={username}
                     style="font-size: x-large"
@@ -48,6 +49,7 @@
             <label>
                 Password
                 <input
+                    aria-label="Password"
                     autocomplete="current-password"
                     bind:value={password}
                     style="font-size: x-large"
@@ -56,12 +58,14 @@
             </label>
             <div class="flex-center" style="justify-content: space-between">
                 <button
+                    aria-label="Sign Up"
                     on:click|preventDefault={create}
                     type="button"
                 >
                     Sign Up
                 </button>
                 <button
+                    aria-label="Log In"
                     class="primary"
                     on:click|preventDefault={login}
                     type="button"

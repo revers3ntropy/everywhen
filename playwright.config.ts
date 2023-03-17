@@ -47,28 +47,10 @@ export default defineConfig({
             name: 'chromium',
             use: { ...devices['Desktop Chrome'] },
         },
-
         {
             name: 'firefox',
             use: { ...devices['Desktop Firefox'] },
         },
-
-        /* Doesn't work on Ubuntu :/ */
-        // {
-        //     name: 'webkit',
-        //     use: { ...devices['Desktop Safari'] },
-        // },
-
-        /* Test against mobile viewports. */
-        {
-            name: 'Mobile Chrome',
-            use: { ...devices['Pixel 5'] },
-        },
-        /* Also doesn't work on Ubuntu :/ */
-        // {
-        //     name: 'Mobile Safari',
-        //     use: { ...devices['iPhone 12'] },
-        // },
 
         /* Test against branded browsers. */
         {
@@ -79,6 +61,22 @@ export default defineConfig({
             name: 'Google Chrome',
             use: { channel: 'chrome' },
         },
+        /* Test against mobile viewports. */
+        {
+            name: 'Mobile Chrome',
+            use: { ...devices['Pixel 5'] },
+        },
+
+        /* Doesn't work on Ubuntu :/ */
+        // {
+        //     name: 'webkit',
+        //     use: { ...devices['Desktop Safari'] },
+        // },
+        /* Also doesn't work on Ubuntu :/ */
+        // {
+        //     name: 'Mobile Safari',
+        //     use: { ...devices['iPhone 12'] },
+        // },
     ],
 
     /* Folder for test artifacts such as screenshots, videos, traces, etc. */

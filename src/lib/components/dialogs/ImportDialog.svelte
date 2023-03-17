@@ -5,7 +5,8 @@
     import { api } from '../../api/apiQuery';
     import type { Label } from '../../controllers/label';
     import type { Auth } from '../../controllers/user';
-    import { displayNotifOnErr, ERR_NOTIFICATION, type Result } from '../../utils';
+    import { displayNotifOnErr, ERR_NOTIFICATION } from '../../utils/notifications';
+    import type { Result } from '../../utils/result';
     import FileDrop from './FileDropDialog.svelte';
     import { importEntries } from './importEntries.js';
     import { importEvents } from './importEvents';

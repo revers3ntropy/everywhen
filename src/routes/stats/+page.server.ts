@@ -2,7 +2,7 @@ import { error } from '@sveltejs/kit';
 import { Entry } from '../../lib/controllers/entry';
 import { query } from '../../lib/db/mysql';
 import { getAuthFromCookies } from '../../lib/security/getAuthFromCookies';
-import { splitText, wordCount as txtWordCount } from '../../lib/utils';
+import { splitText, wordCount as txtWordCount } from '../../lib/utils/text';
 import type { PageServerLoad } from './$types';
 
 function commonWordsFromText (txt: string): [ string, number ][] {

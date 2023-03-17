@@ -2,7 +2,8 @@ import { error } from '@sveltejs/kit';
 import { Event } from '../../../../lib/controllers/event';
 import { query } from '../../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../../lib/security/getAuthFromCookies';
-import { apiResponse, getUnwrappedReqBody } from '../../../../lib/utils';
+import { apiResponse } from '../../../../lib/utils/apiResponse';
+import { getUnwrappedReqBody } from '../../../../lib/utils/requestBody';
 import type { RequestHandler } from './$types';
 
 export const PUT = (async ({ request, params, cookies }) => {

@@ -3,7 +3,8 @@ import { Entry } from '../../../lib/controllers/entry';
 import { Event } from '../../../lib/controllers/event';
 import { query } from '../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
-import { apiResponse, wordCount } from '../../../lib/utils';
+import { apiResponse } from '../../../lib/utils/apiResponse';
+import { wordCount } from '../../../lib/utils/text';
 import type { RequestHandler } from './$types';
 
 export const GET = (async ({ cookies }) => {

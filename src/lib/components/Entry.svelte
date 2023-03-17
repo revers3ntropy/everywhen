@@ -12,7 +12,8 @@
     import { api, apiPath } from '../api/apiQuery';
     import type { Label as LabelController } from '../controllers/label';
     import type { Auth } from '../controllers/user';
-    import { displayNotifOnErr, obfuscate } from '../utils';
+    import { displayNotifOnErr } from '../utils/notifications';
+    import { obfuscate } from '../utils/text';
     import Label from './Label.svelte';
 
     const dispatch = createEventDispatcher();

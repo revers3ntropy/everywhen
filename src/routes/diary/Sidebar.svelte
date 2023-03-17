@@ -4,7 +4,7 @@
 	import Menu from 'svelte-material-icons/Menu.svelte';
 	import Time from 'svelte-time';
 	import type { Entry } from '../../lib/controllers/entry';
-	import { nowS } from '../../lib/utils.js';
+	import { nowS } from '../../lib/utils/time';
 
 	export let titles: Record<number, Entry[]>;
 	export let obfuscated = true;

@@ -1,7 +1,7 @@
+import { browser } from '$app/environment';
 import { getContext, onMount } from 'svelte';
 import { writable } from 'svelte/store';
-import { browser } from '$app/environment';
-import { nowS } from '../utils';
+import { nowS } from '../utils/time';
 
 export const START_ZOOM = 1 / (60 * 60);
 

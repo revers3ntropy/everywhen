@@ -7,7 +7,7 @@
     import Canvas from '../../lib/canvas/Canvas.svelte';
     import type { Entry } from '../../lib/controllers/entry';
     import { Event } from '../../lib/controllers/event';
-    import { displayNotifOnErr } from '../../lib/utils';
+    import { displayNotifOnErr } from '../../lib/utils/notifications';
     import CenterLine from './CenterLine.svelte';
     import Controls from './Controls.svelte';
     import EntryInTimeline from './EntryInTimeline.svelte';

@@ -13,7 +13,10 @@
     import type { App } from '../../app';
     import { api } from '../../lib/api/apiQuery';
     import FileDropDialog from '../../lib/components/dialogs/FileDropDialog.svelte';
-    import { displayNotifOnErr, download as downloadFile, Result, showPopup } from '../../lib/utils';
+    import { download as downloadFile } from '../../lib/utils/files';
+    import { displayNotifOnErr } from '../../lib/utils/notifications';
+    import { showPopup } from '../../lib/utils/popups';
+    import type { Result } from '../../lib/utils/result';
 
     const { addNotification } = getNotificationsContext();
 

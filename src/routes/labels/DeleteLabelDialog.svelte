@@ -3,10 +3,10 @@
     import { getNotificationsContext } from 'svelte-notifications';
     import { api, apiPath } from '../../lib/api/apiQuery';
     import LabelSelect from '../../lib/components/LabelSelect.svelte';
-    import { popup } from '../../lib/constants';
     import type { Entry } from '../../lib/controllers/entry';
     import type { Auth } from '../../lib/controllers/user';
-    import { displayNotifOnErr } from '../../lib/utils';
+    import { popup } from '../../lib/stores';
+    import { displayNotifOnErr } from '../../lib/utils/notifications';
 
     const { addNotification } = getNotificationsContext();
 

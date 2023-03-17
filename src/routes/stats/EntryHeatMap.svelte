@@ -3,7 +3,7 @@
     // @ts-ignore
     import SvelteHeatmap from 'svelte-heatmap';
     import type { Entry } from '../../lib/controllers/entry';
-    import { wordCount } from '../../lib/utils.js';
+    import { wordCount } from '../../lib/utils/text';
     import { By } from './helpers';
 
     export let entries: Entry[];

@@ -3,12 +3,10 @@ import { Entry } from '../../../lib/controllers/entry';
 import { Label } from '../../../lib/controllers/label';
 import { query } from '../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
-import {
-    apiResponse,
-    GETParamIsTruthy,
-    getUnwrappedReqBody,
-    nowS,
-} from '../../../lib/utils';
+import { apiResponse } from '../../../lib/utils/apiResponse';
+import { GETParamIsTruthy } from '../../../lib/utils/GETArgs';
+import { getUnwrappedReqBody } from '../../../lib/utils/requestBody';
+import { nowS } from '../../../lib/utils/time';
 import type { RequestHandler } from './$types';
 
 export const GET = (async ({ url, cookies }) => {

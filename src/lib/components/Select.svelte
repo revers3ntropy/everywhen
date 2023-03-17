@@ -4,7 +4,7 @@
     export let options: Record<string, any>;
     export let key: string;
 
-    export let value;
+    export let value = null;
     $: value = options[key];
 
     $: if (!(key in options)) key = Object.keys(options)[0];

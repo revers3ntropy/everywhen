@@ -5,7 +5,7 @@
     import { api } from '../../lib/api/apiQuery';
     import NewLabelForm from '../../lib/components/NewLabelForm.svelte';
     import type { Label as LabelController } from '../../lib/controllers/label';
-    import { displayNotifOnErr } from '../../lib/utils';
+    import { displayNotifOnErr } from '../../lib/utils/notifications';
     import Label from './Label.svelte';
 
     const { addNotification } = getNotificationsContext();

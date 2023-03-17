@@ -9,9 +9,10 @@
     import { getNotificationsContext } from 'svelte-notifications';
     import { api } from '../../lib/api/apiQuery';
     import LabelSelect from '../../lib/components/LabelSelect.svelte';
-    import { enabledLocation } from '../../lib/constants';
     import type { Auth } from '../../lib/controllers/user';
-    import { displayNotifOnErr, ERR_NOTIFICATION, getFileContents } from '../../lib/utils';
+    import { enabledLocation } from '../../lib/stores';
+    import { getFileContents } from '../../lib/utils/files';
+    import { displayNotifOnErr, ERR_NOTIFICATION } from '../../lib/utils/notifications';
     import LocationToggle from './LocationToggle.svelte';
 
     type OptionalCoords = [ number, number ] | [ null, null ];

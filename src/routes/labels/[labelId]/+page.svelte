@@ -4,7 +4,7 @@
     import { api, apiPath } from '../../../lib/api/apiQuery';
     import Entries from '../../../lib/components/Entries.svelte';
     import type { Label } from '../../../lib/controllers/label';
-    import { displayNotifOnErr } from '../../../lib/utils';
+    import { displayNotifOnErr } from '../../../lib/utils/notifications';
 
     const { addNotification } = getNotificationsContext();
 

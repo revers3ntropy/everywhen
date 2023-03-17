@@ -14,7 +14,8 @@
     import type { Event as EventController } from '../../lib/controllers/event';
     import type { Label } from '../../lib/controllers/label';
     import type { Auth } from '../../lib/controllers/user';
-    import { displayNotifOnErr, fmtTimestampForInput, parseTimestampFromInput } from '../../lib/utils';
+    import { displayNotifOnErr } from '../../lib/utils/notifications';
+    import { fmtTimestampForInput, parseTimestampFromInput } from '../../lib/utils/time';
 
     const { addNotification } = getNotificationsContext();
     const dispatch = createEventDispatcher();

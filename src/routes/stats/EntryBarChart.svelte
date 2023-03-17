@@ -8,7 +8,8 @@
     import ToggleSwitchOff from 'svelte-material-icons/ToggleSwitchOff.svelte';
     import Select from '../../lib/components/Select.svelte';
     import type { Entry } from '../../lib/controllers/entry';
-    import { nowS, splitText, wordCount } from '../../lib/utils';
+    import { splitText, wordCount } from '../../lib/utils/text';
+    import { nowS } from '../../lib/utils/time';
     import { By } from './helpers';
 
     export let entries: Entry[];
