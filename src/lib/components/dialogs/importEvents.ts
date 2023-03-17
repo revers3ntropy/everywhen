@@ -1,11 +1,12 @@
 import { matches } from 'schemion';
 import { api } from '../../api/apiQuery';
-import type { Entry } from '../../controllers/entry';
+import type { Event } from '../../controllers/event';
 import type { Label } from '../../controllers/label';
 import type { Auth } from '../../controllers/user';
-import type { Mutable, NotificationOptions } from '../../utils';
+import type { NotificationOptions } from '../../utils';
+import { type Mutable, nowS } from '../../utils';
 
-export async function importEntries (
+export async function importEvents (
     contents: string,
     labels: Label[],
     auth: Auth,
@@ -38,69 +39,58 @@ export async function importEntries (
     let notifications: Partial<NotificationOptions>[] = [];
 
     let i = -1;
-    for (let entryJSON of json) {
+    for (let eventJson of json) {
         i++;
-        if (!matches(entryJSON, {
-            entry: 'string',
-            title: 'string',
-            time: 'string',
+
+        if (!matches(eventJson, {
+            name: 'string',
+            start: 'number',
+            end: 'number',
             created: 'number',
-            latitude: 'number',
-            longitude: 'number',
-            location: 'object',
-            types: 'object',
             label: 'string',
         }, {
-            time: '0',
-            location: [],
-            types: [],
             label: '',
+            created: nowS(),
         })) {
-            errors.push([ i, `entry is not object` ]);
+            errors.push([ i, `Wrong schema for event` ]);
             continue;
         }
 
-        const postBody: Mutable<Omit<Partial<Entry>, 'label'>> & {
-            label?: string
+        const postBody: Omit<Mutable<Partial<Event>>, 'label'> & {
+            label?: string,
         } = {};
 
-        if (entryJSON.location && !Array.isArray(entryJSON.location)) {
-            errors.push([ i, `location is not array` ]);
-            continue;
-        }
+        postBody.name = eventJson.name;
+        postBody.start = eventJson.start;
+        postBody.end = eventJson.end;
+        postBody.created = eventJson.created;
 
-        postBody.entry = entryJSON.entry;
-        postBody.title = entryJSON.title || '';
-        postBody.created = parseInt(entryJSON.time) || entryJSON.created;
-        postBody.latitude = parseFloat((entryJSON.latitude || entryJSON.location[0]) as string) || 0;
-        postBody.longitude = parseFloat((entryJSON.longitude || entryJSON.location[1]) as string) || 0;
-
-        if (entryJSON.types && Array.isArray(entryJSON.types) && entryJSON.types.length) {
-            const name = entryJSON.types[0] as string;
-            if (!labelHashMap.has(name)) {
+        if (eventJson.label) {
+            const labelId = labelHashMap.get(eventJson.label);
+            if (!labelId) {
                 notifications.push({
-                    text: `Creating label ${name}`,
+                    text: `Creating label ${eventJson.label}`,
                     type: 'info',
                     removeAfter: 10000,
                 });
                 const { err, val: createLabelRes } = await api.post(auth, `/labels`, {
-                    name,
+                    name: eventJson.label,
                     colour: '#000000',
                 });
                 if (err) {
-                    errors.push([ i, `failed to create label ${name}` ]);
+                    errors.push([ i, `failed to create label '${eventJson.label}'` ]);
                     continue;
                 }
 
                 postBody.label = createLabelRes.id;
-                labelHashMap.set(name, createLabelRes.id);
-            } else {
-                postBody.label = labelHashMap.get(name);
+                labelHashMap.set(eventJson.label, createLabelRes.id);
             }
+            postBody.label = labelId;
+        } else {
+            postBody.label = labelHashMap.get(eventJson.label);
         }
-        postBody.label ||= entryJSON.label;
 
-        const { err } = await api.post(auth, `/entries`, postBody);
+        const { err } = await api.post(auth, `/events`, postBody);
         if (err) {
             errors.push([ i, err ]);
         }
@@ -120,4 +110,5 @@ export async function importEntries (
     }
 
     return notifications;
+
 }

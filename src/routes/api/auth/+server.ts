@@ -21,12 +21,14 @@ export const GET = (async ({ url, cookies }) => {
         throw error(401, 'Invalid login');
     }
 
-    const { err } = await User.authenticate(query, username, key);
+    const { err, val: user } = await User.authenticate(query, username, key);
 
     if (err) throw error(401, err);
 
     cookies.set(KEY_COOKIE_KEY, key, AUTH_COOKIE_OPTIONS);
     cookies.set(USERNAME_COOKIE_KEY, username, AUTH_COOKIE_OPTIONS);
 
-    return apiResponse({});
+    return apiResponse({
+        key, username, id: user.id,
+    });
 }) satisfies RequestHandler;

@@ -1,14 +1,16 @@
 <script lang="ts">
     import Plus from 'svelte-material-icons/Plus.svelte';
+    import TrayArrowUp from 'svelte-material-icons/TrayArrowUp.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../../app';
     import { api } from '../../lib/api/apiQuery';
+    import ImportDialog from '../../lib/components/dialogs/ImportDialog.svelte';
     import Select from '../../lib/components/Select.svelte';
     import type { EventsSortKey } from '../../lib/constants';
     import { eventsSortKey } from '../../lib/constants';
     import type { Event as EventController } from '../../lib/controllers/event';
     import type { Label } from '../../lib/controllers/label';
-    import { displayNotifOnErr, nowS } from '../../lib/utils.js';
+    import { displayNotifOnErr, nowS, showPopup } from '../../lib/utils.js';
     import Event from './Event.svelte';
 
     const NEW_EVENT_NAME = 'New Event';
@@ -80,6 +82,13 @@
         ].sort((a, b) => b.created - a.created);
     }
 
+    function importPopup () {
+        showPopup(ImportDialog, {
+            auth: data,
+            type: 'events',
+        }, reloadEvents);
+    }
+
     let eventCount: number;
     $: eventCount = events.filter(e => !e.deleted).length;
 
@@ -87,6 +96,13 @@
     $: selectNameId = events[
         events.findIndex(e => e.name === NEW_EVENT_NAME && !e.deleted)
         ]?.id || '';
+
+    const sortEventsKeys = {
+        'created': 'created',
+        'start': 'start',
+        'end': 'end',
+        'name': 'name',
+    };
 </script>
 
 <svelte:head>
@@ -95,9 +111,8 @@
 </svelte:head>
 
 <main>
-    <h1>Events ({eventCount})</h1>
     <div class="menu">
-        <div>
+        <div class="flex-center">
             <button
                 class="primary"
                 on:click={newEvent}
@@ -105,18 +120,19 @@
                 <Plus size="30" />
                 New Event
             </button>
+            <button class="primary" on:click={importPopup}>
+                <TrayArrowUp size="30" />
+                Import
+            </button>
         </div>
+
+        <h1>Events ({eventCount})</h1>
 
         <div class="flex-center">
             Sort by
             <Select
                 bind:key={$eventsSortKey}
-                options={{
-                    'created': 'created',
-                    'start': 'start',
-                    'end': 'end',
-                    'name': 'name',
-                }}
+                options={sortEventsKeys}
             />
         </div>
 

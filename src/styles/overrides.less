@@ -1,46 +1,47 @@
 @import 'variables.less';
 
 .popup-background {
-	background: @bg !important;
-	border-radius: 10px;
+    background: @bg !important;
+    border-radius: 10px;
 }
 
 .notifications {
-	div {
-		z-index: 100;
-	}
+    div {
+        z-index: 100;
+    }
 
-	.notification {
-		color: @text-color;
+    .notification {
+        color: @text-color;
 
-		z-index: 100;
+        z-index: 100;
 
-		&.default-notification-style.default-notification-info {
-			background: @bg !important;
-			border-radius: 0 10px 10px 0;
-			border: 1px solid @border-heavy;
-			border-left: 5px solid @accent-color-secondary;
+        &.default-notification-style.default-notification-info {
+            background: @bg !important;
+            border-radius: 0 10px 10px 0;
+            border: 1px solid @border-heavy;
+            border-left: 5px solid @accent-color-secondary;
+            color: @text-color !important;
 
-			.notification-button.default-notification-style-button {
-				color: @text-color !important;
-				border-left: 1px solid @border-heavy;
+            .notification-button.default-notification-style-button {
+                color: @text-color !important;
+                border-left: 1px solid @border-heavy;
 
-				&:hover {
-					background: @accent-color-primary !important;
-				}
-			}
-		}
+                &:hover {
+                    background: @accent-color-primary !important;
+                }
+            }
+        }
 
-		&.default-notification-style.default-notification-error {
-			.notification-button.default-notification-style-button {
-				&:hover {
-					background: @accent-color-secondary !important;
-				}
-			}
-		}
-	}
+        &.default-notification-style.default-notification-error {
+            .notification-button.default-notification-style-button {
+                &:hover {
+                    background: @accent-color-secondary !important;
+                }
+            }
+        }
+    }
 }
 
 .dropzone {
-	color: @text-color;
+    color: @text-color;
 }

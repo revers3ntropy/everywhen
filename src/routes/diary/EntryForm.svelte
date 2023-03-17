@@ -87,9 +87,8 @@
         } else {
             console.error(res);
             addNotification({
+                ...ERR_NOTIFICATION,
                 text: `Cannot create entry: ${JSON.stringify(res)}`,
-                position: 'top-center',
-                type: 'error',
             });
         }
 

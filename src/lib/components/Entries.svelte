@@ -48,7 +48,10 @@
     let loading = true;
 
     function importPopup () {
-        showPopup(ImportDialog, { auth }, () => reloadEntries());
+        showPopup(ImportDialog, {
+            auth,
+            type: 'entries',
+        }, reloadEntries);
     }
 
     export async function reloadEntries () {

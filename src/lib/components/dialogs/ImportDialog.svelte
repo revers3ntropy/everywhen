@@ -5,25 +5,51 @@
     import { api } from '../../api/apiQuery';
     import type { Label } from '../../controllers/label';
     import type { Auth } from '../../controllers/user';
-    import { displayNotifOnErr, type Result } from '../../utils';
+    import { displayNotifOnErr, ERR_NOTIFICATION, type Result } from '../../utils';
     import FileDrop from './FileDropDialog.svelte';
-    import { entries } from './importEntries.js';
+    import { importEntries } from './importEntries.js';
+    import { importEvents } from './importEvents';
 
     const { addNotification } = getNotificationsContext();
 
     export let auth: Auth;
+    export let type: 'events' | 'entries';
 
-    let labels: Label[] = [];
+    let labels: Label[] | null = null;
 
     async function withContents (result: Result<string>): Promise<void> {
         const contents = displayNotifOnErr(addNotification, result);
-        const res = await entries(contents, labels, auth);
+
+        if (!labels) {
+            addNotification({
+                ...ERR_NOTIFICATION,
+                text: `Failed to load labels`,
+            });
+            return;
+        }
+
+        let res;
+        if (type === 'events') {
+            res = await importEvents(contents, labels, auth);
+        } else if (type === 'entries') {
+            res = await importEntries(contents, labels, auth);
+        } else {
+            throw new Error('Invalid type');
+        }
+
+        // handle error messages
         if (Array.isArray(res)) {
             for (const notification of res) {
-                addNotification(notification);
+                addNotification({
+                    ...ERR_NOTIFICATION,
+                    ...notification,
+                });
             }
         } else if (res) {
-            addNotification(res);
+            addNotification({
+                ...ERR_NOTIFICATION,
+                ...res,
+            });
         }
     }
 
@@ -36,7 +62,7 @@
 
 </script>
 
-{#if labels.length}
+{#if labels?.length}
     <FileDrop
         message="Import Entries from .json file"
         {withContents}

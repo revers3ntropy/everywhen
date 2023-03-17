@@ -88,5 +88,6 @@ export default defineConfig({
     webServer: {
         command: 'bin/dev',
         port: 5173,
+        reuseExistingServer: true,
     },
 });
