@@ -1,4 +1,5 @@
 #!/bin/bash
 
 npm run check -- \
-  --compiler-warnings "css-unused-selector:ignore,unused-export-let:ignore"
+  --compiler-warnings "css-unused-selector:ignore,unused-export-let:ignore" \
+  "$@"
