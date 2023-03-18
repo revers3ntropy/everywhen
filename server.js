@@ -4,12 +4,13 @@ import compression from 'compression';
 import fs from 'fs';
 import https from 'https';
 import http from 'http';
+import dotenv from 'dotenv';
 
-const privateKey = fs.readFileSync('key.pem', 'utf8');
-const certificate = fs.readFileSync('cert.pem', 'utf8');
+dotenv.config();
+
 const credentials = {
-    key: privateKey,
-    cert: certificate
+    key: fs.readFileSync('./key.pem', 'utf8'),
+    cert: fs.readFileSync('./cert.pem', 'utf8'),
 };
 
 const app = express();
@@ -18,15 +19,12 @@ app.use(compression());
 const httpsServer = https.createServer(credentials, app);
 const httpServer = http.createServer(app);
 
-const HTTPS_PORT = 18890;
-const HTTP_PORT = 18891;
-
-httpServer.listen(HTTP_PORT, '0.0.0.0', () => {
-    console.log(`HTTP Server is running on: https://localhost:${HTTP_PORT}`);
+httpServer.listen(parseInt(process.env.PORT), '0.0.0.0', () => {
+    console.log(`HTTP Server is running on: http://localhost:${process.env.PORT}`);
 });
 
-httpsServer.listen(HTTPS_PORT, '0.0.0.0', () => {
-    console.log(`HTTPS Server is running on: https://localhost:${HTTPS_PORT}`);
+httpsServer.listen(parseInt(process.env.HTTPS_PORT), '0.0.0.0', () => {
+    console.log(`HTTPS Server is running on: https://localhost:${process.env.HTTPS_PORT}`);
 });
 
 // add a route that lives separately from the SvelteKit app

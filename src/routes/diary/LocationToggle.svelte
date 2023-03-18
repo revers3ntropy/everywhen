@@ -17,9 +17,6 @@
         function checkPermission () {
             if (permissionStatus.state !== 'granted') {
                 enabledLocation.set(false);
-            } else {
-                // show location button in chrome menu
-                navigator.geolocation.getCurrentPosition(() => 0);
             }
         }
 

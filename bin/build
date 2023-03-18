@@ -1,6 +1,3 @@
 #!/bin/bash
 
-#rm -r build;
-rm -r misc_3-server;
-
 vite build

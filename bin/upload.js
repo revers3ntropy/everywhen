@@ -10,7 +10,6 @@ import fs from 'fs';
 export const flags = commandLineArgs([
     { name: 'verbose', type: Boolean, alias: 'v', defaultValue: false },
     { name: 'env', type: String, alias: 'e', defaultValue: 'prod' },
-    { name: 'dir', type: String, defaultValue: 'misc_3-server' },
 ]);
 
 $.verbose = flags.verbose;
@@ -22,14 +21,15 @@ async function uploadPath (localPath, remotePath, args = '') {
 }
 
 async function upload () {
-    await $`mv ./build ./${flags.dir}`;
+    await $`mv ./build ./${process.env.DIR}`;
     console.log(c.green('Uploading...'));
-    await uploadPath(flags.dir, '~/', '-r');
+    await uploadPath(process.env.DIR, '~/', '-r');
 
     const paths = {
         [`./secrets/${flags.env}/remote.package.json`]: '/package.json',
         [`./secrets/${flags.env}/cert.pem`]: '/cert.pem',
         [`./secrets/${flags.env}/key.pem`]: '/key.pem',
+        [`./secrets/${flags.env}/remote.env`]: '/.env',
         ['./server.js']: '/server.js',
     };
 
@@ -37,12 +37,15 @@ async function upload () {
         Object.keys(paths).map(async (path) => {
             if (fs.existsSync(path)) {
                 console.log(c.yellow(path));
-                await uploadPath(path, '~/' + flags.dir + paths[path]);
+                await uploadPath(
+                    path,
+                    '~/' + process.env.DIR + paths[path],
+                );
             }
         }),
     );
 
-    //await $`rm -r ./${DIR}`;
+    await $`rm -r ./${process.env.DIR}`;
 }
 
 (async () => {
