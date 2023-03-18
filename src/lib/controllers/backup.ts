@@ -39,6 +39,7 @@ export class Backup {
             created: number,
         }[],
         public created: number,
+        public appVersion: string,
     ) {
     }
 
@@ -86,6 +87,7 @@ export class Backup {
                 created: event.created,
             })),
             nowS(),
+            __VERSION__,
         ));
     }
 
@@ -106,10 +108,10 @@ export class Backup {
             labels: 'object',
             assets: 'object',
             events: 'object',
+            created: 'number',
+            appVersion: 'string',
         })) {
-            return Result.err(
-                'data must be an object with entries and labels properties',
-            );
+            return Result.err('Invalid backup format');
         }
 
         const { entries, labels, assets, events } = decryptedData;
