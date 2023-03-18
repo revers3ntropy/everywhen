@@ -9,6 +9,12 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
+      - uses: mirromutth/mysql-action@v1.1
+        with:
+          host port: 3306
+          mysql database: 'misc_3_dev'
+          mysql user: 'root'
+          mysql password: ''
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
