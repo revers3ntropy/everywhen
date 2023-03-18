@@ -5,15 +5,6 @@ on:
   pull_request:
     branches: [ main ]
 jobs:
-  services:
-    mysql:
-      image: mysql:5.7
-      env:
-        MYSQL_ALLOW_EMPTY_PASSWORD: yes
-        MYSQL_ROOT_PASSWORD: ''
-      ports:
-        - 3306
-      options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
@@ -23,13 +14,20 @@ jobs:
         with:
           node-version: 16
 
-      - name: Verify MySQL connection from host
-        run: |
-          sudo apt-get install -y mysql-client
-          mysql --host 127.0.0.1 -uroot -e "SHOW DATABASES"
-
       - name: Install dependencies
-        run: npm i -g pnpm && pnpm install
+        run: npm i -g pnpm && pnpm install && sudo apt update && sudo apt install mysql-server
+
+      - name: Start MySQL
+        run: sudo service mysql start
+
+      - name: Set MySQL root password
+        run: sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '';"
+
+      - name: Create database
+        run: mysql -u root -e "CREATE DATABASE IF NOT EXISTS misc_3_dev;"
+
+      - name: Run migrations
+        run: mysql -u root misc_3_dev < schema.sql
 
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
