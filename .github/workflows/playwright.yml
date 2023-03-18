@@ -23,7 +23,8 @@ jobs:
         with:
           host port: 3306
           mysql database: 'misc_3_dev'
-          mysql root password: ''
+          mysql password: ''
+          mysql user: 'root'
       - name: Run Playwright tests
         run: pnpm exec playwright test
       - uses: actions/upload-artifact@v3
