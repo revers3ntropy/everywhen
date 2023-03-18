@@ -29,6 +29,8 @@ declare global {
         toLowerCase (): Lowercase<string>;
     }
 
+    declare const __VERSION__: string;
+
     // See https://kit.svelte.dev/docs/types#app
     namespace App {
 

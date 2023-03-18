@@ -9,12 +9,14 @@ die () {
 
 [ "$#" -eq 1 ] || die "1 argument required, $# provided"
 
+[ -d "./secrets/$1" ] || die "Error: Directory /secrets/$1 does not exists."
+
 mv .env tmp.env
-mv "$1.remote.env" .env
+mv "./secrets/$1/remote.env" .env
 
 bin/build;
 
-mv .env "$1.remote.env"
+mv .env "./secrets/$1/remote.env"
 mv tmp.env .env
 
 [ -d "build" ] || die "output dir not found"

@@ -9,7 +9,6 @@ eof
 
 mysql -u root misc_3_dev < ./schema.sql
 
-
 end=$(date +%s)
 
 runtime=$( echo "$end - $start" | bc -l )

@@ -12,12 +12,12 @@ node_modules
 .vercel
 
 # Secrets
-.env
-*.env
-!example.env
-*.sshpass
-entries-example.json
-*.pem
+/.env
+/secrets/**/*.pem
+/secrets/**/*.env
+/secrets/**/sshpass.txt
+!/secrets/example/*
+!/secrets/**/*.package.json
 
 # Build files
 .output
