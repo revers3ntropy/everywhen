@@ -21,7 +21,7 @@ jobs:
         run: sudo service mysql start
 
       - name: Set MySQL root password
-        run: sudo mysql -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '';"
+        run: sudo mysql -p -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY '';"
 
       - name: Create database
         run: mysql -u root -e "CREATE DATABASE IF NOT EXISTS misc_3_dev;"

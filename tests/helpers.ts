@@ -1,9 +1,15 @@
-import { type APIRequestContext, request } from '@playwright/test';
+import {
+    type APIRequestContext,
+    type Expect,
+    type Page,
+    request,
+} from '@playwright/test';
 import { serialize } from 'cookie';
 import {
     KEY_COOKIE_KEY,
     KEY_COOKIE_OPTIONS,
     USERNAME_COOKIE_KEY,
+    USERNAME_COOKIE_OPTIONS,
 } from '../src/lib/constants.js';
 import type { Auth, RawAuth } from '../src/lib/controllers/user.js';
 import { encryptionKeyFromPassword } from '../src/lib/security/authUtils.js';
@@ -66,6 +72,28 @@ export async function generateUser (): Promise<{
     };
 }
 
+export async function generateUserAndSignIn (
+    page: Page,
+): Promise<{
+    auth: Auth & { password: string },
+    api: APIRequestContext,
+}> {
+    const { auth, api } = await generateUser();
+
+    await page.getByLabel('Username')
+              .click();
+    await page.getByLabel('Username')
+              .type(auth.username);
+    await page.getByLabel('Password')
+              .fill(auth.password);
+    await page.getByRole('button', { name: 'Log In' })
+              .click();
+
+    await page.waitForURL('/home');
+
+    return { auth, api };
+}
+
 export async function deleteUser (api: APIRequestContext): Promise<Result> {
     const res = await api.delete('./users');
     if (res.ok()) return Result.ok(null);
@@ -77,15 +105,27 @@ export async function deleteUser (api: APIRequestContext): Promise<Result> {
     }
 }
 
-export async function generateApiCtx (auth: RawAuth | null = null): Promise<APIRequestContext> {
+export async function expectDeleteUser (
+    api: APIRequestContext,
+    expect: Expect,
+): Promise<void> {
+    const { err } = await deleteUser(api);
+    expect(err).toBe(null);
+}
+
+export async function generateApiCtx (
+    auth: RawAuth | null = null,
+): Promise<APIRequestContext> {
     return await request.newContext({
         baseURL: 'http://localhost:5173/api/',
         extraHTTPHeaders: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
             'Cookie': auth
-                ? serialize(KEY_COOKIE_KEY, auth.key, KEY_COOKIE_OPTIONS) + ' ; '
-                + serialize(USERNAME_COOKIE_KEY, auth.username, KEY_COOKIE_OPTIONS)
+                ? serialize(KEY_COOKIE_KEY, auth.key,
+                    KEY_COOKIE_OPTIONS) + ' ; '
+                + serialize(USERNAME_COOKIE_KEY, auth.username,
+                    USERNAME_COOKIE_OPTIONS)
                 : '',
         },
     });

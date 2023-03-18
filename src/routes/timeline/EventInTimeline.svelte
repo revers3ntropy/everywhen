@@ -10,6 +10,8 @@
     export let label: Label | undefined = undefined;
     export let yLevel: number;
     export let eventTextParityHeight: boolean;
+    export let created: number;
+    export let decrypted: boolean;
     export let options = {
         h: 20,
         yMargin: 2,

@@ -203,7 +203,11 @@
         placeholder="Entry"
     ></textarea>
 
-    <button class="send-mobile" on:click={submit}>
+    <button
+        aria-label="Submit Entry"
+        class="send-mobile"
+        on:click={submit}
+    >
         <Send size="30" />
     </button>
 </div>

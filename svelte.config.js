@@ -1,6 +1,11 @@
 import adapter from '@sveltejs/adapter-node';
 import preprocess from 'svelte-preprocess';
 
+const ignoreWarningCodes = [
+    'css-unused-selector',
+    'unused-export-let',
+];
+
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
     // Consult https://github.com/sveltejs/svelte-preprocess
@@ -14,7 +19,7 @@ const config = {
     onwarn: (warning, handler) => {
         const { code } = warning;
 
-        if (code === 'css-unused-selector')
+        if (ignoreWarningCodes.includes(code))
             return;
 
         handler(warning);

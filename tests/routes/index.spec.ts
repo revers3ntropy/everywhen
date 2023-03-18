@@ -1,7 +1,13 @@
 import { expect, test } from '@playwright/test';
 import { USERNAME_COOKIE_KEY } from '../../src/lib/constants.js';
 import { encryptionKeyFromPassword } from '../../src/lib/security/authUtils.js';
-import { deleteUser, generateApiCtx, generateUser, randStr } from '../helpers.js';
+import {
+    deleteUser,
+    expectDeleteUser,
+    generateApiCtx,
+    generateUser,
+    randStr,
+} from '../helpers.js';
 
 test.describe('/', () => {
     test('Has title', async ({ page }) => {
@@ -17,11 +23,6 @@ test.describe('/', () => {
             username: randStr(),
             password: randStr(),
         };
-
-        const api = await generateApiCtx({
-            username: auth.username,
-            key: encryptionKeyFromPassword(auth.password),
-        });
 
         expect(await page.isVisible('input[aria-label="Password"]'))
             .toBe(true);
@@ -62,8 +63,12 @@ test.describe('/', () => {
         expect(await page.isVisible('button[aria-label="Delete Account"]'))
             .toBe(true);
 
-        const { err } = await deleteUser(api);
-        expect(err).toBe(null);
+        const api = await generateApiCtx({
+            username: auth.username,
+            key: encryptionKeyFromPassword(auth.password),
+        });
+
+        await expectDeleteUser(api, expect);
 
         await page.waitForLoadState();
         await page.goto('/', { waitUntil: 'networkidle' });
@@ -80,8 +85,8 @@ test.describe('/', () => {
     });
 
     test('Can log into account', async ({ page }) => {
-        await page.goto('/', { waitUntil: 'networkidle' });
         const { auth, api } = await generateUser();
+        await page.goto('/', { waitUntil: 'networkidle' });
 
         await page.getByLabel('Username').fill(auth.username);
         await page.getByLabel('Password').fill(auth.password);
