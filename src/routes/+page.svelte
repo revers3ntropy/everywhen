@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { sha256 } from 'js-sha256';
     import ChevronRight from 'svelte-material-icons/ChevronRight.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../app';
     import { api } from '../lib/api/apiQuery';
+    import { encryptionKeyFromPassword } from '../lib/security/authUtils';
     import { displayNotifOnErr } from '../lib/utils/notifications';
 
     const { addNotification } = getNotificationsContext();
@@ -19,7 +19,7 @@
         actionPending = true;
         displayNotifOnErr(addNotification,
             await api.get(data, `/auth`, {
-                key: sha256(password).substring(0, 32),
+                key: encryptionKeyFromPassword(password),
                 username,
             }),
             {},
@@ -32,7 +32,7 @@
         actionPending = true;
         displayNotifOnErr(addNotification,
             await api.post(data, `/users`, {
-                password: sha256(password).substring(0, 32),
+                password: encryptionKeyFromPassword(password),
                 username,
             }),
             {},

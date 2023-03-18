@@ -2,7 +2,12 @@ import { browser } from '$app/environment';
 import { PUBLIC_SVELTEKIT_PORT } from '$env/static/public';
 import type { HttpMethod } from '@sveltejs/kit/types/private';
 import { serialize } from 'cookie';
-import { AUTH_COOKIE_OPTIONS, KEY_COOKIE_KEY, USERNAME_COOKIE_KEY } from '../constants';
+import {
+    KEY_COOKIE_KEY,
+    KEY_COOKIE_OPTIONS,
+    USERNAME_COOKIE_KEY,
+    USERNAME_COOKIE_OPTIONS,
+} from '../constants';
 import type { Auth } from '../controllers/user';
 import type { GenericResponse } from '../utils/apiResponse';
 import { GETArgs } from '../utils/GETArgs';
@@ -71,9 +76,9 @@ export async function makeApiReq<
             'Content-Type': 'application/json',
             Accept: 'application/json',
             Cookie:
-                serialize(KEY_COOKIE_KEY, auth.key, AUTH_COOKIE_OPTIONS)
+                serialize(KEY_COOKIE_KEY, auth.key, KEY_COOKIE_OPTIONS)
                 + ' ; '
-                + serialize(USERNAME_COOKIE_KEY, auth.username, AUTH_COOKIE_OPTIONS),
+                + serialize(USERNAME_COOKIE_KEY, auth.username, USERNAME_COOKIE_OPTIONS),
         },
     };
     if (body) {

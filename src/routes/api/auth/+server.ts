@@ -1,9 +1,10 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
 import {
-    AUTH_COOKIE_OPTIONS,
     KEY_COOKIE_KEY,
+    KEY_COOKIE_OPTIONS,
     USERNAME_COOKIE_KEY,
+    USERNAME_COOKIE_OPTIONS,
 } from '../../../lib/constants';
 import { User } from '../../../lib/controllers/user';
 import { query } from '../../../lib/db/mysql';
@@ -25,15 +26,8 @@ export const GET = (async ({ url, cookies }) => {
 
     if (err) throw error(401, err);
 
-    cookies.set(KEY_COOKIE_KEY, key, AUTH_COOKIE_OPTIONS);
-    // allow the username cookie to be read by the client
-    // so that it can check the auth is still valid
-    // but keep the key cookie httpOnly, to prevent XSS
-    // https://owasp.org/www-community/HttpOnly
-    cookies.set(USERNAME_COOKIE_KEY, username, {
-        ...AUTH_COOKIE_OPTIONS,
-        httpOnly: false,
-    });
+    cookies.set(KEY_COOKIE_KEY, key, KEY_COOKIE_OPTIONS);
+    cookies.set(USERNAME_COOKIE_KEY, username, USERNAME_COOKIE_OPTIONS);
 
     return apiResponse({
         key, username, id: user.id,

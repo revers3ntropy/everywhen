@@ -1,9 +1,10 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
 import {
-    AUTH_COOKIE_OPTIONS,
     KEY_COOKIE_KEY,
+    KEY_COOKIE_OPTIONS,
     USERNAME_COOKIE_KEY,
+    USERNAME_COOKIE_OPTIONS,
 } from '../../../lib/constants';
 import { Backup } from '../../../lib/controllers/backup';
 import { User } from '../../../lib/controllers/user';
@@ -21,8 +22,8 @@ export const POST = (async ({ request, cookies }) => {
     const { err } = await User.create(query, body.username, body.password);
     if (err) throw error(400, err);
 
-    cookies.set(KEY_COOKIE_KEY, body.password, AUTH_COOKIE_OPTIONS);
-    cookies.set(USERNAME_COOKIE_KEY, body.username, AUTH_COOKIE_OPTIONS);
+    cookies.set(KEY_COOKIE_KEY, body.password, KEY_COOKIE_OPTIONS);
+    cookies.set(USERNAME_COOKIE_KEY, body.username, USERNAME_COOKIE_OPTIONS);
 
     return apiResponse({});
 }) satisfies RequestHandler;
@@ -35,8 +36,8 @@ export const DELETE = (async ({ cookies }) => {
 
     await User.purge(query, auth);
 
-    cookies.delete(KEY_COOKIE_KEY, AUTH_COOKIE_OPTIONS);
-    cookies.delete(USERNAME_COOKIE_KEY, AUTH_COOKIE_OPTIONS);
+    cookies.delete(KEY_COOKIE_KEY, KEY_COOKIE_OPTIONS);
+    cookies.delete(USERNAME_COOKIE_KEY, USERNAME_COOKIE_OPTIONS);
 
     return apiResponse({
         backup: backup.asEncryptedString(auth),

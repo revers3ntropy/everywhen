@@ -2,8 +2,8 @@ import { type APIRequestContext, request } from '@playwright/test';
 import { serialize } from 'cookie';
 import { sha256 } from 'js-sha256';
 import {
-    AUTH_COOKIE_OPTIONS,
     KEY_COOKIE_KEY,
+    KEY_COOKIE_OPTIONS,
     USERNAME_COOKIE_KEY,
 } from '../src/lib/constants.js';
 import type { Auth, RawAuth } from '../src/lib/controllers/user.js';
@@ -30,7 +30,7 @@ export async function generateUser (
 
     const key = sha256(password).substring(0, 32);
 
-    const makeRes = await api.post('/users', {
+    const makeRes = await api.post('./users', {
         data: {
             username,
             password: key,
@@ -40,7 +40,7 @@ export async function generateUser (
         return Result.err(JSON.parse(await makeRes.json()).message);
     }
 
-    const authRes = await api.get('/auth', {
+    const authRes = await api.get('./auth', {
         data: {
             username, key,
         },
@@ -58,22 +58,26 @@ export async function generateUser (
 }
 
 export async function deleteUser (api: APIRequestContext): Promise<Result> {
-    const res = await api.delete('/users');
+    const res = await api.delete('./users');
     if (res.ok()) return Result.ok(null);
-    const body = JSON.parse(await res.json());
-    return Result.err(body.message);
+    const body = await res.text();
+    try {
+        return Result.err(JSON.parse(body).message);
+    } catch (e) {
+        return Result.err(body);
+    }
 }
 
 export async function generateApiCtx (auth: RawAuth): Promise<APIRequestContext> {
     return await request.newContext({
-        baseURL: '/api',
+        baseURL: 'http://localhost:5173/api/',
         extraHTTPHeaders: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
             'Cookie':
-                serialize(KEY_COOKIE_KEY, auth.key, AUTH_COOKIE_OPTIONS)
+                serialize(KEY_COOKIE_KEY, auth.key, KEY_COOKIE_OPTIONS)
                 + ' ; '
-                + serialize(USERNAME_COOKIE_KEY, auth.username, AUTH_COOKIE_OPTIONS),
+                + serialize(USERNAME_COOKIE_KEY, auth.username, KEY_COOKIE_OPTIONS),
         },
     });
 }
