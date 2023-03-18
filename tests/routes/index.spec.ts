@@ -1,19 +1,17 @@
 import { expect, test } from '@playwright/test';
 import { USERNAME_COOKIE_KEY } from '../../src/lib/constants.js';
 import { encryptionKeyFromPassword } from '../../src/lib/security/authUtils.js';
-import { deleteUser, generateApiCtx, randStr } from '../helpers.js';
+import { deleteUser, generateApiCtx, generateUser, randStr } from '../helpers.js';
 
 test.describe('/', () => {
     test('Has title', async ({ page }) => {
-        await page.goto('/');
+        await page.goto('/', { waitUntil: 'networkidle' });
 
         await expect(page).toHaveTitle(/Diary/);
     });
 
     test('Can create account with form', async ({ page }) => {
-        await page.goto('/');
-
-        await page.waitForURL('/');
+        await page.goto('/', { waitUntil: 'networkidle' });
 
         const auth = {
             username: randStr(),
@@ -42,7 +40,7 @@ test.describe('/', () => {
         // haven't been signed in with random credentials
         await expect(page).toHaveURL('/');
 
-        await page.goto('/home', { waitUntil: 'domcontentloaded' });
+        await page.goto('/home', { waitUntil: 'networkidle' });
         await expect(page).toHaveURL('/');
 
         // inputs are erased when checking that we can't go to /home
@@ -67,7 +65,8 @@ test.describe('/', () => {
         const { err } = await deleteUser(api);
         expect(err).toBe(null);
 
-        await page.goto('/', { waitUntil: 'domcontentloaded' });
+        await page.waitForLoadState();
+        await page.goto('/', { waitUntil: 'networkidle' });
         await expect(page).toHaveURL('/');
 
         await page.getByLabel('Username').fill(auth.username);
@@ -76,7 +75,25 @@ test.describe('/', () => {
         await page.getByRole('button', { name: 'Log In' }).click();
 
         // account doesn't exist and wil be redirected if try to log in
-        await page.goto('/home', { waitUntil: 'domcontentloaded' });
+        await page.goto('/home', { waitUntil: 'networkidle' });
+        await expect(page).toHaveURL('/');
+    });
+
+    test('Can log into account', async ({ page }) => {
+        await page.goto('/', { waitUntil: 'networkidle' });
+        const { auth, api } = await generateUser();
+
+        await page.getByLabel('Username').fill(auth.username);
+        await page.getByLabel('Password').fill(auth.password);
+
+        await page.getByRole('button', { name: 'Log In' }).click();
+
+        await page.waitForURL('/home', { waitUntil: 'networkidle' });
+
+        const { err } = await deleteUser(api);
+        expect(err).toBe(null);
+
+        await page.goto('/home', { waitUntil: 'networkidle' });
         await expect(page).toHaveURL('/');
     });
 });

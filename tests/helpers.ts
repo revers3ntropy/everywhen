@@ -1,12 +1,12 @@
 import { type APIRequestContext, request } from '@playwright/test';
 import { serialize } from 'cookie';
-import { sha256 } from 'js-sha256';
 import {
     KEY_COOKIE_KEY,
     KEY_COOKIE_OPTIONS,
     USERNAME_COOKIE_KEY,
 } from '../src/lib/constants.js';
 import type { Auth, RawAuth } from '../src/lib/controllers/user.js';
+import { encryptionKeyFromPassword } from '../src/lib/security/authUtils.js';
 import { Result } from '../src/lib/utils/result.js';
 
 export function randStr (
@@ -22,13 +22,16 @@ export function randStr (
     return result;
 }
 
-export async function generateUser (
-    api: APIRequestContext,
-): Promise<Result<Auth & { password: string }>> {
+export async function generateUser (): Promise<{
+    auth: Auth & { password: string },
+    api: APIRequestContext
+}> {
     const username = randStr();
     const password = randStr();
 
-    const key = sha256(password).substring(0, 32);
+    const key = encryptionKeyFromPassword(password);
+
+    const api = await generateApiCtx();
 
     const makeRes = await api.post('./users', {
         data: {
@@ -37,24 +40,30 @@ export async function generateUser (
         },
     });
     if (!makeRes.ok()) {
-        return Result.err(JSON.parse(await makeRes.json()).message);
+        throw await makeRes.text();
     }
 
     const authRes = await api.get('./auth', {
-        data: {
-            username, key,
+        params: {
+            username,
+            key,
         },
     });
     if (!authRes.ok()) {
-        return Result.err(JSON.parse(await authRes.json()).message);
+        throw await authRes.text();
     }
 
-    return Result.ok({
+    const auth = {
         key,
         username,
         password,
-        id: JSON.parse(await authRes.json()).id,
-    });
+        id: (await authRes.json()).id,
+    };
+
+    return {
+        auth,
+        api: await generateApiCtx(auth),
+    };
 }
 
 export async function deleteUser (api: APIRequestContext): Promise<Result> {
@@ -68,16 +77,16 @@ export async function deleteUser (api: APIRequestContext): Promise<Result> {
     }
 }
 
-export async function generateApiCtx (auth: RawAuth): Promise<APIRequestContext> {
+export async function generateApiCtx (auth: RawAuth | null = null): Promise<APIRequestContext> {
     return await request.newContext({
         baseURL: 'http://localhost:5173/api/',
         extraHTTPHeaders: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'Cookie':
-                serialize(KEY_COOKIE_KEY, auth.key, KEY_COOKIE_OPTIONS)
-                + ' ; '
-                + serialize(USERNAME_COOKIE_KEY, auth.username, KEY_COOKIE_OPTIONS),
+            'Cookie': auth
+                ? serialize(KEY_COOKIE_KEY, auth.key, KEY_COOKIE_OPTIONS) + ' ; '
+                + serialize(USERNAME_COOKIE_KEY, auth.username, KEY_COOKIE_OPTIONS)
+                : '',
         },
     });
 }

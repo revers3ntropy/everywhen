@@ -32,7 +32,7 @@ setInterval(async () => {
 
 function logRequest (req: Request) {
     console.log(new Date().toLocaleTimeString()
-        + ' ' + req.method.padEnd(4, ' ')
+        + ' ' + req.method.padEnd(6, ' ')
         + ' ' + new URL(req.url).pathname);
 }
 
