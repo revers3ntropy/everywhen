@@ -14,14 +14,16 @@ jobs:
         with:
           node-version: 16
 
+      - uses: mirromutth/mysql-action@v1.1
+        with:
+          mysql database: 'misc_3_dev'
+          mysql root password: 'Pass'
+
       - name: Install dependencies
         run: npm i -g pnpm && pnpm install && sudo apt update && sudo apt install mysql-server
 
-      - name: Start MySQL
-        run: sudo service mysql start
-
       - name: Create database
-        run: sudo mysql -u root -e "CREATE DATABASE IF NOT EXISTS misc_3_dev;"
+        run: sudo mysql -u root -pPass -e "ALTER USER 'root'@'localhost' IDENTIFIED BY ''"
 
       - name: Run migrations
         run: mysql -u root misc_3_dev < schema.sql
