@@ -43,7 +43,7 @@
 </script>
 
 <main>
-    <div class="flex-center page-center form">
+    <div class="flex-center">
         <div class="content">
             <label>
                 Username
@@ -91,15 +91,20 @@
 </main>
 
 <style lang="less">
-    .form {
-        .content, form input {
-            max-width: 94vw;
-        }
+    @import '../styles/layout.less';
 
-        label {
-            display: flex;
-            flex-direction: column;
-            margin: 1rem 0;
-        }
+    main {
+        .flex-center();
+        height: 100vh;
+    }
+
+    .content, input {
+        max-width: 94vw;
+    }
+
+    label {
+        display: flex;
+        flex-direction: column;
+        margin: 1rem 0;
     }
 </style>

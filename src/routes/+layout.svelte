@@ -6,11 +6,12 @@
     import Modal from 'svelte-simple-modal';
     import 'ts-polyfill';
     import '../app.less';
-    import Nav from '../lib/components/Nav.svelte';
     import { INACTIVE_TIMEOUT_MS, USERNAME_COOKIE_KEY } from '../lib/constants';
     import { obfuscated, popup } from '../lib/stores';
     import { INFO_NOTIFICATION } from '../lib/utils/notifications';
     import type { NotificationOptions } from '../lib/utils/types';
+    import Footer from './Footer.svelte';
+    import Nav from './Nav.svelte';
     import Notifier from './Notifier.svelte';
 
     $: home = $page.url.pathname.trim() === '/';
@@ -87,14 +88,15 @@
         <Nav />
     {/if}
 
-    <slot />
+    <div style="min-height: calc(100vh - var(--nav-height))">
+        <slot />
+    </div>
+
     <Modal
         classContent="popup-background"
         classWindow="popup-background"
         show={$popup}
     />
 
-    {#if !home}
-        <footer></footer>
-    {/if}
+    <Footer />
 </Notifications>

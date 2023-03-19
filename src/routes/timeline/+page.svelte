@@ -111,4 +111,12 @@
         left: 0;
         z-index: 1;
     }
+
+    :global(footer) {
+        display: none !important;
+    }
+
+    :global(body) {
+        max-height: 100vw;
+    }
 </style>

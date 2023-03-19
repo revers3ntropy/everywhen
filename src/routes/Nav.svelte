@@ -56,7 +56,7 @@
 </header>
 
 <style lang="less">
-    @import '../../styles/variables';
+    @import '../styles/variables';
 
     header {
         position: relative;
@@ -65,7 +65,7 @@
         justify-content: space-between;
         align-items: center;
         padding: 0;
-        height: 60px;
+        height: var(--nav-height);
         background-color: @header-bg;
         z-index: 10;
 
