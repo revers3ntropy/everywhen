@@ -29,6 +29,7 @@ httpsServer.listen(parseInt(process.env.HTTPS_PORT), '0.0.0.0', () => {
 
 // add a route that lives separately from the SvelteKit app
 app.get('/healthcheck', (req, res) => {
+    console.log('[healthcheck]');
     res.end('ok');
 });
 
