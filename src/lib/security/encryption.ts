@@ -1,15 +1,16 @@
 import { browser } from '$app/environment';
 import { PUBLIC_INIT_VECTOR } from '$env/static/public';
 import * as crypto from 'crypto';
+import { Result } from '../utils/result';
 
 const ALGORITHM = 'aes-256-cbc';
 
-export function encrypt (plainText: string, key: string): string {
+export function encrypt (plainText: string, key: string): Result<string> {
     if (browser) {
         console.trace();
         throw 'Cannot encrypt/decrypt in browser';
     }
-    if (!plainText) return '';
+    if (!plainText) return Result.ok('');
 
     let encryptedData = '';
 
@@ -29,17 +30,17 @@ export function encrypt (plainText: string, key: string): string {
             ':',
             e,
         );
-        return '';
+        return Result.err('Error encrypting');
     }
-    return encryptedData;
+    return Result.ok(encryptedData);
 }
 
-export function decrypt (cypherText: string, key: string): string {
+export function decrypt (cypherText: string, key: string): Result<string> {
     if (browser) {
         console.trace();
         throw 'Cannot encrypt/decrypt in browser';
     }
-    if (!cypherText) return '';
+    if (!cypherText) return Result.ok('');
 
     let decryptedData = '';
 
@@ -50,10 +51,10 @@ export function decrypt (cypherText: string, key: string): string {
         decryptedData += decipher.final('utf8');
     } catch (e) {
         console.error('Error decrypting', cypherText, 'with key', key, ':', e);
-        return '';
+        return Result.err('Error decrypting');
     }
 
-    return decryptedData;
+    return Result.ok(decryptedData);
 }
 
 

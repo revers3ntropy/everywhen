@@ -31,10 +31,13 @@ export class Label {
             return Result.err('Label not found');
         }
 
+        const { err, val: nameDecrypted } = decrypt(res[0].name, auth.key);
+        if (err) return Result.err(err);
+
         return Result.ok(new Label(
             res[0].id,
             res[0].colour,
-            decrypt(res[0].name, auth.key),
+            nameDecrypted,
             res[0].created,
         ));
     }
@@ -44,10 +47,13 @@ export class Label {
         auth: Auth,
         nameDecrypted: string,
     ): Promise<Result<string>> {
+        const { err, val: encryptedName } = encrypt(nameDecrypted, auth.key);
+        if (err) return Result.err(err);
+
         const res = await query<Required<Label>[]>`
             SELECT id
             FROM labels
-            WHERE name = ${encrypt(nameDecrypted, auth.key)}
+            WHERE name = ${encryptedName}
               AND user = ${auth.id}
         `;
 
@@ -63,10 +69,14 @@ export class Label {
         auth: Auth,
         nameDecrypted: string,
     ): Promise<Result<Label>> {
+
+        const { err, val: encryptedName } = encrypt(nameDecrypted, auth.key);
+        if (err) return Result.err(err);
+
         const res = await query<Required<Label>[]>`
             SELECT id, colour, name, created
             FROM labels
-            WHERE name = ${encrypt(nameDecrypted, auth.key)}
+            WHERE name = ${encryptedName}
               AND user = ${auth.id}
         `;
 
@@ -85,7 +95,7 @@ export class Label {
     public static async all (
         query: QueryFunc,
         auth: Auth,
-    ): Promise<Label[]> {
+    ): Promise<Result<Label[]>> {
         const res = await query<Required<Label>[]>`
             SELECT id, colour, name, created
             FROM labels
@@ -93,12 +103,16 @@ export class Label {
             ORDER BY name
         `;
 
-        return res.map(label => new Label(
-            label.id,
-            label.colour,
-            decrypt(label.name, auth.key),
-            label.created,
-        ));
+        return Result.collect(res.map(label => {
+            const { err, val: nameDecrypted } = decrypt(label.name, auth.key);
+            if (err) return Result.err(err);
+            return Result.ok(new Label(
+                label.id,
+                label.colour,
+                nameDecrypted,
+                label.created,
+            ));
+        }));
     }
 
     public static async userHasLabelWithId (
@@ -168,11 +182,14 @@ export class Label {
         json.id ??= await generateUUId(query);
         json.created ??= nowS();
 
+        const { err, val: encryptedName } = encrypt(json.name, auth.key);
+        if (err) return Result.err(err);
+
         await query`
             INSERT INTO labels (id, user, name, colour, created)
             VALUES (${json.id},
                     ${auth.id},
-                    ${encrypt(json.name, auth.key)},
+                    ${encryptedName},
                     ${json.colour},
                     ${json.created})
         `;
@@ -195,9 +212,12 @@ export class Label {
             return Result.err('Label with that name already exists');
         }
 
+        const { err, val: encryptedName } = encrypt(name, auth.key);
+        if (err) return Result.err(err);
+
         await query`
             UPDATE labels
-            SET name = ${encrypt(name, auth.key)}
+            SET name = ${encryptedName}
             WHERE id = ${label.id}
         `;
 

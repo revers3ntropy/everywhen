@@ -44,8 +44,17 @@ export class Asset {
                 Object.keys(Asset.fileExtToContentType).join(', ') + '.');
         }
 
-        const encryptedContents = encrypt(contentsPlainText, auth.key);
-        const encryptedFileName = encrypt(fileNamePlainText, auth.key);
+        const {
+            err: contentsErr,
+            val: encryptedContents,
+        } = encrypt(contentsPlainText, auth.key);
+        if (contentsErr) return Result.err(contentsErr);
+
+        const {
+            err: fileNameErr,
+            val: encryptedFileName,
+        } = encrypt(fileNamePlainText, auth.key);
+        if (fileNameErr) return Result.err(fileNameErr);
 
         await query`
             INSERT INTO assets (id, publicId, user, created, fileName, contentType, content)
@@ -79,11 +88,18 @@ export class Asset {
         }
 
         const [ row ] = res;
+
+        const { err: contentsErr, val: contents } = decrypt(row.content, auth.key);
+        if (contentsErr) return Result.err(contentsErr);
+
+        const { err: fileNameErr, val: fileName } = decrypt(row.fileName, auth.key);
+        if (fileNameErr) return Result.err(fileNameErr);
+
         return Result.ok(new Asset(
             row.id,
             row.publicId,
-            decrypt(row.content, auth.key),
-            decrypt(row.fileName, auth.key),
+            contents,
+            fileName,
             row.contentType,
             row.created,
         ));
@@ -92,21 +108,29 @@ export class Asset {
     public static async all (
         query: QueryFunc,
         auth: Auth,
-    ): Promise<Asset[]> {
+    ): Promise<Result<Asset[]>> {
         const res = await query<Asset[]>`
             SELECT id, publicId, content, created, fileName, contentType
             FROM assets
             WHERE user = ${auth.id}
         `;
 
-        return res.map(row => new Asset(
-            row.id,
-            row.publicId,
-            decrypt(row.content, auth.key),
-            decrypt(row.fileName, auth.key),
-            row.contentType,
-            row.created,
-        ));
+        return Result.collect(res.map(row => {
+            const { err: contentErr, val: content } = decrypt(row.content, auth.key);
+            if (contentErr) return Result.err(contentErr);
+
+            const { err: fileNameErr, val: fileName } = decrypt(row.fileName, auth.key);
+            if (fileNameErr) return Result.err(fileNameErr);
+
+            return Result.ok(new Asset(
+                row.id,
+                row.publicId,
+                content,
+                fileName,
+                row.contentType,
+                row.created,
+            ));
+        }));
     }
 
     public static async purgeAll (query: QueryFunc, auth: Auth): Promise<void> {

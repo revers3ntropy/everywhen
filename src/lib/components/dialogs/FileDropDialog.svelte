@@ -15,7 +15,16 @@
 
     export let message: string;
     export let readEncoding: 'UTF-8' | 'b64' = 'UTF-8';
-    export let withContents: (body: Result<string>) => Promise<void> | void;
+    export let showTextBox: boolean = false;
+    export let textBoxType: 'password' | 'text' = 'text';
+    export let textBoxLabel: string = '';
+    export let textBoxPlaceholder: string = '';
+    export let withContents: (
+        body: Result<string>,
+        textBoxContent?: string,
+    ) => Promise<void> | void;
+
+    let textBoxContent: string = '';
 
     async function onFileDrop (e: CustomEvent<{ files: Files }>) {
         const files = e.detail.files;
@@ -38,16 +47,36 @@
         const file = files.accepted[0];
         const contents = await getFileContents(file, readEncoding);
 
-        await withContents(contents);
+        await withContents(contents, textBoxContent);
 
         popup.set(null);
     }
+
+    function handleTextBoxInput (e: Event) {
+        textBoxContent = (e.target as HTMLInputElement).value;
+    }
 </script>
 
-<div
-    class="dropzone"
-    on:filedrop={onFileDrop}
-    use:filedrop={fileOptions}
->
-    {message}
+<div>
+    <div class="flex-center">
+        {#if showTextBox}
+            <label>
+                {textBoxLabel}
+                <input
+                    class="text-box"
+                    on:input={handleTextBoxInput}
+                    placeholder={textBoxPlaceholder}
+                    type={textBoxType}
+                />
+            </label>
+        {/if}
+    </div>
+
+    <div
+        class="dropzone"
+        on:filedrop={onFileDrop}
+        use:filedrop={fileOptions}
+    >
+        {message}
+    </div>
 </div>

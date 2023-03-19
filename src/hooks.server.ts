@@ -9,27 +9,6 @@ setInterval(async () => {
     con?.ping();
 }, 1000 * 60);
 
-
-// const minificationOptions = {
-//     collapseBooleanAttributes: true,
-//     collapseWhitespace: true,
-//     conservativeCollapse: true,
-//     decodeEntities: true,
-//     html5: true,
-//     ignoreCustomComments: [ /^#/ ],
-//     minifyCSS: true,
-//     minifyJS: true,
-//     removeAttributeQuotes: true,
-//     removeComments: true,
-//     removeOptionalTags: true,
-//     removeRedundantAttributes: true,
-//     removeScriptTypeAttributes: true,
-//     removeStyleLinkTypeAttributes: true,
-//     sortAttributes: true,
-//     sortClassName: true,
-//     removeEmptyElements: true,
-// };
-
 function logRequest (req: Request) {
     console.log(new Date().toLocaleTimeString()
         + ' ' + req.method.padEnd(6, ' ')
@@ -38,5 +17,5 @@ function logRequest (req: Request) {
 
 export const handle = (async ({ event, resolve }) => {
     logRequest(event.request);
-    return await resolve(event);
+    return resolve(event);
 }) satisfies Handle;

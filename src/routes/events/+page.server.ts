@@ -11,7 +11,8 @@ export const load: PageServerLoad = async ({ cookies }) => {
     const { val: events, err } = await Event.all(query, auth);
     if (err) throw error(400, err);
 
-    const labels = await Label.all(query, auth);
+    const { err: labelsErr, val: labels } = await Label.all(query, auth);
+    if (labelsErr) throw error(400, labelsErr);
 
     return {
         events: events.map((event) => ({

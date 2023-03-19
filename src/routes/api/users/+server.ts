@@ -39,7 +39,10 @@ export const DELETE = (async ({ cookies }) => {
     cookies.delete(KEY_COOKIE_KEY, KEY_COOKIE_OPTIONS);
     cookies.delete(USERNAME_COOKIE_KEY, USERNAME_COOKIE_OPTIONS);
 
+    const { err: backupErr, val: backupEncrypted } = backup.asEncryptedString(auth);
+    if (backupErr) throw error(400, backupErr);
+
     return apiResponse({
-        backup: backup.asEncryptedString(auth),
+        backup: backupEncrypted,
     });
 }) satisfies RequestHandler;

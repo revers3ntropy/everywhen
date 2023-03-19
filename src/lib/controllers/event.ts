@@ -93,9 +93,13 @@ export class Event {
         auth: Auth,
         rawEvent: RawEvent,
     ): Promise<Result<Event>> {
+
+        const { err, val: nameDecrypted } = decrypt(rawEvent.name, auth.key);
+        if (err) return Result.err(err);
+
         const event = new Event(
             rawEvent.id,
-            decrypt(rawEvent.name, auth.key),
+            nameDecrypted,
             rawEvent.start,
             rawEvent.end,
             rawEvent.created,
@@ -135,12 +139,15 @@ export class Event {
             if (err) return Result.err(err);
         }
 
+        const { err: nameErr, val: nameEncrypted } = encrypt(name, auth.key);
+        if (nameErr) return Result.err(nameErr);
+
         await query`
             INSERT INTO events
                 (id, user, name, start, end, created, label)
             VALUES (${id},
                     ${auth.id},
-                    ${encrypt(name, auth.key)},
+                    ${nameEncrypted},
                     ${start},
                     ${end},
                     ${created},
@@ -210,9 +217,13 @@ export class Event {
             return Result.err('Event name cannot be empty');
         }
         self.name = namePlaintext;
+
+        const { err, val: nameEncrypted } = encrypt(namePlaintext, auth.key);
+        if (err) return Result.err(err);
+
         await query`
             UPDATE events
-            SET name = ${encrypt(namePlaintext, auth.key)}
+            SET name = ${nameEncrypted}
             WHERE id = ${self.id}
         `;
         return Result.ok(self);

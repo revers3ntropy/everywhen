@@ -168,10 +168,16 @@ export class Entry {
         auth: Auth,
         rawEntry: RawEntry,
     ): Promise<Result<Entry>> {
+        const { err: titleErr, val: decryptedTitle } = decrypt(rawEntry.title, auth.key);
+        if (titleErr) return Result.err(titleErr);
+
+        const { err: entryErr, val: decryptedEntry } = decrypt(rawEntry.entry, auth.key);
+        if (entryErr) return Result.err(entryErr);
+
         const entry = new Entry(
             rawEntry.id,
-            decrypt(rawEntry.title, auth.key),
-            decrypt(rawEntry.entry, auth.key),
+            decryptedTitle,
+            decryptedEntry,
             rawEntry.created,
             rawEntry.deleted,
         );
@@ -334,13 +340,19 @@ export class Entry {
             if (err) return Result.err(err);
         }
 
+        const { err: titleErr, val: encryptedTitle } = encrypt(entry.title, auth.key);
+        if (titleErr) return Result.err(titleErr);
+
+        const { err: entryErr, val: encryptedEntry } = encrypt(entry.entry, auth.key);
+        if (entryErr) return Result.err(entryErr);
+
         await query`
             INSERT INTO entries
                 (id, user, title, entry, created, deleted, label, latitude, longitude)
             VALUES (${entry.id},
                     ${auth.id},
-                    ${encrypt(entry.title, auth.key)},
-                    ${encrypt(entry.entry, auth.key)},
+                    ${encryptedTitle},
+                    ${encryptedEntry},
                     ${entry.created},
                     ${entry.deleted},
                     ${entry.label?.id ?? null},

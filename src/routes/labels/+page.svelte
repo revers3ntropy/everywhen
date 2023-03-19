@@ -18,6 +18,7 @@
         const res = displayNotifOnErr(addNotification,
             await api.get(data, '/labels'),
         );
+
         labels = res.labels;
     }
 

@@ -52,8 +52,10 @@ export class Backup {
         if (entryErr) return Result.err(entryErr);
         const { err: eventsErr, val: events } = await Event.all(query, auth);
         if (eventsErr) return Result.err(eventsErr);
-        const labels = await Label.all(query, auth);
-        const assets = await Asset.all(query, auth);
+        const { err: labelsErr, val: labels } = await Label.all(query, auth);
+        if (labelsErr) return Result.err(labelsErr);
+        const { err: assetsErr, val: assets } = await Asset.all(query, auth);
+        if (assetsErr) return Result.err(assetsErr);
 
         return Result.ok(new Backup(
             entries.map((entry) => ({
@@ -95,10 +97,13 @@ export class Backup {
         query: QueryFunc,
         auth: Auth,
         backupEncrypted: string,
+        key: string,
     ): Promise<Result> {
         let decryptedData: unknown;
+        const { err, val: decryptedRaw } = decrypt(backupEncrypted, key);
+        if (err) return Result.err(err);
         try {
-            decryptedData = JSON.parse(decrypt(backupEncrypted, auth.key));
+            decryptedData = JSON.parse(decryptedRaw);
         } catch (e) {
             return Result.err('data must be a valid JSON string');
         }
@@ -205,7 +210,7 @@ export class Backup {
         return Result.ok(null);
     }
 
-    public asEncryptedString (auth: Auth): string {
+    public asEncryptedString (auth: Auth): Result<string> {
         return encrypt(JSON.stringify(this), auth.key);
     }
 }

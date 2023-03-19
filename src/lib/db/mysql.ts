@@ -38,7 +38,7 @@ export async function connect () {
 
 export type QueryFunc = <Res extends queryRes = mysql.RowDataPacket[]>(
     queryParts: TemplateStringsArray,
-    ...params: any[]
+    ...params: (string | number | null | boolean)[]
 ) => Promise<Res>;
 
 export async function query<Res extends queryRes = mysql.RowDataPacket[]> (

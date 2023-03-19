@@ -9,7 +9,8 @@ import type { RequestHandler } from './$types';
 export const GET = (async ({ cookies }) => {
     const auth = await getAuthFromCookies(cookies);
 
-    const labels = await Label.all(query, auth);
+    const { err, val: labels } = await Label.all(query, auth);
+    if (err) throw error(400, err);
 
     return apiResponse({ labels });
 }) satisfies RequestHandler;

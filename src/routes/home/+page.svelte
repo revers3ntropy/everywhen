@@ -13,6 +13,7 @@
     import type { App } from '../../app';
     import { api } from '../../lib/api/apiQuery';
     import FileDropDialog from '../../lib/components/dialogs/FileDropDialog.svelte';
+    import { encryptionKeyFromPassword } from '../../lib/security/authUtils';
     import { download as downloadFile } from '../../lib/utils/files';
     import { displayNotifOnErr } from '../../lib/utils/notifications';
     import { showPopup } from '../../lib/utils/popups';
@@ -39,7 +40,11 @@
         showPopup(FileDropDialog, {
             auth: data,
             message: 'Drop encrypted .json file here',
-            withContents: async (res: Result<string>) => {
+            showTextBox: true,
+            textBoxType: 'password',
+            textBoxLabel: 'Password of account the backup came from ' +
+                '(leave blank if same account)',
+            withContents: async (res: Result<string>, password?: string) => {
                 const contents = displayNotifOnErr(addNotification, res);
 
                 if (!confirm(
@@ -48,9 +53,17 @@
                 )) {
                     return;
                 }
+
+                if (!password) {
+                    password = data.key;
+                } else {
+                    password = encryptionKeyFromPassword(password);
+                }
+
                 displayNotifOnErr(addNotification,
                     await api.post(data, '/backups', {
                         data: contents,
+                        key: password,
                     }),
                 );
 
