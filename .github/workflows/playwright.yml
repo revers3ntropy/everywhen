@@ -20,7 +20,7 @@ jobs:
           mysql root password: 'Pass'
 
       - name: Start MySql socket
-        run: sudo systemctl status mysql.service && sudo systemctl start mysql
+        run: sudo service mysql start
 
       - name: Install dependencies
         run: npm i -g pnpm && pnpm install && sudo apt update && sudo apt install mysql-server

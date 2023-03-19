@@ -129,6 +129,15 @@
             await getFileContents(file, 'b64'),
         );
 
+        if (!content) return;
+        if (content.length > 1_000_000) {
+            addNotification({
+                ...ERR_NOTIFICATION,
+                text: 'File too large',
+            });
+            return;
+        }
+
         const { id } = displayNotifOnErr(addNotification,
             await api.post(auth, '/assets', {
                 fileName: file.name,
