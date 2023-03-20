@@ -32,6 +32,7 @@ interface ApiResponse {
         '/backups': GET<typeof import('../../routes/api/backups/+server')>,
         '/auth': GET<typeof import('../../routes/api/auth/+server')>,
         '/assets/': GET<typeof import('../../routes/api/assets/[asset]/+server')>,
+        '/settings': GET<typeof import('../../routes/api/settings/+server')>,
     },
     'POST': {
         '/users': POST<typeof import('../../routes/api/users/+server')>,
@@ -51,6 +52,7 @@ interface ApiResponse {
         '/labels/': PUT<typeof import('../../routes/api/labels/[labelId]/+server')>,
         '/events/': PUT<typeof import('../../routes/api/events/[eventId]/+server')>,
         '/entries/': PUT<typeof import('../../routes/api/entries/[entryId]/+server')>,
+        '/settings': PUT<typeof import('../../routes/api/settings/+server')>,
     },
 }
 
@@ -147,6 +149,8 @@ export const api = {
 };
 
 // TODO make this work with template strings maybe?
+// needed to match generic types of string literals with ids in them,
+// eg /labels/:id
 export function apiPath<T extends string> (
     path: T,
     param: string,

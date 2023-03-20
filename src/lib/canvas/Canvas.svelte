@@ -140,6 +140,7 @@
     width={$canvasState.width * $canvasState.pixelRatio}
     height={$canvasState.height * $canvasState.pixelRatio}}
     style="width: {$canvasState.width}px; height: {$canvasState.height}px;"
+    class="fullscreen"
 
     on:mousedown={canvasListener('mousedown')}
     on:mouseup={canvasListener('mouseup')}

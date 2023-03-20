@@ -16,10 +16,13 @@
 
     $: home = $page.url.pathname.trim() === '/';
 
+    export let data: App.PageData;
+
     let lastActivity = Date.now();
 
     let addNotification: <T>(props: Record<string, T> | NotificationOptions) => void;
-    let isObfuscated = true;
+    let isObfuscated;
+    $: isObfuscated = data.settings.hideEntriesByDefault.value;
     $: obfuscated.update(() => isObfuscated);
 
     function checkObfuscatedTimeout () {

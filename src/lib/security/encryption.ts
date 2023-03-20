@@ -21,14 +21,10 @@ export function encrypt (plainText: string, key: string): Result<string> {
         encryptedData += cipher.final('hex');
     } catch (e) {
         console.error(
-            'Error encrypting ',
-            typeof plainText,
-            'of length',
-            plainText.length,
-            'with key',
-            key,
-            ':',
-            e,
+            'Error encrypting ', typeof plainText,
+            'of length', plainText.length,
+            'with key', key,
+            ':', e,
         );
         return Result.err('Error encrypting');
     }
@@ -50,7 +46,12 @@ export function decrypt (cypherText: string, key: string): Result<string> {
         decryptedData = decipher.update(cypherText, 'hex', 'utf-8');
         decryptedData += decipher.final('utf8');
     } catch (e) {
-        console.error('Error decrypting', cypherText, 'with key', key, ':', e);
+        console.error(
+            'Error decrypting ', typeof cypherText,
+            'of length', cypherText.length,
+            'with key', key,
+            ':', e,
+        );
         return Result.err('Error decrypting');
     }
 

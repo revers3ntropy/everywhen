@@ -82,6 +82,18 @@ CREATE TABLE `assets`
 
 -- --------------------------------------------------------
 
+CREATE TABLE `settings`
+(
+    `id`      varchar(128) NOT NULL,
+    `user`    varchar(128) NOT NULL,
+    `created` int(64)      NOT NULL,
+    `key`     varchar(256) NOT NULL,
+    `value`   longtext     NOT NULL
+) ENGINE = InnoDB
+  DEFAULT CHARSET = latin1;
+
+-- --------------------------------------------------------
+
 CREATE TABLE `ids`
 (
     `id` varchar(128) NOT NULL

@@ -68,6 +68,30 @@
 <svelte:head>
     <title>Timeline</title>
     <meta content="Timeline" name="description" />
+
+    <!-- put the style here because the styles should all be global,
+        however when switching pages the styles get leaked and cause
+        weird issues (the bar chart not showing on the stats page) -->
+    <style>
+        /*
+            put the canvas behind everything,
+            but filling the screen
+        */
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        footer {
+            display: none !important;
+        }
+
+        body {
+            max-height: 100vw;
+        }
+    </style>
 </svelte:head>
 
 <main>
@@ -101,22 +125,3 @@
 
     </Canvas>
 </main>
-
-<style lang="less">
-    // put the canvas behind everything,
-    // but filling the screen
-    :global(canvas) {
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: 1;
-    }
-
-    :global(footer) {
-        display: none !important;
-    }
-
-    :global(body) {
-        max-height: 100vw;
-    }
-</style>

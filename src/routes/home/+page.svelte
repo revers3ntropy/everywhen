@@ -2,6 +2,7 @@
     import moment from 'moment';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
+    import Cog from 'svelte-material-icons/Cog.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
     import Download from 'svelte-material-icons/Download.svelte';
     import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
@@ -114,6 +115,10 @@
             <a class="primary" href="/stats">
                 <Counter size="30" />
                 Stats
+            </a>
+            <a class="primary" href="/settings">
+                <Cog size="30" />
+                Settings
             </a>
         </div>
     </section>
