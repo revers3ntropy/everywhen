@@ -9,10 +9,6 @@ button {
     border: none;
     cursor: pointer;
     outline: none;
-
-    &:hover svg {
-        color: @text-color-light;
-    }
 }
 
 .danger:hover {
@@ -124,6 +120,10 @@ button {
         &:hover {
             background: @accent-color-primary;
             color: @text-color-invert;
+
+            svg, svg * {
+                color: @text-color-invert;
+            }
         }
 
         &.unbordered {
