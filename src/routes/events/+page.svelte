@@ -161,9 +161,7 @@
 
     // Layout doesn't really work below 750px, so say that
     // 'mobile' is anything below that
-    @mobile: (max-width: 750px
-    )
-    ;
+    @mobile: ~"only screen and (max-width: 750px)";
 
     ul {
         list-style: none;
