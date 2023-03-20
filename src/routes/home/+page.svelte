@@ -189,6 +189,10 @@
                 background: @light-accent;
                 color: @accent-color-secondary;
                 text-decoration: none;
+
+                svg, svg * {
+                    color: @accent-color-primary !important;
+                }
             }
 
             @media @mobile {

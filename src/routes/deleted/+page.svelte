@@ -53,7 +53,7 @@
     {#if !loaded}
         <h2><i>Loading...</i></h2>
     {:else if entries.length === 0}
-        <h2><i>No deleted items.</i></h2>
+        <h2><i>No deleted entries.</i></h2>
     {/if}
 </main>
 

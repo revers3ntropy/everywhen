@@ -28,6 +28,7 @@
     export let latitude: number | null = null;
     export let longitude: number | null = null;
     export let deleted = false;
+    export const decrypted = true;
 
     export let obfuscated = true;
     export let showLabels = true;

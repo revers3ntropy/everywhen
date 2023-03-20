@@ -159,6 +159,12 @@
     @import '../../styles/variables.less';
     @import '../../styles/layout.less';
 
+    // Layout doesn't really work below 750px, so say that
+    // 'mobile' is anything below that
+    @mobile: (max-width: 750px
+    )
+    ;
+
     ul {
         list-style: none;
         padding: 0;

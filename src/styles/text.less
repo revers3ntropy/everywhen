@@ -43,15 +43,27 @@ h2 {
     font-size: 1rem;
 }
 
-pre {
-    font-size: 16px;
-    font-family: var(--font-mono);
-    background-color: rgba(255, 255, 255, 0.45);
-    border-radius: 3px;
-    box-shadow: 2px 2px 6px rgb(255 255 255 / 25%);
-    padding: 0.5em;
+code {
+    background-color: @light-accent;
+    border-radius: 5px;
+    padding: 0.3em;
     overflow-x: auto;
-    color: var(--text-color);
+    color: @text-color;
+    font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+    font-size: 0.95rem;
+}
+
+pre {
+    background-color: @light-accent;
+    border-radius: 6px;
+    padding: 16px;
+    overflow: auto;
+    font-size: 85%;
+    line-height: 1.45;
+
+    code {
+        background: none;
+    }
 }
 
 .obfuscated, .obfuscated * {
@@ -61,12 +73,4 @@ pre {
 
 .text-light {
     color: @text-color-light !important;
-}
-
-code {
-    background-color: @light-accent;
-    border-radius: 3px;
-    padding: 0.5em;
-    overflow-x: auto;
-    color: var(--text-color);
 }

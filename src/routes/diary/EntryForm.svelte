@@ -210,6 +210,7 @@
         bind:value={newEntryBody}
         class="entry"
         placeholder="Entry"
+
     ></textarea>
 
     <button
@@ -243,6 +244,7 @@
 
         @media @mobile {
             display: block;
+            border: none;
         }
     }
 
@@ -255,6 +257,7 @@
         @media @mobile {
             width: 100%;
             margin: 0.2em;
+            border-bottom: 1px solid @border-light;
         }
     }
 
@@ -298,5 +301,12 @@
 
     input, textarea {
         z-index: 10;
+    }
+
+    textarea {
+        @media @mobile {
+            // annoying on mobile to resize horizontally
+            resize: vertical;
+        }
     }
 </style>
