@@ -1,13 +1,34 @@
 import { redirect } from '@sveltejs/kit';
 import 'ts-polyfill';
 import { KEY_COOKIE_KEY, USERNAME_COOKIE_KEY } from '../lib/constants';
-import { Settings, type SettingsConfig } from '../lib/controllers/settings';
+import { Settings } from '../lib/controllers/settings';
 import type { Auth } from '../lib/controllers/user';
 import { User } from '../lib/controllers/user';
 import { query } from '../lib/db/mysql';
 import type { LayoutServerLoad } from './$types';
 
 export const prerender = false;
+
+async function isAuthenticated (
+    home: boolean,
+    auth: Auth,
+): Promise<App.PageData> {
+    if (home) {
+        throw redirect(307, '/home');
+    }
+
+    const { err, val: settings } = await Settings.allAsMap(query, auth);
+    if (err) {
+        console.error(err);
+        throw err;
+    }
+    return {
+        ...auth,
+        settings: JSON.parse(JSON.stringify(
+            Settings.fillWithDefaults(settings as Record<string, Settings>),
+        )) as App.PageData['settings'],
+    };
+}
 
 export const load: LayoutServerLoad = async ({
     cookies,
@@ -19,24 +40,13 @@ export const load: LayoutServerLoad = async ({
     const username = cookies.get(USERNAME_COOKIE_KEY);
 
     if (key && username) {
-        const { err, val: { id } } = await User.authenticate(query, username, key);
+        const { err, val: user } = await User.authenticate(query, username, key);
         if (!err) {
-            if (home) {
-                throw redirect(307, '/home');
-            }
-
-            const auth = { key, username, id } satisfies Auth;
-
-            const { err, val: settings } = await Settings.allAsMap(query, auth);
-            if (err) {
-                throw err;
-            }
-            return {
-                ...auth,
-                settings: JSON.parse(JSON.stringify(
-                    Settings.fillWithDefaults(settings),
-                )) as App.PageData['settings'],
-            };
+            return await isAuthenticated(home, {
+                key,
+                username,
+                id: user.id,
+            });
         }
     }
 
@@ -49,6 +59,8 @@ export const load: LayoutServerLoad = async ({
         key: '',
         username: '',
         id: '',
-        settings: {} as SettingsConfig,
+        settings: JSON.parse(JSON.stringify(
+            Settings.fillWithDefaults({}),
+        )) as App.PageData['settings'],
     };
 };

@@ -1,5 +1,6 @@
 <script lang="ts">
     import { renderable, START_ZOOM } from '../../lib/canvas/canvas';
+    import type { Label } from '../../lib/controllers/label';
     import { obfuscated } from '../../lib/stores';
 
     export let id: string;
@@ -10,6 +11,7 @@
     export let entry: string;
     export let decrypted: boolean;
     export let deleted: boolean;
+    export let label: Label | null = null;
 
     renderable(state => {
         const renderPos = state.timeToRenderPos(created);

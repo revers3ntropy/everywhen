@@ -1,6 +1,5 @@
-import type { Milliseconds, Seconds } from './utils/types';
+import type { Seconds } from './utils/types';
 
-export const INACTIVE_TIMEOUT_MS: Milliseconds = 1000 * 60 * 2;
 export const COOKIE_TIMEOUT: Seconds = 60 * 60;
 export const KEY_COOKIE_KEY = '__misc_3_key_v2';
 export const USERNAME_COOKIE_KEY = '__misc_3_username_v2';

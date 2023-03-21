@@ -11,10 +11,9 @@
 </svelte:head>
 
 <main>
-    {#each Object.keys(SettingsController.config) as key}
+    {#each Object.entries(SettingsController.config) as [key, config] (key)}
         <Settings
-            {key}
-            {...SettingsController.config[key]}
+            {...config}
             {...data.settings[key]}
             auth={data}
         />

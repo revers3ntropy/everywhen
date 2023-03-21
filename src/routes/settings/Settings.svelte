@@ -1,6 +1,7 @@
 <script lang="ts">
     import moment from 'moment';
-    import CloudSyncOutline from 'svelte-material-icons/CloudSyncOutline.svelte';
+    import CloudCheckOutline from 'svelte-material-icons/CloudCheckOutline.svelte';
+    import Sync from 'svelte-material-icons/Sync.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import { api } from '../../lib/api/apiQuery';
     import type { Auth } from '../../lib/controllers/user';
@@ -21,7 +22,7 @@
 
     let saving = false;
 
-    let inputType;
+    let inputType: 'text' | 'number' | 'checkbox';
 
     switch (type) {
         case 'string':
@@ -54,10 +55,11 @@
         saving = false;
     }
 
-    async function onInput (event) {
-        let newValue = event.target.value;
+    async function onInput (event: Event) {
+        let target = event.target as HTMLInputElement;
+        let newValue: boolean | string | number = target.value;
         if (type === 'boolean') {
-            newValue = event.target.checked;
+            newValue = target.checked;
         }
         if (type === 'number') {
             newValue = Number(newValue);
@@ -68,18 +70,23 @@
 
 <div>
     <div class="header">
-        <h3>
-            {name}
+        <div>
+            <h3>
+                {#if saving}
+                    <Sync size={20} />
+                {:else}
+                    <CloudCheckOutline size={20} />
+                {/if}
+                {name}
+            </h3>
+        </div>
 
-            {#if saving}
-                <CloudSyncOutline />
-            {/if}
-        </h3>
         {#if created}
             <p class="last-updated">
                 Last updated
                 {moment.duration(nowS() - created, 's')
                     .humanize()}
+                ago
             </p>
         {/if}
         {#if value !== defaultValue}
@@ -114,7 +121,8 @@
         }
 
         &[type="checkbox"] {
-            scale: 1.5;
+            scale: 1.4;
+            margin-left: 50px;
         }
     }
 
@@ -128,6 +136,7 @@
         width: fit-content;
         display: flex;
         flex-direction: row;
+        margin: .1em 0;
 
         & > * {
             padding: 0 1em;
@@ -140,6 +149,14 @@
             &:last-child {
                 border-right: none;
             }
+        }
+
+        h3 {
+            display: grid;
+            grid-template-columns: 40px 1fr;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
         }
 
         .last-updated {

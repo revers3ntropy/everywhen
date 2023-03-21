@@ -3,6 +3,7 @@ import { decrypt, encrypt } from '../security/encryption';
 import { generateUUId } from '../security/uuid';
 import { Result } from '../utils/result';
 import { nowS } from '../utils/time';
+import type { Seconds } from '../utils/types';
 import type { Auth } from './user';
 
 export interface ISettingsConfig<T> {
@@ -12,11 +13,13 @@ export interface ISettingsConfig<T> {
     defaultValue: T,
 }
 
+export type SettingsKey = keyof typeof Settings.config;
 export type SettingsConfig =
-    Record<
-        keyof typeof Settings.config,
-        Settings<typeof Settings.config[keyof typeof Settings.config]['defaultValue']>
-    >
+    {
+        [key in SettingsKey]:
+        Settings<typeof Settings.config[key]['defaultValue']>
+    }
+    & Record<string, Settings>;
 
 export class Settings<T = unknown> {
 
@@ -27,7 +30,14 @@ export class Settings<T = unknown> {
             name: 'Blur Entries By Default',
             description: 'Blur entries by default, and manually show them.',
         } satisfies ISettingsConfig<boolean>,
-    };
+        autoHideEntriesDelay: {
+            type: 'number',
+            defaultValue: 60 * 2,
+            name: 'Auto Blur Entries After',
+            description: `Blur entries after 'N' seconds without user interaction. ` +
+                `Set to 0 to disable.`,
+        } satisfies ISettingsConfig<Seconds>,
+    } satisfies Record<string, ISettingsConfig<unknown>>;
 
     constructor (
         public readonly id: string,
@@ -40,18 +50,18 @@ export class Settings<T = unknown> {
     public static async update (
         query: QueryFunc,
         auth: Auth,
-        key: keyof typeof Settings.config,
+        key: string,
         value: unknown,
     ): Promise<Result<Settings>> {
         const id = await generateUUId(query);
 
-        if (!Settings.config[key]) {
+        if (!Settings.config.hasOwnProperty(key)) {
             return Result.err(`Invalid setting key`);
         }
 
         const now = nowS();
 
-        const expectedType = Settings.config[key].type;
+        const expectedType = Settings.config[key as SettingsKey].type;
         if (typeof value !== expectedType) {
             return Result.err(
                 `Invalid setting value, expected ${expectedType} but got ${typeof value}`);
@@ -102,17 +112,19 @@ export class Settings<T = unknown> {
     public static async allAsMap (
         query: QueryFunc,
         auth: Auth,
-    ): Promise<Result<Record<string, Settings>>> {
+    ): Promise<Result<Partial<SettingsConfig>>> {
         const res = await Settings.all(query, auth);
-        if (res.err) return Result.err(res.err);
+        if (res.err) {
+            return Result.err(res.err);
+        }
         return Result.ok(Object.fromEntries(
             res.val.map(s => [ s.key, s ]),
-        ));
+        ) as Partial<SettingsConfig>);
     }
 
     public static fillWithDefaults (
         map: Record<string, Settings>,
-    ): Record<string, Settings> {
+    ): SettingsConfig {
         const newMap = { ...map };
         for (const [ key, config ] of Object.entries(Settings.config)) {
             if (!newMap[key]) {
@@ -122,6 +134,6 @@ export class Settings<T = unknown> {
                 );
             }
         }
-        return newMap;
+        return newMap as SettingsConfig;
     }
 }

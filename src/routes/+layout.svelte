@@ -6,9 +6,10 @@
     import Modal from 'svelte-simple-modal';
     import 'ts-polyfill';
     import '../app.less';
-    import { INACTIVE_TIMEOUT_MS, USERNAME_COOKIE_KEY } from '../lib/constants';
+    import { USERNAME_COOKIE_KEY } from '../lib/constants';
     import { obfuscated, popup } from '../lib/stores';
     import { INFO_NOTIFICATION } from '../lib/utils/notifications';
+    import { nowS } from '../lib/utils/time';
     import type { NotificationOptions } from '../lib/utils/types';
     import Footer from './Footer.svelte';
     import Nav from './Nav.svelte';
@@ -18,21 +19,24 @@
 
     export let data: App.PageData;
 
-    let lastActivity = Date.now();
+    let lastActivity = nowS();
 
     let addNotification: <T>(props: Record<string, T> | NotificationOptions) => void;
-    let isObfuscated;
+    let isObfuscated: boolean;
     $: isObfuscated = data.settings.hideEntriesByDefault.value;
     $: obfuscated.update(() => isObfuscated);
 
     function checkObfuscatedTimeout () {
-        if (isObfuscated) {
-            return;
-        }
+        if (isObfuscated) return;
 
-        if (Date.now() - lastActivity > INACTIVE_TIMEOUT_MS) {
+        const hideAfter = data.settings.autoHideEntriesDelay.value;
+        if (hideAfter < 1) return;
+
+        console.log(nowS() - lastActivity, hideAfter);
+        if (nowS() - lastActivity >= hideAfter) {
             addNotification({
                 ...INFO_NOTIFICATION,
+                removeAfter: -1,
                 text: 'Hidden due to inactivity',
             });
             isObfuscated = true;
@@ -54,16 +58,18 @@
     }
 
     setInterval(() => {
+        if (home) return;
+
         checkObfuscatedTimeout();
         checkCookies();
     }, 1000);
 
     function activity () {
-        lastActivity = Date.now();
+        lastActivity = nowS();
     }
 
     function keydown (e: KeyboardEvent) {
-        lastActivity = Date.now();
+        lastActivity = nowS();
         if (e.key === 'Escape') {
             if (e.ctrlKey) {
                 isObfuscated = !isObfuscated;
