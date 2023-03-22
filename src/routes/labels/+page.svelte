@@ -23,6 +23,9 @@
     }
 
     onMount(reload);
+
+    onMount(() => document.title = 'Labels');
+
 </script>
 
 <svelte:head>

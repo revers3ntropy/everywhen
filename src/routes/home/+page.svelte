@@ -1,5 +1,6 @@
 <script lang="ts">
     import moment from 'moment';
+    import { onMount } from 'svelte';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
     import Cog from 'svelte-material-icons/Cog.svelte';
@@ -91,6 +92,9 @@
         downloadBackup(backupData, data.username);
         window.location.assign('/');
     }
+
+    onMount(() => document.title = `Home`);
+
 </script>
 
 <main>

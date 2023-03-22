@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
     import ChevronRight from 'svelte-material-icons/ChevronRight.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../app';
@@ -25,7 +26,7 @@
             {},
             () => actionPending = false,
         );
-        window.location.assign('/home');
+        location.assign('/home');
     }
 
     async function create (): Promise<void> {
@@ -38,8 +39,10 @@
             {},
             () => actionPending = false,
         );
-        window.location.assign('/home');
+        location.assign('/home');
     }
+
+    onMount(() => document.title = 'Home');
 </script>
 
 <main>

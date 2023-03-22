@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../../../app';
     import { api, apiPath } from '../../../lib/api/apiQuery';
@@ -28,6 +29,9 @@
             }),
         );
     }
+
+    onMount(() => document.title = `${data.label.name} - Label`);
+
 </script>
 
 <svelte:head>

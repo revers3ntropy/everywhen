@@ -1,5 +1,10 @@
 <script lang="ts">
-    window.location.assign('/');
+    import { onMount } from 'svelte';
+
+    location.assign('/');
+
+    onMount(() => document.title = 'Home');
+
 </script>
 
 <svelte:head>

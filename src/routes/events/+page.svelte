@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import TrayArrowUp from 'svelte-material-icons/TrayArrowUp.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
@@ -105,6 +106,9 @@
         'end': 'end',
         'name': 'name',
     };
+
+    onMount(() => document.title = `Events`);
+
 </script>
 
 <svelte:head>

@@ -63,6 +63,9 @@
             await api.get(data, '/timeline'),
         );
     });
+
+    onMount(() => document.title = 'Timeline');
+
 </script>
 
 <svelte:head>

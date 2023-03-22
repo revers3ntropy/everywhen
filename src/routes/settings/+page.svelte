@@ -1,8 +1,12 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
     import { Settings as SettingsController } from '../../lib/controllers/settings';
     import Settings from './Settings.svelte';
 
     export let data: App.PageData;
+
+    onMount(() => document.title = 'Settings');
+
 </script>
 
 <svelte:head>

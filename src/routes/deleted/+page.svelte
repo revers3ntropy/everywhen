@@ -32,6 +32,9 @@
     }
 
     onMount(reload);
+
+    onMount(() => document.title = `Deleted`);
+
 </script>
 
 <svelte:head>

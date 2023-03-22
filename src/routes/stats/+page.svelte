@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
     import type { App } from '../../app';
     import type { Entry } from '../../lib/controllers/entry';
     import CommonWordsList from './CommoWordsList.svelte';
@@ -15,6 +16,9 @@
         charCount: number,
         commonWords: [ string, number ][]
     };
+
+    onMount(() => document.title = 'Analytics');
+
 </script>
 
 <svelte:head>
