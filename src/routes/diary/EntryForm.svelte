@@ -1,5 +1,6 @@
 <script lang="ts">
     import { browser } from '$app/environment';
+    import { enabledLocation } from '$lib/stores.js';
     // @ts-ignore
     import { tooltip } from '@svelte-plugins/tooltips';
     import { filedrop, type FileDropOptions, type Files } from 'filedrop-svelte';
@@ -7,34 +8,31 @@
     import ImageArea from 'svelte-material-icons/ImageArea.svelte';
     import Send from 'svelte-material-icons/Send.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
-    import { api } from '../../lib/api/apiQuery';
+    import { api, apiPath } from '../../lib/api/apiQuery';
     import LabelSelect from '../../lib/components/LabelSelect.svelte';
     import type { Auth } from '../../lib/controllers/user';
-    import { enabledLocation } from '../../lib/stores';
     import { getFileContents } from '../../lib/utils/files';
+    import { getLocation } from '../../lib/utils/geolocation';
     import { displayNotifOnErr, ERR_NOTIFICATION } from '../../lib/utils/notifications';
     import LocationToggle from './LocationToggle.svelte';
-
-    type OptionalCoords = [ number, number ] | [ null, null ];
 
     const { addNotification } = getNotificationsContext();
     const dispatch = createEventDispatcher();
 
     let mounted = false;
 
-    let newEntryTitle = '';
-    let newEntryBody = '';
-    let newEntryLabel = '';
-    $: if (mounted && browser) localStorage.setItem('__misc_3_newEntryTitle', newEntryTitle);
-    $: if (mounted && browser) localStorage.setItem('__misc_3_newEntryBody', newEntryBody);
-    $: if (mounted && browser) localStorage.setItem('__misc_3_newEntryLabel', newEntryLabel);
+    export let action: 'create' | 'edit' = 'create';
+    export let eventId = '';
 
-    onMount(() => {
-        newEntryTitle = localStorage.getItem('__misc_3_newEntryTitle') || '';
-        newEntryBody = localStorage.getItem('__misc_3_newEntryBody') || '';
-        newEntryLabel = localStorage.getItem('__misc_3_newEntryLabel') || '';
-        mounted = true;
-    });
+    if (eventId && action !== 'edit') {
+        throw new Error('eventID can only be set when action is edit');
+    }
+
+    export let loadFromLS = true;
+
+    export let newEntryTitle = '';
+    export let newEntryBody = '';
+    export let newEntryLabel = '';
 
     export let auth: Auth;
 
@@ -44,46 +42,52 @@
         newEntryLabel = '';
     }
 
-    async function getLocation (): Promise<OptionalCoords> {
-        let currentLocation: OptionalCoords = [ null, null ];
-        if ($enabledLocation) {
-            currentLocation = await new Promise((resolve) => {
-                navigator.geolocation.getCurrentPosition(
-                    pos => {
-                        resolve([
-                            pos.coords.latitude,
-                            pos.coords.longitude,
-                        ]);
-                    },
-                    err => {
-                        addNotification({
-                            text: `Cannot get location: ${err.message}`,
-                            removeAfter: 8000,
-                            type: 'error',
-                            position: 'top-center',
-                        });
-                        resolve([ null, null ]);
-                    },
-                );
-            });
-        }
-        return currentLocation;
+    $: if (mounted && browser && loadFromLS) {
+        localStorage.setItem('__misc_3_newEntryTitle', newEntryTitle);
+        localStorage.setItem('__misc_3_newEntryBody', newEntryBody);
+        localStorage.setItem('__misc_3_newEntryLabel', newEntryLabel);
     }
 
-    async function submit () {
-        const currentLocation = await getLocation();
+    onMount(() => {
+        if (loadFromLS) {
+            newEntryTitle = localStorage.getItem('__misc_3_newEntryTitle') || '';
+            newEntryBody = localStorage.getItem('__misc_3_newEntryBody') || '';
+            newEntryLabel = localStorage.getItem('__misc_3_newEntryLabel') || '';
+        }
+        mounted = true;
+    });
 
-        const res = displayNotifOnErr(addNotification,
-            await api.post(auth, '/entries', {
-                title: newEntryTitle,
-                entry: newEntryBody,
-                label: newEntryLabel,
-                latitude: currentLocation[0],
-                longitude: currentLocation[1],
-            }),
-        );
+    async function submit () {
+        const currentLocation = $enabledLocation
+            ? await getLocation(addNotification)
+            : [ null, null ];
+
+        const body = {
+            title: newEntryTitle,
+            entry: newEntryBody,
+            label: newEntryLabel,
+            latitude: currentLocation[0],
+            longitude: currentLocation[1],
+        };
+
+        let res;
+        switch (action) {
+            case 'create':
+                res = displayNotifOnErr(addNotification,
+                    await api.post(auth, '/entries', body),
+                );
+                break;
+            case 'edit':
+                res = displayNotifOnErr(addNotification,
+                    await api.put(auth, apiPath('/entries/?', eventId), body),
+                );
+                break;
+            default:
+                throw new Error(`Unknown action: ${action}`);
+        }
 
         if (res.id) {
+            // make really sure it's saved before resetting
             reset();
         } else {
             console.error(res);

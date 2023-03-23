@@ -5,5 +5,10 @@ export function GETArgs (args: Record<string, any>): string {
 }
 
 export function GETParamIsTruthy (val: string | null = null): boolean {
-    return val && val === 'true' || val === '1';
+    return val
+        && val === 'true'
+        || val === '1'
+        || val === 'on'
+        || val === 'yes'
+        || val === 'y';
 }

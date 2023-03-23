@@ -32,7 +32,6 @@
         const hideAfter = data.settings.autoHideEntriesDelay.value;
         if (hideAfter < 1) return;
 
-        console.log(nowS() - lastActivity, hideAfter);
         if (nowS() - lastActivity >= hideAfter) {
             addNotification({
                 ...INFO_NOTIFICATION,

@@ -1,5 +1,7 @@
 <script lang="ts">
     import { browser } from '$app/environment';
+    // @ts-ignore
+    import { tooltip } from '@svelte-plugins/tooltips';
     import DomPurify from 'dompurify';
     import { marked } from 'marked';
     import moment from 'moment';
@@ -8,11 +10,13 @@
     import Restore from 'svelte-material-icons/DeleteRestore.svelte';
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
+    import NoteEditOutline from 'svelte-material-icons/NoteEditOutline.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import { api, apiPath } from '../api/apiQuery';
+    import type { Entry } from '../controllers/entry';
     import type { Label as LabelController } from '../controllers/label';
     import type { Auth } from '../controllers/user';
-    import { displayNotifOnErr } from '../utils/notifications';
+    import { displayNotifOnErr, SUCCESS_NOTIFICATION } from '../utils/notifications';
     import { obfuscate } from '../utils/text';
     import Label from './Label.svelte';
 
@@ -28,7 +32,10 @@
     export let latitude: number | null = null;
     export let longitude: number | null = null;
     export let deleted = false;
-    export const decrypted = true;
+    export let decrypted = true;
+    export let edits: Entry[] = [];
+    export let isEdit = false;
+    export let showFullDate = false;
 
     export let obfuscated = true;
     export let showLabels = true;
@@ -50,16 +57,14 @@
         }
 
         displayNotifOnErr(addNotification,
-            await api.delete(auth, apiPath('/entries/', id), {
+            await api.delete(auth, apiPath('/entries/?', id), {
                 restore: !!deleted,
             }),
         );
 
         addNotification({
-            removeAfter: 4000,
+            ...SUCCESS_NOTIFICATION,
             text: `Entry ${deleted ? 'restored' : 'deleted'}`,
-            type: 'success',
-            position: 'top-center',
         });
         dispatch('updated');
     }
@@ -72,13 +77,19 @@
         marked(obfuscated ? obfuscate(entry) : entry),
         { USE_PROFILES: { html: true } },
     ) : '';
+    // doesn't set reactivity on tooltip content if in props???
+    $: restoreDeleteTooltip = deleted ? 'Restore Entry' : 'Delete Entry';
 </script>
 
 <div class="entry {obfuscated ? '' : 'visible'}">
     <div class="header">
         <div>
 			<span class="time">
-				{moment(new Date(created * 1000)).format('h:mm A')}
+                {#if showFullDate}
+                    {moment(new Date(created * 1000)).format('DD/MM/YYYY h:mm A')}
+                {:else}
+                    {moment(new Date(created * 1000)).format('h:mm A')}
+                {/if}
 			</span>
             <Label label={showLabel} obfuscated={obfuscated} />
         </div>
@@ -86,11 +97,17 @@
             {obfuscated ? obfuscate(title) : title}
         </div>
 
-        <div>
-            {#if !obfuscated}
+        <div class="flex-center">
+            {#if !obfuscated && !isEdit}
+                {#if edits.length}
+                    <a href="/diary/{id}?history=on">
+                        {edits.length} edit{edits.length > 1 ? 's' : ''}
+                    </a>
+                {/if}
                 <button
                     on:click={deleteSelf}
                     aria-label={deleted ? 'Restore' : 'Delete'}
+                    use:tooltip={{ content: restoreDeleteTooltip }}
                 >
                     {#if deleted}
                         <Restore size="25" />
@@ -98,6 +115,12 @@
                         <Bin size="25" />
                     {/if}
                 </button>
+                <a
+                    href="/diary/{id}/edit"
+                    use:tooltip={{ content: 'Edit Entry' }}
+                >
+                    <NoteEditOutline size="25" />
+                </a>
             {/if}
 
             <button
@@ -126,9 +149,14 @@
         height: fit-content;
         white-space: pre-wrap;
 
+        border-style: solid;
+        border-width: 1px;
+        border-color: transparent;
+
         &.visible {
-            border-left: 1px solid @border-heavy;
-            //background: #2D2D2D
+            border-image: linear-gradient(transparent,
+            @accent-color-primary,
+            transparent) 1 100%;
         }
 
         @media @mobile {

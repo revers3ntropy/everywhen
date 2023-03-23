@@ -26,7 +26,7 @@
         },
     ) {
         displayNotifOnErr(addNotification,
-            await api.put(auth, apiPath(`/labels/`, id), changes),
+            await api.put(auth, apiPath(`/labels/?`, id), changes),
         );
         dispatch('updated');
     }
@@ -34,7 +34,7 @@
     async function deleteLabel () {
         if (numEntries === 0) {
             displayNotifOnErr(addNotification,
-                await api.delete(auth, apiPath(`/labels/`, id)),
+                await api.delete(auth, apiPath(`/labels/?`, id)),
             );
             dispatch('updated');
             return;

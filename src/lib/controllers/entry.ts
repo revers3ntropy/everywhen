@@ -26,8 +26,11 @@ export type DecryptedRawEntry = Omit<RawEntry, 'decrypted'> & {
     decrypted: true
 };
 
+export type EntryEdit = Omit<Entry, 'edits'>;
+
 export class Entry {
     public label?: Label;
+    public edits?: EntryEdit[];
     public readonly decrypted = true;
 
     private constructor (
@@ -64,7 +67,7 @@ export class Entry {
         await query`
             UPDATE entries
             SET deleted = ${!restore},
-                label=${null}
+                label   = ${null}
             WHERE entries.id = ${id}
               AND user = ${auth.id}
         `;
@@ -167,6 +170,7 @@ export class Entry {
         query: QueryFunc,
         auth: Auth,
         rawEntry: RawEntry,
+        isEdit = false,
     ): Promise<Result<Entry>> {
         const { err: titleErr, val: decryptedTitle } = decrypt(rawEntry.title, auth.key);
         if (titleErr) return Result.err(titleErr);
@@ -174,7 +178,7 @@ export class Entry {
         const { err: entryErr, val: decryptedEntry } = decrypt(rawEntry.entry, auth.key);
         if (entryErr) return Result.err(entryErr);
 
-        const entry = new Entry(
+        let entry = new Entry(
             rawEntry.id,
             decryptedTitle,
             decryptedEntry,
@@ -183,10 +187,17 @@ export class Entry {
         );
 
         if (rawEntry.label) {
-            const { err } = await Entry.addLabel(
+            const { err, val } = await Entry.addLabel(
                 query, auth, entry, rawEntry.label,
             );
             if (err) return Result.err(err);
+            entry = val;
+        }
+
+        if (!isEdit) {
+            const { err, val } = await Entry.addEdits(query, auth, entry);
+            if (err) return Result.err(err);
+            entry = val;
         }
 
         return Result.ok(entry);
@@ -424,6 +435,60 @@ export class Entry {
         return entry;
     }
 
+    public static async edit (
+        query: QueryFunc,
+        auth: Auth,
+        entry: Entry,
+        newTitle: string,
+        newEntry: string,
+        newLatitude: number,
+        newLongitude: number,
+        newLabel: Label | string,
+    ): Promise<Result> {
+        const { err: titleErr, val: encryptedNewTitle } = encrypt(newTitle, auth.key);
+        if (titleErr) return Result.err(titleErr);
+        const { err: entryErr, val: encryptedNewEntry } = encrypt(newEntry, auth.key);
+        if (entryErr) return Result.err(entryErr);
+
+        const editId = await generateUUId(query);
+
+        const { err: oldTitleErr, val: oldTitle } = encrypt(entry.title, auth.key);
+        if (oldTitleErr) return Result.err(oldTitleErr);
+        const { err: oldEntryErr, val: oldEntry } = encrypt(entry.entry, auth.key);
+        if (oldEntryErr) return Result.err(oldEntryErr);
+
+        await query`
+            INSERT INTO entryEdits
+                (id, entryId, created, latitude, longitude, title, entry, label)
+            VALUES (${editId},
+                    ${entry.id},
+                    ${entry.created},
+                    ${entry.latitude ?? null},
+                    ${entry.longitude ?? null},
+                    ${oldTitle},
+                    ${oldEntry},
+                    ${entry.label?.id ?? null})
+        `;
+
+        if (newLabel instanceof Label) {
+            newLabel = newLabel.id;
+        }
+
+        await query`
+            UPDATE entries
+            SET title     = ${encryptedNewTitle},
+                entry     = ${encryptedNewEntry},
+                latitude  = ${newLatitude ?? null},
+                longitude = ${newLongitude ?? null},
+                label     = ${newLabel ?? null},
+                created   = ${nowS()}
+            WHERE id = ${entry.id}
+              AND user = ${auth.id}
+        `;
+
+        return Result.ok(null);
+    }
+
     private static async addLabel (
         query: QueryFunc,
         auth: Auth,
@@ -439,6 +504,27 @@ export class Entry {
         } else {
             self.label = label;
         }
+
+        return Result.ok(self);
+    }
+
+    private static async addEdits (
+        query: QueryFunc,
+        auth: Auth,
+        self: Entry,
+    ): Promise<Result<EntryEdit>> {
+        const rawEdits = await query<RawEntry[]>`
+            SELECT created, latitude, longitude, title, entry, label
+            FROM entryEdits
+            WHERE entryId = ${self.id}
+        `;
+
+        const { err, val: edits } = Result.collect(await Promise.all(
+            rawEdits.map(e => Entry.fromRaw(query, auth, e, true)),
+        ));
+        if (err) return Result.err(err);
+
+        self.edits = edits;
 
         return Result.ok(self);
     }

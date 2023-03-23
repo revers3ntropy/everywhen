@@ -19,8 +19,10 @@ export const SUCCESS_NOTIFICATION = Object.freeze({
     position: 'top-center',
 } as const satisfies NotificationOptions);
 
+export type Notifier = (notification: NotificationOptions) => void;
+
 export function displayNotifOnErr<T> (
-    addNotification: (notification: NotificationOptions) => void,
+    addNotification: Notifier,
     { err, val }: Result<T>,
     options: PickOptional<NotificationOptions> = {},
     onErr: (err: string | null) => any = () => 0,

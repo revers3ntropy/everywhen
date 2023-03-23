@@ -62,8 +62,8 @@ export const POST = (async ({ request, cookies }) => {
         }
     }
 
-    const { val: id, err } = await Entry.create(query, auth, body);
+    const { val: entry, err } = await Entry.create(query, auth, body);
     if (err) throw error(400, err);
 
-    return apiResponse({ id });
+    return apiResponse({ id: entry.id });
 }) satisfies RequestHandler;

@@ -64,6 +64,7 @@
         if (type === 'number') {
             newValue = Number(newValue);
         }
+
         await updateValue(newValue);
     }
 </script>

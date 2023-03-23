@@ -32,11 +32,11 @@
     async function delAndDelEntries () {
         await Promise.all(entries.map(async entry => {
             displayNotifOnErr(addNotification,
-                await api.delete(auth, apiPath('/entries/', entry.id)),
+                await api.delete(auth, apiPath('/entries/?', entry.id)),
             );
         }));
         displayNotifOnErr(addNotification,
-            await api.delete(auth, apiPath('/labels/', id)),
+            await api.delete(auth, apiPath('/labels/?', id)),
         );
         popup.set(null);
     }
@@ -44,13 +44,13 @@
     async function delAndRmLabel () {
         await Promise.all(entries.map(async entry => {
             displayNotifOnErr(addNotification,
-                await api.put(auth, apiPath(`/entries/`, entry.id), {
+                await api.put(auth, apiPath(`/entries/?/label`, entry.id), {
                     label: null,
                 }),
             );
         }));
         displayNotifOnErr(addNotification,
-            await api.delete(auth, apiPath(`/labels/`, id)),
+            await api.delete(auth, apiPath(`/labels/?`, id)),
         );
         popup.set(null);
     }
@@ -58,13 +58,13 @@
     async function delAndReassign () {
         await Promise.all(entries.map(async entry => {
             displayNotifOnErr(addNotification,
-                await api.put(auth, apiPath('/entries/', entry.id), {
+                await api.put(auth, apiPath('/entries/?/label', entry.id), {
                     label: changeLabelId,
                 }),
             );
         }));
         displayNotifOnErr(addNotification,
-            await api.delete(auth, apiPath('/labels/', id)),
+            await api.delete(auth, apiPath('/labels/?', id)),
         );
         popup.set(null);
     }

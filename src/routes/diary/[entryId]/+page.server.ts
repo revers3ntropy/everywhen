@@ -2,9 +2,10 @@ import { redirect } from '@sveltejs/kit';
 import { Entry } from '../../../lib/controllers/entry';
 import { query } from '../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
+import { GETParamIsTruthy } from '../../../lib/utils/GETArgs';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ params, cookies }) => {
+export const load = (async ({ params, cookies, url }) => {
     const auth = await getAuthFromCookies(cookies);
 
     const { val: entry, err } = await Entry.fromId(
@@ -13,5 +14,9 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
     );
     if (err) throw redirect(307, '/diary');
 
-    return { ...entry, label: { ...entry.label } };
-};
+    return {
+        entry: JSON.parse(JSON.stringify(entry)) as {},
+        history: GETParamIsTruthy(url.searchParams.get('history')),
+    };
+
+}) satisfies PageServerLoad;

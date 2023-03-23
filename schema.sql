@@ -38,6 +38,21 @@ CREATE TABLE `entries`
 
 -- --------------------------------------------------------
 
+CREATE TABLE `entryEdits`
+(
+    `id`        varchar(128) NOT NULL,
+    `entryId`   varchar(128) NOT NULL,
+    `created`   int(64)      NOT NULL,
+    `latitude`  double       DEFAULT NULL,
+    `longitude` double       DEFAULT NULL,
+    `title`     text         NULL,
+    `entry`     text         NOT NULL,
+    `label`     varchar(128) DEFAULT NULL
+) ENGINE = InnoDB
+  DEFAULT CHARSET = latin1;
+
+-- --------------------------------------------------------
+
 CREATE TABLE `events`
 (
     `id`      varchar(128) NOT NULL,

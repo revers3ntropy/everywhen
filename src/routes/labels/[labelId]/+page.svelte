@@ -16,7 +16,7 @@
 
     async function updateName () {
         displayNotifOnErr(addNotification,
-            await api.put(data, apiPath('/labels/', data.label.id), {
+            await api.put(data, apiPath('/labels/?', data.label.id), {
                 name: data.label.name,
             }),
         );
@@ -24,7 +24,7 @@
 
     async function updateColour () {
         displayNotifOnErr(addNotification,
-            await api.put(data, apiPath('/labels/', data.label.id), {
+            await api.put(data, apiPath('/labels/?', data.label.id), {
                 colour: data.label.colour,
             }),
         );

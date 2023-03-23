@@ -1,4 +1,3 @@
-import { browser } from '$app/environment';
 import { PUBLIC_INIT_VECTOR } from '$env/static/public';
 import * as crypto from 'crypto';
 import { Result } from '../utils/result';
@@ -6,10 +5,6 @@ import { Result } from '../utils/result';
 const ALGORITHM = 'aes-256-cbc';
 
 export function encrypt (plainText: string, key: string): Result<string> {
-    if (browser) {
-        console.trace();
-        throw 'Cannot encrypt/decrypt in browser';
-    }
     if (!plainText) return Result.ok('');
 
     let encryptedData = '';
@@ -32,10 +27,6 @@ export function encrypt (plainText: string, key: string): Result<string> {
 }
 
 export function decrypt (cypherText: string, key: string): Result<string> {
-    if (browser) {
-        console.trace();
-        throw 'Cannot encrypt/decrypt in browser';
-    }
     if (!cypherText) return Result.ok('');
 
     let decryptedData = '';

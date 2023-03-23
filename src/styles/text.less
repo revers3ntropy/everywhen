@@ -20,15 +20,20 @@ a {
     text-decoration: none;
     cursor: pointer;
 
-    &::after {
-        content: '';
-        display: block;
-        width: 100%;
-        height: 2px;
+    &:hover {
+        text-decoration: underline;
+        text-underline-color: @text-color-accent;
     }
 
-    &:hover {
-        &:after {
+    &.icon {
+        &::after {
+            content: '';
+            display: block;
+            width: 100%;
+            height: 2px;
+        }
+
+        &:hover::after {
             background: @text-color-accent;
         }
     }

@@ -25,13 +25,13 @@ interface ApiResponse {
     'GET': {
         '/timeline': GET<typeof import('../../routes/api/timeline/+server')>,
         '/labels': GET<typeof import('../../routes/api/labels/+server')>,
-        '/labels/': GET<typeof import('../../routes/api/labels/[labelId]/+server')>,
+        '/labels/?': GET<typeof import('../../routes/api/labels/[labelId]/+server')>,
         '/events': GET<typeof import('../../routes/api/events/+server')>,
         '/entries': GET<typeof import('../../routes/api/entries/+server')>,
         '/entries/titles': GET<typeof import('../../routes/api/entries/titles/+server')>,
         '/backups': GET<typeof import('../../routes/api/backups/+server')>,
         '/auth': GET<typeof import('../../routes/api/auth/+server')>,
-        '/assets/': GET<typeof import('../../routes/api/assets/[asset]/+server')>,
+        '/assets/?': GET<typeof import('../../routes/api/assets/[asset]/+server')>,
         '/settings': GET<typeof import('../../routes/api/settings/+server')>,
     },
     'POST': {
@@ -44,15 +44,16 @@ interface ApiResponse {
     },
     'DELETE': {
         '/users': DELETE<typeof import('../../routes/api/users/+server')>,
-        '/labels/': DELETE<typeof import('../../routes/api/labels/[labelId]/+server')>,
-        '/events/': DELETE<typeof import('../../routes/api/events/[eventId]/+server')>,
-        '/entries/': DELETE<typeof import('../../routes/api/entries/[entryId]/+server')>,
+        '/labels/?': DELETE<typeof import('../../routes/api/labels/[labelId]/+server')>,
+        '/events/?': DELETE<typeof import('../../routes/api/events/[eventId]/+server')>,
+        '/entries/?': DELETE<typeof import('../../routes/api/entries/[entryId]/+server')>,
     },
     'PUT': {
-        '/labels/': PUT<typeof import('../../routes/api/labels/[labelId]/+server')>,
-        '/events/': PUT<typeof import('../../routes/api/events/[eventId]/+server')>,
-        '/entries/': PUT<typeof import('../../routes/api/entries/[entryId]/+server')>,
+        '/labels/?': PUT<typeof import('../../routes/api/labels/[labelId]/+server')>,
+        '/events/?': PUT<typeof import('../../routes/api/events/[eventId]/+server')>,
+        '/entries/?/label': PUT<typeof import('../../routes/api/entries/[entryId]/label/+server')>,
         '/settings': PUT<typeof import('../../routes/api/settings/+server')>,
+        '/entries/?': PUT<typeof import('../../routes/api/entries/[entryId]/+server')>,
     },
 }
 
@@ -148,12 +149,13 @@ export const api = {
     },
 };
 
-// TODO make this work with template strings maybe?
-// needed to match generic types of string literals with ids in them,
-// eg /labels/:id
+// eg '/labels/?', '1' ==> '/labels/1' but returns '/labels/?' as type
 export function apiPath<T extends string> (
     path: T,
-    param: string,
+    ...params: string[]
 ): T {
-    return path + param as T;
+    return path.replace(
+        /\?/g,
+        () => params.shift() || '',
+    ) as T;
 }

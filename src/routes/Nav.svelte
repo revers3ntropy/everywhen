@@ -13,35 +13,35 @@
     <div>
         <a
             aria-label="home"
-            class="{$page.url.pathname === '/home' ? 'current' : ''}"
+            class="icon {$page.url.pathname === '/home' ? 'current' : ''}"
             href="/home"
         >
             <Home size="40" />
         </a>
         <a
             aria-label="diary"
-            class="{$page.url.pathname === '/diary' ? 'current' : ''}"
+            class="icon {$page.url.pathname === '/diary' ? 'current' : ''}"
             href="/diary"
         >
             <Notebook size="40" />
         </a>
         <a
             aria-label="events"
-            class="{$page.url.pathname === '/events' ? 'current' : ''}"
+            class="icon {$page.url.pathname === '/events' ? 'current' : ''}"
             href="/events"
         >
             <Calendar size="40" />
         </a>
         <a
             aria-label="timeline"
-            class="{$page.url.pathname === '/timeline' ? 'current' : ''}"
+            class="icon {$page.url.pathname === '/timeline' ? 'current' : ''}"
             href="/timeline"
         >
             <ChartTimeline size="40" />
         </a>
         <a
             aria-label="statistics"
-            class="{$page.url.pathname === '/stats' ? 'current' : ''}"
+            class="icon {$page.url.pathname === '/stats' ? 'current' : ''}"
             href="/stats"
         >
             <Counter size="40" />

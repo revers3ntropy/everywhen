@@ -41,7 +41,7 @@
         },
     ) {
         displayNotifOnErr(addNotification,
-            await api.put(auth, apiPath('/events/', event.id), changes),
+            await api.put(auth, apiPath('/events/?', event.id), changes),
         );
         dispatch('update');
     }
@@ -81,7 +81,7 @@
         }
         changeEventCount(-1);
         displayNotifOnErr(addNotification,
-            await api.delete(auth, apiPath('/events/', event.id)),
+            await api.delete(auth, apiPath('/events/?', event.id)),
         );
         dispatch('delete', event);
     }

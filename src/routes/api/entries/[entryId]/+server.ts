@@ -1,6 +1,5 @@
 import { error } from '@sveltejs/kit';
 import { Entry } from '../../../../lib/controllers/entry';
-import { Label } from '../../../../lib/controllers/label';
 import { query } from '../../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../../lib/security/getAuthFromCookies';
 import { apiResponse } from '../../../../lib/utils/apiResponse';
@@ -26,37 +25,39 @@ export const DELETE = (async ({ request, params, cookies }) => {
 
 export const PUT = (async ({ request, params, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
-
-    if (!params.entryId) {
-        throw error(400, 'invalid id');
-    }
+    if (!params.entryId) throw error(400, 'invalid id');
 
     const body = await getUnwrappedReqBody(request, {
+        title: 'string',
+        entry: 'string',
         label: 'string',
+        latitude: 'number',
+        longitude: 'number',
     }, {
+        title: '',
+        entry: '',
         label: '',
+        latitude: null as unknown as number,
+        longitude: null as unknown as number,
     });
 
-    const { err: entryErr, val: entry } = await Entry.fromId(
-        query, auth,
-        params.entryId,
-    );
+    const {
+        err: entryErr,
+        val: entry,
+    } = await Entry.fromId(query, auth, params.entryId, true);
     if (entryErr) throw error(400, entryErr);
 
-    if (entry.label?.id === body.label || (!body.label && !entry.label)) {
-        throw error(400, 'Entry already has that label');
-    }
+    const { err } = await Entry.edit(
+        query, auth,
+        entry,
+        body.title,
+        body.entry,
+        body.latitude,
+        body.longitude,
+        body.label,
+    );
 
-    if (body.label) {
-        if (!await Label.userHasLabelWithId(query, auth, body.label)) {
-            throw error(404, 'Label not found');
-        }
-    }
+    if (err) throw error(400, err);
 
-    const updateRes = await Entry.updateLabel(query, auth, entry, body.label);
-    if (updateRes.err) {
-        throw error(400, updateRes.err);
-    }
-
-    return apiResponse({});
+    return apiResponse({ id: entry.id });
 }) satisfies RequestHandler;

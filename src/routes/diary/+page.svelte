@@ -1,6 +1,5 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import type { App } from '../../app';
     import Entries from '../../lib/components/Entries.svelte';
     import EntryForm from './EntryForm.svelte';
 

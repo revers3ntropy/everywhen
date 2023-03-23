@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
     import ChevronRight from 'svelte-material-icons/ChevronRight.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../app';
@@ -41,8 +40,6 @@
         );
         location.assign('/home');
     }
-
-    onMount(() => document.title = 'Home');
 </script>
 
 <main>
