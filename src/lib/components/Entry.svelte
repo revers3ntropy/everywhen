@@ -206,6 +206,37 @@
                 padding: 0;
                 border: none;
             }
+
+            :global(ul), :global(ol) {
+                margin: 0 .5em;
+                padding: 0;
+                border: none;
+
+                :global(li) {
+                    margin: 0;
+                    padding: 0;
+                    border: none;
+                }
+            }
+
+            :global(table) {
+                border-collapse: collapse;
+
+                :global(tr) {
+
+                    :global(td), :global(th) {
+                        border: 1px solid @border;
+
+                        margin: 0;
+                        padding: 0.3rem;
+                        text-align: center;
+                    }
+
+                    :global(th) {
+                        font-size: 1.2rem;
+                    }
+                }
+            }
         }
     }
 </style>
