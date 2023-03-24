@@ -1,7 +1,6 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { getNotificationsContext } from 'svelte-notifications';
-    import type { App } from '../../../app';
     import { api, apiPath } from '../../../lib/api/apiQuery';
     import Entries from '../../../lib/components/Entries.svelte';
     import type { Label } from '../../../lib/controllers/label';

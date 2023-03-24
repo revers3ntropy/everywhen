@@ -1,4 +1,6 @@
 <script lang="ts">
+    // @ts-ignore
+    import { tooltip } from '@svelte-plugins/tooltips';
     import moment from 'moment';
     import CloudCheckOutline from 'svelte-material-icons/CloudCheckOutline.svelte';
     import Sync from 'svelte-material-icons/Sync.svelte';
@@ -83,7 +85,12 @@
         </div>
 
         {#if created}
-            <p class="last-updated">
+            <p
+                class="last-updated"
+                use:tooltip={{
+                    content: moment(new Date(created * 1000)).format('DD/MM/YYYY h:mm A')
+                }}
+            >
                 Last updated
                 {moment.duration(nowS() - created, 's')
                     .humanize()}
@@ -107,7 +114,7 @@
             value={value}
         />
         <br>
-        <i>{description}</i>
+        {description}
     </label>
 </div>
 

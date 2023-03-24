@@ -155,8 +155,7 @@
 
         &.visible {
             border-image: linear-gradient(transparent,
-            @accent-color-primary,
-            transparent) 1 100%;
+            @accent-color-secondary, transparent) 1 100%;
         }
 
         @media @mobile {
@@ -236,6 +235,12 @@
                         font-size: 1.2rem;
                     }
                 }
+            }
+
+            :global(blockquote) {
+                border-left: 3px solid @accent-color-secondary;
+                margin: 0 0 0 .5em;
+                padding: 0 0 0 1em;
             }
         }
     }
