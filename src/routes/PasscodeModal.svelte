@@ -25,6 +25,7 @@
         {#if loaded}
             <div class="content">
                 <h1>Please enter your passcode</h1>
+                <!-- svelte-ignore a11y-autofocus -->
                 <input
                     type="text"
                     bind:value={input}
