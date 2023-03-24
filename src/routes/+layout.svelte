@@ -2,18 +2,20 @@
     import { browser } from '$app/environment';
     import { page } from '$app/stores';
     import { parse } from 'cookie';
+    import { onMount } from 'svelte';
     import Notifications from 'svelte-notifications';
     import Modal from 'svelte-simple-modal';
     import 'ts-polyfill';
     import '../app.less';
     import { USERNAME_COOKIE_KEY } from '../lib/constants';
-    import { obfuscated, popup } from '../lib/stores';
+    import { obfuscated, passcodeLastEntered, popup } from '../lib/stores';
     import { INFO_NOTIFICATION } from '../lib/utils/notifications';
     import { nowS } from '../lib/utils/time';
     import type { NotificationOptions } from '../lib/utils/types';
     import Footer from './Footer.svelte';
     import Nav from './Nav.svelte';
     import Notifier from './Notifier.svelte';
+    import PasscodeModal from './PasscodeModal.svelte';
 
     $: home = $page.url.pathname.trim() === '/';
 
@@ -25,6 +27,8 @@
     let isObfuscated: boolean;
     $: isObfuscated = data.settings.hideEntriesByDefault.value;
     $: obfuscated.update(() => isObfuscated);
+
+    let showPasscodeModal = true;
 
     function checkObfuscatedTimeout () {
         if (isObfuscated) return;
@@ -43,9 +47,6 @@
     }
 
     function checkCookies () {
-        if (!browser) return;
-        if (window.location.pathname === '/') return;
-
         const cookies = parse(document.cookie);
 
         // the key cookie is HttpOnly, so we can't read it from JS
@@ -56,12 +57,22 @@
         }
     }
 
-    setInterval(() => {
-        if (home) return;
+    function checkPasscode () {
+        const secondsSinceLastEntered = nowS() - $passcodeLastEntered;
 
-        checkObfuscatedTimeout();
-        checkCookies();
-    }, 1000);
+        showPasscodeModal = secondsSinceLastEntered > data.settings.passcodeTimeout.value;
+    }
+
+    onMount(() => {
+        setInterval(() => {
+            if (home) return;
+
+            checkObfuscatedTimeout();
+            checkCookies();
+            checkPasscode();
+        }, 1000);
+    });
+
 
     function activity () {
         lastActivity = nowS();
@@ -105,6 +116,20 @@
         classWindow="popup-background"
         show={$popup}
     />
+
+    {#if data.settings.passcode.value
+    && nowS() - $passcodeLastEntered > data.settings.passcodeTimeout.value
+    && showPasscodeModal
+    && !home
+    && (data.settings.passcodeTimeout.value > 0
+        || !$passcodeLastEntered
+        || !browser)
+    }
+        <PasscodeModal
+            bind:show={showPasscodeModal}
+            passcode={data.settings.passcode.value}
+        />
+    {/if}
 
     <Footer />
 </Notifications>

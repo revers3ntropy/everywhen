@@ -5,6 +5,8 @@ import type { EventsSortKey } from './utils/types';
 
 export const enabledLocation = localStorageWritable(
     '__misc_3_enabled_location', false);
+export const passcodeLastEntered = localStorageWritable(
+    '__misc_3_passcode_last_entered', 0);
 export const eventsSortKey = localStorageWritable<EventsSortKey>(
     '__misc_3_events_sort_key', 'created',
 );

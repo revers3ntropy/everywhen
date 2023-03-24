@@ -1,8 +1,8 @@
 import { matches } from 'schemion';
-import { api } from '../../api/apiQuery';
 import type { Event } from '../../controllers/event';
 import type { Label } from '../../controllers/label';
 import type { Auth } from '../../controllers/user';
+import { api } from '../../utils/apiRequest';
 import { nowS } from '../../utils/time';
 import type { Mutable, NotificationOptions } from '../../utils/types';
 

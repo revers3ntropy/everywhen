@@ -2,7 +2,7 @@
     import { createEventDispatcher } from 'svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../../app';
-    import { api } from '../api/apiQuery';
+    import { api } from '../utils/apiRequest';
     import { displayNotifOnErr, ERR_NOTIFICATION, SUCCESS_NOTIFICATION } from '../utils/notifications';
 
     const dispatch = createEventDispatcher();

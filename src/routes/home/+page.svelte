@@ -13,9 +13,9 @@
     import Upload from 'svelte-material-icons/Upload.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../../app';
-    import { api } from '../../lib/api/apiQuery';
     import FileDropDialog from '../../lib/components/dialogs/FileDropDialog.svelte';
     import { encryptionKeyFromPassword } from '../../lib/security/authUtils';
+    import { api } from '../../lib/utils/apiRequest';
     import { download as downloadFile } from '../../lib/utils/files';
     import { displayNotifOnErr } from '../../lib/utils/notifications';
     import { showPopup } from '../../lib/utils/popups';

@@ -43,6 +43,19 @@ export class Settings<T = unknown> {
             name: 'Entries per Page',
             description: `Number of entries displayed per page.`,
         } satisfies ISettingsConfig<Seconds>,
+        passcode: {
+            type: 'string',
+            defaultValue: '',
+            name: 'Passcode',
+            description: `Passcode to access the app. Set to 0 to disable.`,
+        } satisfies ISettingsConfig<string>,
+        passcodeTimeout: {
+            type: 'number',
+            defaultValue: 0,
+            name: 'Passcode Timeout',
+            description: `Delay before passcode is required again. `
+                + `Set to 0 to only require once.`,
+        } satisfies ISettingsConfig<Seconds>,
     } satisfies Record<string, ISettingsConfig<unknown>>;
 
     constructor (

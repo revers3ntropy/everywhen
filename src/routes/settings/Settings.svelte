@@ -5,8 +5,8 @@
     import CloudCheckOutline from 'svelte-material-icons/CloudCheckOutline.svelte';
     import Sync from 'svelte-material-icons/Sync.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
-    import { api } from '../../lib/api/apiQuery';
     import type { Auth } from '../../lib/controllers/user';
+    import { api } from '../../lib/utils/apiRequest';
     import { displayNotifOnErr } from '../../lib/utils/notifications.js';
     import { nowS } from '../../lib/utils/time.js';
 
@@ -100,7 +100,7 @@
         {#if value !== defaultValue}
             <p class="restore">
                 <button on:click={() => updateValue(defaultValue)}>
-                    Restore default ({defaultValue})
+                    Restore default ({JSON.stringify(defaultValue)})
                 </button>
             </p>
         {/if}

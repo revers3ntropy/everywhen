@@ -3,8 +3,8 @@
     import Plus from 'svelte-material-icons/Plus.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../../app';
-    import { api } from '../../lib/api/apiQuery';
     import type { Label as LabelController } from '../../lib/controllers/label';
+    import { api } from '../../lib/utils/apiRequest';
     import { displayNotifOnErr } from '../../lib/utils/notifications';
     import { nowS } from '../../lib/utils/time';
     import Label from './Label.svelte';

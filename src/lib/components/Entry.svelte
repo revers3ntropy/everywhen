@@ -12,10 +12,10 @@
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import NoteEditOutline from 'svelte-material-icons/NoteEditOutline.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
-    import { api, apiPath } from '../api/apiQuery';
     import type { Entry } from '../controllers/entry';
     import type { Label as LabelController } from '../controllers/label';
     import type { Auth } from '../controllers/user';
+    import { api, apiPath } from '../utils/apiRequest';
     import { displayNotifOnErr, SUCCESS_NOTIFICATION } from '../utils/notifications';
     import { obfuscate } from '../utils/text';
     import Label from './Label.svelte';

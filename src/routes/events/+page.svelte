@@ -4,12 +4,12 @@
     import TrayArrowUp from 'svelte-material-icons/TrayArrowUp.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../../app';
-    import { api } from '../../lib/api/apiQuery';
     import ImportDialog from '../../lib/components/dialogs/ImportDialog.svelte';
     import Select from '../../lib/components/Select.svelte';
     import type { Event as EventController } from '../../lib/controllers/event';
     import type { Label } from '../../lib/controllers/label';
     import { eventsSortKey } from '../../lib/stores';
+    import { api } from '../../lib/utils/apiRequest';
     import { displayNotifOnErr } from '../../lib/utils/notifications';
     import { showPopup } from '../../lib/utils/popups';
     import { nowS } from '../../lib/utils/time';

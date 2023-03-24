@@ -3,9 +3,9 @@
     import Plus from 'svelte-material-icons/Plus.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import Dropdown from '../../lib/components/Dropdown.svelte';
-    import { api } from '../api/apiQuery';
     import type { Label } from '../controllers/label';
     import type { Auth } from '../controllers/user';
+    import { api } from '../utils/apiRequest';
     import { displayNotifOnErr } from '../utils/notifications';
     import { showPopup } from '../utils/popups';
     import NewLabelDialog from './dialogs/NewLabelDialog.svelte';

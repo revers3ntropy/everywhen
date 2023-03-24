@@ -1,9 +1,9 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { getNotificationsContext } from 'svelte-notifications';
-    import { api, apiPath } from '../../../lib/api/apiQuery';
     import Entries from '../../../lib/components/Entries.svelte';
     import type { Label } from '../../../lib/controllers/label';
+    import { api, apiPath } from '../../../lib/utils/apiRequest';
     import { displayNotifOnErr } from '../../../lib/utils/notifications';
 
     const { addNotification } = getNotificationsContext();

@@ -15,6 +15,7 @@
 </svelte:head>
 
 <main>
+    <i>Please note you will have to reload the page for changes to take effect</i>
     <h1>Settings</h1>
     {#each Object.entries(SettingsController.config) as [key, config] (key)}
         <Settings

@@ -9,9 +9,9 @@ import {
     USERNAME_COOKIE_OPTIONS,
 } from '../constants';
 import type { Auth } from '../controllers/user';
-import type { GenericResponse } from '../utils/apiResponse';
-import { GETArgs } from '../utils/GETArgs';
-import { Result } from '../utils/result';
+import type { GenericResponse } from './apiResponse';
+import { GETArgs } from './GETArgs';
+import { Result } from './result';
 
 export type ResType<T> = T extends (props: any) =>
     Promise<GenericResponse<infer R>> ? R : never;
