@@ -21,6 +21,7 @@
     <Entries
         auth={data}
         bind:reload={reloadEntries}
+        pageSize={data.settings.entriesPerPage.value}
         showBin={true}
         showImport={true}
         showLabels={true}

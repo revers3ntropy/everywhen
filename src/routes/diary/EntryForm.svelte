@@ -22,9 +22,9 @@
     let mounted = false;
 
     export let action: 'create' | 'edit' = 'create';
-    export let eventId = '';
+    export let entryId = '';
 
-    if (eventId && action !== 'edit') {
+    if (entryId && action !== 'edit') {
         throw new Error('eventID can only be set when action is edit');
     }
 
@@ -79,7 +79,7 @@
                 break;
             case 'edit':
                 res = displayNotifOnErr(addNotification,
-                    await api.put(auth, apiPath('/entries/?', eventId), body),
+                    await api.put(auth, apiPath('/entries/?', entryId), body),
                 );
                 break;
             default:
@@ -98,6 +98,10 @@
         }
 
         dispatch('updated');
+
+        if (entryId) {
+            location.assign(`/diary/${entryId}`);
+        }
     }
 
     const fileOptions: FileDropOptions = {

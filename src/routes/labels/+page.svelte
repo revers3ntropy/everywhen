@@ -1,11 +1,12 @@
 <script lang="ts">
     import { onMount } from 'svelte';
+    import Plus from 'svelte-material-icons/Plus.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../../app';
     import { api } from '../../lib/api/apiQuery';
-    import NewLabelForm from '../../lib/components/NewLabelForm.svelte';
     import type { Label as LabelController } from '../../lib/controllers/label';
     import { displayNotifOnErr } from '../../lib/utils/notifications';
+    import { nowS } from '../../lib/utils/time';
     import Label from './Label.svelte';
 
     const { addNotification } = getNotificationsContext();
@@ -22,6 +23,28 @@
         labels = res.labels;
     }
 
+    async function newLabel () {
+        let name = 'New Label';
+        let i = 0;
+        while (labels.some(l => l.name === name)) {
+            name = `New Label ${++i}`;
+        }
+
+        const newLabel = {
+            name,
+            colour: '#000',
+        };
+        const { id } = displayNotifOnErr(addNotification,
+            await api.post(data, '/labels', newLabel),
+        );
+
+        labels = [ ...labels, {
+            ...newLabel,
+            id,
+            created: nowS(),
+        } ];
+    }
+
     onMount(reload);
 
     onMount(() => document.title = 'Labels');
@@ -34,8 +57,8 @@
 </svelte:head>
 
 <main>
+    <h1>Labels ({labels.length})</h1>
     <div class="labels">
-        <NewLabelForm auth={data} on:submit={reload} />
         <div class="label-list">
             {#each labels as label}
                 <Label
@@ -48,6 +71,13 @@
             {#if labels.length === 0}
                 <i class="flex-center text-light">No labels yet</i>
             {/if}
+
+            <div class="flex-center">
+                <button class="primary" on:click={newLabel}>
+                    <Plus size="30" />
+                    Add Label
+                </button>
+            </div>
         </div>
     </div>
 </main>
@@ -57,11 +87,10 @@
 
     .labels {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-gap: 1rem;
+        place-content: center;
 
-        @media @mobile {
-            grid-template-columns: 1fr;
+        & > * {
+            max-width: 50rem;
         }
     }
 </style>

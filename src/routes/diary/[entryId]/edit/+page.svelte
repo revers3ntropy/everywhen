@@ -30,7 +30,7 @@
     <EntryForm
         action="edit"
         auth={data}
-        eventId={data.entry.id}
+        entryId={data.entry.id}
         loadFromLS={false}
         newEntryBody={data.entry.entry}
         newEntryLabel={data.entry?.label?.id || ''}

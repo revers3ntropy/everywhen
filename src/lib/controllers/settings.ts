@@ -37,6 +37,12 @@ export class Settings<T = unknown> {
             description: `Blur entries after 'N' seconds without user interaction. ` +
                 `Set to 0 to disable.`,
         } satisfies ISettingsConfig<Seconds>,
+        entriesPerPage: {
+            type: 'number',
+            defaultValue: 100,
+            name: 'Entries per Page',
+            description: `Number of entries displayed per page.`,
+        } satisfies ISettingsConfig<Seconds>,
     } satisfies Record<string, ISettingsConfig<unknown>>;
 
     constructor (

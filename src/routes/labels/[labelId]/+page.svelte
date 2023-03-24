@@ -62,6 +62,7 @@
         auth={data}
         options={{ labelId: data.label.id }}
         showLabels={false}
+        pageSize={data.settings.entriesPerPage.value}
     />
 </main>
 

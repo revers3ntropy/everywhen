@@ -19,7 +19,7 @@
     export let editable = true;
     export let created: number;
 
-    async function put (
+    async function updateLabel (
         changes: {
             name?: string;
             colour?: string;
@@ -63,13 +63,13 @@
         <input
             type="color"
             bind:value={colour}
-            on:change={() => put({ colour })}
+            on:change={() => updateLabel({ colour })}
         />
         <input
             bind:value={name}
             class="editable-text"
             autocomplete="none"
-            on:change={() => put({ name })}
+            on:change={() => updateLabel({ name })}
         >
     {:else}
         <div class="entry-label-colour"
@@ -81,7 +81,7 @@
         {numEntries} {numEntries === 1 ? 'entry' : 'entries'}
     </a>
     <div>
-        <button on:click={deleteLabel}>
+        <button on:click={deleteLabel} class="icon-button">
             <Delete size="25" />
         </button>
     </div>

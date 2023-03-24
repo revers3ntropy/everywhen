@@ -15,6 +15,7 @@
 </svelte:head>
 
 <main>
+    <h1>Settings</h1>
     {#each Object.entries(SettingsController.config) as [key, config] (key)}
         <Settings
             {...config}
@@ -28,5 +29,9 @@
 <style lang="less">
     hr {
         margin: 1.5rem;
+
+        &:last-child {
+            display: none;
+        }
     }
 </style>

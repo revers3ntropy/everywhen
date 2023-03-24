@@ -22,7 +22,7 @@
 <main>
     {#if data.entry.deleted}
         <i>This entry has been deleted. </i>
-    {:else}
+    {:else if data.history}
         <i>Current Version</i>
     {/if}
     <Entry

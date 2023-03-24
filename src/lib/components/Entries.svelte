@@ -28,8 +28,7 @@
     export let showImport = false;
     export let showSearch = true;
     export let showLabels = true;
-
-    const PAGE_LENGTH = 100;
+    export let pageSize: number;
 
     interface IOptions {
         pageSize?: number;
@@ -62,7 +61,7 @@
         const entriesOptions: IOptions = {
             page,
             ...options,
-            pageSize: PAGE_LENGTH,
+            pageSize,
         };
         if (search) {
             entriesOptions.search = search;
@@ -115,7 +114,7 @@
             <div>
                 <PageCounter
                     bind:page
-                    pageLength={PAGE_LENGTH}
+                    pageLength={pageSize}
                     {pages}
                     total={entryCount}
                 />
