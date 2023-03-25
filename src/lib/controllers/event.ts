@@ -317,6 +317,49 @@ export class Event {
         return Result.ok(null);
     }
 
+    public static async withLabel (
+        query: QueryFunc,
+        auth: Auth,
+        labelId: string,
+    ): Promise<Result<Event[]>> {
+        const { err } = await Label.fromId(query, auth, labelId);
+        if (err) return Result.err(err);
+
+        const { val: events, err: allErr } = await Event.all(query, auth);
+        if (allErr) return Result.err(allErr);
+
+        return Result.ok(events.filter(evt => evt.label?.id === labelId));
+    }
+
+    public static async reassignAllLabels (
+        query: QueryFunc,
+        auth: Auth,
+        oldLabel: string,
+        newLabel: string,
+    ): Promise<Result> {
+        await query`
+            UPDATE events
+            SET label = ${newLabel}
+            WHERE label = ${oldLabel}
+              AND user = ${auth.id}
+        `;
+        return Result.ok(null);
+    }
+
+    public static async removeAllLabel (
+        query: QueryFunc,
+        auth: Auth,
+        labelId: string,
+    ): Promise<Result> {
+        await query`
+            UPDATE events
+            SET label = NULL
+            WHERE label = ${labelId}
+              AND user = ${auth.id}
+        `;
+        return Result.ok(null);
+    }
+
     private static async addLabel (
         query: QueryFunc,
         auth: Auth,

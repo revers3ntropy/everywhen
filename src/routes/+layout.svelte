@@ -104,7 +104,7 @@
     <Notifier bind:addNotification />
 
     {#if !home}
-        <Nav />
+        <Nav auth={data} />
     {/if}
 
     <div style="min-height: calc(100vh - var(--nav-height))">

@@ -1,8 +1,10 @@
 <script lang="ts">
+    import BookSpinner from '$lib/components/BookSpinner.svelte';
     import { onMount } from 'svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import LabelSelect from '../../lib/components/LabelSelect.svelte';
     import type { Entry } from '../../lib/controllers/entry';
+    import type { Event } from '../../lib/controllers/event';
     import type { Auth } from '../../lib/controllers/user';
     import { popup } from '../../lib/stores';
     import { api, apiPath } from '../../lib/utils/apiRequest';
@@ -16,57 +18,46 @@
     export let name: string;
 
     let entries: Entry[] = [];
+    let events: Event[] = [];
 
-    async function reloadEntries (auth: Auth, id: string) {
-        const data = await api
-            .get(auth, `/entries`, { labelId: id })
-            .then((res) => (
-                displayNotifOnErr(addNotification, res)
-            ));
-        entries = data.entries;
+    let loaded = false;
+
+    async function reloadEntries () {
+
+        loaded = false;
+        const entriesRes = displayNotifOnErr(addNotification,
+            await api.get(auth, `/entries`, { labelId: id }),
+        );
+        entries = entriesRes.entries;
+        const eventsRes = displayNotifOnErr(addNotification,
+            await api.get(auth, `/events`, { labelId: id }),
+        );
+        events = eventsRes.events
+                          .filter(e => e.label?.id === id);
+        loaded = true;
     }
 
-    onMount(() => reloadEntries(auth, id));
+    onMount(reloadEntries);
+
     let changeLabelId: string;
 
-    async function delAndDelEntries () {
-        await Promise.all(entries.map(async entry => {
-            displayNotifOnErr(addNotification,
-                await api.delete(auth, apiPath('/entries/?', entry.id)),
-            );
-        }));
+    async function rmLabel () {
         displayNotifOnErr(addNotification,
-            await api.delete(auth, apiPath('/labels/?', id)),
+            await api.delete(auth, apiPath(`/labels/?`, id), {
+                strategy: 'remove',
+            }),
         );
-        popup.set(null);
+        location.reload();
     }
 
-    async function delAndRmLabel () {
-        await Promise.all(entries.map(async entry => {
-            displayNotifOnErr(addNotification,
-                await api.put(auth, apiPath(`/entries/?/label`, entry.id), {
-                    label: null,
-                }),
-            );
-        }));
+    async function reassign () {
         displayNotifOnErr(addNotification,
-            await api.delete(auth, apiPath(`/labels/?`, id)),
+            await api.delete(auth, apiPath(`/labels/?`, id), {
+                strategy: 'reassign',
+                newLabelId: changeLabelId,
+            }),
         );
-        popup.set(null);
-    }
-
-    async function delAndReassign () {
-        await Promise.all(entries.map(async entry => {
-            displayNotifOnErr(addNotification,
-                await api.put(auth, apiPath('/entries/?/label', entry.id), {
-                    label: changeLabelId,
-                }),
-            );
-        }));
-        displayNotifOnErr(addNotification,
-            await api.delete(auth, apiPath('/labels/?', id)),
-        );
-        popup.set(null);
+        location.reload();
     }
 
     function cancel () {
@@ -76,35 +67,39 @@
 
 <div>
     <h1>Delete Label '{name}'</h1>
-    <p>There are {entries.length} entries with this label.</p>
+    <p>There are {entries.length} entries and {events.length} events with this label.</p>
 
-    <div class="options">
-        <div>
-            <button on:click={delAndRmLabel}>
-                Remove Label from Entries with this Label
-            </button>
+
+    {#if !loaded}
+        <BookSpinner />
+    {:else}
+        <div class="options">
+            <div>
+                <LabelSelect
+                    {auth}
+                    bind:value={changeLabelId}
+                    filter={label => label.id !== id}
+                />
+                <button on:click={reassign}>
+                    Give Different Label to Entries/Events with this Label
+                </button>
+            </div>
+
+            <h2>OR</h2>
+
+            <div>
+                <button on:click={rmLabel}>
+                    Delete Label and Remove from Entries/Events
+                </button>
+            </div>
+
+            <div class="cancel">
+                <button on:click|self={cancel}>
+                    Cancel
+                </button>
+            </div>
         </div>
-        <div>
-            <button on:click={delAndDelEntries}>
-                Delete Entries with this Label
-            </button>
-        </div>
-        <div>
-            <button on:click={delAndReassign}>
-                Give Different Label to Entries with this Label
-            </button>
-            <LabelSelect
-                {auth}
-                bind:value={changeLabelId}
-                filter={(label) => label.id !== id}
-            />
-        </div>
-        <div class="cancel">
-            <button on:click|self={cancel}>
-                Cancel
-            </button>
-        </div>
-    </div>
+    {/if}
 </div>
 
 <style lang="less">
@@ -125,15 +120,25 @@
             padding: 0.6em;
             margin: 0.5em;
 
-            &:hover {
-                background: @accent-color-danger;
+            button {
+                border-radius: 10px;
+                margin: .5rem;
+                padding: .3rem;
+
+                &:hover {
+                    background: @accent-color-danger;
+                }
             }
 
             &.cancel {
                 border: none;
 
-                &:hover {
-                    background: @accent-color-primary;
+                button {
+                    padding: .5rem;
+
+                    &:hover {
+                        background: @light-accent;
+                    }
                 }
             }
         }

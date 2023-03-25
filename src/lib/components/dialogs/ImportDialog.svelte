@@ -65,7 +65,7 @@
 
 {#if labels?.length}
     <FileDrop
-        message="Import Entries from .json file"
+        message="Import {type} from .json file"
         {withContents}
     />
 {:else}

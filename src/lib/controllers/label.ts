@@ -6,6 +6,11 @@ import { nowS } from '../utils/time';
 import type { PickOptional } from '../utils/types';
 import type { Auth } from './user';
 
+export type LabelWithCount = Label & {
+    entryCount: number,
+    eventCount: number,
+};
+
 export class Label {
     private constructor (
         public id: string,
@@ -240,5 +245,42 @@ export class Label {
         label.colour = colour;
 
         return Result.ok(label);
+    }
+
+    public static async allWithCounts (
+        query: QueryFunc,
+        auth: Auth,
+    ): Promise<Result<LabelWithCount[]>> {
+        const { err, val: all } = await Label.all(query, auth);
+        if (err) return Result.err(err);
+
+        return Result.ok(await Promise.all(all.map(async label => {
+            const entryCount = await query<{ count: number }[]>`
+                SELECT COUNT(*) as count
+                FROM entries
+                WHERE user = ${auth.id}
+                  AND label = ${label.id}
+            `;
+            const eventCount = await query<{ count: number }[]>`
+                SELECT COUNT(*) as count
+                FROM events
+                WHERE user = ${auth.id}
+                  AND label = ${label.id}
+            `;
+            const editCount = await query<{ count: number }[]>`
+                SELECT COUNT(*) as count
+                FROM entryEdits,
+                     entries
+                WHERE entryEdits.entry = entries.id
+                  AND entries.user = ${auth.id}
+                  AND entryEdits.label = ${label.id}
+            `;
+
+            return {
+                ...label,
+                entryCount: entryCount[0].count + editCount[0].count,
+                eventCount: eventCount[0].count,
+            };
+        })));
     }
 }

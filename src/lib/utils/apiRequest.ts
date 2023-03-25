@@ -51,7 +51,6 @@ interface ApiResponse {
     'PUT': {
         '/labels/?': PUT<typeof import('../../routes/api/labels/[labelId]/+server')>,
         '/events/?': PUT<typeof import('../../routes/api/events/[eventId]/+server')>,
-        '/entries/?/label': PUT<typeof import('../../routes/api/entries/[entryId]/label/+server')>,
         '/settings': PUT<typeof import('../../routes/api/settings/+server')>,
         '/entries/?': PUT<typeof import('../../routes/api/entries/[entryId]/+server')>,
     },

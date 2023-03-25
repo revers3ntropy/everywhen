@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { createEventDispatcher, onMount } from 'svelte';
+    import { createEventDispatcher } from 'svelte';
     import Delete from 'svelte-material-icons/Delete.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import type { Auth } from '../../lib/controllers/user';
@@ -18,6 +18,10 @@
     export let id: string;
     export let editable = true;
     export let created: number;
+    export let entryCount: number;
+    export let eventCount: number;
+
+    let deleted = false;
 
     async function updateLabel (
         changes: {
@@ -28,15 +32,19 @@
         displayNotifOnErr(addNotification,
             await api.put(auth, apiPath(`/labels/?`, id), changes),
         );
-        dispatch('updated');
     }
 
     async function deleteLabel () {
-        if (numEntries === 0) {
+
+        // if there are no entries or events tied to this
+        // label, deleting it easy, but if there are then
+        // a more complex approach is required to clear the
+        // label from the entries and events
+        if (entryCount + eventCount < 1) {
             displayNotifOnErr(addNotification,
                 await api.delete(auth, apiPath(`/labels/?`, id)),
             );
-            dispatch('updated');
+            dispatch('delete', { id });
             return;
         }
 
@@ -45,47 +53,42 @@
             id,
             colour,
             name,
-        }, () => {
-            dispatch('updated');
         });
     }
-
-    let numEntries = -1;
-
-    onMount(async () => {
-        const entries = await api.get(auth, `/entries`, { labelId: id })
-                                 .then(res => displayNotifOnErr(addNotification, res));
-        numEntries = entries.entries.length;
-    });
 </script>
-<div class="label {editable ? 'editable' : ''}">
-    {#if editable}
-        <input
-            type="color"
-            bind:value={colour}
-            on:change={() => updateLabel({ colour })}
-        />
-        <input
-            bind:value={name}
-            class="editable-text"
-            autocomplete="none"
-            on:change={() => updateLabel({ name })}
-        >
-    {:else}
-        <div class="entry-label-colour"
-              style="background: {colour}"
-        ></div>
-        <div>{name}</div>
-    {/if}
-    <a class="text-light" href="/labels/{id}">
-        {numEntries} {numEntries === 1 ? 'entry' : 'entries'}
-    </a>
-    <div>
-        <button on:click={deleteLabel} class="icon-button">
-            <Delete size="25" />
-        </button>
+{#if !deleted}
+    <div class="label {editable ? 'editable' : ''}">
+        {#if editable}
+            <input
+                type="color"
+                bind:value={colour}
+                on:change={() => updateLabel({ colour })}
+            />
+            <input
+                bind:value={name}
+                class="editable-text"
+                autocomplete="none"
+                on:change={() => updateLabel({ name })}
+            >
+        {:else}
+            <div class="entry-label-colour"
+                 style="background: {colour}"
+            ></div>
+            <div>{name}</div>
+        {/if}
+        <a class="text-light" href="/labels/{id}">
+            {entryCount} {entryCount === 1 ? 'entry' : 'entries'}
+            {#if eventCount > 0}
+                , {eventCount} {eventCount === 1 ? 'event' : 'events'}
+            {/if}
+        </a>
+        <div>
+            <button on:click={deleteLabel} class="icon-button">
+                <Delete size="30" />
+            </button>
+        </div>
     </div>
-</div>
+{/if}
 
 <style lang="less">
     .label {

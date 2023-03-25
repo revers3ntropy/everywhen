@@ -205,8 +205,8 @@
                 color: @accent-color-secondary;
                 text-decoration: none;
 
-                svg, svg * {
-                    color: @accent-color-primary !important;
+                :global(svg), :global(svg *) {
+                    color: @accent-color-secondary !important;
                 }
             }
 

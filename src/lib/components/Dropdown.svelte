@@ -1,9 +1,11 @@
 <script lang="ts">
+    import cn from 'classnames';
     import MenuDown from 'svelte-material-icons/MenuDown.svelte';
 
     export let open = false;
     export let rounded = false;
     export let ariaLabel = '';
+    export let unstyledButton = false;
 
     export let close = () => {
         open = false;
@@ -19,10 +21,12 @@
 
 <svelte:window on:mousedown={globalMouseDown} />
 
-<div class="dropdown {open ? 'open' : ''} {rounded ? 'rounded' : ''}">
+<div class={cn({
+    dropdown: true, open, rounded, unstyledButton
+})}>
     <button aria-label={ariaLabel || 'Open popup'} on:click={() => open = !open}>
         <slot name="button"></slot>
-        <MenuDown size="30" />
+        <MenuDown class="menu-down" size="30" />
     </button>
     {#if open}
         <div class="popup">
@@ -36,6 +40,21 @@
 <style lang="less">
     @import '../../styles/variables.less';
     @import '../../styles/layout.less';
+
+    .unstyledButton {
+        button {
+            padding: 0;
+            border-radius: 0;
+            border: none;
+            grid-template-columns: 1fr;
+
+            :global(.menu-down) {
+                display: none;
+            }
+        }
+
+        border: none !important;
+    }
 
     button {
         background: none;
@@ -52,6 +71,7 @@
 
         border-radius: 10px;
     }
+
 
     div {
         position: relative;

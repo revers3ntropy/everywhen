@@ -11,22 +11,17 @@
 
     const { addNotification } = getNotificationsContext();
 
-    export let data: App.PageData;
-
-    let labels: LabelController[] = [];
-
-    async function reload () {
-        const res = displayNotifOnErr(addNotification,
-            await api.get(data, '/labels'),
-        );
-
-        labels = res.labels;
-    }
+    export let data: App.PageData & {
+        labels: (LabelController & {
+            entryCount: number;
+            eventCount: number;
+        })[];
+    };
 
     async function newLabel () {
         let name = 'New Label';
         let i = 0;
-        while (labels.some(l => l.name === name)) {
+        while (data.labels.some(l => l.name === name)) {
             name = `New Label ${++i}`;
         }
 
@@ -38,14 +33,24 @@
             await api.post(data, '/labels', newLabel),
         );
 
-        labels = [ ...labels, {
-            ...newLabel,
-            id,
-            created: nowS(),
-        } ];
+        data = {
+            ...data,
+            labels: [ ...data.labels, {
+                ...newLabel,
+                id,
+                created: nowS(),
+                entryCount: 0,
+                eventCount: 0,
+            } ],
+        };
     }
 
-    onMount(reload);
+    function labelDeleted (id: string) {
+        data = {
+            ...data,
+            labels: data.labels.filter(l => l.id !== id),
+        };
+    }
 
     onMount(() => document.title = 'Labels');
 
@@ -57,18 +62,18 @@
 </svelte:head>
 
 <main>
-    <h1>Labels ({labels.length})</h1>
+    <h1>Labels ({data.labels.length})</h1>
     <div class="labels">
         <div class="label-list">
-            {#each labels as label}
+            {#each data.labels as label}
                 <Label
                     {...label}
                     auth={data}
-                    on:updated={reload}
+                    on:delete={({ detail }) => labelDeleted(detail.id)}
                 />
             {/each}
 
-            {#if labels.length === 0}
+            {#if data.labels.length === 0}
                 <i class="flex-center text-light">No labels yet</i>
             {/if}
 

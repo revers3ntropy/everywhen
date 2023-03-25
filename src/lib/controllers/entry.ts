@@ -565,6 +565,56 @@ export class Entry {
         return Result.ok(entries);
     }
 
+    public static async reassignAllLabels (
+        query: QueryFunc,
+        auth: Auth,
+        oldLabel: string,
+        newLabel: string,
+    ): Promise<Result> {
+
+        await query`
+            UPDATE entryEdits
+            SET label = ${newLabel}
+            WHERE entryId IN (SELECT id
+                              FROM entries
+                              WHERE user = ${auth.id})
+              AND label = ${oldLabel}
+        `;
+
+        await query`
+            UPDATE entries
+            SET label = ${newLabel}
+            WHERE user = ${auth.id}
+              AND label = ${oldLabel}
+        `;
+
+        return Result.ok(null);
+    }
+
+    public static async removeAllLabel (
+        query: QueryFunc,
+        auth: Auth,
+        labelId: string,
+    ): Promise<Result> {
+        await query`
+            UPDATE entryEdits
+            SET label = ${null}
+            WHERE entryId IN (SELECT id
+                              FROM entries
+                              WHERE user = ${auth.id})
+              AND label = ${labelId}
+        `;
+
+        await query`
+            UPDATE entries
+            SET label = ${null}
+            WHERE user = ${auth.id}
+              AND label = ${labelId}
+        `;
+
+        return Result.ok(null);
+    }
+
     private static async addLabel (
         query: QueryFunc,
         auth: Auth,
