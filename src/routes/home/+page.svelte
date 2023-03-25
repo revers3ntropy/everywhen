@@ -14,21 +14,24 @@
     import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../../app';
     import FileDropDialog from '../../lib/components/dialogs/FileDropDialog.svelte';
+    import EntryTitles from '../../lib/components/EntryTitles.svelte';
+    import type { Entry } from '../../lib/controllers/entry';
     import { encryptionKeyFromPassword } from '../../lib/security/authUtils';
     import { api } from '../../lib/utils/apiRequest';
     import { download as downloadFile } from '../../lib/utils/files';
-    import { displayNotifOnErr } from '../../lib/utils/notifications';
+    import { displayNotifOnErr, SUCCESS_NOTIFICATION } from '../../lib/utils/notifications';
     import { showPopup } from '../../lib/utils/popups';
     import type { Result } from '../../lib/utils/result';
 
     const { addNotification } = getNotificationsContext();
 
-    export let data: App.PageData;
+    export let data: App.PageData & {
+        titles: Record<number, Entry[]>,
+    };
 
     function downloadBackup (data: string, username: string) {
         const dateFmt = moment(new Date()).format('D-MM-YYYY');
         downloadFile(`${dateFmt}-${username}.backup.encrypted.json`, data);
-
     }
 
     async function download () {
@@ -70,10 +73,8 @@
                 );
 
                 addNotification({
-                    removeAfter: 4_000,
+                    ...SUCCESS_NOTIFICATION,
                     text: 'File uploaded successfully',
-                    type: 'success',
-                    position: 'top-center',
                 });
             },
         });
@@ -90,11 +91,10 @@
             await api.delete(data, '/users'),
         );
         downloadBackup(backupData, data.username);
-        window.location.assign('/');
+        location.assign('/');
     }
 
     onMount(() => document.title = `Home`);
-
 </script>
 
 <main>
@@ -161,6 +161,12 @@
             </button>
         </div>
     </section>
+    {#if Object.keys(data.titles || {}).length}
+        <section>
+            <h1>Recent Entries</h1>
+            <EntryTitles titles={data.titles} />
+        </section>
+    {/if}
 </main>
 
 <style lang="less">

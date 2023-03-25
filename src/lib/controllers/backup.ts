@@ -18,6 +18,14 @@ export class Backup {
             latitude?: number;
             longitude?: number;
             created: number;
+            edits: {
+                title: string;
+                label?: string; // label's name
+                entry: string;
+                latitude?: number;
+                longitude?: number;
+                created: number;
+            }[],
         }[],
         public labels: {
             name: string;
@@ -68,6 +76,14 @@ export class Backup {
                 latitude: entry.latitude ?? undefined,
                 longitude: entry.longitude ?? undefined,
                 title: entry.title,
+                edits: entry.edits?.map(edit => ({
+                    entry: edit.entry,
+                    created: edit.created,
+                    label: edit.label?.name,
+                    latitude: edit.latitude ?? undefined,
+                    longitude: edit.longitude ?? undefined,
+                    title: edit.title,
+                })) || [],
             })),
             labels.map((label) => ({
                 name: label.name,
@@ -210,7 +226,10 @@ export class Backup {
         return Result.ok(null);
     }
 
-    public asEncryptedString (auth: Auth): Result<string> {
-        return encrypt(JSON.stringify(this), auth.key);
+    public static asEncryptedString (
+        self: Backup,
+        auth: Auth,
+    ): Result<string> {
+        return encrypt(JSON.stringify(self), auth.key);
     }
 }

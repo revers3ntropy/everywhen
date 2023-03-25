@@ -8,7 +8,6 @@
     import Time from 'svelte-time';
     import EntryGroup from '../../lib/components/EntryGroup.svelte';
     import PageCounter from '../../lib/components/PageCounter.svelte';
-    import Sidebar from '../../routes/diary/Sidebar.svelte';
     import { Entry } from '../controllers/entry';
     import type { Auth } from '../controllers/user';
     import { obfuscated } from '../stores';
@@ -18,6 +17,7 @@
     import { nowS } from '../utils/time';
     import Spinner from './BookSpinner.svelte';
     import ImportDialog from './dialogs/ImportDialog.svelte';
+    import Sidebar from './EntriesSidebar.svelte';
 
     const { addNotification } = getNotificationsContext();
 
@@ -85,9 +85,7 @@
 
     export const reload = () => reloadEntries();
 
-    onMount(() => {
-        reloadEntries();
-    });
+    onMount(reloadEntries);
     $: [ page, search, browser ? reloadEntries() : 0 ];
 </script>
 

@@ -11,7 +11,10 @@ export const GET = (async ({ cookies }) => {
 
     const { err, val: backup } = await Backup.generate(query, auth);
     if (err) throw error(400, err);
-    const { err: encryptErr, val: encryptedResponse } = backup.asEncryptedString(auth);
+    const {
+        err: encryptErr,
+        val: encryptedResponse,
+    } = Backup.asEncryptedString(backup, auth);
     if (encryptErr) throw error(400, encryptErr);
 
     return apiResponse({ data: encryptedResponse });

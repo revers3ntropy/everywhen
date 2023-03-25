@@ -1,9 +1,9 @@
 import type { QueryFunc } from '../db/mysql';
-import { decrypt, encrypt } from '../security/encryption';
+import { decrypt, encrypt, encryptMulti } from '../security/encryption';
 import { generateUUId } from '../security/uuid';
 import { Result } from '../utils/result';
 import { nowS } from '../utils/time';
-import type { PickOptionalAndMutable } from '../utils/types';
+import type { Mutable, PickOptionalAndMutable } from '../utils/types';
 import { Label } from './label';
 import type { Auth } from './user';
 
@@ -29,6 +29,9 @@ export type DecryptedRawEntry = Omit<RawEntry, 'decrypted'> & {
 export type EntryEdit = Omit<Entry, 'edits'>;
 
 export class Entry {
+
+    public static TITLE_CUTOFF = 25;
+
     public label?: Label;
     public edits?: EntryEdit[];
     public readonly decrypted = true;
@@ -79,6 +82,13 @@ export class Entry {
         query: QueryFunc,
         auth: Auth,
     ): Promise<void> {
+        await query`
+            DELETE
+            FROM entryEdits
+            WHERE entry IN (SELECT id
+                            FROM entries
+                            WHERE user = ${auth.id})
+        `;
         await query`
             DELETE
             FROM entries
@@ -205,8 +215,8 @@ export class Entry {
 
     public static groupEntriesByDay<T extends { created: number } = Entry> (
         entries: T[],
-    ): Record<number, T[]> {
-        const grouped: Record<number, T[]> = [];
+    ): T[][] {
+        const grouped: T[][] = [];
 
         entries.forEach((entry) => {
             const day =
@@ -220,8 +230,8 @@ export class Entry {
         });
 
         // sort each day
-        for (const day in grouped) {
-            grouped[day].sort((a, b) => {
+        for (const day of Object.keys(grouped)) {
+            grouped[parseInt(day)].sort((a, b) => {
                 return b.created - a.created;
             });
         }
@@ -293,6 +303,7 @@ export class Entry {
 
     public static jsonIsRawEntry (
         json: unknown,
+        isEdit = false,
     ): json is Omit<Entry, 'id' | 'label'> & {
         label?: string
     } {
@@ -318,7 +329,14 @@ export class Entry {
                 || !json.label
             )
             && 'created' in json
-            && typeof json.created === 'number';
+            && typeof json.created === 'number'
+            && (
+                isEdit ||
+                !('edits' in json)
+                || Array.isArray(json.edits)
+                && json.edits
+                       .every((e) => Entry.jsonIsRawEntry(e, true))
+            );
     }
 
     public static async create (
@@ -346,6 +364,17 @@ export class Entry {
             !!json.deleted,
         );
 
+        entry.edits = await Promise.all(
+            json.edits
+                ?.map(async e => new Entry(
+                    await generateUUId(query),
+                    e.title,
+                    e.entry,
+                    e.created,
+                    false,
+                )) ?? [],
+        );
+
         if (json.label) {
             const { err } = await Entry.addLabel(query, auth, entry, json.label);
             if (err) return Result.err(err);
@@ -370,6 +399,34 @@ export class Entry {
                     ${entry.latitude ?? null},
                     ${entry.longitude ?? null})
         `;
+
+        for (const edit of entry.edits) {
+            const {
+                err: editTitleErr,
+                val: encryptedEditTitle,
+            } = encrypt(edit.title, auth.key);
+            if (editTitleErr) return Result.err(editTitleErr);
+
+            const {
+                err: editEntryErr,
+                val: encryptedEditEntry,
+            } = encrypt(edit.entry, auth.key);
+            if (editEntryErr) return Result.err(editEntryErr);
+
+            await query`
+                INSERT INTO entryEdits
+                (id, entryId, title, entry,
+                 created, label, latitude, longitude)
+                VALUES (${edit.id},
+                        ${entry.id},
+                        ${encryptedEditTitle},
+                        ${encryptedEditEntry},
+                        ${edit.created},
+                        ${edit.label?.id ?? null},
+                        ${edit.latitude ?? null},
+                        ${edit.longitude ?? null})
+            `;
+        }
 
         return Result.ok(entry);
     }
@@ -445,26 +502,31 @@ export class Entry {
         newLongitude: number,
         newLabel: Label | string,
     ): Promise<Result> {
-        const { err: titleErr, val: encryptedNewTitle } = encrypt(newTitle, auth.key);
-        if (titleErr) return Result.err(titleErr);
-        const { err: entryErr, val: encryptedNewEntry } = encrypt(newEntry, auth.key);
-        if (entryErr) return Result.err(entryErr);
+        const { err, val: encryptionResults } = encryptMulti(
+            auth.key,
+            newTitle,
+            newEntry,
+            entry.title,
+            entry.entry,
+        );
+        if (err) return Result.err(err);
+        const [
+            encryptedNewTitle,
+            encryptedNewEntry,
+            oldTitle,
+            oldEntry,
+        ] = encryptionResults;
 
         const editId = await generateUUId(query);
-
-        const { err: oldTitleErr, val: oldTitle } = encrypt(entry.title, auth.key);
-        if (oldTitleErr) return Result.err(oldTitleErr);
-        const { err: oldEntryErr, val: oldEntry } = encrypt(entry.entry, auth.key);
-        if (oldEntryErr) return Result.err(oldEntryErr);
 
         await query`
             INSERT INTO entryEdits
                 (id, entryId, created, latitude, longitude, title, entry, label)
             VALUES (${editId},
                     ${entry.id},
-                    ${entry.created},
-                    ${entry.latitude ?? null},
-                    ${entry.longitude ?? null},
+                    ${nowS()},
+                    ${newLatitude ?? null},
+                    ${newLongitude ?? null},
                     ${oldTitle},
                     ${oldEntry},
                     ${entry.label?.id ?? null})
@@ -476,17 +538,31 @@ export class Entry {
 
         await query`
             UPDATE entries
-            SET title     = ${encryptedNewTitle},
-                entry     = ${encryptedNewEntry},
-                latitude  = ${newLatitude ?? null},
-                longitude = ${newLongitude ?? null},
-                label     = ${newLabel ?? null},
-                created   = ${nowS()}
+            SET title = ${encryptedNewTitle},
+                entry = ${encryptedNewEntry},
+                label = ${newLabel ?? null}
             WHERE id = ${entry.id}
               AND user = ${auth.id}
         `;
 
         return Result.ok(null);
+    }
+
+    public static async getTitles (
+        query: QueryFunc,
+        auth: Auth,
+    ): Promise<Result<Entry[]>> {
+        const { val: entries, err } = await Entry.all(query, auth);
+        if (err) return Result.err(err);
+
+        entries.map((entry: Mutable<Entry>) => {
+            entry.entry = entry
+                .entry
+                .replace(/[^0-9a-z ]/gi, '')
+                .substring(0, Entry.TITLE_CUTOFF);
+        });
+
+        return Result.ok(entries);
     }
 
     private static async addLabel (

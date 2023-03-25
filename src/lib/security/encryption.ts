@@ -50,3 +50,11 @@ export function decrypt (cypherText: string, key: string): Result<string> {
 }
 
 
+export function encryptMulti<T extends string[]> (
+    key: string,
+    ...plainTexts: T
+): Result<T> {
+    return Result.collect(
+        plainTexts.map(text => encrypt(text, key)),
+    ) as Result<T>;
+}
