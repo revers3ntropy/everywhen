@@ -26,7 +26,7 @@ jobs:
         run: sudo mysql -h 127.0.0.1 -u root -pPass -e "ALTER USER 'root'@'%' IDENTIFIED BY ''"
 
       - name: Run migrations
-        run: sudo mysql -h 127.0.0.1 -u root -p misc_3_dev < schema.sql
+        run: sudo mysql -h 127.0.0.1 -u root misc_3_dev < schema.sql
 
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
