@@ -23,7 +23,7 @@ jobs:
         run: npm i -g pnpm && pnpm install && sudo apt update && sudo apt install mysql-server
 
       - name: Create database
-        run: sudo mysql -h 127.0.0.1 -u root -pPass -e "ALTER USER 'root'@'%' WITH mysql_native_password BY ''"
+        run: sudo mysql -h 127.0.0.1 -u root -pPass -e "ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY ''"
 
       - name: Run migrations
         run: sudo mysql -h 127.0.0.1 -u root -p misc_3_dev < schema.sql
