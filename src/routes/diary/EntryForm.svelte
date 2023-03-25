@@ -307,10 +307,6 @@
         }
     }
 
-    input, textarea {
-        z-index: 10;
-    }
-
     textarea {
         @media @mobile {
             // annoying on mobile to resize horizontally
