@@ -3,11 +3,11 @@
 start=`date +%s`
 
 mysql -u root << eof
-    DROP DATABASE IF EXISTS misc_3_dev;
-    CREATE DATABASE misc_3_dev
+    DROP DATABASE IF EXISTS halcyon_land_dev;
+    CREATE DATABASE halcyon_land_dev
 eof
 
-mysql -u root misc_3_dev < ./schema.sql
+mysql -u root halcyon_land_dev < ./schema.sql
 
 end=$(date +%s)
 

@@ -20,7 +20,7 @@ jobs:
           mysql root password: 'Pass'
 
       - name: Install dependencies
-        run: npm i -g pnpm && pnpm install && sudo apt update && sudo apt install mysql-server
+        run: npm install && sudo apt update && sudo apt install mysql-server
 
       - name: Set root password
         run: sudo mysql -h 127.0.0.1 -u root -pPass -e "ALTER USER 'root'@'%' IDENTIFIED BY ''"
@@ -28,11 +28,14 @@ jobs:
       - name: Run migrations
         run: sudo mysql -h 127.0.0.1 -u root halcyon_land_dev < schema.sql
 
-      - name: Install Playwright Browsers
-        run: pnpm exec playwright install --with-deps
+      - name: Install Playwright browsers
+        run: npx playwright install msedge && npx playwright install chromium && npx playwright install firefox
+
+      - name: Install Playwright system dependencies
+        run: npx playwright install-deps
 
       - name: Run Playwright tests
-        run: pnpm exec playwright test
+        run: bin/test
 
       - uses: actions/upload-artifact@v3
         if: always()
