@@ -1,4 +1,4 @@
-import { redirect } from '@sveltejs/kit';
+import { error } from '@sveltejs/kit';
 import { Entry } from '../../../../lib/controllers/entry';
 import { query } from '../../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../../lib/security/getAuthFromCookies';
@@ -9,9 +9,9 @@ export const load = (async ({ params, cookies }) => {
 
     const { val: entry, err } = await Entry.fromId(
         query, auth,
-        params.entryId, false,
+        params.entryId, true,
     );
-    if (err) throw redirect(307, '/diary');
+    if (err) throw error(400, err);
 
     return {
         entry: JSON.parse(JSON.stringify(entry)),

@@ -115,12 +115,14 @@
                         <Bin size="25" />
                     {/if}
                 </button>
-                <a
-                    href="/diary/{id}/edit"
-                    use:tooltip={{ content: 'Edit Entry' }}
-                >
-                    <NoteEditOutline size="25" />
-                </a>
+                {#if !deleted}
+                    <a
+                        href="/diary/{id}/edit"
+                        use:tooltip={{ content: 'Edit Entry' }}
+                    >
+                        <NoteEditOutline size="25" />
+                    </a>
+                {/if}
             {/if}
 
             <button
