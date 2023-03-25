@@ -54,7 +54,9 @@
     <div>
         <Dropdown unstyledButton={true}>
             <span class="account-button" slot="button">
-                {auth.username}
+                <span class="username-span">
+                    {auth.username}
+                </span>
                 <AccountCircleOutline size="40" />
             </span>
 
@@ -72,6 +74,7 @@
 
 <style lang="less">
     @import '../styles/variables';
+    @import '../styles/layout';
 
     header {
         position: relative;
@@ -102,6 +105,7 @@
     }
 
     .account-button {
+        .bordered();
         display: grid;
         grid-template-columns: 1fr 40px;
         align-items: center;
@@ -110,9 +114,14 @@
         cursor: pointer;
         border-radius: 10px;
         padding: .1rem .3rem;
+        width: fit-content;
 
         &:hover {
             background-color: @light-accent;
         }
+    }
+
+    .username-span {
+        min-width: min(4rem, 10vw);
     }
 </style>

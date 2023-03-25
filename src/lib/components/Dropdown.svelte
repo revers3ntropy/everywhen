@@ -21,10 +21,13 @@
 
 <svelte:window on:mousedown={globalMouseDown} />
 
-<div class={cn({
-    dropdown: true, open, rounded, unstyledButton
-})}>
-    <button aria-label={ariaLabel || 'Open popup'} on:click={() => open = !open}>
+<div class="dropdown {cn({
+    open, rounded, 'unstyled': unstyledButton
+})}">
+    <button
+        aria-label={ariaLabel || 'Open popup'}
+        on:click={() => open = !open}
+    >
         <slot name="button"></slot>
         <MenuDown class="menu-down" size="30" />
     </button>
@@ -41,83 +44,84 @@
     @import '../../styles/variables.less';
     @import '../../styles/layout.less';
 
-    .unstyledButton {
-        button {
-            padding: 0;
-            border-radius: 0;
-            border: none;
-            grid-template-columns: 1fr;
-
-            :global(.menu-down) {
-                display: none;
-            }
-        }
-
-        border: none !important;
-    }
-
-    button {
-        background: none;
-        border: none;
-        padding: 0 0.2em;
-        font: inherit;
-        cursor: pointer;
-        outline: inherit;
-        display: inline-grid;
-        width: 100%;
-        grid-template-columns: 1fr 30px;
-        justify-content: space-between;
-        align-items: center;
-
-        border-radius: 10px;
-    }
-
-
-    div {
+    .dropdown {
         position: relative;
         width: 200px;
-    }
 
-    .popup {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        right: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 5;
+        button {
+            background: none;
+            border: none;
+            padding: 0 0.2em;
+            font: inherit;
+            cursor: pointer;
+            outline: inherit;
+            display: inline-grid;
+            width: 100%;
+            grid-template-columns: 1fr 30px;
+            justify-content: space-between;
+            align-items: center;
 
-        .content {
-            background: @light-accent;
-            border-radius: 0 0 10px 10px;
-            border-top: none;
+            border-radius: 10px;
         }
-    }
 
-    .rounded {
+        &.unstyled {
+            button {
+                padding: 0;
+                border-radius: 0;
+                border: none;
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+
+                :global(.menu-down) {
+                    display: none;
+                }
+            }
+
+            border: none !important;
+            width: fit-content;
+        }
+
         .popup {
-            transform: translateY(0.5em);
+            .flex-center();
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 5;
 
             .content {
-                border-radius: 10px;
+                background: @light-accent;
+                border-radius: 0 0 10px 10px;
+                border-top: none;
+                min-width: 100%;
             }
         }
-    }
 
-    :not(.rounded).dropdown {
-        .bordered();
-        border-radius: 10px;
-        margin: .5em;
+        &.rounded {
+            .popup {
+                transform: translateY(0.5em);
 
-        &:hover {
-            background: @light-v-accent;
+                .content {
+                    border-radius: 10px;
+                }
+            }
         }
 
-        &.open {
-            background: @light-accent;
-            border-radius: 10px 10px 0 0;
-            border: 1px solid @border-heavy;
+        &:not(.rounded) {
+            .bordered();
+            border-radius: 10px;
+            margin: .5em;
+
+            &:hover {
+                background: @light-v-accent;
+            }
+
+            &.open {
+                background: @light-accent;
+                border-radius: 10px 10px 0 0;
+                border: 1px solid @border-heavy;
+            }
         }
     }
 </style>
