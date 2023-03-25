@@ -12,7 +12,6 @@ node_modules
 .vercel
 
 # Secrets
-/.env
 /secrets/**/*.pem
 /secrets/**/*.env
 /secrets/**/sshpass.txt
