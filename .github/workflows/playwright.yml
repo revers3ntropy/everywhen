@@ -19,14 +19,11 @@ jobs:
           mysql database: 'misc_3_dev'
           mysql root password: 'Pass'
 
+      - name: Set root password
+        run: sudo mysql -h 127.0.0.1 -u root -p -e "ALTER USER 'root'@'%' IDENTIFIED BY ''"
+
       - name: Install dependencies
         run: npm i -g pnpm && pnpm install && sudo apt update && sudo apt install mysql-server
-
-      - name: Set root password
-        run: sudo mysql -h 127.0.0.1 -u root -pPass -e "ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY ''"
-
-      - name: Set root password (again)
-        run: sudo mysql -h 127.0.0.1 -u root -p -e "ALTER USER 'root'@'%' IDENTIFIED BY ''"
 
       - name: Run migrations
         run: sudo mysql -h 127.0.0.1 -u root -p misc_3_dev < schema.sql
