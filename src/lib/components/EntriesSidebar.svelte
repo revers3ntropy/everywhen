@@ -28,7 +28,7 @@
             </button>
         </div>
         <div class="content">
-            <EntryTitles {titles} />
+            <EntryTitles obfuscated={false} {titles} />
         </div>
     </div>
 </div>

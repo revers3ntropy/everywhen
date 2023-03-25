@@ -1,13 +1,32 @@
 <script lang="ts">
+	// @ts-ignore
+	import { tooltip } from '@svelte-plugins/tooltips';
 	import moment from 'moment';
+	import Eye from 'svelte-material-icons/Eye.svelte';
+	import EyeOff from 'svelte-material-icons/EyeOff.svelte';
 	import Time from 'svelte-time';
 	import { Entry } from '../controllers/entry';
+	import { obfuscate } from '../utils/text';
 	import { nowS } from '../utils/time';
 
 	export let titles: Record<number, Entry[]>;
+	export let obfuscated = true;
 </script>
 
 <div>
+	<div class="menu">
+		<button
+			aria-label={obfuscated ? 'Show entry' : 'Hide entry'}
+			on:click={() => obfuscated = !obfuscated}
+		>
+			{#if obfuscated}
+				<Eye size="25" />
+			{:else}
+				<EyeOff size="25" />
+			{/if}
+		</button>
+	</div>
+
 	{#each Object.keys(titles)
 		.sort((a, b) => parseInt(b) - parseInt(a)) as day}
 		<div class="day">
@@ -43,18 +62,21 @@
 					<span
 						class="entry-label-colour"
 						style="background: {entry.label?.colour || 'transparent'}"
+						use:tooltip={{ content: entry.label?.name }}
 					></span>
 
-					{#if entry.title}
-						{entry.title}
-					{:else}
+					<div class="title {obfuscated ? 'obfuscated' : ''}">
+						{#if entry.title}
+							{obfuscated ? obfuscate(entry.title) : entry.title}
+						{:else}
 						<span class="entry-preview">
-							{entry.entry}
+							{obfuscated ? obfuscate(entry.entry) : entry.entry}
 							{#if entry.entry.length >= Entry.TITLE_CUTOFF}
 								...
 							{/if}
 						</span>
-					{/if}
+						{/if}
+					</div>
 				</a>
 			{/each}
 		</div>
@@ -71,6 +93,12 @@
 
 <style lang="less">
 	@import '../../styles/variables.less';
+
+	.menu {
+		display: flex;
+		justify-content: flex-end;
+		margin: 0.5rem 0;
+	}
 
 	.day {
 		margin: 0.6rem 0 0.9em 0;

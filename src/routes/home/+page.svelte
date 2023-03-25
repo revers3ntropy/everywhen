@@ -17,6 +17,7 @@
     import EntryTitles from '../../lib/components/EntryTitles.svelte';
     import type { Entry } from '../../lib/controllers/entry';
     import { encryptionKeyFromPassword } from '../../lib/security/authUtils';
+    import { obfuscated } from '../../lib/stores.js';
     import { api } from '../../lib/utils/apiRequest';
     import { download as downloadFile } from '../../lib/utils/files';
     import { displayNotifOnErr, SUCCESS_NOTIFICATION } from '../../lib/utils/notifications';
@@ -164,7 +165,10 @@
     {#if Object.keys(data.titles || {}).length}
         <section>
             <h1>Recent Entries</h1>
-            <EntryTitles titles={data.titles} />
+            <EntryTitles
+                titles={data.titles}
+                obfuscated={$obfuscated}
+            />
         </section>
     {/if}
 </main>
