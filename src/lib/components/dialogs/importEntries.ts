@@ -40,23 +40,38 @@ export async function importEntries (
     let i = -1;
     for (let entryJSON of json) {
         i++;
+
+        if (typeof (entryJSON as any).time === 'string') {
+            (entryJSON as any).time = parseInt((entryJSON as any).time);
+        }
+        if (typeof (entryJSON as any).deleted !== 'boolean') {
+            (entryJSON as any).deleted = !!(entryJSON as any).deleted;
+        }
+
         if (!matches(entryJSON, {
             entry: 'string',
             title: 'string',
-            time: 'string',
+            time: 'number',
             created: 'number',
             latitude: 'number',
             longitude: 'number',
             location: 'object',
             types: 'object',
             label: 'string',
+            deleted: 'boolean',
         }, {
-            time: '0',
+            title: '',
+            time: 0,
+            created: 0,
+            latitude: 0,
+            longitude: 0,
             location: [],
             types: [],
             label: '',
+            deleted: false,
         })) {
-            errors.push([ i, `entry is not object` ]);
+            console.log(entryJSON);
+            errors.push([ i, `entry is not valid object` ]);
             continue;
         }
 
@@ -71,7 +86,7 @@ export async function importEntries (
 
         postBody.entry = entryJSON.entry;
         postBody.title = entryJSON.title || '';
-        postBody.created = parseInt(entryJSON.time) || entryJSON.created;
+        postBody.created = entryJSON.time || entryJSON.created;
         postBody.latitude = parseFloat((entryJSON.latitude || entryJSON.location[0]) as string) || 0;
         postBody.longitude = parseFloat((entryJSON.longitude || entryJSON.location[1]) as string) || 0;
 
@@ -101,9 +116,7 @@ export async function importEntries (
         postBody.label ||= entryJSON.label;
 
         const { err } = await api.post(auth, `/entries`, postBody);
-        if (err) {
-            errors.push([ i, err ]);
-        }
+        if (err) errors.push([ i, err ]);
     }
 
     if (errors.length < 0) {

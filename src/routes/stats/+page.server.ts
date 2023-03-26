@@ -7,7 +7,8 @@ import type { PageServerLoad } from './$types';
 
 function commonWordsFromText (txt: string): [ string, number ][] {
     const words: Record<string, number> = {};
-    for (const word of splitText(txt)) {
+    for (let word of splitText(txt)) {
+        word = word.toLowerCase();
         words[word] ??= 0;
         words[word]++;
     }

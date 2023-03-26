@@ -18,6 +18,8 @@
 
     let labels: Label[] | null = null;
 
+    let loading = false;
+
     async function withContents (result: Result<string>): Promise<void> {
         const contents = displayNotifOnErr(addNotification, result);
 
@@ -28,6 +30,8 @@
             });
             return;
         }
+
+        loading = true;
 
         let res;
         if (type === 'events') {
@@ -52,6 +56,8 @@
                 ...res,
             });
         }
+
+        loading = false;
     }
 
     onMount(async () => {
@@ -63,7 +69,7 @@
 
 </script>
 
-{#if labels?.length}
+{#if labels && !loading}
     <FileDrop
         message="Import {type} from .json file"
         {withContents}
