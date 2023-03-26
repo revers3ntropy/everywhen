@@ -22,6 +22,9 @@ export type PickOptionalAndMutable<A, B extends keyof A> =
 export type PickOptional<A, B extends keyof A = keyof A> =
     NonFunctionProperties<Omit<A, B>
                           & Partial<Pick<A, B>>>;
+
+export type Bytes = number;
+
 export type Seconds = number;
 export type TimestampSecs = number;
 export type Milliseconds = number;

@@ -220,9 +220,9 @@ export class Entry {
 
         entries.forEach((entry) => {
             const day =
-                new Date(entry.created * 1000)
+                Math.round(new Date(entry.created * 1000)
                     .setHours(0, 0, 0, 0)
-                    .valueOf() / 1000;
+                    .valueOf() / 1000);
             if (!grouped[day]) {
                 grouped[day] = [];
             }

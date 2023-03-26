@@ -9,6 +9,7 @@
     import Send from 'svelte-material-icons/Send.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import LabelSelect from '../../lib/components/LabelSelect.svelte';
+    import { MAX_IMAGE_SIZE } from '../../lib/constants';
     import type { Auth } from '../../lib/controllers/user';
     import { api, apiPath } from '../../lib/utils/apiRequest';
     import { getFileContents } from '../../lib/utils/files';
@@ -138,7 +139,7 @@
         );
 
         if (!content) return;
-        if (content.length > 1_000_000) {
+        if (content.length > MAX_IMAGE_SIZE) {
             addNotification({
                 ...ERR_NOTIFICATION,
                 text: 'File too large',
