@@ -1,5 +1,6 @@
 <script lang="ts">
     import { browser } from '$app/environment';
+    import { beforeNavigate } from '$app/navigation';
     import { enabledLocation } from '$lib/stores.js';
     // @ts-ignore
     import { tooltip } from '@svelte-plugins/tooltips';
@@ -10,6 +11,7 @@
     import { getNotificationsContext } from 'svelte-notifications';
     import LabelSelect from '../../lib/components/LabelSelect.svelte';
     import { MAX_IMAGE_SIZE } from '../../lib/constants';
+    import type { Entry } from '../../lib/controllers/entry';
     import type { Auth } from '../../lib/controllers/user';
     import { api, apiPath } from '../../lib/utils/apiRequest';
     import { getFileContents } from '../../lib/utils/files';
@@ -22,10 +24,11 @@
 
     let mounted = false;
 
+    // as this form is used in entry editing and creating
     export let action: 'create' | 'edit' = 'create';
-    export let entryId = '';
 
-    if (entryId && action !== 'edit') {
+    export let entry: Entry | null = null;
+    if (entry && action !== 'edit') {
         throw new Error('eventID can only be set when action is edit');
     }
 
@@ -44,9 +47,17 @@
     }
 
     $: if (mounted && browser && loadFromLS) {
-        localStorage.setItem('__misc_3_newEntryTitle', newEntryTitle);
-        localStorage.setItem('__misc_3_newEntryBody', newEntryBody);
-        localStorage.setItem('__misc_3_newEntryLabel', newEntryLabel);
+        // be reactive on these
+        [ newEntryTitle, newEntryBody, newEntryLabel ];
+        saveToLS();
+    }
+
+    function saveToLS () {
+        if (loadFromLS) {
+            localStorage.setItem('__misc_3_newEntryTitle', newEntryTitle);
+            localStorage.setItem('__misc_3_newEntryBody', newEntryBody);
+            localStorage.setItem('__misc_3_newEntryLabel', newEntryLabel);
+        }
     }
 
     onMount(() => {
@@ -56,6 +67,29 @@
             newEntryLabel = localStorage.getItem('__misc_3_newEntryLabel') || '';
         }
         mounted = true;
+    });
+
+    function areUnsavedChanges () {
+        if (entry && !loadFromLS) {
+            // check for unsaved changes
+            if (entry.title !== newEntryTitle
+                || entry.entry !== newEntryBody
+                || ((entry.label?.id || '') !== newEntryLabel)
+            ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    beforeNavigate(({ cancel }) => {
+        saveToLS();
+
+        if (areUnsavedChanges()) {
+            if (!confirm('You have unsaved changes, are you sure you want to leave?')) {
+                cancel();
+            }
+        }
     });
 
     async function submit () {
@@ -79,8 +113,9 @@
                 );
                 break;
             case 'edit':
+                if (!entry) throw new Error('entry must be set when action is edit');
                 res = displayNotifOnErr(addNotification,
-                    await api.put(auth, apiPath('/entries/?', entryId), body),
+                    await api.put(auth, apiPath('/entries/?', entry.id), body),
                 );
                 break;
             default:
@@ -100,8 +135,8 @@
 
         dispatch('updated');
 
-        if (entryId) {
-            location.assign(`/diary/${entryId}`);
+        if (entry) {
+            location.assign(`/diary/${entry.id}`);
         }
     }
 
@@ -154,6 +189,7 @@
             }),
         );
 
+        // insert markdown to link to image
         newEntryBody += `![${file.name}](/api/assets/${id})`;
     }
 
