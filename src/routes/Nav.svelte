@@ -87,7 +87,7 @@
 
             <a
                 aria-label="settings"
-                class="primary unbordered"
+                class="primary unbordered account-dropdown-button"
                 href="/settings"
             >
                 <Cog size="30" />
@@ -96,7 +96,7 @@
 
             <a
                 aria-label="log out"
-                class="primary unbordered"
+                class="primary unbordered account-dropdown-button"
                 href="/logout"
             >
                 <Logout size="30" />
@@ -211,6 +211,19 @@
                 place-items: center;
                 width: 100%;
                 text-align: left;
+            }
+        }
+    }
+
+    .account-dropdown-button {
+        margin: 0;
+
+        &:hover {
+            background-color: @light-v-accent;
+            color: @text-color;
+
+            :global(svg), :global(svg *) {
+                fill: @accent-color-secondary;
             }
         }
     }
