@@ -82,10 +82,12 @@
         return false;
     }
 
+    let submitted = false;
+
     beforeNavigate(({ cancel }) => {
         saveToLS();
 
-        if (areUnsavedChanges()) {
+        if (!submitted && areUnsavedChanges()) {
             if (!confirm('You have unsaved changes, are you sure you want to leave?')) {
                 cancel();
             }
@@ -114,6 +116,11 @@
                 break;
             case 'edit':
                 if (!entry) throw new Error('entry must be set when action is edit');
+                if (!areUnsavedChanges()) {
+                    if (!confirm('No changes have been made, are you sure you want to edit this entry?')) {
+                        return;
+                    }
+                }
                 res = displayNotifOnErr(addNotification,
                     await api.put(auth, apiPath('/entries/?', entry.id), body),
                 );
@@ -136,6 +143,7 @@
         dispatch('updated');
 
         if (entry) {
+            submitted = true;
             location.assign(`/diary/${entry.id}`);
         }
     }
