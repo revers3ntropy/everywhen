@@ -1,10 +1,10 @@
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
-import { generateUUId } from '../security/uuid';
 import { Result } from '../utils/result';
 import { nowS } from '../utils/time';
 import type { Seconds } from '../utils/types';
 import type { Auth } from './user';
+import { UUID } from './uuid';
 
 export interface ISettingsConfig<T> {
     type: 'string' | 'boolean' | 'number',
@@ -72,7 +72,7 @@ export class Settings<T = unknown> {
         key: string,
         value: unknown,
     ): Promise<Result<Settings>> {
-        const id = await generateUUId(query);
+        const id = await UUID.generateUUId(query);
 
         if (!Settings.config.hasOwnProperty(key)) {
             return Result.err(`Invalid setting key`);

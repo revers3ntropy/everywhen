@@ -4,6 +4,7 @@
     import Calendar from 'svelte-material-icons/Calendar.svelte';
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
     import Close from 'svelte-material-icons/Close.svelte';
+    import Cog from 'svelte-material-icons/Cog.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
     import Home from 'svelte-material-icons/Home.svelte';
     import Logout from 'svelte-material-icons/Logout.svelte';
@@ -85,11 +86,20 @@
             </span>
 
             <a
+                aria-label="settings"
+                class="primary unbordered"
+                href="/settings"
+            >
+                <Cog size="30" />
+                Settings
+            </a>
+
+            <a
                 aria-label="log out"
                 class="primary unbordered"
                 href="/logout"
             >
-                <Logout size="40" />
+                <Logout size="30" />
                 Log Out
             </a>
         </Dropdown>

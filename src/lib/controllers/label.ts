@@ -1,10 +1,10 @@
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
-import { generateUUId } from '../security/uuid';
 import { Result } from '../utils/result';
 import { nowS } from '../utils/time';
 import type { PickOptional } from '../utils/types';
 import type { Auth } from './user';
+import { UUID } from './uuid';
 
 export type LabelWithCount = Label & {
     entryCount: number,
@@ -184,7 +184,7 @@ export class Label {
         }
 
         json = { ...json };
-        json.id ??= await generateUUId(query);
+        json.id ??= await UUID.generateUUId(query);
         json.created ??= nowS();
 
         const { err, val: encryptedName } = encrypt(json.name, auth.key);

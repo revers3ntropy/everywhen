@@ -1,5 +1,4 @@
 import type { QueryFunc } from '../db/mysql';
-import { generateUUId } from '../security/uuid';
 import { Result } from '../utils/result';
 import { cryptoRandomStr } from '../utils/text';
 import { nowS } from '../utils/time';
@@ -7,6 +6,7 @@ import { Asset } from './asset';
 import { Entry } from './entry';
 import { Event } from './event';
 import { Label } from './label';
+import { UUID } from './uuid';
 
 export class User {
     public constructor (
@@ -73,7 +73,7 @@ export class User {
         if (err) return Result.err(err);
 
         const salt = await User.generateSalt(query);
-        const id = await generateUUId(query);
+        const id = await UUID.generateUUId(query);
 
         await query`
             INSERT INTO users (id, username, password, salt, created)

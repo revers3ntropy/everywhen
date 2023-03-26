@@ -1,11 +1,11 @@
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt, encryptMulti } from '../security/encryption';
-import { generateUUId } from '../security/uuid';
 import { Result } from '../utils/result';
 import { nowS } from '../utils/time';
 import type { Mutable, PickOptionalAndMutable } from '../utils/types';
 import { Label } from './label';
 import type { Auth } from './user';
+import { UUID } from './uuid';
 
 
 // RawEntry is the raw data from the database,
@@ -352,7 +352,7 @@ export class Entry {
     ): Promise<Result<Entry>> {
         const json: typeof json_ & { id: string } = {
             ...json_,
-            id: await generateUUId(query),
+            id: await UUID.generateUUId(query),
         };
         json.created ??= nowS();
 
@@ -367,7 +367,7 @@ export class Entry {
         entry.edits = await Promise.all(
             json.edits
                 ?.map(async e => new Entry(
-                    await generateUUId(query),
+                    await UUID.generateUUId(query),
                     e.title,
                     e.entry,
                     e.created,
@@ -517,7 +517,7 @@ export class Entry {
             oldEntry,
         ] = encryptionResults;
 
-        const editId = await generateUUId(query);
+        const editId = await UUID.generateUUId(query);
 
         await query`
             INSERT INTO entryEdits

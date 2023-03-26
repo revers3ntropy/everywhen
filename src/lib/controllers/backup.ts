@@ -1,4 +1,5 @@
 import schemion from 'schemion';
+import { parseSemVer } from 'semver-parser';
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { Result } from '../utils/result';
@@ -124,6 +125,12 @@ export class Backup {
             return Result.err('data must be a valid JSON string');
         }
 
+        if (typeof decryptedData !== 'object' || decryptedData === null) {
+            return Result.err('data must be a non-null object');
+        }
+
+        decryptedData = Backup.migrate(decryptedData as Record<string, unknown>);
+
         if (!schemion.matches(decryptedData, {
             entries: 'object',
             labels: 'object',
@@ -231,5 +238,19 @@ export class Backup {
         auth: Auth,
     ): Result<string> {
         return encrypt(JSON.stringify(self), auth.key);
+    }
+
+    public static migrate (
+        json: Partial<Backup> & Record<string, unknown>,
+    ): Result<Backup> {
+        json.appVersion ||= '0.0.0';
+        const version = parseSemVer(json.appVersion);
+        version.major ||= 0;
+
+        if (version.major > 1) {
+            return Result.err(`Cannot time travel to version 1`);
+        }
+
+        return Result.ok(json as Backup);
     }
 }

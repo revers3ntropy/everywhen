@@ -1,11 +1,11 @@
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
-import { generateUUId } from '../security/uuid';
 import { Result } from '../utils/result';
 import { nowS } from '../utils/time';
 import type { Seconds, TimestampSecs } from '../utils/types';
 import { Label } from './label';
 import type { Auth } from './user';
+import { UUID } from './uuid';
 
 // RawEvent is the raw data from the database,
 // Event is the data after decryption and links to labels
@@ -123,7 +123,7 @@ export class Event {
         label?: string,
         created?: TimestampSecs,
     ): Promise<Result<Event>> {
-        const id = await generateUUId(query);
+        const id = await UUID.generateUUId(query);
         created ??= nowS();
 
         const event = new Event(

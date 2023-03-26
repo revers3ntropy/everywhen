@@ -1,9 +1,9 @@
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
-import { generateUUId } from '../security/uuid';
 import { Result } from '../utils/result';
 import { nowS } from '../utils/time';
 import type { Auth } from './user';
+import { UUID } from './uuid';
 
 export class Asset {
 
@@ -32,8 +32,8 @@ export class Asset {
         created?: number,
         publicId?: string,
     ): Promise<Result<string>> {
-        publicId ??= await generateUUId(query);
-        const id = await generateUUId(query);
+        publicId ??= await UUID.generateUUId(query);
+        const id = await UUID.generateUUId(query);
         const fileExt = fileNamePlainText.split('.').pop();
         if (!fileExt) {
             return Result.err('Invalid file extension');
