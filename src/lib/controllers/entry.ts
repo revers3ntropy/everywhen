@@ -2,7 +2,7 @@ import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt, encryptMulti } from '../security/encryption';
 import { Result } from '../utils/result';
 import { nowS } from '../utils/time';
-import type { Mutable, PickOptionalAndMutable } from '../utils/types';
+import type { Mutable, PickOptionalAndMutable, Seconds } from '../utils/types';
 import { Label } from './label';
 import type { Auth } from './user';
 import { UUID } from './uuid';
@@ -40,7 +40,7 @@ export class Entry {
         public readonly id: string,
         public readonly title: string,
         public readonly entry: string,
-        public readonly created: number,
+        public readonly created: Seconds,
         public readonly deleted: boolean,
         public readonly latitude?: number,
         public readonly longitude?: number,

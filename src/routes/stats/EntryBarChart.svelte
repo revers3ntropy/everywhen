@@ -10,7 +10,8 @@
     import type { Entry } from '../../lib/controllers/entry';
     import { splitText, wordCount } from '../../lib/utils/text';
     import { nowS } from '../../lib/utils/time';
-    import { By } from './helpers';
+    import type { Seconds } from '../../lib/utils/types';
+    import { Bucket, bucketiseTime, bucketSize, By } from './helpers';
 
     export let entries: Entry[];
     export let by: By;
@@ -22,7 +23,7 @@
         labels: string[]
     }
 
-    let bucketSize = 60 * 60 * 24 * 7;
+    let selectedBucket = Bucket.Week;
 
     let data: ChartData;
     let filter = '';
@@ -32,13 +33,33 @@
         by = (by === By.Entries) ? By.Words : By.Entries;
     }
 
-    function bucketiseTime (time: number, bucketSize: number): number {
-        return Math.floor(time / bucketSize) * bucketSize;
+    function generateLabels (start: Seconds, buckets: Seconds[]) {
+        let year = moment(start * 1000).year();
+        return buckets.map(k => {
+            const thisYear = moment(k * 1000).year();
+            if (selectedBucket === Bucket.Year) {
+                return moment(k * 1000).format('YYYY');
+            }
+            if (selectedBucket === Bucket.Month) {
+                if (thisYear !== year) {
+                    year = thisYear;
+                    return moment(k * 1000).format('MMM YYYY');
+                }
+                return moment(k * 1000).format('MMM');
+            }
+
+            if (thisYear !== year) {
+                year = thisYear;
+                return moment(k * 1000).format('Do MMM YYYY');
+            }
+            return moment(k * 1000).format('Do MMM');
+        });
     }
+
 
     function getGraphData (
         entries: Entry[],
-        bucketSize: number,
+        selectedBucket: Bucket,
         by: By,
     ): ChartData {
         let filteredWords = splitText(filter);
@@ -59,30 +80,23 @@
             })
             .sort((a, b) => a.created - b.created);
 
-        const buckets: Record<number, number> = {};
-        const start = bucketiseTime(sortedFilteredEntries[0].created, bucketSize);
-        const end = bucketiseTime(nowS(), bucketSize) + bucketSize;
-        for (let i = start; i < end; i += bucketSize) {
-            buckets[i] = 0;
+        const buckets: Record<string, number> = {};
+        const start = sortedFilteredEntries[0].created;
+        const end = nowS() + bucketSize(selectedBucket);
+        for (let i = start; i < end; i += bucketSize(selectedBucket)) {
+            buckets[bucketiseTime(i, selectedBucket).toString()] = 0;
         }
 
         for (const entry of sortedFilteredEntries) {
-            const bucket = bucketiseTime(entry.created, bucketSize);
-            buckets[bucket] += (by === By.Entries) ? 1 : wordCount(entry.entry);
+            const bucket = bucketiseTime(entry.created, selectedBucket);
+            buckets[bucket.toString()] += (by === By.Entries) ? 1 : wordCount(entry.entry);
         }
 
-        let year = moment(start * 1000).year();
-        const labels = Object
-            .keys(buckets)
-            .map(k => parseInt(k))
-            .map(k => {
-                const thisYear = moment(k * 1000).year();
-                if (thisYear !== year) {
-                    year = thisYear;
-                    return moment(k * 1000).format('Do MMM YYYY');
-                }
-                return moment(k * 1000).format('Do MMM');
-            });
+        const labels = generateLabels(
+            start,
+            Object.keys(buckets)
+                  .map(k => parseInt(k)),
+        );
 
         const dataset = {
             data: Object.values(buckets),
@@ -95,21 +109,12 @@
         };
     }
 
-    function reloadChart (entries: Entry[], bucketSize: number, by: By) {
-        data = getGraphData(entries, bucketSize, by);
-
-        // if (browser) {
-        //     let size = Math.min(Math.max(
-        //         Math.ceil(document.body.clientWidth * 0.005), 1), 20);
-        //     if (bucketSize < 60 * 60 * 24 + 1) {
-        //         size = Math.min(size, 2);
-        //     }
-        //     document.body.style.setProperty('--bar-width', `${size}px`);
-        // }
+    function reloadChart (): void {
+        data = getGraphData(entries, selectedBucket, by);
     }
 
     // no data fetching so top level
-    $: reloadChart(entries, bucketSize, by);
+    $: [ entries, by, selectedBucket, reloadChart() ];
 </script>
 
 <Bar
@@ -122,13 +127,13 @@
     <div class="flex-center">
         <div>Group by</div>
         <Select
-            bind:value={bucketSize}
+            bind:value={selectedBucket}
             key="Week"
             options={{
-                Year: 60 * 60 * 24 * 365,
-                Month: 60 * 60 * 24 * 30,
-                Week: 60 * 60 * 24 * 7,
-                Day: 60 * 60 * 24,
+                Year: Bucket.Year,
+                Month: Bucket.Month,
+                Week: Bucket.Week,
+                Day: Bucket.Day,
             }}
         />
     </div>

@@ -47,7 +47,7 @@ export class Settings<T = unknown> {
             type: 'string',
             defaultValue: '',
             name: 'Passcode',
-            description: `Passcode to access the app. Set to 0 to disable.`,
+            description: `Passcode to access the app. Leave blank to disable.`,
         } satisfies ISettingsConfig<string>,
         passcodeTimeout: {
             type: 'number',
