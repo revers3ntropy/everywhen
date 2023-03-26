@@ -1,6 +1,6 @@
-import type { RequestHandler } from '@sveltejs/kit';
-import { apiResponse } from '../../../lib/utils/apiResponse';
+import { apiRes404 } from '../../../lib/utils/apiResponse';
 
-export const GET = (async ({}) => {
-    return apiResponse({ status: 404 });
-}) satisfies RequestHandler;
+export const GET = apiRes404;
+export const POST = apiRes404;
+export const DELETE = apiRes404;
+export const PUT = apiRes404;

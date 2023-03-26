@@ -1,3 +1,5 @@
+import type { RequestHandler } from '@sveltejs/kit';
+
 export class GenericResponse<T extends Record<string, unknown>> extends Response {
     constructor (val: string, init: ResponseInit) {
         super(val, init);
@@ -26,3 +28,7 @@ export function apiResponse<T extends {}> (
         },
     ) as GenericResponse<T extends Record<string, unknown> ? T : never>;
 }
+
+export const apiRes404 = (async ({}) => {
+    return apiResponse({ status: 404 }, { status: 404 });
+}) satisfies RequestHandler;

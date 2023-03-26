@@ -4,7 +4,7 @@ import { Event } from '../../../../lib/controllers/event';
 import { Label } from '../../../../lib/controllers/label';
 import { query } from '../../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../../lib/security/getAuthFromCookies';
-import { apiResponse } from '../../../../lib/utils/apiResponse';
+import { apiRes404, apiResponse } from '../../../../lib/utils/apiResponse';
 import { getUnwrappedReqBody } from '../../../../lib/utils/requestBody';
 import type { RequestHandler } from './$types';
 
@@ -101,3 +101,5 @@ export let DELETE = (async ({ cookies, params, request }) => {
 
     throw error(400, 'Invalid strategy');
 }) satisfies RequestHandler;
+
+export const POST = apiRes404;

@@ -8,7 +8,7 @@ import {
 } from '../../../lib/constants';
 import { User } from '../../../lib/controllers/user';
 import { query } from '../../../lib/db/mysql';
-import { apiResponse } from '../../../lib/utils/apiResponse';
+import { apiRes404, apiResponse } from '../../../lib/utils/apiResponse';
 
 export const GET = (async ({ url, cookies }) => {
     let key: string | undefined | null = url.searchParams.get('key');
@@ -33,3 +33,7 @@ export const GET = (async ({ url, cookies }) => {
         key, username, id: user.id,
     });
 }) satisfies RequestHandler;
+
+export const POST = apiRes404;
+export const DELETE = apiRes404;
+export const PUT = apiRes404;

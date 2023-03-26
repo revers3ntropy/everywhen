@@ -6,6 +6,7 @@ import { Asset } from './asset';
 import { Entry } from './entry';
 import { Event } from './event';
 import { Label } from './label';
+import { Settings } from './settings';
 import { UUID } from './uuid';
 
 export class User {
@@ -92,6 +93,7 @@ export class User {
         await Entry.purgeAll(query, auth);
         await Asset.purgeAll(query, auth);
         await Event.purgeAll(query, auth);
+        await Settings.purgeAll(query, auth);
 
         await query`
             DELETE

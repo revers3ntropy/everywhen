@@ -155,4 +155,16 @@ export class Settings<T = unknown> {
         }
         return newMap as SettingsConfig;
     }
+
+    public static async purgeAll (
+        query: QueryFunc,
+        auth: Auth,
+    ): Promise<Result> {
+        await query`
+            DELETE
+            FROM settings
+            WHERE user = ${auth.id}
+        `;
+        return Result.ok(null);
+    }
 }

@@ -3,7 +3,7 @@ import { error } from '@sveltejs/kit';
 import { Asset } from '../../../lib/controllers/asset';
 import { query } from '../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
-import { apiResponse } from '../../../lib/utils/apiResponse';
+import { apiRes404, apiResponse } from '../../../lib/utils/apiResponse';
 import { getUnwrappedReqBody } from '../../../lib/utils/requestBody';
 
 export const POST = (async ({ request, cookies }) => {
@@ -22,3 +22,7 @@ export const POST = (async ({ request, cookies }) => {
 
     return apiResponse({ id: val });
 }) satisfies RequestHandler;
+
+export const GET = apiRes404;
+export const DELETE = apiRes404;
+export const PUT = apiRes404;

@@ -10,7 +10,7 @@ import { Backup } from '../../../lib/controllers/backup';
 import { User } from '../../../lib/controllers/user';
 import { query } from '../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
-import { apiResponse } from '../../../lib/utils/apiResponse';
+import { apiRes404, apiResponse } from '../../../lib/utils/apiResponse';
 import { getUnwrappedReqBody } from '../../../lib/utils/requestBody';
 
 export const POST = (async ({ request, cookies }) => {
@@ -49,3 +49,6 @@ export const DELETE = (async ({ cookies }) => {
         backup: backupEncrypted,
     });
 }) satisfies RequestHandler;
+
+export const GET = apiRes404;
+export const PUT = apiRes404;

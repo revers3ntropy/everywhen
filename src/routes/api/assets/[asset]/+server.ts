@@ -3,6 +3,7 @@ import { error } from '@sveltejs/kit';
 import { Asset } from '../../../../lib/controllers/asset';
 import { query } from '../../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../../lib/security/getAuthFromCookies';
+import { apiRes404 } from '../../../../lib/utils/apiResponse';
 
 export const GET: RequestHandler = async ({ params, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
@@ -35,3 +36,7 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
         },
     );
 };
+
+export const POST = apiRes404;
+export const DELETE = apiRes404;
+export const PUT = apiRes404;

@@ -2,7 +2,7 @@ import { error } from '@sveltejs/kit';
 import { Label } from '../../../lib/controllers/label';
 import { query } from '../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
-import { apiResponse } from '../../../lib/utils/apiResponse';
+import { apiRes404, apiResponse } from '../../../lib/utils/apiResponse';
 import { getUnwrappedReqBody } from '../../../lib/utils/requestBody';
 import type { RequestHandler } from './$types';
 
@@ -30,3 +30,6 @@ export const POST = (async ({ request, cookies }) => {
 
     return apiResponse({ id: label.id });
 }) satisfies RequestHandler;
+
+export const DELETE = apiRes404;
+export const PUT = apiRes404;
