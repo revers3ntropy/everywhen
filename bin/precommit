@@ -1,0 +1,4 @@
+#!/bin/bash
+
+bin/check || exit 1
+bin/test || exit 1
