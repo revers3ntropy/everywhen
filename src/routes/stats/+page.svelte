@@ -1,4 +1,6 @@
 <script lang="ts">
+    // @ts-ignore
+    import { tooltip } from '@svelte-plugins/tooltips';
     import { onMount } from 'svelte';
     import type { App } from '../../app';
     import type { Entry } from '../../lib/controllers/entry';
@@ -41,7 +43,11 @@
         <section class="container unbordered">
             <h1>{data.entryCount} Entries</h1>
             <div class="stats">
-                <div>
+                <div
+                    use:tooltip={{
+                        content: "A typical novel is 100,000 words"
+                    }}
+                >
                     <span>{data.wordCount}</span>
                     Words
                 </div>
@@ -53,9 +59,13 @@
                     <span>{Math.round(data.wordCount / (data.entryCount || 1))}</span>
                     Words/Entry
                 </div>
-                <div>
+                <div
+                    use:tooltip={{
+                        content: "The average English word is 4.7 letters long"
+                    }}
+                >
                     <span>{Math.round(data.charCount / (data.wordCount || 1))}</span>
-                    Characters/Word
+                    Letters/Word
                 </div>
             </div>
         </section>
