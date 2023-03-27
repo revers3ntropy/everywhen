@@ -41,6 +41,8 @@
 
     export let auth: Auth;
 
+    let newEntryInputElement: HTMLTextAreaElement;
+
     export function reset () {
         newEntryTitle = '';
         newEntryBody = '';
@@ -81,6 +83,31 @@
             }
         }
         return false;
+    }
+
+    /**
+     * @src https://stackoverflow.com/questions/11076975
+     */
+    function insertAtCursor (input: HTMLInputElement | HTMLTextAreaElement, text: string) {
+        // IE support
+        if ((document as any).selection) {
+            input.focus();
+            const sel = (document as any).selection.createRange();
+            sel.text = text;
+        }
+        // MOZILLA and others
+        else if (input.selectionStart || input.selectionStart === 0) {
+            const startPos = input.selectionStart ?? undefined;
+            const endPos = input.selectionEnd ?? 0;
+            input.value = input.value.substring(0, startPos)
+                + text
+                + input.value.substring(endPos, input.value.length);
+            // restore cursor to after inserted text
+            input.selectionStart = startPos + text.length;
+            input.selectionEnd = startPos + text.length;
+        } else {
+            input.value += text;
+        }
     }
 
     let submitted = false;
@@ -199,7 +226,7 @@
         );
 
         // insert markdown to link to image
-        newEntryBody += `![${file.name}](/api/assets/${id})`;
+        insertAtCursor(newEntryInputElement, `\n![${file.name}](/api/assets/${id})\n`);
     }
 
     async function stopSpaceAndEnterBeingInterceptedByFileDrop () {
@@ -277,10 +304,10 @@
         </button>
     </div>
     <textarea
+        bind:this={newEntryInputElement}
         bind:value={newEntryBody}
         class="entry"
         placeholder="Entry"
-
     ></textarea>
 
     <button
