@@ -129,9 +129,13 @@ export class Backup {
             return Result.err('data must be a non-null object');
         }
 
-        decryptedData = Backup.migrate(decryptedData as Record<string, unknown>);
+        const {
+            err: migrateErr,
+            val: migratedData,
+        } = Backup.migrate(decryptedData as Record<string, unknown>);
+        if (migrateErr) return Result.err(migrateErr);
 
-        if (!schemion.matches(decryptedData, {
+        if (!schemion.matches(migratedData, {
             entries: 'object',
             labels: 'object',
             assets: 'object',
@@ -142,7 +146,7 @@ export class Backup {
             return Result.err('Invalid backup format');
         }
 
-        const { entries, labels, assets, events } = decryptedData;
+        const { entries, labels, assets, events } = migratedData;
         if (
             !Array.isArray(entries)
             || !Array.isArray(labels)

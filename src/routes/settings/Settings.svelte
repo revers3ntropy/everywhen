@@ -41,7 +41,6 @@
     }
 
     async function updateValue (newValue: unknown) {
-
         saving = true;
 
         value = newValue;
