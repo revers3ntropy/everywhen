@@ -1,7 +1,6 @@
 <script lang="ts">
     import { browser } from '$app/environment';
     import { beforeNavigate } from '$app/navigation';
-    import { enabledLocation } from '$lib/stores.js';
     // @ts-ignore
     import { tooltip } from '@svelte-plugins/tooltips';
     import { filedrop, type FileDropOptions, type Files } from 'filedrop-svelte';
@@ -12,7 +11,9 @@
     import LabelSelect from '../../lib/components/LabelSelect.svelte';
     import { MAX_IMAGE_SIZE } from '../../lib/constants';
     import type { Entry } from '../../lib/controllers/entry';
+    import type { Label } from '../../lib/controllers/label';
     import type { Auth } from '../../lib/controllers/user';
+    import { enabledLocation } from '../../lib/stores.js';
     import { api, apiPath } from '../../lib/utils/apiRequest';
     import { getFileContents } from '../../lib/utils/files';
     import { getLocation } from '../../lib/utils/geolocation';
@@ -223,8 +224,20 @@
         document.querySelector('.entry-file-drop > input').click();
     }
 
+    let labels: Label[] | null = null;
+
+    async function loadLabels () {
+        const labelsRes = displayNotifOnErr(addNotification,
+            await api.get(auth, '/labels'),
+        );
+        labels = labelsRes.labels;
+    }
+
     onMount(async () => {
-        await stopSpaceAndEnterBeingInterceptedByFileDrop();
+        await Promise.all([
+            loadLabels(),
+            stopSpaceAndEnterBeingInterceptedByFileDrop(),
+        ]);
     });
 
 </script>
@@ -250,7 +263,11 @@
         </button>
         <LocationToggle />
 
-        <LabelSelect {auth} bind:value={newEntryLabel} />
+        <LabelSelect
+            {auth}
+            bind:value={newEntryLabel}
+            {labels}
+        />
         <button
             aria-label="Submit Entry"
             class="send"

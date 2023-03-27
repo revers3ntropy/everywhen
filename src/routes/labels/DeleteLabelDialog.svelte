@@ -1,10 +1,11 @@
 <script lang="ts">
-    import BookSpinner from '$lib/components/BookSpinner.svelte';
     import { onMount } from 'svelte';
     import { getNotificationsContext } from 'svelte-notifications';
+    import BookSpinner from '../../lib/components/BookSpinner.svelte';
     import LabelSelect from '../../lib/components/LabelSelect.svelte';
     import type { Entry } from '../../lib/controllers/entry';
     import type { Event } from '../../lib/controllers/event';
+    import type { Label } from '../../lib/controllers/label';
     import type { Auth } from '../../lib/controllers/user';
     import { popup } from '../../lib/stores';
     import { api, apiPath } from '../../lib/utils/apiRequest';
@@ -19,6 +20,7 @@
 
     let entries: Entry[] = [];
     let events: Event[] = [];
+    let labels: Label[] | null = null;
 
     let loaded = false;
 
@@ -34,6 +36,12 @@
         );
         events = eventsRes.events
                           .filter(e => e.label?.id === id);
+
+        const labelsRes = displayNotifOnErr(addNotification,
+            await api.get(auth, '/labels'),
+        );
+        labels = labelsRes.labels;
+
         loaded = true;
     }
 
@@ -75,11 +83,16 @@
     {:else}
         <div class="options">
             <div>
-                <LabelSelect
-                    {auth}
-                    bind:value={changeLabelId}
-                    filter={label => label.id !== id}
-                />
+                {#if labels}
+                    <LabelSelect
+                        {auth}
+                        bind:value={changeLabelId}
+                        filter={label => label.id !== id}
+                        {labels}
+                    />
+                {:else}
+                    Loading...
+                {/if}
                 <button on:click={reassign}>
                     Give Different Label to Entries/Events with this Label
                 </button>

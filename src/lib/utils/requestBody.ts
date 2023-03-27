@@ -25,7 +25,6 @@ export async function bodyFromReq<T extends Schema & object> (
         body,
         schema,
         defaults as T extends object ? { [P in keyof T]?: SchemaResult<T[P]> | undefined; } | null : null,
-        { strict: true },
     )) {
         return Result.err(`Invalid body: does not match expected schema`);
     }

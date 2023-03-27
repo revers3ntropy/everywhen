@@ -43,6 +43,7 @@ export const PUT = (async ({ request, params, cookies }) => {
     }
 
     if (body.label !== 'NO_CHANGE') {
+        console.log(body.label);
         const { err } = await Event.updateLabel(query, auth, event, body.label);
         if (err) throw error(400, err);
     }

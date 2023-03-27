@@ -16,6 +16,7 @@
     import { api, apiPath } from '../../lib/utils/apiRequest';
     import { displayNotifOnErr } from '../../lib/utils/notifications';
     import { fmtTimestampForInput, parseTimestampFromInput } from '../../lib/utils/time';
+    import type { Seconds } from '../../lib/utils/types';
 
     const { addNotification } = getNotificationsContext();
     const dispatch = createEventDispatcher();
@@ -26,7 +27,7 @@
     export let changeEventCount: (by: number) => void;
 
     let nameInput: HTMLInputElement;
-    let labels: Label[] = [];
+    export let labels: Label[] | null;
 
     type OnChangeEvent = Event & { currentTarget: EventTarget & HTMLInputElement } | {
         target: { value: string }
@@ -35,8 +36,8 @@
     async function updateEvent (
         changes: {
             name?: string;
-            start?: number;
-            end?: number;
+            start?: Seconds;
+            end?: Seconds;
             label?: Label['id'];
         },
     ) {
@@ -104,35 +105,31 @@
     async function makeDurationEvent () {
         const newEnd = event.end + 60 * 60;
         event.end = newEnd;
-        await updateEnd({
-            target: {
-                value: fmtTimestampForInput(newEnd),
-            },
-        } as OnChangeEvent);
+        await updateEvent({
+            end: newEnd,
+        });
     }
 
     async function makeInstantEvent () {
         event.end = event.start;
-        await updateEnd({
-            target: {
-                value: fmtTimestampForInput(event.start),
-            },
-        } as OnChangeEvent);
+        await updateEvent({
+            end: event.start,
+        });
     }
 
     async function updateLabel (
         { detail: { id } }: CustomEvent<{ id: string }>,
     ) {
-        if (id === (event.label?.id || '')) {
-            return;
-        }
+        if (id === (event.label?.id || '')) return;
+        if (!labels) return;
+
         event.label = labels.find(l => l.id === id) || undefined;
         await updateEvent({
             label: id,
         });
     }
 
-    onMount(() => {
+    onMount(async () => {
         if (selectNameId === event.id) {
             nameInput.focus();
             nameInput.select();
@@ -165,7 +162,7 @@
         <LabelSelect
             on:change={updateLabel}
             value={event.label?.id || ''}
-            bind:labels={labels}
+            {labels}
             {auth}
         />
         <button

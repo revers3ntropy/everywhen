@@ -1,12 +1,12 @@
 <script lang="ts">
-    import { createEventDispatcher, onMount } from 'svelte';
+    import { createEventDispatcher } from 'svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import Dropdown from '../../lib/components/Dropdown.svelte';
     import type { Label } from '../controllers/label';
     import type { Auth } from '../controllers/user';
     import { api } from '../utils/apiRequest';
-    import { displayNotifOnErr } from '../utils/notifications';
+    import { displayNotifOnErr, ERR_NOTIFICATION } from '../utils/notifications';
     import { showPopup } from '../utils/popups';
     import NewLabelDialog from './dialogs/NewLabelDialog.svelte';
 
@@ -14,7 +14,7 @@
 
     const { addNotification } = getNotificationsContext();
 
-    export let labels: Label[] = [];
+    export let labels: Label[] | null;
     export let value = '';
     export let auth: Auth;
     export let showAddButton = true;
@@ -36,20 +36,14 @@
         });
     }
 
-    async function loadLabels() {
-        const res = displayNotifOnErr(addNotification,
-            await api.get(auth, '/labels'),
-        );
-        labels = res.labels;
-
-        // if we delete a label while it was selected, unselect
-        if (!labels.find(l => l.id === value) && value !== '') {
-            console.error(`Label ${value} not found`);
-            value = '';
-        }
+    $: if (labels && value !== '' && !labels.find(l => l.id === value)) {
+        console.error(`Label ${value} not found`);
+        value = '';
+        addNotification({
+            ...ERR_NOTIFICATION,
+            text: `Can't find label`,
+        });
     }
-
-    onMount(loadLabels);
 
 </script>
 <div class="select-label">
@@ -61,11 +55,15 @@
         <span slot="button" class="select-button">
             <span
                 class="entry-label-colour"
-                style="background: {labels
+                style="background: {(labels ?? [])
                     .find(l => l.id === value)?.colour || 'transparent'
                   }"
             ></span>
-            {labels.find(l => l.id === value)?.name || '(No Label)'}
+            {#if labels}
+                {labels.find(l => l.id === value)?.name || '(No Label)'}
+            {:else}
+                loading...
+            {/if}
         </span>
         <button
             on:click={() => { closeDropDown(); value = '' }}
@@ -74,7 +72,7 @@
         >
             <i>(No Label)</i>
         </button>
-        {#each labels.filter(filter) as label (label.id)}
+        {#each (labels ?? []).filter(filter) as label (label.id)}
             <button
                 on:click={() => { closeDropDown(); value = label.id }}
                 class="label-button"

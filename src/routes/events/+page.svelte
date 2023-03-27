@@ -28,6 +28,14 @@
     type EventData = EventController & { deleted?: true };
 
     let events: EventData[] = data.events;
+    let labels: Label[] | null = null;
+
+    async function loadLabels () {
+        const labelsRes = displayNotifOnErr(addNotification,
+            await api.get(data, '/labels'),
+        );
+        labels = labelsRes.labels;
+    }
 
     function sortEvents<T extends Event | EventData> (
         events: T[],
@@ -109,6 +117,10 @@
 
     onMount(() => document.title = `Events`);
 
+    onMount(async () => {
+        await loadLabels();
+    });
+
 </script>
 
 <svelte:head>
@@ -141,7 +153,6 @@
                 options={sortEventsKeys}
             />
         </div>
-
     </div>
     <ul>
         {#each events as event}
@@ -153,6 +164,7 @@
                     changeEventCount={(by) => eventCount += by}
                     on:update={reloadEvents}
                     on:delete={handleDeleteEvent}
+                    {labels}
                 />
             </li>
         {/each}
