@@ -197,6 +197,12 @@ export class Event {
         return evt.end - evt.start;
     }
 
+    public static isInstantEvent (
+        evt: { start: TimestampSecs, end: TimestampSecs },
+    ): boolean {
+        return Event.duration(evt) < 60;
+    }
+
     public static intersects (
         evt1: { start: TimestampSecs, end: TimestampSecs },
         evt2: { start: TimestampSecs, end: TimestampSecs },

@@ -1,5 +1,6 @@
 <script lang="ts">
     import { renderable, START_ZOOM } from '../../lib/canvas/canvas';
+    import type { EntryEdit } from '../../lib/controllers/entry';
     import type { Label } from '../../lib/controllers/label';
     import { obfuscated } from '../../lib/stores';
 
@@ -12,6 +13,7 @@
     export let decrypted: boolean;
     export let deleted: boolean;
     export let label: Label | null = null;
+    export let edits: EntryEdit[] = [];
 
     renderable(state => {
         const renderPos = state.timeToRenderPos(created);

@@ -1,13 +1,12 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../../app';
     import Background from '../../lib/canvas/Background.svelte';
+    import { canvasState } from '../../lib/canvas/canvas';
     import Canvas from '../../lib/canvas/Canvas.svelte';
     import type { Entry } from '../../lib/controllers/entry';
     import { Event } from '../../lib/controllers/event';
-    import { api } from '../../lib/utils/apiRequest';
-    import { displayNotifOnErr } from '../../lib/utils/notifications';
+    import { nowS } from '../../lib/utils/time';
     import CenterLine from './CenterLine.svelte';
     import Controls from './Controls.svelte';
     import EntryInTimeline from './EntryInTimeline.svelte';
@@ -16,28 +15,24 @@
     import TimeCursor from './TimeCursor.svelte';
     import TimeMarkers from './TimeMarkers.svelte';
 
-    const { addNotification } = getNotificationsContext();
-
-    export let data: App.PageData;
-
-    let timeline: {
+    export let data: App.PageData & {
         entries: (Entry & { wordCount: number })[],
         events: Event[],
-    } = {
-        entries: [],
-        events: [],
     };
+
     let events: ({ yLevel: number } & Event)[];
 
     const eventBaseY = 4;
 
-    function updateEvents (rawEvents: Event[]) {
+    function addYToEvents (
+        rawEvents: Event[],
+    ): ({ yLevel: number } & Event)[] {
         const evts: (typeof events) = rawEvents.sort((e1, e2) => {
             return Event.duration(e1) - Event.duration(e2);
         }).map(e => ({ ...e, yLevel: 0 }));
 
         for (const event of evts) {
-            if (Event.duration(event) < 60) {
+            if (Event.isInstantEvent(event)) {
                 continue;
             }
 
@@ -52,17 +47,36 @@
             }
         }
 
-        events = evts;
+        return evts;
     }
 
-    $: updateEvents(timeline.events);
+    $: events = addYToEvents(data.events);
 
-
-    onMount(async () => {
-        timeline = displayNotifOnErr(addNotification,
-            await api.get(data, '/timeline'),
+    function setInitialZoomAndPos () {
+        const earliestTimestamp = Math.min(
+            ...data.entries.map(e => e.created),
+            ...data.events.map(e => e.start),
         );
-    });
+        const earliestTimestampTimeAgo = nowS() - earliestTimestamp;
+        const daysAgo = Math.round(Math.min(
+            52,
+            Math.max(
+                earliestTimestampTimeAgo / (60 * 60 * 24),
+                0,
+            ),
+        ));
+
+        // zoom so that there is 7 days of blank space to the left
+        // of the last entry/event,
+        // except if it is more than 52 days ago,
+        // then show 59 days
+
+        $canvasState.zoom = 1 / 60 / (daysAgo + 7);
+
+        $canvasState.cameraOffset = 24;
+    }
+
+    onMount(setInitialZoomAndPos);
 
     onMount(() => document.title = 'Timeline');
 
@@ -108,7 +122,7 @@
         <NowLine />
         <TimeCursor />
 
-        {#each timeline.entries as entry, i}
+        {#each data.entries as entry, i}
             <EntryInTimeline
                 {...entry}
                 entryTextParityHeight={i % 2 === 0}

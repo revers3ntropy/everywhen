@@ -16,7 +16,7 @@ function commonWordsFromText (txt: string): [ string, number ][] {
     return wordEntries.sort(([ _, a ], [ _2, b ]) => b - a);
 }
 
-export const load: PageServerLoad = async ({ cookies }) => {
+export const load = (async ({ cookies }) => {
     const auth = await getAuthFromCookies(cookies);
 
     const { val: entries, err } = await Entry.all(query, auth, false);
@@ -35,4 +35,4 @@ export const load: PageServerLoad = async ({ cookies }) => {
         wordCount,
         charCount,
     };
-};
+}) satisfies PageServerLoad;

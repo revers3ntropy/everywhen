@@ -23,7 +23,6 @@ export type DELETE<T extends { DELETE: unknown }> = ResType<T['DELETE']>;
 
 interface ApiResponse {
     'GET': {
-        '/timeline': GET<typeof import('../../routes/api/timeline/+server')>,
         '/labels': GET<typeof import('../../routes/api/labels/+server')>,
         '/labels/?': GET<typeof import('../../routes/api/labels/[labelId]/+server')>,
         '/events': GET<typeof import('../../routes/api/events/+server')>,
