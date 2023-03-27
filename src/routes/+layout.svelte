@@ -101,6 +101,21 @@
 </svelte:head>
 
 <Notifications>
+
+    {#if data.settings.passcode.value
+    && nowS() - $passcodeLastEntered > data.settings.passcodeTimeout.value
+    && showPasscodeModal
+    && !home
+    && (data.settings.passcodeTimeout.value > 0
+        || !$passcodeLastEntered
+        || !browser)
+    }
+        <PasscodeModal
+            bind:show={showPasscodeModal}
+            passcode={data.settings.passcode.value}
+        />
+    {/if}
+
     <Notifier bind:addNotification />
 
     {#if !home}
@@ -116,20 +131,6 @@
         classWindow="popup-background"
         show={$popup}
     />
-
-    {#if data.settings.passcode.value
-    && nowS() - $passcodeLastEntered > data.settings.passcodeTimeout.value
-    && showPasscodeModal
-    && !home
-    && (data.settings.passcodeTimeout.value > 0
-        || !$passcodeLastEntered
-        || !browser)
-    }
-        <PasscodeModal
-            bind:show={showPasscodeModal}
-            passcode={data.settings.passcode.value}
-        />
-    {/if}
 
     <Footer />
 </Notifications>
