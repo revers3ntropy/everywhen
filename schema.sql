@@ -30,7 +30,7 @@ CREATE TABLE `entries`
     `latitude`  double       DEFAULT NULL,
     `longitude` double       DEFAULT NULL,
     `title`     text         NULL,
-    `entry`     text         NOT NULL,
+    `entry`     longtext     NOT NULL,
     `deleted`   int(1)       DEFAULT 0,
     `label`     varchar(128) DEFAULT NULL
 ) ENGINE = InnoDB
@@ -46,7 +46,7 @@ CREATE TABLE `entryEdits`
     `latitude`  double       DEFAULT NULL,
     `longitude` double       DEFAULT NULL,
     `title`     text         NULL,
-    `entry`     text         NOT NULL,
+    `entry`     longtext     NOT NULL,
     `label`     varchar(128) DEFAULT NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
