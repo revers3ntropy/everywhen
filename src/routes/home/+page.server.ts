@@ -32,5 +32,6 @@ export const load: PageServerLoad = async ({ cookies }) => {
 
     return {
         titles,
+        entries: JSON.parse(JSON.stringify(entries)),
     };
 };

@@ -10,6 +10,7 @@
 
     export let data: App.PageData;
 
+    // user log in / create account form values
     let password = '';
     let username = '';
 

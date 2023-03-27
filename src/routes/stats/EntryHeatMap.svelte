@@ -10,7 +10,7 @@
     export let by: By;
     let data: { date: Date, value: number }[] = [];
 
-    function reloadChart (entries: Entry[], by: By) {
+    function reloadChart () {
         data = entries.map((entry) => {
             return {
                 date: new Date(entry.created * 1000),
@@ -21,7 +21,7 @@
         });
     }
 
-    $: reloadChart(entries, by);
+    $: if (entries && by) reloadChart();
 
     const showMonths = 6;
     const currentMonth = new Date().getMonth();

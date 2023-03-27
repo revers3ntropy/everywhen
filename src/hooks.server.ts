@@ -4,6 +4,8 @@ import { con, connect } from './lib/db/mysql';
 process.on('SIGINT', process.exit);
 process.on('SIGTERM', process.exit);
 
+// keep connection to database alive
+// so it's not re-connected on API request
 setInterval(async () => {
     if (!con) await connect();
     con?.ping();

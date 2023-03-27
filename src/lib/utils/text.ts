@@ -13,6 +13,9 @@ export function obfuscate (
     });
 }
 
+/**
+ * Split into 'words' as best as possible
+ */
 export function splitText (text: string): string[] {
     return text.split(/[\s,.\-:;!"*()=+\[\]{}?|]+/)
                .filter(Boolean);

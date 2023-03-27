@@ -70,7 +70,6 @@ export async function importEntries (
             label: '',
             deleted: false,
         })) {
-            console.log(entryJSON);
             errors.push([ i, `entry is not valid object` ]);
             continue;
         }

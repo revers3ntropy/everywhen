@@ -23,11 +23,13 @@
     import { displayNotifOnErr, SUCCESS_NOTIFICATION } from '../../lib/utils/notifications';
     import { showPopup } from '../../lib/utils/popups';
     import type { Result } from '../../lib/utils/result';
+    import type { Seconds } from '../../lib/utils/types';
 
     const { addNotification } = getNotificationsContext();
 
     export let data: App.PageData & {
         titles: Record<number, Entry[]>,
+        entries: Entry[],
     };
 
     function downloadBackup (data: string, username: string) {
@@ -96,6 +98,29 @@
     }
 
     onMount(() => document.title = `Home`);
+
+    function entriesYearsAgoToday<T extends { created: Seconds }> (
+        entries: T[],
+    ): Record<string, T[]> {
+        const res: Record<string, T[]> = {};
+        const nowTime = moment();
+        for (const entry of entries) {
+            const entryTime = moment(new Date(entry.created * 1000));
+            // entries on the same day and month, but not this year
+            if (
+                entryTime.date() === nowTime.date()
+                && entryTime.month() === nowTime.month()
+                && entryTime.year() !== nowTime.year()
+            ) {
+                const yearsAgo = nowTime.year() - entryTime.year();
+                if (!res[yearsAgo]) {
+                    res[yearsAgo] = [];
+                }
+                res[yearsAgo].push(entry);
+            }
+        }
+        return res;
+    }
 </script>
 
 <main>
@@ -171,6 +196,17 @@
             />
         </section>
     {/if}
+    {#each Object.entries(entriesYearsAgoToday(data.entries)) as [yearsAgo, titles]}
+        <section>
+            <h1>
+                {yearsAgo === '1' ? `A Year` : `${yearsAgo} Years`} Ago Today
+            </h1>
+            <EntryTitles
+                titles={{ [titles[0].created]: titles }}
+                obfuscated={$obfuscated}
+            />
+        </section>
+    {/each}
 </main>
 
 <style lang="less">
