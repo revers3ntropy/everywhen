@@ -79,6 +79,11 @@
 
         .content {
             text-align: center;
+
+            .password-input {
+                -webkit-text-security: disc;
+                text-security: disc;
+            }
         }
     }
 </style>

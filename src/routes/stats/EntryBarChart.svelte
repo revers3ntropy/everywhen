@@ -165,6 +165,10 @@
         justify-content: space-between;
         align-items: center;
         padding: 0;
+
+        @media @mobile {
+            flex-direction: column;
+        }
     }
 
     .container {

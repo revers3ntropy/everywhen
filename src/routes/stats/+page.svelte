@@ -124,5 +124,11 @@
     .container {
         padding: 1em;
         margin: 1em;
+
+        @media @mobile {
+            padding: 0;
+            margin: 1em 0;
+            border: none;
+        }
     }
 </style>
