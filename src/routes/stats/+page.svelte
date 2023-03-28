@@ -21,6 +21,10 @@
 
     onMount(() => document.title = 'Analytics');
 
+    function round1DP (num: number) {
+        return Math.round(num * 10) / 10;
+    }
+
 </script>
 
 <svelte:head>
@@ -56,7 +60,7 @@
                     Characters
                 </div>
                 <div>
-                    <span>{Math.round(data.wordCount / (data.entryCount || 1))}</span>
+                    <span>{round1DP(data.wordCount / (data.entryCount || 1))}</span>
                     Words/Entry
                 </div>
                 <div
@@ -64,7 +68,7 @@
                         content: "The average English word is 4.7 letters long"
                     }}
                 >
-                    <span>{Math.round(data.charCount / (data.wordCount || 1))}</span>
+                    <span>{round1DP(data.charCount / (data.wordCount || 1))}</span>
                     Letters/Word
                 </div>
             </div>
