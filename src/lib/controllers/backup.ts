@@ -1,7 +1,9 @@
+import moment from 'moment/moment';
 import schemion from 'schemion';
 import { parseSemVer } from 'semver-parser';
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
+import { download as downloadFile } from '../utils/files';
 import { Result } from '../utils/result';
 import { nowS } from '../utils/time';
 import { Asset } from './asset';
@@ -256,5 +258,10 @@ export class Backup {
         }
 
         return Result.ok(json as Backup);
+    }
+
+    public static download (data: string, username: string) {
+        const dateFmt = moment(new Date()).format('YYYY-MM-DD:HH-mm');
+        downloadFile(`${dateFmt}-${username}.backup.encrypted.json`, data);
     }
 }

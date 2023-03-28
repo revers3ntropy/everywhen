@@ -12,16 +12,34 @@
     import Notebook from 'svelte-material-icons/Notebook.svelte';
     import Dropdown from '../lib/components/Dropdown.svelte';
     import type { Auth } from '../lib/controllers/user';
+    import { wheel } from '../lib/utils/toggleScrollable';
 
     export let auth: Auth;
 
     let showingNavPopup = false;
+
+    function onClick (_: Event) {
+        if (showingNavPopup) {
+            showingNavPopup = false;
+        }
+    }
+
+    function openNavPopup (event: Event) {
+        event.stopPropagation();
+        showingNavPopup = true;
+    }
 </script>
+
+<svelte:window
+    on:click={onClick}
+    use:wheel={{ scrollable: !showingNavPopup }}
+/>
+
 <header>
     <div class="menu-button-mobile">
         <button
             aria-label="Show nav menu"
-            on:click={() => (showingNavPopup = true)}
+            on:click={openNavPopup}
         >
             <Menu size="40" />
         </button>
