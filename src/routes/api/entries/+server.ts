@@ -40,7 +40,7 @@ export const GET = (async ({ url, cookies }) => {
 export const POST = (async ({ request, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
 
-    const body = await getUnwrappedReqBody(request, {
+    let body = await getUnwrappedReqBody(request, {
         created: 'number',
         latitude: 'number',
         longitude: 'number',
@@ -62,7 +62,11 @@ export const POST = (async ({ request, cookies }) => {
         }
     }
 
-    const { val: entry, err } = await Entry.create(query, auth, body);
+    const { val: entry, err } = await Entry.create(query, auth, {
+        ...body,
+        latitude: body.latitude || undefined,
+        longitude: body.longitude || undefined,
+    });
     if (err) throw error(400, err);
 
     return apiResponse({ id: entry.id });

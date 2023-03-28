@@ -37,8 +37,8 @@ export const PUT = (async ({ request, params, cookies }) => {
         title: '',
         entry: '',
         label: '',
-        latitude: null as unknown as number,
-        longitude: null as unknown as number,
+        latitude: 0,
+        longitude: 0,
     });
 
     const {
@@ -52,8 +52,8 @@ export const PUT = (async ({ request, params, cookies }) => {
         entry,
         body.title,
         body.entry,
-        body.latitude,
-        body.longitude,
+        body.latitude || undefined,
+        body.longitude || undefined,
         body.label,
     );
 

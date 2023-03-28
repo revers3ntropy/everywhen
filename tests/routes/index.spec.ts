@@ -60,6 +60,9 @@ test.describe('/', () => {
 
         await expect(page).toHaveURL('/home');
 
+        await page.goto('/settings', { waitUntil: 'networkidle' });
+        await expect(page).toHaveURL('/settings');
+
         expect(await page.isVisible('button[aria-label="Delete Account"]'))
             .toBe(true);
 

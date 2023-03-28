@@ -7,14 +7,11 @@
     import Counter from 'svelte-material-icons/Counter.svelte';
     import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
     import Notebook from 'svelte-material-icons/Notebook.svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../../app';
     import EntryTitles from '../../lib/components/EntryTitles.svelte';
     import type { Entry } from '../../lib/controllers/entry';
     import { obfuscated } from '../../lib/stores.js';
     import type { Seconds } from '../../lib/utils/types';
-
-    const { addNotification } = getNotificationsContext();
 
     export let data: App.PageData & {
         titles: Record<number, Entry[]>,
@@ -83,6 +80,12 @@
                 titles={data.titles}
                 obfuscated={$obfuscated}
             />
+        </section>
+    {:else}
+        <section>
+            <h1>Recent Entries</h1>
+            Doesn't look like you have any entries yet.
+            Why not <a href="/diary">write one</a>?
         </section>
     {/if}
     {#each Object.entries(entriesYearsAgoToday(data.entries)) as [yearsAgo, titles]}

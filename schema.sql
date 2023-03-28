@@ -12,11 +12,12 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `users`
 (
-    `id`       varchar(128) NOT NULL,
-    `username` varchar(255) NOT NULL,
-    `password` varchar(255) NOT NULL,
-    `salt`     varchar(255) NOT NULL,
-    `created`  int(64)      NOT NULL
+    `id`              varchar(128) NOT NULL,
+    `username`        varchar(255) NOT NULL,
+    `password`        varchar(255) NOT NULL,
+    `salt`            varchar(255) NOT NULL,
+    `created`         int(64)      NOT NULL,
+    `createdTZOffset` double       NOT NULL DEFAULT 0
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
@@ -24,15 +25,16 @@ CREATE TABLE `users`
 
 CREATE TABLE `entries`
 (
-    `id`        varchar(128) NOT NULL,
-    `user`      varchar(128) NOT NULL,
-    `created`   int(64)      NOT NULL,
-    `latitude`  double       DEFAULT NULL,
-    `longitude` double       DEFAULT NULL,
-    `title`     text         NULL,
-    `entry`     longtext     NOT NULL,
-    `deleted`   int(1)       DEFAULT 0,
-    `label`     varchar(128) DEFAULT NULL
+    `id`              varchar(128) NOT NULL,
+    `user`            varchar(128) NOT NULL,
+    `created`         int(64)      NOT NULL,
+    `createdTZOffset` double       NOT NULL DEFAULT 0,
+    `latitude`        double                DEFAULT NULL,
+    `longitude`       double                DEFAULT NULL,
+    `title`           text         NULL,
+    `entry`           longtext     NOT NULL,
+    `deleted`         int(1)                DEFAULT 0,
+    `label`           varchar(128)          DEFAULT NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
 
@@ -40,14 +42,15 @@ CREATE TABLE `entries`
 
 CREATE TABLE `entryEdits`
 (
-    `id`        varchar(128) NOT NULL,
-    `entryId`   varchar(128) NOT NULL,
-    `created`   int(64)      NOT NULL,
-    `latitude`  double       DEFAULT NULL,
-    `longitude` double       DEFAULT NULL,
-    `title`     text         NULL,
-    `entry`     longtext     NOT NULL,
-    `label`     varchar(128) DEFAULT NULL
+    `id`              varchar(128) NOT NULL,
+    `entryId`         varchar(128) NOT NULL,
+    `created`         int(64)      NOT NULL,
+    `createdTZOffset` double       NOT NULL DEFAULT 0,
+    `latitude`        double                DEFAULT NULL,
+    `longitude`       double                DEFAULT NULL,
+    `title`           text         NULL,
+    `entry`           longtext     NOT NULL,
+    `label`           varchar(128)          DEFAULT NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
 
@@ -55,13 +58,16 @@ CREATE TABLE `entryEdits`
 
 CREATE TABLE `events`
 (
-    `id`      varchar(128) NOT NULL,
-    `user`    varchar(128) NOT NULL,
-    `name`    varchar(256) NOT NULL,
-    `start`   int(64)      NOT NULL,
-    `end`     int(64)      NOT NULL,
-    `label`   varchar(128) DEFAULT NULL,
-    `created` int(64)      NOT NULL
+    `id`              varchar(128) NOT NULL,
+    `user`            varchar(128) NOT NULL,
+    `name`            varchar(256) NOT NULL,
+    `start`           int(64)      NOT NULL,
+    `startTZOffset`   double       NOT NULL DEFAULT 0,
+    `end`             int(64)      NOT NULL,
+    `endTZOffset`     double       NOT NULL DEFAULT 0,
+    `label`           varchar(128)          DEFAULT NULL,
+    `created`         int(64)      NOT NULL,
+    `createdTZOffset` double       NOT NULL DEFAULT 0
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
 
@@ -69,11 +75,12 @@ CREATE TABLE `events`
 
 CREATE TABLE `labels`
 (
-    `id`      varchar(128) NOT NULL,
-    `user`    varchar(128) NOT NULL,
-    `name`    varchar(256) NOT NULL,
-    `colour`  varchar(64)  NOT NULL,
-    `created` int(64)      NOT NULL
+    `id`              varchar(128) NOT NULL,
+    `user`            varchar(128) NOT NULL,
+    `name`            varchar(256) NOT NULL,
+    `colour`          varchar(64)  NOT NULL,
+    `created`         int(64)      NOT NULL,
+    `createdTZOffset` double       NOT NULL DEFAULT 0
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
 
@@ -81,17 +88,18 @@ CREATE TABLE `labels`
 
 CREATE TABLE `assets`
 (
-    `id`          varchar(128) NOT NULL,
+    `id`              varchar(128) NOT NULL,
     # publicId is unique per user and allows same
     # public id to be used for different users
     # (for instance when importing a backup into a different
     # account, which will duplicate IDs)
-    `publicId`    varchar(128) NOT NULL,
-    `user`        varchar(128) NOT NULL,
-    `created`     int(64)      NOT NULL,
-    `fileName`    varchar(256) NOT NULL,
-    `contentType` varchar(128) NOT NULL,
-    `content`     longtext     NOT NULL
+    `publicId`        varchar(128) NOT NULL,
+    `user`            varchar(128) NOT NULL,
+    `created`         int(64)      NOT NULL,
+    `createdTZOffset` double       NOT NULL DEFAULT 0,
+    `fileName`        varchar(256) NOT NULL,
+    `contentType`     varchar(128) NOT NULL,
+    `content`         longtext     NOT NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
 
@@ -99,11 +107,12 @@ CREATE TABLE `assets`
 
 CREATE TABLE `settings`
 (
-    `id`      varchar(128) NOT NULL,
-    `user`    varchar(128) NOT NULL,
-    `created` int(64)      NOT NULL,
-    `key`     varchar(256) NOT NULL,
-    `value`   longtext     NOT NULL
+    `id`              varchar(128) NOT NULL,
+    `user`            varchar(128) NOT NULL,
+    `created`         int(64)      NOT NULL,
+    `createdTZOffset` double       NOT NULL DEFAULT 0,
+    `key`             varchar(256) NOT NULL,
+    `value`           longtext     NOT NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
 

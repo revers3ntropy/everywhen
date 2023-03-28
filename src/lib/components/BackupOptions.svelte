@@ -8,7 +8,7 @@
     import { api } from '../utils/apiRequest';
     import { displayNotifOnErr, SUCCESS_NOTIFICATION } from '../utils/notifications';
     import { showPopup } from '../utils/popups';
-    import { Result } from '../utils/result';
+    import type { Result } from '../utils/result';
     import FileDropDialog from './dialogs/FileDropDialog.svelte';
 
     const { addNotification } = getNotificationsContext();

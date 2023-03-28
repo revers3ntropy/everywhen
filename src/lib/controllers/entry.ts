@@ -498,8 +498,8 @@ export class Entry {
         entry: Entry,
         newTitle: string,
         newEntry: string,
-        newLatitude: number,
-        newLongitude: number,
+        newLatitude: number | undefined,
+        newLongitude: number | undefined,
         newLabel: Label | string,
     ): Promise<Result> {
         const { err, val: encryptionResults } = encryptMulti(

@@ -82,6 +82,7 @@
 
             .password-input {
                 -webkit-text-security: disc;
+                -moz-text-security: disc;
                 text-security: disc;
             }
         }
