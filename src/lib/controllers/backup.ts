@@ -119,12 +119,17 @@ export class Backup {
         key: string,
     ): Promise<Result> {
         let decryptedData: unknown;
-        const { err, val: decryptedRaw } = decrypt(backupEncrypted, key);
-        if (err) return Result.err(err);
+
         try {
-            decryptedData = JSON.parse(decryptedRaw);
+            decryptedData = JSON.parse(backupEncrypted);
         } catch (e) {
-            return Result.err('data must be a valid JSON string');
+            const { err, val: decryptedRaw } = decrypt(backupEncrypted, key);
+            if (err) return Result.err(err);
+            try {
+                decryptedData = JSON.parse(decryptedRaw);
+            } catch (e) {
+                return Result.err('data must be a valid JSON string');
+            }
         }
 
         if (typeof decryptedData !== 'object' || decryptedData === null) {
@@ -260,8 +265,12 @@ export class Backup {
         return Result.ok(json as Backup);
     }
 
-    public static download (data: string, username: string) {
-        const dateFmt = moment(new Date()).format('YYYY-MM-DD:HH-mm');
-        downloadFile(`${dateFmt}-${username}.backup.encrypted.json`, data);
+    public static download (data: string, username: string, encrypted = true) {
+        const dateFmt = moment(new Date()).format('yyyyMMDD-HHmm');
+        const encryptedExt = encrypted ? '.encrypted' : '';
+        downloadFile(
+            `${dateFmt}-${username}.backup${encryptedExt}.json`,
+            data,
+        );
     }
 }

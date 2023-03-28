@@ -1,6 +1,5 @@
 import { browser } from '$app/environment';
 import { PUBLIC_SVELTEKIT_PORT } from '$env/static/public';
-import type { HttpMethod } from '@sveltejs/kit/types/private';
 import { serialize } from 'cookie';
 import {
     KEY_COOKIE_KEY,
@@ -61,7 +60,7 @@ export async function makeApiReq<
     Body extends object
 > (
     auth: Auth,
-    method: HttpMethod,
+    method: Verb,
     path: string,
     body: Body | null = null,
 ): Promise<Result<ApiResponse[Verb][Path]>> {

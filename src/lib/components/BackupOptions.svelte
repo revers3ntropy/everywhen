@@ -1,5 +1,6 @@
 <script lang="ts">
     import Download from 'svelte-material-icons/Download.svelte';
+    import DownloadLock from 'svelte-material-icons/DownloadLock.svelte';
     import Upload from 'svelte-material-icons/Upload.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import { Backup } from '../controllers/backup';
@@ -15,11 +16,16 @@
 
     export let auth: Auth;
 
-    async function download () {
+    let downloading = false;
+
+    async function download (encrypted: boolean) {
+        if (downloading) return;
+        downloading = true;
         const { data: backupData } = displayNotifOnErr(addNotification,
-            await api.get(auth, '/backups'),
+            await api.get(auth, '/backups', { encrypted }),
         );
         Backup.download(backupData, auth.username);
+        downloading = false;
     }
 
     function upload () {
@@ -31,7 +37,7 @@
             textBoxLabel: 'Password of account the backup came from ' +
                 '(leave blank if same account)',
             withContents: async (res: Result<string>, password?: string) => {
-                const contents = displayNotifOnErr(addNotification, res);
+                let contents = displayNotifOnErr(addNotification, res);
 
                 if (!confirm(
                     'Are you sure you want to restore from this backup?'
@@ -62,11 +68,24 @@
     }
 </script>
 
-<button on:click={download}>
-    <Download size="30" />
+<button
+    disabled={downloading}
+    on:click={() => download(true)}
+>
+    <DownloadLock size="30" />
     Download Backup
 </button>
-<button on:click={upload}>
+<button
+    disabled={downloading}
+    on:click={() => download(false)}
+>
+    <Download size="30" />
+    Download Backup (Unencrypted)
+</button>
+<button
+    disabled={downloading}
+    on:click={upload}
+>
     <Upload size="30" />
     Restore from Backup
 </button>
