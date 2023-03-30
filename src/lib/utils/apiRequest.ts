@@ -86,8 +86,6 @@ export async function makeApiReq<
         body.utcTimeS ??= nowS();
     }
 
-    console.log(body);
-
     const init: RequestInit = {
         method,
         headers: {

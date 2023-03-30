@@ -15,7 +15,7 @@
     import type { Auth } from '../../lib/controllers/user';
     import { api, apiPath } from '../../lib/utils/apiRequest';
     import { displayNotifOnErr } from '../../lib/utils/notifications';
-    import { fmtTimestampForInput, parseTimestampFromInput } from '../../lib/utils/time';
+    import { fmtTimestampForInput, parseTimestampFromInputUtc } from '../../lib/utils/time';
     import type { Seconds } from '../../lib/utils/types';
 
     const { addNotification } = getNotificationsContext();
@@ -56,23 +56,25 @@
 
     async function updateStart ({ target }: OnChangeEvent) {
         if (!target || !('value' in target)) throw target;
+        console.log(target.value);
         await updateEvent({
-            start: parseTimestampFromInput(target.value),
+            start: parseTimestampFromInputUtc(target.value),
         });
     }
 
     async function updateStartAndEnd ({ target }: OnChangeEvent) {
         if (!target || !('value' in target)) throw target;
         await updateEvent({
-            start: parseTimestampFromInput(target.value),
-            end: parseTimestampFromInput(target.value),
+            start: parseTimestampFromInputUtc(target.value),
+            end: parseTimestampFromInputUtc(target.value),
         });
     }
 
     async function updateEnd ({ target }: OnChangeEvent) {
         if (!target || !('value' in target)) throw target;
+        console.log(target.value);
         await updateEvent({
-            end: parseTimestampFromInput(target.value),
+            end: parseTimestampFromInputUtc(target.value),
         });
     }
 
