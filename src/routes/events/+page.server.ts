@@ -17,7 +17,7 @@ export const load: PageServerLoad = async ({ cookies }) => {
     return {
         events: events.map((event) => ({
             ...event,
-            label: { ...event.label },
+            label: event.label ? { ...event.label } : undefined,
         })),
         labels: labels.map((label) => ({ ...label })),
     };
