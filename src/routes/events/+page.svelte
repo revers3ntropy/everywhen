@@ -178,21 +178,6 @@
             grid-template-columns: 100%;
             margin: 0;
         }
-
-        li {
-            .bordered();
-            margin: .3rem .3em;
-            padding: .4em;
-            border-radius: 10px;
-
-            @media @mobile {
-                margin: .3rem 0;
-                padding: 0.5em 0 1em 0;
-                border-radius: 0;
-                border: none;
-                border-top: 1px solid @border;
-            }
-        }
     }
 
     .menu {

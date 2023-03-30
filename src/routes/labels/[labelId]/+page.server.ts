@@ -1,5 +1,6 @@
 import { error } from '@sveltejs/kit';
 import { Entry } from '../../../lib/controllers/entry';
+import { Event } from '../../../lib/controllers/event';
 import { Label } from '../../../lib/controllers/label';
 import { query } from '../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
@@ -20,8 +21,21 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
     );
     if (entriesErr) throw error(400, entriesErr);
 
+    const { err: eventsErr, val: events } = await Event.all(query, auth);
+    if (eventsErr) throw error(400, eventsErr);
+
+    const { err: LabelsErr, val: labels } = await Label.all(query, auth);
+    if (LabelsErr) throw error(400, LabelsErr);
+
     return {
         label: { ...label },
         entryCount: entries[1],
+        events: events
+            .filter((event) => event.label?.id === labelId)
+            .map((event) => ({
+                ...event,
+                label: event.label ? { ...event.label } : undefined,
+            })),
+        labels: JSON.parse(JSON.stringify(labels)),
     };
 };

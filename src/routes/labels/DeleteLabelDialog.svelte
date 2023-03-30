@@ -17,12 +17,14 @@
     export let id: string;
     export let colour: string;
     export let name: string;
+    export let reloadOnDelete = true;
 
     let entries: Entry[] = [];
     let events: Event[] = [];
     let labels: Label[] | null = null;
 
     let loaded = false;
+    let changeLabelId: string;
 
     async function reloadEntries () {
 
@@ -45,17 +47,17 @@
         loaded = true;
     }
 
-    onMount(reloadEntries);
-
-    let changeLabelId: string;
-
     async function rmLabel () {
         displayNotifOnErr(addNotification,
             await api.delete(auth, apiPath(`/labels/?`, id), {
                 strategy: 'remove',
             }),
         );
-        location.reload();
+        if (reloadOnDelete) {
+            location.reload();
+        } else {
+            popup.set(null);
+        }
     }
 
     async function reassign () {
@@ -65,12 +67,19 @@
                 newLabelId: changeLabelId,
             }),
         );
-        location.reload();
+        if (reloadOnDelete) {
+            location.reload();
+        } else {
+            popup.set(null);
+        }
     }
 
     function cancel () {
         popup.set(null);
     }
+
+    onMount(reloadEntries);
+
 </script>
 
 <div>

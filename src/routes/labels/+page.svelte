@@ -7,7 +7,7 @@
     import { api } from '../../lib/utils/apiRequest';
     import { displayNotifOnErr } from '../../lib/utils/notifications';
     import { nowS } from '../../lib/utils/time';
-    import Label from './Label.svelte';
+    import LabelOptions from './LabelOptions.svelte';
 
     const { addNotification } = getNotificationsContext();
 
@@ -66,7 +66,7 @@
     <div class="labels">
         <div class="label-list">
             {#each data.labels as label}
-                <Label
+                <LabelOptions
                     {...label}
                     auth={data}
                     on:delete={({ detail }) => labelDeleted(detail.id)}

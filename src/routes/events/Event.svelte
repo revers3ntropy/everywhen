@@ -13,6 +13,7 @@
     import TimelineClockOutline from 'svelte-material-icons/TimelineClockOutline.svelte';
     import TimelineOutline from 'svelte-material-icons/TimelineOutline.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
+    import Label from '../../lib/components/Label.svelte';
     import LabelSelect from '../../lib/components/LabelSelect.svelte';
     import type { Event as EventController } from '../../lib/controllers/event';
     import type { Label as LabelController } from '../../lib/controllers/label';
@@ -29,12 +30,12 @@
     export let auth: Auth;
     export let obfuscated = true;
     export let event: EventController & { deleted?: true };
-    export let selectNameId: string;
+    export let selectNameId = '';
     export let changeEventCount: (by: number) => void;
     export let editingLabel = false;
 
     let nameInput: HTMLInputElement;
-    export let labels: LabelController[] | null;
+    export let labels: LabelController[];
 
     type OnChangeEvent = Event & { currentTarget: EventTarget & HTMLInputElement } | {
         target: { value: string }
@@ -149,186 +150,203 @@
         nameInput.focus();
     }
 </script>
-
-{#if event.deleted}
-    <div class="restore-menu">
-        <i>'{event.name}' has been deleted</i>
-        <button
-            class="primary unbordered"
-            on:click={restoreEvent}
-        >
-            <Restore />
-            Undo Deletion
-        </button>
-    </div>
-{:else}
-    <div class="header">
-        <button
-            aria-label={obfuscated ? 'Show entry' : 'Hide entry'}
-            on:click={() => obfuscated = !obfuscated}
-        >
-            {#if obfuscated}
-                <Eye size="25" />
-            {:else}
-                <EyeOff size="25" />
-            {/if}
-        </button>
-        {#if !obfuscated}
-            <i>
-                Created
-                {moment(new Date(event.created * 1000))
-                    .format('hh:mm DD/MM/YYYY')}
-            </i>
-            {#if editingLabel}
-                <div class="flex-center">
-                    <LabelSelect
-                        on:change={updateLabel}
-                        value={event.label?.id || ''}
-                        {labels}
-                        {auth}
-                    />
-                    <button
-                        on:click={() => editingLabel = false}
-                        class="icon-button"
-                    >
-                        <PencilOff size="20" />
-                    </button>
-                </div>
-            {:else}
-                {#if event.label}
-                    <button
-                        on:click={() => editingLabel = true}
-                    >
-                        <span
-                            class="entry-label-colour"
-                            style="background: {event.label?.colour || 'transparent'}"
-                        ></span>
-                        {event.label.name}
-                        <Pencil size="15" />
-                    </button>
-                {:else}
-                    <button
-                        class="link"
-                        on:click={() => editingLabel = true}
-                    >
-                        Add Label
-                    </button>
-                {/if}
-            {/if}
+<div class="event">
+    {#if event.deleted}
+        <div class="restore-menu">
+            <i>'{event.name}' has been deleted</i>
             <button
-                class="danger"
-                on:click={deleteEvent}
+                class="primary unbordered"
+                on:click={restoreEvent}
             >
-                <Bin size="25" />
+                <Restore />
+                Undo Deletion
             </button>
-        {/if}
-    </div>
-    <div class="middle-row">
-        {#if obfuscated}
-            <p class="event-name-inp obfuscated">
-                {obfuscate(event.name)}
-            </p>
-        {:else}
-            <input
-                bind:this={nameInput}
-                class="editable-text event-name-inp"
-                on:change={updateName}
-                placeholder="Event Name"
-                value={event.name}
+        </div>
+    {:else}
+        <div class="header">
+            <button
+                aria-label={obfuscated ? 'Show entry' : 'Hide entry'}
+                on:click={() => obfuscated = !obfuscated}
             >
-        {/if}
-        <p>
-            {#if event.end - event.start > 60}
+                {#if obfuscated}
+                    <Eye size="25" />
+                {:else}
+                    <EyeOff size="25" />
+                {/if}
+            </button>
+            {#if !obfuscated}
                 <i>
-                    ({moment.duration(event.end - event.start, 's')
-                    .humanize()})
+                    Created
+                    {moment(new Date(event.created * 1000))
+                        .format('hh:mm DD/MM/YYYY')}
                 </i>
-            {/if}
-        </p>
-    </div>
-    <div class="from-to-menu">
-        {#if event.end - event.start < 60}
-            {#if obfuscated}
-                <div>
-                    <i>at</i>
-                    <span>
-                        {moment(new Date(event.start * 1000))
-                            .format('DD/MM/YYYY HH:mm')}
-                    </span>
-                </div>
-            {:else}
-                <div>
-                    <i>at</i>
-                    <input
-                        class="editable-text"
-                        on:change={updateStartAndEnd}
-                        placeholder="Start"
-                        type="datetime-local"
-                        value={fmtTimestampForInput(event.start)}
-                    >
-                </div>
+                {#if editingLabel}
+                    <div class="flex-center">
+                        <LabelSelect
+                            on:change={updateLabel}
+                            value={event.label?.id || ''}
+                            {labels}
+                            {auth}
+                        />
+                        <button
+                            on:click={() => editingLabel = false}
+                            class="icon-button"
+                        >
+                            <PencilOff size="20" />
+                        </button>
+                    </div>
+                {:else}
+                    {#if event.label}
+                        <span>
+                            <Label
+                                {obfuscated}
+                                label={event.label}
+                            />
+                            <button
+                                on:click={() => editingLabel = true}
+                            >
+                                <Pencil size="15" />
+                            </button>
+                        </span>
+                    {:else}
+                        <button
+                            class="link"
+                            on:click={() => editingLabel = true}
+                        >
+                            Add Label
+                        </button>
+                    {/if}
+                {/if}
                 <button
-                    class="link"
-                    on:click={makeDurationEvent}
-                    use:tooltip={{ content: 'Give this event a duration' }}
+                    class="danger"
+                    on:click={deleteEvent}
                 >
-                    <TimelineOutline size="30" />
+                    <Bin size="25" />
                 </button>
             {/if}
-        {:else}
+        </div>
+        <div class="middle-row">
             {#if obfuscated}
-                <div>
-                    <i>from</i>
-                    <span>
-                        {moment(new Date(event.start * 1000))
-                            .format('DD/MM/YYYY HH:mm')}
-                    </span>
-                </div>
-                <div>
-                    <i>to</i>
-                    <span>
-                        {moment(new Date(event.end * 1000))
-                            .format('DD/MM/YYYY HH:mm')}
-                    </span>
-                </div>
+                <p class="event-name-inp obfuscated">
+                    {obfuscate(event.name)}
+                </p>
             {:else}
-                <div>
-                    <i>from</i>
-                    <input
-                        class="editable-text"
-                        on:change={updateStart}
-                        placeholder="Start"
-                        type="datetime-local"
-                        value={fmtTimestampForInput(event.start)}
-                    >
-                </div>
-                <div>
-                    <i>to</i>
-                    <input
-                        class="editable-text"
-                        on:change={updateEnd}
-                        placeholder="End"
-                        type="datetime-local"
-                        value={fmtTimestampForInput(event.end)}
-                    >
-                </div>
-                <div>
+                <input
+                    bind:this={nameInput}
+                    class="editable-text event-name-inp"
+                    on:change={updateName}
+                    placeholder="Event Name"
+                    value={event.name}
+                >
+            {/if}
+            <p>
+                {#if event.end - event.start > 60}
+                    <i>
+                        ({moment.duration(event.end - event.start, 's')
+                        .humanize()})
+                    </i>
+                {/if}
+            </p>
+        </div>
+        <div class="from-to-menu">
+            {#if event.end - event.start < 60}
+                {#if obfuscated}
+                    <div>
+                        <i>at</i>
+                        <span>
+                            {moment(new Date(event.start * 1000))
+                                .format('DD/MM/YYYY HH:mm')}
+                        </span>
+                    </div>
+                {:else}
+                    <div>
+                        <i>at</i>
+                        <input
+                            class="editable-text"
+                            on:change={updateStartAndEnd}
+                            placeholder="Start"
+                            type="datetime-local"
+                            value={fmtTimestampForInput(event.start)}
+                        >
+                    </div>
                     <button
                         class="link"
-                        on:click={makeInstantEvent}
-                        use:tooltip={{ content: 'Make this event instantaneous' }}
+                        on:click={makeDurationEvent}
+                        use:tooltip={{ content: 'Give this event a duration' }}
                     >
-                        <TimelineClockOutline size="30" />
+                        <TimelineOutline size="30" />
                     </button>
-                </div>
+                {/if}
+            {:else}
+                {#if obfuscated}
+                    <div>
+                        <i>from</i>
+                        <span>
+                            {moment(new Date(event.start * 1000))
+                                .format('DD/MM/YYYY HH:mm')}
+                        </span>
+                    </div>
+                    <div>
+                        <i>to</i>
+                        <span>
+                            {moment(new Date(event.end * 1000))
+                                .format('DD/MM/YYYY HH:mm')}
+                        </span>
+                    </div>
+                {:else}
+                    <div>
+                        <i>from</i>
+                        <input
+                            class="editable-text"
+                            on:change={updateStart}
+                            placeholder="Start"
+                            type="datetime-local"
+                            value={fmtTimestampForInput(event.start)}
+                        >
+                    </div>
+                    <div>
+                        <i>to</i>
+                        <input
+                            class="editable-text"
+                            on:change={updateEnd}
+                            placeholder="End"
+                            type="datetime-local"
+                            value={fmtTimestampForInput(event.end)}
+                        >
+                    </div>
+                    <div>
+                        <button
+                            class="link"
+                            on:click={makeInstantEvent}
+                            use:tooltip={{ content: 'Make this event instantaneous' }}
+                        >
+                            <TimelineClockOutline size="30" />
+                        </button>
+                    </div>
+                {/if}
             {/if}
-        {/if}
-    </div>
-{/if}
+        </div>
+    {/if}
+</div>
 
 <style lang="less">
     @import '../../styles/variables.less';
     @import '../../styles/layout.less';
+
+    .event {
+        .bordered();
+        margin: .3rem .3em;
+        padding: .4em;
+        border-radius: 10px;
+
+        @media @mobile {
+            margin: .3rem 0;
+            padding: 0.5em 0 1em 0;
+            border-radius: 0;
+            border: none;
+            border-top: 1px solid @border;
+        }
+    }
 
     i {
         font-size: 0.8em;
