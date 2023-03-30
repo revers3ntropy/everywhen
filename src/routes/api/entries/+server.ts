@@ -47,12 +47,14 @@ export const POST = (async ({ request, cookies }) => {
         title: 'string',
         entry: 'string',
         label: 'string',
+        timezoneUtcOffset: 'number',
     }, {
         title: '',
         label: '',
         latitude: 0,
         longitude: 0,
         created: nowS(),
+        timezoneUtcOffset: 0,
     });
 
     // check label exists
@@ -66,6 +68,7 @@ export const POST = (async ({ request, cookies }) => {
         ...body,
         latitude: body.latitude || undefined,
         longitude: body.longitude || undefined,
+        createdTZOffset: body.timezoneUtcOffset,
     });
     if (err) throw error(400, err);
 

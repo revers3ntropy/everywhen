@@ -4,7 +4,6 @@
     import { tooltip } from '@svelte-plugins/tooltips';
     import DomPurify from 'dompurify';
     import { marked } from 'marked';
-    import moment from 'moment';
     import { createEventDispatcher } from 'svelte';
     import Bin from 'svelte-material-icons/Delete.svelte';
     import Restore from 'svelte-material-icons/DeleteRestore.svelte';
@@ -12,6 +11,7 @@
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import NoteEditOutline from 'svelte-material-icons/NoteEditOutline.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
+    import UtcTime from '../../lib/components/UtcTime.svelte';
     import type { Entry } from '../controllers/entry';
     import type { Label as LabelController } from '../controllers/label';
     import type { Auth } from '../controllers/user';
@@ -26,7 +26,8 @@
     export let id = '';
     export let title = '';
     export let entry = '';
-    export let created = 0;
+    export let created: number;
+    export let createdTZOffset = 0;
     export let label: LabelController | null | undefined =
         undefined as LabelController | null | undefined;
     export let latitude: number | null = null;
@@ -83,14 +84,14 @@
 
 <div class="entry {obfuscated ? '' : 'visible'}">
     <div class="header">
-        <div>
-			<span class="time">
-                {#if showFullDate}
-                    {moment(new Date(created * 1000)).format('DD/MM/YYYY h:mm A')}
-                {:else}
-                    {moment(new Date(created * 1000)).format('h:mm A')}
-                {/if}
-			</span>
+        <div class="flex-center">
+            <span class="time">
+                <UtcTime
+                    showDate={showFullDate}
+                    timestamp={created}
+                    tzOffset={createdTZOffset}
+                />
+            </span>
             <Label label={showLabel} obfuscated={obfuscated} />
         </div>
         <div class="title {obfuscated ? 'obfuscated' : ''}">
@@ -208,6 +209,7 @@
                 border: none;
             }
 
+            // generated from markdown
             :global(ul), :global(ol) {
                 margin: 0 .5em;
                 padding: 0;

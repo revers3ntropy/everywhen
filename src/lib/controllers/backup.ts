@@ -21,6 +21,7 @@ export class Backup {
             latitude?: number;
             longitude?: number;
             created: number;
+            createdTZOffset: number;
             edits: {
                 title: string;
                 label?: string; // label's name
@@ -28,6 +29,7 @@ export class Backup {
                 latitude?: number;
                 longitude?: number;
                 created: number;
+                createdTZOffset: number;
             }[],
         }[],
         public labels: {
@@ -57,6 +59,7 @@ export class Backup {
     public static async generate (
         query: QueryFunc,
         auth: Auth,
+        created?: number,
     ): Promise<Result<Backup>> {
         // use allRaw to keep the label as a string (it's Id)
         const { err: entryErr, val: entries } = await Entry.all(query, auth);
@@ -75,6 +78,7 @@ export class Backup {
                 label: entry.label?.name,
                 entry: entry.entry,
                 created: entry.created,
+                createdTZOffset: entry.createdTZOffset,
                 // not `null`
                 latitude: entry.latitude ?? undefined,
                 longitude: entry.longitude ?? undefined,
@@ -82,6 +86,7 @@ export class Backup {
                 edits: entry.edits?.map(edit => ({
                     entry: edit.entry,
                     created: edit.created,
+                    createdTZOffset: edit.createdTZOffset,
                     label: edit.label?.name,
                     latitude: edit.latitude ?? undefined,
                     longitude: edit.longitude ?? undefined,
@@ -107,7 +112,7 @@ export class Backup {
                 end: event.end,
                 created: event.created,
             })),
-            nowS(),
+            created ?? nowS(),
             __VERSION__,
         ));
     }

@@ -25,6 +25,7 @@ export type PickOptional<A, B extends keyof A = keyof A> =
 
 export type Bytes = number;
 
+export type Hours = number;
 export type Seconds = number;
 export type TimestampSecs = number;
 export type Milliseconds = number;

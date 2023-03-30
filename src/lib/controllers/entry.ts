@@ -2,7 +2,12 @@ import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt, encryptMulti } from '../security/encryption';
 import { Result } from '../utils/result';
 import { nowS } from '../utils/time';
-import type { Mutable, PickOptionalAndMutable, Seconds } from '../utils/types';
+import type {
+    Hours,
+    Mutable,
+    PickOptionalAndMutable,
+    TimestampSecs,
+} from '../utils/types';
 import { Label } from './label';
 import type { Auth } from './user';
 import { UUID } from './uuid';
@@ -40,7 +45,8 @@ export class Entry {
         public readonly id: string,
         public readonly title: string,
         public readonly entry: string,
-        public readonly created: Seconds,
+        public readonly created: TimestampSecs,
+        public readonly createdTZOffset: Hours,
         public readonly deleted: boolean,
         public readonly latitude?: number,
         public readonly longitude?: number,
@@ -104,6 +110,7 @@ export class Entry {
         return await query<RawEntry[]>`
             SELECT id,
                    created,
+                   createdTZOffset,
                    title,
                    deleted,
                    label,
@@ -193,6 +200,7 @@ export class Entry {
             decryptedTitle,
             decryptedEntry,
             rawEntry.created,
+            rawEntry.createdTZOffset,
             rawEntry.deleted,
         );
 
@@ -361,6 +369,7 @@ export class Entry {
             json.title,
             json.entry,
             json.created,
+            json.createdTZOffset,
             !!json.deleted,
         );
 
@@ -371,6 +380,7 @@ export class Entry {
                     e.title,
                     e.entry,
                     e.created,
+                    e.createdTZOffset,
                     false,
                 )) ?? [],
         );
@@ -388,12 +398,14 @@ export class Entry {
 
         await query`
             INSERT INTO entries
-                (id, user, title, entry, created, deleted, label, latitude, longitude)
+            (id, user, title, entry, created, createdTZOffset, deleted, label, latitude,
+             longitude)
             VALUES (${entry.id},
                     ${auth.id},
                     ${encryptedTitle},
                     ${encryptedEntry},
                     ${entry.created},
+                    ${entry.createdTZOffset ?? 0},
                     ${entry.deleted},
                     ${entry.label?.id ?? null},
                     ${entry.latitude ?? null},
@@ -416,12 +428,13 @@ export class Entry {
             await query`
                 INSERT INTO entryEdits
                 (id, entryId, title, entry,
-                 created, label, latitude, longitude)
+                 created, createdTZOffset, label, latitude, longitude)
                 VALUES (${edit.id},
                         ${entry.id},
                         ${encryptedEditTitle},
                         ${encryptedEditEntry},
                         ${edit.created},
+                        ${edit.createdTZOffset ?? 0},
                         ${edit.label?.id ?? null},
                         ${edit.latitude ?? null},
                         ${edit.longitude ?? null})
@@ -484,6 +497,7 @@ export class Entry {
             self.title,
             self.entry,
             self.created,
+            self.createdTZOffset,
             self.deleted,
             self.latitude,
             self.longitude,
@@ -501,6 +515,7 @@ export class Entry {
         newLatitude: number | undefined,
         newLongitude: number | undefined,
         newLabel: Label | string,
+        tzOffset: number,
     ): Promise<Result> {
         const { err, val: encryptionResults } = encryptMulti(
             auth.key,
@@ -521,10 +536,12 @@ export class Entry {
 
         await query`
             INSERT INTO entryEdits
-                (id, entryId, created, latitude, longitude, title, entry, label)
+            (id, entryId, created, createdTZOffset, latitude, longitude, title, entry,
+             label)
             VALUES (${editId},
                     ${entry.id},
                     ${nowS()},
+                    ${tzOffset},
                     ${newLatitude ?? null},
                     ${newLongitude ?? null},
                     ${oldTitle},

@@ -11,6 +11,13 @@ import type { Auth } from '../controllers/user';
 import type { GenericResponse } from './apiResponse';
 import { GETArgs } from './GETArgs';
 import { Result } from './result';
+import { nowS } from './time';
+
+type ReqBody = {
+    timezoneUtcOffset?: number,
+    utcTimeS?: number,
+    [key: string]: any,
+}
 
 export type ResType<T> = T extends (props: any) =>
     Promise<GenericResponse<infer R>> ? R : never;
@@ -57,7 +64,7 @@ interface ApiResponse {
 export async function makeApiReq<
     Verb extends keyof ApiResponse,
     Path extends keyof ApiResponse[Verb],
-    Body extends object
+    Body extends ReqBody
 > (
     auth: Auth,
     method: Verb,
@@ -70,17 +77,29 @@ export async function makeApiReq<
         url = `http://localhost:${PUBLIC_SVELTEKIT_PORT}${url}`;
     }
 
+    if (method !== 'GET') {
+        body ??= {} as Body;
+        // supply default timezone to all requests
+        if (browser) {
+            body.timezoneUtcOffset ??= -(new Date().getTimezoneOffset() / 60);
+        }
+        body.utcTimeS ??= nowS();
+    }
+
+    console.log(body);
+
     const init: RequestInit = {
         method,
         headers: {
             'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Cookie:
+            'Accept': 'application/json',
+            'Cookie':
                 serialize(KEY_COOKIE_KEY, auth.key, KEY_COOKIE_OPTIONS)
                 + ' ; '
                 + serialize(USERNAME_COOKIE_KEY, auth.username, USERNAME_COOKIE_OPTIONS),
         },
     };
+
     if (body) {
         init.body = JSON.stringify(body);
     }

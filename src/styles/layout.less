@@ -18,7 +18,11 @@ body {
 }
 
 main:extend(#svelte) {
-    padding: 30px 16px;
+    padding: 1.2rem;
+
+    @media @mobile {
+        padding: 0;
+    }
 }
 
 .flex-center {

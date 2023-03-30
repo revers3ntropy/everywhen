@@ -281,34 +281,38 @@
             class="title"
             placeholder="Title"
         />
-        <button
-            aria-label="Insert Image"
-            on:click={triggerFileDrop}
-            use:tooltip={{ content: 'Insert Image' }}
-        >
-            <ImageArea size="30" />
-        </button>
-        <LocationToggle />
+        <div class="right-options">
+            <button
+                aria-label="Insert Image"
+                on:click={triggerFileDrop}
+                use:tooltip={{ content: 'Insert Image' }}
+            >
+                <ImageArea size="30" />
+            </button>
+            <LocationToggle />
 
-        <LabelSelect
-            {auth}
-            bind:value={newEntryLabel}
-            {labels}
-        />
-        <button
-            aria-label="Submit Entry"
-            class="send"
-            on:click={submit}
-        >
-            <Send size="30" />
-        </button>
+            <LabelSelect
+                {auth}
+                bind:value={newEntryLabel}
+                {labels}
+            />
+            <button
+                aria-label="Submit Entry"
+                class="send icon-button"
+                on:click={submit}
+            >
+                <Send size="30" />
+            </button>
+        </div>
     </div>
-    <textarea
-        bind:this={newEntryInputElement}
-        bind:value={newEntryBody}
-        class="entry"
-        placeholder="Entry"
-    ></textarea>
+    <div class="entry-container">
+        <textarea
+            bind:this={newEntryInputElement}
+            bind:value={newEntryBody}
+            class="entry"
+            placeholder="Entry"
+        ></textarea>
+    </div>
 
     <button
         aria-label="Submit Entry"
@@ -333,28 +337,38 @@
 
     .head {
         margin: 0;
-        padding: 0.4em;
+        padding: 0 0.4em;
         border-bottom: 1px solid @border-light;
         display: flex;
-        align-items: center;
+        align-items: end;
         justify-content: space-between;
 
         @media @mobile {
-            display: block;
+            display: flex;
+            flex-wrap: wrap;
             border: none;
         }
-    }
 
-    .title {
-        border: none;
-        width: 55%;
-        font-size: 20px;
-        margin: 0 0 0 1em;
+        .title {
+            border: none;
+            width: 55%;
+            font-size: 20px;
+            margin: 0 0 .2rem .3em;
 
-        @media @mobile {
-            width: 100%;
-            margin: 0.2em;
-            border-bottom: 1px solid @border-light;
+            @media @mobile {
+                width: 100%;
+                margin: 0.2em;
+                border-bottom: 1px solid @border-light;
+            }
+        }
+
+        .right-options {
+            height: 100%;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: end;
+            align-items: center;
         }
     }
 
@@ -376,6 +390,8 @@
     }
 
     .send {
+        margin: 0 0 0 .2rem;
+        padding: .4rem;
         @media @mobile {
             display: none;
         }
@@ -396,10 +412,27 @@
         }
     }
 
-    textarea {
-        @media @mobile {
-            // annoying on mobile to resize horizontally
-            resize: vertical;
+    .entry-container {
+        padding: 1rem;
+
+        textarea {
+            width: 100%;
+            max-width: 100%;
+            resize: both;
+            padding: 0;
+            margin: 0;
+
+            // fills page
+            height: calc(100vh - 12rem);
+
+            @media @mobile {
+                // annoying on mobile to resize horizontally
+                resize: vertical;
+
+                // puts submit button at bottom of screen nicely
+                height: calc(100vh - 19rem);
+            }
         }
     }
+
 </style>

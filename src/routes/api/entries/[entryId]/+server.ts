@@ -33,12 +33,14 @@ export const PUT = (async ({ request, params, cookies }) => {
         label: 'string',
         latitude: 'number',
         longitude: 'number',
+        timezoneUtcOffset: 'number',
     }, {
         title: '',
         entry: '',
         label: '',
         latitude: 0,
         longitude: 0,
+        timezoneUtcOffset: 0,
     });
 
     const {
@@ -55,6 +57,7 @@ export const PUT = (async ({ request, params, cookies }) => {
         body.latitude || undefined,
         body.longitude || undefined,
         body.label,
+        body.timezoneUtcOffset,
     );
 
     if (err) throw error(400, err);

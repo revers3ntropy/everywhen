@@ -30,3 +30,7 @@ export function cryptoRandomStr (length = 32): string {
         .randomBytes(length)
         .toString('base64url');
 }
+
+export function numberAsSignedStr (num: number): string {
+    return num >= 0 ? `+${num}` : `${num}`;
+}

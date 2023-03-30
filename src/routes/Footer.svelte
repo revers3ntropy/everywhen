@@ -1,10 +1,21 @@
 <script>
+    import Github from 'svelte-material-icons/Github.svelte';
+
     const version = __VERSION__;
 </script>
 
 <footer>
     <div>
         v{version}
+    </div>
+    <div>
+        <a
+            href="https://github.com/revers3ntropy/halcyon.land"
+            rel="noreferrer"
+            target="_blank"
+        >
+            <Github size="30" />
+        </a>
     </div>
 </footer>
 

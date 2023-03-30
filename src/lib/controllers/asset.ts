@@ -57,7 +57,8 @@ export class Asset {
         if (fileNameErr) return Result.err(fileNameErr);
 
         await query`
-            INSERT INTO assets (id, publicId, user, created, fileName, contentType, content)
+            INSERT INTO assets (id, publicId, user, created, fileName,
+                                contentType, content)
             VALUES (${id},
                     ${publicId},
                     ${auth.id},
@@ -76,8 +77,13 @@ export class Asset {
         publicId: string,
     ): Promise<Result<Asset>> {
 
-        const res = await query`
-            SELECT id, publicId, content, created, fileName, contentType
+        const res = await query<Asset[]>`
+            SELECT id,
+                   publicId,
+                   content,
+                   created,
+                   fileName,
+                   contentType
             FROM assets
             WHERE publicId = ${publicId}
               AND user = ${auth.id}
@@ -110,7 +116,12 @@ export class Asset {
         auth: Auth,
     ): Promise<Result<Asset[]>> {
         const res = await query<Asset[]>`
-            SELECT id, publicId, content, created, fileName, contentType
+            SELECT id,
+                   publicId,
+                   content,
+                   created,
+                   fileName,
+                   contentType
             FROM assets
             WHERE user = ${auth.id}
         `;
