@@ -109,6 +109,8 @@
         } else {
             input.value += text;
         }
+
+        newEntryBody = input.value;
     }
 
     let submitted = false;

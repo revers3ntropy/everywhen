@@ -1,6 +1,7 @@
 <script lang="ts">
     // @ts-ignore
     import { tooltip } from '@svelte-plugins/tooltips';
+    import moment from 'moment';
     import { createEventDispatcher, onMount } from 'svelte';
     import Check from 'svelte-material-icons/Check.svelte';
     import ContentCopy from 'svelte-material-icons/ContentCopy.svelte';
@@ -97,6 +98,11 @@
         </div>
         <div>
             {#if !obfuscated}
+                {moment(new Date(created * 1000)).format('MMMM Do YYYY, h:mm:ss a')}
+            {/if}
+        </div>
+        <div>
+            {#if !obfuscated}
                 <button class="icon-button" on:click={deleteImg}>
                     <Delete size="30" />
                 </button>
@@ -140,7 +146,7 @@
             height: 50px;
             border-radius: 5px;
             padding: 5px;
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.5);
             display: flex;
             justify-content: space-between;
             align-items: center;
