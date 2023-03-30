@@ -21,7 +21,7 @@ export const SUCCESS_NOTIFICATION = Object.freeze({
 
 export type Notifier = (notification: NotificationOptions) => void;
 
-export function displayNotifOnErr<T> (
+export function displayNotifOnErr<T extends {}> (
     addNotification: Notifier,
     { err, val }: Result<T>,
     options: PickOptional<NotificationOptions> = {},

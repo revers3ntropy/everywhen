@@ -1,3 +1,4 @@
+import type { ResultSetHeader } from 'mysql2';
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { Result } from '../utils/result';
@@ -144,12 +145,59 @@ export class Asset {
         }));
     }
 
+    public static async allMetadata (
+        query: QueryFunc,
+        auth: Auth,
+    ): Promise<Result<Omit<Asset, 'content'>[]>> {
+        const res = await query<Omit<Asset, 'content'>[]>`
+            SELECT id,
+                   publicId,
+                   created,
+                   fileName,
+                   contentType
+            FROM assets
+            WHERE user = ${auth.id}
+        `;
+
+        return Result.collect(res.map(row => {
+            const { err: fileNameErr, val: fileName } = decrypt(row.fileName, auth.key);
+            if (fileNameErr) return Result.err(fileNameErr);
+
+            return Result.ok(new Asset(
+                row.id,
+                row.publicId,
+                undefined as unknown as string,
+                fileName,
+                row.contentType,
+                row.created,
+            ));
+        }));
+    }
+
     public static async purgeAll (query: QueryFunc, auth: Auth): Promise<void> {
         query`
             DELETE
             FROM assets
             WHERE user = ${auth.id}
         `;
+    }
+
+    public static async purgeWithPublicId (
+        query: QueryFunc,
+        auth: Auth,
+        publicId: string,
+    ): Promise<Result> {
+        const res = await query<ResultSetHeader>`
+            DELETE
+            FROM assets
+            WHERE user = ${auth.id}
+              AND publicId = ${publicId}
+        `;
+
+        if (!res.affectedRows) {
+            return Result.err('Asset not found');
+        }
+        return Result.ok(null);
     }
 
     public static jsonIsRawAsset (
@@ -167,5 +215,9 @@ export class Asset {
             typeof json.contentType === 'string' &&
             'created' in json &&
             typeof json.created === 'number';
+    }
+
+    public static markDownLink (fileName: string, publicId: string): string {
+        return `![${fileName}](/api/assets/${publicId})`;
     }
 }

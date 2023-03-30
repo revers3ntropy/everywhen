@@ -5,6 +5,7 @@
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
     import Cog from 'svelte-material-icons/Cog.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
+    import ImageOutline from 'svelte-material-icons/ImageOutline.svelte';
     import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
     import Notebook from 'svelte-material-icons/Notebook.svelte';
     import type { App } from '../../app';
@@ -66,6 +67,10 @@
             <a class="primary" href="/stats">
                 <Counter size="30" />
                 Stats
+            </a>
+            <a class="primary" href="/assets">
+                <ImageOutline size="30" />
+                Assets
             </a>
             <a class="primary" href="/settings">
                 <Cog size="30" />

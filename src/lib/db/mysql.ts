@@ -3,6 +3,7 @@ import { DB, DB_HOST, DB_PASS, DB_PORT, DB_USER } from '$env/static/private';
 import mysql from 'mysql2/promise';
 import '../require';
 
+
 export type queryRes =
     | mysql.RowDataPacket[][]
     | mysql.RowDataPacket[]
@@ -35,6 +36,7 @@ export async function connect () {
     });
     console.log(`Connected to database`);
 }
+
 
 export type QueryFunc = <Res extends queryRes = mysql.RowDataPacket[]>(
     queryParts: TemplateStringsArray,

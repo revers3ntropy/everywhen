@@ -14,7 +14,7 @@ export const GET = (async ({ cookies, params }) => {
     const { val: label, err } = await Label.fromId(query, auth, params.labelId);
     if (err) throw error(404, err);
 
-    return apiResponse(label);
+    return apiResponse({ ...label });
 }) satisfies RequestHandler;
 
 export const PUT = (async ({ cookies, request, params }) => {

@@ -10,6 +10,7 @@
     import { getNotificationsContext } from 'svelte-notifications';
     import LabelSelect from '../../lib/components/LabelSelect.svelte';
     import { MAX_IMAGE_SIZE } from '../../lib/constants';
+    import { Asset } from '../../lib/controllers/asset';
     import type { Entry } from '../../lib/controllers/entry';
     import type { Label } from '../../lib/controllers/label';
     import type { Auth } from '../../lib/controllers/user';
@@ -226,7 +227,7 @@
         );
 
         // insert markdown to link to image
-        insertAtCursor(newEntryInputElement, `\n![${file.name}](/api/assets/${id})\n`);
+        insertAtCursor(newEntryInputElement, `\n${Asset.markDownLink(file.name, id)}\n`);
     }
 
     async function stopSpaceAndEnterBeingInterceptedByFileDrop () {
@@ -413,10 +414,11 @@
     }
 
     .entry-container {
+        .flex-center();
         padding: 1rem;
 
         textarea {
-            width: 100%;
+            width: min(100%, 700px);
             max-width: 100%;
             resize: both;
             padding: 0;

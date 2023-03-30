@@ -4,6 +4,10 @@ export function nowS (): TimestampSecs {
     return Math.floor(Date.now() / 1000);
 }
 
+export function nowUtcS (): TimestampSecs {
+    return nowS() - (new Date().getTimezoneOffset() * 60);
+}
+
 export function fmtTimestampForInput (
     timestamp: TimestampSecs,
     timezoneOffset: Hours = 0,

@@ -3,9 +3,13 @@ import { error } from '@sveltejs/kit';
 import { Asset } from '../../../../lib/controllers/asset';
 import { query } from '../../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../../lib/security/getAuthFromCookies';
-import { apiRes404 } from '../../../../lib/utils/apiResponse';
+import {
+    apiRes404,
+    apiResponse,
+    rawApiResponse,
+} from '../../../../lib/utils/apiResponse';
 
-export const GET: RequestHandler = async ({ params, cookies }) => {
+export const GET = (async ({ params, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
 
     const { err, val: asset } = await Asset.fromPublicId(
@@ -23,7 +27,7 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
 
     const img = Buffer.from(imgB64, 'base64');
 
-    return new Response(
+    return rawApiResponse(
         img,
         {
             status: 200,
@@ -35,8 +39,19 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
             } as unknown as HeadersInit,
         },
     );
-};
+}) satisfies RequestHandler;
 
-export const POST = apiRes404;
-export const DELETE = apiRes404;
-export const PUT = apiRes404;
+export const DELETE = (async ({ params, cookies }) => {
+    const auth = await getAuthFromCookies(cookies);
+
+    const { err } = await Asset.purgeWithPublicId(
+        query, auth,
+        params.asset || '',
+    );
+    if (err) throw error(404, err);
+
+    return apiResponse({});
+}) satisfies RequestHandler;
+
+export const POST = apiRes404 satisfies RequestHandler;
+export const PUT = apiRes404 satisfies RequestHandler;

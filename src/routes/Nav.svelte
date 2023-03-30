@@ -6,12 +6,15 @@
     import Close from 'svelte-material-icons/Close.svelte';
     import Cog from 'svelte-material-icons/Cog.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
+    import Eye from 'svelte-material-icons/Eye.svelte';
+    import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import Home from 'svelte-material-icons/Home.svelte';
     import Logout from 'svelte-material-icons/Logout.svelte';
     import Menu from 'svelte-material-icons/Menu.svelte';
     import Notebook from 'svelte-material-icons/Notebook.svelte';
     import Dropdown from '../lib/components/Dropdown.svelte';
     import type { Auth } from '../lib/controllers/user';
+    import { obfuscated } from '../lib/stores';
     import { wheel } from '../lib/utils/toggleScrollable';
 
     export let auth: Auth;
@@ -95,6 +98,16 @@
     </div>
 
     <div>
+        <button
+            aria-label={$obfuscated ? 'Show all' : 'Hide all'}
+            on:click={() => $obfuscated = !$obfuscated}
+        >
+            {#if $obfuscated}
+                <Eye size="25" />
+            {:else}
+                <EyeOff size="25" />
+            {/if}
+        </button>
         <Dropdown unstyledButton={true}>
             <span class="account-button" slot="button">
                 <span class="username-span">

@@ -8,10 +8,10 @@ import {
     USERNAME_COOKIE_OPTIONS,
 } from '../constants';
 import type { Auth } from '../controllers/user';
-import type { GenericResponse } from './apiResponse';
+import type { apiRes404, GenericResponse } from './apiResponse';
 import { GETArgs } from './GETArgs';
 import { Result } from './result';
-import { nowS } from './time';
+import { nowUtcS } from './time';
 
 type ReqBody = {
     timezoneUtcOffset?: number,
@@ -19,8 +19,12 @@ type ReqBody = {
     [key: string]: any,
 }
 
-export type ResType<T> = T extends (props: any) =>
-    Promise<GenericResponse<infer R>> ? R : never;
+export type ResType<T> =
+    T extends (props: any) => Promise<GenericResponse<infer R>>
+        ? T extends typeof apiRes404
+            ? 'this path gives a 404'
+            : R
+        : 'not an API route';
 
 export type GET<T extends { GET: unknown }> = ResType<T['GET']>;
 export type POST<T extends { POST: unknown }> = ResType<T['POST']>;
@@ -52,6 +56,7 @@ interface ApiResponse {
         '/labels/?': DELETE<typeof import('../../routes/api/labels/[labelId]/+server')>,
         '/events/?': DELETE<typeof import('../../routes/api/events/[eventId]/+server')>,
         '/entries/?': DELETE<typeof import('../../routes/api/entries/[entryId]/+server')>,
+        '/assets/?': DELETE<typeof import('../../routes/api/assets/[asset]/+server')>,
     },
     'PUT': {
         '/labels/?': PUT<typeof import('../../routes/api/labels/[labelId]/+server')>,
@@ -83,7 +88,7 @@ export async function makeApiReq<
         if (browser) {
             body.timezoneUtcOffset ??= -(new Date().getTimezoneOffset() / 60);
         }
-        body.utcTimeS ??= nowS();
+        body.utcTimeS ??= nowUtcS();
     }
 
     const init: RequestInit = {

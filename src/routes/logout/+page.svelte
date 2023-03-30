@@ -3,7 +3,7 @@
 
     location.assign('/');
 
-    onMount(() => document.title = 'Home');
+    onMount(() => document.title = 'Log out');
 
 </script>
 
