@@ -5,6 +5,8 @@
     import { tooltip } from '@svelte-plugins/tooltips';
     import { filedrop, type FileDropOptions, type Files } from 'filedrop-svelte';
     import { createEventDispatcher, onMount } from 'svelte';
+    import Eye from 'svelte-material-icons/Eye.svelte';
+    import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import ImageArea from 'svelte-material-icons/ImageArea.svelte';
     import Send from 'svelte-material-icons/Send.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
@@ -19,6 +21,7 @@
     import { getFileContents } from '../../lib/utils/files';
     import { getLocation } from '../../lib/utils/geolocation';
     import { displayNotifOnErr, ERR_NOTIFICATION } from '../../lib/utils/notifications';
+    import { obfuscate } from '../../lib/utils/text';
     import { nowS } from '../../lib/utils/time';
     import LocationToggle from './LocationToggle.svelte';
 
@@ -42,6 +45,11 @@
     export let newEntryLabel = '';
 
     export let auth: Auth;
+    export let obfuscated = true;
+
+    $: if (!newEntryBody && !newEntryLabel && !newEntryTitle) {
+        obfuscated = false;
+    }
 
     let newEntryInputElement: HTMLTextAreaElement;
 
@@ -271,7 +279,6 @@
             stopSpaceAndEnterBeingInterceptedByFileDrop(),
         ]);
     });
-
 </script>
 
 <div
@@ -280,13 +287,35 @@
     use:filedrop={fileOptions}
 >
     <div class="head">
-        <input
-            aria-label="Entry Title"
-            bind:value={newEntryTitle}
-            class="title"
-            placeholder="Title"
-        />
-        <div class="right-options">
+        <div class="left-options">
+            <button
+                aria-label={obfuscated ? 'Show entry form' : 'Hide entry form'}
+                on:click={() => obfuscated = !obfuscated}
+            >
+                {#if obfuscated}
+                    <Eye size="25" />
+                {:else}
+                    <EyeOff size="25" />
+                {/if}
+            </button>
+            {#if obfuscated}
+                <input
+                    aria-label="Entry Title"
+                    value={obfuscate(newEntryTitle)}
+                    class="title obfuscated"
+                    disabled
+                    placeholder="..."
+                />
+            {:else}
+                <input
+                    aria-label="Entry Title"
+                    bind:value={newEntryTitle}
+                    class="title"
+                    placeholder="Title"
+                />
+            {/if}
+        </div>
+        <div class="right-options {obfuscated ? 'blur' : ''}">
             <button
                 aria-label="Insert Image"
                 on:click={triggerFileDrop}
@@ -301,6 +330,7 @@
                 bind:value={newEntryLabel}
                 {labels}
             />
+
             <button
                 aria-label="Submit Entry"
                 class="send icon-button"
@@ -311,11 +341,19 @@
         </div>
     </div>
     <div class="entry-container">
-        <textarea
-            bind:this={newEntryInputElement}
-            bind:value={newEntryBody}
-            placeholder="Entry"
-        ></textarea>
+        {#if obfuscated}
+            <textarea
+                placeholder="..."
+                disabled
+                class="obfuscated"
+            >{obfuscate(newEntryBody)}</textarea>
+        {:else}
+            <textarea
+                bind:this={newEntryInputElement}
+                bind:value={newEntryBody}
+                placeholder="Entry"
+            ></textarea>
+        {/if}
     </div>
 
     <button
@@ -344,7 +382,7 @@
         padding: 0 0.4em;
         border-bottom: 1px solid @border-light;
         display: flex;
-        align-items: end;
+        align-items: center;
         justify-content: space-between;
 
         @media @mobile {
@@ -353,16 +391,25 @@
             border: none;
         }
 
-        .title {
-            border: none;
-            width: 55%;
-            font-size: 20px;
-            margin: 0 0 .2rem .3em;
+        .left-options {
+            height: 100%;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: start;
+            align-items: center;
 
-            @media @mobile {
-                width: 100%;
-                margin: 0.2em;
-                border-bottom: 1px solid @border-light;
+            .title {
+                border: none;
+                width: 55%;
+                font-size: 20px;
+                margin: 0 0 .2rem .3em;
+
+                @media @mobile {
+                    width: 100%;
+                    margin: 0.2em;
+                    border-bottom: 1px solid @border-light;
+                }
             }
         }
 
@@ -373,6 +420,10 @@
             flex-wrap: wrap;
             justify-content: end;
             align-items: center;
+
+            &.blur {
+                filter: blur(4px);
+            }
         }
     }
 

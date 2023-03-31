@@ -15,6 +15,8 @@
                     let centerTime = s.renderPosToTime(s.width / 2);
                     s.zoom *= deltaZ;
 
+                    s.zoom = Math.max(Math.min(100, s.zoom), 1e-20);
+
                     let newCenterTime = s.renderPosToTime(s.width / 2);
                     s.cameraOffset -= (newCenterTime - centerTime) * s.zoom;
 
@@ -39,14 +41,13 @@
             });
 
             $canvasState.listen('mousemove', evt => {
-                if (dragging) {
-                    canvasState.update(s => {
-                        dragEnd = s.getMousePosRaw(evt);
-                        s.cameraOffset -= (dragEnd - dragStart) * s.zoom;
-                        return s;
-                    });
-                    dragStart = dragEnd;
-                }
+                if (!dragging) return;
+                canvasState.update(s => {
+                    dragEnd = s.getMousePosRaw(evt);
+                    s.cameraOffset -= (dragEnd - dragStart) * s.zoom;
+                    return s;
+                });
+                dragStart = dragEnd;
             });
 
             // mobile

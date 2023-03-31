@@ -20,6 +20,7 @@ export const SUCCESS_NOTIFICATION = Object.freeze({
 } as const satisfies NotificationOptions);
 export const INFO_NOTIFICATION = Object.freeze({
     removeAfter: 4000,
+    type: 'info',
     position: 'top-center',
 } as const satisfies NotificationOptions);
 

@@ -48,7 +48,9 @@
 					noTooltip={true}
 				/>
 				{#if showTimeAgo}
-					&#x2022;
+					<span class="dot-separator">
+						&#x2022;
+					</span>
 					<span class="text-light">
 						{#if nowS() - parseInt(day) < 8.64e4}
 							Today

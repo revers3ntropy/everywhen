@@ -265,6 +265,7 @@ export class Entry {
                    deleted,
                    id,
                    created,
+                   createdTZOffset,
                    title,
                    entry,
                    latitude,
@@ -661,7 +662,7 @@ export class Entry {
         self: Entry,
     ): Promise<Result<EntryEdit>> {
         const rawEdits = await query<RawEntry[]>`
-            SELECT created, latitude, longitude, title, entry, label
+            SELECT created, createdTZOffset, latitude, longitude, title, entry, label
             FROM entryEdits
             WHERE entryId = ${self.id}
         `;

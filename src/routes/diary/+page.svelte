@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import Entries from '../../lib/components/Entries.svelte';
+    import { obfuscated } from '../../lib/stores';
     import EntryForm from './EntryForm.svelte';
 
     export let data: App.PageData;
@@ -16,6 +17,7 @@
     <EntryForm
         auth={data}
         bind:reset={clearEntryForm}
+        obfuscated={$obfuscated}
         on:updated={reloadEntries}
     />
     <Entries

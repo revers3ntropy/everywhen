@@ -5,11 +5,13 @@
     import { onMount } from 'svelte';
     import Notifications from 'svelte-notifications';
     import Modal from 'svelte-simple-modal';
+    import type { Writable } from 'svelte/store';
     import 'ts-polyfill';
     import '../app.less';
     import { USERNAME_COOKIE_KEY } from '../lib/constants';
     import { obfuscated, passcodeLastEntered, popup } from '../lib/stores';
     import { api } from '../lib/utils/apiRequest';
+    import { GETParamIsFalsy } from '../lib/utils/GETArgs';
     import { displayNotifOnErr, INFO_NOTIFICATION } from '../lib/utils/notifications';
     import { nowS } from '../lib/utils/time';
     import type { NotificationOptions } from '../lib/utils/types';
@@ -26,16 +28,19 @@
     let lastActivity = nowS();
 
     let addNotification: <T>(props: Record<string, T> | NotificationOptions) => void;
-    let isObfuscated: boolean;
-    $: isObfuscated = data.settings.hideEntriesByDefault.value;
-    $: obfuscated.update(() => isObfuscated);
+
+    $: obfuscated.set(data.settings.hideEntriesByDefault.value);
+
+    $: if (GETParamIsFalsy($page.url.searchParams.get('obfuscate'))) {
+        obfuscated.set(false);
+    }
 
     let showPasscodeModal = true;
     let newVersionAvailable = false;
     let newVersion: string = '<error>';
 
     function checkObfuscatedTimeout () {
-        if (isObfuscated) return;
+        if ($obfuscated) return;
 
         const hideAfter = data.settings.autoHideEntriesDelay.value;
         if (hideAfter < 1) return;
@@ -46,7 +51,7 @@
                 removeAfter: 0,
                 text: 'Hidden due to inactivity',
             });
-            isObfuscated = true;
+            (obfuscated as Writable<boolean>).set(true);
         }
     }
 
@@ -100,7 +105,7 @@
         lastActivity = nowS();
         if (e.key === 'Escape') {
             if (e.ctrlKey) {
-                isObfuscated = !isObfuscated;
+                obfuscated.set(!$obfuscated);
                 e.preventDefault();
             }
         }

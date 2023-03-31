@@ -80,7 +80,12 @@
 
     function edit () {
         if (isInDialog) popup.set(null);
-        location.assign(`/diary/${id}/edit`);
+        location.assign(`/diary/${id}/edit?obfuscate=0`);
+    }
+
+    function seeEdits () {
+        if (isInDialog) popup.set(null);
+        location.assign(`/diary/${id}?history=on&obfuscate=0`);
     }
 
     $: entryHtml = browser ? DomPurify.sanitize(
@@ -110,9 +115,9 @@
         <div class="flex-center">
             {#if !obfuscated && !isEdit}
                 {#if edits.length}
-                    <a href="/diary/{id}?history=on">
+                    <button on:click={seeEdits} class="link">
                         {edits.length} edit{edits.length > 1 ? 's' : ''}
-                    </a>
+                    </button>
                 {/if}
                 <button
                     on:click={deleteSelf}
