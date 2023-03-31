@@ -26,13 +26,13 @@
 		</button>
 	</div>
 
-	{#each Object.keys(titles)
-		.sort((a, b) => parseInt(b) - parseInt(a)) as day}
+	{#each Object.keys(titles).sort((a, b) => parseInt(b) - parseInt(a)) as day}
 		<div class="day">
 			<h2>
 				<UtcTime
 					timestamp={parseInt(day)}
 					fmt="dddd DD/MM/YY"
+					noTooltip={true}
 				/>
 				&#x2022;
 				<span class="text-light">
@@ -46,7 +46,7 @@
 							timestamp={parseInt(day)
 									+ 60 * 60 * 23 + 60 * 60 + 59
 							}
-							class="text-light"
+							noTooltip={true}
 						/>
 					{/if}
 				</span>
@@ -58,6 +58,7 @@
 						<UtcTime
 							timestamp={entry.created}
 							fmt="h:mm A"
+							tzOffset={entry.createdTZOffset}
 						/>
 					</span>
 					<span

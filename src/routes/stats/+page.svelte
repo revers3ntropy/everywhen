@@ -130,7 +130,7 @@
         margin: 1em;
 
         @media @mobile {
-            padding: 0;
+            padding: 0 .6rem;
             margin: 1em 0;
             border: none;
         }

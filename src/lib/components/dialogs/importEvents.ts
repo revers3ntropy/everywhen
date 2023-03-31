@@ -2,7 +2,7 @@ import { matches } from 'schemion';
 import type { Event } from '../../controllers/event';
 import type { Label } from '../../controllers/label';
 import type { Auth } from '../../controllers/user';
-import { api } from '../../utils/apiRequest';
+import { api, type ReqBody } from '../../utils/apiRequest';
 import { nowS } from '../../utils/time';
 import type { Mutable, NotificationOptions } from '../../utils/types';
 
@@ -58,7 +58,7 @@ export async function importEvents (
 
         const postBody: Omit<Mutable<Partial<Event>>, 'label'> & {
             label?: string,
-        } = {};
+        } & ReqBody = {};
 
         postBody.name = eventJson.name;
         postBody.start = eventJson.start;
@@ -89,6 +89,10 @@ export async function importEvents (
         } else {
             postBody.label = labelHashMap.get(eventJson.label);
         }
+
+        // not a very good solution, but without manually inputting it
+        // there isn't really a better default value
+        postBody.timezoneUtcOffset ??= 0;
 
         const { err } = await api.post(auth, `/events`, postBody);
         if (err) {

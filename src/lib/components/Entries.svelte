@@ -156,9 +156,7 @@
                             {:else}
                                 <UtcTime
                                     relative
-                                    timestamp={parseInt(day)
-                                                + 60 * 60 * 23 + 60 * 60 + 59
-                                    }
+                                    timestamp={parseInt(day)}
                                 />
                             {/if}
                         </span>

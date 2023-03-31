@@ -27,9 +27,9 @@
         }
     }
 
-    function openNavPopup (event: Event) {
+    function toggleNavPopup (event: Event) {
         event.stopPropagation();
-        showingNavPopup = true;
+        showingNavPopup = !showingNavPopup;
     }
 </script>
 
@@ -42,19 +42,16 @@
     <div class="menu-button-mobile">
         <button
             aria-label="Show nav menu"
-            on:click={openNavPopup}
+            on:click={toggleNavPopup}
         >
-            <Menu size="40" />
+            {#if showingNavPopup}
+                <Close size="40" />
+            {:else}
+                <Menu size="40" />
+            {/if}
         </button>
     </div>
     <div class="nav-buttons {showingNavPopup ? 'showing' : ''}">
-        <button
-            aria-label="Hide nav menu"
-            class="hide-menu-mobile"
-            on:click={() => (showingNavPopup = false)}
-        >
-            <Close size="40" />
-        </button>
         <a
             aria-label="home"
             class="icon {$page.url.pathname === '/home' ? 'current' : ''}"
@@ -220,7 +217,7 @@
             height: 0;
             display: none;
             position: absolute;
-            top: 0;
+            top: var(--nav-height);
             left: 0;
             width: 100%;
             z-index: 20;

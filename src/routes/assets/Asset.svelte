@@ -1,5 +1,4 @@
 <script lang="ts">
-
     // @ts-ignore
     import { tooltip } from '@svelte-plugins/tooltips';
     import { createEventDispatcher, onMount } from 'svelte';
@@ -9,11 +8,11 @@
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
+    import UtcTime from '../../lib/components/UtcTime.svelte';
     import { Asset } from '../../lib/controllers/asset';
     import type { Auth } from '../../lib/controllers/user';
     import { api, apiPath } from '../../lib/utils/apiRequest';
     import { displayNotifOnErr, SUCCESS_NOTIFICATION } from '../../lib/utils/notifications';
-    import { currentTzOffset, fmtUtc } from '../../lib/utils/time.js';
     import type { TimestampSecs } from '../../lib/utils/types';
 
     const { addNotification } = getNotificationsContext();
@@ -100,7 +99,10 @@
         <div>
             {#if !obfuscated}
                 <!-- TODO use tzOffset from db -->
-                {fmtUtc(created, currentTzOffset(), 'MMMM Do YYYY, h:mma')}
+                <UtcTime
+                    timestamp={created}
+                    fmt="MMMM Do YYYY, h:mma"
+                />
             {/if}
         </div>
         <div>

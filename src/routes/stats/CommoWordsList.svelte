@@ -35,6 +35,10 @@
             span {
                 display: inline-block;
             }
+
+            &:last-child {
+                border-bottom: none;
+            }
         }
 
         @media @mobile {

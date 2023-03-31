@@ -12,6 +12,7 @@
     import TimelineClockOutline from 'svelte-material-icons/TimelineClockOutline.svelte';
     import TimelineOutline from 'svelte-material-icons/TimelineOutline.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
+    import type { ChangeEventHandler } from 'svelte/elements';
     import Label from '../../lib/components/Label.svelte';
     import LabelSelect from '../../lib/components/LabelSelect.svelte';
     import UtcTime from '../../lib/components/UtcTime.svelte';
@@ -22,8 +23,7 @@
     import { api, apiPath } from '../../lib/utils/apiRequest';
     import { displayNotifOnErr } from '../../lib/utils/notifications';
     import { obfuscate } from '../../lib/utils/text';
-    import { currentTzOffset, fmtTimestampForInput, parseTimestampFromInputUtc } from '../../lib/utils/time';
-    import { fmtDuration, fmtUtc } from '../../lib/utils/time.js';
+    import { fmtDuration, fmtTimestampForInput, parseTimestampFromInputUtc } from '../../lib/utils/time';
     import type { Seconds } from '../../lib/utils/types';
 
     const { addNotification } = getNotificationsContext();
@@ -39,10 +39,6 @@
     let nameInput: HTMLInputElement;
     export let labels: LabelController[];
 
-    type OnChangeEvent = Event & { currentTarget: EventTarget & HTMLInputElement } | {
-        target: { value: string }
-    };
-
     async function updateEvent (
         changes: {
             name?: string;
@@ -57,36 +53,42 @@
         dispatch('update');
     }
 
-    async function updateName ({ target }: OnChangeEvent) {
-        if (!target || !('value' in target)) throw target;
+    const updateName = (async ({ target }) => {
+        if (!target || !('value' in target) || typeof target.value !== 'string') {
+            throw target;
+        }
         await updateEvent({
             name: target.value,
         });
-    }
+    }) satisfies ChangeEventHandler<HTMLInputElement>;
 
-    async function updateStart ({ target }: OnChangeEvent) {
-        if (!target || !('value' in target)) throw target;
-        console.log(target.value);
+    const updateStart = (async ({ target }) => {
+        if (!target || !('value' in target) || typeof target.value !== 'string') {
+            throw target;
+        }
         await updateEvent({
             start: parseTimestampFromInputUtc(target.value),
         });
-    }
+    }) satisfies ChangeEventHandler<HTMLInputElement>;
 
-    async function updateStartAndEnd ({ target }: OnChangeEvent) {
-        if (!target || !('value' in target)) throw target;
+    const updateStartAndEnd = (async ({ target }) => {
+        if (!target || !('value' in target) || typeof target.value !== 'string') {
+            throw target;
+        }
         await updateEvent({
             start: parseTimestampFromInputUtc(target.value),
             end: parseTimestampFromInputUtc(target.value),
         });
-    }
+    }) satisfies ChangeEventHandler<HTMLInputElement>;
 
-    async function updateEnd ({ target }: OnChangeEvent) {
-        if (!target || !('value' in target)) throw target;
-        console.log(target.value);
+    const updateEnd = (async ({ target }) => {
+        if (!target || !('value' in target) || typeof target.value !== 'string') {
+            throw target;
+        }
         await updateEvent({
             end: parseTimestampFromInputUtc(target.value),
         });
-    }
+    }) satisfies ChangeEventHandler<HTMLInputElement>;
 
     async function deleteEvent () {
         if (!confirm('Are you sure you want to delete this event?')) {
@@ -180,7 +182,10 @@
                 <i>
                     Created
                     <!-- TODO use tz from db -->
-                    {fmtUtc(event.created, currentTzOffset(), 'hh:mm DD/MM/YYYY')}
+                    <UtcTime
+                        timestamp={event.created}
+                        fmt="hh:mm DD/MM/YYYY"
+                    />
                 </i>
                 {#if editingLabel}
                     <div class="flex-center">

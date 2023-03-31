@@ -2,7 +2,7 @@ import { matches } from 'schemion';
 import type { Entry } from '../../controllers/entry';
 import type { Label } from '../../controllers/label';
 import type { Auth } from '../../controllers/user';
-import { api } from '../../utils/apiRequest';
+import { api, type ReqBody } from '../../utils/apiRequest';
 import type { Mutable, NotificationOptions } from '../../utils/types';
 
 export async function importEntries (
@@ -59,6 +59,7 @@ export async function importEntries (
             types: 'object',
             label: 'string',
             deleted: 'boolean',
+            createdTZOffset: 'number',
         }, {
             title: '',
             time: 0,
@@ -69,12 +70,13 @@ export async function importEntries (
             types: [],
             label: '',
             deleted: false,
+            createdTZOffset: 0,
         })) {
             errors.push([ i, `entry is not valid object` ]);
             continue;
         }
 
-        const postBody: Mutable<Omit<Partial<Entry>, 'label'>> & {
+        const postBody: ReqBody & Mutable<Omit<Partial<Entry>, 'label'>> & {
             label?: string
         } = {};
 
@@ -88,6 +90,7 @@ export async function importEntries (
         postBody.created = entryJSON.time || entryJSON.created;
         postBody.latitude = parseFloat((entryJSON.latitude || entryJSON.location[0]) as string) || 0;
         postBody.longitude = parseFloat((entryJSON.longitude || entryJSON.location[1]) as string) || 0;
+        postBody.timezoneUtcOffset = entryJSON.createdTZOffset || 0;
 
         if (entryJSON.types && Array.isArray(entryJSON.types) && entryJSON.types.length) {
             const name = entryJSON.types[0] as string;

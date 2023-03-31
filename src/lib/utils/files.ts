@@ -36,7 +36,7 @@ export async function getFileContents (
     });
 }
 
-export function download (filename: string, text: string) {
+export function download (filename: string, text: string): void {
     const element = document.createElement('a');
     const elData = 'data:text/plain;charset=utf-8,' + encodeURIComponent(text);
     element.setAttribute('href', elData);

@@ -88,9 +88,11 @@
         </section>
     {:else}
         <section>
-            <h1>Recent Entries</h1>
-            Doesn't look like you have any entries yet.
-            Why not <a href="/diary">write one</a>?
+            <h1 class="recent-entries">Recent Entries</h1>
+            <p>
+                Doesn't look like you have any entries yet,
+                why not <a href="/diary">write one</a>?
+            </p>
         </section>
     {/if}
     {#each Object.entries(entriesYearsAgoToday(data.entries)) as [yearsAgo, titles]}
@@ -168,6 +170,10 @@
 
         @media @mobile {
             font-size: 1.2rem;
+        }
+
+        &.recent-entries {
+            margin: 1rem;
         }
     }
 </style>

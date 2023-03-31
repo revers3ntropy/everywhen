@@ -139,29 +139,29 @@ export async function makeApiReq<
 }
 
 export const api = {
-    get: async <Path extends keyof ApiResponse['GET'], Body extends object> (
+    get: async <Path extends keyof ApiResponse['GET'], Body extends ReqBody> (
         auth: Auth, path: Path, args: object | null = null,
     ) => {
         return await makeApiReq<'GET', Path, Body>(
             auth, 'GET', path + (args ? GETArgs(args) : ''));
     },
 
-    post: async <Path extends keyof ApiResponse['POST'], Body extends object> (
-        auth: Auth, path: Path, body: any = {},
+    post: async <Path extends keyof ApiResponse['POST'], Body extends ReqBody> (
+        auth: Auth, path: Path, body: Body = {} as Body,
     ) => {
         return await makeApiReq<'POST', Path, Body>(
             auth, 'POST', path, body);
     },
 
-    put: async <Path extends keyof ApiResponse['PUT'], Body extends object> (
-        auth: Auth, path: Path, body: any = {},
+    put: async <Path extends keyof ApiResponse['PUT'], Body extends ReqBody> (
+        auth: Auth, path: Path, body: Body = {} as Body,
     ) => {
         return await makeApiReq<'PUT', Path, Body>(
             auth, 'PUT', path, body);
     },
 
-    delete: async <Path extends keyof ApiResponse['DELETE'], Body extends object> (
-        auth: Auth, path: Path, body: any = {},
+    delete: async <Path extends keyof ApiResponse['DELETE'], Body extends ReqBody> (
+        auth: Auth, path: Path, body: Body = {} as Body,
     ) => {
         return await makeApiReq<'DELETE', Path, Body>(
             auth, 'DELETE', path, body);

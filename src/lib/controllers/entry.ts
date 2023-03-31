@@ -233,11 +233,12 @@ export class Entry {
             const localDate = fmtUtc(
                 entry.created,
                 entry.createdTZOffset,
-                'yyyy-MM-DD',
+                'YYYY-MM-DD',
             );
-            const day = new Date(localDate).getTime() / 1000;
-            grouped[day] ??= [];
-            grouped[day].push(entry);
+            const dayTimeStamp = new Date(localDate)
+                .setHours(12, 0, 0, 0) / 1000;
+            grouped[dayTimeStamp] ??= [];
+            grouped[dayTimeStamp].push(entry);
         });
 
         // sort each day
