@@ -10,6 +10,7 @@
     </div>
     <div>
         <a
+            aria-label="Github"
             href="https://github.com/revers3ntropy/halcyon.land"
             rel="noreferrer"
             target="_blank"

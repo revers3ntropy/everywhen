@@ -1,5 +1,7 @@
 <script lang="ts">
+    import { fmtUtc } from '$lib/utils/time.js';
     import { renderable, START_ZOOM } from '../../lib/canvas/canvas';
+    import { currentTzOffset } from '../../lib/utils/time';
 
     renderable(state => {
         // center screen
@@ -14,7 +16,7 @@
         );
         if (state.zoom > START_ZOOM) {
             state.text(
-                centerTimeDate.toLocaleTimeString(),
+                fmtUtc(centerTimeDate / 1000, currentTzOffset(), 'hh:mma'),
                 state.width / 2,
                 state.centerLnY() - 40,
                 { c: '#6FA' },

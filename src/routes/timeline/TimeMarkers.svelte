@@ -82,11 +82,10 @@
                     for (let h = 1; h < 24; h++) {
                         let dayTime = new Date(date.getFullYear(), m, d, h);
                         let renderPos = state.timeToRenderPos(dayTime.getTime() / 1000);
-                        const isStartOfWeek = dayTime.getDay() === 1;
                         if (renderPos > 0) {
-                            state.rect(renderPos, 0, isStartOfWeek ? 2 : 1, state.height, {
+                            state.rect(renderPos, 0, 1, state.height, {
                                 radius: 0,
-                                colour: '#222',
+                                colour: '#080808',
                             });
                         }
 
