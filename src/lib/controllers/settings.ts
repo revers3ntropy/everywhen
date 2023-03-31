@@ -56,6 +56,12 @@ export class Settings<T = unknown> {
             description: `Delay before passcode is required again. `
                 + `Set to 0 to only require once.`,
         } satisfies ISettingsConfig<Seconds>,
+        yearOfBirth: {
+            type: 'number',
+            defaultValue: 2000,
+            name: 'Year of Birth',
+            description: `The first year in which you lived. Used by the timeline.`,
+        } satisfies ISettingsConfig<number>,
     } satisfies Record<string, ISettingsConfig<unknown>>;
 
     constructor (

@@ -30,7 +30,7 @@
             background: @light-accent;
             border: 1px solid @accent-color-secondary;
             padding: 1rem;
-            font-size: 1.2rem;
+            font-size: 1.05rem;
             border-radius: 10px;
 
             span {

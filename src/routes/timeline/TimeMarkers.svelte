@@ -1,9 +1,10 @@
 <script lang="ts">
     import { renderable, START_ZOOM } from '../../lib/canvas/canvas';
 
-    renderable(state => {
+    export let startYear: number;
 
-        let date = new Date(2005, 0, 1);
+    renderable(state => {
+        let date = new Date(startYear, 0, 1);
 
         let rightHandSide = state.renderPosToTime(state.width);
 
@@ -15,7 +16,7 @@
                 break;
             }
             years++;
-            if (years > 100) {
+            if (years > 200) {
                 break;
             }
 

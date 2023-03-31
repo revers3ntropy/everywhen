@@ -1,6 +1,5 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import type { App } from '../../app';
     import Background from '../../lib/canvas/Background.svelte';
     import { canvasState } from '../../lib/canvas/canvas';
     import Canvas from '../../lib/canvas/Canvas.svelte';
@@ -116,7 +115,9 @@
         <Controls />
         <Background />
 
-        <TimeMarkers />
+        <TimeMarkers
+            startYear={data.settings.yearOfBirth.value}
+        />
 
         <NowLine />
 
