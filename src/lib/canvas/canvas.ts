@@ -113,7 +113,7 @@ export class CanvasState implements ICanvasListeners {
     public renderPosToTime (pos: number) {
         pos = this.width - pos;
         pos = this.zoomScaledPosition(pos, 1 / this.zoom, this.cameraOffset);
-        return Math.round(nowS() - pos - this.cameraOffset);
+        return Math.round(nowS() - pos + this.cameraOffset);
     }
 
     public getMousePosRaw (event: MouseEvent | TouchEvent): number {

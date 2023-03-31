@@ -3,7 +3,7 @@
 
     renderable(state => {
         // center screen
-        let centerTime = state.renderPosToTime(state.width / 2);
+        const centerTime = state.renderPosToTime(state.width / 2);
         let centerTimeDate = new Date(centerTime * 1000);
 
         state.text(
@@ -22,7 +22,7 @@
         }
 
         state.rect(
-            state.width / 2,
+            state.timeToRenderPos(centerTime),
             state.centerLnY() - 20,
             1,
             40,

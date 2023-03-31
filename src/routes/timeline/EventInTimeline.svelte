@@ -7,7 +7,7 @@
     export let start: number;
     export let end: number;
     export let name: string;
-    export let label: Label | undefined = undefined;
+    export let label = undefined as Label | undefined;
     export let yLevel: number;
     export let eventTextParityHeight: boolean;
     export let created: number;
@@ -18,15 +18,15 @@
         textXOffset: 1,
         radius: 5,
     };
+    if (!start || !end) throw 'Missing required props';
+
+    const duration = end - start;
+    const colour = label ? label.colour : CanvasState.c_Primary;
 
     renderable(state => {
-
-        const duration = end - start;
         const x = state.timeToRenderPos(start);
         const y = state.centerLnY() - yLevel * (options.h + options.yMargin);
         const width = duration * state.zoom;
-        const colour = label ? label.colour : CanvasState.c_Primary;
-
         const isSingleEvent = duration < 60;
 
         if (isSingleEvent) {

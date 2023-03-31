@@ -14,6 +14,7 @@
     export let deleted: boolean;
     export let label: Label | null = null;
     export let edits: EntryEdit[] = [];
+    export let createdTZOffset = 0;
 
     renderable(state => {
         const renderPos = state.timeToRenderPos(created);
