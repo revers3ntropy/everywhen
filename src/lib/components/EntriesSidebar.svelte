@@ -1,10 +1,12 @@
 <script lang="ts">
-    import EntryTitles from '$lib/components/EntryTitles.svelte';
     import Close from 'svelte-material-icons/Close.svelte';
     import Menu from 'svelte-material-icons/Menu.svelte';
     import type { Entry } from '../controllers/entry';
+    import type { Auth } from '../controllers/user';
+    import EntryTitles from './EntryTitles.svelte';
 
     export let titles: Record<number, Entry[]>;
+    export let auth: Auth;
 
     let showing = false;
 </script>
@@ -28,7 +30,7 @@
             </button>
         </div>
         <div class="content">
-            <EntryTitles obfuscated={false} {titles} />
+            <EntryTitles {auth} obfuscated={false} {titles} />
         </div>
     </div>
 </div>

@@ -4,12 +4,25 @@
 	import Eye from 'svelte-material-icons/Eye.svelte';
 	import EyeOff from 'svelte-material-icons/EyeOff.svelte';
 	import { Entry } from '../controllers/entry';
+	import type { Auth } from '../controllers/user';
+	import { showPopup } from '../utils/popups';
 	import { obfuscate } from '../utils/text';
 	import { nowS } from '../utils/time';
+	import EntryDialog from './dialogs/EntryDialog.svelte';
 	import UtcTime from './UtcTime.svelte';
 
 	export let titles: Record<number, Entry[]>;
 	export let obfuscated = true;
+	export let showTimeAgo = true;
+	export let auth: Auth;
+
+	function showEntryPopup (entryId: string) {
+		showPopup(EntryDialog, {
+			id: entryId,
+			auth,
+			obfuscated,
+		});
+	}
 </script>
 
 <div>
@@ -34,26 +47,29 @@
 					fmt="dddd DD/MM/YY"
 					noTooltip={true}
 				/>
-				&#x2022;
-				<span class="text-light">
-					{#if nowS() - parseInt(day) < 8.64e4}
-						Today
-					{:else if nowS() - parseInt(day) < 2 * 8.64e4}
-						Yesterday
-					{:else}
-						<UtcTime
-							relative
-							timestamp={parseInt(day)
-									+ 60 * 60 * 23 + 60 * 60 + 59
-							}
-							noTooltip={true}
-						/>
-					{/if}
-				</span>
+				{#if showTimeAgo}
+					&#x2022;
+					<span class="text-light">
+						{#if nowS() - parseInt(day) < 8.64e4}
+							Today
+						{:else if nowS() - parseInt(day) < 2 * 8.64e4}
+							Yesterday
+						{:else}
+							<UtcTime
+								relative
+								timestamp={parseInt(day)}
+								noTooltip={true}
+							/>
+						{/if}
+					</span>
+				{/if}
 			</h2>
 
 			{#each titles[parseInt(day)] as entry}
-				<a class="entry" href="/diary/{entry.id}">
+				<button
+					class="entry"
+					on:click={() => showEntryPopup(entry.id)}
+				>
 					<span class="entry-time">
 						<UtcTime
 							timestamp={entry.created}
@@ -67,7 +83,7 @@
 						use:tooltip={{ content: entry.label?.name }}
 					></span>
 
-					<div class="title {obfuscated ? 'obfuscated' : ''}">
+					<span class="title {obfuscated ? 'obfuscated' : ''}">
 						{#if entry.title}
 							{obfuscated ? obfuscate(entry.title) : entry.title}
 						{:else}
@@ -78,8 +94,8 @@
 							{/if}
 						</span>
 						{/if}
-					</div>
-				</a>
+					</span>
+				</button>
 			{/each}
 		</div>
 	{/each}

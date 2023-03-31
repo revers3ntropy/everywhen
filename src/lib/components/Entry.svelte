@@ -15,6 +15,7 @@
     import type { Entry } from '../controllers/entry';
     import type { Label as LabelController } from '../controllers/label';
     import type { Auth } from '../controllers/user';
+    import { popup } from '../stores';
     import { api, apiPath } from '../utils/apiRequest';
     import { displayNotifOnErr, SUCCESS_NOTIFICATION } from '../utils/notifications';
     import { obfuscate } from '../utils/text';
@@ -40,6 +41,7 @@
 
     export let obfuscated = true;
     export let showLabels = true;
+    export let isInDialog = false;
 
     export let auth: Auth;
 
@@ -63,6 +65,8 @@
             }),
         );
 
+        if (isInDialog) popup.set(null);
+
         addNotification({
             ...SUCCESS_NOTIFICATION,
             text: `Entry ${deleted ? 'restored' : 'deleted'}`,
@@ -72,6 +76,11 @@
 
     function toggleObfuscation () {
         obfuscated = !obfuscated;
+    }
+
+    function edit () {
+        if (isInDialog) popup.set(null);
+        location.assign(`/diary/${id}/edit`);
     }
 
     $: entryHtml = browser ? DomPurify.sanitize(
@@ -117,12 +126,12 @@
                     {/if}
                 </button>
                 {#if !deleted}
-                    <a
-                        href="/diary/{id}/edit"
+                    <button
+                        on:click={edit}
                         use:tooltip={{ content: 'Edit Entry' }}
                     >
                         <NoteEditOutline size="25" />
-                    </a>
+                    </button>
                 {/if}
             {/if}
 
@@ -199,7 +208,7 @@
         }
 
         .body {
-            margin: 0 2em;
+            margin: 0 2rem;
             word-break: break-word;
 
             // inner <p> element is created when using @html
@@ -210,8 +219,10 @@
             }
 
             // generated from markdown
+
             :global(ul), :global(ol) {
-                margin: 0 .5em;
+                // ugh
+                margin: -2.5rem 0 -2.5rem .8rem;
                 padding: 0;
                 border: none;
 

@@ -93,7 +93,7 @@
         <div class="entries-menu">
             <div>
                 {#if showSidebar}
-                    <Sidebar titles={entryTitles} />
+                    <Sidebar titles={entryTitles} {auth} />
                 {/if}
                 {#if showBin}
                     <a class="primary" href="/deleted">

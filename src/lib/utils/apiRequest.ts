@@ -38,6 +38,7 @@ interface ApiResponse {
         '/events': GET<typeof import('../../routes/api/events/+server')>,
         '/entries': GET<typeof import('../../routes/api/entries/+server')>,
         '/entries/titles': GET<typeof import('../../routes/api/entries/titles/+server')>,
+        '/entries/?': GET<typeof import('../../routes/api/entries/[entryId]/+server')>,
         '/backups': GET<typeof import('../../routes/api/backups/+server')>,
         '/auth': GET<typeof import('../../routes/api/auth/+server')>,
         '/assets/?': GET<typeof import('../../routes/api/assets/[asset]/+server')>,

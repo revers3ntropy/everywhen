@@ -65,5 +65,18 @@ export const PUT = (async ({ request, params, cookies }) => {
     return apiResponse({ id: entry.id });
 }) satisfies RequestHandler;
 
-export const GET = apiRes404;
+export const GET = (async ({ params, cookies }) => {
+    const auth = await getAuthFromCookies(cookies);
+    if (!params.entryId) throw error(400, 'invalid id');
+
+    const {
+        err,
+        val: entry,
+    } = await Entry.fromId(query, auth, params.entryId, true);
+
+    if (err) throw error(400, err);
+
+    return apiResponse({ ...entry });
+}) satisfies RequestHandler;
+
 export const POST = apiRes404;

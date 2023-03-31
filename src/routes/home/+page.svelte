@@ -82,6 +82,7 @@
         <section>
             <h1>Recent Entries</h1>
             <EntryTitles
+                auth={data}
                 titles={data.titles}
                 obfuscated={$obfuscated}
             />
@@ -108,6 +109,8 @@
                     )]: titles
                 }}
                 obfuscated={$obfuscated}
+                showTimeAgo={false}
+                auth={data}
             />
         </section>
     {/each}
