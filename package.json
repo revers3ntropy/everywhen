@@ -1,6 +1,6 @@
 {
     "name": "halcyon.land",
-    "version": "0.3.5",
+    "version": "0.3.5-a",
     "type": "module",
     "private": true,
     "devDependencies": {
@@ -42,9 +42,7 @@
         "ts-polyfill": "^3.8.2",
         "typescript": "^4.9.5",
         "uuid": "^9.0.0",
-        "vite": "^4.1.4"
-    },
-    "dependencies": {
+        "vite": "^4.1.4",
         "timeago.js": "^4.0.2"
     }
 }
