@@ -64,12 +64,14 @@ export const POST = (async ({ request, cookies }) => {
         }
     }
 
-    const { val: entry, err } = await Entry.create(query, auth, {
-        ...body,
-        latitude: body.latitude || undefined,
-        longitude: body.longitude || undefined,
-        createdTZOffset: body.timezoneUtcOffset,
-    });
+    const { val: entry, err } = await Entry.create(
+        query, auth, {
+            ...body,
+            latitude: body.latitude || undefined,
+            longitude: body.longitude || undefined,
+            createdTZOffset: body.timezoneUtcOffset,
+        },
+    );
     if (err) throw error(400, err);
 
     return apiResponse({ id: entry.id });

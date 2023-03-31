@@ -1,16 +1,36 @@
-import type { Hours, TimestampSecs } from './types';
+import moment from 'moment';
+import type { Hours, Seconds, TimestampSecs } from './types';
 
+/**
+ * Get the UTC timestamp of now in seconds
+ * @returns {TimestampSecs}
+ */
 export function nowS (): TimestampSecs {
     return Math.floor(Date.now() / 1000);
 }
 
-export function nowUtcS (): TimestampSecs {
-    return nowS() - (new Date().getTimezoneOffset() * 60);
+export function currentTzOffset (): Hours {
+    return -(new Date().getTimezoneOffset() / 60);
+}
+
+export function fmtUtc (
+    timestamp: TimestampSecs,
+    tzOffset: Hours,
+    fmt: string,
+): string {
+    return moment(new Date((timestamp + tzOffset * 60 * 60) * 1000))
+        .utc()
+        .format(fmt);
+}
+
+export function fmtDuration (time: Seconds): string {
+    return moment.duration(time, 's')
+                 .humanize();
 }
 
 export function fmtTimestampForInput (
     timestamp: TimestampSecs,
-    timezoneOffset: Hours = 0,
+    timezoneOffset: Hours = currentTzOffset(),
     roundToMinute = true,
 ): string {
     if (roundToMinute) {
@@ -23,5 +43,5 @@ export function fmtTimestampForInput (
 }
 
 export function parseTimestampFromInputUtc (timestamp: string): TimestampSecs {
-    return Math.floor(Date.parse(timestamp) / 1000) - (new Date().getTimezoneOffset() * 60);
+    return Math.floor(Date.parse(timestamp) / 1000);
 }

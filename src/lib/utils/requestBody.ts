@@ -34,7 +34,10 @@ export async function bodyFromReq<T extends Schema & object> (
     ));
 }
 
-export async function getUnwrappedReqBody<T extends Schema & object> (
+export async function getUnwrappedReqBody<T extends Schema & object & {
+    timezoneUtcOffset?: 'number',
+    utcTimeS?: 'number',
+}> (
     request: Request,
     valueType: T,
     defaults: { [P in keyof T]?: SchemaResult<T[P]> } = {},

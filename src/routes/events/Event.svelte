@@ -2,7 +2,6 @@
     import { browser } from '$app/environment';
     // @ts-ignore
     import { tooltip } from '@svelte-plugins/tooltips';
-    import moment from 'moment';
     import { createEventDispatcher, onMount } from 'svelte';
     import Bin from 'svelte-material-icons/Delete.svelte';
     import Eye from 'svelte-material-icons/Eye.svelte';
@@ -15,13 +14,16 @@
     import { getNotificationsContext } from 'svelte-notifications';
     import Label from '../../lib/components/Label.svelte';
     import LabelSelect from '../../lib/components/LabelSelect.svelte';
+    import UtcTime from '../../lib/components/UtcTime.svelte';
     import type { Event as EventController } from '../../lib/controllers/event';
+    import { Event } from '../../lib/controllers/event';
     import type { Label as LabelController } from '../../lib/controllers/label';
     import type { Auth } from '../../lib/controllers/user';
     import { api, apiPath } from '../../lib/utils/apiRequest';
     import { displayNotifOnErr } from '../../lib/utils/notifications';
     import { obfuscate } from '../../lib/utils/text';
-    import { fmtTimestampForInput, parseTimestampFromInputUtc } from '../../lib/utils/time';
+    import { currentTzOffset, fmtTimestampForInput, parseTimestampFromInputUtc } from '../../lib/utils/time';
+    import { fmtDuration, fmtUtc } from '../../lib/utils/time.js';
     import type { Seconds } from '../../lib/utils/types';
 
     const { addNotification } = getNotificationsContext();
@@ -177,8 +179,8 @@
             {#if !obfuscated}
                 <i>
                     Created
-                    {moment(new Date(event.created * 1000))
-                        .format('hh:mm DD/MM/YYYY')}
+                    <!-- TODO use tz from db -->
+                    {fmtUtc(event.created, currentTzOffset(), 'hh:mm DD/MM/YYYY')}
                 </i>
                 {#if editingLabel}
                     <div class="flex-center">
@@ -240,22 +242,23 @@
                 >
             {/if}
             <p>
-                {#if event.end - event.start > 60}
+                {#if !Event.isInstantEvent(event)}
                     <i>
-                        ({moment.duration(event.end - event.start, 's')
-                        .humanize()})
+                        ({fmtDuration(event.end - event.start)})
                     </i>
                 {/if}
             </p>
         </div>
         <div class="from-to-menu">
-            {#if event.end - event.start < 60}
+            {#if Event.isInstantEvent(event)}
                 {#if obfuscated}
                     <div>
                         <i>at</i>
                         <span>
-                            {moment(new Date(event.start * 1000))
-                                .format('DD/MM/YYYY HH:mm')}
+                            <UtcTime
+                                timestamp={event.start}
+                                fmt="DD/MM/YYYY HH:mm"
+                            />
                         </span>
                     </div>
                 {:else}
@@ -282,15 +285,19 @@
                     <div>
                         <i>from</i>
                         <span>
-                            {moment(new Date(event.start * 1000))
-                                .format('DD/MM/YYYY HH:mm')}
+                            <UtcTime
+                                timestamp={event.start}
+                                fmt="DD/MM/YYYY HH:mm"
+                            />
                         </span>
                     </div>
                     <div>
                         <i>to</i>
                         <span>
-                            {moment(new Date(event.end * 1000))
-                                .format('DD/MM/YYYY HH:mm')}
+                           <UtcTime
+                               timestamp={event.end}
+                               fmt="DD/MM/YYYY HH:mm"
+                           />
                         </span>
                     </div>
                 {:else}

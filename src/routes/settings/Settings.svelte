@@ -1,14 +1,13 @@
 <script lang="ts">
     // @ts-ignore
     import { tooltip } from '@svelte-plugins/tooltips';
-    import moment from 'moment';
     import CloudCheckOutline from 'svelte-material-icons/CloudCheckOutline.svelte';
     import Sync from 'svelte-material-icons/Sync.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import type { Auth } from '../../lib/controllers/user';
     import { api } from '../../lib/utils/apiRequest';
     import { displayNotifOnErr } from '../../lib/utils/notifications.js';
-    import { nowS } from '../../lib/utils/time.js';
+    import { currentTzOffset, fmtDuration, fmtUtc, nowS } from '../../lib/utils/time.js';
 
     const { addNotification } = getNotificationsContext();
 
@@ -25,6 +24,8 @@
     let saving = false;
 
     let inputType: 'text' | 'number' | 'checkbox';
+
+    if (!type || !key) throw new Error('Missing type or key');
 
     switch (type) {
         case 'string':
@@ -87,12 +88,11 @@
             <p
                 class="last-updated"
                 use:tooltip={{
-                    content: moment(new Date(created * 1000)).format('DD/MM/YYYY h:mm A')
+                    content: fmtUtc(created, currentTzOffset(), 'DD/MM/YYYY h:mm A')
                 }}
             >
                 Last updated
-                {moment.duration(nowS() - created, 's')
-                    .humanize()}
+                {fmtDuration(nowS() - created)}
                 ago
             </p>
         {/if}

@@ -1,4 +1,4 @@
-import moment from 'moment/moment';
+import moment from 'moment';
 import type { Seconds } from '../../lib/utils/types';
 
 export enum By {

@@ -1,7 +1,7 @@
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt, encryptMulti } from '../security/encryption';
 import { Result } from '../utils/result';
-import { nowS } from '../utils/time';
+import { fmtUtc, nowS } from '../utils/time';
 import type {
     Hours,
     Mutable,
@@ -221,19 +221,22 @@ export class Entry {
         return Result.ok(entry);
     }
 
-    public static groupEntriesByDay<T extends { created: number } = Entry> (
+    public static groupEntriesByDay<T extends {
+        created: TimestampSecs,
+        createdTZOffset: Hours,
+    } = Entry> (
         entries: T[],
     ): T[][] {
         const grouped: T[][] = [];
 
         entries.forEach((entry) => {
-            const day =
-                Math.round(new Date(entry.created * 1000)
-                    .setHours(0, 0, 0, 0)
-                    .valueOf() / 1000);
-            if (!grouped[day]) {
-                grouped[day] = [];
-            }
+            const localDate = fmtUtc(
+                entry.created,
+                entry.createdTZOffset,
+                'yyyy-MM-DD',
+            );
+            const day = new Date(localDate).getTime() / 1000;
+            grouped[day] ??= [];
             grouped[day].push(entry);
         });
 

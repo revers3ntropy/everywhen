@@ -1,5 +1,4 @@
 <script lang="ts">
-    import moment from 'moment';
     import { onMount } from 'svelte';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
@@ -12,7 +11,7 @@
     import EntryTitles from '../../lib/components/EntryTitles.svelte';
     import type { Entry } from '../../lib/controllers/entry';
     import { obfuscated } from '../../lib/stores.js';
-    import type { Seconds } from '../../lib/utils/types';
+    import { currentTzOffset, fmtUtc, nowS } from '../../lib/utils/time';
 
     export let data: App.PageData & {
         titles: Record<number, Entry[]>,
@@ -21,24 +20,25 @@
 
     onMount(() => document.title = `Home`);
 
-    function entriesYearsAgoToday<T extends { created: Seconds }> (
-        entries: T[],
-    ): Record<string, T[]> {
-        const res: Record<string, T[]> = {};
-        const nowTime = moment();
+    function entriesYearsAgoToday (
+        entries: Entry[],
+    ): Record<string, Entry[]> {
+        const res: Record<string, Entry[]> = {};
+        const nowDate = fmtUtc(nowS(), currentTzOffset(), 'MM-DD');
+        const nowYear = fmtUtc(nowS(), currentTzOffset(), 'YYYY');
+
         for (const entry of entries) {
-            const entryTime = moment(new Date(entry.created * 1000));
+            const entryDate = fmtUtc(entry.created, entry.createdTZOffset, 'MM-DD');
             // entries on the same day and month, but not this year
-            if (
-                entryTime.date() === nowTime.date()
-                && entryTime.month() === nowTime.month()
-                && entryTime.year() !== nowTime.year()
-            ) {
-                const yearsAgo = nowTime.year() - entryTime.year();
-                if (!res[yearsAgo]) {
-                    res[yearsAgo] = [];
+            if (entryDate === nowDate) {
+                const entryYear = fmtUtc(entry.created, entry.createdTZOffset, 'YYYY');
+                if (entryYear !== nowYear) {
+                    const yearsAgo = parseInt(nowYear) - parseInt(entryYear);
+                    if (!res[yearsAgo]) {
+                        res[yearsAgo] = [];
+                    }
+                    res[yearsAgo].push(entry);
                 }
-                res[yearsAgo].push(entry);
             }
         }
         return res;
@@ -159,7 +159,9 @@
 
     h1 {
         font-size: 1.5rem;
-        margin: 1em;
+        // negative on the bottom to put in line with the titles due
+        // to the visibility toggle being inline
+        margin: 1em 1em -22px 1em;
         padding: 0.5em;
         border-bottom: 1px solid @light-accent;
         text-align: start;

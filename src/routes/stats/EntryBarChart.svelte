@@ -1,7 +1,6 @@
 <script lang="ts">
     import { browser } from '$app/environment';
     import 'chart.js/auto';
-    import moment from 'moment';
     // https://www.npmjs.com/package/svelte-chartjs
     import { Bar } from 'svelte-chartjs';
     import ToggleSwitch from 'svelte-material-icons/ToggleSwitch.svelte';
@@ -9,7 +8,7 @@
     import Select from '../../lib/components/Select.svelte';
     import type { Entry } from '../../lib/controllers/entry';
     import { splitText, wordCount } from '../../lib/utils/text';
-    import { nowS } from '../../lib/utils/time';
+    import { currentTzOffset, fmtUtc, nowS } from '../../lib/utils/time';
     import type { Seconds } from '../../lib/utils/types';
     import { Bucket, bucketiseTime, bucketSize, By } from './helpers';
 
@@ -34,25 +33,26 @@
     }
 
     function generateLabels (start: Seconds, buckets: Seconds[]) {
-        let year = moment(start * 1000).year();
+        let year = parseInt(fmtUtc(start, currentTzOffset(), 'YYYY'));
         return buckets.map(k => {
-            const thisYear = moment(k * 1000).year();
             if (selectedBucket === Bucket.Year) {
-                return moment(k * 1000).format('YYYY');
+                return fmtUtc(k, currentTzOffset(), 'YYYY');
             }
+
+            const thisYear = parseInt(fmtUtc(k, currentTzOffset(), 'YYYY'));
             if (selectedBucket === Bucket.Month) {
                 if (thisYear !== year) {
                     year = thisYear;
-                    return moment(k * 1000).format('MMM YYYY');
+                    return fmtUtc(k, currentTzOffset(), 'MMM YYYY');
                 }
-                return moment(k * 1000).format('MMM');
+                return fmtUtc(k, currentTzOffset(), 'MMM');
             }
 
             if (thisYear !== year) {
                 year = thisYear;
-                return moment(k * 1000).format('Do MMM YYYY');
+                return fmtUtc(k, currentTzOffset(), 'Do MMM YYYY');
             }
-            return moment(k * 1000).format('Do MMM');
+            return fmtUtc(k, currentTzOffset(), 'Do MMM');
         });
     }
 

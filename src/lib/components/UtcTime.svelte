@@ -1,28 +1,29 @@
 <script lang="ts">
     // @ts-ignore
     import { tooltip } from '@svelte-plugins/tooltips';
-    import moment from 'moment/moment';
+    import * as timeago from 'timeago.js';
     import { numberAsSignedStr } from '../utils/text';
+    import { currentTzOffset, fmtUtc } from '../utils/time';
     import type { Hours, Seconds } from '../utils/types';
 
     export let timestamp: Seconds;
-    export let tzOffset: Hours;
-    export let showDate = false;
-
-    let date = moment(new Date(timestamp * 1000));
-    let utcDate = moment(new Date((timestamp - tzOffset * 60 * 60) * 1000));
+    export let tzOffset: Hours = currentTzOffset();
+    export let fmt = 'h:mm A';
+    export let relative = false;
 </script>
 
 <span
     class="time"
     use:tooltip={{
-        content: `UTC ${utcDate.format('HH:mm')}`
+        content: `UTC ${fmtUtc(timestamp, 0, 'hh:mma')}`
         + ` (${numberAsSignedStr(tzOffset)}h)`
+        + `<p>${fmtUtc(timestamp, currentTzOffset(), 'hh:mma')} local time</p>`,
+        autoPosition: true,
     }}
 >
-    {#if showDate}
-        {date.format('DD/MM/YYYY h:mm A')}
+    {#if relative}
+        {timeago.format(timestamp * 1000)}
     {:else}
-        {date.format('h:mm A')}
+        {fmtUtc(timestamp, tzOffset, fmt)}
     {/if}
 </span>

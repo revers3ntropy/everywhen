@@ -11,9 +11,9 @@ import type { Auth } from '../controllers/user';
 import type { apiRes404, GenericResponse } from './apiResponse';
 import { GETArgs } from './GETArgs';
 import { Result } from './result';
-import { nowUtcS } from './time';
+import { nowS } from './time';
 
-type ReqBody = {
+export type ReqBody = {
     timezoneUtcOffset?: number,
     utcTimeS?: number,
     [key: string]: any,
@@ -88,7 +88,7 @@ export async function makeApiReq<
         if (browser) {
             body.timezoneUtcOffset ??= -(new Date().getTimezoneOffset() / 60);
         }
-        body.utcTimeS ??= nowUtcS();
+        body.utcTimeS ??= nowS();
     }
 
     const init: RequestInit = {

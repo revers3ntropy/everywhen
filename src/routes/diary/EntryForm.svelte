@@ -19,6 +19,7 @@
     import { getFileContents } from '../../lib/utils/files';
     import { getLocation } from '../../lib/utils/geolocation';
     import { displayNotifOnErr, ERR_NOTIFICATION } from '../../lib/utils/notifications';
+    import { nowS } from '../../lib/utils/time';
     import LocationToggle from './LocationToggle.svelte';
 
     const { addNotification } = getNotificationsContext();
@@ -136,6 +137,7 @@
             label: newEntryLabel,
             latitude: currentLocation[0],
             longitude: currentLocation[1],
+            created: nowS(),
         };
 
         let res;
@@ -312,7 +314,6 @@
         <textarea
             bind:this={newEntryInputElement}
             bind:value={newEntryBody}
-            class="entry"
             placeholder="Entry"
         ></textarea>
     </div>
@@ -375,23 +376,6 @@
         }
     }
 
-    .entry {
-        border-radius: 0;
-        outline: none;
-        border: none;
-        width: calc(100% - 2.4em);
-        max-width: 1500px;
-        height: 500px;
-        font-size: 20px;
-        padding: 1.2em;
-
-        @media @mobile {
-            width: calc(100% - .8em);
-            overflow-y: scroll;
-            padding: .4em;
-        }
-    }
-
     .send {
         margin: 0 0 0 .2rem;
         padding: .4rem;
@@ -422,8 +406,9 @@
         textarea {
             width: min(100%, 700px);
             max-width: 100%;
+            min-width: 200px;
             resize: both;
-            padding: 0;
+            padding: 0.4rem;
             margin: 0;
 
             // fills page
@@ -435,7 +420,21 @@
 
                 // puts submit button at bottom of screen nicely
                 height: calc(100vh - 19rem);
+                width: calc(100% - .8em);
+                overflow-y: scroll;
+                margin: 0;
+                background: none;
             }
+
+            outline: none;
+            border: none;
+            font-size: 20px;
+            background: @light-v-accent;
+            border-radius: 8px;
+        }
+
+        @media @mobile {
+            padding: 0;
         }
     }
 

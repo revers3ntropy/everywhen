@@ -1,11 +1,10 @@
-import moment from 'moment/moment';
 import schemion from 'schemion';
 import { parseSemVer } from 'semver-parser';
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { download as downloadFile } from '../utils/files';
 import { Result } from '../utils/result';
-import { nowS } from '../utils/time';
+import { currentTzOffset, fmtUtc, nowS } from '../utils/time';
 import { Asset } from './asset';
 import { Entry } from './entry';
 import { Event } from './event';
@@ -271,7 +270,7 @@ export class Backup {
     }
 
     public static download (data: string, username: string, encrypted = true) {
-        const dateFmt = moment(new Date()).format('yyyyMMDD-HHmm');
+        const dateFmt = fmtUtc(nowS(), currentTzOffset(), 'yyyyMMDD-HHmm');
         const encryptedExt = encrypted ? '.encrypted' : '';
         downloadFile(
             `${dateFmt}-${username}.backup${encryptedExt}.json`,

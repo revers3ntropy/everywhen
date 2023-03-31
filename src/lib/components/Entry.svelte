@@ -87,7 +87,7 @@
         <div class="flex-center">
             <span class="time">
                 <UtcTime
-                    showDate={showFullDate}
+                    fmt={showFullDate ? 'DD-MM-YYYY h:mm A' : 'h:mm A'}
                     timestamp={created}
                     tzOffset={createdTZOffset}
                 />

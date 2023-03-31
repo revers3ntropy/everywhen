@@ -1,13 +1,12 @@
 <script lang="ts">
 	// @ts-ignore
 	import { tooltip } from '@svelte-plugins/tooltips';
-	import moment from 'moment';
 	import Eye from 'svelte-material-icons/Eye.svelte';
 	import EyeOff from 'svelte-material-icons/EyeOff.svelte';
-	import Time from 'svelte-time';
 	import { Entry } from '../controllers/entry';
 	import { obfuscate } from '../utils/text';
 	import { nowS } from '../utils/time';
+	import UtcTime from './UtcTime.svelte';
 
 	export let titles: Record<number, Entry[]>;
 	export let obfuscated = true;
@@ -16,7 +15,7 @@
 <div>
 	<div class="menu">
 		<button
-			aria-label={obfuscated ? 'Show entry' : 'Hide entry'}
+			aria-label={obfuscated ? 'Show entries' : 'Hide entries'}
 			on:click={() => obfuscated = !obfuscated}
 		>
 			{#if obfuscated}
@@ -31,23 +30,23 @@
 		.sort((a, b) => parseInt(b) - parseInt(a)) as day}
 		<div class="day">
 			<h2>
-				<Time
-					format="dddd DD/MM/YY"
-					timestamp={new Date(parseInt(day) * 1000)}
+				<UtcTime
+					timestamp={parseInt(day)}
+					fmt="dddd DD/MM/YY"
 				/>
+				&#x2022;
 				<span class="text-light">
 					{#if nowS() - parseInt(day) < 8.64e4}
 						Today
 					{:else if nowS() - parseInt(day) < 2 * 8.64e4}
 						Yesterday
 					{:else}
-						<Time relative
-							  timestamp={new Date(
-									parseInt(day) * 1000 + (
-										60 * 60 * 23 + 60 * 60 + 59
-									) * 1000
-								)}
-							  class="text-light"
+						<UtcTime
+							relative
+							timestamp={parseInt(day)
+									+ 60 * 60 * 23 + 60 * 60 + 59
+							}
+							class="text-light"
 						/>
 					{/if}
 				</span>
@@ -56,8 +55,10 @@
 			{#each titles[parseInt(day)] as entry}
 				<a class="entry" href="/diary/{entry.id}">
 					<span class="entry-time">
-						{moment(new Date(entry.created * 1000))
-							.format('h:mm A')}
+						<UtcTime
+							timestamp={entry.created}
+							fmt="h:mm A"
+						/>
 					</span>
 					<span
 						class="entry-label-colour"

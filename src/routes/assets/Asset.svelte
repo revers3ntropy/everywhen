@@ -1,7 +1,7 @@
 <script lang="ts">
+
     // @ts-ignore
     import { tooltip } from '@svelte-plugins/tooltips';
-    import moment from 'moment';
     import { createEventDispatcher, onMount } from 'svelte';
     import Check from 'svelte-material-icons/Check.svelte';
     import ContentCopy from 'svelte-material-icons/ContentCopy.svelte';
@@ -13,6 +13,7 @@
     import type { Auth } from '../../lib/controllers/user';
     import { api, apiPath } from '../../lib/utils/apiRequest';
     import { displayNotifOnErr, SUCCESS_NOTIFICATION } from '../../lib/utils/notifications';
+    import { currentTzOffset, fmtUtc } from '../../lib/utils/time.js';
     import type { TimestampSecs } from '../../lib/utils/types';
 
     const { addNotification } = getNotificationsContext();
@@ -98,7 +99,8 @@
         </div>
         <div>
             {#if !obfuscated}
-                {moment(new Date(created * 1000)).format('MMMM Do YYYY, h:mm:ss a')}
+                <!-- TODO use tzOffset from db -->
+                {fmtUtc(created, currentTzOffset(), 'MMMM Do YYYY, h:mma')}
             {/if}
         </div>
         <div>

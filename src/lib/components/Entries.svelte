@@ -1,11 +1,9 @@
 <script lang="ts">
     import { browser } from '$app/environment';
-    import moment from 'moment';
     import { onMount } from 'svelte';
     import Bin from 'svelte-material-icons/Delete.svelte';
     import TrayArrowUp from 'svelte-material-icons/TrayArrowUp.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
-    import Time from 'svelte-time';
     import EntryGroup from '../../lib/components/EntryGroup.svelte';
     import PageCounter from '../../lib/components/PageCounter.svelte';
     import { Entry } from '../controllers/entry';
@@ -18,6 +16,7 @@
     import Spinner from './BookSpinner.svelte';
     import ImportDialog from './dialogs/ImportDialog.svelte';
     import Sidebar from './EntriesSidebar.svelte';
+    import UtcTime from './UtcTime.svelte';
 
     const { addNotification } = getNotificationsContext();
 
@@ -144,8 +143,10 @@
                 >
                     <div slot="title" class="entry-group-title">
                         <h2>
-                            {moment(new Date(parseInt(day) * 1000))
-                                .format('dddd, Do MMMM YYYY')}
+                            <UtcTime
+                                timestamp={parseInt(day)}
+                                fmt="dddd, Do MMMM YYYY"
+                            />
                         </h2>
                         <span class="text-light">
                             {#if nowS() - parseInt(day) < 8.64e4}
@@ -153,13 +154,11 @@
                             {:else if nowS() - parseInt(day) < 1.728e5}
                                 <span>Yesterday</span>
                             {:else}
-                                <Time
+                                <UtcTime
                                     relative
-                                    timestamp={new Date(
-                                        parseInt(day) * 1000 + (
-                                            60 * 60 * 23 + 60 * 60 + 59
-                                        ) * 1000
-                                    )}
+                                    timestamp={parseInt(day)
+                                                + 60 * 60 * 23 + 60 * 60 + 59
+                                    }
                                 />
                             {/if}
                         </span>
