@@ -66,12 +66,12 @@
             ),
         ));
 
-        // zoom so that there is 7 days of blank space to the left
+        // zoom so that there is 1 day of blank space to the left
         // of the last entry/event,
         // except if it is more than 52 days ago,
         // then show 59 days
 
-        $canvasState.zoom = 1 / 60 / (daysAgo + 7);
+        $canvasState.zoom = 1 / 60 / (daysAgo + 1);
 
         $canvasState.cameraOffset = 24;
     }
@@ -117,10 +117,8 @@
         <Background />
 
         <TimeMarkers />
-        <CenterLine />
 
         <NowLine />
-        <TimeCursor />
 
         {#each data.entries as entry, i}
             <EntryInTimeline
@@ -140,5 +138,7 @@
             />
         {/each}
 
+        <CenterLine />
+        <TimeCursor />
     </Canvas>
 </main>

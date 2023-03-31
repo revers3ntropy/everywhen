@@ -1,4 +1,4 @@
-import type { Bytes, Seconds } from './utils/types';
+import type { Bytes, Pixels, Seconds } from './utils/types';
 
 export const COOKIE_TIMEOUT: Seconds = 60 * 60;
 export const KEY_COOKIE_KEY = '__misc_3_key_v2';
@@ -24,3 +24,5 @@ export const USERNAME_COOKIE_OPTIONS = Object.freeze({
 });
 
 export const MAX_IMAGE_SIZE: Bytes = 1024 * 1024 * 4; // 4MiB
+
+export const EVENT_IN_TIMELINE_HEIGHT: Pixels = 30;

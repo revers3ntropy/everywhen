@@ -164,29 +164,32 @@ export class CanvasState implements ICanvasListeners {
         y: number,
         w: number,
         h: number,
-        colour = CanvasState.c_Primary,
+        {
+            radius = 0,
+            colour = CanvasState.c_Primary,
+        } = {},
     ) {
         if (!this.ctx) throw new Error('Canvas not set');
         this.ctx.beginPath();
         this.ctx.fillStyle = colour;
-        this.ctx.rect(x, y, w, h);
+        this.ctx.roundRect(x, y, w, h, radius);
         this.ctx.fill();
     }
 
     public text (txt: string, x: number, y: number, {
         c = CanvasState.c_Text,
-        mWidth = undefined,
+        maxWidth = undefined,
         align = 'left',
     }: {
         c?: string,
-        mWidth?: number,
+        maxWidth?: number,
         align?: CanvasTextAlign
     } = {}) {
         if (!this.ctx) throw new Error('Canvas not set');
         this.ctx.beginPath();
         this.ctx.textAlign = align;
         this.ctx.fillStyle = c;
-        this.ctx.fillText(txt, x, y, mWidth);
+        this.ctx.fillText(txt, x, y, maxWidth);
         this.ctx.fill();
     }
 

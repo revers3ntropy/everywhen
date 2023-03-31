@@ -24,7 +24,7 @@ export type PickOptional<A, B extends keyof A = keyof A> =
                           & Partial<Pick<A, B>>>;
 
 export type Bytes = number;
-
+export type Pixels = number;
 export type Hours = number;
 export type Seconds = number;
 export type TimestampSecs = number;

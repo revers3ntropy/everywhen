@@ -26,7 +26,10 @@
             state.centerLnY() - 20,
             1,
             40,
-            '#6FA',
+            {
+                radius: 0,
+                colour: '#6FA',
+            },
         );
     });
 </script>

@@ -1,6 +1,8 @@
 <script lang="ts">
     import { CanvasState, renderable, START_ZOOM } from '../../lib/canvas/canvas';
+    import { EVENT_IN_TIMELINE_HEIGHT } from '../../lib/constants';
     import type { Label } from '../../lib/controllers/label';
+    import { obfuscated } from '../../lib/stores';
     import { isLightColour } from './utils';
 
     export let id: string;
@@ -13,9 +15,9 @@
     export let created: number;
     export let decrypted: boolean;
     export let options = {
-        h: 20,
+        h: EVENT_IN_TIMELINE_HEIGHT,
         yMargin: 2,
-        textXOffset: 1,
+        textXOffset: 5,
         radius: 5,
     };
     if (!start || !end) throw 'Missing required props';
@@ -30,12 +32,18 @@
         const isSingleEvent = duration < 60;
 
         if (isSingleEvent) {
-            state.circle(x, y + options.radius * 4,
+            state.circle(x, y + options.h,
                 options.radius, colour);
-            const h = state.centerLnY() - (y + options.radius * 4);
-            state.rect(x, y + options.radius * 4, 1, h, colour);
+            const h = state.centerLnY() - (y + options.h);
+            state.rect(x, y + options.h, 1, h, {
+                radius: 0,
+                colour,
+            });
         } else {
-            state.rect(x, y, width, options.h, colour);
+            state.rect(x, y, width, options.h, {
+                radius: options.radius,
+                colour,
+            });
         }
 
         let textColour = '#fff';
@@ -48,19 +56,21 @@
             return;
         }
 
+        if ($obfuscated) return;
+
         if (width > 50 && !isSingleEvent) {
             state.text(
                 name,
                 Math.max(5, x + options.textXOffset),
                 y + options.h / 2 + 5,
-                { c: textColour, mWidth: width },
+                { c: textColour, maxWidth: width - 2 * options.textXOffset },
             );
         } else if (isSingleEvent && state.zoom > START_ZOOM / 2) {
             state.text(
                 name,
                 x + options.radius,
                 y + options.h / 2 + (
-                    eventTextParityHeight ? options.radius * 2 + 18 : 0
+                    eventTextParityHeight ? options.h / 2 + 20 : 0
                 ),
                 { c: '#fff', align: 'center' },
             );

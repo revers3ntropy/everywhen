@@ -20,9 +20,12 @@
         const renderPos = state.timeToRenderPos(created);
         if (renderPos < 0 || renderPos > state.width) return;
 
-        const size = Math.max(wordCount * 0.1, 5);
+        const size = 0.1 * wordCount + 20;
 
-        state.rect(renderPos, state.centerLnY(), 5, size, 'rgb(100, 100, 100)');
+        state.rect(renderPos, state.centerLnY(), 5, size, {
+            radius: 2,
+            colour: 'rgb(100, 100, 100)',
+        });
 
         if (state.zoom > START_ZOOM * 2 && !$obfuscated) {
             let y = state.centerLnY();
@@ -33,7 +36,9 @@
                 y += size + 12;
             }
 
-            state.text(title, renderPos - 5, y, { align: 'center' });
+            state.text(title, renderPos - 5, y, {
+                align: 'center',
+            });
         }
     });
 </script>
