@@ -11,7 +11,7 @@
     import EntryTitles from '../../lib/components/EntryTitles.svelte';
     import type { Entry } from '../../lib/controllers/entry';
     import { obfuscated } from '../../lib/stores.js';
-    import { currentTzOffset, fmtUtc, nowS } from '../../lib/utils/time';
+    import { currentTzOffset, dayUtcFromTimestamp, fmtUtc, nowS } from '../../lib/utils/time';
 
     export let data: App.PageData & {
         titles: Record<number, Entry[]>,
@@ -101,7 +101,12 @@
                 {yearsAgo === '1' ? `A Year` : `${yearsAgo} Years`} Ago Today
             </h1>
             <EntryTitles
-                titles={{ [titles[0].created]: titles }}
+                titles={{
+                    [dayUtcFromTimestamp(
+                        titles[0].created,
+                         titles[0].createdTZOffset
+                    )]: titles
+                }}
                 obfuscated={$obfuscated}
             />
         </section>

@@ -15,6 +15,7 @@
     import type { NotificationOptions } from '../lib/utils/types';
     import Footer from './Footer.svelte';
     import Nav from './Nav.svelte';
+    import NewVersionAvailable from './NewVersionAvailable.svelte';
     import Notifier from './Notifier.svelte';
     import PasscodeModal from './PasscodeModal.svelte';
 
@@ -30,6 +31,8 @@
     $: obfuscated.update(() => isObfuscated);
 
     let showPasscodeModal = true;
+    let newVersionAvailable = false;
+    let newVersion: string = '<error>';
 
     function checkObfuscatedTimeout () {
         if (isObfuscated) return;
@@ -40,7 +43,7 @@
         if (nowS() - lastActivity >= hideAfter) {
             addNotification({
                 ...INFO_NOTIFICATION,
-                removeAfter: -1,
+                removeAfter: 0,
                 text: 'Hidden due to inactivity',
             });
             isObfuscated = true;
@@ -70,13 +73,8 @@
             await api.get(data, '/version'),
         );
 
-        if (versionResult.version !== currentVersion) {
-            addNotification({
-                ...INFO_NOTIFICATION,
-                removeAfter: -1,
-                text: 'New version available, please reload the page',
-            });
-        }
+        newVersionAvailable = versionResult.version !== currentVersion;
+        newVersion = versionResult.version;
     }
 
     onMount(() => {
@@ -145,6 +143,10 @@
     <div style="min-height: calc(100vh - var(--nav-height))">
         <slot />
     </div>
+
+    {#if newVersionAvailable}
+        <NewVersionAvailable {newVersion} />
+    {/if}
 
     <Modal
         classContent="popup-background"

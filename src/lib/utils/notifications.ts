@@ -1,9 +1,9 @@
 import type { Result } from './result';
 import type { NotificationOptions, PickOptional } from './types';
 
-export const INFO_NOTIFICATION = Object.freeze({
-    removeAfter: 4000,
-    type: 'info',
+export const WARN_NOTIFICATION = Object.freeze({
+    removeAfter: 6000,
+    type: 'warning',
     position: 'top-center',
 } as const satisfies NotificationOptions);
 export const ERR_NOTIFICATION = Object.freeze({
@@ -16,6 +16,10 @@ export const SUCCESS_NOTIFICATION = Object.freeze({
     removeAfter: 4000,
     text: 'Success',
     type: 'success',
+    position: 'top-center',
+} as const satisfies NotificationOptions);
+export const INFO_NOTIFICATION = Object.freeze({
+    removeAfter: 4000,
     position: 'top-center',
 } as const satisfies NotificationOptions);
 

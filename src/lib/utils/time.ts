@@ -45,3 +45,11 @@ export function fmtTimestampForInput (
 export function parseTimestampFromInputUtc (timestamp: string): TimestampSecs {
     return Math.floor(Date.parse(timestamp) / 1000);
 }
+
+export function dayUtcFromTimestamp (
+    timestamp: TimestampSecs,
+    tzOffset: Hours = currentTzOffset(),
+): TimestampSecs {
+    const day = fmtUtc(timestamp, tzOffset, 'YYYY-MM-DD');
+    return new Date(`${day}T12:00:00Z`).getTime() / 1000;
+}
