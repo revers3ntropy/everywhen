@@ -42,6 +42,7 @@ interface ApiResponse {
         '/auth': GET<typeof import('../../routes/api/auth/+server')>,
         '/assets/?': GET<typeof import('../../routes/api/assets/[asset]/+server')>,
         '/settings': GET<typeof import('../../routes/api/settings/+server')>,
+        '/version': GET<typeof import('../../routes/api/version/+server')>,
     },
     'POST': {
         '/users': POST<typeof import('../../routes/api/users/+server')>,

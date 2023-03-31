@@ -9,7 +9,8 @@
     import '../app.less';
     import { USERNAME_COOKIE_KEY } from '../lib/constants';
     import { obfuscated, passcodeLastEntered, popup } from '../lib/stores';
-    import { INFO_NOTIFICATION } from '../lib/utils/notifications';
+    import { api } from '../lib/utils/apiRequest';
+    import { displayNotifOnErr, INFO_NOTIFICATION } from '../lib/utils/notifications';
     import { nowS } from '../lib/utils/time';
     import type { NotificationOptions } from '../lib/utils/types';
     import Footer from './Footer.svelte';
@@ -63,6 +64,21 @@
         showPasscodeModal = secondsSinceLastEntered > data.settings.passcodeTimeout.value;
     }
 
+    async function checkForUpdate () {
+        const currentVersion = __VERSION__;
+        const versionResult = displayNotifOnErr(addNotification,
+            await api.get(data, '/version'),
+        );
+
+        if (versionResult.version !== currentVersion) {
+            addNotification({
+                ...INFO_NOTIFICATION,
+                removeAfter: -1,
+                text: 'New version available, please reload the page',
+            });
+        }
+    }
+
     onMount(() => {
         setInterval(() => {
             if (home) return;
@@ -71,6 +87,10 @@
             checkCookies();
             checkPasscode();
         }, 1000);
+
+        setInterval(() => {
+            checkForUpdate();
+        }, 1000 * 10);
     });
 
 
