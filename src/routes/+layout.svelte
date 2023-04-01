@@ -9,6 +9,7 @@
     import 'ts-polyfill';
     import '../app.less';
     import { USERNAME_COOKIE_KEY } from '../lib/constants';
+    import { Backup } from '../lib/controllers/backup';
     import { obfuscated, passcodeLastEntered, popup } from '../lib/stores';
     import { api } from '../lib/utils/apiRequest';
     import { GETParamIsFalsy } from '../lib/utils/GETArgs';
@@ -35,9 +36,12 @@
         obfuscated.set(false);
     }
 
+    $: $page && popup.set(null);
+
     let showPasscodeModal = true;
     let newVersionAvailable = false;
     let newVersion: string = '<error>';
+    let downloadingBackup = false;
 
     function checkObfuscatedTimeout () {
         if ($obfuscated) return;
@@ -101,12 +105,29 @@
         lastActivity = nowS();
     }
 
+    async function downloadBackup () {
+        if (downloadingBackup) return;
+        downloadingBackup = true;
+        const { data: backupData } = displayNotifOnErr(addNotification,
+            await api.get(data, '/backups', { encrypted: true }),
+        );
+        Backup.download(backupData, data.username);
+        downloadingBackup = false;
+    }
+
     function keydown (e: KeyboardEvent) {
         lastActivity = nowS();
-        if (e.key === 'Escape') {
-            if (e.ctrlKey) {
+        if (e.ctrlKey) {
+            if (e.key === 'Escape') {
                 obfuscated.set(!$obfuscated);
                 e.preventDefault();
+                return;
+            }
+
+            if (e.key === 's') {
+                downloadBackup();
+                e.preventDefault();
+                return;
             }
         }
     }

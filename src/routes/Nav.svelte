@@ -6,20 +6,28 @@
     import Close from 'svelte-material-icons/Close.svelte';
     import Cog from 'svelte-material-icons/Cog.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
+    import DownloadLock from 'svelte-material-icons/DownloadLock.svelte';
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import Home from 'svelte-material-icons/Home.svelte';
     import Logout from 'svelte-material-icons/Logout.svelte';
     import Menu from 'svelte-material-icons/Menu.svelte';
     import Notebook from 'svelte-material-icons/Notebook.svelte';
+    import { getNotificationsContext } from 'svelte-notifications';
     import Dropdown from '../lib/components/Dropdown.svelte';
+    import { Backup } from '../lib/controllers/backup';
     import type { Auth } from '../lib/controllers/user';
     import { obfuscated } from '../lib/stores';
+    import { api } from '../lib/utils/apiRequest';
+    import { displayNotifOnErr } from '../lib/utils/notifications';
     import { wheel } from '../lib/utils/toggleScrollable';
+
+    const { addNotification } = getNotificationsContext();
 
     export let auth: Auth;
 
     let showingNavPopup = false;
+    let downloadingBackup = false;
 
     function onClick (_: Event) {
         if (showingNavPopup) {
@@ -30,6 +38,16 @@
     function toggleNavPopup (event: Event) {
         event.stopPropagation();
         showingNavPopup = !showingNavPopup;
+    }
+
+    async function downloadBackup () {
+        if (downloadingBackup) return;
+        downloadingBackup = true;
+        const { data: backupData } = displayNotifOnErr(addNotification,
+            await api.get(auth, '/backups', { encrypted: true }),
+        );
+        Backup.download(backupData, auth.username);
+        downloadingBackup = false;
     }
 </script>
 
@@ -112,6 +130,20 @@
                 </span>
                 <AccountCircleOutline size="40" />
             </span>
+
+            <button
+                aria-label="download encrypted backup"
+                class="primary unbordered account-dropdown-button"
+                disabled={downloadingBackup}
+                on:click={downloadBackup}
+            >
+                <DownloadLock size="30" />
+                {#if downloadingBackup}
+                    Downloading...
+                {:else}
+                    Download Backup
+                {/if}
+            </button>
 
             <a
                 aria-label="settings"

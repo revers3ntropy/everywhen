@@ -78,16 +78,6 @@
         obfuscated = !obfuscated;
     }
 
-    function edit () {
-        if (isInDialog) popup.set(null);
-        location.assign(`/diary/${id}/edit?obfuscate=0`);
-    }
-
-    function seeEdits () {
-        if (isInDialog) popup.set(null);
-        location.assign(`/diary/${id}?history=on&obfuscate=0`);
-    }
-
     $: entryHtml = browser ? DomPurify.sanitize(
         marked(obfuscated ? obfuscate(entry) : entry),
         { USE_PROFILES: { html: true } },
@@ -115,9 +105,9 @@
         <div class="flex-center">
             {#if !obfuscated && !isEdit}
                 {#if edits.length}
-                    <button on:click={seeEdits} class="link">
+                    <a href="/diary/{id}?history=on&obfuscate=0" class="link">
                         {edits.length} edit{edits.length > 1 ? 's' : ''}
-                    </button>
+                    </a>
                 {/if}
                 <button
                     on:click={deleteSelf}
@@ -131,12 +121,12 @@
                     {/if}
                 </button>
                 {#if !deleted}
-                    <button
-                        on:click={edit}
+                    <a
+                        href="/diary/{id}/edit?obfuscate=0"
                         use:tooltip={{ content: 'Edit Entry' }}
                     >
                         <NoteEditOutline size="25" />
-                    </button>
+                    </a>
                 {/if}
             {/if}
 
@@ -166,9 +156,7 @@
         height: fit-content;
         white-space: pre-wrap;
 
-        border-style: solid;
-        border-width: 1px;
-        border-color: transparent;
+        border: 1px solid transparent;
 
         &.visible {
             border-image: linear-gradient(transparent,
@@ -215,6 +203,7 @@
         .body {
             margin: 0 2rem;
             word-break: break-word;
+            max-width: 700px;
 
             // inner <p> element is created when using @html
             :global(p) {

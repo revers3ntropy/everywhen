@@ -128,7 +128,7 @@
             </div>
         </div>
     </div>
-    <div>
+    <div class="entries">
         {#if loading}
             <Spinner />
         {:else}
