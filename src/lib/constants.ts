@@ -26,3 +26,5 @@ export const USERNAME_COOKIE_OPTIONS = Object.freeze({
 export const MAX_IMAGE_SIZE: Bytes = 1024 * 1024 * 4; // 4MiB
 
 export const EVENT_IN_TIMELINE_HEIGHT: Pixels = 30;
+
+export const NAVBAR_HEIGHT: Pixels = 60;

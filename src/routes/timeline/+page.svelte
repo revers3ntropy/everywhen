@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import Background from '../../lib/canvas/Background.svelte';
-    import { canvasState } from '../../lib/canvas/canvas';
+    import { canvasState } from '../../lib/canvas/canvasHelpers';
     import Canvas from '../../lib/canvas/Canvas.svelte';
     import type { Entry } from '../../lib/controllers/entry';
     import { Event } from '../../lib/controllers/event';

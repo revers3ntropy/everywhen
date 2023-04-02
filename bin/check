@@ -1,6 +1,6 @@
 #!/bin/bash
 
-svelte-kit sync && svelte-check \
+svelte-kit sync && npx svelte-check \
   --tsconfig ./tsconfig.json \
   --compiler-warnings "css-unused-selector:ignore,unused-export-let:ignore" \
   "$@"

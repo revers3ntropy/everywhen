@@ -1,7 +1,6 @@
 <script lang="ts">
     import { onMount, setContext } from 'svelte';
-    import type { ICanvasState } from './canvas';
-    import { canvasState, CanvasState, key } from './canvas';
+    import { canvasState, CanvasState, key, type ICanvasState } from './canvasHelpers';
 
     export let killLoopOnError = true;
     export let attributes: CanvasRenderingContext2DSettings = {};

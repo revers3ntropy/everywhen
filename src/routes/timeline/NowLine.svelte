@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { renderable } from '../../lib/canvas/canvas';
+    import { renderable } from '../../lib/canvas/canvasHelpers';
     import { nowS } from '../../lib/utils/time';
 
     renderable(state => {
@@ -11,14 +11,13 @@
         }
 
         state.rect(nowLinePos, 0, 1, state.height, {
-            radius: 0,
             colour: '#79ebe2',
         });
 
         state.text(
             'now',
-            nowLinePos - 23,
-            72,
+            nowLinePos + 5,
+            state.centerLnY() - 5,
             { c: '#79ebe2' },
         );
     });

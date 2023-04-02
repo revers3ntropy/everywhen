@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { renderable } from './canvas';
+    import { renderable } from './canvasHelpers';
 
     export let color: string | null = null;
 

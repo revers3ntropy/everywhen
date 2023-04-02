@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import type { PageServerLoad } from '../../../.svelte-kit/types/src/routes/stats/$types';
+import type { PageServerLoad } from './$types';
 import { Entry } from '../../lib/controllers/entry';
 import { Event } from '../../lib/controllers/event';
 import { query } from '../../lib/db/mysql';

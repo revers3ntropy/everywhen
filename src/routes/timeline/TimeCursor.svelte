@@ -1,7 +1,6 @@
 <script lang="ts">
-    import { fmtUtc } from '$lib/utils/time.js';
-    import { renderable, START_ZOOM } from '../../lib/canvas/canvas';
-    import { currentTzOffset } from '../../lib/utils/time';
+    import { renderable, START_ZOOM } from '../../lib/canvas/canvasHelpers';
+    import { currentTzOffset, fmtUtc } from '../../lib/utils/time';
 
     renderable(state => {
         // center screen

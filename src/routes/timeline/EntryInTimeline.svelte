@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { renderable, START_ZOOM } from '../../lib/canvas/canvas';
+    import { renderable, START_ZOOM } from '../../lib/canvas/canvasHelpers';
     import type { EntryEdit } from '../../lib/controllers/entry';
     import type { Label } from '../../lib/controllers/label';
     import { obfuscated } from '../../lib/stores';

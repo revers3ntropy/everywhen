@@ -2,6 +2,7 @@ import { browser } from '$app/environment';
 import { getContext, onMount } from 'svelte';
 import { writable } from 'svelte/store';
 import { nowS } from '../utils/time';
+import type { TimestampSecs } from "../utils/types";
 
 export const START_ZOOM = 1 / (60 * 60);
 
@@ -104,16 +105,34 @@ export class CanvasState implements ICanvasListeners {
         return (pos - center) * zoom + center;
     }
 
-    public timeToRenderPos (t: number): number {
+    public timeToRenderPos (t: TimestampSecs): number {
+        t -= new Date().getTimezoneOffset() * 60;
         t = nowS() - t + this.cameraOffset;
         t = this.zoomScaledPosition(t, this.zoom, this.cameraOffset);
         return this.width - t;
     }
 
-    public renderPosToTime (pos: number) {
+    public dateToRenderPos (
+        year: number,
+        month = 0,
+        date = 1,
+        hour = 0,
+        minute = 0,
+        second = 0
+    ): number {
+        const t = new Date(year, month, date, hour, minute, second).getTime() / 1000;
+        return this.timeToRenderPos(t);
+    }
+
+    public renderPosToTime (pos: number): TimestampSecs {
         pos = this.width - pos;
         pos = this.zoomScaledPosition(pos, 1 / this.zoom, this.cameraOffset);
-        return Math.round(nowS() - pos + this.cameraOffset);
+        return Math.round(
+            nowS()
+            - pos
+            + this.cameraOffset
+            + new Date().getTimezoneOffset() * 60
+        );
     }
 
     public getMousePosRaw (event: MouseEvent | TouchEvent): number {

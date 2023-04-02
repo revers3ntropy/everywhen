@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { CanvasState, renderable, START_ZOOM } from '../../lib/canvas/canvas';
+    import { CanvasState, renderable, START_ZOOM } from '../../lib/canvas/canvasHelpers';
     import { EVENT_IN_TIMELINE_HEIGHT } from '../../lib/constants';
     import type { Label } from '../../lib/controllers/label';
     import { obfuscated } from '../../lib/stores';

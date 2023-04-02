@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { canvasState, renderable } from '../../lib/canvas/canvas';
+    import { canvasState, renderable } from '../../lib/canvas/canvasHelpers';
 
     renderable({
         setup () {
@@ -15,7 +15,7 @@
                     let centerTime = s.renderPosToTime(s.width / 2);
                     s.zoom *= deltaZ;
 
-                    s.zoom = Math.max(Math.min(100, s.zoom), 1e-20);
+                    s.zoom = Math.max(Math.min(100, s.zoom), 1e-10);
 
                     let newCenterTime = s.renderPosToTime(s.width / 2);
                     s.cameraOffset -= (newCenterTime - centerTime) * s.zoom;
