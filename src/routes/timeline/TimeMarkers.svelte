@@ -177,8 +177,8 @@
                 } else if (week === nextWeek) {
                     text = 'Next week';
                 } else {
-                    const [ thisYear, thisWeekIdx ] = thisWeek.split('-');
-                    const [ weekYear, weekIdx ] = week.split('-');
+                    const [ thisYear, thisWeekIdx ] = thisWeek.split('-').map(parseInt);
+                    const [ weekYear, weekIdx ] = week.split('-').map(parseInt);
 
                     if (thisYear === weekYear && thisWeekIdx > weekIdx) {
                         text = `${thisWeekIdx - weekIdx} weeks ago`;
