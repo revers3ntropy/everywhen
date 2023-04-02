@@ -47,10 +47,6 @@
     export let auth: Auth;
     export let obfuscated = true;
 
-    $: if (!newEntryBody && !newEntryLabel && !newEntryTitle) {
-        obfuscated = false;
-    }
-
     let newEntryInputElement: HTMLTextAreaElement;
 
     export function reset () {
@@ -78,6 +74,12 @@
             newEntryTitle = localStorage.getItem('__misc_3_newEntryTitle') || '';
             newEntryBody = localStorage.getItem('__misc_3_newEntryBody') || '';
             newEntryLabel = localStorage.getItem('__misc_3_newEntryLabel') || '';
+
+            if (!newEntryBody && !newEntryLabel && !newEntryTitle) {
+                obfuscated = false;
+            }
+        } else {
+            obfuscated = true;
         }
         mounted = true;
     });

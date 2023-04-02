@@ -210,10 +210,10 @@ export class CanvasState implements ICanvasListeners {
 export const canvasState = writable(CanvasState.empty());
 export const key = Symbol();
 
-type renderProps = Omit<Readonly<CanvasState>, 'ctx'> & {
+export type RenderProps = Omit<Readonly<CanvasState>, 'ctx'> & {
     ctx: CanvasRenderingContext2D
 };
-export type RenderCallback = (props: renderProps, dt: number) => void | Promise<void>;
+export type RenderCallback = (props: RenderProps, dt: number) => void | Promise<void>;
 
 export const renderable = (
     render?: RenderCallback
