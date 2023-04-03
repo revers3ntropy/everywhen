@@ -22,8 +22,6 @@ test.describe('/diary', () => {
         await page.getByPlaceholder('Entry').fill(entryBody);
         await page.getByRole('button', { name: 'Submit Entry' }).click();
 
-        await page.getByRole('button', { name: 'Show entry' }).click();
-
         await expect(await page.getByText(entryTitle)).toBeTruthy();
         await expect(await page.getByText(entryBody)).toBeTruthy();
 

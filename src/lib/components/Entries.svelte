@@ -12,7 +12,7 @@
     import { api } from '../utils/apiRequest';
     import { displayNotifOnErr } from '../utils/notifications';
     import { showPopup } from '../utils/popups';
-    import { fmtUtc, nowS, utcEq } from '../utils/time';
+    import { nowS, utcEq } from '../utils/time';
     import Spinner from './BookSpinner.svelte';
     import ImportDialog from './dialogs/ImportDialog.svelte';
     import Sidebar from './EntriesSidebar.svelte';
