@@ -65,6 +65,7 @@
     @media @mobile {
         .outer {
             overflow-x: auto;
+            direction: rtl;
 
             .inner {
                 width: 1200px;

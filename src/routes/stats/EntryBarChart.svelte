@@ -82,7 +82,7 @@
 
         const buckets: Record<string, number> = {};
         const start = sortedFilteredEntries[0].created;
-        const end = nowS() + bucketSize(selectedBucket);
+        const end = nowS();
         for (let i = start; i < end; i += bucketSize(selectedBucket)) {
             buckets[bucketiseTime(i, selectedBucket).toString()] = 0;
         }

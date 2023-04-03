@@ -117,7 +117,7 @@
 
     function keydown (e: KeyboardEvent) {
         lastActivity = nowS();
-        if (e.ctrlKey) {
+        if (e.ctrlKey || e.metaKey) {
             if (e.key === 'Escape') {
                 obfuscated.set(!$obfuscated);
                 e.preventDefault();

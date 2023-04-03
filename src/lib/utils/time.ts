@@ -53,3 +53,12 @@ export function dayUtcFromTimestamp (
     const day = fmtUtc(timestamp, tzOffset, 'YYYY-MM-DD');
     return new Date(`${day}T12:00:00Z`).getTime() / 1000;
 }
+
+export function utcEq (
+    a: TimestampSecs,
+    b: TimestampSecs,
+    fmt='YYYY-MM-DD',
+    tzOffset: Hours = currentTzOffset(),
+): boolean {
+    return fmtUtc(a, tzOffset, fmt) === fmtUtc(b, tzOffset, fmt);
+}

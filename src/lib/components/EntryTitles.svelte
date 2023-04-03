@@ -7,7 +7,7 @@
 	import type { Auth } from '../controllers/user';
 	import { showPopup } from '../utils/popups';
 	import { obfuscate } from '../utils/text';
-	import { nowS } from '../utils/time';
+	import { nowS, utcEq } from '../utils/time';
 	import EntryDialog from './dialogs/EntryDialog.svelte';
 	import UtcTime from './UtcTime.svelte';
 
@@ -52,10 +52,10 @@
 						&#x2022;
 					</span>
 					<span class="text-light">
-						{#if nowS() - parseInt(day) < 8.64e4}
-							Today
-						{:else if nowS() - parseInt(day) < 2 * 8.64e4}
-							Yesterday
+						{#if utcEq(nowS(), parseInt(day))}
+							<span>Today</span>
+						{:else if utcEq(nowS() - 60*60*24, parseInt(day))}
+							<span>Yesterday</span>
 						{:else}
 							<UtcTime
 								relative

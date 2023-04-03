@@ -11,6 +11,7 @@ export interface ISettingsConfig<T> {
     name: string,
     description: string,
     defaultValue: T,
+    unit?: string,
 }
 
 export type SettingsKey = keyof typeof Settings.config;
@@ -26,7 +27,7 @@ export class Settings<T = unknown> {
     public static config = {
         hideEntriesByDefault: {
             type: 'boolean',
-            defaultValue: true,
+            defaultValue: false,
             name: 'Blur Entries By Default',
             description: 'Blur entries by default, and manually show them.',
         } satisfies ISettingsConfig<boolean>,
@@ -36,12 +37,14 @@ export class Settings<T = unknown> {
             name: 'Auto Blur Entries After',
             description: `Blur entries after 'N' seconds without user interaction. ` +
                 `Set to 0 to disable.`,
+            unit: 'seconds'
         } satisfies ISettingsConfig<Seconds>,
         entriesPerPage: {
             type: 'number',
             defaultValue: 100,
             name: 'Entries per Page',
             description: `Number of entries displayed per page.`,
+            unit: 'entries'
         } satisfies ISettingsConfig<Seconds>,
         passcode: {
             type: 'string',
@@ -55,6 +58,7 @@ export class Settings<T = unknown> {
             name: 'Passcode Timeout',
             description: `Delay before passcode is required again. `
                 + `Set to 0 to only require once.`,
+            unit: 'seconds'
         } satisfies ISettingsConfig<Seconds>,
         yearOfBirth: {
             type: 'number',

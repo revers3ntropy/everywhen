@@ -68,7 +68,7 @@
                 dragEnd = $canvasState.getMousePosRaw(evt);
 
                 canvasState.update(s => {
-                    s.cameraOffset -= (dragEnd - dragStart) * s.zoom;
+                    s.cameraOffset -= (dragEnd - dragStart) * s.zoom * 0.5;
                     return s;
                 });
                 dragStart = dragEnd;

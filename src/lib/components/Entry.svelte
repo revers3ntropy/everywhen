@@ -87,6 +87,9 @@
 </script>
 
 <div class="entry {obfuscated ? '' : 'visible'}">
+    <p class="mobile-title {obfuscated ? 'obfuscated' : ''}">
+        {obfuscated ? obfuscate(title) : title}
+    </p>
     <div class="header">
         <div class="flex-center">
             <span class="time">
@@ -98,6 +101,7 @@
             </span>
             <Label label={showLabel} obfuscated={obfuscated} />
         </div>
+
         <div class="title {obfuscated ? 'obfuscated' : ''}">
             {obfuscated ? obfuscate(title) : title}
         </div>
@@ -192,6 +196,12 @@
 
         .title {
             font-size: 1.2em;
+            white-space: nowrap;
+            overflow-x: scroll;
+
+            @media @mobile {
+                display: none;
+            }
         }
 
         .time {
@@ -204,6 +214,10 @@
             margin: 0 2rem;
             word-break: break-word;
             max-width: 700px;
+
+            @media @mobile {
+                margin: 0 .5rem;
+            }
 
             // inner <p> element is created when using @html
             :global(p) {
@@ -250,6 +264,17 @@
                 border-left: 3px solid @accent-color-secondary;
                 margin: 0 0 0 .5em;
                 padding: 0 0 0 1em;
+            }
+        }
+
+        .mobile-title {
+            display: none;
+            margin: 2rem 0 -1.2rem .5rem;
+            font-size: 1.1em;
+            text-align: center;
+
+            @media @mobile {
+                display: block;
             }
         }
     }

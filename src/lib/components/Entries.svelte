@@ -12,7 +12,7 @@
     import { api } from '../utils/apiRequest';
     import { displayNotifOnErr } from '../utils/notifications';
     import { showPopup } from '../utils/popups';
-    import { nowS } from '../utils/time';
+    import { fmtUtc, nowS, utcEq } from '../utils/time';
     import Spinner from './BookSpinner.svelte';
     import ImportDialog from './dialogs/ImportDialog.svelte';
     import Sidebar from './EntriesSidebar.svelte';
@@ -146,12 +146,13 @@
                             <UtcTime
                                 timestamp={parseInt(day)}
                                 fmt="dddd, Do MMMM YYYY"
+                                noTooltip
                             />
                         </h2>
                         <span class="text-light">
-                            {#if nowS() - parseInt(day) < 8.64e4}
+                            {#if utcEq(nowS(), parseInt(day))}
                                 <span>Today</span>
-                            {:else if nowS() - parseInt(day) < 1.728e5}
+                            {:else if utcEq(nowS() - 60*60*24, parseInt(day))}
                                 <span>Yesterday</span>
                             {:else}
                                 <UtcTime

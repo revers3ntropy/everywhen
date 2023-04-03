@@ -1,5 +1,5 @@
 <script lang="ts">
-    import BackupOptions from '$lib/components/BackupOptions.svelte';
+    import BackupOptions from '../../lib/components/BackupOptions.svelte';
     import { onMount } from 'svelte';
     import Logout from 'svelte-material-icons/Logout.svelte';
     import Skull from 'svelte-material-icons/Skull.svelte';
@@ -13,7 +13,6 @@
     const { addNotification } = getNotificationsContext();
 
     export let data: App.PageData;
-
 
     async function deleteAccount () {
         if (!confirm(
@@ -70,7 +69,6 @@
                 {...data.settings[key]}
                 auth={data}
             />
-            <hr>
         {/each}
     </section>
 </main>

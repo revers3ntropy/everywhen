@@ -11,7 +11,7 @@
     import Send from 'svelte-material-icons/Send.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import LabelSelect from '../../lib/components/LabelSelect.svelte';
-    import { MAX_IMAGE_SIZE } from '../../lib/constants';
+    import { LS_KEY, MAX_IMAGE_SIZE } from '../../lib/constants';
     import { Asset } from '../../lib/controllers/asset';
     import type { Entry } from '../../lib/controllers/entry';
     import type { Label } from '../../lib/controllers/label';
@@ -63,17 +63,17 @@
 
     function saveToLS () {
         if (loadFromLS) {
-            localStorage.setItem('__misc_3_newEntryTitle', newEntryTitle);
-            localStorage.setItem('__misc_3_newEntryBody', newEntryBody);
-            localStorage.setItem('__misc_3_newEntryLabel', newEntryLabel);
+            localStorage.setItem(LS_KEY.newEntryTitle, newEntryTitle);
+            localStorage.setItem(LS_KEY.newEntryBody, newEntryBody);
+            localStorage.setItem(LS_KEY.newEntryLabel, newEntryLabel);
         }
     }
 
     onMount(() => {
         if (loadFromLS) {
-            newEntryTitle = localStorage.getItem('__misc_3_newEntryTitle') || '';
-            newEntryBody = localStorage.getItem('__misc_3_newEntryBody') || '';
-            newEntryLabel = localStorage.getItem('__misc_3_newEntryLabel') || '';
+            newEntryTitle = localStorage.getItem(LS_KEY.newEntryTitle) || '';
+            newEntryBody = localStorage.getItem(LS_KEY.newEntryBody) || '';
+            newEntryLabel = localStorage.getItem(LS_KEY.newEntryLabel) || '';
 
             if (!newEntryBody && !newEntryLabel && !newEntryTitle) {
                 obfuscated = false;
@@ -383,9 +383,8 @@
         margin: 0;
         padding: 0 0.4em;
         border-bottom: 1px solid @border-light;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+        display: grid;
+        grid-template-columns: 1fr 23.5rem;
 
         @media @mobile {
             display: flex;
@@ -403,12 +402,12 @@
 
             .title {
                 border: none;
-                width: 55%;
                 font-size: 20px;
+                width: calc(100% - 50px);
                 margin: 0 0 .2rem .3em;
 
                 @media @mobile {
-                    width: 100%;
+                    width: calc(100vw - 60px);
                     margin: 0.2em;
                     border-bottom: 1px solid @border-light;
                 }

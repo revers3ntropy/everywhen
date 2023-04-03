@@ -18,6 +18,7 @@
     export let name: string;
     export let type: string;
     export let description: string;
+    export let unit = '';
     export let value: any;
     export let created: number | null = null;
 
@@ -71,54 +72,73 @@
     }
 </script>
 
-<div>
-    <div class="header">
-        <div>
-            <h3>
-                {#if saving}
-                    <Sync size={20} />
-                {:else}
-                    <CloudCheckOutline size={20} />
-                {/if}
-                {name}
-            </h3>
-        </div>
+<div class="wrapper">
+    <div class="left">
+        <div class="header">
+            <div>
+                <h3>
+                    {#if saving}
+                        <Sync size={20} />
+                    {:else}
+                        <CloudCheckOutline size={20} />
+                    {/if}
+                    {name}
+                </h3>
+            </div>
 
-        {#if created}
-            <p
-                class="last-updated"
-                use:tooltip={{
+            {#if created}
+                <p
+                        class="last-updated"
+                        use:tooltip={{
                     content: fmtUtc(created, currentTzOffset(), 'DD/MM/YYYY h:mm A')
                 }}
-            >
-                Last updated
-                {fmtDuration(nowS() - created)}
-                ago
-            </p>
-        {/if}
-        {#if value !== defaultValue}
-            <p class="restore">
-                <button on:click={() => updateValue(defaultValue)}>
-                    Restore default ({JSON.stringify(defaultValue)})
-                </button>
-            </p>
-        {/if}
-    </div>
-    <label>
-        <input
-            checked={inputType === 'checkbox' && value}
-            class="text-box"
-            on:change={onInput}
-            type={inputType}
-            value={value}
-        />
-        <br>
+                >
+                    Last updated
+                    {fmtDuration(nowS() - created)}
+                    ago
+                </p>
+            {/if}
+            {#if value !== defaultValue}
+                <p class="restore">
+                    <button on:click={() => updateValue(defaultValue)}>
+                        Restore default ({JSON.stringify(defaultValue)})
+                    </button>
+                </p>
+            {/if}
+        </div>
         {description}
-    </label>
+    </div>
+    <div class="right">
+        <label>
+            <input
+                    checked={inputType === 'checkbox' && value}
+                    class="text-box"
+                    on:change={onInput}
+                    type={inputType}
+                    value={value}
+            />
+            {unit}
+        </label>
+    </div>
 </div>
 
 <style lang="less">
-    @import '../../styles/variables.less';
+    @import '../../styles/layout';
+    @import '../../styles/variables';
+
+    .wrapper {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        padding: .5em;
+
+        @media @mobile {
+            display: block;
+        }
+
+        .left, .right {
+            margin: 0.5em;
+        }
+    }
 
     input {
         margin: 0 0 .5rem 0;

@@ -1,9 +1,14 @@
 <script lang="ts">
     import { onMount } from 'svelte';
+    import { LS_KEY } from "../../lib/constants";
 
-    location.assign('/');
-
-    onMount(() => document.title = 'Log out');
+    onMount(() => {
+        document.title = 'Log out';
+        localStorage.removeItem(LS_KEY.newEntryTitle);
+        localStorage.removeItem(LS_KEY.newEntryBody);
+        localStorage.removeItem(LS_KEY.newEntryLabel);
+        location.assign('/');
+    });
 
 </script>
 
