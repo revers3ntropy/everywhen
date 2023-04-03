@@ -126,7 +126,7 @@
 
         position: relative;
 
-        border-radius: 10px;
+        border-radius: @border-radius;
         margin: .5rem;
 
         height: 50vh;

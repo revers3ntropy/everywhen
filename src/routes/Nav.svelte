@@ -216,7 +216,7 @@
         gap: .5rem;
         text-align: right;
         cursor: pointer;
-        border-radius: 10px;
+        border-radius: @border-radius;
         padding: .1rem .3rem;
         width: fit-content;
 

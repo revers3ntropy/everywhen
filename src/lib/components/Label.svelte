@@ -25,7 +25,7 @@
 		margin: 0.5em;
 		width: fit-content;
 		padding: 5px;
-		border-radius: 10px;
+		border-radius: @border-radius;
 		display: inline-grid;
 		align-items: center;
 		align-content: center;

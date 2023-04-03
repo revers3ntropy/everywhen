@@ -42,7 +42,7 @@
     @media @mobile {
 
         .title {
-            border-radius: 10px;
+            border-radius: @border-radius;
             background: @light-accent;
             margin: 0.3em;
             position: sticky;

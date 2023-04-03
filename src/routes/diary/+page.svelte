@@ -9,8 +9,7 @@
     let clearEntryForm: () => void;
     let reloadEntries: () => Promise<void>;
 
-    onMount(() => document.title = `Diary`);
-
+    onMount(() => document.title = `Journal`);
 </script>
 
 <main>

@@ -138,12 +138,12 @@
             align-items: center;
             justify-content: center;
             border: 1px solid @border;
-            border-radius: 10px;
+            border-radius: @border-radius;
             padding: 0.6em;
             margin: 0.5em;
 
             button {
-                border-radius: 10px;
+                border-radius: @border-radius;
                 margin: .5rem;
                 padding: .3rem;
 

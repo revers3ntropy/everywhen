@@ -20,7 +20,7 @@
     import { api, apiPath } from '../../lib/utils/apiRequest';
     import { getFileContents } from '../../lib/utils/files';
     import { getLocation } from '../../lib/utils/geolocation';
-    import { displayNotifOnErr, ERR_NOTIFICATION } from '../../lib/utils/notifications';
+    import { displayNotifOnErr, ERR_NOTIFICATION, SUCCESS_NOTIFICATION } from '../../lib/utils/notifications';
     import { obfuscate } from '../../lib/utils/text';
     import { nowS } from '../../lib/utils/time';
     import LocationToggle from './LocationToggle.svelte';
@@ -188,6 +188,11 @@
         if (entry) {
             submitted = true;
             location.assign(`/diary/${entry.id}`);
+        } else {
+            addNotification({
+                ...SUCCESS_NOTIFICATION,
+                text: `Entry created!`,
+            });
         }
     }
 
@@ -442,7 +447,7 @@
         display: none;
         width: calc(100% - 1em);
         border: 1px solid @border;
-        border-radius: 10px;
+        border-radius: @border-radius;
         margin: 0.5em;
         padding: 0.2em;
 

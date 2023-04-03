@@ -66,7 +66,7 @@
 
         button {
             border: 1px solid @border;
-            border-radius: 10px;
+            border-radius: @border-radius;
             padding: 1em;
             margin: 1em;
 

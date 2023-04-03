@@ -16,7 +16,8 @@
         entryCount: number,
         wordCount: number,
         charCount: number,
-        commonWords: [ string, number ][]
+        commonWords: [ string, number ][],
+        days: number,
     };
 
     onMount(() => document.title = 'Analytics');
@@ -70,6 +71,14 @@
                 >
                     <span>{round1DP(data.charCount / (data.wordCount || 1))}</span>
                     Letters/Word
+                </div>
+                <div>
+                    <span>{round1DP(data.wordCount / data.days)}</span>
+                    Words/Day
+                </div>
+                <div>
+                    <span>{round1DP(data.entryCount / Math.max(data.days / 7, 1))}</span>
+                    Entries/Week
                 </div>
             </div>
         </section>

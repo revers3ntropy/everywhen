@@ -96,7 +96,7 @@
             // with the other buttons
             a, :global(button) {
                 .bordered();
-                border-radius: 10px;
+                border-radius: @border-radius;
                 padding: .8rem;
                 margin: .5rem;
                 display: grid;

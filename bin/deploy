@@ -14,7 +14,7 @@ die () {
 mv .env tmp.env
 mv "./secrets/$1/remote.env" .env
 
-bin/build;
+bin/build || die "build failed";
 
 mv .env "./secrets/$1/remote.env"
 mv tmp.env .env

@@ -61,7 +61,7 @@
             justify-content: space-between;
             align-items: center;
 
-            border-radius: 10px;
+            border-radius: @border-radius;
         }
 
         &.unstyled {
@@ -103,14 +103,14 @@
                 transform: translateY(0.5em);
 
                 .content {
-                    border-radius: 10px;
+                    border-radius: @border-radius;
                 }
             }
         }
 
         &:not(.rounded) {
             .bordered();
-            border-radius: 10px;
+            border-radius: @border-radius;
             margin: .5em;
 
             &:hover {

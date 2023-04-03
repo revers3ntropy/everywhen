@@ -62,3 +62,9 @@ export function utcEq (
 ): boolean {
     return fmtUtc(a, tzOffset, fmt) === fmtUtc(b, tzOffset, fmt);
 }
+
+export function daysSince (
+    timestamp: TimestampSecs,
+): number {
+    return Math.floor((nowS() - timestamp) / 60 / 60 / 24);
+}

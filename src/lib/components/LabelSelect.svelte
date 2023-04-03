@@ -65,30 +65,32 @@
                 loading...
             {/if}
         </span>
-        <button
-            on:click={() => { closeDropDown(); value = '' }}
-            class="label-button single"
-            aria-label="Remove label"
-        >
-            <i>(No Label)</i>
-        </button>
-        {#each (labels ?? []).filter(filter) as label (label.id)}
+        <div class="list-container">
             <button
-                on:click={() => { closeDropDown(); value = label.id }}
-                class="label-button"
-                aria-label="Select label {label.name}"
+                    on:click={() => { closeDropDown(); value = '' }}
+                    class="label-button single"
+                    aria-label="Remove label"
             >
-                <span
-                    class="entry-label-colour"
-                    style="background: {label.colour}"
-                ></span>
-                {#if value === label.id}
-                    <b>{label.name}</b>
-                {:else}
-                    {label.name}
-                {/if}
+                <i>(No Label)</i>
             </button>
-        {/each}
+            {#each (labels ?? []).filter(filter) as label (label.id)}
+                <button
+                        on:click={() => { closeDropDown(); value = label.id }}
+                        class="label-button"
+                        aria-label="Select label {label.name}"
+                >
+                <span
+                        class="entry-label-colour"
+                        style="background: {label.colour}"
+                ></span>
+                    {#if value === label.id}
+                        <b>{label.name}</b>
+                    {:else}
+                        {label.name}
+                    {/if}
+                </button>
+            {/each}
+        </div>
     </Dropdown>
     {#if showAddButton}
         <button
@@ -109,13 +111,13 @@
         justify-content: space-between;
         gap: 10px;
         background-color: @light-accent;
-        border-radius: 10px;
+        border-radius: @border-radius;
         border: none;
 
         .icon-button {
             background: transparent;
             padding: 0.2em;
-            border-radius: 10px;
+            border-radius: @border-radius;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -148,12 +150,17 @@
 
         &:hover {
             background: @bg;
-            border-radius: 10px;
+            border-radius: @border-radius;
             border: 1px solid @border;
         }
 
         &.single {
             grid-template-columns: 1fr;
         }
+    }
+
+    .list-container {
+        max-height: 80vh;
+        overflow-y: auto;
     }
 </style>

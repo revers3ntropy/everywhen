@@ -34,7 +34,7 @@
     button {
         display: block;
         padding: .3em;
-        border-radius: 10px;
+        border-radius: @border-radius;
 
         &:hover {
             background-color: @accent-color-primary;
