@@ -2,6 +2,7 @@
     import { onMount } from 'svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import TrayArrowUp from 'svelte-material-icons/TrayArrowUp.svelte';
+    import Calendar from 'svelte-material-icons/Calendar.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../../app';
     import ImportDialog from '../../lib/components/dialogs/ImportDialog.svelte';
@@ -132,7 +133,11 @@
             </button>
         </div>
 
-        <h1>Events ({eventCount})</h1>
+        <h1>
+            <Calendar size="40" />
+            <span>Events</span>
+            <i>({eventCount})</i>
+        </h1>
 
         <div class="flex-center">
             Sort by
@@ -161,12 +166,27 @@
 </main>
 
 <style lang="less">
-    @import '../../styles/variables.less';
-    @import '../../styles/layout.less';
+    @import '../../styles/variables';
+    @import '../../styles/layout';
 
     // Layout doesn't really work below 750px, so say that
     // 'mobile' is anything below that
     @mobile: ~"only screen and (max-width: 750px)";
+
+    h1 {
+        .flex-center();
+        margin: 0;
+        font-size: 40px;
+
+        i {
+            font-size: 0.5em;
+            margin-left: 0.5em;
+        }
+
+        span {
+            margin-left: 0.2em;
+        }
+    }
 
     ul {
         list-style: none;

@@ -1,9 +1,11 @@
 <script lang="ts">
-    import BackupOptions from '../../lib/components/BackupOptions.svelte';
     import { onMount } from 'svelte';
+    import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import Logout from 'svelte-material-icons/Logout.svelte';
+    import Cog from 'svelte-material-icons/Cog.svelte';
     import Skull from 'svelte-material-icons/Skull.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
+    import BackupOptions from '../../lib/components/BackupOptions.svelte';
     import { Backup } from '../../lib/controllers/backup';
     import { Settings as SettingsController } from '../../lib/controllers/settings';
     import { api } from '../../lib/utils/apiRequest';
@@ -39,7 +41,10 @@
 
 <main>
     <section>
-        <h1>My Data and Account</h1>
+        <h1>
+            <AccountCircleOutline size="40" />
+            <span>My Data and Account</span>
+        </h1>
 
         <div class="buttons">
             <BackupOptions auth={data} />
@@ -62,7 +67,10 @@
     </section>
     <section>
         <i>Please note you will have to reload the page for changes to take effect</i>
-        <h1>General Settings</h1>
+        <h1>
+            <Cog size="40" />
+            <span>General Settings</span>
+        </h1>
         {#each Object.entries(SettingsController.config) as [key, config] (key)}
             <Settings
                 {...config}
@@ -75,6 +83,16 @@
 
 <style lang="less">
     @import '../../styles/layout.less';
+
+    h1 {
+        .flex-center();
+        margin: 1rem 0 0 0;
+        font-size: 38px;
+
+        span {
+            margin-left: 0.2em;
+        }
+    }
 
     hr {
         margin: 1.5rem;

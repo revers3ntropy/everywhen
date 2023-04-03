@@ -6,6 +6,9 @@
     export let rounded = false;
     export let ariaLabel = '';
     export let unstyledButton = false;
+    export let width = '100%';
+    export let fromRight = false;
+    export let openOnHover = false;
 
     export let close = () => {
         open = false;
@@ -22,7 +25,11 @@
 <svelte:window on:mousedown={globalMouseDown} />
 
 <div class="dropdown {cn({
-    open, rounded, 'unstyled': unstyledButton
+    open,
+    rounded,
+     'unstyled': unstyledButton,
+     'from-right': fromRight,
+     'open-on-hover': openOnHover,
 })}">
     <button
         aria-label={ariaLabel || 'Open popup'}
@@ -31,13 +38,11 @@
         <slot name="button"></slot>
         <MenuDown class="menu-down" size="30" />
     </button>
-    {#if open}
-        <div class="popup">
-            <div class="content">
-                <slot />
-            </div>
+    <div class="popup">
+        <div class="content" style="width: {width}">
+            <slot />
         </div>
-    {/if}
+    </div>
 </div>
 
 <style lang="less">
@@ -82,13 +87,24 @@
             width: fit-content;
         }
 
+        &.popup {
+            .popup {
+                left: 0;
+            }
+        }
+
+        &.from-right {
+            .popup {
+                right: 0;
+            }
+        }
+
         .popup {
             .flex-center();
             position: absolute;
             top: 100%;
-            left: 0;
-            right: 0;
             z-index: 5;
+            display: none;
 
             .content {
                 background: @light-accent;
@@ -123,5 +139,12 @@
                 border: 1px solid @border-heavy;
             }
         }
+
+        &.open, &.open-on-hover:hover {
+            .popup {
+                display: block;
+            }
+        }
     }
+
 </style>

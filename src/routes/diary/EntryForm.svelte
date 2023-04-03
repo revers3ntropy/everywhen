@@ -127,7 +127,11 @@
     let submitted = false;
 
     beforeNavigate(({ cancel }) => {
-        saveToLS();
+        // would save to LS here, except sometimes we want to navigate away
+        // after editing something in LS, for example making 'Dream' entry from navbar
+        // in which case saving would override anything we set there.
+        // Should be fine, as we always save whenever the local variables which store the form
+        // contents are changed.
 
         if (!submitted && areUnsavedChanges()) {
             if (!confirm('You have unsaved changes, are you sure you want to leave?')) {

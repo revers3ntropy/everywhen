@@ -4,7 +4,12 @@
     import Calendar from 'svelte-material-icons/Calendar.svelte';
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
     import Close from 'svelte-material-icons/Close.svelte';
+    import Brain from 'svelte-material-icons/Brain.svelte';
+    import Pencil from 'svelte-material-icons/Pencil.svelte';
+    import Plus from 'svelte-material-icons/Plus.svelte';
     import Cog from 'svelte-material-icons/Cog.svelte';
+    import Lightbulb from 'svelte-material-icons/Lightbulb.svelte';
+    import Moon from 'svelte-material-icons/MoonWaningCrescent.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
     import DownloadLock from 'svelte-material-icons/DownloadLock.svelte';
     import Eye from 'svelte-material-icons/Eye.svelte';
@@ -21,6 +26,7 @@
     import { api } from '../lib/utils/apiRequest';
     import { displayNotifOnErr } from '../lib/utils/notifications';
     import { wheel } from '../lib/utils/toggleScrollable';
+    import { LS_KEY } from "../lib/constants";
 
     const { addNotification } = getNotificationsContext();
 
@@ -48,6 +54,49 @@
         );
         Backup.download(backupData, auth.username);
         downloadingBackup = false;
+    }
+
+    async function makeLabelFromNameIfDoesntExist (
+        name: string,
+        defaultColour: string
+    ): Promise<string> {
+        const { labels } = displayNotifOnErr(addNotification,
+            await api.get(auth, '/labels'),
+        );
+        const label = labels.find(label => label.name === name);
+        if (label) {
+            return label.id;
+        }
+        const res = displayNotifOnErr(addNotification,
+            await api.post(auth, '/labels', {
+                name,
+                colour: defaultColour
+            }),
+        );
+        return res.id;
+    }
+
+    async function goToEntryFormWithLabel (
+        name: string,
+        defaultColour: string
+    ) {
+        const labelId = await makeLabelFromNameIfDoesntExist(name, defaultColour);
+        localStorage.setItem(LS_KEY.newEntryLabel, labelId);
+        location.assign('/diary');
+    }
+
+    async function makeDream () {
+        await goToEntryFormWithLabel('Dream', '#7730ce');
+    }
+    async function makeIdea () {
+        await goToEntryFormWithLabel('Idea', '#ffff65');
+    }
+    async function makeThought () {
+        await goToEntryFormWithLabel('Thought', '#735820');
+    }
+    async function makeEntry () {
+        localStorage.removeItem(LS_KEY.newEntryLabel);
+        location.assign('/diary');
     }
 </script>
 
@@ -113,6 +162,55 @@
     </div>
 
     <div>
+        <Dropdown
+            unstyledButton
+            width="170px"
+            openOnHover
+        >
+            <span class="create-button" slot="button">
+                <Plus size="40"/>
+            </span>
+
+            <div class="record-something-buttons">
+                <div>
+                    <button
+                        on:click={makeEntry}
+                        class="primary unbordered oneline record-entry"
+                    >
+                        <Pencil size="30" />
+                        Record Entry
+                    </button>
+                </div>
+                <div>
+                    <button
+                        on:click={makeDream}
+                        class="primary unbordered oneline record-dream"
+                    >
+                        <Moon size="30" />
+                        Record Dream
+                    </button>
+                </div>
+                <div>
+                    <button
+                            on:click={makeIdea}
+                            class="primary unbordered oneline record-idea"
+                    >
+                        <Lightbulb size="30" />
+                        Record Idea
+                    </button>
+                </div>
+                <div>
+                    <button
+                            on:click={makeThought}
+                            class="primary unbordered oneline record-thought"
+                    >
+                        <Brain size="30" />
+                        Record Thought
+                    </button>
+                </div>
+            </div>
+        </Dropdown>
+
         <button
             aria-label={$obfuscated ? 'Show all' : 'Hide all'}
             on:click={() => $obfuscated = !$obfuscated}
@@ -123,7 +221,8 @@
                 <EyeOff size="25" />
             {/if}
         </button>
-        <Dropdown unstyledButton={true}>
+
+        <Dropdown unstyledButton>
             <span class="account-button" slot="button">
                 <span class="username-span">
                     {auth.username}
@@ -255,7 +354,6 @@
             z-index: 20;
             justify-content: flex-start;
 
-
             &.showing {
                 height: fit-content;
                 display: flex;
@@ -284,6 +382,58 @@
 
             :global(svg), :global(svg *) {
                 fill: @accent-color-secondary;
+            }
+        }
+    }
+
+    .create-button {
+        &:hover {
+            background-color: @bg;
+            border-radius: @border-radius;
+        }
+    }
+
+    .record-something-buttons {
+
+        display: block;
+        padding: 0 0 .8rem 0;
+
+        button.primary {
+            width: 100%;
+            margin: 0;
+            border-radius: 0;
+            text-align: left;
+        }
+
+        .record-entry:hover {
+            background: @light-v-accent;
+            color: @text-color;
+            :global(svg), :global(svg *) {
+                fill:  @accent-color-primary;
+            }
+        }
+
+        .record-dream:hover {
+            background: rgba(0, 0, 255, 0.1);
+            color: @text-color;
+            :global(svg), :global(svg *) {
+                fill: @accent-color-secondary;
+            }
+        }
+
+        .record-idea:hover {
+            background: rgba(255, 255, 0, 0.1);
+            color: @text-color;
+            :global(svg), :global(svg *) {
+                fill: yellow;
+            }
+        }
+
+        .record-thought:hover {
+            background: rgba(220, 105, 33, 0.1);
+            color: @text-color;
+            :global(svg), :global(svg *) {
+                fill: rgb(183, 110, 30);
             }
         }
     }

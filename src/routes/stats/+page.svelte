@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Counter from 'svelte-material-icons/Counter.svelte';
     // @ts-ignore
     import { tooltip } from '@svelte-plugins/tooltips';
     import { onMount } from 'svelte';
@@ -39,30 +40,37 @@
             <h1>No Entries</h1>
             <div class="flex-center">
                 <p>
-                    You need to create some entries before you can see Stats.
-                    <a href="/diary">Create one!</a>
+                    You need to create some entries before you can see analytics,
+                    <a href="/diary">why not create one?</a>
                 </p>
             </div>
         </section>
     {:else}
+        <h1>
+            <Counter size="40"/>
+            <span>Analytics</span>
+        </h1>
         <section class="container unbordered">
-            <h1>{data.entryCount} Entries</h1>
             <div class="stats">
+                <div>
+                    <span>{data.entryCount}</span>
+                    entries
+                </div>
                 <div
                     use:tooltip={{
                         content: "A typical novel is 100,000 words"
                     }}
                 >
                     <span>{data.wordCount}</span>
-                    Words
+                    words
                 </div>
                 <div>
                     <span>{data.charCount}</span>
-                    Characters
+                    characters
                 </div>
                 <div>
                     <span>{round1DP(data.wordCount / (data.entryCount || 1))}</span>
-                    Words/Entry
+                    words / entry
                 </div>
                 <div
                     use:tooltip={{
@@ -70,26 +78,28 @@
                     }}
                 >
                     <span>{round1DP(data.charCount / (data.wordCount || 1))}</span>
-                    Letters/Word
+                    letters / word
                 </div>
                 <div>
                     <span>{round1DP(data.wordCount / data.days)}</span>
-                    Words/Day
+                    words / day
                 </div>
                 <div>
                     <span>{round1DP(data.entryCount / Math.max(data.days / 7, 1))}</span>
-                    Entries/Week
+                    entries / week
                 </div>
             </div>
         </section>
 
         <section class="charts">
-            <div class="entry-bar-chart-wrapper container">
-                <EntryBarChart {by} entries={data.entries} />
-            </div>
             <div class="entry-heatmap-wrapper container">
                 <EntryHeatMap {by} entries={data.entries} />
             </div>
+            {#if data.entryCount > 5}
+                <div class="entry-bar-chart-wrapper container">
+                    <EntryBarChart {by} entries={data.entries} />
+                </div>
+            {/if}
         </section>
 
         <section class="container">
@@ -102,7 +112,19 @@
 </main>
 
 <style lang="less">
-    @import '../../styles/variables.less';
+    @import '../../styles/layout';
+    @import '../../styles/variables';
+
+    h1 {
+        .flex-center();
+        font-size: 40px;
+        margin: 0;
+        padding: 0;
+
+        span {
+            margin-left: 0.5rem;
+        }
+    }
 
     .stats {
         text-align: center;

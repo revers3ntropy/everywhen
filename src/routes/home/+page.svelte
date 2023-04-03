@@ -70,7 +70,7 @@
             </a>
             <a class="primary" href="/assets">
                 <ImageOutline size="30" />
-                Assets
+                Gallery
             </a>
             <a class="primary" href="/settings">
                 <Cog size="30" />
