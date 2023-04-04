@@ -1,8 +1,8 @@
 <script lang="ts">
-    import Counter from 'svelte-material-icons/Counter.svelte';
     // @ts-ignore
     import { tooltip } from '@svelte-plugins/tooltips';
     import { onMount } from 'svelte';
+    import Counter from 'svelte-material-icons/Counter.svelte';
     import type { App } from '../../app';
     import type { Entry } from '../../lib/controllers/entry';
     import CommonWordsList from './CommoWordsList.svelte';
@@ -47,7 +47,7 @@
         </section>
     {:else}
         <h1>
-            <Counter size="40"/>
+            <Counter size="40" />
             <span>Analytics</span>
         </h1>
         <section class="container unbordered">

@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { LS_KEY } from "../../lib/constants";
+    import { LS_KEY } from '../../lib/constants';
 
     onMount(() => {
         document.title = 'Log out';

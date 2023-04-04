@@ -1,9 +1,9 @@
 <script lang="ts">
+    import { browser } from '$app/environment';
     import { renderable, type RenderProps } from '../../lib/canvas/canvasHelpers';
-    import { monthIdxToName } from "./utils";
-    import { NAVBAR_HEIGHT } from "../../lib/constants";
-    import { browser } from "$app/environment";
+    import { NAVBAR_HEIGHT } from '../../lib/constants';
     import { currentTzOffset, fmtUtc, nowS } from '../../lib/utils/time.js';
+    import { monthIdxToName } from './utils';
 
     export let startYear: number;
 
@@ -15,7 +15,7 @@
         week: '#aaa',
         day: '#666',
         hour: '#444',
-    }
+    };
 
     $: if (startYear + showYears < new Date().getFullYear()) {
         if (browser) alert(`Born in ${startYear}?? You are old!`);
@@ -52,7 +52,7 @@
                 state.text(year.toString(), renderPos + 5, NAVBAR_HEIGHT + 10);
             }
             if (showBothSidesText) {
-                state.text((year-1).toString(), renderPos - 25, NAVBAR_HEIGHT + 10);
+                state.text((year - 1).toString(), renderPos - 25, NAVBAR_HEIGHT + 10);
             }
 
             year++;
@@ -119,11 +119,11 @@
         const showWeekText = state.zoom >= 1.2e-4;
 
         while (true) {
-            const dayDate = new Date(day * 1000)
+            const dayDate = new Date(day * 1000);
             let dayStart = new Date(
                 dayDate.getFullYear(),
                 dayDate.getMonth(),
-                dayDate.getDate()
+                dayDate.getDate(),
             ).getTime() / 1000;
             let renderPos = state.timeToRenderPos(dayStart);
 
@@ -162,7 +162,7 @@
                 state.text(
                     text,
                     renderPos + 6,
-                    NAVBAR_HEIGHT + 40
+                    NAVBAR_HEIGHT + 40,
                 );
             }
 
@@ -189,7 +189,7 @@
                     state.text(
                         text,
                         renderPos + 6,
-                        NAVBAR_HEIGHT + 30
+                        NAVBAR_HEIGHT + 30,
                     );
                 }
             }
@@ -208,7 +208,7 @@
             leftMost = firstHourTimestamp;
         }
 
-        let hour = Math.floor(leftMost / (60*60)) * (60*60);
+        let hour = Math.floor(leftMost / (60 * 60)) * (60 * 60);
         // deal with timezones
         hour -= currentTzOffset() * 60 * 60;
 
@@ -227,11 +227,11 @@
                 state.text(
                     fmtUtc(hour, currentTzOffset(), 'ha'),
                     renderPos + 6,
-                    NAVBAR_HEIGHT + 50
+                    NAVBAR_HEIGHT + 50,
                 );
             }
 
-            hour += 60*60;
+            hour += 60 * 60;
         }
     }
 

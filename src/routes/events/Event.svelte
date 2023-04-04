@@ -3,6 +3,8 @@
     // @ts-ignore
     import { tooltip } from '@svelte-plugins/tooltips';
     import { createEventDispatcher, onMount } from 'svelte';
+    import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
+    import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
     import Bin from 'svelte-material-icons/Delete.svelte';
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
@@ -183,14 +185,12 @@
                     {/if}
                 </button>
                 {#if !obfuscated}
-                    <i>
-                        Created
-                        <!-- TODO use tz from db -->
-                        <UtcTime
-                            timestamp={event.created}
-                            fmt="hh:mm DD/MM/YYYY"
-                        />
-                    </i>
+                    <button
+                        class="danger"
+                        on:click={deleteEvent}
+                    >
+                        <Bin size="25" />
+                    </button>
                     {#if editingLabel}
                         <div class="flex-center">
                             <LabelSelect
@@ -228,17 +228,22 @@
                             </button>
                         {/if}
                     {/if}
-                    <button
-                        class="danger"
-                        on:click={deleteEvent}
-                    >
-                        <Bin size="25" />
-                    </button>
                 {/if}
-                <button on:click={() => panelOpen = false}>
-                    close
+                <button
+                    on:click={() => panelOpen = false}
+                    class="icon-button"
+                >
+                    <ChevronUp size="25" />
                 </button>
             </div>
+            <i>
+                Created
+                <!-- TODO use tz from db -->
+                <UtcTime
+                    timestamp={event.created}
+                    fmt="hh:mm DD/MM/YYYY"
+                />
+            </i>
             <div class="middle-row">
                 {#if obfuscated}
                     <p class="event-name-inp obfuscated">
@@ -253,13 +258,6 @@
                         value={event.name}
                     >
                 {/if}
-                <p>
-                    {#if !Event.isInstantEvent(event)}
-                        <i>
-                            ({fmtDuration(event.end - event.start)})
-                        </i>
-                    {/if}
-                </p>
             </div>
             <div class="from-to-menu">
                 {#if Event.isInstantEvent(event)}
@@ -344,6 +342,13 @@
                         </div>
                     {/if}
                 {/if}
+                <p>
+                    {#if !Event.isInstantEvent(event)}
+                        <i>
+                            ({fmtDuration(event.end - event.start)})
+                        </i>
+                    {/if}
+                </p>
             </div>
         {:else}
             <button
@@ -370,24 +375,36 @@
                     value={event.name}
                 >
             {/if}
-            <div>
-                <span
-                    class="entry-label-colour"
-                    style="background: {event.label?.colour || 'transparent'}"
-                    use:tooltip={{ content: event.label?.name }}
-                ></span>
+            <div class="label-and-open-container">
+                {#if obfuscated}
+                    <span
+                        class="entry-label-colour big"
+                        style="background: {event.label?.colour || 'transparent'}"
+                    ></span>
+                {:else}
+                    <span
+                        class="entry-label-colour big"
+                        style="background: {event.label?.colour || 'transparent'}"
+                        use:tooltip={{ content: event.label?.name}}
+                    ></span>
+                {/if}
 
-                <button on:click={() => panelOpen = true}>
-                    open
-                </button>
+                <div>
+                    <button
+                        on:click={() => panelOpen = true}
+                        class="icon-button"
+                    >
+                        <ChevronDown size="25" />
+                    </button>
+                </div>
             </div>
         {/if}
     {/if}
 </div>
 
 <style lang="less">
-    @import '../../styles/variables.less';
-    @import '../../styles/layout.less';
+    @import '../../styles/variables';
+    @import '../../styles/layout';
 
     .event {
         .bordered();
@@ -414,9 +431,9 @@
                 justify-content: space-between;
                 align-items: center;
 
-                @media @mobile {
-                    display: block;
-                }
+                //@media @mobile {
+                //    display: block;
+                //}
             }
         }
     }
@@ -466,5 +483,10 @@
         @media @mobile {
             display: block;
         }
+    }
+
+    .label-and-open-container {
+        .flex-center();
+        justify-content: space-between;
     }
 </style>

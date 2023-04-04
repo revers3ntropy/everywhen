@@ -50,7 +50,7 @@
         <div class="buttons">
             <a class="primary" href="/diary">
                 <Notebook size="30" />
-                Diary
+                Journal
             </a>
             <a class="primary" href="/events">
                 <Calendar size="30" />
@@ -90,7 +90,7 @@
     {:else}
         <section>
             <h1 class="recent-entries">Recent Entries</h1>
-            <p>
+            <p class="recent-entries-text">
                 Doesn't look like you have any entries yet,
                 why not <a href="/diary?obfuscate=0">write one</a>?
             </p>
@@ -117,8 +117,8 @@
 </main>
 
 <style lang="less">
-    @import '../../styles/variables.less';
-    @import '../../styles/layout.less';
+    @import '../../styles/variables';
+    @import '../../styles/layout';
 
     .buttons {
         display: flex;
@@ -184,4 +184,9 @@
             margin: 1rem;
         }
     }
+
+    .recent-entries-text {
+        margin: .5rem;
+    }
+
 </style>

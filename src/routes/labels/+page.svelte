@@ -1,8 +1,8 @@
 <script lang="ts">
     import { onMount } from 'svelte';
+    import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
-    import type { App } from '../../app';
     import type { Label as LabelController } from '../../lib/controllers/label';
     import { api } from '../../lib/utils/apiRequest';
     import { displayNotifOnErr } from '../../lib/utils/notifications';
@@ -62,7 +62,11 @@
 </svelte:head>
 
 <main>
-    <h1>Labels ({data.labels.length})</h1>
+    <h1>
+        <LabelOutline size="40" />
+        <span>Labels</span>
+        <i>({data.labels.length})</i>
+    </h1>
     <div class="labels">
         <div class="label-list">
             {#each data.labels as label}
@@ -88,7 +92,23 @@
 </main>
 
 <style lang="less">
-    @import '../../styles/variables.less';
+    @import '../../styles/layout';
+    @import '../../styles/variables';
+
+    h1 {
+        .flex-center();
+        margin: 0 0 1rem 0;
+        font-size: 40px;
+
+        i {
+            font-size: 0.5em;
+            margin-left: 0.5em;
+        }
+
+        span {
+            margin-left: 0.2em;
+        }
+    }
 
     .labels {
         display: grid;

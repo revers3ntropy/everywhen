@@ -1,32 +1,32 @@
 <script lang="ts">
     import { page } from '$app/stores';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
+    import Brain from 'svelte-material-icons/Brain.svelte';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
     import Close from 'svelte-material-icons/Close.svelte';
-    import Brain from 'svelte-material-icons/Brain.svelte';
-    import Pencil from 'svelte-material-icons/Pencil.svelte';
-    import Plus from 'svelte-material-icons/Plus.svelte';
     import Cog from 'svelte-material-icons/Cog.svelte';
-    import Lightbulb from 'svelte-material-icons/Lightbulb.svelte';
-    import Moon from 'svelte-material-icons/MoonWaningCrescent.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
     import DownloadLock from 'svelte-material-icons/DownloadLock.svelte';
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import Home from 'svelte-material-icons/Home.svelte';
+    import Lightbulb from 'svelte-material-icons/Lightbulb.svelte';
     import Logout from 'svelte-material-icons/Logout.svelte';
     import Menu from 'svelte-material-icons/Menu.svelte';
+    import Moon from 'svelte-material-icons/MoonWaningCrescent.svelte';
     import Notebook from 'svelte-material-icons/Notebook.svelte';
+    import Pencil from 'svelte-material-icons/Pencil.svelte';
+    import Plus from 'svelte-material-icons/Plus.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import Dropdown from '../lib/components/Dropdown.svelte';
+    import { LS_KEY } from '../lib/constants';
     import { Backup } from '../lib/controllers/backup';
     import type { Auth } from '../lib/controllers/user';
     import { obfuscated } from '../lib/stores';
     import { api } from '../lib/utils/apiRequest';
     import { displayNotifOnErr } from '../lib/utils/notifications';
     import { wheel } from '../lib/utils/toggleScrollable';
-    import { LS_KEY } from "../lib/constants";
 
     const { addNotification } = getNotificationsContext();
 
@@ -58,7 +58,7 @@
 
     async function makeLabelFromNameIfDoesntExist (
         name: string,
-        defaultColour: string
+        defaultColour: string,
     ): Promise<string> {
         const { labels } = displayNotifOnErr(addNotification,
             await api.get(auth, '/labels'),
@@ -70,7 +70,7 @@
         const res = displayNotifOnErr(addNotification,
             await api.post(auth, '/labels', {
                 name,
-                colour: defaultColour
+                colour: defaultColour,
             }),
         );
         return res.id;
@@ -78,22 +78,25 @@
 
     async function goToEntryFormWithLabel (
         name: string,
-        defaultColour: string
+        defaultColour: string,
     ) {
         const labelId = await makeLabelFromNameIfDoesntExist(name, defaultColour);
         localStorage.setItem(LS_KEY.newEntryLabel, labelId);
-        location.assign('/diary');
+        location.assign('/diary?obfuscate=0');
     }
 
     async function makeDream () {
         await goToEntryFormWithLabel('Dream', '#7730ce');
     }
+
     async function makeIdea () {
         await goToEntryFormWithLabel('Idea', '#ffff65');
     }
+
     async function makeThought () {
         await goToEntryFormWithLabel('Thought', '#735820');
     }
+
     async function makeEntry () {
         localStorage.removeItem(LS_KEY.newEntryLabel);
         location.assign('/diary');
@@ -163,19 +166,19 @@
 
     <div>
         <Dropdown
+            openOnHover
             unstyledButton
             width="170px"
-            openOnHover
         >
             <span class="create-button" slot="button">
-                <Plus size="40"/>
+                <Plus size="40" />
             </span>
 
             <div class="record-something-buttons">
                 <div>
                     <button
-                        on:click={makeEntry}
                         class="primary unbordered oneline record-entry"
+                        on:click={makeEntry}
                     >
                         <Pencil size="30" />
                         Record Entry
@@ -183,8 +186,8 @@
                 </div>
                 <div>
                     <button
-                        on:click={makeDream}
                         class="primary unbordered oneline record-dream"
+                        on:click={makeDream}
                     >
                         <Moon size="30" />
                         Record Dream
@@ -192,8 +195,8 @@
                 </div>
                 <div>
                     <button
-                            on:click={makeIdea}
-                            class="primary unbordered oneline record-idea"
+                        class="primary unbordered oneline record-idea"
+                        on:click={makeIdea}
                     >
                         <Lightbulb size="30" />
                         Record Idea
@@ -201,8 +204,8 @@
                 </div>
                 <div>
                     <button
-                            on:click={makeThought}
-                            class="primary unbordered oneline record-thought"
+                        class="primary unbordered oneline record-thought"
+                        on:click={makeThought}
                     >
                         <Brain size="30" />
                         Record Thought
@@ -408,14 +411,16 @@
         .record-entry:hover {
             background: @light-v-accent;
             color: @text-color;
+
             :global(svg), :global(svg *) {
-                fill:  @accent-color-primary;
+                fill: @accent-color-primary;
             }
         }
 
         .record-dream:hover {
             background: rgba(0, 0, 255, 0.1);
             color: @text-color;
+
             :global(svg), :global(svg *) {
                 fill: @accent-color-secondary;
             }
@@ -424,6 +429,7 @@
         .record-idea:hover {
             background: rgba(255, 255, 0, 0.1);
             color: @text-color;
+
             :global(svg), :global(svg *) {
                 fill: yellow;
             }
@@ -432,6 +438,7 @@
         .record-thought:hover {
             background: rgba(220, 105, 33, 0.1);
             color: @text-color;
+
             :global(svg), :global(svg *) {
                 fill: rgb(183, 110, 30);
             }

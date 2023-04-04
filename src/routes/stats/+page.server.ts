@@ -3,12 +3,12 @@ import { Entry } from '../../lib/controllers/entry';
 import { query } from '../../lib/db/mysql';
 import { getAuthFromCookies } from '../../lib/security/getAuthFromCookies';
 import { splitText, wordCount as txtWordCount } from '../../lib/utils/text';
+import { daysSince, nowS } from '../../lib/utils/time';
 import type { PageServerLoad } from './$types';
-import { daysSince, nowS } from "../../lib/utils/time";
 
 function commonWordsFromText (
     txt: string,
-    words: Record<string, number> = {}
+    words: Record<string, number> = {},
 ): Record<string, number> {
     for (let word of splitText(txt)) {
         word = word.toLowerCase();
@@ -43,8 +43,8 @@ export const load = (async ({ cookies }) => {
     }
 
     let commonWordsArr = Object.entries(commonWords)
-        .sort(([ _, a ], [ _2, b ]) => b - a)
-        .slice(0, 100);
+                               .sort(([ _, a ], [ _2, b ]) => b - a)
+                               .slice(0, 100);
 
     return {
         entries: JSON.parse(JSON.stringify(entries)),

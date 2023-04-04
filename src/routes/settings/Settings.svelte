@@ -88,8 +88,8 @@
 
             {#if created}
                 <p
-                        class="last-updated"
-                        use:tooltip={{
+                    class="last-updated"
+                    use:tooltip={{
                     content: fmtUtc(created, currentTzOffset(), 'DD/MM/YYYY h:mm A')
                 }}
                 >
@@ -111,11 +111,11 @@
     <div class="right">
         <label>
             <input
-                    checked={inputType === 'checkbox' && value}
-                    class="text-box"
-                    on:change={onInput}
-                    type={inputType}
-                    value={value}
+                checked={inputType === 'checkbox' && value}
+                class="text-box"
+                on:change={onInput}
+                type={inputType}
+                value={value}
             />
             {unit}
         </label>
