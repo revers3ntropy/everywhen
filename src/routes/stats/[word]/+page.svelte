@@ -12,6 +12,7 @@
 
     export let data: App.PageData & {
         entries: (Entry & { instancesOfWord: number })[],
+        entriesForBarChart: Entry[],
         wordCount: number,
         charCount: number,
         wordInstances: number,
@@ -82,7 +83,7 @@
                 <EntryHeatMap {by} entries={data.entries} />
             </div>
             <div class="entry-bar-chart-wrapper container">
-                <EntryBarChart {by} entries={data.entries} />
+                <EntryBarChart {by} entries={data.entriesForBarChart} />
             </div>
         </section>
     {/if}

@@ -13,7 +13,8 @@ export const load = (async ({ cookies, params }) => {
 
     const theWord = params.word.toLowerCase();
 
-    let filteredEntries: (Entry & { instancesOfWord: number })[] = [];
+    const filteredEntries: (Entry & { instancesOfWord: number })[] = [];
+    const entriesForBarChart: Entry[] = [];
     let wordInstances = 0;
     let wordCount = 0;
     let charCount = 0;
@@ -40,6 +41,13 @@ export const load = (async ({ cookies, params }) => {
             ...entry,
             instancesOfWord: instancesInEntry,
         });
+        entriesForBarChart.push({
+            ...entry,
+            // just repeat something so that it looks like the word count
+            // is the same as the number of instances of the word,
+            // which is what you want to see in the bar chart
+            entry: 'a '.repeat(instancesInEntry),
+        });
     }
 
     return {
@@ -48,5 +56,6 @@ export const load = (async ({ cookies, params }) => {
         charCount,
         wordInstances,
         theWord,
+        entriesForBarChart: JSON.parse(JSON.stringify(entriesForBarChart)),
     };
 }) satisfies PageServerLoad;
