@@ -2,8 +2,6 @@
     import { browser } from '$app/environment';
     // @ts-ignore
     import { tooltip } from '@svelte-plugins/tooltips';
-    import DomPurify from 'dompurify';
-    import { marked } from 'marked';
     import { createEventDispatcher } from 'svelte';
     import Bin from 'svelte-material-icons/Delete.svelte';
     import Restore from 'svelte-material-icons/DeleteRestore.svelte';
@@ -18,7 +16,7 @@
     import { popup } from '../stores';
     import { api, apiPath } from '../utils/apiRequest';
     import { displayNotifOnErr, SUCCESS_NOTIFICATION } from '../utils/notifications';
-    import { obfuscate } from '../utils/text';
+    import { obfuscate, rawMdToHtml } from '../utils/text';
     import Label from './Label.svelte';
 
     const dispatch = createEventDispatcher();
@@ -78,11 +76,8 @@
         obfuscated = !obfuscated;
     }
 
-    $: entryHtml = browser ? DomPurify.sanitize(
-        marked(obfuscated ? obfuscate(entry) : entry),
-        { USE_PROFILES: { html: true } },
-    ) : '';
-    // doesn't set reactivity on tooltip content if in props???
+    $: entryHtml = browser ? rawMdToHtml(entry, obfuscated) : '';
+    // doesn't set reactively on tooltip content if in props???
     $: restoreDeleteTooltip = deleted ? 'Restore Entry' : 'Delete Entry';
 </script>
 
@@ -109,7 +104,7 @@
         <div class="flex-center">
             {#if !obfuscated && !isEdit}
                 {#if edits.length}
-                    <a href="/diary/{id}?history=on&obfuscate=0" class="link">
+                    <a href="/journal/{id}?history=on&obfuscate=0" class="link">
                         {edits.length} edit{edits.length > 1 ? 's' : ''}
                     </a>
                 {/if}
@@ -126,7 +121,7 @@
                 </button>
                 {#if !deleted}
                     <a
-                        href="/diary/{id}/edit?obfuscate=0"
+                        href="/journal/{id}/edit?obfuscate=0"
                         use:tooltip={{ content: 'Edit Entry' }}
                     >
                         <NoteEditOutline size="25" />

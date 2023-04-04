@@ -140,8 +140,8 @@
 />
 
 <svelte:head>
-    <title>Diary</title>
-    <meta content="Diary" name="description" />
+    <title>Halcyon.Land</title>
+    <meta content="Halcyon.Land - Journal and Life Logging" name="description" />
 </svelte:head>
 
 <Notifications>

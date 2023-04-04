@@ -12,6 +12,11 @@
     onMount(() => document.title = `Journal`);
 </script>
 
+<svelte:head>
+    <title>Journal</title>
+    <meta content="Journal" name="description" />
+</svelte:head>
+
 <main>
     <EntryForm
         auth={data}

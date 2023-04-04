@@ -21,7 +21,7 @@
         });
     }
 
-    $: if (entries && by) reloadChart();
+    $: if (entries && typeof by === 'number') reloadChart();
 
     const showMonths = 6;
     const currentMonth = new Date().getMonth();

@@ -1,4 +1,6 @@
 import crypto from 'crypto';
+import DomPurify from 'dompurify';
+import { marked } from 'marked';
 import { OBFUSCATE_CHARS } from '../constants';
 
 export function obfuscate (
@@ -33,4 +35,15 @@ export function cryptoRandomStr (length = 32): string {
 
 export function numberAsSignedStr (num: number): string {
     return num >= 0 ? `+${num}` : `${num}`;
+}
+
+export function round1DP (num: number): number {
+    return Math.round(num * 10) / 10;
+}
+
+export function rawMdToHtml (md: string, obfuscated = false): string {
+    return DomPurify.sanitize(
+        marked(obfuscated ? obfuscate(md) : md),
+        { USE_PROFILES: { html: true } },
+    );
 }

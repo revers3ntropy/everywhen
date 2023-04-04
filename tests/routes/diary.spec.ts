@@ -1,16 +1,16 @@
 import { expect, test } from '@playwright/test';
 import { expectDeleteUser, generateUserAndSignIn } from '../helpers.js';
 
-test.describe('/diary', () => {
+test.describe('/journal', () => {
     test('Cannot visit page without authentication', async ({ page }) => {
-        await page.goto('/diary', { waitUntil: 'networkidle' });
+        await page.goto('/journal', { waitUntil: 'networkidle' });
         await expect(page).toHaveURL('/');
     });
 
     test('Can create and view entry', async ({ page }) => {
         await page.goto('/', { waitUntil: 'networkidle' });
         const { api } = await generateUserAndSignIn(page);
-        await page.goto('/diary', { waitUntil: 'networkidle' });
+        await page.goto('/journal', { waitUntil: 'networkidle' });
 
         const entryBody = 'This is a test entry body!';
         const entryTitle = 'This is a test entry title!';

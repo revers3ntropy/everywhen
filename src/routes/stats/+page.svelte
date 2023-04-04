@@ -3,8 +3,9 @@
     import { tooltip } from '@svelte-plugins/tooltips';
     import { onMount } from 'svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
-    import type { App } from '../../app';
+    import type { ChangeEventHandler } from 'svelte/elements';
     import type { Entry } from '../../lib/controllers/entry';
+    import { round1DP } from '../../lib/utils/text';
     import CommonWordsList from './CommoWordsList.svelte';
     import EntryBarChart from './EntryBarChart.svelte';
     import EntryHeatMap from './EntryHeatMap.svelte';
@@ -23,9 +24,9 @@
 
     onMount(() => document.title = 'Analytics');
 
-    function round1DP (num: number) {
-        return Math.round(num * 10) / 10;
-    }
+    const searchWordChange = (e => {
+        location.assign(`/stats/${(e.target as HTMLInputElement).value}`);
+    }) satisfies ChangeEventHandler<HTMLInputElement>;
 
 </script>
 
@@ -41,15 +42,29 @@
             <div class="flex-center">
                 <p>
                     You need to create some entries before you can see analytics,
-                    <a href="/diary">why not create one?</a>
+                    <a href="/journal">why not create one?</a>
                 </p>
             </div>
         </section>
     {:else}
-        <h1>
-            <Counter size="40" />
-            <span>Analytics</span>
-        </h1>
+
+        <div class="title-line">
+            <div></div>
+            <div>
+                <h1>
+                    <Counter size="40" />
+                    <span>Analytics</span>
+                </h1>
+            </div>
+            <div class="search-for-word">
+                <input
+                    on:change={searchWordChange}
+                    value=""
+                    placeholder="Search for word..."
+                >
+            </div>
+        </div>
+
         <section class="container unbordered">
             <div class="stats">
                 <div>
@@ -95,7 +110,7 @@
             <div class="entry-heatmap-wrapper container">
                 <EntryHeatMap {by} entries={data.entries} />
             </div>
-            {#if data.entryCount > 5}
+            {#if data.entryCount > 4}
                 <div class="entry-bar-chart-wrapper container">
                     <EntryBarChart {by} entries={data.entries} />
                 </div>
@@ -114,6 +129,28 @@
 <style lang="less">
     @import '../../styles/layout';
     @import '../../styles/variables';
+
+    .title-line {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        align-items: center;
+
+        .search-for-word {
+            text-align: right;
+        }
+
+        @media @mobile {
+            display: block;
+
+            & > * {
+                margin: 0.5rem 0;
+            }
+
+            .search-for-word {
+                text-align: center;
+            }
+        }
+    }
 
     h1 {
         .flex-center();

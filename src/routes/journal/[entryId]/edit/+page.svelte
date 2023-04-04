@@ -21,7 +21,7 @@
 <main>
     <div class="header">
         <div>
-            <a href="/diary/{data.entry.id}?obfuscate=0">
+            <a href="/journal/{data.entry.id}?obfuscate=0">
                 <Close size="30" />
             </a>
         </div>

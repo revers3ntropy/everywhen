@@ -82,7 +82,7 @@
     ) {
         const labelId = await makeLabelFromNameIfDoesntExist(name, defaultColour);
         localStorage.setItem(LS_KEY.newEntryLabel, labelId);
-        location.assign('/diary?obfuscate=0');
+        location.assign('/journal?obfuscate=0');
     }
 
     async function makeDream () {
@@ -99,7 +99,7 @@
 
     async function makeEntry () {
         localStorage.removeItem(LS_KEY.newEntryLabel);
-        location.assign('/diary');
+        location.assign('/journal');
     }
 </script>
 
@@ -131,12 +131,12 @@
             <span class="name">Home</span>
         </a>
         <a
-            aria-label="diary"
-            class="icon {$page.url.pathname === '/diary' ? 'current' : ''}"
-            href="/diary"
+            aria-label="journal"
+            class="icon {$page.url.pathname === '/journal' ? 'current' : ''}"
+            href="/journal"
         >
             <Notebook size="40" />
-            <span class="name">Diary</span>
+            <span class="name">Journal</span>
         </a>
         <a
             aria-label="events"

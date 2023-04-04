@@ -191,7 +191,7 @@
 
         if (entry) {
             submitted = true;
-            location.assign(`/diary/${entry.id}`);
+            location.assign(`/journal/${entry.id}`);
         } else {
             addNotification({
                 ...SUCCESS_NOTIFICATION,

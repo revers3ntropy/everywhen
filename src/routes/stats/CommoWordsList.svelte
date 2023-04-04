@@ -5,49 +5,38 @@
 
 <div class="common-words">
     {#each words as [word, count], i}
-        <div class="common-word">
-            <span style="min-width: 40px">
-                #{i + 1}
-            </span>
-            <span style="min-width: min(20rem, 25%)">
-                <b>{word}</b>
-            </span>
-            <span style="min-width: 25%">
-                {count}
-            </span>
-            <span style="min-width: 25%">
-                {(count / entryCount).toPrecision(3)} / entry
-            </span>
-        </div>
+        <div>#{i + 1}</div>
+
+        <a href="/stats/{word}">{word}</a>
+
+        <div>{count}</div>
+
+        <div>{(count / entryCount).toPrecision(3)} / entry</div>
+
+        {#if i < words.length - 1}
+            <hr />
+        {/if}
     {/each}
 </div>
 
 <style lang="less">
-    @import '../../styles/variables.less';
+    @import '../../styles/variables';
 
     .common-words {
         margin: .5em 0;
+        display: grid;
+        grid-template-columns: 3rem 1fr 4rem 8rem;
+        grid-row-gap: .3rem;
 
-        .common-word {
-            border-bottom: 1px solid @border-light;
-            padding: 6px 20px;
-
-            span {
-                display: inline-block;
-            }
-
-            &:last-child {
-                border-bottom: none;
-            }
-        }
+        max-width: 700px;
 
         @media @mobile {
             margin: 10px 0;
             padding: 10px 2px;
+        }
 
-            .common-word {
-                padding: 4px;
-            }
+        hr {
+            grid-column: 1 / 5;
         }
     }
 </style>

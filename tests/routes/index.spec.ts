@@ -12,7 +12,7 @@ import {
 test.describe('/', () => {
     test('Has title', async ({ page }) => {
         await page.goto('/', { waitUntil: 'networkidle' });
-        await expect(page).toHaveTitle(/Diary/);
+        await expect(page).toHaveTitle(/Halcyon\.Land/);
     });
 
     test('Can create account with form', async ({ page }) => {
@@ -44,7 +44,7 @@ test.describe('/', () => {
         await expect(page).toHaveURL('/');
 
         // inputs are erased when checking that we can't go to /home
-        // focus page before typing ??? TODO why that is dumb
+        // focus page before typing ??? TODO why, that is weird
         await page.getByLabel('Username').click();
         await page.getByLabel('Username').type(auth.username);
         await page.getByLabel('Password').fill(auth.password);

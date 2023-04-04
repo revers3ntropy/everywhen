@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { splitText } from '../../lib/utils/text';
 import type { Seconds } from '../../lib/utils/types';
 
 export enum By {
@@ -38,4 +39,16 @@ export function bucketSize (bucket: Bucket): Seconds {
         case Bucket.Day:
             return 60 * 60 * 24;
     }
+}
+
+export function commonWordsFromText (
+    txt: string,
+    words: Record<string, number> = {},
+): Record<string, number> {
+    for (let word of splitText(txt)) {
+        word = word.toLowerCase();
+        words[word] ??= 0;
+        words[word]++;
+    }
+    return words;
 }

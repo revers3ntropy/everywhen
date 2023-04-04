@@ -48,7 +48,7 @@
 <main>
     <section>
         <div class="buttons">
-            <a class="primary" href="/diary">
+            <a class="primary" href="/journal">
                 <Notebook size="30" />
                 Journal
             </a>
@@ -92,7 +92,7 @@
             <h1 class="recent-entries">Recent Entries</h1>
             <p class="recent-entries-text">
                 Doesn't look like you have any entries yet,
-                why not <a href="/diary?obfuscate=0">write one</a>?
+                why not <a href="/journal?obfuscate=0">write one</a>?
             </p>
         </section>
     {/if}
