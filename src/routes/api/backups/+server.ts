@@ -1,4 +1,5 @@
 import { error } from '@sveltejs/kit';
+import { cachedApiRoute, invalidateCache } from '../../../hooks.server';
 import { Backup } from '../../../lib/controllers/backup';
 import { query } from '../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
@@ -7,30 +8,30 @@ import { GETParamIsTruthy } from '../../../lib/utils/GETArgs';
 import { getUnwrappedReqBody } from '../../../lib/utils/requestBody';
 import type { RequestHandler } from './$types';
 
-export const GET = (async ({ cookies, url }) => {
-    const auth = await getAuthFromCookies(cookies);
-
+export const GET = cachedApiRoute(async (auth, { url }) => {
     const encrypt = GETParamIsTruthy(url.searchParams.get('encrypted'));
 
     const { err, val: backup } = await Backup.generate(query, auth);
     if (err) throw error(400, err);
+
+    if (!encrypt) {
+        return {
+            data: JSON.stringify(backup),
+        };
+    }
+
     const {
         err: encryptErr,
         val: encryptedResponse,
     } = Backup.asEncryptedString(backup, auth);
     if (encryptErr) throw error(400, encryptErr);
 
-    if (!encrypt) {
-        return apiResponse({
-            data: JSON.stringify(backup),
-        });
-    }
-
-    return apiResponse({ data: encryptedResponse });
+    return { data: encryptedResponse };
 }) satisfies RequestHandler;
 
 export const POST = (async ({ request, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
+    invalidateCache(auth.id);
 
     const body = await getUnwrappedReqBody(request, {
         data: 'string',

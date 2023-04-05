@@ -1,4 +1,5 @@
 import { error } from '@sveltejs/kit';
+import { cachedApiRoute, invalidateCache } from '../../../hooks.server';
 import { Entry } from '../../../lib/controllers/entry';
 import { Label } from '../../../lib/controllers/label';
 import { query } from '../../../lib/db/mysql';
@@ -9,9 +10,7 @@ import { getUnwrappedReqBody } from '../../../lib/utils/requestBody';
 import { nowS } from '../../../lib/utils/time';
 import type { RequestHandler } from './$types';
 
-export const GET = (async ({ url, cookies }) => {
-    const auth = await getAuthFromCookies(cookies);
-
+export const GET = cachedApiRoute((async (auth, { url }) => {
     const pageSize = parseInt(url.searchParams.get('pageSize') || '50');
     const page = parseInt(url.searchParams.get('page') || '0');
     const deleted = GETParamIsTruthy(url.searchParams.get('deleted'));
@@ -28,17 +27,18 @@ export const GET = (async ({ url, cookies }) => {
     if (err) throw error(400, err);
     const [ entries, numEntries ] = val;
 
-    return apiResponse({
+    return {
         entries,
         page,
         pageSize,
         totalPages: Math.ceil(numEntries / pageSize),
         totalEntries: numEntries,
-    });
-}) satisfies RequestHandler;
+    };
+})) satisfies RequestHandler;
 
 export const POST = (async ({ request, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
+    invalidateCache(auth.id);
 
     let body = await getUnwrappedReqBody(request, {
         created: 'number',

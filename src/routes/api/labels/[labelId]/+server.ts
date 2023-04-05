@@ -1,4 +1,5 @@
 import { error } from '@sveltejs/kit';
+import { invalidateCache } from '../../../../hooks.server';
 import { Entry } from '../../../../lib/controllers/entry';
 import { Event } from '../../../../lib/controllers/event';
 import { Label } from '../../../../lib/controllers/label';
@@ -19,6 +20,8 @@ export const GET = (async ({ cookies, params }) => {
 
 export const PUT = (async ({ cookies, request, params }) => {
     const auth = await getAuthFromCookies(cookies);
+    invalidateCache(auth.id);
+
     const body = await getUnwrappedReqBody(request, {
         name: 'string',
         colour: 'string',
@@ -46,6 +49,7 @@ export const PUT = (async ({ cookies, request, params }) => {
 
 export let DELETE = (async ({ cookies, params, request }) => {
     const auth = await getAuthFromCookies(cookies);
+    invalidateCache(auth.id);
 
     if (!await Label.userHasLabelWithId(query, auth, params.labelId)) {
         throw error(404, 'Label with that id not found');

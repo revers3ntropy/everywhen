@@ -1,8 +1,8 @@
 import { browser } from '$app/environment';
 import { DB, DB_HOST, DB_PASS, DB_PORT, DB_USER } from '$env/static/private';
-import mysql from 'mysql2/promise';
+import type mysql from 'mysql2/promise';
+import { connect, dbConnection } from '../../hooks.server';
 import '../require';
-
 
 export type queryRes =
     | mysql.RowDataPacket[][]
@@ -12,31 +12,17 @@ export type queryRes =
     | mysql.ResultSetHeader
     | Record<string, any>[];
 
-async function getConfig () {
+export async function getConfig (): Promise<mysql.ConnectionOptions> {
     // define defaults from .env file
     const port = DB_PORT ? parseInt(DB_PORT) : 3306;
-    const config: mysql.ConnectionOptions = {
+    return {
         host: DB_HOST,
         user: DB_USER,
         password: DB_PASS,
         database: DB,
         port,
     };
-    return config;
 }
-
-export let con: mysql.Connection | null = null;
-
-export async function connect () {
-    const config = await getConfig();
-    con = await mysql.createConnection(config).catch((e: any) => {
-        console.error(`Error connecting to mysql db '${config.database}'`);
-        console.error(e);
-        throw e;
-    });
-    console.log(`Connected to database`);
-}
-
 
 export type QueryFunc = <Res extends queryRes = mysql.RowDataPacket[]>(
     queryParts: TemplateStringsArray,
@@ -50,7 +36,7 @@ export async function query<Res extends queryRes = mysql.RowDataPacket[]> (
     if (browser) {
         throw new Error('Cannot query database from browser');
     }
-    if (!con) {
+    if (!dbConnection) {
         await connect();
     }
 
@@ -82,5 +68,5 @@ export async function query<Res extends queryRes = mysql.RowDataPacket[]> (
         }
     }
 
-    return <Res>((await con?.query(query, params)) || [])[0];
+    return <Res>((await dbConnection?.query(query, params)) || [])[0];
 }

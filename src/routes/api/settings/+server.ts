@@ -1,4 +1,5 @@
 import { error } from '@sveltejs/kit';
+import { cachedApiRoute, invalidateCache } from '../../../hooks.server';
 import { Settings } from '../../../lib/controllers/settings';
 import { query } from '../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
@@ -6,17 +7,15 @@ import { apiRes404, apiResponse } from '../../../lib/utils/apiResponse';
 import { getUnwrappedReqBody } from '../../../lib/utils/requestBody';
 import type { RequestHandler } from './$types';
 
-export const GET = (async ({ cookies }) => {
-    const auth = await getAuthFromCookies(cookies);
-
+export const GET = cachedApiRoute(async (auth, {}) => {
     const { err, val: settings } = await Settings.all(query, auth);
-    if (err) throw error(400, err);
-
+    if (err) throw error(500, err);
     return apiResponse({ settings });
 }) satisfies RequestHandler;
 
 export const PUT = (async ({ request, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
+    invalidateCache(auth.id);
 
     const body = await getUnwrappedReqBody(request, {
         key: 'string',

@@ -1,16 +1,25 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
+import {
+    cacheResponse,
+    getCachedResponse,
+    invalidateCache,
+} from '../../../../hooks.server';
 import { Asset } from '../../../../lib/controllers/asset';
 import { query } from '../../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../../lib/security/getAuthFromCookies';
 import {
     apiRes404,
     apiResponse,
+    type GenericResponse,
     rawApiResponse,
 } from '../../../../lib/utils/apiResponse';
 
-export const GET = (async ({ params, cookies }) => {
+export const GET = (async ({ params, url, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
+
+    const cached = getCachedResponse(url.href, auth.id);
+    if (cached) return cached as GenericResponse<Buffer>;
 
     const { err, val: asset } = await Asset.fromPublicId(
         query, auth,
@@ -27,7 +36,7 @@ export const GET = (async ({ params, cookies }) => {
 
     const img = Buffer.from(imgB64, 'base64');
 
-    return rawApiResponse(
+    const response = rawApiResponse(
         img,
         {
             status: 200,
@@ -39,10 +48,13 @@ export const GET = (async ({ params, cookies }) => {
             } as unknown as HeadersInit,
         },
     );
+    cacheResponse(url.href, auth.id, response);
+    return response;
 }) satisfies RequestHandler;
 
 export const DELETE = (async ({ params, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
+    invalidateCache(auth.id);
 
     const { err } = await Asset.purgeWithPublicId(
         query, auth,

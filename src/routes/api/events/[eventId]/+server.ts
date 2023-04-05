@@ -1,4 +1,5 @@
 import { error } from '@sveltejs/kit';
+import { invalidateCache } from '../../../../hooks.server';
 import { Event } from '../../../../lib/controllers/event';
 import { query } from '../../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../../lib/security/getAuthFromCookies';
@@ -9,6 +10,7 @@ import type { RequestHandler } from './$types';
 export const PUT = (async ({ request, params, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
     if (!params.eventId) throw error(400, 'invalid event id');
+    invalidateCache(auth.id);
 
     const body = await getUnwrappedReqBody(request, {
         name: 'string',
@@ -53,6 +55,7 @@ export const PUT = (async ({ request, params, cookies }) => {
 export const DELETE = (async ({ params, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
     if (!params.eventId) throw error(400, 'invalid event id');
+    invalidateCache(auth.id);
 
     const { err, val: event } = await Event.fromId(query, auth, params.eventId);
     if (err) throw error(404, err);

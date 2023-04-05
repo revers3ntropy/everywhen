@@ -1,5 +1,6 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
+import { invalidateCache } from '../../../hooks.server';
 import {
     KEY_COOKIE_KEY,
     KEY_COOKIE_OPTIONS,
@@ -30,6 +31,7 @@ export const POST = (async ({ request, cookies }) => {
 
 export const DELETE = (async ({ cookies }) => {
     const auth = await getAuthFromCookies(cookies);
+    invalidateCache(auth.id);
 
     const { err, val: backup } = await Backup.generate(query, auth);
     if (err) throw error(400, err);

@@ -1,5 +1,6 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
+import { invalidateCache } from '../../../hooks.server';
 import { Asset } from '../../../lib/controllers/asset';
 import { query } from '../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
@@ -8,6 +9,7 @@ import { getUnwrappedReqBody } from '../../../lib/utils/requestBody';
 
 export const POST = (async ({ request, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
+    invalidateCache(auth.id);
 
     const body = await getUnwrappedReqBody(request, {
         content: 'string',
