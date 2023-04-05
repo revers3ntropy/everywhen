@@ -18,7 +18,7 @@ import {
 export const GET = (async ({ params, url, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
 
-    const cached = getCachedResponse(url.href, auth.id);
+    const cached = getCachedResponse<Response>(url.href, auth.id)?.clone();
     if (cached) return cached as GenericResponse<Buffer>;
 
     const { err, val: asset } = await Asset.fromPublicId(
@@ -48,7 +48,7 @@ export const GET = (async ({ params, url, cookies }) => {
             } as unknown as HeadersInit,
         },
     );
-    cacheResponse(url.href, auth.id, response);
+    cacheResponse(url.href, auth.id, response.clone());
     return response;
 }) satisfies RequestHandler;
 
