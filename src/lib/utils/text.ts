@@ -47,3 +47,23 @@ export function rawMdToHtml (md: string, obfuscated = false): string {
         { USE_PROFILES: { html: true } },
     );
 }
+
+export function fmtBytes (bytes: number): string {
+    if (bytes < 1000) {
+        return `${bytes}B`;
+    }
+    if (bytes < 1000 * 1000) {
+        return `${round1DP(bytes / 1000)}KB`;
+    }
+    if (bytes < 1000 * 1000 * 1000) {
+        return `${round1DP(bytes / 1000 / 1000)}MB`;
+    }
+    return `${round1DP(bytes / 1000 / 1000 / 1000)}GB`;
+}
+
+export function removeAnsi (str: string): string {
+    return str.replace(
+        /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
+        '',
+    );
+}

@@ -4,11 +4,44 @@ import type { Auth } from '../controllers/user';
 import { getAuthFromCookies } from '../security/getAuthFromCookies';
 import type { GenericResponse } from './apiResponse';
 import { makeLogger } from './log';
+import { fmtBytes } from './text';
+import { nowS } from './time';
+import type { Bytes, Seconds } from './types';
 
-const cacheLogger = makeLogger('CACHE', chalk.magentaBright);
-cacheLogger.log('Initialised');
+const cacheLogger = makeLogger('CACHE', chalk.magentaBright, 'cache.log');
+cacheLogger.logToFile('Initialised');
 
 const cache: Record<string, Record<string, unknown>> = {};
+const cacheLastUsed: Record<string, number> = {};
+
+function roughSizeOfObject (object: unknown): number {
+    let objectList: any[] = [];
+    let stack: any[] = [ object ];
+    let bytes = 0;
+
+    while (stack.length) {
+        const value = stack.pop();
+
+        if (typeof value === 'boolean') {
+            bytes += 4;
+        } else if (typeof value === 'string') {
+            bytes += value.length * 2;
+        } else if (typeof value === 'number') {
+            bytes += 8;
+        } else if
+        (
+            typeof value === 'object'
+            && objectList.indexOf(value) === -1
+        ) {
+            objectList.push(value);
+
+            for (const i in value) {
+                stack.push(value[i]);
+            }
+        }
+    }
+    return bytes;
+}
 
 export function cacheResponse<T> (
     url: string,
@@ -17,12 +50,14 @@ export function cacheResponse<T> (
 ): void {
     cache[userId] = cache[userId] || {};
     cache[userId][url] = response;
+    cacheLastUsed[userId] = nowS();
 }
 
 export function getCachedResponse<T> (
     url: string,
     userId: string,
 ): T | undefined {
+    cacheLastUsed[userId] = nowS();
     if (cache[userId]?.hasOwnProperty(url)) {
         cacheLogger.log(`${chalk.green('HIT')}  ${new URL(url).pathname}`);
         return cache[userId][url] as T;
@@ -34,6 +69,45 @@ export function getCachedResponse<T> (
 
 export function invalidateCache (userId: string): void {
     delete cache[userId];
+    delete cacheLastUsed[userId];
+}
+
+export function cleanupCache (): void {
+    const now = nowS();
+    const cacheSize = roughSizeOfObject(cache);
+    const timeout = cacheTimeout(cacheSize);
+
+    const bytesFmt = chalk.yellow(fmtBytes(cacheSize));
+    let cleared = 0;
+
+    for (const userId of Object.keys(cacheLastUsed)) {
+        const timeSinceLastUsed = now - cacheLastUsed[userId];
+        if (timeSinceLastUsed > timeout) {
+            invalidateCache(userId);
+            cleared++;
+        }
+    }
+
+    const cacheSizeAfter = roughSizeOfObject(cache);
+    const changeFmt = chalk.yellow(fmtBytes(cacheSizeAfter - cacheSize));
+    cacheLogger.logToFile(
+        chalk.yellow('CLEANUP'),
+        `size=${bytesFmt}`,
+        `timeout=${timeout}s`,
+        `change=${changeFmt}`,
+        `cleared=${cleared}`,
+    );
+}
+
+export function cacheTimeout (size: Bytes): Seconds {
+    if (size < 500_000) {
+        return 60 * 60;
+    } else if (size < 2_000_000) {
+        return 60 * 2;
+    } else if (size < 50_000_000) {
+        return 15;
+    }
+    return 0;
 }
 
 export function cachedApiRoute<

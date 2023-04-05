@@ -15,6 +15,8 @@
 	export let obfuscated = true;
 	export let showTimeAgo = true;
 	export let auth: Auth;
+	export let blurToggleOnLeft = false;
+	export let hideBlurToggle = false;
 
 	function showEntryPopup (entryId: string) {
 		showPopup(EntryDialog, {
@@ -26,18 +28,20 @@
 </script>
 
 <div>
-	<div class="menu">
-		<button
-			aria-label={obfuscated ? 'Show entries' : 'Hide entries'}
-			on:click={() => obfuscated = !obfuscated}
-		>
-			{#if obfuscated}
-				<Eye size="25" />
-			{:else}
-				<EyeOff size="25" />
-			{/if}
-		</button>
-	</div>
+	{#if !hideBlurToggle}
+		<div class="menu {blurToggleOnLeft ? 'left' : ''}">
+			<button
+				aria-label={obfuscated ? 'Show entries' : 'Hide entries'}
+				on:click={() => obfuscated = !obfuscated}
+			>
+				{#if obfuscated}
+					<Eye size="25" />
+				{:else}
+					<EyeOff size="25" />
+				{/if}
+			</button>
+		</div>
+	{/if}
 
 	{#each Object.keys(titles).sort((a, b) => parseInt(b) - parseInt(a)) as day}
 		<div class="day">
@@ -117,12 +121,16 @@
 </div>
 
 <style lang="less">
-	@import '../../styles/variables.less';
+	@import '../../styles/variables';
 
 	.menu {
 		display: flex;
 		justify-content: flex-end;
 		margin: 0.5rem 0;
+
+		&.left {
+			justify-content: flex-start;
+		}
 	}
 
 	.day {

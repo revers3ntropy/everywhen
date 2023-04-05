@@ -108,7 +108,7 @@
     use:wheel={{ scrollable: !showingNavPopup }}
 />
 
-<header>
+<header class="{showingNavPopup ? 'showing-dropdown' : ''}">
     <div class="menu-button-mobile">
         <button
             aria-label="Show nav menu"
@@ -288,6 +288,10 @@
             align-items: center;
             height: 100%;
         }
+
+        &.showing-dropdown {
+            box-shadow: 0 0 4px 4px black;
+        }
     }
 
     a, button {
@@ -348,21 +352,21 @@
 
     .nav-buttons {
         @media @mobile {
-            height: 0;
-            display: none;
             position: absolute;
+            height: fit-content;
             top: var(--nav-height);
             left: 0;
             width: 100%;
-            z-index: 20;
+            z-index: 8;
             justify-content: flex-start;
+            display: flex;
+            flex-direction: column;
+            background: @header-bg;
+            transform: translate(0, -50rem);
+            transition: transform 200ms ease-in-out;
 
             &.showing {
-                height: fit-content;
-                display: flex;
-                flex-direction: column;
-
-                background: @header-bg;
+                transform: translate(0);
             }
 
             a, button {

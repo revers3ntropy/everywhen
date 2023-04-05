@@ -45,7 +45,8 @@
     let page = 0;
     let pages = 0;
     let search = '';
-    let loading = false;
+
+    let loading = true;
 
     function importPopup () {
         showPopup(ImportDialog, {
@@ -54,8 +55,8 @@
         }, reloadEntries);
     }
 
-    export async function reloadEntries () {
-        if (loading) return;
+    export async function reloadEntries (force = false) {
+        if (loading && !force) return;
         loading = true;
 
         const entriesOptions: IOptions = {
@@ -85,7 +86,9 @@
 
     export const reload = () => reloadEntries();
 
-    onMount(reloadEntries);
+    onMount(async () => {
+        await reloadEntries(true);
+    });
     $: [ page, search, browser ? reloadEntries() : 0 ];
 </script>
 

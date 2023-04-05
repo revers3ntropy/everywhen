@@ -1,4 +1,4 @@
-import type { Bytes, Pixels, Seconds } from './utils/types';
+import type { Bytes, Milliseconds, Pixels, Seconds } from './utils/types';
 
 export const COOKIE_TIMEOUT: Seconds = 60 * 60;
 export const KEY_COOKIE_KEY = '__misc_3_key_v2';
@@ -8,7 +8,7 @@ export const LS_KEY = {
     newEntryBody: '__misc_3_newEntryBody',
     newEntryTitle: '__misc_3_newEntryTitle',
     newEntryLabel: '__misc_3_newEntryLabel',
-}
+};
 
 // possible characters to show when the text is blurred
 export const OBFUSCATE_CHARS = '0123456789abcdefghijklmnopqrstuvwxyz ';
@@ -34,3 +34,5 @@ export const MAX_IMAGE_SIZE: Bytes = 1024 * 1024 * 4; // 4MiB
 export const EVENT_IN_TIMELINE_HEIGHT: Pixels = 30;
 
 export const NAVBAR_HEIGHT: Pixels = 60;
+
+export const ANIMATION_DURATION: Milliseconds = 200;

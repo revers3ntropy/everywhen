@@ -1,6 +1,10 @@
 <script lang="ts">
     import Close from 'svelte-material-icons/Close.svelte';
+    import Eye from 'svelte-material-icons/Eye.svelte';
+    import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import Menu from 'svelte-material-icons/Menu.svelte';
+    import { fly } from 'svelte/transition';
+    import { ANIMATION_DURATION } from '../constants';
     import type { Entry } from '../controllers/entry';
     import type { Auth } from '../controllers/user';
     import EntryTitles from './EntryTitles.svelte';
@@ -9,6 +13,7 @@
     export let auth: Auth;
 
     let showing = false;
+    let obfuscated = false;
 </script>
 
 <div>
@@ -20,23 +25,46 @@
             <Menu size="40" />
         </button>
     </div>
-    <div class="sidebar {showing ? 'showing' : ''}">
-        <div class="header">
-            <button
-                aria-label="Close sidebar menu"
-                on:click={() => (showing = !showing)}
-            >
-                <Close size="30" />
-            </button>
+    {#if showing}
+        <div
+            class="sidebar"
+            transition:fly={{
+                duration: ANIMATION_DURATION,
+                x: -200,
+            }}
+        >
+            <div class="header">
+                <button
+                    aria-label={obfuscated ? 'Show entries' : 'Hide entries'}
+                    on:click={() => obfuscated = !obfuscated}
+                >
+                    {#if obfuscated}
+                        <Eye size="25" />
+                    {:else}
+                        <EyeOff size="25" />
+                    {/if}
+                </button>
+                <button
+                    aria-label="Close sidebar menu"
+                    on:click={() => (showing = !showing)}
+                >
+                    <Close size="30" />
+                </button>
+            </div>
+            <div class="content">
+                <EntryTitles
+                    {auth}
+                    {obfuscated}
+                    {titles}
+                    hideBlurToggle
+                />
+            </div>
         </div>
-        <div class="content">
-            <EntryTitles {auth} obfuscated={false} {titles} />
-        </div>
-    </div>
+    {/if}
 </div>
 
 <style lang="less">
-    @import '../../styles/variables.less';
+    @import '../../styles/variables';
 
     @width: 300px;
 
@@ -45,19 +73,12 @@
         top: 0;
         left: 0;
         min-width: @width;
-        max-width: max(30%, @width);
         height: 100%;
         background-color: @header-bg;
         z-index: 100;
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
         border-right: 2px solid @border-heavy;
         overflow-y: scroll;
         padding: 0;
-
-        &.showing {
-            transform: translateX(0);
-        }
 
         .header {
             padding: 0.5rem;
@@ -66,7 +87,6 @@
             align-content: center;
             position: sticky;
             top: 0;
-            background: linear-gradient(180deg, @light-accent, transparent);
         }
     }
 </style>
