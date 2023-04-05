@@ -1,13 +1,11 @@
 import { error } from '@sveltejs/kit';
+import { cachedPageRoute } from '../../hooks.server';
 import { Event } from '../../lib/controllers/event';
 import { Label } from '../../lib/controllers/label';
 import { query } from '../../lib/db/mysql';
-import { getAuthFromCookies } from '../../lib/security/getAuthFromCookies';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ cookies }) => {
-    const auth = await getAuthFromCookies(cookies);
-
+export const load = cachedPageRoute(async (auth) => {
     const { val: events, err } = await Event.all(query, auth);
     if (err) throw error(400, err);
 
@@ -15,10 +13,7 @@ export const load: PageServerLoad = async ({ cookies }) => {
     if (labelsErr) throw error(400, labelsErr);
 
     return {
-        events: events.map((event) => ({
-            ...event,
-            label: event.label ? { ...event.label } : undefined,
-        })),
-        labels: labels.map((label) => ({ ...label })),
+        events,
+        labels,
     };
-};
+}) satisfies PageServerLoad;

@@ -1,13 +1,12 @@
 import { error } from '@sveltejs/kit';
+import { cachedPageRoute } from '../../../hooks.server';
 import { Entry } from '../../../lib/controllers/entry';
 import { Event } from '../../../lib/controllers/event';
 import { Label } from '../../../lib/controllers/label';
 import { query } from '../../../lib/db/mysql';
-import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ params, cookies }) => {
-    const auth = await getAuthFromCookies(cookies);
+export const load = cachedPageRoute(async (auth, { params }) => {
     const labelId = params.labelId;
     if (!labelId) throw error(404, 'Not found');
 
@@ -28,14 +27,10 @@ export const load: PageServerLoad = async ({ params, cookies }) => {
     if (LabelsErr) throw error(400, LabelsErr);
 
     return {
-        label: { ...label },
+        label,
         entryCount: entries[1],
         events: events
-            .filter((event) => event.label?.id === labelId)
-            .map((event) => ({
-                ...event,
-                label: event.label ? { ...event.label } : undefined,
-            })),
-        labels: JSON.parse(JSON.stringify(labels)),
+            .filter((event) => event.label?.id === labelId),
+        labels,
     };
-};
+}) satisfies PageServerLoad;

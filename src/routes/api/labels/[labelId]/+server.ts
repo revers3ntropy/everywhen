@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { invalidateCache } from '../../../../hooks.server';
+import { cachedApiRoute, invalidateCache } from '../../../../hooks.server';
 import { Entry } from '../../../../lib/controllers/entry';
 import { Event } from '../../../../lib/controllers/event';
 import { Label } from '../../../../lib/controllers/label';
@@ -9,13 +9,10 @@ import { apiRes404, apiResponse } from '../../../../lib/utils/apiResponse';
 import { getUnwrappedReqBody } from '../../../../lib/utils/requestBody';
 import type { RequestHandler } from './$types';
 
-export const GET = (async ({ cookies, params }) => {
-    const auth = await getAuthFromCookies(cookies);
-
+export const GET = cachedApiRoute(async (auth, { params }) => {
     const { val: label, err } = await Label.fromId(query, auth, params.labelId);
     if (err) throw error(404, err);
-
-    return apiResponse({ ...label });
+    return label;
 }) satisfies RequestHandler;
 
 export const PUT = (async ({ cookies, request, params }) => {

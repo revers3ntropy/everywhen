@@ -45,7 +45,7 @@
     let page = 0;
     let pages = 0;
     let search = '';
-    let loading = true;
+    let loading = false;
 
     function importPopup () {
         showPopup(ImportDialog, {
@@ -55,6 +55,7 @@
     }
 
     export async function reloadEntries () {
+        if (loading) return;
         loading = true;
 
         const entriesOptions: IOptions = {
@@ -152,7 +153,7 @@
                         <span class="text-light">
                             {#if utcEq(nowS(), parseInt(day))}
                                 <span>Today</span>
-                            {:else if utcEq(nowS() - 60*60*24, parseInt(day))}
+                            {:else if utcEq(nowS() - 60 * 60 * 24, parseInt(day))}
                                 <span>Yesterday</span>
                             {:else}
                                 <UtcTime

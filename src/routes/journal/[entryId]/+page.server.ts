@@ -1,13 +1,11 @@
 import { error } from '@sveltejs/kit';
+import { cachedPageRoute } from '../../../hooks.server';
 import { Entry } from '../../../lib/controllers/entry';
 import { query } from '../../../lib/db/mysql';
-import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
 import { GETParamIsTruthy } from '../../../lib/utils/GETArgs';
 import type { PageServerLoad } from './$types';
 
-export const load = (async ({ params, cookies, url }) => {
-    const auth = await getAuthFromCookies(cookies);
-
+export const load = cachedPageRoute(async (auth, { params, url }) => {
     const { val: entry, err } = await Entry.fromId(
         query, auth,
         params.entryId, false,
@@ -15,7 +13,7 @@ export const load = (async ({ params, cookies, url }) => {
     if (err) throw error(404, 'Entry not found');
 
     return {
-        entry: JSON.parse(JSON.stringify(entry)) as {},
+        entry,
         history: GETParamIsTruthy(url.searchParams.get('history')),
     };
 

@@ -1,4 +1,4 @@
-import type { Handle, RequestEvent } from '@sveltejs/kit';
+import type { Handle, RequestEvent, ServerLoadEvent } from '@sveltejs/kit';
 import mysql from 'mysql2/promise';
 import type { Auth } from './lib/controllers/user';
 import { getConfig } from './lib/db/mysql';
@@ -7,25 +7,25 @@ import type { GenericResponse } from './lib/utils/apiResponse';
 
 export let dbConnection: mysql.Connection | null = null;
 
-let cache: Record<string, Record<string, Response>> = {};
+let cache: Record<string, Record<string, unknown>> = {};
 console.log('  [CACHE RESET]');
 
-export function cacheResponse (
+export function cacheResponse<T> (
     url: string,
     userId: string,
-    response: Response,
+    response: T,
 ): void {
     cache[userId] = cache[userId] || {};
-    cache[userId][url] = response.clone();
+    cache[userId][url] = response;
 }
 
-export function getCachedResponse (
+export function getCachedResponse<T> (
     url: string,
     userId: string,
-): Response | undefined {
+): T | undefined {
     if (cache[userId]?.hasOwnProperty(url)) {
         console.log(`  [CACHE HIT] ${url}`);
-        return cache[userId][url].clone();
+        return cache[userId][url] as T;
     } else {
         console.log(`  [CACHE MISS] ${url}`);
         return undefined;
@@ -49,7 +49,7 @@ export function cachedApiRoute<
     return (async (props: RequestEvent<Params, RouteId>): Promise<GenericResponse<Res>> => {
         const url = props.url.href;
         const auth = await getAuthFromCookies(props.cookies);
-        const cached = getCachedResponse(url, auth.id);
+        const cached = getCachedResponse<Response>(url, auth.id)?.clone();
         if (cached) {
             return cached as GenericResponse<Res>;
         }
@@ -65,9 +65,36 @@ export function cachedApiRoute<
             responseString,
             { status: 200 },
         ) as GenericResponse<Res>;
-        cacheResponse(url, auth.id, responseObj);
+        cacheResponse(url, auth.id, responseObj.clone());
         return responseObj;
     }) satisfies (event: RequestEvent<Params, RouteId>) => Promise<GenericResponse<Res>>;
+}
+
+export function cachedPageRoute<
+    Params extends Partial<Record<string, string>>,
+    ParentData extends Record<string, any>,
+    OutputData extends Record<string, any> | void,
+    RouteId extends string | null
+> (
+    handler: (
+        auth: Auth,
+        event: ServerLoadEvent<Params, ParentData, RouteId>,
+    ) => Promise<OutputData>,
+): (event: ServerLoadEvent<Params, ParentData, RouteId>) => Promise<OutputData> {
+    return (async (props: ServerLoadEvent<Params, ParentData, RouteId>): Promise<OutputData> => {
+        const url = props.url.href;
+        const auth = await getAuthFromCookies(props.cookies);
+        const cached = getCachedResponse(url, auth.id);
+        if (cached) {
+            return cached as OutputData;
+        }
+        // stringify and parse to turn into a plain object
+        const response = JSON.parse(JSON.stringify(
+            await handler(auth, props),
+        )) as OutputData;
+        cacheResponse(url, auth.id, response);
+        return response;
+    }) satisfies (event: ServerLoadEvent<Params, ParentData, RouteId>) => Promise<OutputData>;
 }
 
 export async function connect () {

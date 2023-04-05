@@ -1,13 +1,11 @@
 import { error } from '@sveltejs/kit';
+import { cachedPageRoute } from '../../../hooks.server';
 import { Entry } from '../../../lib/controllers/entry';
 import { query } from '../../../lib/db/mysql';
-import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
 import { splitText } from '../../../lib/utils/text';
 import type { PageServerLoad } from './$types';
 
-export const load = (async ({ cookies, params }) => {
-    const auth = await getAuthFromCookies(cookies);
-
+export const load = cachedPageRoute(async (auth, { params }) => {
     const { val: entries, err } = await Entry.all(query, auth, false);
     if (err) throw error(400, err);
 

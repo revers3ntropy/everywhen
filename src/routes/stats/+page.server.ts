@@ -1,15 +1,13 @@
 import { error } from '@sveltejs/kit';
+import { cachedPageRoute } from '../../hooks.server';
 import { Entry } from '../../lib/controllers/entry';
 import { query } from '../../lib/db/mysql';
-import { getAuthFromCookies } from '../../lib/security/getAuthFromCookies';
 import { wordCount as txtWordCount } from '../../lib/utils/text';
 import { daysSince, nowS } from '../../lib/utils/time';
 import type { PageServerLoad } from './$types';
 import { commonWordsFromText } from './helpers';
 
-export const load = (async ({ cookies }) => {
-    const auth = await getAuthFromCookies(cookies);
-
+export const load = cachedPageRoute(async (auth, {}) => {
     const { val: entries, err } = await Entry.all(query, auth, false);
     if (err) throw error(400, err);
 

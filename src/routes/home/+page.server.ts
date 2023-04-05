@@ -1,14 +1,12 @@
 import { error } from '@sveltejs/kit';
+import { cachedPageRoute } from '../../hooks.server';
 import { Entry } from '../../lib/controllers/entry';
 import { query } from '../../lib/db/mysql';
-import { getAuthFromCookies } from '../../lib/security/getAuthFromCookies';
 import type { PageServerLoad } from './$types';
 
 const NUMBER_OF_ENTRY_TITLES = 10;
 
-export const load: PageServerLoad = async ({ cookies }) => {
-    const auth = await getAuthFromCookies(cookies);
-
+export const load: PageServerLoad = cachedPageRoute(async (auth, {}) => {
     const { val: entries, err } = await Entry.getTitles(query, auth);
     if (err) throw error(400, err);
 
@@ -32,6 +30,6 @@ export const load: PageServerLoad = async ({ cookies }) => {
 
     return {
         titles,
-        entries: JSON.parse(JSON.stringify(entries)),
+        entries,
     };
-};
+}) satisfies PageServerLoad;
