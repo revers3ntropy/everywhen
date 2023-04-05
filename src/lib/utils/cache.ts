@@ -72,7 +72,7 @@ export function invalidateCache (userId: string): void {
     delete cacheLastUsed[userId];
 }
 
-export function cleanupCache (): void {
+export function cleanupCache (): number {
     const now = nowS();
     const cacheSize = roughSizeOfObject(cache);
     const timeout = cacheTimeout(cacheSize);
@@ -97,17 +97,18 @@ export function cleanupCache (): void {
         `change=${changeFmt}`,
         `cleared=${cleared}`,
     );
+    return cacheSizeAfter;
 }
 
 export function cacheTimeout (size: Bytes): Seconds {
-    if (size < 500_000) {
-        return 60 * 60;
-    } else if (size < 2_000_000) {
-        return 60 * 2;
+    if (size < 1_000_000) {
+        return 60 * 60 * 24 * 7; // 1 week
     } else if (size < 50_000_000) {
-        return 15;
+        return 60 * 60 * 24; // 1 day
+    } else if (size < 500_000_000) {
+        return 60 * 5; // 5 minutes
     }
-    return 0;
+    return 0; // clear cache completely when above 500MB
 }
 
 export function cachedApiRoute<

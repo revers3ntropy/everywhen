@@ -49,6 +49,9 @@ export function rawMdToHtml (md: string, obfuscated = false): string {
 }
 
 export function fmtBytes (bytes: number): string {
+    if (bytes < 0) {
+        return `-${fmtBytes(-bytes)}`;
+    }
     if (bytes < 1000) {
         return `${bytes}B`;
     }
