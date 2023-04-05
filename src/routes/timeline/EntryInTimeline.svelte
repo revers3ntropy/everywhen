@@ -9,7 +9,6 @@
     export let title: string;
     export let wordCount: number;
     export let entryTextParityHeight: boolean;
-    export let entry: string;
     export let decrypted: boolean;
     export let deleted: boolean;
     export let label: Label | null = null;

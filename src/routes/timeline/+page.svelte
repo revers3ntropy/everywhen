@@ -3,9 +3,9 @@
     import Background from '../../lib/canvas/Background.svelte';
     import Canvas from '../../lib/canvas/Canvas.svelte';
     import { canvasState } from '../../lib/canvas/canvasHelpers';
-    import type { Entry } from '../../lib/controllers/entry';
     import { Event } from '../../lib/controllers/event';
     import { nowS } from '../../lib/utils/time';
+    import type { TimelineEntry } from './+page.server';
     import CenterLine from './CenterLine.svelte';
     import Controls from './Controls.svelte';
     import EntryInTimeline from './EntryInTimeline.svelte';
@@ -16,7 +16,7 @@
     import { addYToEvents, type EventWithYLevel } from './utils';
 
     export let data: App.PageData & {
-        entries: (Entry & { wordCount: number })[],
+        entries: TimelineEntry[],
         events: Event[],
     };
 

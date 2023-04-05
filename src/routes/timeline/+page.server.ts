@@ -6,6 +6,10 @@ import { cachedPageRoute } from '../../lib/utils/cache';
 import { wordCount } from '../../lib/utils/text';
 import type { PageServerLoad } from './$types';
 
+export type TimelineEntry = Omit<Entry, 'entry'> & {
+    wordCount: number;
+}
+
 export const load = cachedPageRoute(async (auth) => {
     let { val: entries, err } = await Entry.all(query, auth);
     if (err) throw error(400, err);
@@ -14,14 +18,11 @@ export const load = cachedPageRoute(async (auth) => {
     if (eventsErr) throw error(400, eventsErr);
 
     return {
-        entries: JSON.parse(JSON.stringify(
-            entries.map(e => ({
-                ...e,
-                wordCount: wordCount(e.entry),
-            })),
-        )),
-        events: JSON.parse(JSON.stringify(
-            events,
-        )),
+        entries: entries.map(e => ({
+            ...e,
+            wordCount: wordCount(e.entry),
+            entry: undefined,
+        })) as TimelineEntry[],
+        events,
     };
 }) satisfies PageServerLoad;

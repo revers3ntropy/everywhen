@@ -26,7 +26,7 @@ export const load = cachedPageRoute(async (auth, {}) => {
     }
 
     return {
-        entries: JSON.parse(JSON.stringify(entries)),
+        entries,
         entryCount: entries.length,
         commonWords: Object.entries(commonWords)
                            .sort(([ _, a ], [ _0, b ]) => b - a)
