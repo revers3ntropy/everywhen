@@ -11,6 +11,7 @@
     export let fmt = 'h:mm A';
     export let relative = false;
     export let noTooltip = false;
+    export let tooltipPosition = 'top';
 </script>
 
 {#if !noTooltip}
@@ -20,6 +21,7 @@
                     + ` (${numberAsSignedStr(tzOffset)}h)`
                     + `<p>${fmtUtc(timestamp, currentTzOffset(), 'hh:mma')} local time</p>`,
             autoPosition: true,
+            position: tooltipPosition,
         }}
     >
         {#if relative}

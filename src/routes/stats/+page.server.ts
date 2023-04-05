@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
-import { cachedPageRoute } from '../../hooks.server';
 import { Entry } from '../../lib/controllers/entry';
 import { query } from '../../lib/db/mysql';
+import { cachedPageRoute } from '../../lib/utils/cache';
 import { wordCount as txtWordCount } from '../../lib/utils/text';
 import { daysSince, nowS } from '../../lib/utils/time';
 import type { PageServerLoad } from './$types';

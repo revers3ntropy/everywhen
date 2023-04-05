@@ -1,10 +1,5 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
-import {
-    cacheResponse,
-    getCachedResponse,
-    invalidateCache,
-} from '../../../../hooks.server';
 import { Asset } from '../../../../lib/controllers/asset';
 import { query } from '../../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../../lib/security/getAuthFromCookies';
@@ -14,6 +9,11 @@ import {
     type GenericResponse,
     rawApiResponse,
 } from '../../../../lib/utils/apiResponse';
+import {
+    cacheResponse,
+    getCachedResponse,
+    invalidateCache,
+} from '../../../../lib/utils/cache';
 
 export const GET = (async ({ params, url, cookies }) => {
     const auth = await getAuthFromCookies(cookies);

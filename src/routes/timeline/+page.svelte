@@ -1,8 +1,8 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import Background from '../../lib/canvas/Background.svelte';
-    import { canvasState } from '../../lib/canvas/canvasHelpers';
     import Canvas from '../../lib/canvas/Canvas.svelte';
+    import { canvasState } from '../../lib/canvas/canvasHelpers';
     import type { Entry } from '../../lib/controllers/entry';
     import { Event } from '../../lib/controllers/event';
     import { nowS } from '../../lib/utils/time';
@@ -13,41 +13,16 @@
     import NowLine from './NowLine.svelte';
     import TimeCursor from './TimeCursor.svelte';
     import TimeMarkers from './TimeMarkers.svelte';
+    import { addYToEvents, type EventWithYLevel } from './utils';
 
     export let data: App.PageData & {
         entries: (Entry & { wordCount: number })[],
         events: Event[],
     };
 
-    let events: ({ yLevel: number } & Event)[];
+    let events: EventWithYLevel[];
 
     const eventBaseY = 4;
-
-    function addYToEvents (
-        rawEvents: Event[],
-    ): ({ yLevel: number } & Event)[] {
-        const evts: (typeof events) = rawEvents.sort((e1, e2) => {
-            return Event.duration(e1) - Event.duration(e2);
-        }).map(e => ({ ...e, yLevel: 0 }));
-
-        for (const event of evts) {
-            if (Event.isInstantEvent(event)) {
-                continue;
-            }
-
-            let overlappedLargerEvents = evts.filter(e => {
-                return Event.intersects(event, e)
-                    && Event.duration(e) > Event.duration(event)
-                    && e !== event;
-            });
-
-            for (const e of overlappedLargerEvents) {
-                e.yLevel = Math.max(e.yLevel, event.yLevel + 1);
-            }
-        }
-
-        return evts;
-    }
 
     $: events = addYToEvents(data.events);
 

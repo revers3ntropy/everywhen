@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
-import { cachedPageRoute } from '../../hooks.server';
 import { Asset } from '../../lib/controllers/asset';
 import { query } from '../../lib/db/mysql';
+import { cachedPageRoute } from '../../lib/utils/cache';
 import type { PageServerLoad } from './$types';
 
 

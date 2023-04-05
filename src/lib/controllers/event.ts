@@ -197,6 +197,36 @@ export class Event {
         return evt.end - evt.start;
     }
 
+    /**
+     * Orders events against each other.
+     * Used to find Y position of events in timeline.
+     */
+    public static compare (
+        evt1: Event,
+        evt2: Event,
+    ): boolean {
+        const evt1Duration = Event.duration(evt1);
+        const evt2Duration = Event.duration(evt2);
+
+        if (evt1Duration !== evt2Duration) {
+            return evt1Duration > evt2Duration;
+        }
+
+        if (evt1.start !== evt2.start) {
+            return evt1.start > evt2.start;
+        }
+
+        if (evt1.end !== evt2.end) {
+            return evt1.end > evt2.end;
+        }
+
+        if (evt1.created !== evt2.created) {
+            return evt1.created > evt2.created;
+        }
+
+        return evt1.id.localeCompare(evt2.id) > 0;
+    }
+
     public static isInstantEvent (
         evt: { start: TimestampSecs, end: TimestampSecs },
     ): boolean {
@@ -207,10 +237,13 @@ export class Event {
         evt1: { start: TimestampSecs, end: TimestampSecs },
         evt2: { start: TimestampSecs, end: TimestampSecs },
     ): boolean {
-        return evt1.start <= evt2.start
+        return (
+            evt1.start <= evt2.start
             && evt1.end >= evt2.start
-            || evt2.start <= evt1.start
-            && evt2.end >= evt1.start;
+        ) || (
+            evt2.start <= evt1.start
+            && evt2.end >= evt1.start
+        );
     }
 
     public static async updateName (

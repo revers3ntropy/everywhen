@@ -1,8 +1,8 @@
 import { error } from '@sveltejs/kit';
-import { cachedPageRoute } from '../../hooks.server';
 import { Entry } from '../../lib/controllers/entry';
 import { Event } from '../../lib/controllers/event';
 import { query } from '../../lib/db/mysql';
+import { cachedPageRoute } from '../../lib/utils/cache';
 import { wordCount } from '../../lib/utils/text';
 import type { PageServerLoad } from './$types';
 

@@ -1,9 +1,9 @@
 import { error } from '@sveltejs/kit';
-import { invalidateCache } from '../../../../hooks.server';
 import { Event } from '../../../../lib/controllers/event';
 import { query } from '../../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../../lib/security/getAuthFromCookies';
 import { apiRes404, apiResponse } from '../../../../lib/utils/apiResponse';
+import { invalidateCache } from '../../../../lib/utils/cache';
 import { getUnwrappedReqBody } from '../../../../lib/utils/requestBody';
 import type { RequestHandler } from './$types';
 

@@ -141,6 +141,8 @@
     });
 
     async function submit () {
+        submitted = true;
+
         const currentLocation = $enabledLocation
             ? await getLocation(addNotification)
             : [ null, null ];
@@ -160,6 +162,21 @@
                 res = displayNotifOnErr(addNotification,
                     await api.post(auth, '/entries', body),
                 );
+                submitted = false;
+                if (res.id) {
+                    // make really sure it's saved before resetting
+                    reset();
+                } else {
+                    console.error(res);
+                    addNotification({
+                        ...ERR_NOTIFICATION,
+                        text: `Failed to create entry: ${JSON.stringify(res)}`,
+                    });
+                }
+                addNotification({
+                    ...SUCCESS_NOTIFICATION,
+                    text: `Entry created!`,
+                });
                 break;
             case 'edit':
                 if (!entry) throw new Error('entry must be set when action is edit');
@@ -171,33 +188,13 @@
                 res = displayNotifOnErr(addNotification,
                     await api.put(auth, apiPath('/entries/?', entry.id), body),
                 );
+                location.assign(`/journal/${entry.id}?obfuscate=0`);
                 break;
             default:
                 throw new Error(`Unknown action: ${action}`);
         }
 
-        if (res.id) {
-            // make really sure it's saved before resetting
-            reset();
-        } else {
-            console.error(res);
-            addNotification({
-                ...ERR_NOTIFICATION,
-                text: `Cannot create entry: ${JSON.stringify(res)}`,
-            });
-        }
-
         dispatch('updated');
-
-        if (entry) {
-            submitted = true;
-            location.assign(`/journal/${entry.id}`);
-        } else {
-            addNotification({
-                ...SUCCESS_NOTIFICATION,
-                text: `Entry created!`,
-            });
-        }
     }
 
     const fileOptions: FileDropOptions = {
@@ -323,12 +320,14 @@
                     bind:value={newEntryTitle}
                     class="title"
                     placeholder="Title"
+                    disabled={submitted}
                 />
             {/if}
         </div>
         <div class="right-options {obfuscated ? 'blur' : ''}">
             <button
                 aria-label="Insert Image"
+                disabled={submitted}
                 on:click={triggerFileDrop}
                 use:tooltip={{ content: 'Insert Image' }}
             >
@@ -345,6 +344,7 @@
             <button
                 aria-label="Submit Entry"
                 class="send icon-button"
+                disabled={submitted}
                 on:click={submit}
             >
                 <Send size="30" />
@@ -363,6 +363,7 @@
                 bind:this={newEntryInputElement}
                 bind:value={newEntryBody}
                 placeholder="Entry"
+                disabled={submitted}
             ></textarea>
         {/if}
     </div>
@@ -370,6 +371,7 @@
     <button
         aria-label="Submit Entry"
         class="send-mobile"
+        disabled={submitted}
         on:click={submit}
     >
         <Send size="30" />

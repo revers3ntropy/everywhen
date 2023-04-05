@@ -382,11 +382,15 @@
                         style="background: {event.label?.colour || 'transparent'}"
                     ></span>
                 {:else}
-                    <span
-                        class="entry-label-colour big"
-                        style="background: {event.label?.colour || 'transparent'}"
-                        use:tooltip={{ content: event.label?.name}}
-                    ></span>
+                    {#if event.label}
+                        <span
+                            class="entry-label-colour big"
+                            style="background: {event.label.colour || 'transparent'}"
+                            use:tooltip={{ content: event.label.name}}
+                        ></span>
+                    {:else}
+                        <span class="entry-label-colour big"></span>
+                    {/if}
                 {/if}
 
                 <div>

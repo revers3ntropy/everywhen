@@ -77,13 +77,18 @@
 							timestamp={entry.created}
 							fmt="h:mm A"
 							tzOffset={entry.createdTZOffset}
+							tooltipPosition="right"
 						/>
 					</span>
-					<span
-						class="entry-label-colour"
-						style="background: {entry.label?.colour || 'transparent'}"
-						use:tooltip={{ content: entry.label?.name }}
-					></span>
+					{#if entry.label}
+						<span
+							class="entry-label-colour"
+							style="background: {entry.label?.colour || 'transparent'}"
+							use:tooltip={{ content: entry.label?.name }}
+						></span>
+					{:else}
+						<span class="entry-label-colour"></span>
+					{/if}
 
 					<span class="title {obfuscated ? 'obfuscated' : ''}">
 						{#if entry.title}
@@ -136,9 +141,12 @@
 		.entry {
 			display: grid;
 			grid-template-columns: 65px 18px 1fr;
-			padding: 2px 0;
+			padding: 2px 2px;
 			align-items: center;
 			color: @text-color;
+			border-radius: 2px;
+			width: 100%;
+			text-align: left;
 
 			&:after {
 				display: none;

@@ -1,10 +1,10 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
-import { invalidateCache } from '../../../hooks.server';
 import { Asset } from '../../../lib/controllers/asset';
 import { query } from '../../../lib/db/mysql';
 import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
 import { apiRes404, apiResponse } from '../../../lib/utils/apiResponse';
+import { invalidateCache } from '../../../lib/utils/cache';
 import { getUnwrappedReqBody } from '../../../lib/utils/requestBody';
 
 export const POST = (async ({ request, cookies }) => {
