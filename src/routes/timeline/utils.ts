@@ -73,16 +73,5 @@ export function addYToEvents (
         }
     }
 
-    console.log(evts
-        .map(e => {
-            if (!Event.isInstantEvent(e)) {
-                return `${e.name} ${e.yLevel}`;
-            }
-            return undefined;
-        })
-        .filter(Boolean)
-        .join(',\n'),
-    );
-
     return evts;
 }
