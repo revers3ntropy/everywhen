@@ -406,9 +406,8 @@
     }
 
     .record-something-buttons {
-
         display: block;
-        padding: 0 0 .8rem 0;
+        padding: .8rem 0 .8rem 0;
 
         button.primary {
             width: 100%;

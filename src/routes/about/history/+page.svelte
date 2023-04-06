@@ -1,0 +1,88 @@
+<script lang="ts">
+    const version = __VERSION__;
+</script>
+
+<main class="flex-center">
+    <div>
+        <h1>Version History</h1>
+        <i>Currently {version}</i>
+        <section>
+            <h2>0.4</h2>
+            <ul>
+                <li>'/about' and '/about/history' pages</li>
+                <li>Caching</li>
+                <li>'+' button in navbar</li>
+                <li>More general stats on analytics page</li>
+                <li>Don't blur by default</li>
+                <li>Keyboard shortcuts for Macs</li>
+                <li>Clear entry form when logging out</li>
+                <li>YoB setting for timeline</li>
+                <li>Better timeline styling</li>
+                <li>Timezones</li>
+                <li>Gallery page</li>
+                <li>Blur events</li>
+                <li>Blur entry form</li>
+            </ul>
+        </section>
+        <section>
+            <h2>0.3</h2>
+            <ul>
+                <li>Made public on GitHub</li>
+                <li>Download plaintext backups</li>
+                <li>Better mobile support</li>
+                <li>Better default zoom for timeline</li>
+                <li>'n' Years Ago Today entries</li>
+                <li>Better 'buckets' for barchart in analytics</li>
+                <li>Ask to leave page with unsaved changes when editing entry</li>
+            </ul>
+        </section>
+        <section>
+            <h2>0.2</h2>
+            <ul>
+                <li>Made public on GitHub</li>
+                <li>Download plaintext backups</li>
+                <li>Better mobile support</li>
+                <li>Better default zoom for timeline</li>
+                <li>'n' Years Ago Today entries</li>
+                <li>Better 'buckets' for barchart in analytics</li>
+                <li>Ask to leave page with unsaved changes when editing entry</li>
+            </ul>
+        </section>
+        <section>
+            <h2>0.1</h2>
+            <ul>
+                <li>Better navbar for mobile</li>
+                <li>Import entries from JSON file</li>
+                <li>Import events from JSON file</li>
+                <li>Passcode</li>
+                <li>Edit entries</li>
+                <li>Markdown/HTML in entries</li>
+                <li>User settings</li>
+            </ul>
+        </section>
+        <section>
+            <h2>0.0</h2>
+            <ul>
+                <li>Publish to halcyon.land</li>
+                <li>Integrate testing framework</li>
+                <li>Show events in timeline</li>
+                <li>Location toggle</li>
+                <li>Instant/Duration events</li>
+                <li>Create events</li>
+                <li>Upload images</li>
+                <li>Stats page</li>
+                <li>Search entries</li>
+                <li>Filter entries by label</li>
+                <li>Blur entries</li>
+                <li>Timeline</li>
+                <li>Labels</li>
+                <li>Download and restore backups</li>
+                <li>Mobile Support</li>
+                <li>Edit labels</li>
+                <li>Bin</li>
+                <li>Delete entries</li>
+                <li>Submit and view entries</li>
+            </ul>
+        </section>
+    </div>
+</main>

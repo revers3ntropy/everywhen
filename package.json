@@ -1,6 +1,6 @@
 {
     "name": "halcyon.land",
-    "version": "0.3.22",
+    "version": "0.3.23",
     "type": "module",
     "private": true,
     "devDependencies": {
@@ -12,9 +12,9 @@
         "@sveltejs/pancake": "^0.0.18",
         "@sveltejs/vite-plugin-svelte": "^2.0.3",
         "@testing-library/svelte": "^3.2.2",
-        "@total-typescript/ts-reset": "^0.3.7",
+        "@total-typescript/ts-reset": "^0.4.2",
         "@types/cookie": "^0.5.1",
-        "@types/dompurify": "^2.4.0",
+        "@types/dompurify": "^3.0.1",
         "@types/html-minifier": "^4.0.2",
         "@types/marked": "^4.0.8",
         "@types/uuid": "^9.0.1",

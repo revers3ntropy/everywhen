@@ -1,12 +1,12 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { getNotificationsContext } from 'svelte-notifications';
-    import type { App } from '../../app';
-    import Entry from '../../lib/components/Entry.svelte';
-    import type { Entry as EntryController } from '../../lib/controllers/entry';
-    import { obfuscated } from '../../lib/stores';
-    import { api } from '../../lib/utils/apiRequest';
-    import { displayNotifOnErr } from '../../lib/utils/notifications';
+    import type { App } from '../../../app';
+    import Entry from '../../../lib/components/Entry.svelte';
+    import type { Entry as EntryController } from '../../../lib/controllers/entry';
+    import { obfuscated } from '../../../lib/stores';
+    import { api } from '../../../lib/utils/apiRequest';
+    import { displayNotifOnErr } from '../../../lib/utils/notifications';
 
     const { addNotification } = getNotificationsContext();
 

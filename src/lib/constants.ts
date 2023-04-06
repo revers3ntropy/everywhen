@@ -29,6 +29,12 @@ export const USERNAME_COOKIE_OPTIONS = Object.freeze({
     httpOnly: false,
 });
 
+export const NON_AUTH_ROUTES = Object.freeze([
+    '/',
+    '/about',
+    '/about/history',
+]);
+
 export const MAX_IMAGE_SIZE: Bytes = 1024 * 1024 * 4; // 4MiB
 
 export const EVENT_IN_TIMELINE_HEIGHT: Pixels = 30;

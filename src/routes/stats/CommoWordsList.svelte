@@ -34,12 +34,12 @@
             margin: 10px 0;
             padding: 10px 2px;
             grid-template-columns: 3rem 1fr 2rem 5rem;
-            a {
-                max-width: 9rem;
-                text-overflow: ellipsis;
-                overflow: hidden;
-                white-space: nowrap;
-            }
+        }
+
+        a {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
         }
 
         hr {

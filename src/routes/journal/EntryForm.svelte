@@ -175,6 +175,7 @@
                 }
                 addNotification({
                     ...SUCCESS_NOTIFICATION,
+                    removeAfter: 1000,
                     text: `Entry created!`,
                 });
                 break;

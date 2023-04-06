@@ -1,6 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 import 'ts-polyfill';
-import { KEY_COOKIE_KEY, USERNAME_COOKIE_KEY } from '../lib/constants';
+import { KEY_COOKIE_KEY, NON_AUTH_ROUTES, USERNAME_COOKIE_KEY } from '../lib/constants';
 import { Settings } from '../lib/controllers/settings';
 import type { Auth } from '../lib/controllers/user';
 import { User } from '../lib/controllers/user';
@@ -8,6 +8,7 @@ import { query } from '../lib/db/mysql';
 import type { LayoutServerLoad } from './$types';
 
 export const prerender = false;
+export const ssr = true;
 
 async function isAuthenticated (
     home: boolean,
@@ -35,6 +36,7 @@ export const load = (async ({
     url,
 }): Promise<App.PageData> => {
     const home = url.pathname.trim() === '/';
+    const requireAuth = !NON_AUTH_ROUTES.includes(url.pathname);
 
     const key = cookies.get(KEY_COOKIE_KEY);
     const username = cookies.get(USERNAME_COOKIE_KEY);
@@ -50,7 +52,7 @@ export const load = (async ({
         }
     }
 
-    if (!home) {
+    if (!home && requireAuth) {
         throw redirect(307, '/');
     }
 

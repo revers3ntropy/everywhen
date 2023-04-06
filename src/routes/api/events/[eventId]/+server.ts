@@ -34,14 +34,23 @@ export const PUT = (async ({ request, params, cookies }) => {
         if (err) throw error(400, err);
     }
 
-    if (body.start) {
-        const { err } = await Event.updateStart(query, auth, event, body.start);
+    // deal with differently because otherwise you have to do one first,
+    // which always means one of them will be 'before'/'after' the other,
+    // which is caught by the validation in the controller
+    if (body.start && body.end) {
+        const { err } = await Event.updateStartAndEnd(query, auth, event, body.start, body.end);
         if (err) throw error(400, err);
-    }
 
-    if (body.end) {
-        const { err } = await Event.updateEnd(query, auth, event, body.end);
-        if (err) throw error(400, err);
+    } else {
+        if (body.start) {
+            const { err } = await Event.updateStart(query, auth, event, body.start);
+            if (err) throw error(400, err);
+        }
+
+        if (body.end) {
+            const { err } = await Event.updateEnd(query, auth, event, body.end);
+            if (err) throw error(400, err);
+        }
     }
 
     if (body.label !== 'NO_CHANGE') {

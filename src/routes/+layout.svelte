@@ -8,7 +8,7 @@
     import type { Writable } from 'svelte/store';
     import 'ts-polyfill';
     import '../app.less';
-    import { USERNAME_COOKIE_KEY } from '../lib/constants';
+    import { NON_AUTH_ROUTES, USERNAME_COOKIE_KEY } from '../lib/constants';
     import { Backup } from '../lib/controllers/backup';
     import { obfuscated, passcodeLastEntered, popup } from '../lib/stores';
     import { api } from '../lib/utils/apiRequest';
@@ -19,10 +19,12 @@
     import Footer from './Footer.svelte';
     import Nav from './Nav.svelte';
     import NewVersionAvailable from './NewVersionAvailable.svelte';
+    import NoAuthNav from './NoAuthNav.svelte';
     import Notifier from './Notifier.svelte';
     import PasscodeModal from './PasscodeModal.svelte';
 
     $: home = $page.url.pathname.trim() === '/';
+    $: requireAuth = !NON_AUTH_ROUTES.includes($page.url.pathname);
 
     export let data: App.PageData;
 
@@ -44,6 +46,7 @@
     let downloadingBackup = false;
 
     function checkObfuscatedTimeout () {
+        if (!requireAuth) return;
         if ($obfuscated) return;
 
         const hideAfter = data.settings.autoHideEntriesDelay.value;
@@ -60,19 +63,22 @@
     }
 
     function checkCookies () {
+        if (!requireAuth) return;
+
         const cookies = parse(document.cookie);
 
         // the key cookie is HttpOnly, so we can't read it from JS
         // https://owasp.org/www-community/HttpOnly
         if (!cookies[USERNAME_COOKIE_KEY]) {
             console.error('Cookies have expired');
-            window.location.assign('/');
+            location.assign('/');
         }
     }
 
     function checkPasscode () {
-        const secondsSinceLastEntered = nowS() - $passcodeLastEntered;
+        if (!requireAuth) return;
 
+        const secondsSinceLastEntered = nowS() - $passcodeLastEntered;
         showPasscodeModal = secondsSinceLastEntered > data.settings.passcodeTimeout.value;
     }
 
@@ -163,7 +169,11 @@
     <Notifier bind:addNotification />
 
     {#if !home}
-        <Nav auth={data} />
+        {#if data.id}
+            <Nav auth={data} />
+        {:else}
+            <NoAuthNav />
+        {/if}
     {/if}
 
     <div style="min-height: calc(100vh - var(--nav-height))">

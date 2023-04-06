@@ -100,7 +100,7 @@
                     <Sidebar titles={entryTitles} {auth} />
                 {/if}
                 {#if showBin}
-                    <a class="primary" href="/deleted">
+                    <a class="primary" href="/journal/deleted">
                         <Bin size="30" />
                         Bin
                     </a>

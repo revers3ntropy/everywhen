@@ -312,6 +312,34 @@ export class Event {
         return Result.ok(self);
     }
 
+    public static async updateStartAndEnd (
+        query: QueryFunc,
+        auth: Auth,
+        self: Event,
+        start: TimestampSecs,
+        end: TimestampSecs,
+    ): Promise<Result<Event>> {
+        if (start > end) {
+            return Result.err('Start time cannot be after end time');
+        }
+        if (start < 0) {
+            return Result.err('Start time cannot be negative');
+        }
+        if (end < 0) {
+            return Result.err('End time cannot be negative');
+        }
+        self.start = start;
+        self.end = end;
+        await query`
+            UPDATE events
+            SET start = ${start},
+                end   = ${end}
+            WHERE id = ${self.id}
+              AND user = ${auth.id}
+        `;
+        return Result.ok(self);
+    }
+
     public static async updateLabel (
         query: QueryFunc,
         auth: Auth,
