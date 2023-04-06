@@ -2,9 +2,9 @@
     import { onMount } from 'svelte';
     import ArrowLeft from 'svelte-material-icons/ArrowLeft.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
-    import type { ChangeEventHandler } from 'svelte/elements';
     import type { Entry } from '../../../lib/controllers/entry';
     import { By } from '../helpers';
+    import SearchForWord from '../SearchForWord.svelte';
     import EntryBarChart from './../EntryBarChart.svelte';
     import EntryHeatMap from './../EntryHeatMap.svelte';
 
@@ -20,10 +20,6 @@
     };
 
     onMount(() => document.title = 'Analytics');
-
-    const searchWordChange = (e => {
-        location.assign(`/stats/${(e.target as HTMLInputElement).value}`);
-    }) satisfies ChangeEventHandler<HTMLInputElement>;
 
 </script>
 
@@ -46,11 +42,7 @@
             </h1>
         </div>
         <div class="search-for-word">
-            <input
-                on:change={searchWordChange}
-                placeholder="Search for word..."
-                value="{data.theWord}"
-            >
+            <SearchForWord value={data.theWord} />
         </div>
     </div>
     {#if data.wordInstances === 0}

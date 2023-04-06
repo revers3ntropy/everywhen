@@ -1,8 +1,10 @@
 import { browser } from '$app/environment';
 import { DB, DB_HOST, DB_PASS, DB_PORT, DB_USER } from '$env/static/private';
-import type mysql from 'mysql2/promise';
-import { connect, dbConnection } from '../../hooks.server';
+import chalk from 'chalk';
+import mysql from 'mysql2/promise';
+import { errorLogger } from '../../hooks.server';
 import '../require';
+import { makeLogger } from '../utils/log';
 
 export type queryRes =
     | mysql.RowDataPacket[][]
@@ -11,6 +13,23 @@ export type queryRes =
     | mysql.OkPacket[]
     | mysql.ResultSetHeader
     | Record<string, any>[];
+
+const dbLogger = makeLogger('DB', chalk.yellow, 'db.log');
+
+export let dbConnection: mysql.Connection | null = null;
+
+export async function connect () {
+    const config = await getConfig();
+    dbConnection = await mysql
+        .createConnection(config)
+        .catch((e: any) => {
+            dbLogger.logToFile(`Error connecting to mysql db '${config.database}'`);
+            errorLogger.logToFile(`Error connecting to mysql db '${config.database}'`);
+            dbLogger.logToFile(e);
+            throw e;
+        });
+    dbLogger.logToFile(`Connected`);
+}
 
 export async function getConfig (): Promise<mysql.ConnectionOptions> {
     // define defaults from .env file
@@ -52,12 +71,7 @@ export async function query<Res extends queryRes = mysql.RowDataPacket[]> (
         }
     }, '');
 
-    // logs query but without whitespace
-    // const queryToLog = con?.escape(queryParts)
-    // 	.replace(/\s+/g, ' ')
-    // 	.replace('\\n', '')
-    // 	.replace('\n', '');
-    // console.log(`QUERY: ${queryToLog} ${JSON.stringify(params)}`);
+    dbLogger.log(`${query.trim()}\n ${JSON.stringify(params)}`);
 
     // if it's an array, add all the elements of the array in place as params
     // Flatten 2D arrays

@@ -3,13 +3,13 @@
     import { tooltip } from '@svelte-plugins/tooltips';
     import { onMount } from 'svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
-    import type { ChangeEventHandler } from 'svelte/elements';
     import type { Entry } from '../../lib/controllers/entry';
     import { round1DP } from '../../lib/utils/text';
     import CommonWordsList from './CommoWordsList.svelte';
     import EntryBarChart from './EntryBarChart.svelte';
     import EntryHeatMap from './EntryHeatMap.svelte';
     import { By } from './helpers';
+    import SearchForWord from './SearchForWord.svelte';
 
     let by: By = By.Entries;
 
@@ -23,10 +23,6 @@
     };
 
     onMount(() => document.title = 'Analytics');
-
-    const searchWordChange = (e => {
-        location.assign(`/stats/${(e.target as HTMLInputElement).value}`);
-    }) satisfies ChangeEventHandler<HTMLInputElement>;
 
 </script>
 
@@ -57,11 +53,7 @@
                 </h1>
             </div>
             <div class="search-for-word">
-                <input
-                    on:change={searchWordChange}
-                    value=""
-                    placeholder="Search for word..."
-                >
+                <SearchForWord />
             </div>
         </div>
 

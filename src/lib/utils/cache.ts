@@ -95,7 +95,7 @@ export function cleanupCache (): number {
         `size=${bytesFmt}`,
         `timeout=${timeout}s`,
         `change=${changeFmt}`,
-        `cleared=${cleared}`,
+        `(${cleared})`,
     );
     return cacheSizeAfter;
 }

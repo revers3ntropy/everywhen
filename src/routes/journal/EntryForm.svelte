@@ -471,7 +471,7 @@
             max-width: 100%;
             min-width: 200px;
             resize: both;
-            padding: 0.4rem;
+            padding: 1rem;
             margin: 0;
 
             // fills page
