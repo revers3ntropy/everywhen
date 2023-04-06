@@ -9,6 +9,8 @@ die () {
 
 [ "$#" -eq 1 ] || die "1 argument required, $# provided"
 
+bin/precommit || die "precommit failed";
+
 [ -d "./secrets/$1" ] || die "Error: Directory /secrets/$1 does not exists."
 
 mv .env tmp.env

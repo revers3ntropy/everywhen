@@ -52,7 +52,7 @@
         const { data: backupData } = displayNotifOnErr(addNotification,
             await api.get(auth, '/backups', { encrypted: true }),
         );
-        Backup.download(backupData, auth.username);
+        Backup.download(backupData, auth.username, true);
         downloadingBackup = false;
     }
 
@@ -314,6 +314,10 @@
         }
     }
 
+    .account-dropdown {
+        background: @light-accent;
+    }
+
     .account-button {
         .bordered();
         display: grid;
@@ -357,16 +361,17 @@
             top: var(--nav-height);
             left: 0;
             width: 100%;
-            z-index: 8;
+            z-index: -1;
             justify-content: flex-start;
             display: flex;
             flex-direction: column;
             background: @header-bg;
-            transform: translate(0, -50rem);
-            transition: transform 200ms ease-in-out;
+            transform: translate(0, -30rem);
+            transition: @transition;
 
             &.showing {
                 transform: translate(0);
+                z-index: 8;
             }
 
             a, button {

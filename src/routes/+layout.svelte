@@ -111,7 +111,7 @@
         const { data: backupData } = displayNotifOnErr(addNotification,
             await api.get(data, '/backups', { encrypted: true }),
         );
-        Backup.download(backupData, data.username);
+        Backup.download(backupData, data.username, true);
         downloadingBackup = false;
     }
 

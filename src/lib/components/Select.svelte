@@ -1,8 +1,11 @@
 <script lang="ts">
+    import MenuDown from 'svelte-material-icons/MenuDown.svelte';
+    import MenuUp from 'svelte-material-icons/MenuUp.svelte';
     import Dropdown from '../../lib/components/Dropdown.svelte';
 
     export let options: Record<string, any>;
     export let key: string;
+    export let open: boolean = false;
 
     export let value = null;
     $: value = options[key];
@@ -12,9 +15,18 @@
     let close: () => void;
 </script>
 
-<Dropdown bind:close>
+<Dropdown
+    bind:close
+    bind:open
+    unstyledButton
+>
     <span class="selector" slot="button">
         {key}
+        {#if open}
+            <MenuUp />
+        {:else}
+            <MenuDown />
+        {/if}
     </span>
 
     <div class="options">
@@ -28,13 +40,14 @@
 </Dropdown>
 
 <style lang="less">
-    @import '../../styles/variables.less';
-    @import '../../styles/layout.less';
+    @import '../../styles/variables';
+    @import '../../styles/layout';
 
     button {
         display: block;
         padding: .3em;
         border-radius: @border-radius;
+        border: none;
 
         &:hover {
             background-color: @accent-color-primary;
@@ -48,7 +61,12 @@
         padding: 0;
         border: 1px solid @border-heavy;
         border-top-color: @border-light;
-        border-radius: 0 0 10px 10px;
+        border-radius: @border-radius;
+        background: @light-accent;
+
+        button {
+            padding: .4rem 1.2rem;
+        }
     }
 
     .selector {

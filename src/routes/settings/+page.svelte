@@ -1,8 +1,8 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
-    import Logout from 'svelte-material-icons/Logout.svelte';
     import Cog from 'svelte-material-icons/Cog.svelte';
+    import Logout from 'svelte-material-icons/Logout.svelte';
     import Skull from 'svelte-material-icons/Skull.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import BackupOptions from '../../lib/components/BackupOptions.svelte';
@@ -26,7 +26,7 @@
         const { backup: backupData } = displayNotifOnErr(addNotification,
             await api.delete(data, '/users'),
         );
-        Backup.download(backupData, data.username);
+        Backup.download(backupData, data.username, true);
         location.assign('/');
     }
 

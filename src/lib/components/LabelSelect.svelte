@@ -71,7 +71,7 @@
                     class="label-button single"
                     aria-label="Remove label"
             >
-                <i>(No Label)</i>
+                <i>No Label</i>
             </button>
             {#each (labels ?? []).filter(filter) as label (label.id)}
                 <button

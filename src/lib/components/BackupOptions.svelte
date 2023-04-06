@@ -24,7 +24,7 @@
         const { data: backupData } = displayNotifOnErr(addNotification,
             await api.get(auth, '/backups', { encrypted }),
         );
-        Backup.download(backupData, auth.username);
+        Backup.download(backupData, auth.username, encrypted);
         downloading = false;
     }
 

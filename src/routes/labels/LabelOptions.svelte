@@ -68,6 +68,7 @@
                 bind:value={name}
                 class="editable-text"
                 autocomplete="none"
+                type="text"
                 on:change={() => updateLabel({ name })}
             >
         {:else}
@@ -76,10 +77,14 @@
             ></div>
             <div>{name}</div>
         {/if}
-        <a class="text-light" href="/labels/{id}">
-            {entryCount} {entryCount === 1 ? 'entry' : 'entries'}
-            {#if eventCount > 0}
-                , {eventCount} {eventCount === 1 ? 'event' : 'events'}
+        <a href="/labels/{id}">
+            {entryCount} {entryCount === 1
+            ? 'entry'
+            : 'entries'
+        }
+            {#if eventCount > 0},
+                {eventCount}
+                {eventCount === 1 ? 'event' : 'events'}
             {/if}
         </a>
         <div>
@@ -91,6 +96,8 @@
 {/if}
 
 <style lang="less">
+    @import '../../styles/variables';
+
     .label {
         margin: 0.5em;
         display: grid;
@@ -100,6 +107,19 @@
 
         &.editable {
             grid-template-columns: 60px 1fr 1fr 35px;
+        }
+
+        @media @mobile {
+            max-width: 100vw;
+            grid-template-columns: 15px 1fr 1fr 35px;
+
+            input[type="text"] {
+                width: 100%;
+            }
+
+            a {
+                overflow-wrap: break-word;
+            }
         }
     }
 </style>

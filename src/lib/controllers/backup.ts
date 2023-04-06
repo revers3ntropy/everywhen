@@ -269,7 +269,7 @@ export class Backup {
         return Result.ok(json as Backup);
     }
 
-    public static download (data: string, username: string, encrypted = true): void {
+    public static download (data: string, username: string, encrypted: boolean): void {
         const dateFmt = fmtUtc(nowS(), currentTzOffset(), 'yyyyMMDD-HHmm');
         const encryptedExt = encrypted ? '.encrypted' : '';
         downloadFile(

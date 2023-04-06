@@ -77,6 +77,7 @@
                 display: flex;
                 align-items: center;
                 justify-content: flex-end;
+                background: none;
 
                 :global(.menu-down) {
                     display: none;
@@ -85,6 +86,15 @@
 
             border: none !important;
             width: fit-content;
+            background: none !important;
+
+            .popup {
+                .content {
+                    border: 1px solid @border-heavy;
+                    background: @light-accent;
+                    border-radius: @border-radius
+                }
+            }
         }
 
         &.popup {
@@ -108,7 +118,7 @@
 
             .content {
                 background: @light-accent;
-                border-radius: 0 0 10px 10px;
+                border-radius: 0 0 @border-radius @border-radius;
                 border-top: none;
                 min-width: 100%;
             }
@@ -135,7 +145,7 @@
 
             &.open {
                 background: @light-accent;
-                border-radius: 10px 10px 0 0;
+                border-radius: @border-radius @border-radius 0 0;
                 border: 1px solid @border-heavy;
             }
         }

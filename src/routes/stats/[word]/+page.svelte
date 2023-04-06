@@ -37,8 +37,12 @@
         </div>
         <div>
             <h1>
-                <Counter size="40" />
-                <span>'{data.theWord}'</span>
+                <span class="stats-icon">
+                    <Counter size="40" />
+                </span>
+                <span class="the-word-with-quotes">
+                    '<span class="the-word">{data.theWord}</span>'
+                </span>
             </h1>
         </div>
         <div class="search-for-word">
@@ -99,9 +103,12 @@
             grid-template-columns: 10px 1fr;
 
             .search-for-word {
-                width: 100%;
-                margin: .5rem;
-                text-align: center;
+                font-size: 1.5rem;
+                margin: .4rem 0;
+            }
+
+            .stats-icon, .the-word-with-quotes {
+                display: none;
             }
         }
     }

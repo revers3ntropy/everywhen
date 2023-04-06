@@ -7,9 +7,9 @@
     {#each words as [word, count], i}
         <div>#{i + 1}</div>
 
-        <a href="/stats/{word}">{word}</a>
+        <a href="/stats/{encodeURIComponent(word)}">{word}</a>
 
-        <div>{count}</div>
+        <b>{count}</b>
 
         <div>{(count / entryCount).toPrecision(3)} / entry</div>
 
@@ -33,6 +33,13 @@
         @media @mobile {
             margin: 10px 0;
             padding: 10px 2px;
+            grid-template-columns: 3rem 1fr 2rem 5rem;
+            a {
+                max-width: 9rem;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+            }
         }
 
         hr {
