@@ -47,6 +47,7 @@
             margin: 0.3em;
             position: sticky;
             top: 0.3em;
+            z-index: 4;
         }
 
         .entry-group {

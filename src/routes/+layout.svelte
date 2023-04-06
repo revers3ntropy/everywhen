@@ -148,6 +148,13 @@
 <svelte:head>
     <title>Halcyon.Land</title>
     <meta content="Halcyon.Land - Journal and Life Logging" name="description" />
+
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link crossorigin="anonymous" href="https://fonts.gstatic.com" rel="preconnect">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Quicksand&family=Dosis&family=Edu+NSW+ACT+Foundation:wght@500&family=Raleway:wght@300&display=swap"
+        rel="stylesheet"
+    >
 </svelte:head>
 
 <Notifications>

@@ -147,19 +147,25 @@
 </div>
 
 <style lang="less">
-    @import '../../styles/variables.less';
+    @import '../../styles/text';
+    @import '../../styles/variables';
 
     .entry {
         padding: .8em 0;
         margin: 0;
         height: fit-content;
         white-space: pre-wrap;
-
         border: 1px solid transparent;
+
+        &, * {
+            .font-dosis();
+            font-size: 1.15rem;
+        }
 
         &.visible {
             border-image: linear-gradient(transparent,
-            @accent-color-secondary, transparent) 1 100%;
+            @accent-color-secondary,
+            transparent) 1 100%;
         }
 
         @media @mobile {

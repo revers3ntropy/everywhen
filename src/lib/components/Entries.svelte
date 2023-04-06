@@ -146,13 +146,13 @@
                     {auth}
                 >
                     <div slot="title" class="entry-group-title">
-                        <h2>
+                        <h3>
                             <UtcTime
                                 timestamp={parseInt(day)}
                                 fmt="dddd, Do MMMM YYYY"
                                 noTooltip
                             />
-                        </h2>
+                        </h3>
                         <span class="text-light">
                             {#if utcEq(nowS(), parseInt(day))}
                                 <span>Today</span>
