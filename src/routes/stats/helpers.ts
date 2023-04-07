@@ -4,7 +4,7 @@ import { splitText } from '../../lib/utils/text';
 import type { PickOptionalAndMutable, Seconds } from '../../lib/utils/types';
 
 export type EntryWithWordCount =
-    PickOptionalAndMutable<Entry, 'entry' | 'decrypted'>
+    PickOptionalAndMutable<Entry, 'entry' | 'decrypted' | 'title'>
     & {
         wordCount: number
     };

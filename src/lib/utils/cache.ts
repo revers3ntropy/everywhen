@@ -1,3 +1,4 @@
+import type { MaybePromise } from '$app/forms';
 import type { RequestEvent, ServerLoadEvent } from '@sveltejs/kit';
 import chalk from 'chalk';
 import type { Auth } from '../controllers/user';
@@ -148,26 +149,28 @@ export function cachedApiRoute<
 export function cachedPageRoute<
     Params extends Partial<Record<string, string>>,
     ParentData extends Record<string, any>,
-    OutputData extends Record<string, any> | void,
+    OutputData extends Record<string, any>,
     RouteId extends string
 > (
     handler: (
         auth: Auth,
         event: ServerLoadEvent<Params, ParentData, RouteId>,
-    ) => Promise<OutputData>,
-): (event: ServerLoadEvent<Params, ParentData, RouteId>) => Promise<OutputData> {
-    return (async (props: ServerLoadEvent<Params, ParentData, RouteId>): Promise<OutputData> => {
+    ) => MaybePromise<OutputData>,
+    // doesn't actually return `OutputData & App.PageData`,
+    // but needs to act like it to satisfy the type checker with `svelte-check`
+): (event: ServerLoadEvent<Params, ParentData, RouteId>) => MaybePromise<OutputData & App.PageData> {
+    return (async (props: ServerLoadEvent<Params, ParentData, RouteId>): Promise<OutputData & App.PageData> => {
         const url = props.url.href;
         const auth = await getAuthFromCookies(props.cookies);
         const cached = getCachedResponse(url, auth.id);
         if (cached) {
-            return cached as OutputData;
+            return cached as OutputData & App.PageData;
         }
         // stringify and parse to turn into a plain object
         const response = JSON.parse(JSON.stringify(
             await handler(auth, props),
         )) as OutputData;
         cacheResponse(url, auth.id, response);
-        return response;
-    }) satisfies (event: ServerLoadEvent<Params, ParentData, RouteId>) => Promise<OutputData>;
+        return response as OutputData & App.PageData;
+    }) satisfies (event: ServerLoadEvent<Params, ParentData, RouteId>) => MaybePromise<OutputData & App.PageData>;
 }
