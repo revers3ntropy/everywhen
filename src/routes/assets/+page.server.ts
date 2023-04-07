@@ -9,7 +9,7 @@ export const load = cachedPageRoute(async (auth) => {
         err,
         val: assets,
     } = await Asset.allMetadata(query, auth);
-    if (err) return error(500, err);
+    if (err) throw error(500, err);
 
     return { assets };
 }) satisfies PageServerLoad;

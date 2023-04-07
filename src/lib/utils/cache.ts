@@ -1,4 +1,4 @@
-import type { HttpError, RequestEvent, ServerLoadEvent } from '@sveltejs/kit';
+import type { RequestEvent, ServerLoadEvent } from '@sveltejs/kit';
 import chalk from 'chalk';
 import type { Auth } from '../controllers/user';
 import { getAuthFromCookies } from '../security/getAuthFromCookies';
@@ -149,14 +149,14 @@ export function cachedPageRoute<
     Params extends Partial<Record<string, string>>,
     ParentData extends Record<string, any>,
     OutputData extends Record<string, any> | void,
-    RouteId extends string | null
+    RouteId extends string
 > (
     handler: (
         auth: Auth,
         event: ServerLoadEvent<Params, ParentData, RouteId>,
-    ) => Promise<HttpError | OutputData>,
-): (event: ServerLoadEvent<Params, ParentData, RouteId>) => Promise<HttpError | OutputData> {
-    return (async (props: ServerLoadEvent<Params, ParentData, RouteId>): Promise<HttpError | OutputData> => {
+    ) => Promise<OutputData>,
+): (event: ServerLoadEvent<Params, ParentData, RouteId>) => Promise<OutputData> {
+    return (async (props: ServerLoadEvent<Params, ParentData, RouteId>): Promise<OutputData> => {
         const url = props.url.href;
         const auth = await getAuthFromCookies(props.cookies);
         const cached = getCachedResponse(url, auth.id);
@@ -169,5 +169,5 @@ export function cachedPageRoute<
         )) as OutputData;
         cacheResponse(url, auth.id, response);
         return response;
-    }) satisfies (event: ServerLoadEvent<Params, ParentData, RouteId>) => Promise<HttpError | OutputData>;
+    }) satisfies (event: ServerLoadEvent<Params, ParentData, RouteId>) => Promise<OutputData>;
 }
