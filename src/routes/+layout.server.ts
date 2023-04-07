@@ -31,7 +31,8 @@ async function isAuthenticated (
     };
 }
 
-export const load = (async ({
+// leave as `: LayoutServerLoad` for type checking
+export const load: LayoutServerLoad = async ({
     cookies,
     url,
 }): Promise<App.PageData> => {
@@ -65,4 +66,4 @@ export const load = (async ({
             Settings.fillWithDefaults({}),
         )) as App.PageData['settings'],
     };
-}) satisfies LayoutServerLoad;
+};
