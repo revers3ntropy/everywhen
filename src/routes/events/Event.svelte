@@ -263,7 +263,6 @@
                 {#if Event.isInstantEvent(event)}
                     {#if obfuscated}
                         <div>
-                            <i>at</i>
                             <span>
                                 <UtcTime
                                     timestamp={event.start}
@@ -273,7 +272,6 @@
                         </div>
                     {:else}
                         <div>
-                            <i>at</i>
                             <input
                                 class="editable-text"
                                 on:change={updateStartAndEnd}
@@ -283,17 +281,20 @@
                             >
                         </div>
                         <button
-                            class="link"
+                            class="instant-duration-toggle"
                             on:click={makeDurationEvent}
                             use:tooltip={{ content: 'Give this event a duration' }}
                         >
                             <TimelineOutline size="30" />
+                            <span class="instant-duration-toggle-text">
+                                Make Duration Event
+                            </span>
                         </button>
                     {/if}
                 {:else}
                     {#if obfuscated}
                         <div>
-                            <i>from</i>
+                            from
                             <span>
                                 <UtcTime
                                     timestamp={event.start}
@@ -302,7 +303,7 @@
                             </span>
                         </div>
                         <div>
-                            <i>to</i>
+                            to
                             <span>
                                <UtcTime
                                    timestamp={event.end}
@@ -312,7 +313,7 @@
                         </div>
                     {:else}
                         <div>
-                            <i>from</i>
+                            from
                             <input
                                 class="editable-text"
                                 on:change={updateStart}
@@ -322,7 +323,7 @@
                             >
                         </div>
                         <div>
-                            <i>to</i>
+                            to
                             <input
                                 class="editable-text"
                                 on:change={updateEnd}
@@ -331,24 +332,25 @@
                                 value={fmtTimestampForInput(event.end)}
                             >
                         </div>
+                        <p>
+                            <i>
+                                ({fmtDuration(event.end - event.start)})
+                            </i>
+                        </p>
                         <div>
                             <button
-                                class="link"
+                                class="instant-duration-toggle"
                                 on:click={makeInstantEvent}
                                 use:tooltip={{ content: 'Make this event instantaneous' }}
                             >
                                 <TimelineClockOutline size="30" />
+                                <span class="instant-duration-toggle-text">
+                                    Make Instant Event
+                                </span>
                             </button>
                         </div>
                     {/if}
                 {/if}
-                <p>
-                    {#if !Event.isInstantEvent(event)}
-                        <i>
-                            ({fmtDuration(event.end - event.start)})
-                        </i>
-                    {/if}
-                </p>
             </div>
         {:else}
             <button
@@ -461,7 +463,6 @@
     }
 
     .from-to-menu {
-
         display: flex;
         flex-direction: row;
         justify-content: start;
@@ -470,6 +471,10 @@
 
         @media @mobile {
             display: block;
+
+            input[type="datetime-local"] {
+                margin: .5rem;
+            }
         }
 
         * {
@@ -492,5 +497,25 @@
     .label-and-open-container {
         .flex-center();
         justify-content: space-between;
+    }
+
+    .instant-duration-toggle {
+        @media @mobile {
+            .bordered();
+            border-radius: @border-radius;
+            display: grid;
+            grid-template-columns: 2rem 1fr;
+            padding: .5rem;
+            align-items: center;
+            margin: .5rem;
+        }
+
+        .instant-duration-toggle-text {
+            display: none;
+
+            @media @mobile {
+                display: inline;
+            }
+        }
     }
 </style>

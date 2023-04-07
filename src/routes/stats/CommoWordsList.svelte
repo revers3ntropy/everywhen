@@ -7,11 +7,18 @@
     {#each words as [word, count], i}
         <div>#{i + 1}</div>
 
-        <a href="/stats/{encodeURIComponent(word)}">{word}</a>
+        <a
+            href="/stats/{encodeURIComponent(word)}"
+            class="word"
+        >
+            {word}
+        </a>
 
-        <b>{count}</b>
+        <b class="count">{count}</b>
 
-        <div>{(count / entryCount).toPrecision(3)} / entry</div>
+        <div class="per-entry">
+            {(count / entryCount).toPrecision(3)} / entry
+        </div>
 
         {#if i < words.length - 1}
             <hr />
@@ -28,15 +35,22 @@
         grid-template-columns: 3rem 1fr 4rem 8rem;
         grid-row-gap: .3rem;
 
-        max-width: 700px;
-
         @media @mobile {
             margin: 10px 0;
             padding: 10px 2px;
-            grid-template-columns: 3rem 1fr 2rem 5rem;
+            grid-template-columns: 3rem 1fr 1fr;
+
+            .per-entry {
+                display: none;
+            }
+
+            .count {
+                text-align: right;
+                margin-right: 2rem;
+            }
         }
 
-        a {
+        .word {
             text-overflow: ellipsis;
             overflow: hidden;
             white-space: nowrap;

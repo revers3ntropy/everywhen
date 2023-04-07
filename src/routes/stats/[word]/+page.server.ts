@@ -15,7 +15,8 @@ export const load = cachedPageRoute(async (auth, { params }) => {
     const filteredEntries: EntryWithWordCount[] = [];
     let wordInstances = 0;
     let wordCount = 0;
-    let charCount = 0;
+
+    const totalEntries = entries.length;
 
     for (const entry of entries) {
         const entryAsWords = [
@@ -34,7 +35,6 @@ export const load = cachedPageRoute(async (auth, { params }) => {
         }
         wordInstances += instancesInEntry;
         wordCount += entryAsWords.length;
-        charCount += entry.entry.length;
 
         const e: EntryWithWordCount = entry as EntryWithWordCount;
         e.wordCount = instancesInEntry;
@@ -47,8 +47,8 @@ export const load = cachedPageRoute(async (auth, { params }) => {
     return {
         entries: filteredEntries,
         wordCount,
-        charCount,
         wordInstances,
         theWord,
+        totalEntries,
     };
 }) satisfies PageServerLoad;

@@ -419,8 +419,8 @@
                 margin: 0 0 .2rem .3em;
 
                 @media @mobile {
-                    width: calc(100vw - 60px);
-                    margin: 0.2em;
+                    width: calc(100vw - 70px);
+                    margin: 0.3em;
                     border-bottom: 1px solid @border-light;
                 }
             }

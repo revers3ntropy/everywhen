@@ -208,6 +208,14 @@
 
 
 <style lang="less">
+    @import '../../styles/variables';
+
+    @media @mobile {
+        main {
+            padding: 1rem;
+        }
+    }
+
     p {
         max-width: 500px;
     }

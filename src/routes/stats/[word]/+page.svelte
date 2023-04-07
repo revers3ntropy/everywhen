@@ -12,9 +12,9 @@
     export let data: App.PageData & {
         entries: EntryWithWordCount[],
         wordCount: number,
-        charCount: number,
         wordInstances: number,
         theWord: string,
+        totalEntries: number,
     };
 
     onMount(() => document.title = 'Analytics');
@@ -68,6 +68,15 @@
                     in
                     <span>{data.entries.length}</span>
                     entries
+                </div>
+                <div>
+                    <span>{(data.wordInstances / data.totalEntries).toFixed(1)}</span>
+                    / entry
+                </div>
+                <div>
+                    appears in
+                    <span>{(data.entries.length / data.totalEntries * 100).toFixed(1)}</span>
+                    % of entries
                 </div>
             </div>
         </section>

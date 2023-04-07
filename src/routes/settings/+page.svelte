@@ -82,7 +82,7 @@
 </main>
 
 <style lang="less">
-    @import '../../styles/layout.less';
+    @import '../../styles/layout';
 
     h1 {
         .flex-center();
@@ -91,6 +91,10 @@
 
         span {
             margin-left: 0.2em;
+        }
+
+        @media @mobile {
+            font-size: 30px;
         }
     }
 

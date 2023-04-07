@@ -108,7 +108,7 @@
     use:wheel={{ scrollable: !showingNavPopup }}
 />
 
-<header class="{showingNavPopup ? 'showing-dropdown' : ''}">
+<nav class="{showingNavPopup ? 'showing-dropdown' : ''}">
     <div class="menu-button-mobile">
         <button
             aria-label="Show nav menu"
@@ -266,13 +266,13 @@
             </a>
         </Dropdown>
     </div>
-</header>
+</nav>
 
 <style lang="less">
     @import '../styles/variables';
     @import '../styles/layout';
 
-    header {
+    nav {
         position: relative;
         width: 100%;
         display: flex;
@@ -280,7 +280,6 @@
         align-items: center;
         padding: 0;
         height: var(--nav-height);
-        background-color: @header-bg;
         z-index: 10;
 
         div {

@@ -43,56 +43,54 @@
     }
 </script>
 
-<main>
-    <div class="flex-center">
-        <div class="content">
-            <label>
-                Username
-                <input
-                    aria-label="Username"
-                    autocomplete="username"
-                    bind:value={username}
-                    disabled={actionPending}
-                    style="font-size: x-large"
-                />
-            </label>
-            <label>
-                Password
-                <input
-                    aria-label="Password"
-                    autocomplete="current-password"
-                    bind:value={password}
-                    disabled={actionPending}
-                    style="font-size: x-large"
-                    type="password"
-                />
-            </label>
-            <div class="flex-center" style="justify-content: space-between">
-                <button
-                    aria-label="Create Account"
-                    disabled={actionPending}
-                    on:click|preventDefault={create}
-                    type="button"
-                >
-                    Sign Up
-                </button>
-                <button
-                    aria-label="Log In"
-                    class="primary"
-                    disabled={actionPending}
-                    on:click|preventDefault={login}
-                    type="button"
-                >
-                    <ChevronRight size="30" />
-                    Log In
-                </button>
-            </div>
+<main class="flex-center">
+    <div class="content">
+        <label>
+            Username
+            <input
+                aria-label="Username"
+                autocomplete="username"
+                bind:value={username}
+                disabled={actionPending}
+                style="font-size: x-large"
+            />
+        </label>
+        <label>
+            Password
+            <input
+                aria-label="Password"
+                autocomplete="current-password"
+                bind:value={password}
+                disabled={actionPending}
+                style="font-size: x-large"
+                type="password"
+            />
+        </label>
+        <div class="flex-center" style="justify-content: space-between">
+            <button
+                aria-label="Create Account"
+                disabled={actionPending}
+                on:click|preventDefault={create}
+                type="button"
+            >
+                Sign Up
+            </button>
+            <button
+                aria-label="Log In"
+                class="primary"
+                disabled={actionPending}
+                on:click|preventDefault={login}
+                type="button"
+            >
+                <ChevronRight size="30" />
+                Log In
+            </button>
         </div>
     </div>
 </main>
 
 <style lang="less">
-    @import '../styles/layout.less';
+    @import '../styles/layout';
 
     main {
         .flex-center();

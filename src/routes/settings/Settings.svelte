@@ -88,10 +88,10 @@
 
             {#if created}
                 <p
-                    class="last-updated"
+                    class="last-updated hide-mobile"
                     use:tooltip={{
-                    content: fmtUtc(created, currentTzOffset(), 'DD/MM/YYYY h:mm A')
-                }}
+                        content: fmtUtc(created, currentTzOffset(), 'DD/MM/YYYY h:mm A')
+                    }}
                 >
                     Last updated
                     {fmtDuration(nowS() - created)}
@@ -99,7 +99,7 @@
                 </p>
             {/if}
             {#if value !== defaultValue}
-                <p class="restore">
+                <p class="restore hide-mobile">
                     <button on:click={() => updateValue(defaultValue)}>
                         Restore default ({JSON.stringify(defaultValue)})
                     </button>
@@ -137,11 +137,19 @@
 
         .left, .right {
             margin: 0.5em;
+
+            @media @mobile {
+                margin: 0;
+            }
         }
     }
 
     input {
         margin: 0 0 .5rem 0;
+
+        @media @mobile {
+            margin-top: 0.5rem;
+        }
 
         &:not([type="text"]) {
             cursor: pointer;
@@ -165,6 +173,10 @@
         flex-direction: row;
         margin: .1em 0;
 
+        @media @mobile {
+            flex-direction: column;
+        }
+
         & > * {
             padding: 0 1em;
             margin: .3em 0;
@@ -172,6 +184,12 @@
             text-align: center;
             display: grid;
             place-items: center;
+
+            @media @mobile {
+                display: block;
+                text-align: left;
+                border-right: none;
+            }
 
             &:last-child {
                 border-right: none;

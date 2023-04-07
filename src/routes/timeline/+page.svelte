@@ -62,7 +62,9 @@
     <!-- put the style here because the styles should all be global,
         however when switching pages the styles get leaked and cause
         weird issues (the bar chart not showing on the stats page) -->
-    <style>
+    <style lang="less">
+        @import '../../styles/variables';
+
         /*
             put the canvas behind everything,
             but filling the screen
@@ -80,6 +82,16 @@
 
         body {
             max-height: 100vw;
+        }
+
+        nav {
+            // make navbar visible when hovering to stop unexpected
+            // behaviour when hovering on navbar
+            transition: background-color @transition;
+
+            &:hover {
+                background-color: @header-bg;
+            }
         }
     </style>
 </svelte:head>

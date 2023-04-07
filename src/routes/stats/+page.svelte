@@ -3,7 +3,6 @@
     import { tooltip } from '@svelte-plugins/tooltips';
     import { onMount } from 'svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
-    import { round1DP } from '../../lib/utils/text';
     import CommonWordsList from './CommoWordsList.svelte';
     import EntryBarChart from './EntryBarChart.svelte';
     import EntryHeatMap from './EntryHeatMap.svelte';
@@ -75,7 +74,7 @@
                     characters
                 </div>
                 <div>
-                    <span>{round1DP(data.wordCount / (data.entryCount || 1))}</span>
+                    <span>{(data.wordCount / (data.entryCount || 1)).toFixed(1)}</span>
                     words / entry
                 </div>
                 <div
@@ -83,15 +82,15 @@
                         content: "The average English word is 4.7 letters long"
                     }}
                 >
-                    <span>{round1DP(data.charCount / (data.wordCount || 1))}</span>
+                    <span>{(data.charCount / (data.wordCount || 1)).toFixed(1)}</span>
                     letters / word
                 </div>
                 <div>
-                    <span>{round1DP(data.wordCount / data.days)}</span>
+                    <span>{(data.wordCount / data.days).toFixed(1)}</span>
                     words / day
                 </div>
                 <div>
-                    <span>{round1DP(data.entryCount / Math.max(data.days / 7, 1))}</span>
+                    <span>{(data.entryCount / Math.max(data.days / 7, 1)).toFixed(1)}</span>
                     entries / week
                 </div>
             </div>
