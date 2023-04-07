@@ -11,7 +11,7 @@ test.describe('/journal/deleted', () => {
         await page.goto('/', { waitUntil: 'networkidle' });
         const { api } = await generateUserAndSignIn(page);
         await page.goto('/journal/deleted', { waitUntil: 'networkidle' });
-        await expect(page).toHaveURL('/deleted');
+        await expect(page).toHaveURL('/journal/deleted');
         await expectDeleteUser(api, expect);
     });
 });

@@ -19,9 +19,6 @@ export type RawEntry =
     Omit<
         Entry, 'label'
                | 'decrypted'
-               | 'clone'
-               | 'removeLabel'
-               | 'updateLabel'
     > & {
         label?: string,
         decrypted: false

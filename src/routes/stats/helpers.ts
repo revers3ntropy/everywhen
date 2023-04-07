@@ -1,6 +1,13 @@
 import moment from 'moment';
+import type { Entry } from '../../lib/controllers/entry';
 import { splitText } from '../../lib/utils/text';
-import type { Seconds } from '../../lib/utils/types';
+import type { PickOptionalAndMutable, Seconds } from '../../lib/utils/types';
+
+export type EntryWithWordCount =
+    PickOptionalAndMutable<Entry, 'entry' | 'decrypted'>
+    & {
+        wordCount: number
+    };
 
 export enum By {
     Words,

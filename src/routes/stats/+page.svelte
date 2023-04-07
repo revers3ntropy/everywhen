@@ -3,18 +3,17 @@
     import { tooltip } from '@svelte-plugins/tooltips';
     import { onMount } from 'svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
-    import type { Entry } from '../../lib/controllers/entry';
     import { round1DP } from '../../lib/utils/text';
     import CommonWordsList from './CommoWordsList.svelte';
     import EntryBarChart from './EntryBarChart.svelte';
     import EntryHeatMap from './EntryHeatMap.svelte';
-    import { By } from './helpers';
+    import { By, type EntryWithWordCount } from './helpers';
     import SearchForWord from './SearchForWord.svelte';
 
     let by: By = By.Entries;
 
     export let data: App.PageData & {
-        entries: Entry[],
+        entries: EntryWithWordCount[],
         entryCount: number,
         wordCount: number,
         charCount: number,

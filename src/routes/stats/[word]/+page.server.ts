@@ -3,6 +3,7 @@ import { Entry } from '../../../lib/controllers/entry';
 import { query } from '../../../lib/db/mysql';
 import { cachedPageRoute } from '../../../lib/utils/cache';
 import { splitText } from '../../../lib/utils/text';
+import type { EntryWithWordCount } from '../helpers';
 import type { PageServerLoad } from './$types';
 
 export const load = cachedPageRoute(async (auth, { params }) => {
@@ -11,8 +12,7 @@ export const load = cachedPageRoute(async (auth, { params }) => {
 
     const theWord = params.word.toLowerCase();
 
-    const filteredEntries: (Entry & { instancesOfWord: number })[] = [];
-    const entriesForBarChart: Entry[] = [];
+    const filteredEntries: EntryWithWordCount[] = [];
     let wordInstances = 0;
     let wordCount = 0;
     let charCount = 0;
@@ -35,25 +35,19 @@ export const load = cachedPageRoute(async (auth, { params }) => {
         wordInstances += instancesInEntry;
         wordCount += entryAsWords.length;
         charCount += entry.entry.length;
-        filteredEntries.push({
-            ...entry,
-            instancesOfWord: instancesInEntry,
-        });
-        entriesForBarChart.push({
-            ...entry,
-            // just repeat something so that it looks like the word count
-            // is the same as the number of instances of the word,
-            // which is what you want to see in the bar chart
-            entry: 'a '.repeat(instancesInEntry),
-        });
+
+        const e: EntryWithWordCount = entry as EntryWithWordCount;
+        e.wordCount = instancesInEntry;
+        delete e.entry;
+        delete e.decrypted;
+        filteredEntries.push(e);
     }
 
     return {
-        entries: JSON.parse(JSON.stringify(filteredEntries)),
+        entries: filteredEntries,
         wordCount,
         charCount,
         wordInstances,
         theWord,
-        entriesForBarChart: JSON.parse(JSON.stringify(entriesForBarChart)),
     };
 }) satisfies PageServerLoad;

@@ -6,13 +6,11 @@
     import ToggleSwitch from 'svelte-material-icons/ToggleSwitch.svelte';
     import ToggleSwitchOff from 'svelte-material-icons/ToggleSwitchOff.svelte';
     import Select from '../../lib/components/Select.svelte';
-    import type { Entry } from '../../lib/controllers/entry';
-    import { splitText, wordCount } from '../../lib/utils/text';
     import { currentTzOffset, fmtUtc, nowS } from '../../lib/utils/time';
     import type { Seconds } from '../../lib/utils/types';
-    import { Bucket, bucketiseTime, bucketSize, By } from './helpers';
+    import { Bucket, bucketiseTime, bucketSize, By, type EntryWithWordCount } from './helpers';
 
-    export let entries: Entry[];
+    export let entries: EntryWithWordCount[];
     export let by: By;
 
     interface ChartData {
@@ -25,8 +23,6 @@
     let selectedBucket = Bucket.Week;
 
     let data: ChartData;
-    let filter = '';
-    let filterCaseSensitive = false;
 
     function toggleBy () {
         by = (by === By.Entries) ? By.Words : By.Entries;
@@ -58,38 +54,24 @@
 
 
     function getGraphData (
-        entries: Entry[],
+        entries: EntryWithWordCount[],
         selectedBucket: Bucket,
         by: By,
     ): ChartData {
-        let filteredWords = splitText(filter);
-        if (!filterCaseSensitive) {
-            filteredWords = filteredWords.map(w => w.toLowerCase());
-        }
 
-        const sortedFilteredEntries = entries
-            .filter(e => {
-                if (filter === '') {
-                    return true;
-                }
-                let words = splitText(e.entry);
-                if (!filterCaseSensitive) {
-                    words = words.map(w => w.toLowerCase());
-                }
-                return words.some(w => filteredWords.includes(w));
-            })
+        const sortedEntries = entries
             .sort((a, b) => a.created - b.created);
 
         const buckets: Record<string, number> = {};
-        const start = sortedFilteredEntries[0].created;
+        const start = sortedEntries[0].created;
         const end = nowS();
         for (let i = start; i < end; i += bucketSize(selectedBucket)) {
             buckets[bucketiseTime(i, selectedBucket).toString()] = 0;
         }
 
-        for (const entry of sortedFilteredEntries) {
+        for (const entry of sortedEntries) {
             const bucket = bucketiseTime(entry.created, selectedBucket);
-            buckets[bucket.toString()] += (by === By.Entries) ? 1 : wordCount(entry.entry);
+            buckets[bucket.toString()] += (by === By.Entries) ? 1 : entry.wordCount;
         }
 
         const labels = generateLabels(
@@ -109,12 +91,10 @@
         };
     }
 
-    function reloadChart (): void {
+    // no data fetching so top level
+    $: if (entries || by || selectedBucket) {
         data = getGraphData(entries, selectedBucket, by);
     }
-
-    // no data fetching so top level
-    $: [ entries, by, selectedBucket, reloadChart() ];
 </script>
 
 <Bar
@@ -148,10 +128,10 @@
         >
             {#if by === By.Entries}
                 <ToggleSwitch size="30" />
-                By Words
+                By Entries
             {:else}
                 <ToggleSwitchOff size="30" />
-                By Entries
+                By Words
             {/if}
         </button>
     </div>

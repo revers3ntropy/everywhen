@@ -2,8 +2,7 @@
     import { onMount } from 'svelte';
     import ArrowLeft from 'svelte-material-icons/ArrowLeft.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
-    import type { Entry } from '../../../lib/controllers/entry';
-    import { By } from '../helpers';
+    import { By, type EntryWithWordCount } from '../helpers';
     import SearchForWord from '../SearchForWord.svelte';
     import EntryBarChart from './../EntryBarChart.svelte';
     import EntryHeatMap from './../EntryHeatMap.svelte';
@@ -11,8 +10,7 @@
     let by: By = By.Words;
 
     export let data: App.PageData & {
-        entries: (Entry & { instancesOfWord: number })[],
-        entriesForBarChart: Entry[],
+        entries: EntryWithWordCount[],
         wordCount: number,
         charCount: number,
         wordInstances: number,
@@ -79,7 +77,7 @@
                 <EntryHeatMap {by} entries={data.entries} />
             </div>
             <div class="entry-bar-chart-wrapper container">
-                <EntryBarChart {by} entries={data.entriesForBarChart} />
+                <EntryBarChart {by} entries={data.entries} />
             </div>
         </section>
     {/if}

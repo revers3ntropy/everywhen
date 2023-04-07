@@ -160,7 +160,7 @@
             href="/stats"
         >
             <Counter size="40" />
-            <span class="name">Stats</span>
+            <span class="name">Analytics</span>
         </a>
     </div>
 

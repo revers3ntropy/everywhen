@@ -2,11 +2,9 @@
     import moment from 'moment';
     // @ts-ignore
     import SvelteHeatmap from 'svelte-heatmap';
-    import type { Entry } from '../../lib/controllers/entry';
-    import { wordCount } from '../../lib/utils/text';
-    import { By } from './helpers';
+    import { By, type EntryWithWordCount } from './helpers';
 
-    export let entries: Entry[];
+    export let entries: EntryWithWordCount[];
     export let by: By;
     let data: { date: Date, value: number }[] = [];
 
@@ -16,7 +14,7 @@
                 date: new Date(entry.created * 1000),
                 value: by === By.Entries
                     ? 1
-                    : wordCount(entry.entry),
+                    : entry.wordCount,
             };
         });
     }
@@ -60,7 +58,7 @@
 </div>
 
 <style lang="less">
-    @import "../../styles/variables.less";
+    @import "../../styles/variables";
 
     @media @mobile {
         .outer {

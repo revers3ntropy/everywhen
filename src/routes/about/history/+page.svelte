@@ -5,7 +5,7 @@
 <main class="flex-center">
     <div>
         <h1>Version History</h1>
-        <i>Currently {version}</i>
+        <i>Currently {version}, working towards version 0.4</i>
         <section>
             <h2>0.4</h2>
             <ul>
@@ -70,7 +70,7 @@
                 <li>Instant/Duration events</li>
                 <li>Create events</li>
                 <li>Upload images</li>
-                <li>Stats page</li>
+                <li>Stats (Analytics) page</li>
                 <li>Search entries</li>
                 <li>Filter entries by label</li>
                 <li>Blur entries</li>
