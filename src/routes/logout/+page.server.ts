@@ -6,7 +6,7 @@ import {
 } from '../../lib/constants';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ cookies }) => {
+export const load = (async ({ cookies }) => {
     cookies.set(KEY_COOKIE_KEY, '', KEY_COOKIE_OPTIONS);
     cookies.set(USERNAME_COOKIE_KEY, '', USERNAME_COOKIE_OPTIONS);
 
@@ -15,4 +15,5 @@ export const load: PageServerLoad = async ({ cookies }) => {
     // even with `status: 303` (no cache)
     // throw redirect(303, '/');
     // instead allow the page to load and redirect in the browser
-};
+    return {};
+}) satisfies PageServerLoad;
