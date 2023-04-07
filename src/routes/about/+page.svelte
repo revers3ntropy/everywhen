@@ -1,7 +1,9 @@
 <script lang="ts">
     import ContentCopy from 'svelte-material-icons/ContentCopy.svelte';
+    import ImageArea from 'svelte-material-icons/ImageArea.svelte';
     import NoteEditOutline from 'svelte-material-icons/NoteEditOutline.svelte';
     import OpenInNew from 'svelte-material-icons/OpenInNew.svelte';
+    import { API_DOCS_LINK } from '../../lib/constants';
 </script>
 
 <main class="flex-center">
@@ -66,8 +68,6 @@
 
         <p>
             Record your entries in the <a href="/journal">journal</a>.
-            You can insert images into entries by dragging and dropping them
-            into the entry.
             Each entry stores a title, a body, a label, a timestamp and
             optionally your location when writing it.
         </p>
@@ -89,8 +89,11 @@
             You can write in MarkDown/HTML in your entries. For example
             <code>**bold**</code> or
             <code>&lt;b>bold&lt;/b></code>.
-            The HTML is sanitized before being shown,
-            so you can't use it to inject javascript.
+            The HTML is sanitized before being shown.
+            You can insert images into entries by dragging and dropping them
+            into the entry, or clicking
+            <ImageArea />
+            .
         </p>
 
         <h2>Events</h2>
@@ -113,11 +116,11 @@
             Both your entries and events are displayed on the timeline.
             Instant events appear as 'pins', while duration events appear as
             'bars'.
-            The colour represents the label of the event.
+            The colour of the event represents its label.
         </p>
         <p>
             Entries appear in the timeline as grey bars hanging down from the
-            center horizontal line like stalactites.
+            center horizontal line.
             The height of the bar represents the number of words in the entry.
         </p>
         <p>
@@ -131,7 +134,7 @@
             cursor which shows the date and time at that point on the timeline.
         </p>
         <p>
-            You can set the start date of the timeline in
+            You can set the starting year of the timeline in
             <a href="/settings">settings</a>.
         </p>
 
@@ -144,9 +147,9 @@
             (or <code>cmd + s</code> on Mac).
             By default the backup is encrypted, meaning you can only recover it
             with the password of the account it was created with.
-            You can also download an unencrypted backup, which can be recovered
-            by anyone, but can also be recovered from if you lose your
-            password.
+            You can also download an unencrypted backup from settings,
+            which can be recovered by anyone, but can also be recovered from
+            if you lose your password.
         </p>
         <p>
             Recover from a backup file from the
@@ -186,6 +189,19 @@
             <ContentCopy />
             button will copy the markdown to link to the image to your
             clipboard.
+        </p>
+
+        <h2>API</h2>
+
+        <p>
+            The docs to the public API can be found on
+            <a
+                aria-label="Link to API docs"
+                href="{API_DOCS_LINK}"
+                rel="noreferrer"
+                target="_blank"
+            >this</a>
+            Google Sheets.
         </p>
     </section>
 </main>
