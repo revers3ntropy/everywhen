@@ -4,9 +4,11 @@
 
     onMount(() => {
         document.title = 'Log out';
-        localStorage.removeItem(LS_KEY.newEntryTitle);
-        localStorage.removeItem(LS_KEY.newEntryBody);
-        localStorage.removeItem(LS_KEY.newEntryLabel);
+
+        for (let key in LS_KEY) {
+            localStorage.removeItem(LS_KEY[key as keyof typeof LS_KEY]);
+        }
+
         location.assign('/');
     });
 

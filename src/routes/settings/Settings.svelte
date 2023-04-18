@@ -129,7 +129,7 @@
     .wrapper {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        padding: .5em;
+        padding: 1em 0.5em;
 
         @media @mobile {
             display: block;

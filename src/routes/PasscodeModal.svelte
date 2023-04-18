@@ -79,6 +79,10 @@
 
         .content {
             text-align: center;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(30px);
+            padding: 1rem 2rem 2rem 2rem;
+            border-radius: @border-radius;
 
             .password-input {
                 -webkit-text-security: disc;

@@ -8,6 +8,9 @@ export const LS_KEY = {
     newEntryBody: '__misc_3_newEntryBody',
     newEntryTitle: '__misc_3_newEntryTitle',
     newEntryLabel: '__misc_3_newEntryLabel',
+    passcodeLastEntered: '__misc_3_passcode_last_entered',
+    enabledLocation: '__misc_3_enabled_location',
+    sortEventsKey: '__misc_3_events_sort_key',
 };
 
 // possible characters to show when the text is blurred

@@ -275,10 +275,12 @@ export class Event {
         start: TimestampSecs,
     ): Promise<Result<Event>> {
         if (start > self.end) {
-            return Result.err('Start time cannot be after end time');
-        }
-        if (start < 0) {
-            return Result.err('Start time cannot be negative');
+            const { err } = await Event.updateEnd(query, auth, self,
+                // If trying to update start to be after end,
+                // update end to be 1 hour after start
+                start + 60 * 60,
+            );
+            if (err) return Result.err(err);
         }
         self.start = start;
         await query`
@@ -297,10 +299,12 @@ export class Event {
         end: TimestampSecs,
     ): Promise<Result<Event>> {
         if (end < self.start) {
-            return Result.err('End time cannot be before start time');
-        }
-        if (end < 0) {
-            return Result.err('End time cannot be negative');
+            const { err } = await Event.updateStart(query, auth, self,
+                // If trying to update end to be before start,
+                // update start to be 1 hour before end
+                end - 60 * 60,
+            );
+            if (err) return Result.err(err);
         }
         self.end = end;
         await query`
@@ -321,12 +325,6 @@ export class Event {
     ): Promise<Result<Event>> {
         if (start > end) {
             return Result.err('Start time cannot be after end time');
-        }
-        if (start < 0) {
-            return Result.err('Start time cannot be negative');
-        }
-        if (end < 0) {
-            return Result.err('End time cannot be negative');
         }
         self.start = start;
         self.end = end;

@@ -24,7 +24,7 @@
             journal / life logging app.
             It's a place to record your thoughts, feelings, and experiences.
             It's a place to keep track of your life, and
-            <i>invoke a feeling of halcyon</i>.
+            invoke a feeling of 'halcyon days'.
         </p>
         <p>
             Please note that this is a work in progress,
@@ -49,8 +49,13 @@
             entries.
         </p>
         <p>
-            However this security comes with a compromise.
-            If you lose your password, there is no way to recover your data.
+            However this security comes with a compromise:
+
+        </p>
+        <p>
+            <b>If you lose your password, there is no way to recover your data!</b>
+        </p>
+        <p>
             I would recommend using a password manager to generate a strong
             password, and storing it somewhere safe.
             You can then set a passcode as an additional layer of security
@@ -201,6 +206,7 @@
                 rel="noreferrer"
                 target="_blank"
             >this</a>
+            <OpenInNew size="12" />
             Google Sheets.
         </p>
     </section>
@@ -217,6 +223,6 @@
     }
 
     p {
-        max-width: 500px;
+        max-width: 600px;
     }
 </style>

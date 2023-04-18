@@ -171,4 +171,13 @@
             border: none;
         }
     }
+
+
+    .the-word-with-quotes {
+        max-width: calc(100vw - 400px);
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
 </style>

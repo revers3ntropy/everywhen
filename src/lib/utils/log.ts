@@ -6,11 +6,11 @@ import { removeAnsi } from './text';
 // to make log lines line up
 let maxLogNameLen = 0;
 
-export interface Logger {
+export interface Logger<HasFile extends boolean> {
     log: (...args: unknown[]) => void,
     warn: (...args: unknown[]) => void,
     error: (...args: unknown[]) => void,
-    logToFile: (...args: unknown[]) => Promise<void>,
+    logToFile: HasFile extends true ? (...args: unknown[]) => Promise<void> : never,
 }
 
 function fmt (
@@ -29,21 +29,31 @@ function fmt (
     }).join(' ');
 }
 
-export function makeLogger (
+export function makeLogger<File extends boolean> (
     name: string,
     colour: ChalkInstance = chalk.bold,
-    file: string | null = null,
-): Logger {
+    file: File extends true ? string : null = null as File extends true ? string : null,
+): Logger<File> {
     if (name.length > maxLogNameLen) {
         maxLogNameLen = name.length;
     }
     const colouredName = colour(name);
-    let fileHandle: Promise<FileHandle> | null = null;
+
+    let fileHandle: FileHandle | null = null;
+    let waitForFileHandle = file ? new Promise<void>(resolve => {
+        const interval = setInterval(() => {
+            if (fileHandle) {
+                clearInterval(interval);
+                resolve();
+            }
+        }, 50);
+    }) : null;
+
     if (!browser && file) {
         // allow it to be used client and server side
-        fileHandle = import('fs')
-            .then(fs => {
-                return fs.promises.open(file, 'a');
+        import('fs')
+            .then(async fs => {
+                fileHandle = await fs.promises.open(file, 'a');
             });
     }
     const self = {
@@ -56,14 +66,20 @@ export function makeLogger (
         error: (...args: unknown[]) => {
             console.error(fmt(name.length, colouredName, ...args));
         },
-        logToFile: async (...args: unknown[]) => {
+        logToFile: (async (...args) => {
             self.log(...args);
+
+            if (!browser && !fileHandle) {
+                await waitForFileHandle;
+            }
+
             if (browser || !fileHandle) {
                 return;
             }
-            const line = removeAnsi(fmt(name.length, name, ...args)) + '\n';
-            await fileHandle.then(handle => handle.write(line));
-        },
+            await fileHandle.write(
+                removeAnsi(fmt(name.length, name, ...args)) + '\n',
+            );
+        }) as File extends true ? (...args: unknown[]) => Promise<void> : never,
     };
     self.logToFile('SETUP');
     return self;

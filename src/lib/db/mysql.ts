@@ -48,6 +48,18 @@ export type QueryFunc = <Res extends queryRes = mysql.RowDataPacket[]>(
     ...params: (string | number | null | boolean)[]
 ) => Promise<Res>;
 
+function logQuery (query: string, params: any[]) {
+    params = params.map((p) => {
+        if (typeof p === 'string') {
+            return `String(${p.length})`;
+        } else {
+            return JSON.stringify(p);
+        }
+    });
+
+    dbLogger.log(`\`${query.trim()}\`\n     [${params.join(', ')}]`);
+}
+
 export async function query<Res extends queryRes = mysql.RowDataPacket[]> (
     queryParts: TemplateStringsArray,
     ...params: any[]
@@ -71,7 +83,7 @@ export async function query<Res extends queryRes = mysql.RowDataPacket[]> (
         }
     }, '');
 
-    dbLogger.log(`${query.trim()}\n ${JSON.stringify(params)}`);
+    logQuery(query, params);
 
     // if it's an array, add all the elements of the array in place as params
     // Flatten 2D arrays

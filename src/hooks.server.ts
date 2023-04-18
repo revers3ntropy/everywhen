@@ -16,8 +16,17 @@ setInterval(async () => {
 
 setInterval(cleanupCache, 1000 * 60);
 
-process.on('SIGINT', process.exit);
-process.on('SIGTERM', process.exit);
+async function exitHandler (code: number) {
+    await errorLogger.logToFile(`Exited with code ${code}`);
+    process.exit();
+}
+
+process.on('exit', exitHandler);
+process.on('SIGINT', exitHandler);
+process.on('SIGTERM', exitHandler);
+process.on('SIGUSR1', exitHandler);
+process.on('SIGUSR2', exitHandler);
+process.on('uncaughtException', exitHandler);
 
 export const handle = (async ({ event, resolve }) => {
     const start = performance.now();

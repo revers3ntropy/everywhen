@@ -282,6 +282,12 @@
         labels = labelsRes.labels;
     }
 
+    function handleEntryInputKeydown (event: KeyboardEvent) {
+        if (event.key !== 'Tab') return;
+        event.preventDefault();
+        insertAtCursor(newEntryInputElement, '\t');
+    }
+
     onMount(async () => {
         await Promise.all([
             loadLabels(),
@@ -363,6 +369,7 @@
             <textarea
                 bind:this={newEntryInputElement}
                 bind:value={newEntryBody}
+                on:keydown={handleEntryInputKeydown}
                 placeholder="Entry"
                 disabled={submitted}
             ></textarea>

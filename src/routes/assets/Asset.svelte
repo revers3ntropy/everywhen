@@ -102,6 +102,7 @@
                 <UtcTime
                     timestamp={created}
                     fmt="MMMM Do YYYY, h:mma"
+                    tooltipPosition="bottom"
                 />
             {/if}
         </div>
