@@ -2,7 +2,6 @@
     import { CanvasState, renderable, START_ZOOM } from '../../lib/canvas/canvasHelpers';
     import type { Label } from '../../lib/controllers/label';
     import { obfuscated } from '../../lib/stores';
-    import { isLightColour } from './utils';
 
     const HEIGHT = 30;
     const LABEL_HEIGHT = 4;
@@ -44,6 +43,16 @@
         } else {
             state.rect(
                 x,
+                y,
+                width,
+                HEIGHT,
+                {
+                    colour: '#333',
+                    radius: 5,
+                },
+            );
+            state.rect(
+                x,
                 y + HEIGHT - LABEL_HEIGHT,
                 width,
                 LABEL_HEIGHT,
@@ -52,9 +61,6 @@
         }
 
         let textColour = '#fff';
-        if (isLightColour(colour)) {
-            textColour = '#000';
-        }
 
         if (x + width <= 0) {
             // not on screen
