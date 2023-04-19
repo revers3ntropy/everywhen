@@ -45,8 +45,8 @@ export class Entry {
         public readonly created: TimestampSecs,
         public readonly createdTZOffset: Hours,
         public readonly deleted: boolean,
-        public readonly latitude?: number,
-        public readonly longitude?: number,
+        public readonly latitude: number | null,
+        public readonly longitude: number | null,
     ) {
     }
 
@@ -199,6 +199,8 @@ export class Entry {
             rawEntry.created,
             rawEntry.createdTZOffset,
             rawEntry.deleted,
+            rawEntry.latitude,
+            rawEntry.longitude,
         );
 
         if (rawEntry.label) {
@@ -373,6 +375,8 @@ export class Entry {
             json.created,
             json.createdTZOffset,
             !!json.deleted,
+            json.latitude,
+            json.longitude,
         );
 
         entry.edits = await Promise.all(
@@ -384,6 +388,8 @@ export class Entry {
                     e.created,
                     e.createdTZOffset,
                     false,
+                    e.latitude,
+                    e.longitude,
                 )) ?? [],
         );
 

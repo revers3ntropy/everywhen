@@ -67,8 +67,8 @@ export const POST = (async ({ request, cookies }) => {
     const { val: entry, err } = await Entry.create(
         query, auth, {
             ...body,
-            latitude: body.latitude || undefined,
-            longitude: body.longitude || undefined,
+            latitude: body.latitude || null,
+            longitude: body.longitude || null,
             createdTZOffset: body.timezoneUtcOffset,
         },
     );

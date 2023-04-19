@@ -11,8 +11,6 @@
         redirect: string
     };
 
-    console.log(data.redirect);
-
     // user log in / create account form values
     let password = '';
     let username = '';

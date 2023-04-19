@@ -134,7 +134,21 @@ export async function makeApiReq<
     );
 
     try {
-        return Result.err(await response.text());
+        const resTxt = await response.text();
+        try {
+            const res: any = JSON.parse(resTxt);
+            if (typeof res === 'object' && res !== null) {
+                if (res.error) {
+                    return Result.err(res.error);
+                }
+                if (res.message) {
+                    return Result.err(res.message);
+                }
+            }
+        } catch (e) {
+            // ignore
+        }
+        return Result.err(resTxt);
     } catch (e) {
         return Result.err('An unknown error has occurred');
     }

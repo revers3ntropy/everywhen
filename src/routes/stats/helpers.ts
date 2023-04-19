@@ -6,7 +6,7 @@ import type { PickOptionalAndMutable, Seconds } from '../../lib/utils/types';
 export type EntryWithWordCount =
     PickOptionalAndMutable<Entry, 'entry' | 'decrypted' | 'title'>
     & {
-        wordCount: number
+        wordCount: number,
     };
 
 export enum By {

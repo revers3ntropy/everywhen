@@ -3,6 +3,7 @@
     import { tooltip } from '@svelte-plugins/tooltips';
     import { onMount } from 'svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
+    import Map from '../../lib/components/map/Map.svelte';
     import CommonWordsList from './CommoWordsList.svelte';
     import EntryBarChart from './EntryBarChart.svelte';
     import EntryHeatMap from './EntryHeatMap.svelte';
@@ -105,6 +106,10 @@
                     <EntryBarChart {by} entries={data.entries} />
                 </div>
             {/if}
+        </section>
+
+        <section>
+            <Map entries={data.entries} auth={data} />
         </section>
 
         <section class="container">

@@ -9,6 +9,7 @@
 	import { obfuscate } from '../utils/text';
 	import { nowS, utcEq } from '../utils/time';
 	import EntryDialog from './dialogs/EntryDialog.svelte';
+	import Dot from './Dot.svelte';
 	import UtcTime from './UtcTime.svelte';
 
 	export let titles: Record<number, Entry[]>;
@@ -52,9 +53,7 @@
 					noTooltip={true}
 				/>
 				{#if showTimeAgo}
-					<span class="dot-separator">
-						&#x2022;
-					</span>
+					<Dot />
 					<span class="text-light">
 						{#if utcEq(nowS(), parseInt(day))}
 							<span>Today</span>

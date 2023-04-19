@@ -5,6 +5,7 @@
     import type { Entry as EntryController } from '../../lib/controllers/entry';
     import type { Auth } from '../controllers/user';
     import { nowS, utcEq } from '../utils/time';
+    import Dot from './Dot.svelte';
     import UtcTime from './UtcTime.svelte';
 
     export let obfuscated = true;
@@ -39,9 +40,7 @@
 
                     {#if collapsed}
                         <p class="entry-count">
-                            <span class="dot-separator">
-                                &#x2022;
-                            </span>
+                            <Dot />
                             {entries.length} entries
                         </p>
                     {/if}
