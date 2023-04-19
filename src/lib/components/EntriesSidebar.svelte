@@ -75,7 +75,7 @@
         min-width: @width;
         height: 100%;
         background-color: @header-bg;
-        z-index: 100;
+        z-index: 10;
         border-right: 2px solid @border-heavy;
         overflow-y: scroll;
         padding: 0;

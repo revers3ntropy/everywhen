@@ -14,7 +14,7 @@ export type queryRes =
     | mysql.ResultSetHeader
     | Record<string, any>[];
 
-const dbLogger = makeLogger('DB', chalk.yellow, 'db.log');
+const dbLogger = makeLogger('DB', chalk.yellow, 'general.log');
 
 export let dbConnection: mysql.Connection | null = null;
 

@@ -6,19 +6,20 @@ import { removeAnsi } from './text';
 // to make log lines line up
 let maxLogNameLen = 0;
 
-export interface Logger<HasFile extends boolean> {
+export interface Logger<HasFile extends string | null> {
     log: (...args: unknown[]) => void,
     warn: (...args: unknown[]) => void,
     error: (...args: unknown[]) => void,
-    logToFile: HasFile extends true ? (...args: unknown[]) => Promise<void> : never,
+    logToFile: HasFile extends string ? (...args: unknown[]) => Promise<void> : never,
 }
 
 function fmt (
+    useUTC: boolean,
     nameLength: number,
     name: string,
     ...args: unknown[]
 ): string {
-    const time = chalk.dim(new Date().toLocaleTimeString());
+    const time = chalk.dim(new Date()[useUTC ? 'toUTCString' : 'toLocaleTimeString']());
     const padding = ' '.repeat((maxLogNameLen - nameLength) || 0);
     return `${time} [${name}] ` + padding + args.map((arg) => {
         if (typeof arg === 'object') {
@@ -29,10 +30,10 @@ function fmt (
     }).join(' ');
 }
 
-export function makeLogger<File extends boolean> (
+export function makeLogger<File extends string | null> (
     name: string,
     colour: ChalkInstance = chalk.bold,
-    file: File extends true ? string : null = null as File extends true ? string : null,
+    file: File,
 ): Logger<File> {
     if (name.length > maxLogNameLen) {
         maxLogNameLen = name.length;
@@ -58,13 +59,13 @@ export function makeLogger<File extends boolean> (
     }
     const self = {
         log: (...args: unknown[]) => {
-            console.log(fmt(name.length, colouredName, ...args));
+            console.log(fmt(false, name.length, colouredName, ...args));
         },
         warn: (...args: unknown[]) => {
-            console.warn(fmt(name.length, colouredName, ...args));
+            console.warn(fmt(false, name.length, colouredName, ...args));
         },
         error: (...args: unknown[]) => {
-            console.error(fmt(name.length, colouredName, ...args));
+            console.error(fmt(false, name.length, colouredName, ...args));
         },
         logToFile: (async (...args) => {
             self.log(...args);
@@ -77,12 +78,12 @@ export function makeLogger<File extends boolean> (
                 return;
             }
             await fileHandle.write(
-                removeAnsi(fmt(name.length, name, ...args)) + '\n',
+                removeAnsi(fmt(true, name.length, name, ...args)) + '\n',
             );
-        }) as File extends true ? (...args: unknown[]) => Promise<void> : never,
+        }) as File extends string ? (...args: unknown[]) => Promise<void> : never,
     };
     self.logToFile('SETUP');
     return self;
 }
 
-export const debugLogger = makeLogger('DEBUG', chalk.cyanBright, 'debug.log');
+export const debugLogger = makeLogger('DEBUG', chalk.cyanBright, 'general.log');

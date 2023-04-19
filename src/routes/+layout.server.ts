@@ -19,10 +19,8 @@ async function isAuthenticated (
     }
 
     const { err, val: settings } = await Settings.allAsMap(query, auth);
-    if (err) {
-        console.error(err);
-        throw err;
-    }
+    if (err) throw err;
+
     return {
         ...auth,
         settings: JSON.parse(JSON.stringify(
@@ -54,7 +52,7 @@ export const load: LayoutServerLoad = async ({
     }
 
     if (!home && requireAuth) {
-        throw redirect(307, '/');
+        throw redirect(307, '/?redirect=' + url.pathname.trim().slice(1));
     }
 
     // on home page and not logged in

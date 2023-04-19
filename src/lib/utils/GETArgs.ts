@@ -1,7 +1,16 @@
-export function GETArgs (args: Record<string, any>): string {
+export function serializeGETArgs (args: Record<string, any>): string {
     return '?' + Object.keys(args)
                        .map((key) => `${key}=${args[key]}`)
                        .join('&');
+}
+
+export function getGETArgs (): Record<string, string> {
+    const args: Record<string, any> = {};
+    const searchParams = new URLSearchParams(location.search);
+    searchParams.forEach((value, key) => {
+        args[key] = value;
+    });
+    return args;
 }
 
 export function GETParamIsTruthy (val: string | null = null): boolean {

@@ -4,6 +4,8 @@
     import type { Label } from '../../lib/controllers/label';
     import { obfuscated } from '../../lib/stores';
 
+    const WIDTH = 4;
+
     export let id: string;
     export let created: number;
     export let title: string;
@@ -21,10 +23,16 @@
 
         const size = 0.1 * wordCount + 20;
 
-        state.rect(renderPos, state.centerLnY(), 5, size, {
+        state.rect(renderPos - WIDTH / 2, state.centerLnY(), WIDTH, size, {
             radius: 2,
             colour: 'rgb(100, 100, 100)',
         });
+
+        if (label) {
+            state.rect(renderPos - WIDTH / 2, state.centerLnY() + size - 1, WIDTH, 2, {
+                colour: label.colour,
+            });
+        }
 
         if (state.zoom > START_ZOOM * 2 && !$obfuscated) {
             let y = state.centerLnY();

@@ -9,8 +9,7 @@ import { fmtBytes } from './text';
 import { nowS } from './time';
 import type { Bytes, Seconds } from './types';
 
-const cacheLogger = makeLogger('CACHE', chalk.magentaBright, 'cache.log');
-cacheLogger.logToFile('Initialised');
+const cacheLogger = makeLogger('CACHE', chalk.magentaBright, 'general.log');
 
 const cache: Record<string, Record<string, unknown>> = {};
 const cacheLastUsed: Record<string, number> = {};

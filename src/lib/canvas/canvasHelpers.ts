@@ -2,7 +2,7 @@ import { browser } from '$app/environment';
 import { getContext, onMount } from 'svelte';
 import { writable } from 'svelte/store';
 import { nowS } from '../utils/time';
-import type { TimestampSecs } from "../utils/types";
+import type { TimestampSecs } from '../utils/types';
 
 export const START_ZOOM = 1 / (60 * 60);
 
@@ -118,7 +118,7 @@ export class CanvasState implements ICanvasListeners {
         date = 1,
         hour = 0,
         minute = 0,
-        second = 0
+        second = 0,
     ): number {
         const t = new Date(year, month, date, hour, minute, second).getTime() / 1000;
         return this.timeToRenderPos(t);
@@ -131,7 +131,7 @@ export class CanvasState implements ICanvasListeners {
             nowS()
             - pos
             + this.cameraOffset
-            + new Date().getTimezoneOffset() * 60
+            + new Date().getTimezoneOffset() * 60,
         );
     }
 
@@ -216,7 +216,9 @@ export class CanvasState implements ICanvasListeners {
         x: number,
         y: number,
         r: number,
-        colour = CanvasState.c_Primary,
+        {
+            colour = CanvasState.c_Primary,
+        } = {},
     ) {
         if (!this.ctx) throw new Error('Canvas not set');
         this.ctx.beginPath();

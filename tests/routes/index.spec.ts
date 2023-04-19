@@ -41,6 +41,8 @@ test.describe('/', () => {
         await expect(page).toHaveURL('/');
 
         await page.goto('/home', { waitUntil: 'networkidle' });
+        await expect(page).toHaveURL('/?redirect=home');
+        await page.goto('/', { waitUntil: 'networkidle' });
         await expect(page).toHaveURL('/');
 
         // inputs are erased when checking that we can't go to /home
@@ -83,7 +85,7 @@ test.describe('/', () => {
 
         // account doesn't exist and wil be redirected if try to log in
         await page.goto('/home', { waitUntil: 'networkidle' });
-        await expect(page).toHaveURL('/');
+        await expect(page).toHaveURL('/?redirect=home');
     });
 
     test('Can log into account', async ({ page }) => {
@@ -101,7 +103,7 @@ test.describe('/', () => {
         expect(err).toBe(null);
 
         await page.goto('/home', { waitUntil: 'networkidle' });
-        await expect(page).toHaveURL('/');
+        await expect(page).toHaveURL('/?redirect=home');
     });
 });
 

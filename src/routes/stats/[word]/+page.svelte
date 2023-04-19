@@ -2,6 +2,7 @@
     import { onMount } from 'svelte';
     import ArrowLeft from 'svelte-material-icons/ArrowLeft.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
+    import Entries from '../../../lib/components/Entries.svelte';
     import { By, type EntryWithWordCount } from '../helpers';
     import SearchForWord from '../SearchForWord.svelte';
     import EntryBarChart from './../EntryBarChart.svelte';
@@ -90,6 +91,14 @@
             </div>
         </section>
     {/if}
+
+    <section>
+        <Entries
+            auth={data}
+            options={{ search: data.theWord }}
+            pageSize={data.settings.entriesPerPage.value}
+        />
+    </section>
 </main>
 
 <style lang="less">

@@ -12,11 +12,9 @@
     import { api } from '../utils/apiRequest';
     import { displayNotifOnErr } from '../utils/notifications';
     import { showPopup } from '../utils/popups';
-    import { nowS, utcEq } from '../utils/time';
     import Spinner from './BookSpinner.svelte';
     import ImportDialog from './dialogs/ImportDialog.svelte';
     import Sidebar from './EntriesSidebar.svelte';
-    import UtcTime from './UtcTime.svelte';
 
     const { addNotification } = getNotificationsContext();
 
@@ -144,28 +142,8 @@
                     obfuscated={$obfuscated}
                     {showLabels}
                     {auth}
+                    day={parseInt(day)}
                 >
-                    <div slot="title" class="entry-group-title">
-                        <h3>
-                            <UtcTime
-                                timestamp={parseInt(day)}
-                                fmt="dddd, Do MMMM YYYY"
-                                noTooltip
-                            />
-                        </h3>
-                        <span class="text-light">
-                            {#if utcEq(nowS(), parseInt(day))}
-                                <span>Today</span>
-                            {:else if utcEq(nowS() - 60 * 60 * 24, parseInt(day))}
-                                <span>Yesterday</span>
-                            {:else}
-                                <UtcTime
-                                    relative
-                                    timestamp={parseInt(day)}
-                                />
-                            {/if}
-                        </span>
-                    </div>
                 </EntryGroup>
             {/each}
         {/if}
@@ -173,13 +151,7 @@
 </div>
 
 <style lang="less">
-    @import '../../styles/variables.less';
-
-    .entry-group-title {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
+    @import '../../styles/variables';
 
     .entries-menu {
         display: flex;

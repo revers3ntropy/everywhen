@@ -9,7 +9,7 @@ import {
 } from '../constants';
 import type { Auth } from '../controllers/user';
 import type { apiRes404, GenericResponse } from './apiResponse';
-import { GETArgs } from './GETArgs';
+import { serializeGETArgs } from './GETArgs';
 import { Result } from './result';
 import { nowS } from './time';
 
@@ -145,7 +145,7 @@ export const api = {
         auth: Auth, path: Path, args: object | null = null,
     ) => {
         return await makeApiReq<'GET', Path, Body>(
-            auth, 'GET', path + (args ? GETArgs(args) : ''));
+            auth, 'GET', path + (args ? serializeGETArgs(args) : ''));
     },
 
     post: async <Path extends keyof ApiResponse['POST'], Body extends ReqBody> (

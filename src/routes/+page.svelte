@@ -1,14 +1,17 @@
 <script lang="ts">
     import ChevronRight from 'svelte-material-icons/ChevronRight.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
-    import type { App } from '../app';
     import { encryptionKeyFromPassword } from '../lib/security/authUtils';
     import { api } from '../lib/utils/apiRequest';
     import { displayNotifOnErr } from '../lib/utils/notifications';
 
     const { addNotification } = getNotificationsContext();
 
-    export let data: App.PageData;
+    export let data: App.PageData & {
+        redirect: string
+    };
+
+    console.log(data.redirect);
 
     // user log in / create account form values
     let password = '';
@@ -26,7 +29,7 @@
             {},
             () => actionPending = false,
         );
-        location.assign('/home');
+        location.assign('/' + data.redirect);
     }
 
     async function create (): Promise<void> {
@@ -39,7 +42,7 @@
             {},
             () => actionPending = false,
         );
-        location.assign('/home');
+        location.assign('/' + data.redirect);
     }
 </script>
 

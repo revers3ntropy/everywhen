@@ -4,7 +4,7 @@ import { expectDeleteUser, generateUserAndSignIn } from '../helpers.js';
 test.describe('/events', () => {
     test('Cannot visit page without authentication', async ({ page }) => {
         await page.goto('/events', { waitUntil: 'networkidle' });
-        await expect(page).toHaveURL('/');
+        await expect(page).toHaveURL('/?redirect=events');
     });
 
     test('Can view page', async ({ page }) => {

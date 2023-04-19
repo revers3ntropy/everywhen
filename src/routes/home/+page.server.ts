@@ -32,4 +32,4 @@ export const load: PageServerLoad = cachedPageRoute(async (auth, {}) => {
         titles,
         entries,
     };
-}) satisfies PageServerLoad;
+});

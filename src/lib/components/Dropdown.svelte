@@ -113,7 +113,7 @@
             .flex-center();
             position: absolute;
             top: 100%;
-            z-index: 5;
+            z-index: 15;
             display: none;
 
             .content {

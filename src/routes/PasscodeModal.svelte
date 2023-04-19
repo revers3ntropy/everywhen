@@ -64,7 +64,7 @@
         width: 100vw;
         height: 100vh;
         background-color: rgba(0, 0, 0, 0.2);
-        z-index: 100;
+        z-index: 1500;
         margin: 0;
         padding: 0;
         border-radius: 0;

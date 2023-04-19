@@ -71,7 +71,7 @@
         // https://owasp.org/www-community/HttpOnly
         if (!cookies[USERNAME_COOKIE_KEY]) {
             console.error('Cookies have expired');
-            location.assign('/');
+            location.assign('/?redirect=' + encodeURIComponent(location.pathname.substring(1) + location.search));
         }
     }
 

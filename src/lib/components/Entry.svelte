@@ -91,10 +91,13 @@
                 <UtcTime
                     fmt={showFullDate ? 'DD-MM-YYYY h:mm A' : 'h:mm A'}
                     timestamp={created}
+                    tooltipPosition="right"
                     tzOffset={createdTZOffset}
                 />
             </span>
-            <Label label={showLabel} obfuscated={obfuscated} />
+            {#if showLabels}
+                <Label label={showLabel} obfuscated={obfuscated} />
+            {/if}
         </div>
 
         <div class="title {obfuscated ? 'obfuscated' : ''}">

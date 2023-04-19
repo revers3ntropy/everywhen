@@ -280,7 +280,7 @@
         align-items: center;
         padding: 0;
         height: var(--nav-height);
-        z-index: 10;
+        z-index: 4;
 
         div {
             display: flex;
@@ -370,7 +370,7 @@
 
             &.showing {
                 transform: translate(0);
-                z-index: 8;
+                z-index: 4;
             }
 
             a, button {
