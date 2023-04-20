@@ -5,6 +5,7 @@ import mysql from 'mysql2/promise';
 import { errorLogger } from '../../hooks.server';
 import '../require';
 import { makeLogger } from '../utils/log';
+import type { Milliseconds } from '../utils/types';
 
 export type queryRes =
     | mysql.RowDataPacket[][]
@@ -48,7 +49,12 @@ export type QueryFunc = <Res extends queryRes = mysql.RowDataPacket[]>(
     ...params: (string | number | null | boolean)[]
 ) => Promise<Res>;
 
-function logQuery (query: string, params: any[]) {
+function logQuery (
+    query: string,
+    params: any[],
+    result: any,
+    time: Milliseconds,
+) {
     params = params.map((p) => {
         if (typeof p === 'string') {
             return `String(${p.length})`;
@@ -57,7 +63,14 @@ function logQuery (query: string, params: any[]) {
         }
     });
 
-    dbLogger.log(`\`${query.trim()}\`\n     [${params.join(', ')}]`);
+    const resultStr = Array.isArray(result)
+        ? `Array(${result.length})`
+        : typeof result;
+
+    dbLogger.logToFile(
+        `\`${query.trim()}\`` +
+        `\n     [${params.join(', ')}]` +
+        `\n     (${time.toPrecision(3)}ms) => ${resultStr}`);
 }
 
 export async function query<Res extends queryRes = mysql.RowDataPacket[]> (
@@ -67,6 +80,9 @@ export async function query<Res extends queryRes = mysql.RowDataPacket[]> (
     if (browser) {
         throw new Error('Cannot query database from browser');
     }
+
+    const start = performance.now();
+
     if (!dbConnection) {
         await connect();
     }
@@ -83,7 +99,6 @@ export async function query<Res extends queryRes = mysql.RowDataPacket[]> (
         }
     }, '');
 
-    logQuery(query, params);
 
     // if it's an array, add all the elements of the array in place as params
     // Flatten 2D arrays
@@ -94,5 +109,20 @@ export async function query<Res extends queryRes = mysql.RowDataPacket[]> (
         }
     }
 
-    return <Res>((await dbConnection?.query(query, params)) || [])[0];
+    const result = ((
+        await dbConnection
+            ?.query(query, params)
+            .catch((e: any) => {
+                const end = performance.now();
+                logQuery(query, params, null, end - start);
+                dbLogger.logToFile(`Error querying mysql db '${DB}'`);
+                dbLogger.logToFile(e);
+            })
+    ) || [])[0] as Res;
+
+    const end = performance.now();
+
+    logQuery(query, params, result, end - start);
+
+    return result;
 }

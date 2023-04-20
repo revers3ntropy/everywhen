@@ -1,0 +1,76 @@
+<script lang="ts">
+    // @ts-ignore
+    import { tooltip } from '@svelte-plugins/tooltips';
+    import { onMount } from 'svelte';
+    import Apple from 'svelte-material-icons/Apple.svelte';
+    import Cellphone from 'svelte-material-icons/Cellphone.svelte';
+    import Linux from 'svelte-material-icons/Linux.svelte';
+    import Windows from 'svelte-material-icons/MicrosoftWindows.svelte';
+    import Television from 'svelte-material-icons/Television.svelte';
+    import Watch from 'svelte-material-icons/Watch.svelte';
+    import UAParser from 'ua-parser-js';
+    import type { Pixels } from '../utils/types';
+
+    const mobileOSs = [
+        'Android', 'Android-x86', 'BlackBerry',
+        'iOS', 'Windows Phone', 'Windows Mobile',
+        'Palm',
+    ];
+
+    const watchOSs = [ 'watchOS' ];
+
+    const tvOSs = [ 'tvOS', 'NetTV' ];
+
+    const consoleOSs = [ 'PlayStation', 'Xbox' ];
+
+    const macOSs = [ 'Mac OS' ];
+
+    const windowsOSs = [ 'Windows' ];
+
+    export let data: string = '';
+    export let size: Pixels = 20;
+
+    let parsed: any = {};
+    let ua = null as ReturnType<typeof UAParser> | null;
+
+    onMount(() => {
+        if (!data) return;
+
+        try {
+            parsed = JSON.parse(data);
+        } catch (e) {}
+
+        ua = new UAParser(parsed.userAgent).getResult();
+    });
+
+    $: osName = ua !== null ? ua.os.name || 'Unknown OS' : '';
+
+</script>
+
+{#if ua}
+    <span use:tooltip={{
+        content: `Created on ${osName}`
+    }}>
+        {#if mobileOSs.includes(osName)}
+            <Cellphone {size} />
+        {:else if watchOSs.includes(osName)}
+            <Watch {size} />
+        {:else if tvOSs.includes(osName)}
+            <Television {size} />
+        {:else if consoleOSs.includes(osName)}
+            <Television {size} />
+        {:else if macOSs.includes(osName)}
+            <Apple {size} />
+        {:else if windowsOSs.includes(osName)}
+            <Windows {size} />
+        {:else}
+            <Linux {size} />
+        {/if}
+    </span>
+{/if}
+
+<style lang="less">
+    span {
+        margin: 0.5rem;
+    }
+</style>

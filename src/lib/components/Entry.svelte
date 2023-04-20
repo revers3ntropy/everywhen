@@ -17,6 +17,7 @@
     import { api, apiPath } from '../utils/apiRequest';
     import { displayNotifOnErr, SUCCESS_NOTIFICATION } from '../utils/notifications';
     import { obfuscate, rawMdToHtml } from '../utils/text';
+    import AgentWidget from './AgentWidget.svelte';
     import Label from './Label.svelte';
 
     const dispatch = createEventDispatcher();
@@ -33,6 +34,7 @@
     export let longitude: number | null = null;
     export let deleted = false;
     export let decrypted = true;
+    export let agentData: string = '';
     export let edits: Entry[] = [];
     export let isEdit = false;
     export let showFullDate = false;
@@ -94,6 +96,9 @@
                     tooltipPosition="right"
                     tzOffset={createdTZOffset}
                 />
+            </span>
+            <span class="hide-mobile">
+                <AgentWidget data={agentData} />
             </span>
             {#if showLabels}
                 <Label label={showLabel} obfuscated={obfuscated} />

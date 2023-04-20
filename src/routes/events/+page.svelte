@@ -1,8 +1,9 @@
 <script lang="ts">
+    import Dot from '$lib/components/Dot.svelte';
     import { onMount } from 'svelte';
+    import Calendar from 'svelte-material-icons/Calendar.svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import TrayArrowUp from 'svelte-material-icons/TrayArrowUp.svelte';
-    import Calendar from 'svelte-material-icons/Calendar.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../../app';
     import ImportDialog from '../../lib/components/dialogs/ImportDialog.svelte';
@@ -135,8 +136,13 @@
 
         <h1>
             <Calendar size="40" />
-            <span>Events</span>
-            <i>({eventCount})</i>
+            <span>
+                Events
+                {#if eventCount > 0}
+                    <Dot />
+                    {eventCount}
+                {/if}
+            </span>
         </h1>
 
         <div class="flex-center">

@@ -12,7 +12,6 @@ import { Label } from './label';
 import type { Auth } from './user';
 import { UUID } from './uuid';
 
-
 export interface Streaks {
     current: number;
     longest: number;
@@ -34,7 +33,7 @@ export type DecryptedRawEntry = Omit<RawEntry, 'decrypted'> & {
     decrypted: true
 };
 
-export type EntryEdit = Omit<Entry, 'edits'>;
+export type EntryEdit = Omit<Entry, 'edits'> & { entryId?: string };
 
 export class Entry {
 
@@ -53,6 +52,7 @@ export class Entry {
         public readonly deleted: boolean,
         public readonly latitude: number | null,
         public readonly longitude: number | null,
+        public readonly agentData: string,
     ) {
     }
 
@@ -119,7 +119,8 @@ export class Entry {
                    label,
                    entry,
                    latitude,
-                   longitude
+                   longitude,
+                   agentData
             FROM entries
             WHERE (deleted = ${deleted ? 1 : 0} OR ${deleted === 'both'})
               AND user = ${auth.id}
@@ -189,6 +190,12 @@ export class Entry {
         const { err: entryErr, val: decryptedEntry } = decrypt(rawEntry.entry, auth.key);
         if (entryErr) return Result.err(entryErr);
 
+        const {
+            err: agentErr,
+            val: decryptedAgent,
+        } = decrypt(rawEntry.agentData, auth.key);
+        if (agentErr) return Result.err(agentErr);
+
         let entry = new Entry(
             rawEntry.id,
             decryptedTitle,
@@ -198,6 +205,7 @@ export class Entry {
             rawEntry.deleted,
             rawEntry.latitude,
             rawEntry.longitude,
+            decryptedAgent,
         );
 
         if (rawEntry.label) {
@@ -265,7 +273,8 @@ export class Entry {
                    title,
                    entry,
                    latitude,
-                   longitude
+                   longitude,
+                   agentData
             FROM entries
             WHERE id = ${id}
               AND user = ${auth.id}
@@ -279,34 +288,6 @@ export class Entry {
         }
 
         return await Entry.fromRaw(query, auth, entries[0]);
-    }
-
-    public static async decryptRaw<T extends RawEntry | RawEntry[]> (
-        auth: Auth,
-        raw: T,
-    ): Promise<Result<T extends RawEntry ? DecryptedRawEntry : DecryptedRawEntry[]>> {
-        if (Array.isArray(raw)) {
-            const decrypted = [];
-
-            for (const entry of raw as RawEntry[]) {
-                const { val, err } = await Entry.decryptRaw(auth, entry);
-                if (err) return Result.err(err);
-                decrypted.push(val);
-            }
-
-            return Result.ok(
-                decrypted as T extends RawEntry
-                    ? DecryptedRawEntry
-                    : DecryptedRawEntry[],
-            );
-        }
-
-        return Result.ok({
-            ...raw,
-            title: decrypt(raw.title, auth.key),
-            entry: decrypt(raw.entry, auth.key),
-            decrypted: true,
-        } as unknown as T extends RawEntry ? DecryptedRawEntry : DecryptedRawEntry[]);
     }
 
     public static jsonIsRawEntry (
@@ -335,6 +316,11 @@ export class Entry {
                 !('label' in json)
                 || typeof json.label === 'string'
                 || !json.label
+            )
+            && (
+                !('agentData' in json)
+                || typeof json.agentData === 'string'
+                || !json.agentData
             )
             && 'created' in json
             && typeof json.created === 'number'
@@ -373,6 +359,7 @@ export class Entry {
             !!json.deleted,
             json.latitude,
             json.longitude,
+            json.agentData,
         );
 
         entry.edits = await Promise.all(
@@ -386,6 +373,7 @@ export class Entry {
                     false,
                     e.latitude,
                     e.longitude,
+                    e.agentData,
                 )) ?? [],
         );
 
@@ -400,10 +388,13 @@ export class Entry {
         const { err: entryErr, val: encryptedEntry } = encrypt(entry.entry, auth.key);
         if (entryErr) return Result.err(entryErr);
 
+        const { err: agentErr, val: encryptedAgent } = encrypt(entry.agentData, auth.key);
+        if (agentErr) return Result.err(agentErr);
+
         await query`
             INSERT INTO entries
-            (id, user, title, entry, created, createdTZOffset, deleted, label, latitude,
-             longitude)
+            (id, user, title, entry, created, createdTZOffset, deleted,
+             label, latitude, longitude, agentData)
             VALUES (${entry.id},
                     ${auth.id},
                     ${encryptedTitle},
@@ -413,7 +404,8 @@ export class Entry {
                     ${entry.deleted},
                     ${entry.label?.id ?? null},
                     ${entry.latitude ?? null},
-                    ${entry.longitude ?? null})
+                    ${entry.longitude ?? null},
+                    ${encryptedAgent || ''})
         `;
 
         for (const edit of entry.edits) {
@@ -429,10 +421,16 @@ export class Entry {
             } = encrypt(edit.entry, auth.key);
             if (editEntryErr) return Result.err(editEntryErr);
 
+            const {
+                err: editAgentErr,
+                val: encryptedAgentData,
+            } = encrypt(edit.agentData, auth.key);
+            if (editAgentErr) return Result.err(editAgentErr);
+
             await query`
                 INSERT INTO entryEdits
                 (id, entryId, title, entry,
-                 created, createdTZOffset, label, latitude, longitude)
+                 created, createdTZOffset, label, latitude, longitude, agentData)
                 VALUES (${edit.id},
                         ${entry.id},
                         ${encryptedEditTitle},
@@ -441,7 +439,8 @@ export class Entry {
                         ${edit.createdTZOffset ?? 0},
                         ${edit.label?.id ?? null},
                         ${edit.latitude ?? null},
-                        ${edit.longitude ?? null})
+                        ${edit.longitude ?? null},
+                        ${encryptedAgentData || ''})
             `;
         }
 
@@ -505,6 +504,7 @@ export class Entry {
             self.deleted,
             self.latitude,
             self.longitude,
+            self.agentData,
         );
         entry.label = self.label;
         return entry;
@@ -520,6 +520,7 @@ export class Entry {
         newLongitude: number | undefined,
         newLabel: Label | string,
         tzOffset: number,
+        agentData: string,
     ): Promise<Result> {
         const { err, val: encryptionResults } = encryptMulti(
             auth.key,
@@ -541,7 +542,7 @@ export class Entry {
         await query`
             INSERT INTO entryEdits
             (id, entryId, created, createdTZOffset, latitude, longitude, title, entry,
-             label)
+             label, agentData)
             VALUES (${editId},
                     ${entry.id},
                     ${nowS()},
@@ -550,7 +551,8 @@ export class Entry {
                     ${newLongitude ?? null},
                     ${oldTitle},
                     ${oldEntry},
-                    ${entry.label?.id ?? null})
+                    ${entry.label?.id ?? null},
+                    ${agentData || ''})
         `;
 
         if (newLabel instanceof Label) {
@@ -717,22 +719,25 @@ export class Entry {
         raw: RawEntry[],
     ): Promise<Result<Entry[]>> {
         const edits = await query<EntryEdit[]>`
-            SELECT 
-                entryEdits.created,
-                entryEdits.createdTZOffset,
-                entryEdits.latitude,
-                entryEdits.longitude,
-                entryEdits.title,
-                entryEdits.entry,
-                entryEdits.label
-            FROM entryEdits, entries
+            SELECT entryEdits.created,
+                   entryEdits.entryId,
+                   entryEdits.createdTZOffset,
+                   entryEdits.latitude,
+                   entryEdits.longitude,
+                   entryEdits.title,
+                   entryEdits.entry,
+                   entryEdits.label,
+                   entryEdits.agentData
+            FROM entryEdits,
+                 entries
             WHERE entries.user = ${auth.id}
-            AND entries.id = entryEdits.entry
+              AND entries.id = entryEdits.entryId
         `;
 
         const groupedEdits = edits.reduce<Record<string, EntryEdit[]>>((prev, edit) => {
-            prev[edit.entry] ??= [];
-            prev[edit.entry].push(edit);
+            if (!edit.entryId) return prev;
+            prev[edit.entryId] ??= [];
+            prev[edit.entryId].push(edit);
             return prev;
         }, {});
 
@@ -757,6 +762,12 @@ export class Entry {
             } = decrypt(rawEntry.entry, auth.key);
             if (entryErr) return Result.err(entryErr);
 
+            const {
+                err: agentErr,
+                val: decryptedAgent,
+            } = decrypt(rawEntry.agentData, auth.key);
+            if (agentErr) return Result.err(agentErr);
+
             const entry = new Entry(
                 rawEntry.id,
                 decryptedTitle,
@@ -766,9 +777,11 @@ export class Entry {
                 rawEntry.deleted,
                 rawEntry.latitude,
                 rawEntry.longitude,
+                decryptedAgent,
             );
 
             entry.edits = groupedEdits[rawEntry.id];
+
             if (rawEntry.label) {
                 entry.label = groupedLabels[rawEntry.label];
             }

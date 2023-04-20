@@ -21,6 +21,7 @@ export class Backup {
             longitude?: number;
             created: number;
             createdTZOffset: number;
+            agentData: string;
             edits: {
                 title: string;
                 label?: string; // label's name
@@ -29,6 +30,7 @@ export class Backup {
                 longitude?: number;
                 created: number;
                 createdTZOffset: number;
+                agentData: string;
             }[],
         }[],
         public labels: {
@@ -82,6 +84,7 @@ export class Backup {
                 latitude: entry.latitude ?? undefined,
                 longitude: entry.longitude ?? undefined,
                 title: entry.title,
+                agentData: entry.agentData,
                 edits: entry.edits?.map(edit => ({
                     entry: edit.entry,
                     created: edit.created,
@@ -90,6 +93,7 @@ export class Backup {
                     latitude: edit.latitude ?? undefined,
                     longitude: edit.longitude ?? undefined,
                     title: edit.title,
+                    agentData: edit.agentData,
                 })) || [],
             })),
             labels.map((label) => ({

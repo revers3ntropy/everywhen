@@ -7,7 +7,7 @@ mysql -u root << eof
     CREATE DATABASE halcyon_land_dev
 eof
 
-mysql -u root halcyon_land_dev < ./schema.sql
+mysql -u root halcyon_land_dev < ./db/schema.sql
 
 end=$(date +%s)
 

@@ -30,7 +30,7 @@ async function upload () {
         [`./secrets/${flags.env}/cert.pem`]: '/cert.pem',
         [`./secrets/${flags.env}/key.pem`]: '/key.pem',
         [`./secrets/${flags.env}/remote.env`]: '/.env',
-        ['./server.js']: '/server.js',
+        ['./server/server.js']: '/server.js',
     };
 
     await Promise.all(

@@ -33,7 +33,8 @@ CREATE TABLE `entries`
     `title`           text         NULL,
     `entry`           longtext     NOT NULL,
     `deleted`         int(1)       DEFAULT 0,
-    `label`           varchar(128) DEFAULT NULL
+    `label`           varchar(128) DEFAULT NULL,
+    `agentData`       longtext     NOT NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
 
@@ -49,7 +50,8 @@ CREATE TABLE `entryEdits`
     `longitude`       double       DEFAULT NULL,
     `title`           text         NULL,
     `entry`           longtext     NOT NULL,
-    `label`           varchar(128) DEFAULT NULL
+    `label`           varchar(128) DEFAULT NULL,
+    `agentData`       longtext     NOT NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
 

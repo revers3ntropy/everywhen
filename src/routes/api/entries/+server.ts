@@ -48,6 +48,7 @@ export const POST = (async ({ request, cookies }) => {
         entry: 'string',
         label: 'string',
         timezoneUtcOffset: 'number',
+        agentData: 'string',
     }, {
         title: '',
         label: '',
@@ -55,9 +56,9 @@ export const POST = (async ({ request, cookies }) => {
         longitude: 0,
         created: nowS(),
         timezoneUtcOffset: 0,
+        agentData: '',
     });
 
-    // check label exists
     if (body.label) {
         if (!await Label.userHasLabelWithId(query, auth, body.label)) {
             throw error(400, `Label doesn't exist`);
@@ -69,6 +70,7 @@ export const POST = (async ({ request, cookies }) => {
             ...body,
             latitude: body.latitude || null,
             longitude: body.longitude || null,
+            // timezoneUtcOffset is automatically added to every req
             createdTZOffset: body.timezoneUtcOffset,
         },
     );

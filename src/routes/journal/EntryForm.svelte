@@ -78,11 +78,18 @@
             if (!newEntryBody && !newEntryLabel && !newEntryTitle) {
                 obfuscated = false;
             }
-        } else {
-            obfuscated = true;
         }
         mounted = true;
     });
+
+    function serializeAgentData (): string {
+        return JSON.stringify({
+            userAgent: navigator.userAgent,
+            language: navigator.language,
+            appVersion: navigator.appVersion,
+            platform: navigator.platform,
+        });
+    }
 
     function areUnsavedChanges () {
         if (entry && !loadFromLS) {
@@ -154,6 +161,7 @@
             latitude: currentLocation[0],
             longitude: currentLocation[1],
             created: nowS(),
+            agentData: serializeAgentData(),
         };
 
         let res;

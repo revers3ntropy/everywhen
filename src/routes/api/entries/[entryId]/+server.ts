@@ -50,6 +50,7 @@ export const PUT = (async ({ request, params, cookies }) => {
         latitude: 'number',
         longitude: 'number',
         timezoneUtcOffset: 'number',
+        agentData: 'string',
     }, {
         title: '',
         entry: '',
@@ -57,6 +58,7 @@ export const PUT = (async ({ request, params, cookies }) => {
         latitude: 0,
         longitude: 0,
         timezoneUtcOffset: 0,
+        agentData: '',
     });
 
     const {
@@ -74,6 +76,7 @@ export const PUT = (async ({ request, params, cookies }) => {
         body.longitude || undefined,
         body.label,
         body.timezoneUtcOffset,
+        body.agentData,
     );
 
     if (err) throw error(400, err);
