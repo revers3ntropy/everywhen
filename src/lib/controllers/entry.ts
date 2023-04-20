@@ -153,10 +153,7 @@ export class Entry {
         } = {},
     ): Promise<Result<[ Entry[], number ]>> {
         const rawEntries = await Entry.allRaw(query, auth, deleted);
-
-        let { val: entries, err } = await Result.awaitCollect(
-            rawEntries.map((e) => Entry.fromRaw(query, auth, e)),
-        );
+        let { val: entries, err } = await Entry.fromRawMulti(query, auth, rawEntries);
         if (err) return Result.err(err);
 
         if (labelId) {
