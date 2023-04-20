@@ -650,8 +650,13 @@ export class Entry {
         query: QueryFunc,
         auth: Auth,
     ): Promise<Result<Streaks>> {
-        const { val: entries, err } = await Entry.all(query, auth);
-        if (err) return Result.err(err);
+        const entries = await query<{ created: number, createdTZOffset: number }[]>`
+            SELECT created, createdTZOffset
+            FROM entries
+            WHERE deleted = 0
+              AND user = ${auth.id}
+            ORDER BY created DESC, id
+        `;
 
         if (entries.length < 1) {
             return Result.ok({
@@ -689,7 +694,7 @@ export class Entry {
         let longest = current;
         let currentStreak = 0;
 
-        const firstEntry = entries.sort((a, b) => a.created - b.created)[0];
+        const firstEntry = entries[entries.length - 1];
         const firstDay = fmtUtc(firstEntry.created, firstEntry.createdTZOffset, 'YYYY-MM-DD');
 
         currentDay = today;
@@ -708,7 +713,6 @@ export class Entry {
                 currentStreak = 0;
             }
         }
-
 
         return Result.ok({
             current,

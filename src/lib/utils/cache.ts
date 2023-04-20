@@ -53,16 +53,33 @@ export function cacheResponse<T> (
     cacheLastUsed[userId] = nowS();
 }
 
+function logReq (hit: boolean, url: URL) {
+    const path = url.pathname.split('/');
+    path.shift();
+    let pathStr = '/' + path.shift();
+    if (pathStr === '/api') {
+        pathStr += '/' + path.shift();
+    }
+    if (path.length) {
+        pathStr += `/[...${path.join('/').length}]`;
+    }
+
+    cacheLogger.logToFile(
+        hit ? chalk.green('HIT ') : chalk.red('MISS'),
+        pathStr,
+    );
+}
+
 export function getCachedResponse<T> (
     url: string,
     userId: string,
 ): T | undefined {
     cacheLastUsed[userId] = nowS();
     if (cache[userId]?.hasOwnProperty(url)) {
-        cacheLogger.log(`${chalk.green('HIT')}  ${new URL(url).pathname}`);
+        logReq(true, new URL(url));
         return cache[userId][url] as T;
     } else {
-        cacheLogger.log(`${chalk.red('MISS')} ${new URL(url).pathname}`);
+        logReq(false, new URL(url));
         return undefined;
     }
 }
