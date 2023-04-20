@@ -19,12 +19,14 @@ app.use(compression());
 const httpsServer = https.createServer(credentials, app);
 const httpServer = http.createServer(app);
 
-httpServer.listen(parseInt(process.env.PORT), '0.0.0.0', () => {
-    console.log(`HTTP Server is running on: http://localhost:${process.env.PORT}`);
+const HOSTNAME = '0.0.0.0';
+
+httpServer.listen(parseInt(process.env.PORT), HOSTNAME, () => {
+    console.log(`HTTP Server is running on: http://${HOSTNAME}:${process.env.PORT}`);
 });
 
-httpsServer.listen(parseInt(process.env.HTTPS_PORT), '0.0.0.0', () => {
-    console.log(`HTTPS Server is running on: https://localhost:${process.env.HTTPS_PORT}`);
+httpsServer.listen(parseInt(process.env.HTTPS_PORT), HOSTNAME, () => {
+    console.log(`HTTPS Server is running on: https://${HOSTNAME}:${process.env.HTTPS_PORT}`);
 });
 
 // add a route that lives separately from the SvelteKit app
