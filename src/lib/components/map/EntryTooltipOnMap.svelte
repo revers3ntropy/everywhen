@@ -54,7 +54,7 @@
 <style lang="less">
     .wrapper {
         min-width: 200px;
-        max-width: 40vw;
+        max-width: min(40vw, 700px);
     }
 
     .datetime {

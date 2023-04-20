@@ -20,6 +20,7 @@
     import Plus from 'svelte-material-icons/Plus.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import Dropdown from '../lib/components/Dropdown.svelte';
+    import Streaks from '../lib/components/Streaks.svelte';
     import { LS_KEY } from '../lib/constants';
     import { Backup } from '../lib/controllers/backup';
     import type { Auth } from '../lib/controllers/user';
@@ -228,9 +229,16 @@
         <Dropdown unstyledButton>
             <span class="account-button" slot="button">
                 <span class="username-span">
-                    {auth.username}
+                    <span class="streaks">
+                        <Streaks {auth} />
+                    </span>
+                    <span class="username">
+                        {auth.username}
+                    </span>
                 </span>
-                <AccountCircleOutline size="40" />
+                <span class="hide-mobile flex-center">
+                    <AccountCircleOutline size="35" />
+                </span>
             </span>
 
             <button
@@ -290,6 +298,7 @@
 
         &.showing-dropdown {
             box-shadow: 0 0 4px 4px black;
+            background: @header-bg;
         }
     }
 
@@ -332,10 +341,34 @@
         &:hover {
             background-color: @light-accent;
         }
-    }
 
-    .username-span {
-        min-width: 6rem;
+        @media @mobile {
+            height: 40px;
+            grid-template-columns: 1fr;
+        }
+
+        .username-span {
+            min-width: 6rem;
+            display: grid;
+            grid-template-columns: 3.2rem 1fr;
+            place-items: center;
+
+            .streaks {
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+                width: 100%;
+                height: 100%;
+            }
+
+            .username {
+                text-align: right;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+                width: 100%;
+            }
+        }
     }
 
     .menu-button-mobile {

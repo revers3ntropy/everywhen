@@ -1,7 +1,7 @@
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt, encryptMulti } from '../security/encryption';
 import { Result } from '../utils/result';
-import { fmtUtc, nowS } from '../utils/time';
+import { currentTzOffset, fmtUtc, nowS } from '../utils/time';
 import type {
     Hours,
     Mutable,
@@ -12,6 +12,12 @@ import { Label } from './label';
 import type { Auth } from './user';
 import { UUID } from './uuid';
 
+
+export interface Streaks {
+    current: number;
+    longest: number;
+    runningOut: boolean;
+}
 
 // RawEntry is the raw data from the database,
 // Entry is the data after decryption and links to labels
@@ -638,6 +644,77 @@ export class Entry {
         `;
 
         return Result.ok(null);
+    }
+
+    public static async getStreaks (
+        query: QueryFunc,
+        auth: Auth,
+    ): Promise<Result<Streaks>> {
+        const { val: entries, err } = await Entry.all(query, auth);
+        if (err) return Result.err(err);
+
+        if (entries.length < 1) {
+            return Result.ok({
+                current: 0,
+                longest: 0,
+                runningOut: false,
+            });
+        }
+
+        const today = fmtUtc(nowS(), currentTzOffset(), 'YYYY-MM-DD');
+        const yesterday = fmtUtc(nowS() - 86400, currentTzOffset(), 'YYYY-MM-DD');
+
+        let current = 0;
+
+        let entriesOnDay: Record<string, true | undefined> = {};
+        for (const entry of entries) {
+            entriesOnDay[fmtUtc(entry.created, entry.createdTZOffset, 'YYYY-MM-DD')] = true;
+        }
+
+        let runningOut = !entriesOnDay[today] && !!entriesOnDay[yesterday];
+
+        let currentDay = today;
+        if (!entriesOnDay[currentDay]) {
+            currentDay = yesterday;
+        }
+        while (entriesOnDay[currentDay]) {
+            current++;
+            currentDay = fmtUtc(
+                new Date(currentDay).getTime() / 1000 - 86400,
+                0,
+                'YYYY-MM-DD',
+            );
+        }
+
+        let longest = current;
+        let currentStreak = 0;
+
+        const firstEntry = entries.sort((a, b) => a.created - b.created)[0];
+        const firstDay = fmtUtc(firstEntry.created, firstEntry.createdTZOffset, 'YYYY-MM-DD');
+
+        currentDay = today;
+        while (currentDay !== firstDay) {
+            currentDay = fmtUtc(
+                new Date(currentDay).getTime() / 1000 - 86400,
+                0,
+                'YYYY-MM-DD',
+            );
+            if (entriesOnDay[currentDay]) {
+                currentStreak++;
+                if (currentStreak > longest) {
+                    longest = currentStreak;
+                }
+            } else {
+                currentStreak = 0;
+            }
+        }
+
+
+        return Result.ok({
+            current,
+            longest,
+            runningOut,
+        });
     }
 
     private static async addLabel (
