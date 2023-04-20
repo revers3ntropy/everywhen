@@ -133,16 +133,7 @@ export class Entry {
         deleted: boolean | 'both' = false,
     ): Promise<Result<Entry[]>> {
         const rawEntries = await Entry.allRaw(query, auth, deleted);
-
-        const entries = [];
-
-        for (const rawEntry of rawEntries) {
-            const { err, val } = await Entry.fromRaw(query, auth, rawEntry);
-            if (err) return Result.err(err);
-            entries.push(val);
-        }
-
-        return Result.ok(entries);
+        return Entry.fromRawMulti(query, auth, rawEntries);
     }
 
     public static async getPage (
@@ -317,7 +308,6 @@ export class Entry {
             decrypted: true,
         } as unknown as T extends RawEntry ? DecryptedRawEntry : DecryptedRawEntry[]);
     }
-
 
     public static jsonIsRawEntry (
         json: unknown,
@@ -719,6 +709,72 @@ export class Entry {
             longest,
             runningOut,
         });
+    }
+
+    private static async fromRawMulti (
+        query: QueryFunc,
+        auth: Auth,
+        raw: RawEntry[],
+    ): Promise<Result<Entry[]>> {
+        const edits = await query<EntryEdit[]>`
+            SELECT 
+                entryEdits.created,
+                entryEdits.createdTZOffset,
+                entryEdits.latitude,
+                entryEdits.longitude,
+                entryEdits.title,
+                entryEdits.entry,
+                entryEdits.label
+            FROM entryEdits, entries
+            WHERE entries.user = ${auth.id}
+            AND entries.id = entryEdits.entry
+        `;
+
+        const groupedEdits = edits.reduce<Record<string, EntryEdit[]>>((prev, edit) => {
+            prev[edit.entry] ??= [];
+            prev[edit.entry].push(edit);
+            return prev;
+        }, {});
+
+        const { err, val: labels } = await Label.all(query, auth);
+        if (err) return Result.err(err);
+
+        const groupedLabels = labels.reduce<Record<string, Label>>((prev, label) => {
+            prev[label.id] = label;
+            return prev;
+        }, {});
+
+        return Result.collect(raw.map(rawEntry => {
+            const {
+                err: titleErr,
+                val: decryptedTitle,
+            } = decrypt(rawEntry.title, auth.key);
+            if (titleErr) return Result.err(titleErr);
+
+            const {
+                err: entryErr,
+                val: decryptedEntry,
+            } = decrypt(rawEntry.entry, auth.key);
+            if (entryErr) return Result.err(entryErr);
+
+            const entry = new Entry(
+                rawEntry.id,
+                decryptedTitle,
+                decryptedEntry,
+                rawEntry.created,
+                rawEntry.createdTZOffset,
+                rawEntry.deleted,
+                rawEntry.latitude,
+                rawEntry.longitude,
+            );
+
+            entry.edits = groupedEdits[rawEntry.id];
+            if (rawEntry.label) {
+                entry.label = groupedLabels[rawEntry.label];
+            }
+
+            return Result.ok(entry);
+        }));
     }
 
     private static async addLabel (
