@@ -19,6 +19,7 @@
     import { obfuscate, rawMdToHtml } from '../utils/text';
     import AgentWidget from './AgentWidget.svelte';
     import Label from './Label.svelte';
+    import LocationWidget from './LocationWidget.svelte';
 
     const dispatch = createEventDispatcher();
     const { addNotification } = getNotificationsContext();
@@ -97,9 +98,18 @@
                     tzOffset={createdTZOffset}
                 />
             </span>
-            <span class="hide-mobile">
-                <AgentWidget data={agentData} />
-            </span>
+
+            <AgentWidget data={agentData} />
+
+            {#if latitude && longitude}
+                <LocationWidget
+                    {auth}
+                    entryId={id}
+                    {latitude}
+                    {longitude}
+                />
+            {/if}
+
             {#if showLabels}
                 <Label label={showLabel} obfuscated={obfuscated} />
             {/if}

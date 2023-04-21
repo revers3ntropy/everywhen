@@ -87,3 +87,4 @@ export function makeLogger<File extends string | null> (
 }
 
 export const debugLogger = makeLogger('DEBUG', chalk.cyanBright, 'general.log');
+export const errorLogger = makeLogger('ERR', chalk.red, 'general.log');

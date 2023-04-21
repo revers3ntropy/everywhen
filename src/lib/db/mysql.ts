@@ -2,7 +2,6 @@ import { browser } from '$app/environment';
 import { DB, DB_HOST, DB_PASS, DB_PORT, DB_USER } from '$env/static/private';
 import chalk from 'chalk';
 import mysql from 'mysql2/promise';
-import { errorLogger } from '../../hooks.server';
 import '../require';
 import { makeLogger } from '../utils/log';
 import type { Milliseconds } from '../utils/types';
@@ -25,7 +24,6 @@ export async function connect () {
         .createConnection(config)
         .catch((e: any) => {
             dbLogger.logToFile(`Error connecting to mysql db '${config.database}'`);
-            errorLogger.logToFile(`Error connecting to mysql db '${config.database}'`);
             dbLogger.logToFile(e);
             throw e;
         });

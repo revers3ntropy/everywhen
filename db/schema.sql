@@ -113,6 +113,21 @@ CREATE TABLE `settings`
 
 -- --------------------------------------------------------
 
+CREATE TABLE `locations`
+(
+    `id`              varchar(128) NOT NULL,
+    `user`            varchar(128) NOT NULL,
+    `created`         int(64)      NOT NULL,
+    `createdTZOffset` double       NOT NULL,
+    `name`            varchar(256) NOT NULL,
+    `latitude`        double       NOT NULL,
+    `longitude`       double       NOT NULL,
+    `radius`          double       NOT NULL
+) ENGINE = InnoDB
+  DEFAULT CHARSET = latin1;
+
+-- --------------------------------------------------------
+
 CREATE TABLE `ids`
 (
     `id` varchar(128) NOT NULL

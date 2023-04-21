@@ -1,6 +1,6 @@
 {
     "name": "halcyon.land",
-    "version": "0.3.36",
+    "version": "0.3.38",
     "type": "module",
     "private": true,
     "devDependencies": {
@@ -50,6 +50,7 @@
         "vite": "^4.1.4"
     },
     "dependencies": {
-        "ol": "^7.3.0"
+        "ol": "^7.3.0",
+        "ol-contextmenu": "^5.2.1"
     }
 }

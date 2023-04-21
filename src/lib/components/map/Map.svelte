@@ -7,127 +7,249 @@
 </script>
 
 <script lang="ts">
+    import { Collection } from 'ol';
+    import type { CallbackObject } from 'ol-contextmenu/dist/types';
+    import type Feature from 'ol/Feature';
+    import type { Circle } from 'ol/geom';
+    import { Modify } from 'ol/interaction';
+    import type OlMap from 'ol/Map';
+    import { Style } from 'ol/style';
+    import { getNotificationsContext } from 'svelte-notifications';
+    import { writable } from 'svelte/store';
+    import { errorLogger } from '../../utils/log';
+    import { displayNotifOnErr } from '../../utils/notifications';
     import type { MapBrowserEvent } from 'ol';
     import Map from 'ol/Map';
     import TileLayer from 'ol/layer/Tile';
     import View from 'ol/View';
     import OSM from 'ol/source/OSM';
-    import Feature from 'ol/Feature';
     import SourceVector from 'ol/source/Vector';
     import LayerVector from 'ol/layer/Vector';
-    import Point from 'ol/geom/Point';
     import Overlay from 'ol/Overlay';
+    import ContextMenu from 'ol-contextmenu';
     import { fromLonLat, toLonLat } from 'ol/proj';
-    import type { EntryWithWordCount } from '../../../routes/stats/helpers';
+    import type { EntryLocation } from '../../../routes/stats/helpers';
     import type { Auth } from '../../controllers/user';
+    import { Location } from '../../controllers/location';
     import { popup } from '../../stores';
+    import { api, apiPath } from '../../utils/apiRequest';
     import { showPopup } from '../../utils/popups';
+    import EditLocationDialog from '../dialogs/EditLocationDialog.svelte';
     import EntryDialog from '../dialogs/EntryDialog.svelte';
     import EntryTooltipOnMap from './EntryTooltipOnMap.svelte';
+    import {
+        type EntryFeature,
+        lastEntry,
+        type LocationFeature,
+        olFeatureFromEntry,
+        olFeatureFromLocation,
+    } from './map';
 
-    export let entries: EntryWithWordCount[] = [];
+    const { addNotification } = getNotificationsContext();
+
+    export let entries: EntryLocation[] = [];
+    export let locations: Location[] = [];
     export let auth: Auth;
 
     let mapId = getId();
-    let map: Map | null = null;
     let tooltip: HTMLElement;
     let hoveringEntryId: string | null = null;
     let popupOnRight = false;
     let hoveringSomething = false;
+    let mapZoom = writable<number | undefined>(undefined);
+    let mapCenter = writable<number[] | undefined>(undefined);
 
-    function closestEntryToCoords (
-        entries: EntryWithWordCount[],
-        lat: number,
-        long: number,
-    ): EntryWithWordCount | null {
-        let closestEntry = null;
-        let closestDistance = null;
-        for (const entry of entries) {
-            if (!entry.latitude || !entry.longitude) continue;
-            const distance = Math.sqrt(
-                Math.pow(entry.latitude - lat, 2)
-                + Math.pow(entry.longitude - long, 2),
-            );
-            if (closestDistance === null || distance < closestDistance) {
-                closestDistance = distance;
-                closestEntry = entry;
-            }
-        }
-        return closestEntry;
+    let locationChangeQueue: Record<string, {
+        radius: number,
+        latitude: number,
+        longitude: number
+    }[]> = {};
+
+    async function reloadLocations () {
+        const res = displayNotifOnErr(addNotification,
+            await api.get(auth, '/locations'),
+        );
+        locations = res.locations;
     }
 
-    function lastEntry (entries: EntryWithWordCount[]): EntryWithWordCount | null {
-        let lastEntry = null;
-        let lastDate = null;
-        for (const entry of entries) {
-            if (!entry.created || !entry.latitude || !entry.longitude) continue;
-            if (lastDate === null || entry.created > lastDate) {
-                lastDate = entry.created;
-                lastEntry = entry;
-            }
-        }
-        return lastEntry;
+    async function syncLocationInBackground (
+        id: string,
+        latitude: number,
+        longitude: number,
+        radius: number,
+    ): Promise<void> {
+        displayNotifOnErr(addNotification,
+            await api.put(auth, apiPath('/locations/?', id), {
+                latitude,
+                longitude,
+                radius,
+            }),
+        );
     }
 
-    function setupMap (node: HTMLElement) {
+    setInterval(() => {
+        for (const [ id, changes ] of Object.entries(locationChangeQueue)) {
+            const last = changes[changes.length - 1];
+            syncLocationInBackground(id, last.latitude, last.longitude, last.radius);
+        }
+        locationChangeQueue = {};
+    }, 500);
 
+    async function addNamedLocation (
+        object: CallbackObject,
+        _map: OlMap,
+    ) {
+        const coordinate = object.coordinate;
+        const [ long, lat ] = toLonLat(coordinate);
+
+        displayNotifOnErr(
+            addNotification,
+            await api.post(auth, '/locations', {
+                latitude: lat,
+                longitude: long,
+                name: 'New Location',
+                radius: Location.metersToDegrees(50),
+            }),
+        );
+
+        await reloadLocations();
+    }
+
+    function setupMap (
+        node: HTMLElement,
+        {
+            locations,
+            entries,
+        }: {
+            locations: Location[],
+            entries: EntryLocation[]
+        },
+    ): Map {
         const osmLayer = new TileLayer({
             source: new OSM(),
         });
 
         const last = lastEntry(entries);
-        const center = last && last.latitude && last.longitude
-            ? fromLonLat([ last.longitude, last.latitude ])
-            : [ 0, 0 ];
 
-        map = new Map({
+        let center = [ 0, 0 ];
+        if ($mapCenter) {
+            center = $mapCenter;
+        } else if (last && last.latitude && last.longitude) {
+            center = fromLonLat([ last.longitude, last.latitude ]);
+        }
+
+        let zoom = 1;
+        if ($mapZoom) {
+            zoom = $mapZoom;
+        } else if (last) {
+            // zoom in if focused on last one, else go wide
+            zoom = 19;
+        }
+
+        let map = new Map({
             target: node.id,
             layers: [
                 osmLayer,
             ],
-            view: new View({
-                center,
-                // zoom in if focused on last one, else go wide
-                zoom: last ? 16 : 1,
-            }),
+            view: new View({ center, zoom }),
         });
+
+        const locationFeatures = locations.map(olFeatureFromLocation);
+
 
         map.addLayer(new LayerVector({
             source: new SourceVector({
-                features: entries
-                    .map(entry => (entry.latitude && entry.longitude)
-                        ? new Feature({
-                            name: entry.title,
-                            geometry: new Point(fromLonLat([
-                                entry.longitude,
-                                entry.latitude,
-                            ])),
-                        })
-                        : null,
-                    )
-                    .filter(Boolean),
+                features: locationFeatures,
+            }),
+        }));
+
+        for (const feature of locationFeatures) {
+            const dragInteraction = new Modify({
+                features: new Collection([ feature ]),
+                style: new Style({
+                    renderer ([ x, y ], state) {
+                        const ctx = state.context;
+
+                        if (typeof x !== 'number' || typeof y !== 'number') {
+                            errorLogger.error('x or y is not a number', x, y);
+                            return;
+                        }
+
+                        ctx.beginPath();
+                        ctx.arc(x, y, 5, 0, 2 * Math.PI);
+                        ctx.strokeStyle = 'rgba(74,74,74,0.6)';
+                        ctx.stroke();
+                    },
+                }),
+            });
+            map.addInteraction(dragInteraction);
+
+            feature.on('change', (evt) => {
+                const target = evt.target as Feature;
+                const geometry = target.getGeometry() as Circle;
+                const center = geometry.getCenter();
+                const [ long, lat ] = toLonLat(center);
+                const radius = Location.metersToDegrees(geometry.getRadius());
+                const id = feature.location.id;
+
+                if (!locationChangeQueue[id]) {
+                    locationChangeQueue[id] = [];
+                }
+                locationChangeQueue[id].push({
+                    latitude: lat,
+                    longitude: long,
+                    radius,
+                });
+            });
+        }
+
+        map.addLayer(new LayerVector({
+            source: new SourceVector({
+                features: entries.map(olFeatureFromEntry)
+                                 .filter(Boolean),
             }),
         }));
 
         map.on('singleclick', (event: MapBrowserEvent<any>) => {
             if (!map) return;
 
-            if (!map.hasFeatureAtPixel(event.pixel)) {
+            const features = map.getFeaturesAtPixel(event.pixel);
+
+            if (!features.length) {
                 popup.set(null);
                 return;
             }
-            const coordinate = event.coordinate;
-            const [ long, lat ] = toLonLat(coordinate);
 
-            const closestEntry = closestEntryToCoords(entries, lat, long);
-            if (!closestEntry) return;
+            const hovering = features[0] as EntryFeature | LocationFeature;
 
-            showPopup(EntryDialog, {
-                id: closestEntry.id,
-                auth,
-                obfuscated: false,
-            });
+            if ('entry' in hovering) {
+                showPopup(EntryDialog, {
+                    id: hovering.entry.id,
+                    auth,
+                    obfuscated: false,
+                });
+                return;
+            }
+
+            if ('location' in hovering) {
+                showPopup(EditLocationDialog, {
+                    ...hovering.location,
+                    auth,
+                    onChange: reloadLocations,
+                });
+            }
         });
+
+        map.addControl(new ContextMenu({
+            width: 180,
+            items: [
+                {
+                    text: 'Add Named Location',
+                    classname: 'context-menu-option',
+                    callback: addNamedLocation,
+                },
+            ],
+        }));
 
         map.addOverlay(new Overlay({
             element: tooltip,
@@ -137,17 +259,9 @@
         map.on('pointermove', (event: MapBrowserEvent<any>) => {
             if (!map) return;
 
-            if (!map.hasFeatureAtPixel(event.pixel)) {
-                hoveringEntryId = null;
-                hoveringSomething = false;
-                return;
-            }
+            const features = map.getFeaturesAtPixel(event.pixel);
 
-            const coordinate = event.coordinate;
-            const [ long, lat ] = toLonLat(coordinate);
-
-            const closestEntry = closestEntryToCoords(entries, lat, long);
-            if (!closestEntry) {
+            if (!features.length) {
                 hoveringEntryId = null;
                 hoveringSomething = false;
                 return;
@@ -155,24 +269,51 @@
 
             hoveringSomething = true;
 
+            const hovering = features[0] as EntryFeature | LocationFeature;
+
+            if (!('entry' in hovering)) {
+                hoveringEntryId = null;
+                return;
+            }
+
             const mapWidth = map.getSize()?.[0] || window.innerWidth;
             // never hides the hovered entry
             popupOnRight = event.pixel[0] < mapWidth / 2;
-            hoveringEntryId = closestEntry.id;
+            hoveringEntryId = hovering.entry.id;
         });
 
+        // save the map view
+        map.on('postrender', () => {
+            const view = map.getView();
+            $mapZoom = view.getZoom();
+            $mapCenter = view.getCenter();
+        });
+
+        return map;
+    }
+
+    function map (
+        node: HTMLElement,
+        { locations, entries }: { locations: Location[], entries: EntryLocation[] },
+    ) {
+        let map = setupMap(node, { locations, entries });
         return {
             destroy () {
-                if (map) {
-                    map.setTarget();
-                    map = null;
-                }
+                map.setTarget(undefined as unknown as HTMLElement);
+            },
+            update (props: { locations: Location[], entries: EntryLocation[] }) {
+                map.setTarget(undefined as unknown as HTMLElement);
+                map = setupMap(node, props);
             },
         };
     }
 </script>
 
-<div class="map {hoveringSomething ? 'hovering' : ''}" id={mapId} use:setupMap>
+<div
+    class="map {hoveringSomething ? 'hovering' : ''}"
+    id="ol-map-{mapId}"
+    use:map={{ locations, entries }}
+>
     {#if hoveringEntryId !== null}
         <div
             bind:this={tooltip}
@@ -184,6 +325,7 @@
 </div>
 
 <style lang="less">
+    @import 'ol-contextmenu/ol-contextmenu.css';
     @import '../../../styles/variables';
     @import '../../../styles/layout';
 
@@ -199,6 +341,25 @@
 
         &.hovering {
             cursor: pointer;
+        }
+
+        :global(*) {
+            color: black;
+        }
+
+        :global(.context-menu-option),
+        :global(.ol-ctx-menu-zoom-in),
+        :global(.ol-ctx-menu-zoom-out) {
+            margin: 0;
+
+            &:hover {
+                background: #f0f0f0;
+            }
+        }
+
+        :global(.ol-attribution) {
+            // sorry but it's really messy :/
+            display: none;
         }
     }
 

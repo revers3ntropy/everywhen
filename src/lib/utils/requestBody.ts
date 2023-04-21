@@ -1,5 +1,6 @@
 import { error } from '@sveltejs/kit';
 import schemion, { type Schema, type SchemaResult } from 'schemion';
+import { errorLogger } from './log';
 import { Result } from './result';
 
 export async function bodyFromReq<T extends Schema & object> (
@@ -8,7 +9,8 @@ export async function bodyFromReq<T extends Schema & object> (
     defaults: { [P in keyof T]?: SchemaResult<T[P]> | undefined; } = {},
 ): Promise<Result<Readonly<SchemaResult<T>>>> {
     if (request.method === 'GET') {
-        throw 'GET requests are not supported in bodyFromReq()';
+        errorLogger.logToFile('GET requests are not supported in bodyFromReq()');
+        return Result.err('Something went wrong');
     }
 
     const contentType = request.headers.get('content-type');

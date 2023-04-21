@@ -1,7 +1,9 @@
 export function serializeGETArgs (args: Record<string, any>): string {
-    return '?' + Object.keys(args)
-                       .map((key) => `${key}=${args[key]}`)
-                       .join('&');
+    const keys = Object.keys(args);
+    if (!keys.length) return '';
+    return '?' + keys
+        .map((key) => `${key}=${args[key]}`)
+        .join('&');
 }
 
 export function getGETArgs (): Record<string, string> {

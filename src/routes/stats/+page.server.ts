@@ -1,5 +1,6 @@
 import { error } from '@sveltejs/kit';
 import { Entry } from '../../lib/controllers/entry';
+import { Location } from '../../lib/controllers/location';
 import { query } from '../../lib/db/mysql';
 import { cachedPageRoute } from '../../lib/utils/cache';
 import { wordCount as txtWordCount } from '../../lib/utils/text';
@@ -34,6 +35,9 @@ export const load = cachedPageRoute(async (auth, {}) => {
         entriesWithWordCount.push(e);
     }
 
+    const { err: locationErr, val: locations } = await Location.all(query, auth);
+    if (locationErr) throw error(400, locationErr);
+
     return {
         entries: entriesWithWordCount,
         entryCount: entries.length,
@@ -43,5 +47,6 @@ export const load = cachedPageRoute(async (auth, {}) => {
         days: daysSince(earliestEntryTimeStamp) || 1,
         wordCount,
         charCount,
+        locations,
     };
 }) satisfies PageServerLoad;

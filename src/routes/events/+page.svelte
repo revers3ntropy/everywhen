@@ -1,5 +1,4 @@
 <script lang="ts">
-    import Dot from '$lib/components/Dot.svelte';
     import { onMount } from 'svelte';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
@@ -7,6 +6,7 @@
     import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../../app';
     import ImportDialog from '../../lib/components/dialogs/ImportDialog.svelte';
+    import Dot from '../../lib/components/Dot.svelte';
     import Select from '../../lib/components/Select.svelte';
     import type { Event as EventController } from '../../lib/controllers/event';
     import type { Label } from '../../lib/controllers/label';

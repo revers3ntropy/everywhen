@@ -45,6 +45,7 @@ interface ApiResponse {
         '/assets/?': GET<typeof import('../../routes/api/assets/[asset]/+server')>,
         '/settings': GET<typeof import('../../routes/api/settings/+server')>,
         '/version': GET<typeof import('../../routes/api/version/+server')>,
+        '/locations': GET<typeof import('../../routes/api/locations/+server')>,
     },
     'POST': {
         '/users': POST<typeof import('../../routes/api/users/+server')>,
@@ -53,6 +54,7 @@ interface ApiResponse {
         '/entries': POST<typeof import('../../routes/api/entries/+server')>,
         '/backups': POST<typeof import('../../routes/api/backups/+server')>,
         '/assets': POST<typeof import('../../routes/api/assets/+server')>,
+        '/locations': POST<typeof import('../../routes/api/locations/+server')>,
     },
     'DELETE': {
         '/users': DELETE<typeof import('../../routes/api/users/+server')>,
@@ -60,12 +62,14 @@ interface ApiResponse {
         '/events/?': DELETE<typeof import('../../routes/api/events/[eventId]/+server')>,
         '/entries/?': DELETE<typeof import('../../routes/api/entries/[entryId]/+server')>,
         '/assets/?': DELETE<typeof import('../../routes/api/assets/[asset]/+server')>,
+        '/locations/?': DELETE<typeof import('../../routes/api/locations/[locationId]/+server')>,
     },
     'PUT': {
         '/labels/?': PUT<typeof import('../../routes/api/labels/[labelId]/+server')>,
         '/events/?': PUT<typeof import('../../routes/api/events/[eventId]/+server')>,
         '/settings': PUT<typeof import('../../routes/api/settings/+server')>,
         '/entries/?': PUT<typeof import('../../routes/api/entries/[entryId]/+server')>,
+        '/locations/?': PUT<typeof import('../../routes/api/locations/[locationId]/+server')>,
     },
 }
 
@@ -157,32 +161,28 @@ export async function makeApiReq<
 
 export const api = {
     get: async <Path extends keyof ApiResponse['GET'], Body extends ReqBody> (
-        auth: Auth, path: Path, args: object | null = null,
-    ) => {
-        return await makeApiReq<'GET', Path, Body>(
-            auth, 'GET', path + (args ? serializeGETArgs(args) : ''));
-    },
+        auth: Auth, path: Path, args: object = {},
+    ) => (
+        await makeApiReq<'GET', Path, Body>(auth, 'GET', path + serializeGETArgs(args))
+    ),
 
     post: async <Path extends keyof ApiResponse['POST'], Body extends ReqBody> (
         auth: Auth, path: Path, body: Body = {} as Body,
-    ) => {
-        return await makeApiReq<'POST', Path, Body>(
-            auth, 'POST', path, body);
-    },
+    ) => (
+        await makeApiReq<'POST', Path, Body>(auth, 'POST', path, body)
+    ),
 
     put: async <Path extends keyof ApiResponse['PUT'], Body extends ReqBody> (
         auth: Auth, path: Path, body: Body = {} as Body,
-    ) => {
-        return await makeApiReq<'PUT', Path, Body>(
-            auth, 'PUT', path, body);
-    },
+    ) => (
+        await makeApiReq<'PUT', Path, Body>(auth, 'PUT', path, body)
+    ),
 
     delete: async <Path extends keyof ApiResponse['DELETE'], Body extends ReqBody> (
         auth: Auth, path: Path, body: Body = {} as Body,
-    ) => {
-        return await makeApiReq<'DELETE', Path, Body>(
-            auth, 'DELETE', path, body);
-    },
+    ) => (
+        await makeApiReq<'DELETE', Path, Body>(auth, 'DELETE', path, body)
+    ),
 };
 
 // eg '/labels/?', '1' ==> '/labels/1' but returns '/labels/?' as type
