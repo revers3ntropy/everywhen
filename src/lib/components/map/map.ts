@@ -85,7 +85,7 @@ export function olFeatureFromLocation (location: Location): LocationFeature {
                 ctx.stroke();
                 ctx.closePath();
 
-                if (state.resolution < 1) {
+                if (radius > state.context.canvas.clientWidth / 32) {
                     ctx.beginPath();
                     ctx.fillStyle = 'black';
                     ctx.font = '12px sans-serif';

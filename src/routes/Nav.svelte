@@ -337,6 +337,7 @@
         border-radius: @border-radius;
         padding: .1rem .3rem;
         width: fit-content;
+        background: @header-bg;
 
         &:hover {
             background-color: @light-accent;

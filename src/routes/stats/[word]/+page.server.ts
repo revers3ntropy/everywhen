@@ -7,7 +7,9 @@ import type { EntryWithWordCount } from '../helpers';
 import type { PageServerLoad } from './$types';
 
 export const load = cachedPageRoute(async (auth, { params }) => {
-    const { val: entries, err } = await Entry.all(query, auth, false);
+    const { val: entries, err } = await Entry.all(query, auth, {
+        deleted: false,
+    });
     if (err) throw error(400, err);
 
     const theWord = params.word.toLowerCase();

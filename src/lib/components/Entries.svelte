@@ -6,12 +6,13 @@
     import { getNotificationsContext } from 'svelte-notifications';
     import EntryGroup from '../../lib/components/EntryGroup.svelte';
     import PageCounter from '../../lib/components/PageCounter.svelte';
-    import { Entry } from '../controllers/entry';
+    import { Entry, type EntryFilter } from '../controllers/entry';
     import type { Auth } from '../controllers/user';
     import { obfuscated } from '../stores';
     import { api } from '../utils/apiRequest';
     import { displayNotifOnErr } from '../utils/notifications';
     import { showPopup } from '../utils/popups';
+    import type { PickOptionalAndMutable } from '../utils/types';
     import Spinner from './BookSpinner.svelte';
     import ImportDialog from './dialogs/ImportDialog.svelte';
     import Sidebar from './EntriesSidebar.svelte';
@@ -27,12 +28,9 @@
     export let showLabels = true;
     export let pageSize: number;
 
-    interface IOptions {
+    interface IOptions extends EntryFilter {
         pageSize?: number;
         page?: number;
-        search?: string;
-        labelId?: string;
-        deleted?: boolean;
     }
 
     export let options: IOptions = {};
@@ -57,7 +55,7 @@
         if (loading && !force) return;
         loading = true;
 
-        const entriesOptions: IOptions = {
+        const entriesOptions: PickOptionalAndMutable<IOptions, 'search'> = {
             page,
             ...options,
             pageSize,

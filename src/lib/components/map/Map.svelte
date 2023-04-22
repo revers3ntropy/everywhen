@@ -9,7 +9,6 @@
 <script lang="ts">
     import { Collection } from 'ol';
     import type { CallbackObject } from 'ol-contextmenu/dist/types';
-    import type Feature from 'ol/Feature';
     import type { Circle } from 'ol/geom';
     import { Modify } from 'ol/interaction';
     import type OlMap from 'ol/Map';
@@ -34,7 +33,7 @@
     import { popup } from '../../stores';
     import { api, apiPath } from '../../utils/apiRequest';
     import { showPopup } from '../../utils/popups';
-    import EditLocationDialog from '../dialogs/EditLocationDialog.svelte';
+    import EditLocation from '../EditLocation.svelte';
     import EntryDialog from '../dialogs/EntryDialog.svelte';
     import EntryTooltipOnMap from './EntryTooltipOnMap.svelte';
     import {
@@ -185,7 +184,7 @@
             map.addInteraction(dragInteraction);
 
             feature.on('change', (evt) => {
-                const target = evt.target as Feature;
+                const target = evt.target as LocationFeature;
                 const geometry = target.getGeometry() as Circle;
                 const center = geometry.getCenter();
                 const [ long, lat ] = toLonLat(center);
@@ -200,6 +199,10 @@
                     longitude: long,
                     radius,
                 });
+
+                target.location.latitude = lat;
+                target.location.longitude = long;
+                target.location.radius = radius;
             });
         }
 
@@ -213,12 +216,38 @@
         map.on('singleclick', (event: MapBrowserEvent<any>) => {
             if (!map) return;
 
-            const features = map.getFeaturesAtPixel(event.pixel);
+            let features = map.getFeaturesAtPixel(event.pixel);
 
             if (!features.length) {
                 popup.set(null);
                 return;
             }
+
+            features = features
+                .filter((feature): feature is LocationFeature | EntryFeature => {
+                    // only locations and entries are clickable
+                    if ('entry' in feature) {
+                        return true;
+                    }
+                    return 'location' in feature;
+                })
+                .sort((a, b) => {
+                    // pick entries over locations
+                    if ('entry' in a && 'entry' in b) {
+                        return 0;
+                    }
+                    if ('entry' in a) {
+                        return -1;
+                    }
+                    return 1;
+                })
+                .sort((a, b) => {
+                    if (!('location' in a) || !('location' in b)) {
+                        return 0;
+                    }
+                    // pick smaller locations over larger ones
+                    return a.location.radius - b.location.radius;
+                });
 
             const hovering = features[0] as EntryFeature | LocationFeature;
 
@@ -232,10 +261,11 @@
             }
 
             if ('location' in hovering) {
-                showPopup(EditLocationDialog, {
+                showPopup(EditLocation, {
                     ...hovering.location,
                     auth,
                     onChange: reloadLocations,
+                    isInDialog: true,
                 });
             }
         });
@@ -332,7 +362,7 @@
     .map {
         .container();
         padding: 0;
-        height: 80vh;
+        height: 89vh;
         margin: 0 0 0 1rem;
         width: calc(100vw - 5rem);
         border: none;

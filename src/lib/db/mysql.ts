@@ -44,7 +44,7 @@ export async function getConfig (): Promise<mysql.ConnectionOptions> {
 
 export type QueryFunc = <Res extends queryRes = mysql.RowDataPacket[]>(
     queryParts: TemplateStringsArray,
-    ...params: (string | number | null | boolean)[]
+    ...params: (string | number | null | boolean | undefined)[]
 ) => Promise<Res>;
 
 function logQuery (

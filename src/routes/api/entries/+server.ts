@@ -16,13 +16,14 @@ export const GET = cachedApiRoute((async (auth, { url }) => {
     const deleted = GETParamIsTruthy(url.searchParams.get('deleted'));
     const search = (url.searchParams.get('search') || '').toLowerCase();
     const labelId = url.searchParams.get('labelId') || undefined;
+    const locationId = url.searchParams.get('locationId') || undefined;
     if (page < 0) throw error(400, 'Invalid page number');
     if (!pageSize || pageSize < 0) throw error(400, 'Invalid page size');
 
     const { val, err } = await Entry.getPage(
         query, auth,
         page, pageSize,
-        { deleted, labelId, search },
+        { deleted, labelId, search, locationId },
     );
     if (err) throw error(400, err);
     const [ entries, numEntries ] = val;

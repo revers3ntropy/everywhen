@@ -7,15 +7,16 @@
     import Link from 'svelte-material-icons/OpenInNew.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import type { ChangeEventHandler } from 'svelte/elements';
-    import { Location } from '../../controllers/location';
-    import type { Auth } from '../../controllers/user';
-    import { popup } from '../../stores';
-    import { api, apiPath } from '../../utils/apiRequest';
-    import { displayNotifOnErr } from '../../utils/notifications';
-    import { round1DP } from '../../utils/text';
+    import { Location } from '../controllers/location';
+    import type { Auth } from '../controllers/user';
+    import { popup } from '../stores';
+    import { api, apiPath } from '../utils/apiRequest';
+    import { displayNotifOnErr } from '../utils/notifications';
+    import { round1DP } from '../utils/text';
 
     const { addNotification } = getNotificationsContext();
 
+    export let isInDialog = false;
     export let auth: Auth;
     export let id: string;
     export let name: string;
@@ -86,12 +87,14 @@
             </span>
         {/if}
 
-        <button>
-            <a class="flex-center" href="/location/{id}">
-                See more
-                <Link />
-            </a>
-        </button>
+        {#if isInDialog}
+            <button>
+                <a class="flex-center" href="/location/{id}">
+                    See more
+                    <Link />
+                </a>
+            </button>
+        {/if}
         <button
             on:click={bin}
             use:tooltip={{

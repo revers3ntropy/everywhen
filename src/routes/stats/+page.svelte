@@ -3,8 +3,6 @@
     import { tooltip } from '@svelte-plugins/tooltips';
     import { onMount } from 'svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
-    import Map from '../../lib/components/map/Map.svelte';
-    import type { Location } from '../../lib/controllers/location';
     import CommonWordsList from './CommoWordsList.svelte';
     import EntryBarChart from './EntryBarChart.svelte';
     import EntryHeatMap from './EntryHeatMap.svelte';
@@ -20,7 +18,6 @@
         charCount: number,
         commonWords: [ string, number ][],
         days: number,
-        locations: Location[],
     };
 
     onMount(() => document.title = 'Analytics');
@@ -108,14 +105,6 @@
                     <EntryBarChart {by} entries={data.entries} />
                 </div>
             {/if}
-        </section>
-
-        <section>
-            <Map
-                auth={data}
-                locations={data.locations}
-                entries={data.entries}
-            />
         </section>
 
         <section class="container">

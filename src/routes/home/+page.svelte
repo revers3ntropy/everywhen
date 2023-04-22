@@ -6,6 +6,7 @@
     import Counter from 'svelte-material-icons/Counter.svelte';
     import ImageOutline from 'svelte-material-icons/ImageOutline.svelte';
     import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
+    import MapMarkerOutline from 'svelte-material-icons/MapMarkerOutline.svelte';
     import Notebook from 'svelte-material-icons/Notebook.svelte';
     import type { App } from '../../app';
     import EntryTitles from '../../lib/components/EntryTitles.svelte';
@@ -71,6 +72,10 @@
             <a class="primary" href="/assets">
                 <ImageOutline size="30" />
                 Gallery
+            </a>
+            <a class="primary" href="/location">
+                <MapMarkerOutline size="30" />
+                Map
             </a>
             <a class="primary" href="/settings">
                 <Cog size="30" />

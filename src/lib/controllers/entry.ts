@@ -9,8 +9,16 @@ import type {
     TimestampSecs,
 } from '../utils/types';
 import { Label } from './label';
+import { Location } from './location';
 import type { Auth } from './user';
 import { UUID } from './uuid';
+
+export interface EntryFilter {
+    readonly search?: string;
+    readonly labelId?: string;
+    readonly locationId?: string;
+    readonly deleted?: boolean | 'both';
+}
 
 export interface Streaks {
     current: number;
@@ -108,9 +116,15 @@ export class Entry {
     public static async allRaw (
         query: QueryFunc,
         auth: Auth,
-        deleted: boolean | 'both' = false,
-    ): Promise<RawEntry[]> {
-        return await query<RawEntry[]>`
+        filter: Omit<EntryFilter, 'search'> = {},
+    ): Promise<Result<RawEntry[]>> {
+        let location: Location | undefined;
+        if (filter.locationId) {
+            const locationResult = await Location.fromId(query, auth, filter.locationId);
+            if (locationResult.err) return Result.err(locationResult.err);
+            location = locationResult.val;
+        }
+        return Result.ok(await query<RawEntry[]>`
             SELECT id,
                    created,
                    createdTZOffset,
@@ -122,18 +136,31 @@ export class Entry {
                    longitude,
                    agentData
             FROM entries
-            WHERE (deleted = ${deleted ? 1 : 0} OR ${deleted === 'both'})
+            WHERE (deleted = ${filter.deleted ? 1 : 0} OR ${filter.deleted === 'both'})
+              AND (label = ${filter.labelId || ''} OR ${filter.labelId === undefined})
+              AND (${location === undefined} OR (
+                    latitude IS NOT NULL
+                    AND longitude IS NOT NULL
+                    AND SQRT(
+                                    POW(latitude - ${location?.latitude || 0}, 2)
+                                    + POW(longitude - ${location?.longitude || 0}, 2)
+                            ) <= ${location?.radius || 0}
+                ))
               AND user = ${auth.id}
             ORDER BY created DESC, id
-        `;
+        `);
     }
 
     public static async all (
         query: QueryFunc,
         auth: Auth,
-        deleted: boolean | 'both' = false,
+        filter: EntryFilter = {},
     ): Promise<Result<Entry[]>> {
-        const rawEntries = await Entry.allRaw(query, auth, deleted);
+        const { err, val: rawEntries } = await Entry.allRaw(
+            query, auth,
+            filter,
+        );
+        if (err) return Result.err(err);
         return Entry.fromRawMulti(query, auth, rawEntries);
     }
 
@@ -142,28 +169,18 @@ export class Entry {
         auth: Auth,
         page: number,
         pageSize: number,
-        {
-            deleted = false,
-            labelId = undefined,
-            search = undefined,
-        }: {
-            deleted?: boolean | 'both',
-            labelId?: string,
-            search?: Lowercase<string>
-        } = {},
+        filters: EntryFilter = {},
     ): Promise<Result<[ Entry[], number ]>> {
-        const rawEntries = await Entry.allRaw(query, auth, deleted);
+        const { val: rawEntries, err: rawErr } = await Entry.allRaw(query, auth, filters);
+        if (rawErr) return Result.err(rawErr);
         let { val: entries, err } = await Entry.fromRawMulti(query, auth, rawEntries);
         if (err) return Result.err(err);
 
-        if (labelId) {
-            entries = entries.filter((e) => e.label?.id === labelId);
-        }
-        if (search) {
-            entries = entries.filter((e) => {
-                return e.title.toLowerCase().includes(search)
-                    || e.entry.toLowerCase().includes(search);
-            });
+        if (filters.search) {
+            entries = entries.filter((e) => (
+                e.title.toLowerCase().includes(filters.search || '')
+                || e.entry.toLowerCase().includes(filters.search || '')
+            ));
         }
 
         const start = page * pageSize;
@@ -708,6 +725,35 @@ export class Entry {
             longest,
             runningOut,
         });
+    }
+
+    public static async near (
+        query: QueryFunc,
+        auth: Auth,
+        location: Location,
+        deleted: boolean | 'both' = false,
+    ): Promise<Result<Entry[]>> {
+        return await Entry.fromRawMulti(query, auth, await query<RawEntry[]>`
+            SELECT id,
+                   created,
+                   createdTZOffset,
+                   deleted,
+                   latitude,
+                   longitude,
+                   title,
+                   entry,
+                   label,
+                   agentData
+            FROM entries
+            WHERE (deleted = ${deleted ? 1 : 0} OR ${deleted === 'both'})
+              AND user = ${auth.id}
+              AND latitude IS NOT NULL
+              AND longitude IS NOT NULL
+              AND SQRT(
+                              POW(latitude - ${location.latitude}, 2)
+                              + POW(longitude - ${location.longitude}, 2)
+                      ) <= ${location.radius}
+        `);
     }
 
     private static async fromRawMulti (
