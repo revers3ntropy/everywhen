@@ -80,7 +80,7 @@
     on:click={() => download(false)}
 >
     <Download size="30" />
-    Download Backup (Unencrypted)
+    Download Unencrypted Backup
 </button>
 <button
     disabled={downloading}

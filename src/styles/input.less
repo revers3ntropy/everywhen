@@ -131,8 +131,22 @@ button {
         }
     }
 
+    color: @accent-color-primary;
+
+    &:hover {
+        color: @accent-color-secondary;
+    }
+
+    &.not-link {
+        color: @text-color;
+
+        &:hover {
+            color: @text-color;
+            text-decoration: none;
+        }
+    }
+
     &.link {
-        color: @accent-color-primary;
         text-decoration: underline;
         cursor: pointer;
         padding: 0;
@@ -140,10 +154,6 @@ button {
         border: none;
         background: none;
         outline: none;
-
-        &:hover {
-            color: @accent-color-secondary;
-        }
     }
 
     &.icon-button {
@@ -173,4 +183,24 @@ button {
         border-style: double;
         color: @text-color-light;
     }
+}
+
+.gradient-icon {
+    &, svg, svg * {
+        fill: url(#accent-gradient) !important;
+    }
+}
+
+svg.gradient-icon * {
+    fill: url(#accent-gradient) !important;
+}
+
+.icon-gradient-on-hover:hover {
+    .gradient-icon();
+}
+
+.accent-gradient-svg {
+    position: absolute;
+    width: 0;
+    height: 0;
 }

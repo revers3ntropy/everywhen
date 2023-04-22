@@ -57,21 +57,22 @@
 
         <section class="container unbordered">
             <div class="stats">
-                <div>
+                <div class="primary">
                     <span>{data.entryCount}</span>
                     entries
+                </div>
+                <div>
+                    <span>{data.charCount}</span>
+                    characters
                 </div>
                 <div
                     use:tooltip={{
                         content: "A typical novel is 100,000 words"
                     }}
+                    class="primary"
                 >
                     <span>{data.wordCount}</span>
                     words
-                </div>
-                <div>
-                    <span>{data.charCount}</span>
-                    characters
                 </div>
                 <div>
                     <span>{(data.wordCount / (data.entryCount || 1)).toFixed(1)}</span>
@@ -85,7 +86,7 @@
                     <span>{(data.charCount / (data.wordCount || 1)).toFixed(1)}</span>
                     letters / word
                 </div>
-                <div>
+                <div class="primary">
                     <span>{(data.wordCount / data.days).toFixed(1)}</span>
                     words / day
                 </div>
@@ -169,6 +170,16 @@
             span {
                 font-weight: bold;
                 font-size: 1rem;
+            }
+
+            &.primary {
+                background: @accent-gradient;
+                color: @text-color-invert;
+                .glow();
+
+                span {
+                    color: @text-color-invert;
+                }
             }
         }
     }

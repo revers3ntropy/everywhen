@@ -4,7 +4,6 @@
     import Syncing from 'svelte-material-icons/CloudArrowUpOutline.svelte';
     import Synced from 'svelte-material-icons/CloudCheckOutline.svelte';
     import Bin from 'svelte-material-icons/Delete.svelte';
-    import Link from 'svelte-material-icons/OpenInNew.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import type { ChangeEventHandler } from 'svelte/elements';
     import { Location } from '../controllers/location';
@@ -91,7 +90,6 @@
             <button>
                 <a class="flex-center" href="/location/{id}">
                     See more
-                    <Link />
                 </a>
             </button>
         {/if}

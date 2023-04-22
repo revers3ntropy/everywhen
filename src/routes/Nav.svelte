@@ -13,6 +13,7 @@
     import Home from 'svelte-material-icons/Home.svelte';
     import Lightbulb from 'svelte-material-icons/Lightbulb.svelte';
     import Logout from 'svelte-material-icons/Logout.svelte';
+    import MapMarkerOutline from 'svelte-material-icons/MapMarkerOutline.svelte';
     import Menu from 'svelte-material-icons/Menu.svelte';
     import Moon from 'svelte-material-icons/MoonWaningCrescent.svelte';
     import Notebook from 'svelte-material-icons/Notebook.svelte';
@@ -154,6 +155,14 @@
         >
             <ChartTimeline size="40" />
             <span class="name">Timeline</span>
+        </a>
+        <a
+            aria-label="map"
+            class="icon {$page.url.pathname === '/location' ? 'current' : ''}"
+            href="/location"
+        >
+            <MapMarkerOutline size="40" />
+            <span class="name">Map</span>
         </a>
         <a
             aria-label="statistics"

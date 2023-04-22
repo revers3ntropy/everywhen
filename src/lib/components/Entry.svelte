@@ -18,6 +18,7 @@
     import { displayNotifOnErr, SUCCESS_NOTIFICATION } from '../utils/notifications';
     import { obfuscate, rawMdToHtml } from '../utils/text';
     import AgentWidget from './AgentWidget.svelte';
+    import Dot from './Dot.svelte';
     import Label from './Label.svelte';
     import LocationWidget from './LocationWidget.svelte';
 
@@ -42,6 +43,7 @@
 
     export let obfuscated = true;
     export let showLabels = true;
+    export let showLocations = true;
     export let isInDialog = false;
 
     export let auth: Auth;
@@ -84,15 +86,15 @@
     $: restoreDeleteTooltip = deleted ? 'Restore Entry' : 'Delete Entry';
 </script>
 
-<div class="entry {obfuscated ? '' : 'visible'}">
+<div class="entry {obfuscated ? '' : 'visible'} {isInDialog ? 'in-dialog' : ''}">
     <p class="mobile-title {obfuscated ? 'obfuscated' : ''}">
         {obfuscated ? obfuscate(title) : title}
     </p>
     <div class="header">
-        <div class="flex-center">
+        <div class="flex-space-evenly">
             <span class="time">
                 <UtcTime
-                    fmt={showFullDate ? 'DD-MM-YYYY h:mm A' : 'h:mm A'}
+                    fmt={showFullDate ? 'ddd DD-MM-YYYY h:mm A' : 'h:mm A'}
                     timestamp={created}
                     tooltipPosition="right"
                     tzOffset={createdTZOffset}
@@ -101,13 +103,24 @@
 
             <AgentWidget data={agentData} />
 
-            {#if latitude && longitude}
+            {#if latitude && longitude && showLocations}
                 <LocationWidget
                     {auth}
                     entryId={id}
                     {latitude}
                     {longitude}
+                    {obfuscated}
                 />
+            {/if}
+
+            {#if !obfuscated && !isEdit && edits.length > 0}
+                <Dot />
+                <a
+                    href="/journal/{id}?history=on&obfuscate=0"
+                    class="edits-link link"
+                >
+                    {edits.length} edit{edits.length > 1 ? 's' : ''}
+                </a>
             {/if}
 
             {#if showLabels}
@@ -121,11 +134,6 @@
 
         <div class="flex-center">
             {#if !obfuscated && !isEdit}
-                {#if edits.length}
-                    <a href="/journal/{id}?history=on&obfuscate=0" class="link">
-                        {edits.length} edit{edits.length > 1 ? 's' : ''}
-                    </a>
-                {/if}
                 <button
                     on:click={deleteSelf}
                     aria-label={deleted ? 'Restore' : 'Delete'}
@@ -180,11 +188,11 @@
             font-size: 1.05rem;
         }
 
-        &.visible {
-            border-image: linear-gradient(transparent,
-            @accent-color-secondary,
-            transparent) 1 100%;
-        }
+        //&.visible:not(.in-dialog) {
+        //    border-image: linear-gradient(transparent,
+        //    @accent-color-secondary,
+        //    transparent) 1 100%;
+        //}
 
         @media @mobile {
             padding: 0;
@@ -206,6 +214,7 @@
 
             @media @mobile {
                 margin: 0;
+                padding: 0;
             }
 
             :global(svg) {
@@ -296,5 +305,9 @@
                 display: block;
             }
         }
+    }
+
+    .edits-link {
+        font-size: 0.95rem;
     }
 </style>

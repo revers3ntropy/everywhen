@@ -369,6 +369,13 @@
         position: relative;
         overflow: hidden;
 
+        @media @mobile {
+            width: 100%;
+            height: calc(100vh - var(--nav-height));
+            margin: 0;
+            border-radius: 0;
+        }
+
         &.hovering {
             cursor: pointer;
         }
@@ -412,6 +419,12 @@
         &.right {
             left: auto;
             right: 0.5rem;
+        }
+    }
+
+    @media @mobile {
+        :global(main) {
+            padding: 0;
         }
     }
 </style>

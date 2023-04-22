@@ -8,6 +8,7 @@
     import type { Auth } from '../controllers/user';
     import { api } from '../utils/apiRequest';
     import { displayNotifOnErr } from '../utils/notifications';
+    import { obfuscate } from '../utils/text';
     import Dot from './Dot.svelte';
 
     const MAX_LOCATIONS_SHOWN = 2;
@@ -15,6 +16,7 @@
     export const { addNotification } = getNotificationsContext();
 
     export let auth: Auth;
+    export let obfuscated = false;
     export let entryId: string | null = null;
     export let latitude: number;
     export let longitude: number;
@@ -56,12 +58,18 @@
             <span class="multi-locations-container">
                 {#each locations as location, i}
                     {#if i < MAX_LOCATIONS_SHOWN}
-                        <a href="/location/{location.id}">
-                            {location.name}
-                            {#if i < locations.length - 1}
-                                <Dot />
-                            {/if}
-                        </a>
+                        {#if obfuscated}
+                            <span class="text-light obfuscated">
+                                {obfuscate(location.name)}
+                            </span>
+                        {:else}
+                            <a href="/location/{location.id}">
+                                {location.name}
+                            </a>
+                        {/if}
+                        {#if i < locations.length - 1}
+                            <Dot />
+                        {/if}
                     {:else if i === MAX_LOCATIONS_SHOWN}
                         <span
                             use:tooltip={{

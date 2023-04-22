@@ -1,12 +1,8 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import Calendar from 'svelte-material-icons/Calendar.svelte';
-    import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
     import Cog from 'svelte-material-icons/Cog.svelte';
-    import Counter from 'svelte-material-icons/Counter.svelte';
     import ImageOutline from 'svelte-material-icons/ImageOutline.svelte';
     import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
-    import MapMarkerOutline from 'svelte-material-icons/MapMarkerOutline.svelte';
     import Notebook from 'svelte-material-icons/Notebook.svelte';
     import type { App } from '../../app';
     import EntryTitles from '../../lib/components/EntryTitles.svelte';
@@ -50,35 +46,19 @@
     <section>
         <div class="buttons">
             <a class="primary" href="/journal">
-                <Notebook size="30" />
+                <Notebook size="25" />
                 Journal
             </a>
-            <a class="primary" href="/events">
-                <Calendar size="30" />
-                Events
-            </a>
-            <a class="primary" href="/labels">
-                <LabelOutline size="30" />
+            <a class="icon-gradient-on-hover" href="/labels">
+                <LabelOutline size="25" />
                 Labels
             </a>
-            <a class="primary" href="/timeline">
-                <ChartTimeline size="30" />
-                Timeline
-            </a>
-            <a class="primary" href="/stats">
-                <Counter size="30" />
-                Stats
-            </a>
-            <a class="primary" href="/assets">
-                <ImageOutline size="30" />
+            <a class="icon-gradient-on-hover" href="/assets">
+                <ImageOutline size="25" />
                 Gallery
             </a>
-            <a class="primary" href="/location">
-                <MapMarkerOutline size="30" />
-                Map
-            </a>
-            <a class="primary" href="/settings">
-                <Cog size="30" />
+            <a class="icon-gradient-on-hover" href="/settings">
+                <Cog size="25" />
                 Settings
             </a>
         </div>
@@ -141,25 +121,22 @@
             // assumed one svg icon and then text
             grid-template-columns: 35px 1fr;
             font-size: 1.2rem;
-            padding: .7em 1.2em;
+            padding: 0.6em 0.8em;
             margin: 1em;
             border-radius: 5px;
             text-decoration: none;
             transition: all 0.2s ease;
             color: @accent-color-primary;
+            border: 1px solid @light-accent;
 
             &:after {
                 display: none;
             }
 
             &:hover {
-                background: @light-accent;
+                background: @light-v-accent;
                 color: @accent-color-secondary;
                 text-decoration: none;
-
-                :global(svg), :global(svg *) {
-                    color: @accent-color-secondary !important;
-                }
             }
 
             @media @mobile {
@@ -168,6 +145,18 @@
                 padding: 0.5em;
                 margin: 0.2em;
                 text-align: center;
+            }
+
+            &.primary {
+                background: @accent-gradient;
+
+                &, :global(svg), :global(svg *) {
+                    color: @text-color-invert;
+                }
+
+                &:hover {
+                    .glow();
+                }
             }
         }
     }

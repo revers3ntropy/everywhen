@@ -11,6 +11,7 @@
     export let obfuscated = true;
     export let entries: EntryController[];
     export let showLabels = true;
+    export let showLocations = true;
     export let auth: Auth;
     export let day: number;
 
@@ -25,7 +26,7 @@
     <div class="title">
         <div>
             <h3>
-                <button class="flex-center" on:click={toggleCollapse}>
+                <button class="flex-center not-link" on:click={toggleCollapse}>
                     {#if collapsed}
                         <ChevronDown size="30" />
                     {:else}
@@ -41,7 +42,8 @@
                     {#if collapsed}
                         <p class="entry-count">
                             <Dot />
-                            {entries.length} entries
+                            {entries.length}
+                            {entries.length === 1 ? 'entry' : 'entries'}
                         </p>
                     {/if}
                 </button>
@@ -70,6 +72,7 @@
                     on:updated
                     {obfuscated}
                     {showLabels}
+                    {showLocations}
                     {auth}
                 />
             {/each}

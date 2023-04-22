@@ -1,5 +1,6 @@
 <script lang="ts">
     import ImageOutline from 'svelte-material-icons/ImageOutline.svelte';
+    import Dot from '../../lib/components/Dot.svelte';
     import type { Asset as AssetController } from '../../lib/controllers/asset';
     import { obfuscated } from '../../lib/stores';
     import Asset from './Asset.svelte';
@@ -15,7 +16,10 @@
     <h1>
         <ImageOutline size="40" />
         <span>Gallery</span>
-        <i>({numAssets})</i>
+        {#if numAssets > 0}
+            <Dot />
+            {numAssets}
+        {/if}
     </h1>
     <div class="assets">
         {#each data.assets as asset}
@@ -27,6 +31,11 @@
             />
         {/each}
     </div>
+    {#if numAssets === 0}
+        <div class="flex-center">
+            <i>No images yet</i>
+        </div>
+    {/if}
 </main>
 
 <style lang="less">

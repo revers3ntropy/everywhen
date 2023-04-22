@@ -109,7 +109,7 @@
         {description}
     </div>
     <div class="right">
-        <label>
+        <label class="label-for-{inputType}">
             <input
                 checked={inputType === 'checkbox' && value}
                 class="text-box"
@@ -117,6 +117,7 @@
                 type={inputType}
                 value={value}
             />
+            <span class="checkmark"></span>
             {unit}
         </label>
     </div>
@@ -128,7 +129,7 @@
 
     .wrapper {
         display: grid;
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: 1fr 25rem;
         padding: 1em 0.5em;
 
         @media @mobile {
@@ -144,6 +145,70 @@
         }
     }
 
+    .label-for-checkbox {
+        // https://www.w3schools.com/howto/howto_css_custom_checkbox.asp
+        display: block;
+        position: relative;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 25px;
+            width: 25px;
+            background-color: @light-accent;
+            border-radius: @border-radius;
+        }
+
+        input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+
+            &:checked ~ .checkmark {
+                display: block;
+            }
+        }
+
+        &:hover input ~ .checkmark {
+            background-color: @border-heavy;
+        }
+
+        &:hover input:checked ~ .checkmark {
+            background-color: @accent-color-secondary;
+        }
+
+        input:checked ~ .checkmark {
+            background-color: @accent-color-primary;
+        }
+
+        & .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+            left: 9px;
+            top: 5px;
+            width: 5px;
+            height: 10px;
+            border: solid black;
+            border-width: 0 3px 3px 0;
+            -webkit-transform: rotate(45deg);
+            -ms-transform: rotate(45deg);
+            transform: rotate(45deg);
+        }
+
+        input:checked ~ .checkmark:after {
+            display: block;
+        }
+    }
+
     input {
         margin: 0 0 .5rem 0;
 
@@ -153,11 +218,6 @@
 
         &:not([type="text"]) {
             cursor: pointer;
-        }
-
-        &[type="checkbox"] {
-            scale: 1.4;
-            margin-left: 50px;
         }
     }
 

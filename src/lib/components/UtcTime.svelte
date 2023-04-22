@@ -45,5 +45,7 @@
         color: inherit;
         font-style: inherit;
         font-size: inherit;
+
+        white-space: nowrap;
     }
 </style>

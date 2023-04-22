@@ -31,6 +31,12 @@ main:extend(#svelte) {
     align-items: center;
 }
 
+.flex-space-evenly {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+
 .page-center {
     position: fixed;
     top: 50%;
@@ -61,4 +67,8 @@ main:extend(#svelte) {
     @media @mobile {
         display: none !important;
     }
+}
+
+.glow {
+    box-shadow: 0 0 8px 2px rgba(121, 235, 226, 0.5);
 }

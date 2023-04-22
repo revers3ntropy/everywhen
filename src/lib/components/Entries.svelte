@@ -26,6 +26,7 @@
     export let showImport = false;
     export let showSearch = true;
     export let showLabels = true;
+    export let showLocations = true;
     export let pageSize: number;
 
     interface IOptions extends EntryFilter {
@@ -86,6 +87,8 @@
         await reloadEntries(true);
     });
     $: [ page, search, browser ? reloadEntries() : 0 ];
+
+    console.log(showSearch);
 </script>
 
 <div>
@@ -139,6 +142,7 @@
                     on:updated={() => reloadEntries()}
                     obfuscated={$obfuscated}
                     {showLabels}
+                    {showLocations}
                     {auth}
                     day={parseInt(day)}
                 >
@@ -150,17 +154,29 @@
 
 <style lang="less">
     @import '../../styles/variables';
+    @import '../../styles/layout';
 
     .entries-menu {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin: 30px;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        margin: 3rem 0 0 0;
 
-        div {
+        & > div {
+            width: 100%;
             display: flex;
             align-items: center;
-            justify-items: center;
+
+            &:first-child {
+                justify-content: start;
+            }
+
+            &:nth-child(2) {
+                justify-content: center;
+            }
+
+            &:last-child {
+                justify-content: end;
+            }
         }
 
         a.primary {

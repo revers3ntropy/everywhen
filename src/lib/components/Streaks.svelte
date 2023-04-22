@@ -25,7 +25,10 @@
         loaded = true;
     });
 
-    function makeTooltip (longest: number, runningOut: boolean): string {
+    function makeTooltip (
+        longest: number,
+        runningOut: boolean,
+    ): string {
         return `Current Streak` +
             ((longest > 0) ? ` &#x2022; <br> Longest: ${longest} days` : '') +
             (runningOut ? '<br> Make an entry today to continue the Streak!' : '');
@@ -36,27 +39,34 @@
     {#if error}
         <p>{error}</p>
     {:else if streaks}
-        <span class="flex-center">
-            <span
-                class="flex-center"
-                use:tooltip={{
-                    content: makeTooltip(streaks.longest, streaks.runningOut),
-                    position: tooltipPosition
-                }}
-            >
+        <span
+            class="flex-center"
+            use:tooltip={{
+                content: makeTooltip(streaks.longest, streaks.runningOut),
+                position: tooltipPosition
+            }}
+        >
             {#if streaks.runningOut}
                 <TimerSand size="25" />
+            {:else if streaks.current > 0}
+                <span>
+                    <Fire size="25" class="gradient-icon" />
+                </span>
             {:else}
                 <Fire size="25" />
             {/if}
-
-                <b>{streaks.current}</b>
-            </span>
+            <b>{streaks.current}</b>
         </span>
     {/if}
 {:else}
-    <span class="flex-center text-light">
+    <span
+        class="flex-center"
+        use:tooltip={{
+            content: '...',
+            position: tooltipPosition
+        }}
+    >
         <Fire size="25" />
-        ...
+        <b>...</b>
     </span>
 {/if}

@@ -19,10 +19,11 @@
     <Entries
         auth={data}
         options={{
-        locationId: data.location.id
-    }}
+            locationId: data.location.id
+        }}
         pageSize={data.settings.entriesPerPage.value}
         showLabels={true}
+        showLocations={false}
         showSearch={true}
     />
 </section>

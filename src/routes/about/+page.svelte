@@ -193,7 +193,18 @@
             The
             <ContentCopy />
             button will copy the markdown to link to the image to your
-            clipboard.
+            clipboard which can then be used in an entry.
+        </p>
+
+        <h2>Locations</h2>
+
+        <p>
+            Create a Named Location by right clicking on the map on the Map
+            page.
+            This will create an area in which entries are considered to be
+            at that location.
+            Click the location to change the name or delete,
+            and drag to resize and move.
         </p>
 
         <h2>API</h2>

@@ -362,7 +362,7 @@
                 disabled={submitted}
                 on:click={submit}
             >
-                <Send size="30" />
+                <Send class="gradient-icon" size="30" />
             </button>
         </div>
     </div>

@@ -109,13 +109,17 @@ pre {
     }
 }
 
-.obfuscated, .obfuscated * {
-    color: transparent !important;
-    text-shadow: 0 0 3px @text-color;
+.obfuscated {
+    &, * {
+        color: transparent !important;
+        text-shadow: 0 0 3px @text-color !important;
+    }
 }
 
 .text-light {
-    color: @text-color-light !important;
+    &, * {
+        color: @text-color-light;
+    }
 }
 
 .text-invert {

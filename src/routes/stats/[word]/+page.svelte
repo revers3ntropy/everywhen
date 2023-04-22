@@ -90,15 +90,16 @@
                 <EntryBarChart {by} entries={data.entries} />
             </div>
         </section>
-    {/if}
 
-    <section>
-        <Entries
-            auth={data}
-            options={{ search: data.theWord }}
-            pageSize={data.settings.entriesPerPage.value}
-        />
-    </section>
+        <section class="entries">
+            <Entries
+                auth={data}
+                options={{ search: data.theWord }}
+                pageSize={data.settings.entriesPerPage.value}
+                showSearch={false}
+            />
+        </section>
+    {/if}
 </main>
 
 <style lang="less">
@@ -187,6 +188,14 @@
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
+    }
+
+    .entries {
+        padding: 1rem;
+
+        @media @mobile {
+            padding: 0;
+        }
     }
 
 </style>
