@@ -184,7 +184,7 @@
                 addNotification({
                     ...SUCCESS_NOTIFICATION,
                     removeAfter: 1000,
-                    text: `Entry created!`,
+                    text: `Entry created`,
                 });
                 break;
             case 'edit':
@@ -344,10 +344,14 @@
                 aria-label="Insert Image"
                 disabled={submitted}
                 on:click={triggerFileDrop}
-                use:tooltip={{ content: 'Insert Image' }}
+                use:tooltip={{
+                    content: 'Insert Image',
+                     position: 'bottom'
+                }}
             >
                 <ImageArea size="30" />
             </button>
+
             <LocationToggle />
 
             <LabelSelect
@@ -358,11 +362,11 @@
 
             <button
                 aria-label="Submit Entry"
-                class="send icon-button"
+                class="send"
                 disabled={submitted}
                 on:click={submit}
             >
-                <Send class="gradient-icon" size="30" />
+                <Send size="30" />
             </button>
         </div>
     </div>
@@ -384,19 +388,23 @@
         {/if}
     </div>
 
-    <button
-        aria-label="Submit Entry"
-        class="send-mobile"
-        disabled={submitted}
-        on:click={submit}
-    >
-        <Send size="30" />
-    </button>
+    <div class="send-mobile flex-center">
+        <button
+            aria-label="Submit Entry"
+            class="primary with-icon"
+            disabled={submitted}
+            on:click={submit}
+        >
+            <Send size="30" />
+            Submit Entry
+        </button>
+    </div>
 </div>
 
 <style lang="less">
-    @import '../../styles/variables.less';
-    @import '../../styles/layout.less';
+    @import '../../styles/variables';
+    @import '../../styles/layout';
+    @import '../../styles/input';
 
     .container {
         margin: 0;
@@ -456,25 +464,31 @@
     }
 
     .send {
+        .flex-center();
+        border-radius: @border-radius;
         margin: 0 0 0 .2rem;
-        padding: .4rem;
+        padding: 0.1rem;
+        aspect-ratio: 1/1;
+        background: @accent-gradient;
+
+        :global(svg), :global(svg *) {
+            fill: @text-color-invert;
+        }
+
         @media @mobile {
             display: none;
+        }
+
+        &:hover {
+            .glow();
         }
     }
 
     .send-mobile {
-        .flex-center();
-
         display: none;
-        width: calc(100% - 1em);
-        border: 1px solid @border;
-        border-radius: @border-radius;
-        margin: 0.5em;
-        padding: 0.2em;
 
         @media @mobile {
-            display: inline-block;
+            display: flex;
         }
     }
 

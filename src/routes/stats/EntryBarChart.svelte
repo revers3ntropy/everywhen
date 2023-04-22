@@ -119,20 +119,16 @@
     </div>
     <div>
         <button
-            class="primary"
+            class="toggle-by-button"
             on:click={toggleBy}
-            style="
-                /* Stop the button changing size when toggled */
-                width: 10rem
-            "
         >
+            By Words
             {#if by === By.Entries}
                 <ToggleSwitch size="30" />
-                By Entries
             {:else}
                 <ToggleSwitchOff size="30" />
-                By Words
             {/if}
+            By Entries
         </button>
     </div>
 </div>
@@ -154,6 +150,16 @@
     .container {
         margin: 0;
         padding: 0.3em;
+    }
+
+    .toggle-by-button {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        :global(svg) {
+            margin: 0 0.2rem;
+        }
     }
 
 </style>

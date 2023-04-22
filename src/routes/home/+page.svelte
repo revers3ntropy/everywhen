@@ -123,20 +123,23 @@
             font-size: 1.2rem;
             padding: 0.6em 0.8em;
             margin: 1em;
-            border-radius: 5px;
             text-decoration: none;
-            transition: all 0.2s ease;
-            color: @accent-color-primary;
-            border: 1px solid @light-accent;
+            transition: all @transition;
 
             &:after {
                 display: none;
             }
 
-            &:hover {
-                background: @light-v-accent;
-                color: @accent-color-secondary;
-                text-decoration: none;
+            &:not(.primary) {
+
+                border-radius: @border-radius;
+                border: 1px solid @light-accent;
+
+                &:hover {
+                    background: @light-v-accent;
+                    color: @accent-color-secondary;
+                    text-decoration: none;
+                }
             }
 
             @media @mobile {
@@ -145,18 +148,6 @@
                 padding: 0.5em;
                 margin: 0.2em;
                 text-align: center;
-            }
-
-            &.primary {
-                background: @accent-gradient;
-
-                &, :global(svg), :global(svg *) {
-                    color: @text-color-invert;
-                }
-
-                &:hover {
-                    .glow();
-                }
             }
         }
     }

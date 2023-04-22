@@ -180,14 +180,14 @@
             unstyledButton
             width="170px"
         >
-            <span class="create-button" slot="button">
+            <span class="create-button icon-gradient-on-hover" slot="button">
                 <Plus size="40" />
             </span>
 
             <div class="record-something-buttons">
                 <div>
                     <button
-                        class="primary unbordered oneline record-entry"
+                        class="with-icon oneline record-entry"
                         on:click={makeEntry}
                     >
                         <Pencil size="30" />
@@ -196,7 +196,7 @@
                 </div>
                 <div>
                     <button
-                        class="primary unbordered oneline record-dream"
+                        class="with-icon oneline record-dream"
                         on:click={makeDream}
                     >
                         <Moon size="30" />
@@ -205,7 +205,7 @@
                 </div>
                 <div>
                     <button
-                        class="primary unbordered oneline record-idea"
+                        class="with-icon oneline record-idea"
                         on:click={makeIdea}
                     >
                         <Lightbulb size="30" />
@@ -214,7 +214,7 @@
                 </div>
                 <div>
                     <button
-                        class="primary unbordered oneline record-thought"
+                        class="with-icon oneline record-thought"
                         on:click={makeThought}
                     >
                         <Brain size="30" />
@@ -235,7 +235,7 @@
             {/if}
         </button>
 
-        <Dropdown unstyledButton>
+        <Dropdown fromRight unstyledButton>
             <span class="account-button" slot="button">
                 <span class="username-span">
                     <span class="streaks">
@@ -252,7 +252,7 @@
 
             <button
                 aria-label="download encrypted backup"
-                class="primary unbordered account-dropdown-button"
+                class="account-dropdown-button with-icon"
                 disabled={downloadingBackup}
                 on:click={downloadBackup}
             >
@@ -266,7 +266,7 @@
 
             <a
                 aria-label="settings"
-                class="primary unbordered account-dropdown-button"
+                class="account-dropdown-button with-icon"
                 href="/settings"
             >
                 <Cog size="30" />
@@ -275,7 +275,7 @@
 
             <a
                 aria-label="log out"
-                class="primary unbordered account-dropdown-button"
+                class="account-dropdown-button with-icon"
                 href="/logout"
             >
                 <Logout size="30" />
@@ -288,6 +288,7 @@
 <style lang="less">
     @import '../styles/variables';
     @import '../styles/layout';
+    @import '../styles/input';
 
     nav {
         position: relative;
@@ -429,8 +430,10 @@
 
     .account-dropdown-button {
         margin: 0;
+        padding: 0.4em 0.8em 0.4em 0.4em;
 
         &:hover {
+            border-radius: @border-radius;
             background-color: @light-v-accent;
             color: @text-color;
 
@@ -451,25 +454,25 @@
         display: block;
         padding: .8rem 0 .8rem 0;
 
-        button.primary {
+        button {
             width: 100%;
+            padding: 0.4em 0.8em 0.4em 0.4em;
             margin: 0;
             border-radius: 0;
             text-align: left;
+            color: @text-color;
         }
 
         .record-entry:hover {
             background: @light-v-accent;
-            color: @text-color;
 
             :global(svg), :global(svg *) {
-                fill: @accent-color-primary;
+                fill: url(#accent-gradient);
             }
         }
 
         .record-dream:hover {
             background: rgba(0, 0, 255, 0.1);
-            color: @text-color;
 
             :global(svg), :global(svg *) {
                 fill: @accent-color-secondary;
@@ -478,7 +481,6 @@
 
         .record-idea:hover {
             background: rgba(255, 255, 0, 0.1);
-            color: @text-color;
 
             :global(svg), :global(svg *) {
                 fill: yellow;
@@ -487,10 +489,9 @@
 
         .record-thought:hover {
             background: rgba(220, 105, 33, 0.1);
-            color: @text-color;
 
             :global(svg), :global(svg *) {
-                fill: rgb(183, 110, 30);
+                fill: rgb(147, 81, 9);
             }
         }
     }

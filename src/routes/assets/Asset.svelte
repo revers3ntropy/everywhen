@@ -108,7 +108,7 @@
         </div>
         <div>
             {#if !obfuscated}
-                <button class="icon-button" on:click={deleteImg}>
+                <button class="icon-button danger" on:click={deleteImg}>
                     <Delete size="30" />
                 </button>
             {/if}

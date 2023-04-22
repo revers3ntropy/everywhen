@@ -78,7 +78,7 @@
             </button>
             <button
                 aria-label="Log In"
-                class="primary"
+                class="primary with-icon"
                 disabled={actionPending}
                 on:click|preventDefault={login}
                 type="button"

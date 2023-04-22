@@ -3,6 +3,7 @@
     import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
+    import Dot from '../../lib/components/Dot.svelte';
     import type { Label as LabelController } from '../../lib/controllers/label';
     import { api } from '../../lib/utils/apiRequest';
     import { displayNotifOnErr } from '../../lib/utils/notifications';
@@ -65,7 +66,10 @@
     <h1>
         <LabelOutline size="40" />
         <span>Labels</span>
-        <i>({data.labels.length})</i>
+        {#if data.labels.length > 0}
+            <Dot />
+            {data.labels.length}
+        {/if}
     </h1>
     <div class="labels">
         <div class="label-list">
@@ -82,7 +86,10 @@
             {/if}
 
             <div class="flex-center">
-                <button class="primary" on:click={newLabel}>
+                <button
+                    class="primary with-icon"
+                    on:click={newLabel}
+                >
                     <Plus size="30" />
                     Create Label
                 </button>

@@ -86,19 +86,27 @@
             on:change={updateColour}
         >
     </div>
-    <input
-        class="name editable-text"
-        bind:value={data.label.name}
-        on:change={updateName}
-    >
-    <button class="primary" on:click={deleteLabel}>
-        <Delete size="30" />
-        Delete this Label
-    </button>
+    <div class="title-line">
+        <input
+            class="name editable-text"
+            bind:value={data.label.name}
+            on:change={updateName}
+        >
+        <button
+            class="with-circled-icon danger"
+            on:click={deleteLabel}
+        >
+            <Delete size="30" />
+            Delete this Label
+        </button>
+    </div>
 
     {#if eventCount > 0}
         <section>
-            <h1>{eventCount} {eventCount === 1 ? "Event" : "Events"}</h1>
+            <h1>
+                {eventCount}
+                Event{eventCount !== 1 ? 's' : ''}
+            </h1>
             <div class="events">
                 {#each data.events as event}
                     <Event
@@ -127,6 +135,13 @@
 
 <style lang="less">
     @import '../../../styles/layout';
+
+    .title-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
     .name {
         font-size: 2em;
         font-weight: bold;

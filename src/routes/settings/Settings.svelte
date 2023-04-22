@@ -78,7 +78,10 @@
             <div>
                 <h3>
                     {#if saving}
-                        <Sync size={20} />
+                        <Sync
+                            size={20}
+                            class="gradient-icon"
+                        />
                     {:else}
                         <CloudCheckOutline size={20} />
                     {/if}
@@ -182,11 +185,11 @@
         }
 
         &:hover input:checked ~ .checkmark {
-            background-color: @accent-color-secondary;
+            background: @accent-color-secondary;
         }
 
         input:checked ~ .checkmark {
-            background-color: @accent-color-primary;
+            background: @accent-gradient;
         }
 
         & .checkmark:after {
@@ -211,6 +214,7 @@
 
     input {
         margin: 0 0 .5rem 0;
+        border-radius: @border-radius;
 
         @media @mobile {
             margin-top: 0.5rem;
@@ -270,7 +274,6 @@
 
         .restore button {
             color: @accent-color-primary;
-            text-decoration: underline;
 
             &:hover {
                 color: @accent-color-secondary

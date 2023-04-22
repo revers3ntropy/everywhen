@@ -1,5 +1,34 @@
-@import './variables.less';
-@import './layout.less';
+@import './variables';
+@import './layout';
+
+.gradient-icon {
+    &, svg, svg * {
+        fill: url(#accent-gradient);
+    }
+}
+
+svg.gradient-icon * {
+    fill: url(#accent-gradient);
+}
+
+.icon-gradient-on-hover {
+    &:hover {
+        .gradient-icon();
+    }
+}
+
+.accent-gradient-svg {
+    position: absolute;
+    width: 0;
+    height: 0;
+}
+
+.invert-icon {
+    svg, svg * {
+        color: @text-color-invert;
+        fill: @text-color-invert;
+    }
+}
 
 input,
 button {
@@ -9,12 +38,6 @@ button {
     border: none;
     cursor: pointer;
     outline: none;
-}
-
-.danger:hover {
-    svg {
-        color: @accent-color-danger;
-    }
 }
 
 textarea {
@@ -100,30 +123,29 @@ select {
 
 a,
 button {
+    color: @accent-color-primary;
+
+    &:hover {
+        color: @accent-color-secondary;
+    }
+
     &.primary {
         border: 1px solid @border;
         border-radius: @border-radius;
         padding: 0.4em 0.8em 0.4em 0.4em;
         margin: 0.5em;
-        color: @text-color;
+        background: @accent-gradient;
 
-        display: grid;
-        // assumed one icon (svg) and then text
-        grid-template-columns: 35px 1fr;
-        align-items: center;
-        justify-content: space-between;
-
-        &:after {
-            display: none;
+        &, svg, * {
+            color: @text-color-invert !important;
         }
 
         &:hover {
-            background: @accent-color-primary;
-            color: @text-color-invert;
+            .glow();
+        }
 
-            svg, svg * {
-                color: @text-color-invert;
-            }
+        &:after {
+            display: none;
         }
 
         &.unbordered {
@@ -131,10 +153,32 @@ button {
         }
     }
 
-    color: @accent-color-primary;
+    &.with-icon {
+        display: grid;
+        // assumed one svg icon and then text
+        grid-template-columns: 35px 1fr;
+        align-items: center;
+        justify-content: space-between;
+        margin: 0 0.3rem;
+    }
 
-    &:hover {
-        color: @accent-color-secondary;
+    &.with-circled-icon {
+        .icon-gradient-on-hover();
+
+        display: grid;
+        // assumed one svg icon and then text
+        grid-template-columns: 40px 1fr;
+        align-items: center;
+        justify-content: space-between;
+        margin: 0 0.3rem;
+
+        svg {
+            border-radius: 50%;
+            padding: 0.3em;
+            background: @light-accent;
+            margin: 0 1em 0 0.2rem;
+            width: fit-content;
+        }
     }
 
     &.not-link {
@@ -164,6 +208,7 @@ button {
 
         &:hover {
             background: @light-accent;
+            .gradient-icon();
         }
     }
 }
@@ -185,22 +230,9 @@ button {
     }
 }
 
-.gradient-icon {
-    &, svg, svg * {
-        fill: url(#accent-gradient) !important;
+.danger:hover {
+    svg, svg * {
+        color: @accent-color-danger;
+        fill: @accent-color-danger !important;
     }
-}
-
-svg.gradient-icon * {
-    fill: url(#accent-gradient) !important;
-}
-
-.icon-gradient-on-hover:hover {
-    .gradient-icon();
-}
-
-.accent-gradient-svg {
-    position: absolute;
-    width: 0;
-    height: 0;
 }

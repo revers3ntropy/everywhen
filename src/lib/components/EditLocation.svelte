@@ -82,7 +82,7 @@
                 content: 'Syncing...',
                 position: 'right'
             }}>
-                <Syncing size="25" />
+                <Syncing size="25" class="gradient-icon" />
             </span>
         {/if}
 

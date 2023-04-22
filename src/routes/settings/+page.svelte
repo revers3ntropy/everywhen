@@ -50,6 +50,7 @@
             <BackupOptions auth={data} />
             <a
                 aria-label="Log Out"
+                class="danger"
                 href="/logout"
             >
                 <Logout size="30" />
@@ -125,10 +126,6 @@
                 place-items: center;
                 grid-template-columns: 35px 1fr;
                 color: @accent-color-primary;
-
-                &.danger:hover {
-                    color: @accent-color-danger;
-                }
 
                 &:hover {
                     text-decoration: none;

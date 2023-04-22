@@ -109,7 +109,6 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 10px;
         background-color: @light-accent;
         border-radius: @border-radius;
         border: none;

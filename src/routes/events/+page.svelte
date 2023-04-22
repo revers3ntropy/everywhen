@@ -122,13 +122,16 @@
     <div class="menu">
         <div class="flex-center">
             <button
-                class="primary"
+                class="primary with-icon"
                 on:click={newEvent}
             >
                 <Plus size="30" />
                 New Event
             </button>
-            <button class="primary" on:click={importPopup}>
+            <button
+                class="with-icon icon-gradient-on-hover"
+                on:click={importPopup}
+            >
                 <TrayArrowUp size="30" />
                 Import
             </button>

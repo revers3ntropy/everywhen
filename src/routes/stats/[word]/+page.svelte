@@ -5,6 +5,7 @@
     import Entries from '../../../lib/components/Entries.svelte';
     import { By, type EntryWithWordCount } from '../helpers';
     import SearchForWord from '../SearchForWord.svelte';
+    import StatPill from '../StatPill.svelte';
     import EntryBarChart from './../EntryBarChart.svelte';
     import EntryHeatMap from './../EntryHeatMap.svelte';
 
@@ -60,25 +61,26 @@
     {:else}
         <section class="container unbordered">
             <div class="stats">
-                <div>
-                    appears
-                    <span>{data.wordInstances}</span>
-                    times
-                </div>
-                <div>
-                    in
-                    <span>{data.entries.length}</span>
-                    entries
-                </div>
-                <div>
-                    <span>{(data.wordInstances / data.totalEntries).toFixed(1)}</span>
-                    / entry
-                </div>
-                <div>
-                    appears in
-                    <span>{(data.entries.length / data.totalEntries * 100).toFixed(1)}</span>
-                    % of entries
-                </div>
+                <StatPill
+                    primary
+                    beforeLabel="appears"
+                    value={data.wordInstances}
+                    label="times"
+                />
+                <StatPill
+                    beforeLabel="in"
+                    value={data.entries.length}
+                    label="entries"
+                />
+                <StatPill
+                    value={(data.wordInstances / data.totalEntries).toFixed(1)}
+                    label="/ entry"
+                />
+                <StatPill
+                    beforeLabel="appears in"
+                    value={(data.entries.length / data.totalEntries * 100).toFixed(1)}
+                    label="% of entries"
+                />
             </div>
         </section>
 
@@ -146,19 +148,6 @@
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
-
-        & > div {
-            background: @light-accent;
-            padding: 0.3rem;
-            border-radius: 0.5rem;
-            margin: 0.5rem;
-            font-size: 0.90rem;
-
-            span {
-                font-weight: bold;
-                font-size: 1rem;
-            }
-        }
     }
 
     .charts {

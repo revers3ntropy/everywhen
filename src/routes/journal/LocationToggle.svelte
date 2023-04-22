@@ -9,6 +9,8 @@
 
     const { addNotification } = getNotificationsContext();
 
+    export let tooltipPosition = 'bottom';
+
     async function watchLocationPermissions () {
         const permissionStatus = await navigator
             .permissions
@@ -53,7 +55,8 @@
     <button
         on:click={disableLocation}
         use:tooltip={{
-            content: 'Location will be recorded, click to turn off location'
+            content: 'Location will be recorded, click to turn off location',
+            position: tooltipPosition
         }}
         aria-label="Turn off Location"
     >

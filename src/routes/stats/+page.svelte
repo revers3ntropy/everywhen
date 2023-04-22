@@ -8,6 +8,7 @@
     import EntryHeatMap from './EntryHeatMap.svelte';
     import { By, type EntryWithWordCount } from './helpers';
     import SearchForWord from './SearchForWord.svelte';
+    import StatPill from './StatPill.svelte';
 
     let by: By = By.Entries;
 
@@ -57,43 +58,39 @@
 
         <section class="container unbordered">
             <div class="stats">
-                <div class="primary">
-                    <span>{data.entryCount}</span>
-                    entries
-                </div>
-                <div>
-                    <span>{data.charCount}</span>
-                    characters
-                </div>
-                <div
-                    use:tooltip={{
-                        content: "A typical novel is 100,000 words"
-                    }}
-                    class="primary"
-                >
-                    <span>{data.wordCount}</span>
-                    words
-                </div>
-                <div>
-                    <span>{(data.wordCount / (data.entryCount || 1)).toFixed(1)}</span>
-                    words / entry
-                </div>
-                <div
-                    use:tooltip={{
-                        content: "The average English word is 4.7 letters long"
-                    }}
-                >
-                    <span>{(data.charCount / (data.wordCount || 1)).toFixed(1)}</span>
-                    letters / word
-                </div>
-                <div class="primary">
-                    <span>{(data.wordCount / data.days).toFixed(1)}</span>
-                    words / day
-                </div>
-                <div>
-                    <span>{(data.entryCount / Math.max(data.days / 7, 1)).toFixed(1)}</span>
-                    entries / week
-                </div>
+                <StatPill
+                    primary
+                    value={data.entryCount}
+                    label="entries"
+                />
+                <StatPill
+                    value={data.charCount}
+                    label="characters"
+                />
+                <StatPill
+                    primary
+                    value={data.wordCount}
+                    label="words"
+                    tooltip="A typical novel is 100,000 words"
+                />
+                <StatPill
+                    value={(data.wordCount / (data.entryCount || 1)).toFixed(1)}
+                    label="words / entry"
+                />
+                <StatPill
+                    value={(data.charCount / (data.wordCount || 1)).toFixed(1)}
+                    label="letters / word"
+                    tooltip="The average English word is 4.7 letters long"
+                />
+                <StatPill
+                    primary
+                    value={(data.wordCount / data.days).toFixed(1)}
+                    label="words / day"
+                />
+                <StatPill
+                    value={(data.entryCount / Math.max(data.days / 7, 1)).toFixed(1)}
+                    label="words / week"
+                />
             </div>
         </section>
 
@@ -159,29 +156,6 @@
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
-
-        div {
-            background: @light-accent;
-            padding: 0.3rem;
-            border-radius: 0.5rem;
-            margin: 0.5rem;
-            font-size: 0.90rem;
-
-            span {
-                font-weight: bold;
-                font-size: 1rem;
-            }
-
-            &.primary {
-                background: @accent-gradient;
-                color: @text-color-invert;
-                .glow();
-
-                span {
-                    color: @text-color-invert;
-                }
-            }
-        }
     }
 
     .charts {

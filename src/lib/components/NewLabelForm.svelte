@@ -45,19 +45,43 @@
         <h1>Create New Label</h1>
     </div>
     <div class="content">
-        <input bind:value={labelName} placeholder="Name" type="text" />
-        <input bind:value={labelColour} type="color" />
+        <label>
+            Name<br>
+            <input bind:value={labelName} type="text" />
+        </label>
+        <label>
+            Colour<br>
+            <input bind:value={labelColour} type="color" />
+            <input bind:value={labelColour} type="text" />
+        </label>
     </div>
     <div class="actions">
-        <button on:click={closeHandler}> Create</button>
+        <button
+            class="primary"
+            on:click={closeHandler}
+        >
+            Create
+        </button>
     </div>
 </div>
 
 <style lang="less">
-    @import '../../styles/variables.less';
+    @import '../../styles/variables';
+    @import '../../styles/text';
 
     .content {
-        text-align: center;
+        margin-left: 10vw;
+
+        label {
+            .text-light();
+
+            display: block;
+            margin: 1rem;
+
+            input {
+                margin: 0.2rem 0 0 0;
+            }
+        }
     }
 
     .actions {

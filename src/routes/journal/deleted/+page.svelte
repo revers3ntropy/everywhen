@@ -2,6 +2,7 @@
     import { onMount } from 'svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../../../app';
+    import Dot from '../../../lib/components/Dot.svelte';
     import Entry from '../../../lib/components/Entry.svelte';
     import type { Entry as EntryController } from '../../../lib/controllers/entry';
     import { obfuscated } from '../../../lib/stores';
@@ -43,7 +44,13 @@
 </svelte:head>
 
 <main>
-    <h1>Bin</h1>
+    <h1>
+        Bin
+        {#if entries.length > 0}
+            <Dot />
+            {entries.length}
+        {/if}
+    </h1>
     {#each entries as entry}
         <Entry
             {...entry}

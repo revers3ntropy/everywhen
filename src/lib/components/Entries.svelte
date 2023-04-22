@@ -88,7 +88,6 @@
     });
     $: [ page, search, browser ? reloadEntries() : 0 ];
 
-    console.log(showSearch);
 </script>
 
 <div>
@@ -99,13 +98,13 @@
                     <Sidebar titles={entryTitles} {auth} />
                 {/if}
                 {#if showBin}
-                    <a class="primary" href="/journal/deleted">
+                    <a class="with-circled-icon" href="/journal/deleted">
                         <Bin size="30" />
                         Bin
                     </a>
                 {/if}
                 {#if showImport}
-                    <button class="primary" on:click={importPopup}>
+                    <button class="with-circled-icon hide-mobile" on:click={importPopup}>
                         <TrayArrowUp size="30" />
                         Import
                     </button>
@@ -184,11 +183,16 @@
         }
 
         @media @mobile {
-            flex-direction: column;
+            display: block;
             margin: 0;
 
-            div {
-                margin: 0.5em 0;
+            & > div {
+                margin: 1em 0;
+                justify-content: center !important;
+
+                &:first-child {
+                    justify-content: space-around !important;
+                }
             }
         }
     }
