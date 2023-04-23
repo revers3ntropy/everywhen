@@ -1,21 +1,17 @@
-export function serializeGETArgs (args: Record<string, any>): string {
-    const keys = Object.keys(args);
+export function serializeGETArgs (
+    args: Record<string, string | number | boolean | undefined>,
+): string {
+    const keys = Object.keys(args)
+                       .filter((key) => args[key] !== undefined);
     if (!keys.length) return '';
     return '?' + keys
-        .map((key) => `${key}=${args[key]}`)
+        .map((key) => `${key}=${(args[key] as string | number | boolean).toString()}`)
         .join('&');
 }
 
-export function getGETArgs (): Record<string, string> {
-    const args: Record<string, any> = {};
-    const searchParams = new URLSearchParams(location.search);
-    searchParams.forEach((value, key) => {
-        args[key] = value;
-    });
-    return args;
-}
-
-export function GETParamIsTruthy (val: string | null = null): boolean {
+export function GETParamIsTruthy (
+    val: string | null = null,
+): boolean {
     return val
         && val === 'true'
         || val === '1'
@@ -26,7 +22,9 @@ export function GETParamIsTruthy (val: string | null = null): boolean {
         || val === 'ok';
 }
 
-export function GETParamIsFalsy (val: string | null = null): boolean {
+export function GETParamIsFalsy (
+    val: string | null = null,
+): boolean {
     return val
         && val === 'false'
         || val === '0'

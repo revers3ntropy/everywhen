@@ -26,18 +26,16 @@ export const INFO_NOTIFICATION = Object.freeze({
 
 export type Notifier = (notification: NotificationOptions) => void;
 
-export function displayNotifOnErr<T extends {}> (
+export function displayNotifOnErr<T extends NonNullable<unknown>> (
     addNotification: Notifier,
     { err, val }: Result<T>,
     options: PickOptional<NotificationOptions> = {},
-    onErr: (err: string | null) => any = () => 0,
+    onErr: (err: string | null) => unknown = () => 0,
 ): T {
     if (err) {
         try {
-            err = (JSON.parse(err) as any)?.message
-                || err;
-        } catch (e) {
-        }
+            err = (JSON.parse(err) as Record<string, string>)?.message || err;
+        } catch (e) { /* empty */ }
         onErr(err);
         addNotification({
             ...ERR_NOTIFICATION,

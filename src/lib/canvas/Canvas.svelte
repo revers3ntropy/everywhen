@@ -1,16 +1,16 @@
 <script lang="ts">
     import { onMount, setContext } from 'svelte';
-    import { canvasState, CanvasState, key, type ICanvasState } from './canvasHelpers';
+    import {
+        type CanvasContext,
+        CanvasState,
+        canvasState,
+        type ICanvasState,
+        key,
+        type Listener,
+    } from './canvasHelpers';
 
     export let killLoopOnError = true;
     export let attributes: CanvasRenderingContext2DSettings = {};
-
-    interface Listener {
-        setup?: (props: CanvasState) => void | Promise<void>;
-        render?: (props: CanvasState, dt: number) => void;
-        ready: boolean;
-        mounted: boolean;
-    }
 
     let listeners: Listener[] = [];
     let frame: number;
@@ -27,8 +27,8 @@
         // setup entities
         for (const entity of listeners) {
             if (entity.setup) {
-                let p = entity.setup($canvasState);
-                if (p && (p as any).then) await p;
+                let p = entity.setup($canvasState.asRenderProps());
+                if (p && 'then' in p) await p;
             }
             entity.ready = true;
         }
@@ -45,12 +45,12 @@
         });
     });
 
-    setContext(key, {
+    setContext<CanvasContext>(key, {
         async add (fn: Listener) {
             if (setupCanvas) {
                 if (fn.setup) {
-                    let p = fn.setup($canvasState);
-                    if (p && (p as any).then) await p;
+                    let p = fn.setup($canvasState.asRenderProps());
+                    if (p && 'then' in p) await p;
                 }
                 fn.ready = true;
             }
@@ -72,7 +72,7 @@
         for (const entity of listeners) {
             try {
                 if (entity.mounted && entity.ready && entity.render) {
-                    entity.render($canvasState, dt);
+                    void entity.render($canvasState.asRenderProps(), dt);
                 }
             } catch (err) {
                 console.error(err);

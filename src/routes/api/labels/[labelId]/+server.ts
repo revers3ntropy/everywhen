@@ -27,8 +27,9 @@ export const PUT = (async ({ cookies, request, params }) => {
         colour: '',
     });
 
-    let { val: label, err } = await Label.fromId(query, auth, params.labelId);
+    const { val, err } = await Label.fromId(query, auth, params.labelId);
     if (err) throw error(400, err);
+    let label = val;
 
     if (body.name) {
         const { err, val } = await Label.updateName(query, auth, label, body.name);
@@ -44,7 +45,7 @@ export const PUT = (async ({ cookies, request, params }) => {
     return apiResponse({});
 }) satisfies RequestHandler;
 
-export let DELETE = (async ({ cookies, params, request }) => {
+export const DELETE = (async ({ cookies, params, request }) => {
     const auth = await getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
@@ -68,7 +69,7 @@ export let DELETE = (async ({ cookies, params, request }) => {
     } = await Event.withLabel(query, auth, params.labelId);
     if (eventsErr) throw error(400, eventsErr);
 
-    const [ _, entriesWithLabel ] = val;
+    const [ , entriesWithLabel ] = val;
     if (entriesWithLabel < 1 && eventsWithLabel.length < 1) {
         await Label.purgeWithId(query, auth, params.labelId);
         return apiResponse({});

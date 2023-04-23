@@ -13,7 +13,7 @@
 
     export let id: string;
     export let auth: Auth;
-    export let obfuscated: boolean = false;
+    export let obfuscated = false;
 
     let entry: EntryController | null = null;
 

@@ -1,7 +1,6 @@
 <script lang="ts">
     import { browser } from '$app/environment';
     import { beforeNavigate } from '$app/navigation';
-    // @ts-ignore
     import { tooltip } from '@svelte-plugins/tooltips';
     import { filedrop, type FileDropOptions, type Files } from 'filedrop-svelte';
     import { createEventDispatcher, onMount } from 'svelte';
@@ -107,15 +106,11 @@
     /**
      * @src https://stackoverflow.com/questions/11076975
      */
-    function insertAtCursor (input: HTMLInputElement | HTMLTextAreaElement, text: string) {
-        // IE support
-        if ((document as any).selection) {
-            input.focus();
-            const sel = (document as any).selection.createRange();
-            sel.text = text;
-        }
-        // MOZILLA and others
-        else if (input.selectionStart || input.selectionStart === 0) {
+    function insertAtCursor (
+        input: HTMLInputElement | HTMLTextAreaElement,
+        text: string,
+    ) {
+        if (input.selectionStart || input.selectionStart === 0) {
             const startPos = input.selectionStart ?? undefined;
             const endPos = input.selectionEnd ?? 0;
             input.value = input.value.substring(0, startPos)
@@ -200,7 +195,7 @@
                 location.assign(`/journal/${entry.id}?obfuscate=0`);
                 break;
             default:
-                throw new Error(`Unknown action: ${action}`);
+                throw new Error(`Unknown action: ${action as string}`);
         }
 
         dispatch('updated');
@@ -266,19 +261,19 @@
         }
         // https://stackoverflow.com/questions/19469881
         document.getElementsByClassName('entry-file-drop')[0]
-            .addEventListener('keydown', event => {
+            .addEventListener('keydown', (event: Event) => {
+                const e = event as KeyboardEvent;
                 // same check as lib uses
-                // @ts-ignore
-                if (event.key === ' ' || event.key === 'Enter') {
-                    event.stopImmediatePropagation();
+                if (e.key === ' ' || e.key === 'Enter') {
+                    e.stopImmediatePropagation();
                 }
             }, true);
     }
 
     function triggerFileDrop () {
         // bit hacky... TODO make less hacky
-        // @ts-ignore
-        document.querySelector('.entry-file-drop > input').click();
+        (document.querySelector('.entry-file-drop > input') as HTMLInputElement)
+            .click();
     }
 
     let labels: Label[] | null = null;

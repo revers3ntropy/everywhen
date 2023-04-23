@@ -17,7 +17,7 @@ export const popup = writable<typeof SvelteComponentDev | null | undefined>(null
 
 export function localStorageWritable<T> (
     lsKey: string,
-    initial: T extends Function ? never : T,
+    initial: T extends (...args: infer _) => infer _ ? never : T,
 ): Writable<T> {
 
     if (typeof initial === 'function') {
@@ -28,7 +28,7 @@ export function localStorageWritable<T> (
         const lsVal = localStorage.getItem(lsKey);
         if (lsVal !== null) {
             try {
-                initial = JSON.parse(lsVal) as T extends Function ? never : T;
+                initial = JSON.parse(lsVal) as T extends (...args: infer _) => infer _ ? never : T;
             } catch (e) {
                 console.error('Error parsing localStorage value', e);
             }

@@ -1,5 +1,4 @@
 <script lang="ts">
-    // @ts-ignore
     import { tooltip } from '@svelte-plugins/tooltips';
     import { onMount } from 'svelte';
     import Apple from 'svelte-material-icons/Apple.svelte';
@@ -16,21 +15,16 @@
         'iOS', 'Windows Phone', 'Windows Mobile',
         'Palm',
     ];
-
     const watchOSs = [ 'watchOS' ];
-
     const tvOSs = [ 'tvOS', 'NetTV' ];
-
     const consoleOSs = [ 'PlayStation', 'Xbox' ];
-
     const macOSs = [ 'Mac OS' ];
-
     const windowsOSs = [ 'Windows' ];
 
-    export let data: string = '';
+    export let data = '';
     export let size: Pixels = 20;
 
-    let parsed: any = {};
+    let parsed: unknown = {};
     let ua = null as ReturnType<typeof UAParser> | null;
 
     onMount(() => {
@@ -38,12 +32,17 @@
 
         try {
             parsed = JSON.parse(data);
-        } catch (e) {}
+        } catch (e) { /* empty */ }
 
+        if (typeof parsed !== 'object' || parsed === null) return;
+        if (!('userAgent' in parsed)) return;
+        if (typeof parsed.userAgent !== 'string') return;
         ua = new UAParser(parsed.userAgent).getResult();
     });
 
-    $: osName = ua !== null ? ua.os.name || 'Unknown OS' : '';
+    $: osName = ua !== null
+        ? ua?.os?.name || 'Unknown OS'
+        : '';
 
 </script>
 

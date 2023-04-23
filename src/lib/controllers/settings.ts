@@ -19,11 +19,11 @@ export type SettingsConfig =
     {
         [key in SettingsKey]:
         Settings<typeof Settings.config[key]['defaultValue']>
+    } & {
+        [key: string]: Settings<string | number | boolean>,
     }
-    & Record<string, Settings>;
 
 export class Settings<T = unknown> {
-
     public static config = {
         hideEntriesByDefault: {
             type: 'boolean',
@@ -37,14 +37,14 @@ export class Settings<T = unknown> {
             name: 'Auto Blur Entries After',
             description: `Blur entries after 'N' seconds without user interaction. ` +
                 `Set to 0 to disable.`,
-            unit: 'seconds'
+            unit: 'seconds',
         } satisfies ISettingsConfig<Seconds>,
         entriesPerPage: {
             type: 'number',
             defaultValue: 100,
             name: 'Entries per Page',
             description: `Number of entries displayed per page.`,
-            unit: 'entries'
+            unit: 'entries',
         } satisfies ISettingsConfig<Seconds>,
         passcode: {
             type: 'string',
@@ -58,7 +58,7 @@ export class Settings<T = unknown> {
             name: 'Passcode Timeout',
             description: `Delay before passcode is required again. `
                 + `Set to 0 to only require once.`,
-            unit: 'seconds'
+            unit: 'seconds',
         } satisfies ISettingsConfig<Seconds>,
         yearOfBirth: {
             type: 'number',
@@ -84,7 +84,7 @@ export class Settings<T = unknown> {
     ): Promise<Result<Settings>> {
         const id = await UUID.generateUUId(query);
 
-        if (!Settings.config.hasOwnProperty(key)) {
+        if (!(key in Settings.config)) {
             return Result.err(`Invalid setting key`);
         }
 
@@ -133,7 +133,7 @@ export class Settings<T = unknown> {
                 setting.id,
                 setting.created,
                 setting.key,
-                JSON.parse(unencryptedVal) as any,
+                JSON.parse(unencryptedVal),
             ));
         }));
     }

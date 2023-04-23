@@ -33,14 +33,13 @@
 
     function sortEvents<T extends Event | EventData> (
         events: T[],
-        key: EventsSortKey,
+        key: EventsSortKey & keyof T,
     ): T[] {
         if (events.length === 0) return [];
         if (typeof events[0][key] === 'string') {
             return events.sort((a, b) => {
-                return a[key]
-                    .toString()
-                    .localeCompare(b[key]?.toString());
+                return (a[key] as string)
+                    .localeCompare(b[key] as string);
             });
         } else if (typeof events[0][key] === 'number') {
             return events.sort((a, b) => {
@@ -92,6 +91,10 @@
             auth: data,
             type: 'events',
         }, reloadEvents);
+    }
+
+    function changeEventCount (by: number) {
+        eventCount += by;
     }
 
     let eventCount: number;
@@ -163,7 +166,7 @@
                     {event}
                     auth={data}
                     {selectNameId}
-                    changeEventCount={(by) => eventCount += by}
+                    {changeEventCount}
                     on:update={reloadEvents}
                     on:delete={handleDeleteEvent}
                     labels={data.labels}

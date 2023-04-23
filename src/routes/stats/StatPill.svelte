@@ -1,12 +1,11 @@
 <script lang="ts">
-    // @ts-ignore
     import { tooltip as useTooltip } from '@svelte-plugins/tooltips';
 
     export let value: number | string;
     export let beforeLabel = '';
     export let label: string;
     export let primary = false;
-    export let tooltip: string = '';
+    export let tooltip = '';
 </script>
 
 {#if tooltip}

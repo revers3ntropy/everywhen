@@ -18,7 +18,7 @@ export class UUID {
     }
 
     private static async uuidExists (query: QueryFunc, id: string) {
-        const res = await query`
+        const res = await query<{ id: string }[]>`
             SELECT id
             FROM ids
             WHERE id = ${id}

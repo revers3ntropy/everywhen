@@ -1,6 +1,4 @@
 <script lang="ts">
-    // @ts-ignore
-    import { tooltip } from '@svelte-plugins/tooltips';
     import { onMount } from 'svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
     import CommonWordsList from './CommoWordsList.svelte';

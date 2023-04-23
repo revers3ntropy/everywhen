@@ -6,7 +6,7 @@ import {
 } from '../../lib/constants';
 import type { PageServerLoad } from './$types';
 
-export const load = (async ({ cookies }) => {
+export const load = (({ cookies }) => {
     cookies.set(KEY_COOKIE_KEY, '', KEY_COOKIE_OPTIONS);
     cookies.set(USERNAME_COOKIE_KEY, '', USERNAME_COOKIE_OPTIONS);
 

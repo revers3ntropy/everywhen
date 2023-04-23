@@ -5,7 +5,6 @@
     import { onMount } from 'svelte';
     import Notifications from 'svelte-notifications';
     import Modal from 'svelte-simple-modal';
-    import type { Writable } from 'svelte/store';
     import 'ts-polyfill';
     import '../app.less';
     import { NON_AUTH_ROUTES, USERNAME_COOKIE_KEY } from '../lib/constants';
@@ -42,7 +41,7 @@
 
     let showPasscodeModal = true;
     let newVersionAvailable = false;
-    let newVersion: string = '<error>';
+    let newVersion = '<error>';
     let downloadingBackup = false;
 
     function checkObfuscatedTimeout () {
@@ -58,7 +57,7 @@
                 removeAfter: 0,
                 text: 'Hidden due to inactivity',
             });
-            (obfuscated as Writable<boolean>).set(true);
+            $obfuscated = true;
         }
     }
 
@@ -102,7 +101,7 @@
         }, 1000);
 
         setInterval(() => {
-            checkForUpdate();
+            void checkForUpdate();
         }, 1000 * 10);
     });
 
@@ -115,7 +114,7 @@
         if (downloadingBackup) return;
         downloadingBackup = true;
         const { data: backupData } = displayNotifOnErr(addNotification,
-            await api.get(data, '/backups', { encrypted: true }),
+            await api.get(data, '/backups', { encrypted: 1 }),
         );
         Backup.download(backupData, data.username, true);
         downloadingBackup = false;
@@ -131,7 +130,7 @@
             }
 
             if (e.key === 's') {
-                downloadBackup();
+                void downloadBackup();
                 e.preventDefault();
                 return;
             }

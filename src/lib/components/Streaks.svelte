@@ -1,5 +1,4 @@
 <script lang="ts">
-    // @ts-ignore
     import { tooltip } from '@svelte-plugins/tooltips';
     import { onMount } from 'svelte';
     import Fire from 'svelte-material-icons/Fire.svelte';

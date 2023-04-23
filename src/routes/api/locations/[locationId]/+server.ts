@@ -25,8 +25,9 @@ export const PUT = (async ({ cookies, request, params }) => {
         longitude: 0,
     });
 
-    let { val: location, err } = await Location.fromId(query, auth, params.locationId);
+    const { val, err } = await Location.fromId(query, auth, params.locationId);
     if (err) throw error(400, err);
+    let location = val;
 
     if (body.name) {
         const { err, val } = await Location.updateName(query, auth, location, body.name);

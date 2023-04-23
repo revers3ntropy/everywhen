@@ -18,7 +18,9 @@ declare module '$env/static/public' {
 // See https://kit.svelte.dev/docs/types#app
 declare namespace App {
 
-    interface PageData extends Auth {}
+    interface PageData extends Auth {
+        settings: SettingsConfig;
+    }
 
     // interface Error {}
     // interface Locals {}
@@ -86,4 +88,16 @@ declare global {
             }) => void;
         }
     }
+
+    declare module '@svelte-plugins/tooltips' {
+        export function tooltip (el: HTMLElement, props: {
+            content: string;
+            placement?: 'top' | 'bottom' | 'left' | 'right';
+            offset?: number;
+        }): unknown;
+    }
+
+    // Very annoying, but otherwise `svelte-check` complains about
+    // `import '@svelte-plugins/tooltips'`
+    declare module '*';
 }

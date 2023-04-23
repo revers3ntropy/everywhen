@@ -41,7 +41,7 @@ export function makeLogger<File extends string | null> (
     const colouredName = colour(name);
 
     let fileHandle: FileHandle | null = null;
-    let waitForFileHandle = file ? new Promise<void>(resolve => {
+    const waitForFileHandle = file ? new Promise<void>(resolve => {
         const interval = setInterval(() => {
             if (fileHandle) {
                 clearInterval(interval);
@@ -52,7 +52,7 @@ export function makeLogger<File extends string | null> (
 
     if (!browser && file) {
         // allow it to be used client and server side
-        import('fs')
+        void import('fs')
             .then(async fs => {
                 fileHandle = await fs.promises.open(file, 'a');
             });
@@ -82,7 +82,7 @@ export function makeLogger<File extends string | null> (
             );
         }) as File extends string ? (...args: unknown[]) => Promise<void> : never,
     };
-    self.logToFile('SETUP');
+    void self.logToFile('SETUP');
     return self;
 }
 

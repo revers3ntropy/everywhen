@@ -15,8 +15,8 @@ const cache: Record<string, Record<string, unknown>> = {};
 const cacheLastUsed: Record<string, number> = {};
 
 function roughSizeOfObject (object: unknown): number {
-    let objectList: any[] = [];
-    let stack: any[] = [ object ];
+    const objectList: unknown[] = [];
+    const stack: unknown[] = [ object ];
     let bytes = 0;
 
     while (stack.length) {
@@ -36,7 +36,7 @@ function roughSizeOfObject (object: unknown): number {
             objectList.push(value);
 
             for (const i in value) {
-                stack.push(value[i]);
+                stack.push(value[i as keyof typeof value]);
             }
         }
     }
@@ -56,15 +56,15 @@ export function cacheResponse<T> (
 function logReq (hit: boolean, url: URL) {
     const path = url.pathname.split('/');
     path.shift();
-    let pathStr = '/' + path.shift();
+    let pathStr = `/${path.shift() || ''}`;
     if (pathStr === '/api') {
-        pathStr += '/' + path.shift();
+        pathStr += `/${path.shift() || ''}`;
     }
     if (path.length) {
         pathStr += `/[...${path.join('/').length}]`;
     }
 
-    cacheLogger.logToFile(
+    void cacheLogger.logToFile(
         hit ? chalk.green('HIT ') : chalk.red('MISS'),
         pathStr,
     );
@@ -75,7 +75,7 @@ export function getCachedResponse<T> (
     userId: string,
 ): T | undefined {
     cacheLastUsed[userId] = nowS();
-    if (cache[userId]?.hasOwnProperty(url)) {
+    if (url in cache[userId]) {
         logReq(true, new URL(url));
         return cache[userId][url] as T;
     } else {
@@ -107,7 +107,7 @@ export function cleanupCache (): number {
 
     const cacheSizeAfter = roughSizeOfObject(cache);
     const changeFmt = chalk.yellow(fmtBytes(cacheSizeAfter - cacheSize));
-    cacheLogger.logToFile(
+    void cacheLogger.logToFile(
         chalk.yellow('CLEANUP'),
         `size=${bytesFmt}`,
         `timeout=${timeout}s`,
@@ -131,7 +131,7 @@ export function cacheTimeout (size: Bytes): Seconds {
 export function cachedApiRoute<
     Params extends Partial<Record<string, string>>,
     RouteId extends string | null,
-    Res extends {},
+    Res extends NonNullable<unknown>,
 > (
     handler: (
         auth: Auth,
@@ -164,8 +164,8 @@ export function cachedApiRoute<
 
 export function cachedPageRoute<
     Params extends Partial<Record<string, string>>,
-    ParentData extends Record<string, any>,
-    OutputData extends Record<string, any>,
+    ParentData extends Record<string, unknown>,
+    OutputData extends Record<string, unknown>,
     RouteId extends string
 > (
     handler: (

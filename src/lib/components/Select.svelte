@@ -3,9 +3,9 @@
     import MenuUp from 'svelte-material-icons/MenuUp.svelte';
     import Dropdown from '../../lib/components/Dropdown.svelte';
 
-    export let options: Record<string, any>;
+    export let options: Record<string, string | number>;
     export let key: string;
-    export let open: boolean = false;
+    export let open = false;
 
     export let value = null;
     $: value = options[key];

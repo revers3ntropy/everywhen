@@ -64,16 +64,19 @@
         if (search) {
             entriesOptions.search = search;
         }
+        if (!entriesOptions.search) {
+            delete entriesOptions.search;
+        }
 
-        api.get(auth, `/entries`, entriesOptions)
-           .then(res => displayNotifOnErr(addNotification, res))
-           .then(res => {
-               entries = Entry.groupEntriesByDay(res.entries);
-               pages = res.totalPages;
-               entryCount = res.totalEntries;
+        void api.get(auth, `/entries`, entriesOptions)
+                .then(res => displayNotifOnErr(addNotification, res))
+                .then(res => {
+                    entries = Entry.groupEntriesByDay(res.entries);
+                    pages = res.totalPages;
+                    entryCount = res.totalEntries;
 
-               loading = false;
-           });
+                    loading = false;
+                });
 
         const res = displayNotifOnErr(addNotification,
             await api.get(auth, '/entries/titles'),

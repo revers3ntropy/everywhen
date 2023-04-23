@@ -15,16 +15,16 @@
 
     export let message: string;
     export let readEncoding: 'UTF-8' | 'b64' = 'UTF-8';
-    export let showTextBox: boolean = false;
+    export let showTextBox = false;
     export let textBoxType: 'password' | 'text' = 'text';
-    export let textBoxLabel: string = '';
-    export let textBoxPlaceholder: string = '';
+    export let textBoxLabel = '';
+    export let textBoxPlaceholder = '';
     export let withContents: (
         body: Result<string>,
         textBoxContent?: string,
     ) => Promise<void> | void;
 
-    let textBoxContent: string = '';
+    let textBoxContent = '';
 
     async function onFileDrop (e: CustomEvent<{ files: Files }>) {
         const files = e.detail.files;

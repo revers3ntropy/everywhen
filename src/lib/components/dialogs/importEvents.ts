@@ -22,7 +22,7 @@ export async function importEvents (
     let json: unknown = [];
 
     try {
-        json = JSON.parse(contents) as unknown;
+        json = JSON.parse(contents);
     } catch (e: unknown) {
         return {
             text: `File was not valid JSON`,
@@ -35,11 +35,11 @@ export async function importEvents (
         };
     }
 
-    let errors: [ number, string ][] = [];
-    let notifications: Partial<NotificationOptions>[] = [];
+    const errors: [ number, string ][] = [];
+    const notifications: Partial<NotificationOptions>[] = [];
 
     let i = -1;
-    for (let eventJson of json) {
+    for (const eventJson of json) {
         i++;
 
         if (!matches(eventJson, {
@@ -107,8 +107,8 @@ export async function importEvents (
         };
     }
 
-    for (let error of errors) {
-        const text = '#' + error[0] + ': ' + error[1];
+    for (const error of errors) {
+        const text = `#${error[0]}: ${error[1]}`;
         console.error(text);
         notifications.push({ text });
     }

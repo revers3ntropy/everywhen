@@ -1,5 +1,4 @@
 <script lang="ts">
-    // @ts-ignore
     import { tooltip } from '@svelte-plugins/tooltips';
     import { onMount } from 'svelte';
     import MapMarkerOffOutline from 'svelte-material-icons/MapMarkerOffOutline.svelte';
@@ -26,18 +25,22 @@
         checkPermission();
     }
 
-    async function enableLocation () {
-        // trigger the permission request
-        navigator.geolocation.getCurrentPosition(() => {
-            enabledLocation.set(true);
-        }, () => {
-            enabledLocation.set(false);
-            addNotification({
-                text: 'Something went wrong enabling location'
-                    + ' - please check your browser settings',
-                removeAfter: 8000,
-                type: 'error',
-                position: 'top-center',
+    function enableLocation (): Promise<boolean> {
+        return new Promise(resolve => {
+            // trigger the permission request
+            navigator.geolocation.getCurrentPosition(() => {
+                enabledLocation.set(true);
+                resolve(true);
+            }, () => {
+                enabledLocation.set(false);
+                resolve(false);
+                addNotification({
+                    text: 'Something went wrong enabling location'
+                        + ' - please check your browser settings',
+                    removeAfter: 8000,
+                    type: 'error',
+                    position: 'top-center',
+                });
             });
         });
     }

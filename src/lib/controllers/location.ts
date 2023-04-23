@@ -110,13 +110,13 @@ export class Location {
         auth: Auth,
         id: string,
     ): Promise<Result<Location>> {
-        return (await Location.fromRaw(auth, await query<Location[]>`
+        return Location.fromRaw(auth, await query<Location[]>`
             SELECT id, created, createdTZOffset, name, latitude, longitude, radius
             FROM locations
             WHERE user = ${auth.id}
               AND id = ${id}
-        `))
-            .map(labels => labels[0]);
+        `)
+                       .map(labels => labels[0]);
     }
 
     public static async updateName (

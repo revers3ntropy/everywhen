@@ -16,15 +16,17 @@ import { nowS } from './time';
 export type ReqBody = {
     timezoneUtcOffset?: number,
     utcTimeS?: number,
-    [key: string]: any,
+    [key: string]: unknown,
 }
 
 export type ResType<T> =
-    T extends (props: any) => Promise<GenericResponse<infer R>>
-        ? T extends typeof apiRes404
-            ? 'this path gives a 404'
-            : R
-        : 'not an API route';
+    T extends typeof apiRes404
+        ? 'this path gives a 404'
+        : T extends (props: infer _) => Promise<GenericResponse<infer R>>
+            ? R
+            : T extends (props: infer _) => GenericResponse<infer R>
+                ? R
+                : 'not an API route';
 
 export type GET<T extends { GET: unknown }> = ResType<T['GET']>;
 export type POST<T extends { POST: unknown }> = ResType<T['POST']>;
@@ -141,13 +143,13 @@ export async function makeApiReq<
     try {
         const resTxt = await response.text();
         try {
-            const res: any = JSON.parse(resTxt);
+            const res = JSON.parse(resTxt);
             if (typeof res === 'object' && res !== null) {
-                if (res.error) {
-                    return Result.err(res.error);
+                if ('error' in res) {
+                    return Result.err(typeof res.error === 'string' ? res.error : JSON.stringify(res.error));
                 }
-                if (res.message) {
-                    return Result.err(res.message);
+                if ('message' in res) {
+                    return Result.err(typeof res.message === 'string' ? res.message : JSON.stringify(res.message));
                 }
             }
         } catch (e) {
@@ -161,7 +163,7 @@ export async function makeApiReq<
 
 export const api = {
     get: async <Path extends keyof ApiResponse['GET'], Body extends ReqBody> (
-        auth: Auth, path: Path, args: object = {},
+        auth: Auth, path: Path, args: Record<string, string | number | boolean | undefined> = {},
     ) => (
         await makeApiReq<'GET', Path, Body>(auth, 'GET', path + serializeGETArgs(args))
     ),

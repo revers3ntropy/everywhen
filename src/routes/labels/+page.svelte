@@ -30,23 +30,27 @@
             name,
             colour: '#000',
         };
+
         const { id } = displayNotifOnErr(addNotification,
             await api.post(data, '/labels', newLabel),
         );
 
         data = {
             ...data,
-            labels: [ ...data.labels, {
-                ...newLabel,
-                id,
-                created: nowS(),
-                entryCount: 0,
-                eventCount: 0,
-            } ],
+            labels: [
+                ...data.labels,
+                {
+                    ...newLabel,
+                    id,
+                    created: nowS(),
+                    entryCount: 0,
+                    eventCount: 0,
+                },
+            ],
         };
     }
 
-    function labelDeleted (id: string) {
+    function labelDeleted ({ detail: { id } }: { detail: { id: string } }) {
         data = {
             ...data,
             labels: data.labels.filter(l => l.id !== id),
@@ -77,7 +81,7 @@
                 <LabelOptions
                     {...label}
                     auth={data}
-                    on:delete={({ detail }) => labelDeleted(detail.id)}
+                    on:delete={labelDeleted}
                 />
             {/each}
 

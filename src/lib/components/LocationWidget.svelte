@@ -1,5 +1,4 @@
 <script lang="ts">
-    // @ts-ignore
     import { tooltip } from '@svelte-plugins/tooltips';
     import { onMount } from 'svelte';
     import MapMarker from 'svelte-material-icons/MapMarkerOutline.svelte';

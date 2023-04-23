@@ -21,7 +21,7 @@ export async function importEntries (
     let json: unknown = [];
 
     try {
-        json = JSON.parse(contents) as unknown;
+        json = JSON.parse(contents);
     } catch (e: unknown) {
         return {
             text: `File was not valid JSON`,
@@ -34,18 +34,24 @@ export async function importEntries (
         };
     }
 
-    let errors: [ number, string ][] = [];
-    let notifications: Partial<NotificationOptions>[] = [];
+    const errors: [ number, string ][] = [];
+    const notifications: Partial<NotificationOptions>[] = [];
 
     let i = -1;
-    for (let entryJSON of json) {
+    for (const entryJSON of json) {
         i++;
 
-        if (typeof (entryJSON as any).time === 'string') {
-            (entryJSON as any).time = parseInt((entryJSON as any).time);
+        if (typeof entryJSON !== 'object' || entryJSON === null) {
+            errors.push([ i, `entry is not object` ]);
+            continue;
         }
-        if (typeof (entryJSON as any).deleted !== 'boolean') {
-            (entryJSON as any).deleted = !!(entryJSON as any).deleted;
+
+        // be more flexible with the JSON
+        if ('time' in entryJSON && typeof entryJSON.time === 'string') {
+            entryJSON.time = parseInt(entryJSON.time);
+        }
+        if ('deleted' in entryJSON && typeof entryJSON.deleted !== 'boolean') {
+            entryJSON.deleted = !!entryJSON.deleted;
         }
 
         if (!matches(entryJSON, {
@@ -128,8 +134,8 @@ export async function importEntries (
         };
     }
 
-    for (let error of errors) {
-        const text = '#' + error[0] + ': ' + error[1];
+    for (const error of errors) {
+        const text = `#${error[0]}: ${error[1]}`;
         console.error(text);
         notifications.push({ text });
     }

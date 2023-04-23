@@ -23,6 +23,7 @@
         )) {
             return;
         }
+
         const { backup: backupData } = displayNotifOnErr(addNotification,
             await api.delete(data, '/users'),
         );

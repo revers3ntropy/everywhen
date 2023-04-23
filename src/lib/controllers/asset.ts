@@ -175,7 +175,7 @@ export class Asset {
     }
 
     public static async purgeAll (query: QueryFunc, auth: Auth): Promise<void> {
-        query`
+        await query`
             DELETE
             FROM assets
             WHERE user = ${auth.id}

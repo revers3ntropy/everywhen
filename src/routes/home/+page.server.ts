@@ -6,7 +6,7 @@ import type { PageServerLoad } from './$types';
 
 const NUMBER_OF_ENTRY_TITLES = 10;
 
-export const load: PageServerLoad = cachedPageRoute(async (auth, {}) => {
+export const load: PageServerLoad = cachedPageRoute(async (auth) => {
     const { val: entries, err } = await Entry.getTitles(query, auth);
     if (err) throw error(400, err);
 

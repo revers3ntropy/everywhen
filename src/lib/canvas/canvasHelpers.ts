@@ -8,6 +8,25 @@ export const START_ZOOM = 1 / (60 * 60);
 
 type CanvasListener<T = MouseEvent & TouchEvent & WheelEvent> = (event: T) => void;
 
+export type RenderProps = Omit<Readonly<CanvasState>, 'ctx'> & {
+    ctx: CanvasRenderingContext2D
+};
+export type SetupCallback = (props: RenderProps) => void | Promise<void>;
+export type RenderCallback = (props: RenderProps, dt: number) => void | Promise<void>;
+
+export interface Listener {
+    setup?: SetupCallback;
+    render?: RenderCallback;
+    ready: boolean;
+    mounted: boolean;
+}
+
+export interface CanvasContext {
+    add (fn: Listener): Promise<void>,
+
+    remove (fn: Listener): void
+}
+
 export interface ICanvasListeners {
     mousemove: CanvasListener[],
     mouseup: CanvasListener[],
@@ -139,21 +158,23 @@ export class CanvasState implements ICanvasListeners {
         if (!this.canvas) throw new Error('Canvas not set');
         const rect = this.canvas.getBoundingClientRect();
 
+        let pageX: number;
         if (
             event.type === 'touchstart' ||
             event.type === 'touchmove' ||
             event.type === 'touchend' ||
             event.type === 'touchcancel'
         ) {
-            const evt = (
-                typeof (event as any).originalEvent === 'undefined')
-                ? event
-                : (event as any).originalEvent;
-            event = evt.touches[0] || evt.changedTouches[0];
+            const evt = 'originalEvent' in event
+                ? event.originalEvent as TouchEvent
+                : event as TouchEvent;
+            pageX = evt.touches?.[0]?.pageX || evt.changedTouches?.[0]?.pageX || 0;
+        } else {
+            pageX = (event as MouseEvent).pageX;
         }
 
         return this.zoomScaledPosition(
-            ((event as MouseEvent).pageX - rect.left) * this.canvas.width / rect.width,
+            (pageX - rect.left) * this.canvas.width / rect.width,
             1 / this.zoom,
             this.width / 2,
         );
@@ -161,21 +182,24 @@ export class CanvasState implements ICanvasListeners {
 
     public getMouseYRaw (event: MouseEvent | TouchEvent): number {
         if (!this.canvas) throw new Error('Canvas not set');
-        let rect = this.canvas.getBoundingClientRect();
+        const rect = this.canvas.getBoundingClientRect();
 
+        let pageY: number;
         if (
             event.type === 'touchstart' ||
             event.type === 'touchmove' ||
             event.type === 'touchend' ||
             event.type === 'touchcancel'
         ) {
-            const evt = (typeof (event as any).originalEvent === 'undefined')
-                ? event
-                : (event as any).originalEvent;
-            event = evt.touches[0] || evt.changedTouches[0];
+            const evt = 'originalEvent' in event
+                ? event.originalEvent as TouchEvent
+                : event as TouchEvent;
+            pageY = evt.touches?.[0]?.pageY || evt.changedTouches?.[0]?.pageY || 0;
+        } else {
+            pageY = (event as MouseEvent).pageY;
         }
 
-        return ((event as MouseEvent).pageY - rect.top) * this.canvas.height / rect.height;
+        return (pageY - rect.top) * this.canvas.height / rect.height;
     }
 
     public rect (
@@ -226,25 +250,28 @@ export class CanvasState implements ICanvasListeners {
         this.ctx.arc(x, y, r, 0, 2 * Math.PI);
         this.ctx.fill();
     }
+
+    public asRenderProps (): RenderProps {
+        if (!this.ctx) throw new Error('Canvas not set');
+        return this as unknown as RenderProps;
+    }
 }
 
 export const canvasState = writable(CanvasState.empty());
 export const key = Symbol();
 
-export type RenderProps = Omit<Readonly<CanvasState>, 'ctx'> & {
-    ctx: CanvasRenderingContext2D
-};
-export type RenderCallback = (props: RenderProps, dt: number) => void | Promise<void>;
-
 export const renderable = (
     render?: RenderCallback
-             | { render?: RenderCallback, setup?: RenderCallback },
+             | {
+                 render?: RenderCallback,
+                 setup?: SetupCallback
+             },
 ) => {
-    const api: any = getContext(key);
+    const api: CanvasContext = getContext(key);
     const element = {
         ready: false,
         mounted: false,
-    } as any;
+    } as Listener;
 
     if (typeof render === 'function') {
         element.render = render;
@@ -257,7 +284,7 @@ export const renderable = (
         }
     }
 
-    api.add(element);
+    void api.add(element);
     onMount(() => {
         element.mounted = true;
         return () => {

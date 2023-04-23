@@ -1,18 +1,17 @@
 <script lang="ts">
-	// @ts-ignore
-	import { tooltip } from '@svelte-plugins/tooltips';
-	import Eye from 'svelte-material-icons/Eye.svelte';
-	import EyeOff from 'svelte-material-icons/EyeOff.svelte';
-	import { Entry } from '../controllers/entry';
-	import type { Auth } from '../controllers/user';
-	import { showPopup } from '../utils/popups';
-	import { obfuscate } from '../utils/text';
-	import { nowS, utcEq } from '../utils/time';
-	import EntryDialog from './dialogs/EntryDialog.svelte';
-	import Dot from './Dot.svelte';
-	import UtcTime from './UtcTime.svelte';
+    import { tooltip } from '@svelte-plugins/tooltips';
+    import Eye from 'svelte-material-icons/Eye.svelte';
+    import EyeOff from 'svelte-material-icons/EyeOff.svelte';
+    import { Entry } from '../controllers/entry';
+    import type { Auth } from '../controllers/user';
+    import { showPopup } from '../utils/popups';
+    import { obfuscate } from '../utils/text';
+    import { nowS, utcEq } from '../utils/time';
+    import EntryDialog from './dialogs/EntryDialog.svelte';
+    import Dot from './Dot.svelte';
+    import UtcTime from './UtcTime.svelte';
 
-	export let titles: Record<number, Entry[]>;
+    export let titles: Record<number, Entry[]>;
 	export let obfuscated = true;
 	export let showTimeAgo = true;
 	export let auth: Auth;

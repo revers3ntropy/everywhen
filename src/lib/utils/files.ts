@@ -29,7 +29,7 @@ export async function getFileContents (
             }
             resolve(Result.ok(res || ''));
         };
-        reader.onerror = async () => {
+        reader.onerror = () => {
             resolve(Result.err('Error reading file'));
         };
         reader.readAsText(file, encoding);

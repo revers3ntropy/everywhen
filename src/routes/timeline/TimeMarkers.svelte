@@ -83,7 +83,7 @@
 
             if (showMonthText) {
                 let text = monthIdxToName(month);
-                if (showYear) text += ' ' + year;
+                if (showYear) text += ` ${year}`;
                 state.text(text, renderPos + 6, NAVBAR_HEIGHT + 20);
             }
 

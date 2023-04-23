@@ -78,6 +78,10 @@
         popup.set(null);
     }
 
+    function filter (label: Label) {
+        return label.id !== id;
+    }
+
     onMount(reloadEntries);
 
 </script>
@@ -96,7 +100,7 @@
                     <LabelSelect
                         {auth}
                         bind:value={changeLabelId}
-                        filter={label => label.id !== id}
+                        {filter}
                         {labels}
                     />
                 {:else}

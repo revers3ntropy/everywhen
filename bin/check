@@ -1,6 +1,8 @@
 #!/bin/bash
 
+eslint --fix --config .eslintrc.cjs './src/**/*.{js,ts,svelte}' || exit 1
+
 svelte-kit sync && npx svelte-check \
   --tsconfig ./tsconfig.json \
   --compiler-warnings "css-unused-selector:ignore,unused-export-let:ignore" \
-  "$@"
+  "$@" || exit 1

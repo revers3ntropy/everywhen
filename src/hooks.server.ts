@@ -8,16 +8,22 @@ const reqLogger = makeLogger('REQ', chalk.grey, 'general.log');
 
 // keep connection to database alive
 // so it's not re-connected on API request
-setInterval(async () => {
-    if (!dbConnection) await connect();
-    dbConnection?.ping();
+setInterval(() => {
+    if (!dbConnection) {
+        void connect();
+        return;
+    }
+    void dbConnection?.ping();
 }, 1000 * 60);
 
 setInterval(cleanupCache, 1000 * 60);
 
-async function exitHandler (code: number) {
-    await errorLogger.logToFile(`Exited with code ${code}`);
-    process.exit();
+function exitHandler (code: number) {
+    void errorLogger
+        .logToFile(`Exited with code ${code}`)
+        .then(() => {
+            process.exit();
+        });
 }
 
 process.on('exit', exitHandler);
@@ -30,15 +36,15 @@ process.on('uncaughtException', exitHandler);
 function logReq (time: number, event: RequestEvent) {
     const path = new URL(event.request.url).pathname.split('/');
     path.shift();
-    let pathStr = '/' + path.shift();
+    let pathStr = `/${path.shift() || ''}`;
     if (pathStr === '/api') {
-        pathStr += '/' + path.shift();
+        pathStr += `/${path.shift() || ''}`;
     }
     if (path.length) {
         pathStr += `/[...${path.join('/').length}]`;
     }
 
-    reqLogger.logToFile(
+    void reqLogger.logToFile(
         event.request.method,
         `(${time.toPrecision(3)}ms)`,
         pathStr,
@@ -51,7 +57,7 @@ export const handle = (async ({ event, resolve }) => {
     try {
         result = await resolve(event);
     } catch (e) {
-        errorLogger.logToFile(e);
+        void errorLogger.logToFile(e);
         result = new Response('An Error has Occurred', {
             status: 500,
         });

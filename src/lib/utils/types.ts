@@ -13,7 +13,7 @@ export type Mutable<T> = {
     -readonly [P in keyof T]: T[P]
 };
 type NonFunctionPropertyNames<T> = {
-    [K in keyof T]: T[K] extends Function ? never : K;
+    [K in keyof T]: T[K] extends (...args: infer _) => infer _ ? never : K;
 }[keyof T];
 export type NonFunctionProperties<T> = Pick<T, NonFunctionPropertyNames<T>>;
 export type PickOptionalAndMutable<A, B extends keyof A> =

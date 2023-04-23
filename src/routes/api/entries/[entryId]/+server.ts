@@ -29,7 +29,7 @@ export const DELETE = (async ({ request, params, cookies }) => {
         restore: 'boolean',
     });
 
-    let { err: deleteErr } = await Entry.delete(
+    const { err: deleteErr } = await Entry.delete(
         query, auth,
         params.entryId, body.restore,
     );

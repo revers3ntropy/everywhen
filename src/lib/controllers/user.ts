@@ -22,7 +22,7 @@ export class User {
         username: string,
         key: string,
     ): Promise<Result<User>> {
-        const res = await query`
+        const res = await query<{ id: string }[]>`
             SELECT id
             FROM users
             WHERE username = ${username}
@@ -38,7 +38,7 @@ export class User {
         query: QueryFunc,
         username: string,
     ): Promise<boolean> {
-        const res = await query`
+        const res = await query<Record<string, number>[]>`
             SELECT 1
             FROM users
             WHERE username = ${username}
@@ -104,17 +104,16 @@ export class User {
 
     private static async generateSalt (query: QueryFunc): Promise<string> {
         let salt = '';
-        while (true) {
+        let existingSalts: { salt: string }[];
+        do {
             salt = cryptoRandomStr(10);
-            const existingSalts = await query`
+            existingSalts = await query`
                 SELECT salt
                 FROM users
                 WHERE salt = ${salt}
             `;
-            if (existingSalts.length === 0) {
-                break;
-            }
-        }
+        } while (existingSalts.length !== 0);
+
         return salt;
     }
 }

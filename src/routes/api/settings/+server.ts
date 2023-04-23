@@ -7,7 +7,7 @@ import { cachedApiRoute, invalidateCache } from '../../../lib/utils/cache';
 import { getUnwrappedReqBody } from '../../../lib/utils/requestBody';
 import type { RequestHandler } from './$types';
 
-export const GET = cachedApiRoute(async (auth, {}) => {
+export const GET = cachedApiRoute(async (auth) => {
     const { err, val: settings } = await Settings.all(query, auth);
     if (err) throw error(500, err);
     return apiResponse({ settings });

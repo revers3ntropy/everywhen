@@ -1,5 +1,4 @@
 <script lang="ts">
-    // @ts-ignore
     import { tooltip } from '@svelte-plugins/tooltips';
     import CloudCheckOutline from 'svelte-material-icons/CloudCheckOutline.svelte';
     import Sync from 'svelte-material-icons/Sync.svelte';
@@ -14,12 +13,12 @@
     export let id: string;
     export let auth: Auth;
     export let key: string;
-    export let defaultValue: any;
+    export let defaultValue: string | number | boolean;
     export let name: string;
     export let type: string;
     export let description: string;
     export let unit = '';
-    export let value: any;
+    export let value: string | number | boolean;
     export let created: number | null = null;
 
     let saving = false;
@@ -42,7 +41,7 @@
             throw new Error(`Unknown input type: ${key}`);
     }
 
-    async function updateValue (newValue: unknown) {
+    async function updateValue (newValue: string | number | boolean) {
         saving = true;
 
         value = newValue;
@@ -114,7 +113,7 @@
     <div class="right">
         <label class="label-for-{inputType}">
             <input
-                checked={inputType === 'checkbox' && value}
+                checked={inputType === 'checkbox' && !!value}
                 class="text-box"
                 on:change={onInput}
                 type={inputType}

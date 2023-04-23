@@ -1,6 +1,5 @@
 <script lang="ts">
     import { browser } from '$app/environment';
-    // @ts-ignore
     import { tooltip } from '@svelte-plugins/tooltips';
     import { createEventDispatcher } from 'svelte';
     import Bin from 'svelte-material-icons/Delete.svelte';
@@ -36,7 +35,7 @@
     export let longitude: number | null = null;
     export let deleted = false;
     export let decrypted = true;
-    export let agentData: string = '';
+    export let agentData = '';
     export let edits: Entry[] = [];
     export let isEdit = false;
     export let showFullDate = false;

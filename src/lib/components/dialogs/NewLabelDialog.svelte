@@ -5,7 +5,7 @@
 
     export let auth: Auth;
 
-    async function closeHandler () {
+    function closeHandler () {
         popup.set(null);
     }
 </script>

@@ -70,7 +70,7 @@ export class Entry {
         id: string,
         restore: boolean,
     ): Promise<Result> {
-        const entry = await query`
+        const entry = await query<{ deleted: boolean }[]>`
             SELECT deleted
             FROM entries
             WHERE id = ${id}
@@ -80,7 +80,7 @@ export class Entry {
         if (!entry.length) {
             return Result.err('Entry not found');
         }
-        if (!!entry[0].deleted === !restore) {
+        if (entry[0].deleted === !restore) {
             return Result.err('Entry is already in that state');
         }
 
@@ -173,8 +173,9 @@ export class Entry {
     ): Promise<Result<[ Entry[], number ]>> {
         const { val: rawEntries, err: rawErr } = await Entry.allRaw(query, auth, filters);
         if (rawErr) return Result.err(rawErr);
-        let { val: entries, err } = await Entry.fromRawMulti(query, auth, rawEntries);
+        const { val, err } = await Entry.fromRawMulti(query, auth, rawEntries);
         if (err) return Result.err(err);
+        let entries = val;
 
         if (filters.search) {
             entries = entries.filter((e) => (
@@ -677,12 +678,12 @@ export class Entry {
 
         let current = 0;
 
-        let entriesOnDay: Record<string, true | undefined> = {};
+        const entriesOnDay: Record<string, true | undefined> = {};
         for (const entry of entries) {
             entriesOnDay[fmtUtc(entry.created, entry.createdTZOffset, 'YYYY-MM-DD')] = true;
         }
 
-        let runningOut = !entriesOnDay[today] && !!entriesOnDay[yesterday];
+        const runningOut = !entriesOnDay[today] && !!entriesOnDay[yesterday];
 
         let currentDay = today;
         if (!entriesOnDay[currentDay]) {

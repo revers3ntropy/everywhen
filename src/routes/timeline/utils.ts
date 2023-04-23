@@ -36,7 +36,7 @@ export function addYToEvents (
             continue;
         }
 
-        let overlappedLargerEvents = evts
+        const overlappedLargerEvents = evts
             .filter(e => (
                 e !== event
                 && Event.intersects(e, event)

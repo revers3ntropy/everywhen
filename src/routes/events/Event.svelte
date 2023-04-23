@@ -1,6 +1,5 @@
 <script lang="ts">
     import { browser } from '$app/environment';
-    // @ts-ignore
     import { tooltip } from '@svelte-plugins/tooltips';
     import { createEventDispatcher, onMount } from 'svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
@@ -147,7 +146,7 @@
         });
     }
 
-    onMount(async () => {
+    onMount(() => {
         if (selectNameId === event.id) {
             nameInput.focus();
             nameInput.select();

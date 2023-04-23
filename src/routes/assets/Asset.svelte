@@ -1,5 +1,4 @@
 <script lang="ts">
-    // @ts-ignore
     import { tooltip } from '@svelte-plugins/tooltips';
     import { createEventDispatcher, onMount } from 'svelte';
     import Check from 'svelte-material-icons/Check.svelte';

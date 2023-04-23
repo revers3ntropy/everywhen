@@ -5,7 +5,7 @@ import { query } from '../../lib/db/mysql';
 import { cachedPageRoute } from '../../lib/utils/cache';
 import type { PageServerLoad } from './$types';
 
-export const load = cachedPageRoute(async (auth, {}) => {
+export const load = cachedPageRoute(async (auth) => {
     const { val: entries, err } = await Entry.all(query, auth, {
         deleted: false,
     });

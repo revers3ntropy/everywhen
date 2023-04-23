@@ -1,7 +1,7 @@
 <script lang="ts">
     import { createEventDispatcher } from 'svelte';
     import { getNotificationsContext } from 'svelte-notifications';
-    import type { App } from '../../app';
+    import type { Auth } from '../controllers/user';
     import { api } from '../utils/apiRequest';
     import { displayNotifOnErr, ERR_NOTIFICATION, SUCCESS_NOTIFICATION } from '../utils/notifications';
 
@@ -11,7 +11,7 @@
     let labelName = '';
     let labelColour = '#000000';
 
-    export let auth: App.PageData;
+    export let auth: Auth;
 
     async function closeHandler () {
         if (!labelName) {

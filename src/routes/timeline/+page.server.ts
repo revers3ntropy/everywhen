@@ -11,10 +11,10 @@ export type TimelineEntry = Omit<Entry, 'entry'> & {
 }
 
 export const load = cachedPageRoute(async (auth) => {
-    let { val: entries, err } = await Entry.all(query, auth);
+    const { val: entries, err } = await Entry.all(query, auth);
     if (err) throw error(400, err);
 
-    let { val: events, err: eventsErr } = await Event.all(query, auth);
+    const { val: events, err: eventsErr } = await Event.all(query, auth);
     if (eventsErr) throw error(400, eventsErr);
 
     return {

@@ -37,7 +37,7 @@
     let showingNavPopup = false;
     let downloadingBackup = false;
 
-    function onClick (_: Event) {
+    function onClick () {
         if (showingNavPopup) {
             showingNavPopup = false;
         }
@@ -52,7 +52,7 @@
         if (downloadingBackup) return;
         downloadingBackup = true;
         const { data: backupData } = displayNotifOnErr(addNotification,
-            await api.get(auth, '/backups', { encrypted: true }),
+            await api.get(auth, '/backups', { encrypted: 1 }),
         );
         Backup.download(backupData, auth.username, true);
         downloadingBackup = false;
@@ -99,7 +99,7 @@
         await goToEntryFormWithLabel('Thought', '#735820');
     }
 
-    async function makeEntry () {
+    function makeEntry () {
         localStorage.removeItem(LS_KEY.newEntryLabel);
         location.assign('/journal');
     }

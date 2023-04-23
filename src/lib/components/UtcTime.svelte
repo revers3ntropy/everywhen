@@ -1,5 +1,4 @@
 <script lang="ts">
-    // @ts-ignore
     import { tooltip } from '@svelte-plugins/tooltips';
     import * as timeago from 'timeago.js';
     import { numberAsSignedStr } from '../utils/text';

@@ -11,7 +11,6 @@
     import type { CallbackObject } from 'ol-contextmenu/dist/types';
     import type { Circle } from 'ol/geom';
     import { Modify } from 'ol/interaction';
-    import type OlMap from 'ol/Map';
     import { Style } from 'ol/style';
     import { getNotificationsContext } from 'svelte-notifications';
     import { writable } from 'svelte/store';
@@ -89,14 +88,13 @@
     setInterval(() => {
         for (const [ id, changes ] of Object.entries(locationChangeQueue)) {
             const last = changes[changes.length - 1];
-            syncLocationInBackground(id, last.latitude, last.longitude, last.radius);
+            void syncLocationInBackground(id, last.latitude, last.longitude, last.radius);
         }
         locationChangeQueue = {};
     }, 500);
 
     async function addNamedLocation (
         object: CallbackObject,
-        _map: OlMap,
     ) {
         const coordinate = object.coordinate;
         const [ long, lat ] = toLonLat(coordinate);
@@ -213,7 +211,7 @@
             }),
         }));
 
-        map.on('singleclick', (event: MapBrowserEvent<any>) => {
+        map.on('singleclick', (event: MapBrowserEvent<UIEvent>) => {
             if (!map) return;
 
             let features = map.getFeaturesAtPixel(event.pixel);
@@ -276,7 +274,7 @@
                 {
                     text: 'Add Named Location',
                     classname: 'context-menu-option',
-                    callback: addNamedLocation,
+                    callback: (o: CallbackObject) => void addNamedLocation(o),
                 },
             ],
         }));
@@ -286,7 +284,7 @@
             autoPan: true,
         }));
 
-        map.on('pointermove', (event: MapBrowserEvent<any>) => {
+        map.on('pointermove', (event: MapBrowserEvent<UIEvent>) => {
             if (!map) return;
 
             const features = map.getFeaturesAtPixel(event.pixel);

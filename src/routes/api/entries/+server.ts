@@ -41,7 +41,7 @@ export const POST = (async ({ request, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
-    let body = await getUnwrappedReqBody(request, {
+    const body = await getUnwrappedReqBody(request, {
         created: 'number',
         latitude: 'number',
         longitude: 'number',

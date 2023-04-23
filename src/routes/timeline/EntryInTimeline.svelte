@@ -16,7 +16,7 @@
     export let label: Label | null = null;
     export let edits: EntryEdit[] = [];
     export let createdTZOffset = 0;
-    export let agentData: string = '';
+    export let agentData = '';
 
     renderable(state => {
         const renderPos = state.timeToRenderPos(created);

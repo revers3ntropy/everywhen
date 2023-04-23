@@ -9,7 +9,7 @@ import { getUnwrappedReqBody } from '../../../lib/utils/requestBody';
 import { nowS } from '../../../lib/utils/time';
 import type { RequestHandler } from './$types';
 
-export const GET = cachedApiRoute(async (auth, {}) => {
+export const GET = cachedApiRoute(async (auth) => {
     const { err, val: events } = await Event.all(query, auth);
     if (err) throw error(400, err);
     return { events };

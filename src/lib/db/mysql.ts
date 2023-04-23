@@ -4,33 +4,34 @@ import chalk from 'chalk';
 import mysql from 'mysql2/promise';
 import '../require';
 import { makeLogger } from '../utils/log';
-import type { Milliseconds } from '../utils/types';
+import type { Milliseconds, NonFunctionProperties } from '../utils/types';
 
-export type queryRes =
+export type QueryResult =
     | mysql.RowDataPacket[][]
     | mysql.RowDataPacket[]
     | mysql.OkPacket
     | mysql.OkPacket[]
     | mysql.ResultSetHeader
-    | Record<string, any>[];
+    | Record<string, unknown>[]
+    | object[];
 
 const dbLogger = makeLogger('DB', chalk.yellow, 'general.log');
 
 export let dbConnection: mysql.Connection | null = null;
 
 export async function connect () {
-    const config = await getConfig();
+    const config = getConfig();
     dbConnection = await mysql
         .createConnection(config)
-        .catch((e: any) => {
-            dbLogger.logToFile(`Error connecting to mysql db '${config.database}'`);
-            dbLogger.logToFile(e);
+        .catch((e: unknown) => {
+            void dbLogger.logToFile(`Error connecting to mysql db '${config.database || '?'}'`);
+            void dbLogger.logToFile(e);
             throw e;
         });
-    dbLogger.logToFile(`Connected`);
+    void dbLogger.logToFile(`Connected`);
 }
 
-export async function getConfig (): Promise<mysql.ConnectionOptions> {
+export function getConfig (): mysql.ConnectionOptions {
     // define defaults from .env file
     const port = DB_PORT ? parseInt(DB_PORT) : 3306;
     return {
@@ -42,15 +43,10 @@ export async function getConfig (): Promise<mysql.ConnectionOptions> {
     };
 }
 
-export type QueryFunc = <Res extends queryRes = mysql.RowDataPacket[]>(
-    queryParts: TemplateStringsArray,
-    ...params: (string | number | null | boolean | undefined)[]
-) => Promise<Res>;
-
 function logQuery (
     query: string,
-    params: any[],
-    result: any,
+    params: unknown[],
+    result: unknown,
     time: Milliseconds,
 ) {
     params = params.map((p) => {
@@ -65,16 +61,22 @@ function logQuery (
         ? `Array(${result.length})`
         : typeof result;
 
-    dbLogger.logToFile(
+    void dbLogger.logToFile(
         `\`${query.trim()}\`` +
         `\n     [${params.join(', ')}]` +
         `\n     (${time.toPrecision(3)}ms) => ${resultStr}`);
 }
 
-export async function query<Res extends queryRes = mysql.RowDataPacket[]> (
+export type QueryParam = string | number | null | boolean | undefined;
+export type QueryFunc = <Res extends QueryResult = never> (
     queryParts: TemplateStringsArray,
-    ...params: any[]
-): Promise<Res> {
+    ...params: QueryParam[]
+) => Promise<Res extends (infer A)[] ? NonFunctionProperties<A>[] : Res>;
+
+export const query = (async <Res extends QueryResult = never> (
+    queryParts: TemplateStringsArray,
+    ...params: QueryParam[]
+): Promise<Res extends (infer A)[] ? NonFunctionProperties<A>[] : Res> => {
     if (browser) {
         throw new Error('Cannot query database from browser');
     }
@@ -87,11 +89,12 @@ export async function query<Res extends queryRes = mysql.RowDataPacket[]> (
 
     const query = queryParts.reduce((acc, cur, i) => {
         const str = acc + cur;
-        if (params[i] === undefined) {
+        const p = params[i];
+        if (p === undefined) {
             return str;
-        } else if (Array.isArray(params[i])) {
+        } else if (Array.isArray(p)) {
             // so you have ?,?,...?,? in your query for each array element
-            return str + '?,'.repeat(params[i].length - 1) + '?';
+            return str + '?,'.repeat(p.length - 1) + '?';
         } else {
             return str + '?';
         }
@@ -101,26 +104,27 @@ export async function query<Res extends queryRes = mysql.RowDataPacket[]> (
     // if it's an array, add all the elements of the array in place as params
     // Flatten 2D arrays
     for (let i = 0; i < params.length; i++) {
-        if (Array.isArray(params[i])) {
+        const p = params[i];
+        if (Array.isArray(p)) {
             // insert the contents of the sub array into the array at it's index
-            params.splice(i, 1, ...params[i]);
+            params.splice(i, 1, ...p as QueryParam[]);
         }
     }
 
     const result = ((
         await dbConnection
             ?.query(query, params)
-            .catch((e: any) => {
+            .catch((e: unknown) => {
                 const end = performance.now();
                 logQuery(query, params, null, end - start);
-                dbLogger.logToFile(`Error querying mysql db '${DB}'`);
-                dbLogger.logToFile(e);
+                void dbLogger.logToFile(`Error querying mysql db '${DB}'`);
+                void dbLogger.logToFile(e);
             })
-    ) || [])[0] as Res;
+    ) || [])[0] as Res extends (infer A)[] ? NonFunctionProperties<A>[] : Res;
 
     const end = performance.now();
 
     logQuery(query, params, result, end - start);
 
     return result;
-}
+}) satisfies QueryFunc;

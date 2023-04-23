@@ -27,8 +27,5 @@
     "include": [
         "./src/**/*",
         ".svelte-kit/ambient.d.ts"
-    ],
-    "exclude": [
-        "src/**/*.spec.ts"
     ]
 }

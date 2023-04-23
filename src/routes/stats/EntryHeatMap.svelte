@@ -1,6 +1,5 @@
 <script lang="ts">
     import moment from 'moment';
-    // @ts-ignore
     import SvelteHeatmap from 'svelte-heatmap';
     import { By, type EntryWithWordCount } from './helpers';
 

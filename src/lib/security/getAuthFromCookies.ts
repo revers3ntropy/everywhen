@@ -11,19 +11,7 @@ export async function getAuthFromCookies (cookie: Cookies): Promise<User> {
         throw error(401, 'Invalid login');
     }
 
-    const res = await query`
-        SELECT id
-        FROM users
-        WHERE username = ${username}
-          AND password = SHA2(CONCAT(${key}, salt), 256)
-    `;
-    if (res.length === 0) {
-        throw error(401, 'Invalid login');
-    }
-
-    return new User(
-        res[0].id,
-        username,
-        key,
-    );
+    const { err, val: user } = await User.authenticate(query, username, key);
+    if (err) throw error(401, err);
+    return user;
 }

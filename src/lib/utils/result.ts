@@ -1,6 +1,6 @@
 const RESULT_NULL = Symbol();
 
-export class Result<T = null, E extends {} = string> {
+export class Result<T = null, E extends NonNullable<unknown> = string> {
 
     public static readonly NULL = RESULT_NULL;
 
@@ -28,7 +28,7 @@ export class Result<T = null, E extends {} = string> {
         return this.value !== RESULT_NULL;
     }
 
-    public static collect<T, E extends {}> (
+    public static collect<T, E extends NonNullable<unknown>> (
         iter: Result<T, E>[],
     ): Result<T[], E> {
         const results: T[] = [];
@@ -41,17 +41,17 @@ export class Result<T = null, E extends {} = string> {
         return Result.ok(results);
     }
 
-    public static async awaitCollect<T, E extends {}> (
+    public static async awaitCollect<T, E extends NonNullable<unknown>> (
         iter: Promise<Result<T, E>>[],
     ): Promise<Result<T[], E>> {
         return Result.collect(await Promise.all(iter));
     }
 
-    public static ok<T, E extends {}> (value: T): Result<T, E> {
+    public static ok<T, E extends NonNullable<unknown>> (value: T): Result<T, E> {
         return new Result<T, E>(value, RESULT_NULL);
     }
 
-    public static err<T, E extends {}> (error: E): Result<T, E> {
+    public static err<T, E extends NonNullable<unknown>> (error: E): Result<T, E> {
         return new Result<T, E>(RESULT_NULL, error);
     }
 

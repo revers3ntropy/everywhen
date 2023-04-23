@@ -1,5 +1,4 @@
 <script lang="ts">
-    // @ts-ignore
     import { tooltip } from '@svelte-plugins/tooltips';
     import Syncing from 'svelte-material-icons/CloudArrowUpOutline.svelte';
     import Synced from 'svelte-material-icons/CloudCheckOutline.svelte';
@@ -25,7 +24,7 @@
     export let latitude: number;
     export let longitude: number;
 
-    export let onChange = async (_location: Location | null) => void 0;
+    export let onChange: ((location: Location | null) => Promise<void>) | null = null;
 
     let synced = true;
 
@@ -38,15 +37,17 @@
                 radius,
             }),
         );
-        await onChange(new Location(
-            id,
-            created,
-            createdTZOffset,
-            name,
-            latitude,
-            longitude,
-            radius,
-        ));
+        if (onChange !== null) {
+            await onChange(new Location(
+                id,
+                created,
+                createdTZOffset,
+                name,
+                latitude,
+                longitude,
+                radius,
+            ));
+        }
         synced = true;
     }
 
@@ -64,7 +65,9 @@
             await api.delete(auth, apiPath('/locations/?', id)),
         );
         popup.set(null);
-        await onChange(null);
+        if (onChange !== null) {
+            await onChange(null);
+        }
     }
 </script>
 
