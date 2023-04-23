@@ -6,10 +6,7 @@
     import type { Label } from '../controllers/label';
     import type { Auth } from '../controllers/user';
     import { api } from '../utils/apiRequest';
-    import {
-        displayNotifOnErr,
-        ERR_NOTIFICATION
-    } from '../utils/notifications';
+    import { displayNotifOnErr, ERR_NOTIFICATION } from '../utils/notifications';
     import { showPopup } from '../utils/popups';
     import NewLabelDialog from './dialogs/NewLabelDialog.svelte';
 
@@ -21,18 +18,17 @@
     export let value = '';
     export let auth: Auth;
     export let showAddButton = true;
-    export let filter: (l: Label, i: number, arr: Label[]) => boolean = () =>
-        true;
+    export let filter: (l: Label, i: number, arr: Label[]) => boolean
+        = () => true;
 
     let closeDropDown: () => void;
 
     $: dispatch('change', { id: value });
 
-    function showNewLabelPopup() {
+    function showNewLabelPopup () {
         showPopup(NewLabelDialog, { auth }, async () => {
-            const res = displayNotifOnErr(
-                addNotification,
-                await api.get(auth, '/labels')
+            const res = displayNotifOnErr(addNotification,
+                await api.get(auth, '/labels'),
             );
             labels = res.labels;
             // set to last created label
@@ -45,18 +41,24 @@
         value = '';
         addNotification({
             ...ERR_NOTIFICATION,
-            text: `Can't find label`
+            text: `Can't find label`,
         });
     }
-</script>
 
+</script>
 <div class="select-label">
-    <Dropdown bind:close="{closeDropDown}" rounded ariaLabel="Select label">
+    <Dropdown
+        bind:close={closeDropDown}
+        rounded
+        ariaLabel="Select label"
+    >
         <span slot="button" class="select-button">
             <span
                 class="entry-label-colour"
-                style="background: {(labels ?? []).find(l => l.id === value)
-                    ?.colour || 'transparent'}"></span>
+                style="background: {(labels ?? [])
+                    .find(l => l.id === value)?.colour || 'transparent'
+                  }"
+            ></span>
             {#if labels}
                 {labels.find(l => l.id === value)?.name || '(No Label)'}
             {:else}
@@ -65,27 +67,22 @@
         </span>
         <div class="list-container">
             <button
-                on:click="{() => {
-                    closeDropDown();
-                    value = '';
-                }}"
-                class="label-button single"
-                aria-label="Remove label"
+                    on:click={() => { closeDropDown(); value = '' }}
+                    class="label-button single"
+                    aria-label="Remove label"
             >
                 <i>No Label</i>
             </button>
             {#each (labels ?? []).filter(filter) as label (label.id)}
                 <button
-                    on:click="{() => {
-                        closeDropDown();
-                        value = label.id;
-                    }}"
-                    class="label-button"
-                    aria-label="Select label {label.name}"
+                        on:click={() => { closeDropDown(); value = label.id }}
+                        class="label-button"
+                        aria-label="Select label {label.name}"
                 >
-                    <span
+                <span
                         class="entry-label-colour"
-                        style="background: {label.colour}"></span>
+                        style="background: {label.colour}"
+                ></span>
                     {#if value === label.id}
                         <b>{label.name}</b>
                     {:else}
@@ -97,7 +94,7 @@
     </Dropdown>
     {#if showAddButton}
         <button
-            on:click="{showNewLabelPopup}"
+            on:click={showNewLabelPopup}
             class="icon-button"
             aria-label="Create new label"
         >
@@ -105,7 +102,6 @@
         </button>
     {/if}
 </div>
-
 <style lang="less">
     @import '../../styles/variables';
 

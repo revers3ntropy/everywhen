@@ -7,7 +7,7 @@ import { cachedApiRoute, invalidateCache } from '../../../lib/utils/cache';
 import { getUnwrappedReqBody } from '../../../lib/utils/requestBody';
 import type { RequestHandler } from './$types';
 
-export const GET = cachedApiRoute(async auth => {
+export const GET = cachedApiRoute(async (auth) => {
     const { err, val: settings } = await Settings.all(query, auth);
     if (err) throw error(500, err);
     return apiResponse({ settings });
@@ -19,15 +19,11 @@ export const PUT = (async ({ request, cookies }) => {
 
     const body = await getUnwrappedReqBody(request, {
         key: 'string',
-        value: 'any'
+        value: 'any',
     });
 
-    const { val: setting, err } = await Settings.update(
-        query,
-        auth,
-        body.key,
-        body.value
-    );
+    const { val: setting, err } = await Settings.update(query, auth,
+        body.key, body.value);
     if (err) throw error(400, err);
 
     return apiResponse({ id: setting.id });

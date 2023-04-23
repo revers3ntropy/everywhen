@@ -37,85 +37,85 @@
     let showingNavPopup = false;
     let downloadingBackup = false;
 
-    function onClick() {
+    function onClick () {
         if (showingNavPopup) {
             showingNavPopup = false;
         }
     }
 
-    function toggleNavPopup(event: Event) {
+    function toggleNavPopup (event: Event) {
         event.stopPropagation();
         showingNavPopup = !showingNavPopup;
     }
 
-    async function downloadBackup() {
+    async function downloadBackup () {
         if (downloadingBackup) return;
         downloadingBackup = true;
-        const { data: backupData } = displayNotifOnErr(
-            addNotification,
-            await api.get(auth, '/backups', { encrypted: 1 })
+        const { data: backupData } = displayNotifOnErr(addNotification,
+            await api.get(auth, '/backups', { encrypted: 1 }),
         );
         Backup.download(backupData, auth.username, true);
         downloadingBackup = false;
     }
 
-    async function makeLabelFromNameIfDoesntExist(
+    async function makeLabelFromNameIfDoesntExist (
         name: string,
-        defaultColour: string
+        defaultColour: string,
     ): Promise<string> {
-        const { labels } = displayNotifOnErr(
-            addNotification,
-            await api.get(auth, '/labels')
+        const { labels } = displayNotifOnErr(addNotification,
+            await api.get(auth, '/labels'),
         );
         const label = labels.find(label => label.name === name);
         if (label) {
             return label.id;
         }
-        const res = displayNotifOnErr(
-            addNotification,
+        const res = displayNotifOnErr(addNotification,
             await api.post(auth, '/labels', {
                 name,
-                colour: defaultColour
-            })
+                colour: defaultColour,
+            }),
         );
         return res.id;
     }
 
-    async function goToEntryFormWithLabel(name: string, defaultColour: string) {
-        const labelId = await makeLabelFromNameIfDoesntExist(
-            name,
-            defaultColour
-        );
+    async function goToEntryFormWithLabel (
+        name: string,
+        defaultColour: string,
+    ) {
+        const labelId = await makeLabelFromNameIfDoesntExist(name, defaultColour);
         localStorage.setItem(LS_KEY.newEntryLabel, labelId);
         location.assign('/journal?obfuscate=0');
     }
 
-    async function makeDream() {
+    async function makeDream () {
         await goToEntryFormWithLabel('Dream', '#7730ce');
     }
 
-    async function makeIdea() {
+    async function makeIdea () {
         await goToEntryFormWithLabel('Idea', '#ffff65');
     }
 
-    async function makeThought() {
+    async function makeThought () {
         await goToEntryFormWithLabel('Thought', '#735820');
     }
 
-    function makeEntry() {
+    function makeEntry () {
         localStorage.removeItem(LS_KEY.newEntryLabel);
         location.assign('/journal');
     }
 </script>
 
 <svelte:window
-    on:click="{onClick}"
-    use:wheel="{{ scrollable: !showingNavPopup }}"
+    on:click={onClick}
+    use:wheel={{ scrollable: !showingNavPopup }}
 />
 
 <nav class="{showingNavPopup ? 'showing-dropdown' : ''}">
     <div class="menu-button-mobile">
-        <button aria-label="Show nav menu" on:click="{toggleNavPopup}">
+        <button
+            aria-label="Show nav menu"
+            on:click={toggleNavPopup}
+        >
             {#if showingNavPopup}
                 <Close size="40" />
             {:else}
@@ -175,7 +175,11 @@
     </div>
 
     <div>
-        <Dropdown openOnHover unstyledButton width="170px">
+        <Dropdown
+            openOnHover
+            unstyledButton
+            width="170px"
+        >
             <span class="create-button icon-gradient-on-hover" slot="button">
                 <Plus size="40" />
             </span>
@@ -184,7 +188,7 @@
                 <div>
                     <button
                         class="with-icon oneline record-entry"
-                        on:click="{makeEntry}"
+                        on:click={makeEntry}
                     >
                         <Pencil size="30" />
                         Record Entry
@@ -193,7 +197,7 @@
                 <div>
                     <button
                         class="with-icon oneline record-dream"
-                        on:click="{makeDream}"
+                        on:click={makeDream}
                     >
                         <Moon size="30" />
                         Record Dream
@@ -202,7 +206,7 @@
                 <div>
                     <button
                         class="with-icon oneline record-idea"
-                        on:click="{makeIdea}"
+                        on:click={makeIdea}
                     >
                         <Lightbulb size="30" />
                         Record Idea
@@ -211,7 +215,7 @@
                 <div>
                     <button
                         class="with-icon oneline record-thought"
-                        on:click="{makeThought}"
+                        on:click={makeThought}
                     >
                         <Brain size="30" />
                         Record Thought
@@ -221,8 +225,8 @@
         </Dropdown>
 
         <button
-            aria-label="{$obfuscated ? 'Show all' : 'Hide all'}"
-            on:click="{() => ($obfuscated = !$obfuscated)}"
+            aria-label={$obfuscated ? 'Show all' : 'Hide all'}
+            on:click={() => $obfuscated = !$obfuscated}
         >
             {#if $obfuscated}
                 <Eye size="25" />
@@ -235,7 +239,7 @@
             <span class="account-button" slot="button">
                 <span class="username-span">
                     <span class="streaks">
-                        <Streaks auth="{auth}" />
+                        <Streaks {auth} />
                     </span>
                     <span class="username">
                         {auth.username}
@@ -249,8 +253,8 @@
             <button
                 aria-label="download encrypted backup"
                 class="account-dropdown-button with-icon"
-                disabled="{downloadingBackup}"
-                on:click="{downloadBackup}"
+                disabled={downloadingBackup}
+                on:click={downloadBackup}
             >
                 <DownloadLock size="30" />
                 {#if downloadingBackup}
@@ -308,8 +312,7 @@
         }
     }
 
-    a,
-    button {
+    a, button {
         margin: 0 4px;
 
         &.current {
@@ -338,11 +341,11 @@
         display: grid;
         grid-template-columns: 1fr 40px;
         align-items: center;
-        gap: 0.5rem;
+        gap: .5rem;
         text-align: right;
         cursor: pointer;
         border-radius: @border-radius;
-        padding: 0.1rem 0.3rem;
+        padding: .1rem .3rem;
         width: fit-content;
         background: @header-bg;
 
@@ -414,8 +417,7 @@
                 z-index: 4;
             }
 
-            a,
-            button {
+            a, button {
                 margin: 0;
                 display: grid;
                 grid-template-columns: 50px 1fr;
@@ -435,8 +437,7 @@
             background-color: @light-v-accent;
             color: @text-color;
 
-            :global(svg),
-            :global(svg *) {
+            :global(svg), :global(svg *) {
                 fill: @accent-color-secondary;
             }
         }
@@ -451,7 +452,7 @@
 
     .record-something-buttons {
         display: block;
-        padding: 0.8rem 0 0.8rem 0;
+        padding: .8rem 0 .8rem 0;
 
         button {
             width: 100%;
@@ -465,8 +466,7 @@
         .record-entry:hover {
             background: @light-v-accent;
 
-            :global(svg),
-            :global(svg *) {
+            :global(svg), :global(svg *) {
                 fill: url(#accent-gradient);
             }
         }
@@ -474,8 +474,7 @@
         .record-dream:hover {
             background: rgba(0, 0, 255, 0.1);
 
-            :global(svg),
-            :global(svg *) {
+            :global(svg), :global(svg *) {
                 fill: @accent-color-secondary;
             }
         }
@@ -483,8 +482,7 @@
         .record-idea:hover {
             background: rgba(255, 255, 0, 0.1);
 
-            :global(svg),
-            :global(svg *) {
+            :global(svg), :global(svg *) {
                 fill: yellow;
             }
         }
@@ -492,8 +490,7 @@
         .record-thought:hover {
             background: rgba(220, 105, 33, 0.1);
 
-            :global(svg),
-            :global(svg *) {
+            :global(svg), :global(svg *) {
                 fill: rgb(147, 81, 9);
             }
         }

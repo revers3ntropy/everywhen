@@ -6,10 +6,8 @@ import type { PageServerLoad } from './$types';
 
 export const load = cachedPageRoute(async (auth, { params }) => {
     const { val: entry, err } = await Entry.fromId(
-        query,
-        auth,
-        params.entryId,
-        true
+        query, auth,
+        params.entryId, true,
     );
     if (err) throw error(400, err);
 

@@ -2,7 +2,7 @@ import { v4 as UUIdv4 } from 'uuid';
 import type { QueryFunc } from '../db/mysql';
 
 export class UUID {
-    public static async generateUUId(query: QueryFunc): Promise<string> {
+    public static async generateUUId (query: QueryFunc): Promise<string> {
         let id = UUIdv4();
 
         while (await UUID.uuidExists(query, id)) {
@@ -17,7 +17,7 @@ export class UUID {
         return id;
     }
 
-    private static async uuidExists(query: QueryFunc, id: string) {
+    private static async uuidExists (query: QueryFunc, id: string) {
         const res = await query<{ id: string }[]>`
             SELECT id
             FROM ids

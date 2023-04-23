@@ -12,10 +12,7 @@
     import { obfuscated, passcodeLastEntered, popup } from '../lib/stores';
     import { api } from '../lib/utils/apiRequest';
     import { GETParamIsFalsy } from '../lib/utils/GETArgs';
-    import {
-        displayNotifOnErr,
-        INFO_NOTIFICATION
-    } from '../lib/utils/notifications';
+    import { displayNotifOnErr, INFO_NOTIFICATION } from '../lib/utils/notifications';
     import { nowS } from '../lib/utils/time';
     import type { NotificationOptions } from '../lib/utils/types';
     import Footer from './Footer.svelte';
@@ -32,9 +29,7 @@
 
     let lastActivity = nowS();
 
-    let addNotification: <T>(
-        props: Record<string, T> | NotificationOptions
-    ) => void;
+    let addNotification: <T>(props: Record<string, T> | NotificationOptions) => void;
 
     $: obfuscated.set(data.settings.hideEntriesByDefault.value);
 
@@ -49,7 +44,7 @@
     let newVersion = '<error>';
     let downloadingBackup = false;
 
-    function checkObfuscatedTimeout() {
+    function checkObfuscatedTimeout () {
         if (!requireAuth) return;
         if ($obfuscated) return;
 
@@ -60,13 +55,13 @@
             addNotification({
                 ...INFO_NOTIFICATION,
                 removeAfter: 0,
-                text: 'Hidden due to inactivity'
+                text: 'Hidden due to inactivity',
             });
             $obfuscated = true;
         }
     }
 
-    function checkCookies() {
+    function checkCookies () {
         if (!requireAuth) return;
 
         const cookies = parse(document.cookie);
@@ -75,28 +70,21 @@
         // https://owasp.org/www-community/HttpOnly
         if (!cookies[USERNAME_COOKIE_KEY]) {
             console.error('Cookies have expired');
-            location.assign(
-                '/?redirect=' +
-                    encodeURIComponent(
-                        location.pathname.substring(1) + location.search
-                    )
-            );
+            location.assign('/?redirect=' + encodeURIComponent(location.pathname.substring(1) + location.search));
         }
     }
 
-    function checkPasscode() {
+    function checkPasscode () {
         if (!requireAuth) return;
 
         const secondsSinceLastEntered = nowS() - $passcodeLastEntered;
-        showPasscodeModal =
-            secondsSinceLastEntered > data.settings.passcodeTimeout.value;
+        showPasscodeModal = secondsSinceLastEntered > data.settings.passcodeTimeout.value;
     }
 
-    async function checkForUpdate() {
+    async function checkForUpdate () {
         const currentVersion = __VERSION__;
-        const versionResult = displayNotifOnErr(
-            addNotification,
-            await api.get(data, '/version')
+        const versionResult = displayNotifOnErr(addNotification,
+            await api.get(data, '/version'),
         );
 
         newVersionAvailable = versionResult.version !== currentVersion;
@@ -117,22 +105,22 @@
         }, 1000 * 10);
     });
 
-    function activity() {
+
+    function activity () {
         lastActivity = nowS();
     }
 
-    async function downloadBackup() {
+    async function downloadBackup () {
         if (downloadingBackup) return;
         downloadingBackup = true;
-        const { data: backupData } = displayNotifOnErr(
-            addNotification,
-            await api.get(data, '/backups', { encrypted: 1 })
+        const { data: backupData } = displayNotifOnErr(addNotification,
+            await api.get(data, '/backups', { encrypted: 1 }),
         );
         Backup.download(backupData, data.username, true);
         downloadingBackup = false;
     }
 
-    function keydown(e: KeyboardEvent) {
+    function keydown (e: KeyboardEvent) {
         lastActivity = nowS();
         if (e.ctrlKey || e.metaKey) {
             if (e.key === 'Escape') {
@@ -151,50 +139,51 @@
 </script>
 
 <svelte:window
-    on:keydown|nonpassive="{keydown}"
-    on:mousemove|passive="{activity}"
-    on:scroll|passive="{activity}"
+    on:keydown|nonpassive={keydown}
+    on:mousemove|passive={activity}
+    on:scroll|passive={activity}
 />
 
 <svelte:head>
     <title>Halcyon.Land</title>
-    <meta
-        content="Halcyon.Land - Journal and Life Logging"
-        name="description"
-    />
+    <meta content="Halcyon.Land - Journal and Life Logging" name="description" />
 
-    <link href="https://fonts.googleapis.com" rel="preconnect" />
-    <link
-        crossorigin="anonymous"
-        href="https://fonts.gstatic.com"
-        rel="preconnect"
-    />
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link crossorigin="anonymous" href="https://fonts.gstatic.com" rel="preconnect">
     <link
         href="https://fonts.googleapis.com/css2?family=Quicksand&family=Dosis&family=Edu+NSW+ACT+Foundation:wght@500&family=Raleway:wght@300&display=swap"
         rel="stylesheet"
-    />
+    >
 </svelte:head>
 
-<svg class="accent-gradient-svg" height="{0}" width="{0}">
-    <linearGradient id="accent-gradient" x1="{1}" x2="{1}" y1="{0}" y2="{1}">
-        <stop offset="{0}" stop-color="rgb(121, 235, 226)"></stop>
-        <stop offset="{1}" stop-color="rgb(189, 176, 255)"></stop>
+<svg class="accent-gradient-svg" height={0} width={0}>
+    <linearGradient id="accent-gradient" x1={1} x2={1} y1={0} y2={1}>
+        <stop offset={0} stop-color="rgb(121, 235, 226)" />
+        <stop offset={1} stop-color="rgb(189, 176, 255)" />
     </linearGradient>
 </svg>
 
 <Notifications>
-    {#if data.settings.passcode.value && nowS() - $passcodeLastEntered > data.settings.passcodeTimeout.value && showPasscodeModal && !home && (data.settings.passcodeTimeout.value > 0 || !$passcodeLastEntered || !browser)}
+
+    {#if data.settings.passcode.value
+    && nowS() - $passcodeLastEntered > data.settings.passcodeTimeout.value
+    && showPasscodeModal
+    && !home
+    && (data.settings.passcodeTimeout.value > 0
+        || !$passcodeLastEntered
+        || !browser)
+    }
         <PasscodeModal
-            bind:show="{showPasscodeModal}"
-            passcode="{data.settings.passcode.value}"
+            bind:show={showPasscodeModal}
+            passcode={data.settings.passcode.value}
         />
     {/if}
 
-    <Notifier bind:addNotification="{addNotification}" />
+    <Notifier bind:addNotification />
 
     {#if !home}
         {#if data.id}
-            <Nav auth="{data}" />
+            <Nav auth={data} />
         {:else}
             <NoAuthNav />
         {/if}
@@ -205,13 +194,13 @@
     </div>
 
     {#if newVersionAvailable}
-        <NewVersionAvailable newVersion="{newVersion}" />
+        <NewVersionAvailable {newVersion} />
     {/if}
 
     <Modal
         classContent="popup-background"
         classWindow="popup-background"
-        show="{$popup}"
+        show={$popup}
     />
 
     <Footer />

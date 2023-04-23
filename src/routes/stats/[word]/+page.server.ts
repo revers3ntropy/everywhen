@@ -8,7 +8,7 @@ import type { PageServerLoad } from './$types';
 
 export const load = cachedPageRoute(async (auth, { params }) => {
     const { val: entries, err } = await Entry.all(query, auth, {
-        deleted: false
+        deleted: false,
     });
     if (err) throw error(400, err);
 
@@ -23,7 +23,7 @@ export const load = cachedPageRoute(async (auth, { params }) => {
     for (const entry of entries) {
         const entryAsWords = [
             ...splitText(entry.title),
-            ...splitText(entry.entry)
+            ...splitText(entry.entry),
         ];
 
         let instancesInEntry = 0;
@@ -51,6 +51,6 @@ export const load = cachedPageRoute(async (auth, { params }) => {
         wordCount,
         wordInstances,
         theWord,
-        totalEntries
+        totalEntries,
     };
 }) satisfies PageServerLoad;

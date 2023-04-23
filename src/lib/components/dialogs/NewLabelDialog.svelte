@@ -5,11 +5,12 @@
 
     export let auth: Auth;
 
-    function closeHandler() {
+    function closeHandler () {
         popup.set(null);
     }
 </script>
-
 <div>
-    <NewLabelForm auth="{auth}" on:submit="{closeHandler}" />
+    <NewLabelForm {auth} on:submit={closeHandler} />
 </div>
+
+

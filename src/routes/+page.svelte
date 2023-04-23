@@ -8,7 +8,7 @@
     const { addNotification } = getNotificationsContext();
 
     export let data: App.PageData & {
-        redirect: string;
+        redirect: string
     };
 
     // user log in / create account form values
@@ -17,30 +17,28 @@
 
     let actionPending = false;
 
-    async function login(): Promise<void> {
+    async function login (): Promise<void> {
         actionPending = true;
-        displayNotifOnErr(
-            addNotification,
+        displayNotifOnErr(addNotification,
             await api.get(data, `/auth`, {
                 key: encryptionKeyFromPassword(password),
-                username
+                username,
             }),
             {},
-            () => (actionPending = false)
+            () => actionPending = false,
         );
         location.assign('/' + data.redirect);
     }
 
-    async function create(): Promise<void> {
+    async function create (): Promise<void> {
         actionPending = true;
-        displayNotifOnErr(
-            addNotification,
+        displayNotifOnErr(addNotification,
             await api.post(data, `/users`, {
                 password: encryptionKeyFromPassword(password),
-                username
+                username,
             }),
             {},
-            () => (actionPending = false)
+            () => actionPending = false,
         );
         location.assign('/' + data.redirect);
     }
@@ -53,8 +51,8 @@
             <input
                 aria-label="Username"
                 autocomplete="username"
-                bind:value="{username}"
-                disabled="{actionPending}"
+                bind:value={username}
+                disabled={actionPending}
                 style="font-size: x-large"
             />
         </label>
@@ -63,8 +61,8 @@
             <input
                 aria-label="Password"
                 autocomplete="current-password"
-                bind:value="{password}"
-                disabled="{actionPending}"
+                bind:value={password}
+                disabled={actionPending}
                 style="font-size: x-large"
                 type="password"
             />
@@ -72,8 +70,8 @@
         <div class="flex-center" style="justify-content: space-between">
             <button
                 aria-label="Create Account"
-                disabled="{actionPending}"
-                on:click|preventDefault="{create}"
+                disabled={actionPending}
+                on:click|preventDefault={create}
                 type="button"
             >
                 Sign Up
@@ -81,8 +79,8 @@
             <button
                 aria-label="Log In"
                 class="primary with-icon"
-                disabled="{actionPending}"
-                on:click|preventDefault="{login}"
+                disabled={actionPending}
+                on:click|preventDefault={login}
                 type="button"
             >
                 <ChevronRight size="30" />
@@ -100,8 +98,7 @@
         height: 100vh;
     }
 
-    .content,
-    input {
+    .content, input {
         max-width: 94vw;
     }
 

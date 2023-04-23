@@ -11,12 +11,12 @@ import type { Bytes, Seconds } from './types';
 
 const cacheLogger = makeLogger('CACHE', chalk.magentaBright, 'general.log');
 
-const cache: Record<string, Record<string, unknown> | undefined> = {};
+const cache: Record<string, Record<string, unknown>> = {};
 const cacheLastUsed: Record<string, number> = {};
 
-function roughSizeOfObject(object: unknown): number {
+function roughSizeOfObject (object: unknown): number {
     const objectList: unknown[] = [];
-    const stack: unknown[] = [object];
+    const stack: unknown[] = [ object ];
     let bytes = 0;
 
     while (stack.length) {
@@ -28,9 +28,10 @@ function roughSizeOfObject(object: unknown): number {
             bytes += value.length * 2;
         } else if (typeof value === 'number') {
             bytes += 8;
-        } else if (
-            typeof value === 'object' &&
-            objectList.indexOf(value) === -1
+        } else if
+        (
+            typeof value === 'object'
+            && objectList.indexOf(value) === -1
         ) {
             objectList.push(value);
 
@@ -42,17 +43,17 @@ function roughSizeOfObject(object: unknown): number {
     return bytes;
 }
 
-export function cacheResponse<T>(
+export function cacheResponse<T> (
     url: string,
     userId: string,
-    response: T
+    response: T,
 ): void {
-    const userCache = cache[userId] || {};
-    userCache[url] = response;
+    cache[userId] = cache[userId] || {};
+    cache[userId][url] = response;
     cacheLastUsed[userId] = nowS();
 }
 
-function logReq(hit: boolean, url: URL) {
+function logReq (hit: boolean, url: URL) {
     const path = url.pathname.split('/');
     path.shift();
     let pathStr = `/${path.shift() || ''}`;
@@ -65,31 +66,30 @@ function logReq(hit: boolean, url: URL) {
 
     void cacheLogger.logToFile(
         hit ? chalk.green('HIT ') : chalk.red('MISS'),
-        pathStr
+        pathStr,
     );
 }
 
-export function getCachedResponse<T>(
+export function getCachedResponse<T> (
     url: string,
-    userId: string
+    userId: string,
 ): T | undefined {
     cacheLastUsed[userId] = nowS();
-    const userCache = cache[userId] || {};
-    if (url in userCache) {
+    if (url in cache[userId]) {
         logReq(true, new URL(url));
-        return userCache[url] as T;
+        return cache[userId][url] as T;
     } else {
         logReq(false, new URL(url));
         return undefined;
     }
 }
 
-export function invalidateCache(userId: string): void {
+export function invalidateCache (userId: string): void {
     delete cache[userId];
     delete cacheLastUsed[userId];
 }
 
-export function cleanupCache(): number {
+export function cleanupCache (): number {
     const now = nowS();
     const cacheSize = roughSizeOfObject(cache);
     const timeout = cacheTimeout(cacheSize);
@@ -112,12 +112,12 @@ export function cleanupCache(): number {
         `size=${bytesFmt}`,
         `timeout=${timeout}s`,
         `change=${changeFmt}`,
-        `(${cleared})`
+        `(${cleared})`,
     );
     return cacheSizeAfter;
 }
 
-export function cacheTimeout(size: Bytes): Seconds {
+export function cacheTimeout (size: Bytes): Seconds {
     if (size < 1_000_000) {
         return 60 * 60 * 24 * 7; // 1 week
     } else if (size < 50_000_000) {
@@ -131,13 +131,14 @@ export function cacheTimeout(size: Bytes): Seconds {
 export function cachedApiRoute<
     Params extends Partial<Record<string, string>>,
     RouteId extends string | null,
-    Res extends NonNullable<unknown>
->(
-    handler: (auth: Auth, event: RequestEvent<Params, RouteId>) => Promise<Res>
+    Res extends NonNullable<unknown>,
+> (
+    handler: (
+        auth: Auth,
+        event: RequestEvent<Params, RouteId>,
+    ) => Promise<Res>,
 ): (event: RequestEvent<Params, RouteId>) => Promise<GenericResponse<Res>> {
-    return (async (
-        props: RequestEvent<Params, RouteId>
-    ): Promise<GenericResponse<Res>> => {
+    return (async (props: RequestEvent<Params, RouteId>): Promise<GenericResponse<Res>> => {
         const url = props.url.href;
         const auth = await getAuthFromCookies(props.cookies);
         const cached = getCachedResponse<Response>(url, auth.id)?.clone();
@@ -152,14 +153,13 @@ export function cachedApiRoute<
             throw new Error('Body must not be an array');
         }
         const responseString = JSON.stringify(response);
-        const responseObj = new Response(responseString, {
-            status: 200
-        }) as GenericResponse<Res>;
+        const responseObj = new Response(
+            responseString,
+            { status: 200 },
+        ) as GenericResponse<Res>;
         cacheResponse(url, auth.id, responseObj.clone());
         return responseObj;
-    }) satisfies (
-        event: RequestEvent<Params, RouteId>
-    ) => Promise<GenericResponse<Res>>;
+    }) satisfies (event: RequestEvent<Params, RouteId>) => Promise<GenericResponse<Res>>;
 }
 
 export function cachedPageRoute<
@@ -167,19 +167,15 @@ export function cachedPageRoute<
     ParentData extends Record<string, unknown>,
     OutputData extends Record<string, unknown>,
     RouteId extends string
->(
+> (
     handler: (
         auth: Auth,
-        event: ServerLoadEvent<Params, ParentData, RouteId>
-    ) => MaybePromise<OutputData>
+        event: ServerLoadEvent<Params, ParentData, RouteId>,
+    ) => MaybePromise<OutputData>,
     // doesn't actually return `OutputData & App.PageData`,
     // but needs to act like it to satisfy the type checker with `svelte-check`
-): (
-    event: ServerLoadEvent<Params, ParentData, RouteId>
-) => MaybePromise<OutputData & App.PageData> {
-    return (async (
-        props: ServerLoadEvent<Params, ParentData, RouteId>
-    ): Promise<OutputData & App.PageData> => {
+): (event: ServerLoadEvent<Params, ParentData, RouteId>) => MaybePromise<OutputData & App.PageData> {
+    return (async (props: ServerLoadEvent<Params, ParentData, RouteId>): Promise<OutputData & App.PageData> => {
         const url = props.url.href;
         const auth = await getAuthFromCookies(props.cookies);
         const cached = getCachedResponse(url, auth.id);
@@ -187,12 +183,10 @@ export function cachedPageRoute<
             return cached as OutputData & App.PageData;
         }
         // stringify and parse to turn into a plain object
-        const response = JSON.parse(
-            JSON.stringify(await handler(auth, props))
-        ) as OutputData;
+        const response = JSON.parse(JSON.stringify(
+            await handler(auth, props),
+        )) as OutputData;
         cacheResponse(url, auth.id, response);
         return response as OutputData & App.PageData;
-    }) satisfies (
-        event: ServerLoadEvent<Params, ParentData, RouteId>
-    ) => MaybePromise<OutputData & App.PageData>;
+    }) satisfies (event: ServerLoadEvent<Params, ParentData, RouteId>) => MaybePromise<OutputData & App.PageData>;
 }

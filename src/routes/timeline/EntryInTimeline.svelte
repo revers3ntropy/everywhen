@@ -26,19 +26,13 @@
 
         state.rect(renderPos - WIDTH / 2, state.centerLnY(), WIDTH, size, {
             radius: 2,
-            colour: 'rgb(100, 100, 100)'
+            colour: 'rgb(100, 100, 100)',
         });
 
         if (label) {
-            state.rect(
-                renderPos - WIDTH / 2,
-                state.centerLnY() + size - 1,
-                WIDTH,
-                2,
-                {
-                    colour: label.colour
-                }
-            );
+            state.rect(renderPos - WIDTH / 2, state.centerLnY() + size - 1, WIDTH, 2, {
+                colour: label.colour,
+            });
         }
 
         if (state.zoom > START_ZOOM * 2 && !$obfuscated) {
@@ -51,10 +45,10 @@
             }
 
             state.text(title, renderPos - 5, y, {
-                align: 'center'
+                align: 'center',
             });
         }
     });
 </script>
 
-<slot />
+<slot></slot>

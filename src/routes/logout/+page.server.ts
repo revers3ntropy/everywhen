@@ -2,7 +2,7 @@ import {
     KEY_COOKIE_KEY,
     KEY_COOKIE_OPTIONS,
     USERNAME_COOKIE_KEY,
-    USERNAME_COOKIE_OPTIONS
+    USERNAME_COOKIE_OPTIONS,
 } from '../../lib/constants';
 import type { PageServerLoad } from './$types';
 

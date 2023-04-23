@@ -11,6 +11,7 @@
 
         location.assign('/');
     });
+
 </script>
 
 <svelte:head>
@@ -19,5 +20,7 @@
 </svelte:head>
 
 <main>
-    <h1> Logging Out... </h1>
+    <h1>
+        Logging Out...
+    </h1>
 </main>

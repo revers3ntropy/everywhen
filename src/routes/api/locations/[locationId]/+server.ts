@@ -13,56 +13,39 @@ export const PUT = (async ({ cookies, request, params }) => {
     const auth = await getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
-    const body = await getUnwrappedReqBody(
-        request,
-        {
-            name: 'string',
-            radius: 'number',
-            latitude: 'number',
-            longitude: 'number'
-        },
-        {
-            name: '',
-            radius: 0,
-            latitude: 0,
-            longitude: 0
-        }
-    );
+    const body = await getUnwrappedReqBody(request, {
+        name: 'string',
+        radius: 'number',
+        latitude: 'number',
+        longitude: 'number',
+    }, {
+        name: '',
+        radius: 0,
+        latitude: 0,
+        longitude: 0,
+    });
 
     const { val, err } = await Location.fromId(query, auth, params.locationId);
     if (err) throw error(400, err);
     let location = val;
 
     if (body.name) {
-        const { err, val } = await Location.updateName(
-            query,
-            auth,
-            location,
-            body.name
-        );
+        const { err, val } = await Location.updateName(query, auth, location, body.name);
         if (err) throw error(400, err);
         location = val;
     }
 
     if (body.radius > 0) {
-        const { err, val } = await Location.updateRadius(
-            query,
-            auth,
-            location,
-            body.radius
-        );
+        const {
+            err,
+            val,
+        } = await Location.updateRadius(query, auth, location, body.radius);
         if (err) throw error(400, err);
         location = val;
     }
 
     if (body.latitude !== 0 && body.longitude !== 0) {
-        const { err } = await Location.updateLocation(
-            query,
-            auth,
-            location,
-            body.latitude,
-            body.longitude
-        );
+        const { err } = await Location.updateLocation(query, auth, location, body.latitude, body.longitude);
         if (err) throw error(400, err);
     }
 
@@ -74,11 +57,7 @@ export const DELETE = (async ({ params, cookies }) => {
     if (!params.locationId) throw error(400, 'invalid location id');
     invalidateCache(auth.id);
 
-    const { err: deleteErr } = await Location.purge(
-        query,
-        auth,
-        params.locationId
-    );
+    const { err: deleteErr } = await Location.purge(query, auth, params.locationId);
     if (deleteErr) throw error(400, deleteErr);
 
     return apiResponse({});

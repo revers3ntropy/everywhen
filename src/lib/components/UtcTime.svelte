@@ -15,18 +15,13 @@
 
 {#if !noTooltip}
     <span
-        use:tooltip="{{
-            content:
-                `UTC ${fmtUtc(timestamp, 0, 'hh:mma')}` +
-                ` (${numberAsSignedStr(tzOffset)}h)` +
-                `<p>${fmtUtc(
-                    timestamp,
-                    currentTzOffset(),
-                    'hh:mma'
-                )} local time</p>`,
+        use:tooltip={{
+            content: `UTC ${fmtUtc(timestamp, 0, 'hh:mma')}`
+                    + ` (${numberAsSignedStr(tzOffset)}h)`
+                    + `<p>${fmtUtc(timestamp, currentTzOffset(), 'hh:mma')} local time</p>`,
             autoPosition: true,
-            position: tooltipPosition
-        }}"
+            position: tooltipPosition,
+        }}
     >
         {#if relative}
             {timeago.format(timestamp * 1000)}

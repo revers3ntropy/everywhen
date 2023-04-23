@@ -1,9 +1,5 @@
 <script lang="ts">
-    import {
-        filedrop,
-        type FileDropOptions,
-        type Files
-    } from 'filedrop-svelte';
+    import { filedrop, type FileDropOptions, type Files } from 'filedrop-svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import { popup } from '../../stores';
     import { getFileContents } from '../../utils/files';
@@ -14,7 +10,7 @@
 
     export const fileOptions: FileDropOptions = {
         fileLimit: 1,
-        windowDrop: false
+        windowDrop: false,
     };
 
     export let message: string;
@@ -25,18 +21,18 @@
     export let textBoxPlaceholder = '';
     export let withContents: (
         body: Result<string>,
-        textBoxContent?: string
+        textBoxContent?: string,
     ) => Promise<void> | void;
 
     let textBoxContent = '';
 
-    async function onFileDrop(e: CustomEvent<{ files: Files }>) {
+    async function onFileDrop (e: CustomEvent<{ files: Files }>) {
         const files = e.detail.files;
         if (files.rejected.length > 0) {
             popup.set(null);
             addNotification({
                 ...ERR_NOTIFICATION,
-                text: 'File could not be read, please try again'
+                text: 'File could not be read, please try again',
             });
             return;
         }
@@ -44,7 +40,7 @@
             popup.set(null);
             addNotification({
                 ...ERR_NOTIFICATION,
-                text: 'Please select exactly one file'
+                text: 'Please select exactly one file',
             });
             return;
         }
@@ -56,7 +52,7 @@
         popup.set(null);
     }
 
-    function handleTextBoxInput(e: Event) {
+    function handleTextBoxInput (e: Event) {
         textBoxContent = (e.target as HTMLInputElement).value;
     }
 </script>
@@ -68,9 +64,9 @@
                 {textBoxLabel}
                 <input
                     class="text-box"
-                    on:input="{handleTextBoxInput}"
-                    placeholder="{textBoxPlaceholder}"
-                    type="{textBoxType}"
+                    on:input={handleTextBoxInput}
+                    placeholder={textBoxPlaceholder}
+                    type={textBoxType}
                 />
             </label>
         {/if}
@@ -78,8 +74,8 @@
 
     <div
         class="dropzone"
-        on:filedrop="{onFileDrop}"
-        use:filedrop="{fileOptions}"
+        on:filedrop={onFileDrop}
+        use:filedrop={fileOptions}
     >
         {message}
     </div>

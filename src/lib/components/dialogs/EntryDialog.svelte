@@ -18,11 +18,10 @@
     let entry: EntryController | null = null;
 
     onMount(async () => {
-        entry = displayNotifOnErr(
-            addNotification,
+        entry = displayNotifOnErr(addNotification,
             await api.get(auth, apiPath('/entries/?', id)),
             {},
-            () => popup.set(null)
+            () => popup.set(null),
         );
     });
 </script>
@@ -31,10 +30,10 @@
     {#if entry}
         <Entry
             {...entry}
-            isInDialog="{true}"
-            auth="{auth}"
-            obfuscated="{obfuscated}"
-            showFullDate="{true}"
+            isInDialog={true}
+            {auth}
+            {obfuscated}
+            showFullDate={true}
         />
     {:else}
         <BookSpinner />

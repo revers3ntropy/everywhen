@@ -13,14 +13,12 @@ export const POST = (async ({ request, cookies }) => {
 
     const body = await getUnwrappedReqBody(request, {
         content: 'string',
-        fileName: 'string'
+        fileName: 'string',
     });
 
     const { err, val } = await Asset.create(
-        query,
-        auth,
-        body.fileName,
-        body.content
+        query, auth,
+        body.fileName, body.content,
     );
     if (err) throw error(400, err);
 

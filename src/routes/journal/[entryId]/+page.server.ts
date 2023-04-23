@@ -7,15 +7,14 @@ import type { PageServerLoad } from './$types';
 
 export const load = cachedPageRoute(async (auth, { params, url }) => {
     const { val: entry, err } = await Entry.fromId(
-        query,
-        auth,
-        params.entryId,
-        false
+        query, auth,
+        params.entryId, false,
     );
     if (err) throw error(404, 'Entry not found');
 
     return {
         entry,
-        history: GETParamIsTruthy(url.searchParams.get('history'))
+        history: GETParamIsTruthy(url.searchParams.get('history')),
     };
+
 }) satisfies PageServerLoad;

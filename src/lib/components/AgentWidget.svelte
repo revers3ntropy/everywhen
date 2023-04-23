@@ -11,19 +11,15 @@
     import type { Pixels } from '../utils/types';
 
     const mobileOSs = [
-        'Android',
-        'Android-x86',
-        'BlackBerry',
-        'iOS',
-        'Windows Phone',
-        'Windows Mobile',
-        'Palm'
+        'Android', 'Android-x86', 'BlackBerry',
+        'iOS', 'Windows Phone', 'Windows Mobile',
+        'Palm',
     ];
-    const watchOSs = ['watchOS'];
-    const tvOSs = ['tvOS', 'NetTV'];
-    const consoleOSs = ['PlayStation', 'Xbox'];
-    const macOSs = ['Mac OS'];
-    const windowsOSs = ['Windows'];
+    const watchOSs = [ 'watchOS' ];
+    const tvOSs = [ 'tvOS', 'NetTV' ];
+    const consoleOSs = [ 'PlayStation', 'Xbox' ];
+    const macOSs = [ 'Mac OS' ];
+    const windowsOSs = [ 'Windows' ];
 
     export let data = '';
     export let size: Pixels = 20;
@@ -36,9 +32,7 @@
 
         try {
             parsed = JSON.parse(data);
-        } catch (e) {
-            /* empty */
-        }
+        } catch (e) { /* empty */ }
 
         if (typeof parsed !== 'object' || parsed === null) return;
         if (!('userAgent' in parsed)) return;
@@ -46,29 +40,30 @@
         ua = new UAParser(parsed.userAgent).getResult();
     });
 
-    $: osName = ua !== null ? ua?.os?.name || 'Unknown OS' : '';
+    $: osName = ua !== null
+        ? ua?.os?.name || 'Unknown OS'
+        : '';
+
 </script>
 
 {#if ua}
-    <span
-        use:tooltip="{{
-            content: `Created on ${osName}`
-        }}"
-    >
+    <span use:tooltip={{
+        content: `Created on ${osName}`
+    }}>
         {#if mobileOSs.includes(osName)}
-            <Cellphone size="{size}" />
+            <Cellphone {size} />
         {:else if watchOSs.includes(osName)}
-            <Watch size="{size}" />
+            <Watch {size} />
         {:else if tvOSs.includes(osName)}
-            <Television size="{size}" />
+            <Television {size} />
         {:else if consoleOSs.includes(osName)}
-            <Television size="{size}" />
+            <Television {size} />
         {:else if macOSs.includes(osName)}
-            <Apple size="{size}" />
+            <Apple {size} />
         {:else if windowsOSs.includes(osName)}
-            <Windows size="{size}" />
+            <Windows {size} />
         {:else}
-            <Linux size="{size}" />
+            <Linux {size} />
         {/if}
     </span>
 {/if}

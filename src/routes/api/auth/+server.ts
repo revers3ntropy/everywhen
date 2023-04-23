@@ -4,7 +4,7 @@ import {
     KEY_COOKIE_KEY,
     KEY_COOKIE_OPTIONS,
     USERNAME_COOKIE_KEY,
-    USERNAME_COOKIE_OPTIONS
+    USERNAME_COOKIE_OPTIONS,
 } from '../../../lib/constants';
 import { User } from '../../../lib/controllers/user';
 import { query } from '../../../lib/db/mysql';
@@ -12,8 +12,7 @@ import { apiRes404, apiResponse } from '../../../lib/utils/apiResponse';
 
 export const GET = (async ({ url, cookies }) => {
     let key: string | undefined | null = url.searchParams.get('key');
-    const username: string | undefined | null =
-        url.searchParams.get('username');
+    const username: string | undefined | null = url.searchParams.get('username');
 
     if (!key) {
         key = cookies.get(KEY_COOKIE_KEY);
@@ -31,9 +30,7 @@ export const GET = (async ({ url, cookies }) => {
     cookies.set(USERNAME_COOKIE_KEY, username, USERNAME_COOKIE_OPTIONS);
 
     return apiResponse({
-        key,
-        username,
-        id: user.id
+        key, username, id: user.id,
     });
 }) satisfies RequestHandler;
 

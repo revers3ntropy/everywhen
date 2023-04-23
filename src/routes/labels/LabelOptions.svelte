@@ -23,22 +23,26 @@
 
     let deleted = false;
 
-    async function updateLabel(changes: { name?: string; colour?: string }) {
-        displayNotifOnErr(
-            addNotification,
-            await api.put(auth, apiPath(`/labels/?`, id), changes)
+    async function updateLabel (
+        changes: {
+            name?: string;
+            colour?: string;
+        },
+    ) {
+        displayNotifOnErr(addNotification,
+            await api.put(auth, apiPath(`/labels/?`, id), changes),
         );
     }
 
-    async function deleteLabel() {
+    async function deleteLabel () {
+
         // if there are no entries or events tied to this
         // label, deleting it easy, but if there are then
         // a more complex approach is required to clear the
         // label from the entries and events
         if (entryCount + eventCount < 1) {
-            displayNotifOnErr(
-                addNotification,
-                await api.delete(auth, apiPath(`/labels/?`, id))
+            displayNotifOnErr(addNotification,
+                await api.delete(auth, apiPath(`/labels/?`, id)),
             );
             dispatch('delete', { id });
             return;
@@ -48,40 +52,43 @@
             auth,
             id,
             colour,
-            name
+            name,
         });
     }
 </script>
-
 {#if !deleted}
     <div class="label {editable ? 'editable' : ''}">
         {#if editable}
             <input
                 type="color"
-                bind:value="{colour}"
-                on:change="{() => updateLabel({ colour })}"
+                bind:value={colour}
+                on:change={() => updateLabel({ colour })}
             />
             <input
-                bind:value="{name}"
+                bind:value={name}
                 class="editable-text"
                 autocomplete="none"
                 type="text"
-                on:change="{() => updateLabel({ name })}"
-            />
+                on:change={() => updateLabel({ name })}
+            >
         {:else}
-            <div class="entry-label-colour" style="background: {colour}"></div>
+            <div class="entry-label-colour"
+                 style="background: {colour}"
+            ></div>
             <div>{name}</div>
         {/if}
         <a href="/labels/{id}">
-            {entryCount}
-            {entryCount === 1 ? 'entry' : 'entries'}
+            {entryCount} {entryCount === 1
+            ? 'entry'
+            : 'entries'
+        }
             {#if eventCount > 0},
                 {eventCount}
                 {eventCount === 1 ? 'event' : 'events'}
             {/if}
         </a>
         <div>
-            <button on:click="{deleteLabel}" class="icon-button">
+            <button on:click={deleteLabel} class="icon-button">
                 <Delete size="30" />
             </button>
         </div>
@@ -106,7 +113,7 @@
             max-width: 100vw;
             grid-template-columns: 15px 1fr 1fr 35px;
 
-            input[type='text'] {
+            input[type="text"] {
                 width: 100%;
             }
 

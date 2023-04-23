@@ -17,7 +17,7 @@
 
     let collapsed = false;
 
-    function toggleCollapse() {
+    function toggleCollapse () {
         collapsed = !collapsed;
     }
 </script>
@@ -26,10 +26,7 @@
     <div class="title">
         <div>
             <h3>
-                <button
-                    class="flex-center not-link"
-                    on:click="{toggleCollapse}"
-                >
+                <button class="flex-center not-link" on:click={toggleCollapse}>
                     {#if collapsed}
                         <ChevronDown size="30" />
                     {:else}
@@ -39,7 +36,7 @@
                     <UtcTime
                         fmt="ddd, Do MMMM YYYY"
                         noTooltip
-                        timestamp="{day}"
+                        timestamp={day}
                     />
 
                     {#if collapsed}
@@ -59,7 +56,10 @@
                 {:else if utcEq(nowS() - 60 * 60 * 24, day)}
                     <span>Yesterday</span>
                 {:else}
-                    <UtcTime relative timestamp="{day}" />
+                    <UtcTime
+                        relative
+                        timestamp={day}
+                    />
                 {/if}
             </p>
         </div>
@@ -70,10 +70,10 @@
                 <Entry
                     {...entry}
                     on:updated
-                    obfuscated="{obfuscated}"
-                    showLabels="{showLabels}"
-                    showLocations="{showLocations}"
-                    auth="{auth}"
+                    {obfuscated}
+                    {showLabels}
+                    {showLocations}
+                    {auth}
                 />
             {/each}
         </div>
@@ -97,8 +97,7 @@
                 margin: 0 0 0 0.4em;
                 padding: 0;
 
-                &,
-                & * {
+                &, & * {
                     color: @text-color-light;
                 }
 
@@ -112,13 +111,12 @@
                 background: @light-v-accent;
                 border: 1px solid @border;
                 margin: 0.5rem 0;
-                padding: 0.4rem 0.8rem 0.4rem 0;
+                padding: .4rem .8rem .4rem 0;
                 position: sticky;
                 top: 0.3em;
                 z-index: 4;
 
-                p,
-                h3 {
+                p, h3 {
                     margin: 0;
                     padding: 0;
                 }
@@ -128,7 +126,7 @@
         @media @mobile {
             margin: 0;
             border: none;
-            border-radius: 0;
+            border-radius: 0
         }
 
         .contents {

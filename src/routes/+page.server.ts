@@ -6,6 +6,6 @@ export const load = (({ url }) => {
         redirect: redirect
             .trim()
             // remove leading slashes, which might redirect to another site
-            .replace(/^\/+/g, '')
+            .replace(/^\/+/g, ''),
     };
 }) satisfies PageServerLoad;

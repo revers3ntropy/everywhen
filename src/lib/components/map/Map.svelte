@@ -1,7 +1,7 @@
 <script context="module" lang="ts">
     let id = 20;
 
-    export function getId(): string {
+    export function getId (): string {
         return (id++).toString();
     }
 </script>
@@ -40,7 +40,7 @@
         lastEntry,
         type LocationFeature,
         olFeatureFromEntry,
-        olFeatureFromLocation
+        olFeatureFromLocation,
     } from './map';
 
     const { addNotification } = getNotificationsContext();
@@ -57,55 +57,47 @@
     let mapZoom = writable<number | undefined>(undefined);
     let mapCenter = writable<number[] | undefined>(undefined);
 
-    let locationChangeQueue: Record<
-        string,
-        {
-            radius: number;
-            latitude: number;
-            longitude: number;
-        }[]
-    > = {};
+    let locationChangeQueue: Record<string, {
+        radius: number,
+        latitude: number,
+        longitude: number
+    }[]> = {};
 
-    async function reloadLocations() {
-        const res = displayNotifOnErr(
-            addNotification,
-            await api.get(auth, '/locations')
+    async function reloadLocations () {
+        const res = displayNotifOnErr(addNotification,
+            await api.get(auth, '/locations'),
         );
         locations = res.locations;
     }
 
-    async function syncLocationInBackground(
+    async function syncLocationInBackground (
         id: string,
         latitude: number,
         longitude: number,
-        radius: number
+        radius: number,
     ): Promise<void> {
-        displayNotifOnErr(
-            addNotification,
+        displayNotifOnErr(addNotification,
             await api.put(auth, apiPath('/locations/?', id), {
                 latitude,
                 longitude,
-                radius
-            })
+                radius,
+            }),
         );
     }
 
     setInterval(() => {
-        for (const [id, changes] of Object.entries(locationChangeQueue)) {
+        for (const [ id, changes ] of Object.entries(locationChangeQueue)) {
             const last = changes[changes.length - 1];
-            void syncLocationInBackground(
-                id,
-                last.latitude,
-                last.longitude,
-                last.radius
-            );
+            void syncLocationInBackground(id, last.latitude, last.longitude, last.radius);
         }
         locationChangeQueue = {};
     }, 500);
 
-    async function addNamedLocation(object: CallbackObject) {
+    async function addNamedLocation (
+        object: CallbackObject,
+    ) {
         const coordinate = object.coordinate;
-        const [long, lat] = toLonLat(coordinate);
+        const [ long, lat ] = toLonLat(coordinate);
 
         displayNotifOnErr(
             addNotification,
@@ -113,34 +105,34 @@
                 latitude: lat,
                 longitude: long,
                 name: 'New Location',
-                radius: Location.metersToDegrees(50)
-            })
+                radius: Location.metersToDegrees(50),
+            }),
         );
 
         await reloadLocations();
     }
 
-    function setupMap(
+    function setupMap (
         node: HTMLElement,
         {
             locations,
-            entries
+            entries,
         }: {
-            locations: Location[];
-            entries: EntryLocation[];
-        }
+            locations: Location[],
+            entries: EntryLocation[]
+        },
     ): Map {
         const osmLayer = new TileLayer({
-            source: new OSM()
+            source: new OSM(),
         });
 
         const last = lastEntry(entries);
 
-        let center = [0, 0];
+        let center = [ 0, 0 ];
         if ($mapCenter) {
             center = $mapCenter;
         } else if (last && last.latitude && last.longitude) {
-            center = fromLonLat([last.longitude, last.latitude]);
+            center = fromLonLat([ last.longitude, last.latitude ]);
         }
 
         let zoom = 1;
@@ -153,25 +145,26 @@
 
         let map = new Map({
             target: node.id,
-            layers: [osmLayer],
-            view: new View({ center, zoom })
+            layers: [
+                osmLayer,
+            ],
+            view: new View({ center, zoom }),
         });
 
         const locationFeatures = locations.map(olFeatureFromLocation);
 
-        map.addLayer(
-            new LayerVector({
-                source: new SourceVector({
-                    features: locationFeatures
-                })
-            })
-        );
+
+        map.addLayer(new LayerVector({
+            source: new SourceVector({
+                features: locationFeatures,
+            }),
+        }));
 
         for (const feature of locationFeatures) {
             const dragInteraction = new Modify({
-                features: new Collection([feature]),
+                features: new Collection([ feature ]),
                 style: new Style({
-                    renderer([x, y], state) {
+                    renderer ([ x, y ], state) {
                         const ctx = state.context;
 
                         if (typeof x !== 'number' || typeof y !== 'number') {
@@ -183,16 +176,16 @@
                         ctx.arc(x, y, 5, 0, 2 * Math.PI);
                         ctx.strokeStyle = 'rgba(74,74,74,0.6)';
                         ctx.stroke();
-                    }
-                })
+                    },
+                }),
             });
             map.addInteraction(dragInteraction);
 
-            feature.on('change', evt => {
+            feature.on('change', (evt) => {
                 const target = evt.target as LocationFeature;
                 const geometry = target.getGeometry() as Circle;
                 const center = geometry.getCenter();
-                const [long, lat] = toLonLat(center);
+                const [ long, lat ] = toLonLat(center);
                 const radius = Location.metersToDegrees(geometry.getRadius());
                 const id = feature.location.id;
 
@@ -202,7 +195,7 @@
                 locationChangeQueue[id].push({
                     latitude: lat,
                     longitude: long,
-                    radius
+                    radius,
                 });
 
                 target.location.latitude = lat;
@@ -211,13 +204,12 @@
             });
         }
 
-        map.addLayer(
-            new LayerVector({
-                source: new SourceVector({
-                    features: entries.map(olFeatureFromEntry).filter(Boolean)
-                })
-            })
-        );
+        map.addLayer(new LayerVector({
+            source: new SourceVector({
+                features: entries.map(olFeatureFromEntry)
+                                 .filter(Boolean),
+            }),
+        }));
 
         map.on('singleclick', (event: MapBrowserEvent<UIEvent>) => {
             if (!map) return;
@@ -230,15 +222,13 @@
             }
 
             features = features
-                .filter(
-                    (feature): feature is LocationFeature | EntryFeature => {
-                        // only locations and entries are clickable
-                        if ('entry' in feature) {
-                            return true;
-                        }
-                        return 'location' in feature;
+                .filter((feature): feature is LocationFeature | EntryFeature => {
+                    // only locations and entries are clickable
+                    if ('entry' in feature) {
+                        return true;
                     }
-                )
+                    return 'location' in feature;
+                })
                 .sort((a, b) => {
                     // pick entries over locations
                     if ('entry' in a && 'entry' in b) {
@@ -263,7 +253,7 @@
                 showPopup(EntryDialog, {
                     id: hovering.entry.id,
                     auth,
-                    obfuscated: false
+                    obfuscated: false,
                 });
                 return;
             }
@@ -273,31 +263,26 @@
                     ...hovering.location,
                     auth,
                     onChange: reloadLocations,
-                    isInDialog: true
+                    isInDialog: true,
                 });
             }
         });
 
-        map.addControl(
-            new ContextMenu({
-                width: 180,
-                items: [
-                    {
-                        text: 'Add Named Location',
-                        classname: 'context-menu-option',
-                        callback: (o: CallbackObject) =>
-                            void addNamedLocation(o)
-                    }
-                ]
-            })
-        );
+        map.addControl(new ContextMenu({
+            width: 180,
+            items: [
+                {
+                    text: 'Add Named Location',
+                    classname: 'context-menu-option',
+                    callback: (o: CallbackObject) => void addNamedLocation(o),
+                },
+            ],
+        }));
 
-        map.addOverlay(
-            new Overlay({
-                element: tooltip,
-                autoPan: true
-            })
-        );
+        map.addOverlay(new Overlay({
+            element: tooltip,
+            autoPan: true,
+        }));
 
         map.on('pointermove', (event: MapBrowserEvent<UIEvent>) => {
             if (!map) return;
@@ -335,22 +320,19 @@
         return map;
     }
 
-    function map(
+    function map (
         node: HTMLElement,
-        {
-            locations,
-            entries
-        }: { locations: Location[]; entries: EntryLocation[] }
+        { locations, entries }: { locations: Location[], entries: EntryLocation[] },
     ) {
         let map = setupMap(node, { locations, entries });
         return {
-            destroy() {
+            destroy () {
                 map.setTarget(undefined as unknown as HTMLElement);
             },
-            update(props: { locations: Location[]; entries: EntryLocation[] }) {
+            update (props: { locations: Location[], entries: EntryLocation[] }) {
                 map.setTarget(undefined as unknown as HTMLElement);
                 map = setupMap(node, props);
-            }
+            },
         };
     }
 </script>
@@ -358,14 +340,14 @@
 <div
     class="map {hoveringSomething ? 'hovering' : ''}"
     id="ol-map-{mapId}"
-    use:map="{{ locations, entries }}"
+    use:map={{ locations, entries }}
 >
     {#if hoveringEntryId !== null}
         <div
-            bind:this="{tooltip}"
+            bind:this={tooltip}
             class="ol-popup {popupOnRight ? 'right' : ''}"
         >
-            <EntryTooltipOnMap auth="{auth}" id="{hoveringEntryId}" />
+            <EntryTooltipOnMap {auth} id={hoveringEntryId} />
         </div>
     {/if}
 </div>
@@ -428,8 +410,7 @@
         box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
         pointer-events: none;
 
-        &,
-        :global(*) {
+        &, :global(*) {
             color: black;
         }
 

@@ -17,6 +17,7 @@ declare module '$env/static/public' {
 
 // See https://kit.svelte.dev/docs/types#app
 declare namespace App {
+
     interface PageData extends Auth {
         settings: SettingsConfig;
     }
@@ -28,7 +29,7 @@ declare namespace App {
 
 declare global {
     interface String {
-        toLowerCase(): Lowercase<string>;
+        toLowerCase (): Lowercase<string>;
     }
 
     // loaded in with Vite on build from package.json
@@ -36,6 +37,7 @@ declare global {
 
     // See https://kit.svelte.dev/docs/types#app
     namespace App {
+
         interface PageData extends Auth {
             key: string;
             username: string;
@@ -50,74 +52,49 @@ declare global {
 
     // Polyfill for filedrop-svelte package
     declare type FileDropEvent = import('filedrop-svelte/event').FileDropEvent;
-    declare type FileDropSelectEvent =
-        import('filedrop-svelte/event').FileDropSelectEvent;
-    declare type FileDropDragEvent =
-        import('filedrop-svelte/event').FileDropDragEvent;
+    declare type FileDropSelectEvent = import('filedrop-svelte/event').FileDropSelectEvent;
+    declare type FileDropDragEvent = import('filedrop-svelte/event').FileDropDragEvent;
     declare namespace svelte.JSX {
         interface HTMLAttributes<T> {
-            onfiledrop?: (
-                event: CustomEvent<FileDropSelectEvent> & {
-                    target: EventTarget & T;
-                }
-            ) => void;
-            onfiledragenter?: (
-                event: CustomEvent<FileDropDragEvent> & {
-                    target: EventTarget & T;
-                }
-            ) => void;
-            onfiledragleave?: (
-                event: CustomEvent<FileDropDragEvent> & {
-                    target: EventTarget & T;
-                }
-            ) => void;
-            onfiledragover?: (
-                event: CustomEvent<FileDropDragEvent> & {
-                    target: EventTarget & T;
-                }
-            ) => void;
-            onfiledialogcancel?: (
-                event: CustomEvent<FileDropEvent> & {
-                    target: EventTarget & T;
-                }
-            ) => void;
-            onfiledialogclose?: (
-                event: CustomEvent<FileDropEvent> & {
-                    target: EventTarget & T;
-                }
-            ) => void;
-            onfiledialogopen?: (
-                event: CustomEvent<FileDropEvent> & {
-                    target: EventTarget & T;
-                }
-            ) => void;
-            onwindowfiledragenter?: (
-                event: CustomEvent<FileDropDragEvent> & {
-                    target: EventTarget & T;
-                }
-            ) => void;
-            onwindowfiledragleave?: (
-                event: CustomEvent<FileDropDragEvent> & {
-                    target: EventTarget & T;
-                }
-            ) => void;
-            onwindowfiledragover?: (
-                event: CustomEvent<FileDropDragEvent> & {
-                    target: EventTarget & T;
-                }
-            ) => void;
+            onfiledrop?: (event: CustomEvent<FileDropSelectEvent> & {
+                target: EventTarget & T
+            }) => void;
+            onfiledragenter?: (event: CustomEvent<FileDropDragEvent> & {
+                target: EventTarget & T
+            }) => void;
+            onfiledragleave?: (event: CustomEvent<FileDropDragEvent> & {
+                target: EventTarget & T
+            }) => void;
+            onfiledragover?: (event: CustomEvent<FileDropDragEvent> & {
+                target: EventTarget & T
+            }) => void;
+            onfiledialogcancel?: (event: CustomEvent<FileDropEvent> & {
+                target: EventTarget & T
+            }) => void;
+            onfiledialogclose?: (event: CustomEvent<FileDropEvent> & {
+                target: EventTarget & T
+            }) => void;
+            onfiledialogopen?: (event: CustomEvent<FileDropEvent> & {
+                target: EventTarget & T
+            }) => void;
+            onwindowfiledragenter?: (event: CustomEvent<FileDropDragEvent> & {
+                target: EventTarget & T
+            }) => void;
+            onwindowfiledragleave?: (event: CustomEvent<FileDropDragEvent> & {
+                target: EventTarget & T
+            }) => void;
+            onwindowfiledragover?: (event: CustomEvent<FileDropDragEvent> & {
+                target: EventTarget & T
+            }) => void;
         }
     }
 
     declare module '@svelte-plugins/tooltips' {
-        export function tooltip(
-            el: HTMLElement,
-            props: {
-                content: string;
-                placement?: 'top' | 'bottom' | 'left' | 'right';
-                offset?: number;
-            }
-        ): unknown;
+        export function tooltip (el: HTMLElement, props: {
+            content: string;
+            placement?: 'top' | 'bottom' | 'left' | 'right';
+            offset?: number;
+        }): unknown;
     }
 
     // Very annoying, but otherwise `svelte-check` complains about

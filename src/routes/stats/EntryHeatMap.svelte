@@ -5,13 +5,15 @@
 
     export let entries: EntryWithWordCount[];
     export let by: By;
-    let data: { date: Date; value: number }[] = [];
+    let data: { date: Date, value: number }[] = [];
 
-    function reloadChart() {
-        data = entries.map(entry => {
+    function reloadChart () {
+        data = entries.map((entry) => {
             return {
                 date: new Date(entry.created * 1000),
-                value: by === By.Entries ? 1 : entry.wordCount
+                value: by === By.Entries
+                    ? 1
+                    : entry.wordCount,
             };
         });
     }
@@ -24,45 +26,38 @@
     const lastJanYear = lastJanInCurrentYear
         ? new Date().getFullYear()
         : new Date().getFullYear() - 1;
+
 </script>
 
 <div class="outer">
     <div class="inner">
         <SvelteHeatmap
-            allowOverflow="{true}"
-            cellGap="{2}"
+            allowOverflow={true}
+            cellGap={2}
             cellRadius="50%"
-            colors="{['#95eab0', '#52d8bd', '#3397bd', '#0051cf']}"
-            data="{data}"
-            dayLabelWidth="{20}"
-            emptyColor="{'#dfdfdf'}"
-            endDate="{moment().toDate()}"
-            fontColor="{'#9c9c9c'}"
+            colors={['#95eab0', '#52d8bd', '#3397bd', '#0051cf']}
+            {data}
+            dayLabelWidth={20}
+            emptyColor={'#dfdfdf'}
+            endDate={moment().toDate()}
+            fontColor={'#9c9c9c'}
             fontSize="12"
-            monthGap="{20}"
-            monthLabelHeight="{20}"
-            monthLabels="{[
-                `Jan ${lastJanYear}`,
-                'Feb',
-                'Mar',
-                'Apr',
-                'May',
-                'Jun',
-                'Jul',
-                'Aug',
-                'Sep',
-                'Oct',
-                'Nov',
-                'Dec'
-            ]}"
-            startDate="{moment().subtract(showMonths, 'months').toDate()}"
-            view="{'monthly'}"
+            monthGap={20}
+            monthLabelHeight={20}
+            monthLabels={[
+                `Jan ${lastJanYear}`, 'Feb',
+                'Mar', 'Apr', 'May', 'Jun',
+                'Jul', 'Aug', 'Sep',
+                'Oct', 'Nov', 'Dec',
+            ]}
+            startDate={moment().subtract(showMonths, 'months').toDate()}
+            view={'monthly'}
         />
     </div>
 </div>
 
 <style lang="less">
-    @import '../../styles/variables';
+    @import "../../styles/variables";
 
     @media @mobile {
         .outer {
@@ -74,4 +69,5 @@
             }
         }
     }
+
 </style>

@@ -10,12 +10,12 @@
 
     export let tooltipPosition = 'bottom';
 
-    async function watchLocationPermissions() {
-        const permissionStatus = await navigator.permissions.query({
-            name: 'geolocation'
-        });
+    async function watchLocationPermissions () {
+        const permissionStatus = await navigator
+            .permissions
+            .query({ name: 'geolocation' });
 
-        function checkPermission() {
+        function checkPermission () {
             if (permissionStatus.state !== 'granted') {
                 enabledLocation.set(false);
             }
@@ -25,31 +25,27 @@
         checkPermission();
     }
 
-    function enableLocation(): Promise<boolean> {
+    function enableLocation (): Promise<boolean> {
         return new Promise(resolve => {
             // trigger the permission request
-            navigator.geolocation.getCurrentPosition(
-                () => {
-                    enabledLocation.set(true);
-                    resolve(true);
-                },
-                () => {
-                    enabledLocation.set(false);
-                    resolve(false);
-                    addNotification({
-                        text:
-                            'Something went wrong enabling location' +
-                            ' - please check your browser settings',
-                        removeAfter: 8000,
-                        type: 'error',
-                        position: 'top-center'
-                    });
-                }
-            );
+            navigator.geolocation.getCurrentPosition(() => {
+                enabledLocation.set(true);
+                resolve(true);
+            }, () => {
+                enabledLocation.set(false);
+                resolve(false);
+                addNotification({
+                    text: 'Something went wrong enabling location'
+                        + ' - please check your browser settings',
+                    removeAfter: 8000,
+                    type: 'error',
+                    position: 'top-center',
+                });
+            });
         });
     }
 
-    function disableLocation() {
+    function disableLocation () {
         enabledLocation.set(false);
     }
 
@@ -60,21 +56,21 @@
 
 {#if $enabledLocation}
     <button
-        on:click="{disableLocation}"
-        use:tooltip="{{
+        on:click={disableLocation}
+        use:tooltip={{
             content: 'Location will be recorded, click to turn off location',
             position: tooltipPosition
-        }}"
+        }}
         aria-label="Turn off Location"
     >
         <MapMarkerOutline size="25" />
     </button>
 {:else}
     <button
-        on:click="{enableLocation}"
-        use:tooltip="{{
+        on:click={enableLocation}
+        use:tooltip={{
             content: 'Location is disabled, click to record location with entry'
-        }}"
+        }}
         aria-label="Turn on Location"
     >
         <MapMarkerOffOutline size="25" />

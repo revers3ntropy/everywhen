@@ -2,14 +2,15 @@
     import { canvasState, renderable } from '../../lib/canvas/canvasHelpers';
 
     renderable({
-        setup() {
+        setup () {
+
             let dragging = false;
             let dragStart = 0;
             let dragEnd = 0;
             let dragYStart = 0;
             let dragYEnd = 0;
 
-            function doZoom(deltaZ: number) {
+            function doZoom (deltaZ: number) {
                 canvasState.update(s => {
                     let centerTime = s.renderPosToTime(s.width / 2);
                     s.zoom *= deltaZ;
@@ -25,12 +26,13 @@
 
             $canvasState.listen('wheel', evt => {
                 evt.preventDefault();
-                doZoom(1 + evt.deltaY * -0.001);
+                doZoom(1 + (evt.deltaY * -0.001));
             });
 
             // desktop
             $canvasState.listen('mousedown', event => {
-                dragStart = $canvasState.getMousePosRaw(event);
+                dragStart = $canvasState
+                    .getMousePosRaw(event);
                 dragging = true;
             });
 
@@ -79,8 +81,8 @@
 
                 dragYStart = dragYEnd;
             });
-        }
+        },
     });
 </script>
 
-<slot />
+<slot></slot>

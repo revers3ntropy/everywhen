@@ -10,7 +10,7 @@ export const LS_KEY = {
     newEntryLabel: '__misc_3_newEntryLabel',
     passcodeLastEntered: '__misc_3_passcode_last_entered',
     enabledLocation: '__misc_3_enabled_location',
-    sortEventsKey: '__misc_3_events_sort_key'
+    sortEventsKey: '__misc_3_events_sort_key',
 };
 
 // possible characters to show when the text is blurred
@@ -20,7 +20,7 @@ export const KEY_COOKIE_OPTIONS = Object.freeze({
     path: '/',
     maxAge: COOKIE_TIMEOUT,
     sameSite: 'strict',
-    httpOnly: true
+    httpOnly: true,
 });
 
 // allow the username cookie to be read by the client
@@ -29,10 +29,14 @@ export const KEY_COOKIE_OPTIONS = Object.freeze({
 // https://owasp.org/www-community/HttpOnly
 export const USERNAME_COOKIE_OPTIONS = Object.freeze({
     ...KEY_COOKIE_OPTIONS,
-    httpOnly: false
+    httpOnly: false,
 });
 
-export const NON_AUTH_ROUTES = Object.freeze(['/', '/about', '/about/history']);
+export const NON_AUTH_ROUTES = Object.freeze([
+    '/',
+    '/about',
+    '/about/history',
+]);
 
 export const MAX_IMAGE_SIZE: Bytes = 1024 * 1024 * 8; // 8MiB
 
@@ -42,5 +46,4 @@ export const NAVBAR_HEIGHT: Pixels = 60;
 
 export const ANIMATION_DURATION: Milliseconds = 200;
 
-export const API_DOCS_LINK =
-    'https://docs.google.com/spreadsheets/d/1eLjbfXnzAXRz08qJPRGnM_IsezMKcuT6anuy_qwP-Uo/edit?usp=sharing';
+export const API_DOCS_LINK = 'https://docs.google.com/spreadsheets/d/1eLjbfXnzAXRz08qJPRGnM_IsezMKcuT6anuy_qwP-Uo/edit?usp=sharing';

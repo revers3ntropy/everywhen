@@ -11,7 +11,7 @@
 {#if tooltip}
     <div
         class="{primary ? 'primary' : ''}"
-        use:useTooltip="{{ content: tooltip }}"
+        use:useTooltip={{ content: tooltip }}
     >
         {beforeLabel}
         <span>{value}</span>
@@ -34,7 +34,7 @@
         padding: 0.3rem;
         border-radius: 0.5rem;
         margin: 0.5rem;
-        font-size: 0.9rem;
+        font-size: 0.90rem;
 
         span {
             font-weight: bold;

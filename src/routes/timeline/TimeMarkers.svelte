@@ -1,9 +1,6 @@
 <script lang="ts">
     import { browser } from '$app/environment';
-    import {
-        renderable,
-        type RenderProps
-    } from '../../lib/canvas/canvasHelpers';
+    import { renderable, type RenderProps } from '../../lib/canvas/canvasHelpers';
     import { NAVBAR_HEIGHT } from '../../lib/constants';
     import { currentTzOffset, fmtUtc, nowS } from '../../lib/utils/time.js';
     import { monthIdxToName } from './utils';
@@ -17,7 +14,7 @@
         month: '#fff',
         week: '#aaa',
         day: '#666',
-        hour: '#444'
+        hour: '#444',
     };
 
     $: if (startYear + showYears < new Date().getFullYear()) {
@@ -30,10 +27,10 @@
         startYear = new Date().getFullYear();
     }
 
-    function drawYears(state: RenderProps) {
+    function drawYears (state: RenderProps) {
         let year = Math.max(
             new Date(state.renderPosToTime(0) * 1000).getFullYear() || 0,
-            startYear
+            startYear,
         );
 
         let showYearText = state.zoom >= 2e-6;
@@ -48,30 +45,26 @@
             // -1 to center, as has width 3
             state.rect(renderPos - 1, 0, 3, state.height, {
                 radius: 0,
-                colour: colours.year
+                colour: colours.year,
             });
 
             if (showYearText) {
                 state.text(year.toString(), renderPos + 5, NAVBAR_HEIGHT + 10);
             }
             if (showBothSidesText) {
-                state.text(
-                    (year - 1).toString(),
-                    renderPos - 25,
-                    NAVBAR_HEIGHT + 10
-                );
+                state.text((year - 1).toString(), renderPos - 25, NAVBAR_HEIGHT + 10);
             }
 
             year++;
         }
     }
 
-    function drawMonths(state: RenderProps) {
+    function drawMonths (state: RenderProps) {
         if (state.zoom < 1e-5) return;
 
         let year = Math.max(
             new Date(state.renderPosToTime(0) * 1000).getFullYear() || 0,
-            startYear
+            startYear,
         );
 
         let month = 0;
@@ -85,7 +78,7 @@
             if (renderPos > state.width) break;
 
             state.rect(renderPos, 0, 1, state.height, {
-                colour: colours.month
+                colour: colours.month,
             });
 
             if (showMonthText) {
@@ -102,7 +95,7 @@
         }
     }
 
-    function drawDays(state: RenderProps) {
+    function drawDays (state: RenderProps) {
         if (state.zoom < 5e-5) return;
 
         let leftMost = state.renderPosToTime(0);
@@ -127,24 +120,22 @@
 
         while (true) {
             const dayDate = new Date(day * 1000);
-            let dayStart =
-                new Date(
-                    dayDate.getFullYear(),
-                    dayDate.getMonth(),
-                    dayDate.getDate()
-                ).getTime() / 1000;
+            let dayStart = new Date(
+                dayDate.getFullYear(),
+                dayDate.getMonth(),
+                dayDate.getDate(),
+            ).getTime() / 1000;
             let renderPos = state.timeToRenderPos(dayStart);
 
             if (renderPos > state.width) break;
 
-            const isMonday =
-                fmtUtc(dayStart, currentTzOffset(), 'ddd') === 'Mon';
+            const isMonday = fmtUtc(dayStart, currentTzOffset(), 'ddd') === 'Mon';
 
             const shouldShow = isMonday || showDays;
 
             if (shouldShow) {
                 state.rect(renderPos, 0, 1, state.height, {
-                    colour: isMonday ? colours.week : colours.day
+                    colour: isMonday ? colours.week : colours.day,
                 });
             }
 
@@ -168,7 +159,11 @@
                     text += ' (Tomorrow)';
                 }
 
-                state.text(text, renderPos + 6, NAVBAR_HEIGHT + 40);
+                state.text(
+                    text,
+                    renderPos + 6,
+                    NAVBAR_HEIGHT + 40,
+                );
             }
 
             const week = fmtUtc(dayStart, currentTzOffset(), 'YYYY-WW');
@@ -182,10 +177,8 @@
                 } else if (week === nextWeek) {
                     text = 'Next week';
                 } else {
-                    const [thisYear, thisWeekIdx] = thisWeek
-                        .split('-')
-                        .map(parseInt);
-                    const [weekYear, weekIdx] = week.split('-').map(parseInt);
+                    const [ thisYear, thisWeekIdx ] = thisWeek.split('-').map(parseInt);
+                    const [ weekYear, weekIdx ] = week.split('-').map(parseInt);
 
                     if (thisYear === weekYear && thisWeekIdx > weekIdx) {
                         text = `${thisWeekIdx - weekIdx} weeks ago`;
@@ -193,7 +186,11 @@
                 }
 
                 if (text) {
-                    state.text(text, renderPos + 6, NAVBAR_HEIGHT + 30);
+                    state.text(
+                        text,
+                        renderPos + 6,
+                        NAVBAR_HEIGHT + 30,
+                    );
                 }
             }
 
@@ -201,7 +198,7 @@
         }
     }
 
-    function drawHours(state: RenderProps) {
+    function drawHours (state: RenderProps) {
         if (state.zoom < 5e-3) return;
 
         let leftMost = state.renderPosToTime(0);
@@ -223,14 +220,14 @@
             if (renderPos > state.width) break;
 
             state.rect(renderPos, 0, 1, state.height, {
-                colour: colours.hour
+                colour: colours.hour,
             });
 
             if (showHourText) {
                 state.text(
                     fmtUtc(hour, currentTzOffset(), 'ha'),
                     renderPos + 6,
-                    NAVBAR_HEIGHT + 50
+                    NAVBAR_HEIGHT + 50,
                 );
             }
 
@@ -246,4 +243,4 @@
     });
 </script>
 
-<slot />
+<slot></slot>

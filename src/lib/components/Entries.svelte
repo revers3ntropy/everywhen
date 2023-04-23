@@ -45,25 +45,21 @@
 
     let loading = true;
 
-    function importPopup() {
-        showPopup(
-            ImportDialog,
-            {
-                auth,
-                type: 'entries'
-            },
-            reloadEntries
-        );
+    function importPopup () {
+        showPopup(ImportDialog, {
+            auth,
+            type: 'entries',
+        }, reloadEntries);
     }
 
-    export async function reloadEntries(force = false) {
+    export async function reloadEntries (force = false) {
         if (loading && !force) return;
         loading = true;
 
         const entriesOptions: PickOptionalAndMutable<IOptions, 'search'> = {
             page,
             ...options,
-            pageSize
+            pageSize,
         };
         if (search) {
             entriesOptions.search = search;
@@ -72,20 +68,18 @@
             delete entriesOptions.search;
         }
 
-        void api
-            .get(auth, `/entries`, entriesOptions)
-            .then(res => displayNotifOnErr(addNotification, res))
-            .then(res => {
-                entries = Entry.groupEntriesByDay(res.entries);
-                pages = res.totalPages;
-                entryCount = res.totalEntries;
+        void api.get(auth, `/entries`, entriesOptions)
+                .then(res => displayNotifOnErr(addNotification, res))
+                .then(res => {
+                    entries = Entry.groupEntriesByDay(res.entries);
+                    pages = res.totalPages;
+                    entryCount = res.totalEntries;
 
-                loading = false;
-            });
+                    loading = false;
+                });
 
-        const res = displayNotifOnErr(
-            addNotification,
-            await api.get(auth, '/entries/titles')
+        const res = displayNotifOnErr(addNotification,
+            await api.get(auth, '/entries/titles'),
         );
         entryTitles = Entry.groupEntriesByDay(res.entries);
     }
@@ -95,7 +89,8 @@
     onMount(async () => {
         await reloadEntries(true);
     });
-    $: [page, search, browser ? reloadEntries() : 0];
+    $: [ page, search, browser ? reloadEntries() : 0 ];
+
 </script>
 
 <div>
@@ -103,7 +98,7 @@
         <div class="entries-menu">
             <div>
                 {#if showSidebar}
-                    <Sidebar titles="{entryTitles}" auth="{auth}" />
+                    <Sidebar titles={entryTitles} {auth} />
                 {/if}
                 {#if showBin}
                     <a class="with-circled-icon" href="/journal/deleted">
@@ -112,10 +107,7 @@
                     </a>
                 {/if}
                 {#if showImport}
-                    <button
-                        class="with-circled-icon hide-mobile"
-                        on:click="{importPopup}"
-                    >
+                    <button class="with-circled-icon hide-mobile" on:click={importPopup}>
                         <TrayArrowUp size="30" />
                         Import
                     </button>
@@ -123,17 +115,17 @@
             </div>
             <div>
                 <PageCounter
-                    bind:page="{page}"
-                    pageLength="{pageSize}"
-                    pages="{pages}"
-                    total="{entryCount}"
+                    bind:page
+                    pageLength={pageSize}
+                    {pages}
+                    total={entryCount}
                 />
             </div>
 
             <div>
                 {#if showSearch}
                     <input
-                        bind:value="{search}"
+                        bind:value={search}
                         placeholder="Search..."
                         type="text"
                     />
@@ -145,16 +137,18 @@
         {#if loading}
             <Spinner />
         {:else}
-            {#each Object.keys(entries).sort((a, b) => parseInt(b) - parseInt(a)) as day}
+            {#each Object.keys(entries)
+                .sort((a, b) => parseInt(b) - parseInt(a)) as day}
                 <EntryGroup
-                    entries="{entries[parseInt(day)]}"
-                    on:updated="{() => reloadEntries()}"
-                    obfuscated="{$obfuscated}"
-                    showLabels="{showLabels}"
-                    showLocations="{showLocations}"
-                    auth="{auth}"
-                    day="{parseInt(day)}"
-                />
+                    entries={entries[parseInt(day)]}
+                    on:updated={() => reloadEntries()}
+                    obfuscated={$obfuscated}
+                    {showLabels}
+                    {showLocations}
+                    {auth}
+                    day={parseInt(day)}
+                >
+                </EntryGroup>
             {/each}
         {/if}
     </div>

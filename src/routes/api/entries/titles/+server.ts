@@ -5,7 +5,7 @@ import { query } from '../../../../lib/db/mysql';
 import { apiRes404 } from '../../../../lib/utils/apiResponse';
 import { cachedApiRoute } from '../../../../lib/utils/cache';
 
-export const GET = cachedApiRoute(async auth => {
+export const GET = cachedApiRoute(async (auth) => {
     const { val: entries, err } = await Entry.getTitles(query, auth);
     if (err) throw error(400, err);
 

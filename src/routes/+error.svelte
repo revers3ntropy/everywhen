@@ -1,7 +1,6 @@
 <script lang="ts">
     import { page } from '$app/stores';
 </script>
-
 <main>
     <div>
         <div>
@@ -13,8 +12,9 @@
     </div>
 </main>
 
+
 <style lang="less">
-    @import '../styles/layout';
+    @import "../styles/layout";
 
     main {
         font-size: 2em;

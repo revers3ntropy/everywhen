@@ -8,34 +8,27 @@
     import Select from '../../lib/components/Select.svelte';
     import { currentTzOffset, fmtUtc, nowS } from '../../lib/utils/time';
     import type { Seconds } from '../../lib/utils/types';
-    import {
-        Bucket,
-        bucketiseTime,
-        bucketSize,
-        By,
-        type EntryWithWordCount
-    } from './helpers';
+    import { Bucket, bucketiseTime, bucketSize, By, type EntryWithWordCount } from './helpers';
 
     export let entries: EntryWithWordCount[];
     export let by: By;
 
     interface ChartData {
         datasets: {
-            data: number[];
-            label: string;
-        }[];
-        labels: string[];
+            data: number[], label: string
+        }[],
+        labels: string[]
     }
 
     let selectedBucket = Bucket.Week;
 
     let data: ChartData;
 
-    function toggleBy() {
-        by = by === By.Entries ? By.Words : By.Entries;
+    function toggleBy () {
+        by = (by === By.Entries) ? By.Words : By.Entries;
     }
 
-    function generateLabels(start: Seconds, buckets: Seconds[]) {
+    function generateLabels (start: Seconds, buckets: Seconds[]) {
         let year = parseInt(fmtUtc(start, currentTzOffset(), 'YYYY'));
         return buckets.map(k => {
             if (selectedBucket === Bucket.Year) {
@@ -59,12 +52,15 @@
         });
     }
 
-    function getGraphData(
+
+    function getGraphData (
         entries: EntryWithWordCount[],
         selectedBucket: Bucket,
-        by: By
+        by: By,
     ): ChartData {
-        const sortedEntries = entries.sort((a, b) => a.created - b.created);
+
+        const sortedEntries = entries
+            .sort((a, b) => a.created - b.created);
 
         const buckets: Record<string, number> = {};
         const start = sortedEntries[0].created;
@@ -75,23 +71,23 @@
 
         for (const entry of sortedEntries) {
             const bucket = bucketiseTime(entry.created, selectedBucket);
-            buckets[bucket.toString()] +=
-                by === By.Entries ? 1 : entry.wordCount;
+            buckets[bucket.toString()] += (by === By.Entries) ? 1 : entry.wordCount;
         }
 
         const labels = generateLabels(
             start,
-            Object.keys(buckets).map(k => parseInt(k))
+            Object.keys(buckets)
+                  .map(k => parseInt(k)),
         );
 
         const dataset = {
             data: Object.values(buckets),
-            label: by === By.Entries ? 'Entries' : 'Words'
+            label: by === By.Entries ? 'Entries' : 'Words',
         };
 
         return {
             labels,
-            datasets: [dataset]
+            datasets: [ dataset ],
         };
     }
 
@@ -102,27 +98,30 @@
 </script>
 
 <Bar
-    data="{data}"
+    {data}
     height="400"
-    width="{browser ? document.body.clientWidth : 1000}"
+    width={browser ? document.body.clientWidth : 1000}
 />
 
 <div class="options">
     <div class="flex-center">
         <div>Group by</div>
         <Select
-            bind:value="{selectedBucket}"
+            bind:value={selectedBucket}
             key="Week"
-            options="{{
+            options={{
                 Year: Bucket.Year,
                 Month: Bucket.Month,
                 Week: Bucket.Week,
-                Day: Bucket.Day
-            }}"
+                Day: Bucket.Day,
+            }}
         />
     </div>
     <div>
-        <button class="toggle-by-button" on:click="{toggleBy}">
+        <button
+            class="toggle-by-button"
+            on:click={toggleBy}
+        >
             By Words
             {#if by === By.Entries}
                 <ToggleSwitch size="30" />
@@ -162,4 +161,5 @@
             margin: 0 0.2rem;
         }
     }
+
 </style>

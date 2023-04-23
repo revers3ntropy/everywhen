@@ -12,14 +12,15 @@
     let by: By = By.Words;
 
     export let data: App.PageData & {
-        entries: EntryWithWordCount[];
-        wordCount: number;
-        wordInstances: number;
-        theWord: string;
-        totalEntries: number;
+        entries: EntryWithWordCount[],
+        wordCount: number,
+        wordInstances: number,
+        theWord: string,
+        totalEntries: number,
     };
 
-    onMount(() => (document.title = 'Analytics'));
+    onMount(() => document.title = 'Analytics');
+
 </script>
 
 <svelte:head>
@@ -45,7 +46,7 @@
             </h1>
         </div>
         <div class="search-for-word">
-            <SearchForWord value="{data.theWord}" />
+            <SearchForWord value={data.theWord} />
         </div>
     </div>
     {#if data.wordInstances === 0}
@@ -63,26 +64,21 @@
                 <StatPill
                     primary
                     beforeLabel="appears"
-                    value="{data.wordInstances}"
+                    value={data.wordInstances}
                     label="times"
                 />
                 <StatPill
                     beforeLabel="in"
-                    value="{data.entries.length}"
+                    value={data.entries.length}
                     label="entries"
                 />
                 <StatPill
-                    value="{(data.wordInstances / data.totalEntries).toFixed(
-                        1
-                    )}"
+                    value={(data.wordInstances / data.totalEntries).toFixed(1)}
                     label="/ entry"
                 />
                 <StatPill
                     beforeLabel="appears in"
-                    value="{(
-                        (data.entries.length / data.totalEntries) *
-                        100
-                    ).toFixed(1)}"
+                    value={(data.entries.length / data.totalEntries * 100).toFixed(1)}
                     label="% of entries"
                 />
             </div>
@@ -90,19 +86,19 @@
 
         <section class="charts">
             <div class="entry-heatmap-wrapper container">
-                <EntryHeatMap by="{by}" entries="{data.entries}" />
+                <EntryHeatMap {by} entries={data.entries} />
             </div>
             <div class="entry-bar-chart-wrapper container">
-                <EntryBarChart by="{by}" entries="{data.entries}" />
+                <EntryBarChart {by} entries={data.entries} />
             </div>
         </section>
 
         <section class="entries">
             <Entries
-                auth="{data}"
-                options="{{ search: data.theWord }}"
-                pageSize="{data.settings.entriesPerPage.value}"
-                showSearch="{false}"
+                auth={data}
+                options={{ search: data.theWord }}
+                pageSize={data.settings.entriesPerPage.value}
+                showSearch={false}
             />
         </section>
     {/if}
@@ -127,11 +123,10 @@
 
             .search-for-word {
                 font-size: 1.5rem;
-                margin: 0.4rem 0;
+                margin: .4rem 0;
             }
 
-            .stats-icon,
-            .the-word-with-quotes {
+            .stats-icon, .the-word-with-quotes {
                 display: none;
             }
         }
@@ -157,7 +152,7 @@
 
     .charts {
         & > * {
-            margin: 0.5em 0;
+            margin: .5em 0;
         }
 
         .entry-bar-chart-wrapper {
@@ -170,11 +165,12 @@
         margin: 1em;
 
         @media @mobile {
-            padding: 0 0.6rem;
+            padding: 0 .6rem;
             margin: 1em 0;
             border: none;
         }
     }
+
 
     .the-word-with-quotes {
         max-width: calc(100vw - 400px);
@@ -190,4 +186,5 @@
             padding: 0;
         }
     }
+
 </style>

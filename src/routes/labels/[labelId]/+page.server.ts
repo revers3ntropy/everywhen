@@ -14,11 +14,9 @@ export const load = cachedPageRoute(async (auth, { params }) => {
     if (err) throw error(404, err);
 
     const { val: entries, err: entriesErr } = await Entry.getPage(
-        query,
-        auth,
-        0,
-        1,
-        { labelId }
+        query, auth,
+        0, 1,
+        { labelId },
     );
     if (entriesErr) throw error(400, entriesErr);
 
@@ -31,7 +29,8 @@ export const load = cachedPageRoute(async (auth, { params }) => {
     return {
         label,
         entryCount: entries[1],
-        events: events.filter(event => event.label?.id === labelId),
-        labels
+        events: events
+            .filter((event) => event.label?.id === labelId),
+        labels,
     };
 }) satisfies PageServerLoad;

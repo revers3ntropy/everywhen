@@ -5,11 +5,11 @@
 </script>
 
 <div class="outer">
-    <button class="inner" on:click="{() => location.reload()}">
-        <span
-            >A new version ({newVersion}) is available! Click to apply the
-            update
-        </span>
+    <button
+        class="inner"
+        on:click={() => location.reload()}
+    >
+        <span>A new version ({newVersion}) is available! Click to apply the update </span>
         <Reload size="40" />
     </button>
 </div>
