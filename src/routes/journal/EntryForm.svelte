@@ -2,7 +2,11 @@
     import { browser } from '$app/environment';
     import { beforeNavigate } from '$app/navigation';
     import { tooltip } from '@svelte-plugins/tooltips';
-    import { filedrop, type FileDropOptions, type Files } from 'filedrop-svelte';
+    import {
+        filedrop,
+        type FileDropOptions,
+        type Files
+    } from 'filedrop-svelte';
     import { createEventDispatcher, onMount } from 'svelte';
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
@@ -19,7 +23,11 @@
     import { api, apiPath } from '../../lib/utils/apiRequest';
     import { getFileContents } from '../../lib/utils/files';
     import { getLocation } from '../../lib/utils/geolocation';
-    import { displayNotifOnErr, ERR_NOTIFICATION, SUCCESS_NOTIFICATION } from '../../lib/utils/notifications';
+    import {
+        displayNotifOnErr,
+        ERR_NOTIFICATION,
+        SUCCESS_NOTIFICATION
+    } from '../../lib/utils/notifications';
     import { obfuscate } from '../../lib/utils/text';
     import { nowS } from '../../lib/utils/time';
     import LocationToggle from './LocationToggle.svelte';
@@ -48,7 +56,7 @@
 
     let newEntryInputElement: HTMLTextAreaElement;
 
-    export function reset () {
+    export function reset() {
         newEntryTitle = '';
         newEntryBody = '';
         newEntryLabel = '';
@@ -56,11 +64,11 @@
 
     $: if (mounted && browser && loadFromLS) {
         // be reactive on these
-        [ newEntryTitle, newEntryBody, newEntryLabel ];
+        [newEntryTitle, newEntryBody, newEntryLabel];
         saveToLS();
     }
 
-    function saveToLS () {
+    function saveToLS() {
         if (loadFromLS) {
             localStorage.setItem(LS_KEY.newEntryTitle, newEntryTitle);
             localStorage.setItem(LS_KEY.newEntryBody, newEntryBody);
@@ -81,21 +89,22 @@
         mounted = true;
     });
 
-    function serializeAgentData (): string {
+    function serializeAgentData(): string {
         return JSON.stringify({
             userAgent: navigator.userAgent,
             language: navigator.language,
             appVersion: navigator.appVersion,
-            platform: navigator.platform,
+            platform: navigator.platform
         });
     }
 
-    function areUnsavedChanges () {
+    function areUnsavedChanges() {
         if (entry && !loadFromLS) {
             // check for unsaved changes
-            if (entry.title !== newEntryTitle
-                || entry.entry !== newEntryBody
-                || ((entry.label?.id || '') !== newEntryLabel)
+            if (
+                entry.title !== newEntryTitle ||
+                entry.entry !== newEntryBody ||
+                (entry.label?.id || '') !== newEntryLabel
             ) {
                 return true;
             }
@@ -106,16 +115,17 @@
     /**
      * @src https://stackoverflow.com/questions/11076975
      */
-    function insertAtCursor (
+    function insertAtCursor(
         input: HTMLInputElement | HTMLTextAreaElement,
-        text: string,
+        text: string
     ) {
         if (input.selectionStart || input.selectionStart === 0) {
             const startPos = input.selectionStart ?? undefined;
             const endPos = input.selectionEnd ?? 0;
-            input.value = input.value.substring(0, startPos)
-                + text
-                + input.value.substring(endPos, input.value.length);
+            input.value =
+                input.value.substring(0, startPos) +
+                text +
+                input.value.substring(endPos, input.value.length);
             // restore cursor to after inserted text
             input.selectionStart = startPos + text.length;
             input.selectionEnd = startPos + text.length;
@@ -136,18 +146,22 @@
         // contents are changed.
 
         if (!submitted && areUnsavedChanges()) {
-            if (!confirm('You have unsaved changes, are you sure you want to leave?')) {
+            if (
+                !confirm(
+                    'You have unsaved changes, are you sure you want to leave?'
+                )
+            ) {
                 cancel();
             }
         }
     });
 
-    async function submit () {
+    async function submit() {
         submitted = true;
 
         const currentLocation = $enabledLocation
             ? await getLocation(addNotification)
-            : [ null, null ];
+            : [null, null];
 
         const body = {
             title: newEntryTitle,
@@ -156,14 +170,15 @@
             latitude: currentLocation[0],
             longitude: currentLocation[1],
             created: nowS(),
-            agentData: serializeAgentData(),
+            agentData: serializeAgentData()
         };
 
         let res;
         switch (action) {
             case 'create':
-                res = displayNotifOnErr(addNotification,
-                    await api.post(auth, '/entries', body),
+                res = displayNotifOnErr(
+                    addNotification,
+                    await api.post(auth, '/entries', body)
                 );
                 submitted = false;
                 if (res.id) {
@@ -173,24 +188,30 @@
                     console.error(res);
                     addNotification({
                         ...ERR_NOTIFICATION,
-                        text: `Failed to create entry: ${JSON.stringify(res)}`,
+                        text: `Failed to create entry: ${JSON.stringify(res)}`
                     });
                 }
                 addNotification({
                     ...SUCCESS_NOTIFICATION,
                     removeAfter: 1000,
-                    text: `Entry created`,
+                    text: `Entry created`
                 });
                 break;
             case 'edit':
-                if (!entry) throw new Error('entry must be set when action is edit');
+                if (!entry)
+                    throw new Error('entry must be set when action is edit');
                 if (!areUnsavedChanges()) {
-                    if (!confirm('No changes have been made, are you sure you want to edit this entry?')) {
+                    if (
+                        !confirm(
+                            'No changes have been made, are you sure you want to edit this entry?'
+                        )
+                    ) {
                         return;
                     }
                 }
-                res = displayNotifOnErr(addNotification,
-                    await api.put(auth, apiPath('/entries/?', entry.id), body),
+                res = displayNotifOnErr(
+                    addNotification,
+                    await api.put(auth, apiPath('/entries/?', entry.id), body)
                 );
                 location.assign(`/journal/${entry.id}?obfuscate=0`);
                 break;
@@ -209,15 +230,15 @@
         tabIndex: -1,
         multiple: false,
         accept: 'image/*',
-        id: 'entry-file-drop',
+        id: 'entry-file-drop'
     };
 
-    async function onFileDrop (e: CustomEvent<{ files: Files }>) {
+    async function onFileDrop(e: CustomEvent<{ files: Files }>) {
         const files = e.detail.files;
         if (files.rejected.length > 0) {
             addNotification({
                 ...ERR_NOTIFICATION,
-                text: 'File could not be read, please try again',
+                text: 'File could not be read, please try again'
             });
             return;
         }
@@ -225,67 +246,79 @@
         if (files.accepted.length !== 1) {
             addNotification({
                 ...ERR_NOTIFICATION,
-                text: 'Please select exactly one file',
+                text: 'Please select exactly one file'
             });
             return;
         }
         const file = files.accepted[0];
-        const content = displayNotifOnErr(addNotification,
-            await getFileContents(file, 'b64'),
+        const content = displayNotifOnErr(
+            addNotification,
+            await getFileContents(file, 'b64')
         );
 
         if (!content) return;
         if (content.length > MAX_IMAGE_SIZE) {
             addNotification({
                 ...ERR_NOTIFICATION,
-                text: 'File too large',
+                text: 'File too large'
             });
             return;
         }
 
-        const { id } = displayNotifOnErr(addNotification,
+        const { id } = displayNotifOnErr(
+            addNotification,
             await api.post(auth, '/assets', {
                 fileName: file.name,
-                content,
-            }),
+                content
+            })
         );
 
         // insert markdown to link to image
-        insertAtCursor(newEntryInputElement, `\n${Asset.markDownLink(file.name, id)}\n`);
+        insertAtCursor(
+            newEntryInputElement,
+            `\n${Asset.markDownLink(file.name, id)}\n`
+        );
     }
 
-    async function stopSpaceAndEnterBeingInterceptedByFileDrop () {
+    async function stopSpaceAndEnterBeingInterceptedByFileDrop() {
         // TODO do this properly
         while (!document.getElementsByClassName('entry-file-drop')) {
             await new Promise(r => setTimeout(r, 100));
         }
         // https://stackoverflow.com/questions/19469881
-        document.getElementsByClassName('entry-file-drop')[0]
-            .addEventListener('keydown', (event: Event) => {
+        document.getElementsByClassName('entry-file-drop')[0].addEventListener(
+            'keydown',
+            (event: Event) => {
                 const e = event as KeyboardEvent;
                 // same check as lib uses
                 if (e.key === ' ' || e.key === 'Enter') {
                     e.stopImmediatePropagation();
                 }
-            }, true);
+            },
+            true
+        );
     }
 
-    function triggerFileDrop () {
+    function triggerFileDrop() {
         // bit hacky... TODO make less hacky
-        (document.querySelector('.entry-file-drop > input') as HTMLInputElement)
-            .click();
+        (
+            document.querySelector(
+                '.entry-file-drop > input'
+            ) as HTMLInputElement
+        ).click();
     }
 
     let labels: Label[] | null = null;
 
-    async function loadLabels () {
-        const labelsRes = displayNotifOnErr(addNotification,
-            await api.get(auth, '/labels'),
+    async function loadLabels() {
+        const labelsRes = displayNotifOnErr(
+            addNotification,
+            await api.get(auth, '/labels')
         );
         labels = labelsRes.labels;
     }
 
-    function handleEntryInputKeydown (event: KeyboardEvent) {
+    function handleEntryInputKeydown(event: KeyboardEvent) {
         if (event.key !== 'Tab') return;
         event.preventDefault();
         insertAtCursor(newEntryInputElement, '\t');
@@ -294,21 +327,23 @@
     onMount(async () => {
         await Promise.all([
             loadLabels(),
-            stopSpaceAndEnterBeingInterceptedByFileDrop(),
+            stopSpaceAndEnterBeingInterceptedByFileDrop()
         ]);
     });
 </script>
 
 <div
     class="container entry-file-drop"
-    on:filedrop={onFileDrop}
-    use:filedrop={fileOptions}
+    on:filedrop="{onFileDrop}"
+    use:filedrop="{fileOptions}"
 >
     <div class="head">
         <div class="left-options">
             <button
-                aria-label={obfuscated ? 'Show entry form' : 'Hide entry form'}
-                on:click={() => obfuscated = !obfuscated}
+                aria-label="{obfuscated
+                    ? 'Show entry form'
+                    : 'Hide entry form'}"
+                on:click="{() => (obfuscated = !obfuscated)}"
             >
                 {#if obfuscated}
                     <Eye size="25" />
@@ -319,7 +354,7 @@
             {#if obfuscated}
                 <input
                     aria-label="Entry Title"
-                    value={obfuscate(newEntryTitle)}
+                    value="{obfuscate(newEntryTitle)}"
                     class="title obfuscated"
                     disabled
                     placeholder="..."
@@ -327,22 +362,22 @@
             {:else}
                 <input
                     aria-label="Entry Title"
-                    bind:value={newEntryTitle}
+                    bind:value="{newEntryTitle}"
                     class="title"
                     placeholder="Title"
-                    disabled={submitted}
+                    disabled="{submitted}"
                 />
             {/if}
         </div>
         <div class="right-options {obfuscated ? 'blur' : ''}">
             <button
                 aria-label="Insert Image"
-                disabled={submitted}
-                on:click={triggerFileDrop}
-                use:tooltip={{
+                disabled="{submitted}"
+                on:click="{triggerFileDrop}"
+                use:tooltip="{{
                     content: 'Insert Image',
-                     position: 'bottom'
-                }}
+                    position: 'bottom'
+                }}"
             >
                 <ImageArea size="30" />
             </button>
@@ -350,16 +385,16 @@
             <LocationToggle />
 
             <LabelSelect
-                {auth}
-                bind:value={newEntryLabel}
-                {labels}
+                auth="{auth}"
+                bind:value="{newEntryLabel}"
+                labels="{labels}"
             />
 
             <button
                 aria-label="Submit Entry"
                 class="send"
-                disabled={submitted}
-                on:click={submit}
+                disabled="{submitted}"
+                on:click="{submit}"
             >
                 <Send size="30" />
             </button>
@@ -367,19 +402,16 @@
     </div>
     <div class="entry-container">
         {#if obfuscated}
-            <textarea
-                placeholder="..."
-                disabled
-                class="obfuscated"
-            >{obfuscate(newEntryBody)}</textarea>
+            <textarea placeholder="..." disabled class="obfuscated"
+                >{obfuscate(newEntryBody)}</textarea
+            >
         {:else}
             <textarea
-                bind:this={newEntryInputElement}
-                bind:value={newEntryBody}
-                on:keydown={handleEntryInputKeydown}
+                bind:this="{newEntryInputElement}"
+                bind:value="{newEntryBody}"
+                on:keydown="{handleEntryInputKeydown}"
                 placeholder="Entry"
-                disabled={submitted}
-            ></textarea>
+                disabled="{submitted}"></textarea>
         {/if}
     </div>
 
@@ -387,8 +419,8 @@
         <button
             aria-label="Submit Entry"
             class="primary with-icon"
-            disabled={submitted}
-            on:click={submit}
+            disabled="{submitted}"
+            on:click="{submit}"
         >
             <Send size="30" />
             Submit Entry
@@ -434,7 +466,7 @@
                 border: none;
                 font-size: 20px;
                 width: calc(100% - 50px);
-                margin: 0 0 .2rem .3em;
+                margin: 0 0 0.2rem 0.3em;
 
                 @media @mobile {
                     width: calc(100vw - 70px);
@@ -461,12 +493,13 @@
     .send {
         .flex-center();
         border-radius: @border-radius;
-        margin: 0 0 0 .2rem;
+        margin: 0 0 0 0.2rem;
         padding: 0.1rem;
         aspect-ratio: 1/1;
         background: @accent-gradient;
 
-        :global(svg), :global(svg *) {
+        :global(svg),
+        :global(svg *) {
             fill: @text-color-invert;
         }
 
@@ -508,7 +541,7 @@
 
                 // puts submit button at bottom of screen nicely
                 height: calc(100vh - 19rem);
-                width: calc(100% - .8em);
+                width: calc(100% - 0.8em);
                 overflow-y: scroll;
                 margin: 0;
                 background: none;
@@ -525,5 +558,4 @@
             padding: 0;
         }
     }
-
 </style>

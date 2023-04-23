@@ -24,45 +24,52 @@
     export let latitude: number;
     export let longitude: number;
 
-    export let onChange: ((location: Location | null) => Promise<void>) | null = null;
+    export let onChange: ((location: Location | null) => Promise<void>) | null =
+        null;
 
     let synced = true;
 
-    async function syncWithServer () {
+    async function syncWithServer() {
         synced = false;
         displayNotifOnErr(
             addNotification,
             await api.put(auth, apiPath('/locations/?', id), {
                 name,
-                radius,
-            }),
+                radius
+            })
         );
         if (onChange !== null) {
-            await onChange(new Location(
-                id,
-                created,
-                createdTZOffset,
-                name,
-                latitude,
-                longitude,
-                radius,
-            ));
+            await onChange(
+                new Location(
+                    id,
+                    created,
+                    createdTZOffset,
+                    name,
+                    latitude,
+                    longitude,
+                    radius
+                )
+            );
         }
         synced = true;
     }
 
     const onRadiusChange = (async ({ target }) => {
-        if (!target || !('value' in target) || typeof target.value !== 'string') {
+        if (
+            !target ||
+            !('value' in target) ||
+            typeof target.value !== 'string'
+        ) {
             throw target;
         }
         radius = Location.metersToDegrees(parseFloat(target.value));
         await syncWithServer();
     }) satisfies ChangeEventHandler<HTMLInputElement>;
 
-    async function bin () {
+    async function bin() {
         displayNotifOnErr(
             addNotification,
-            await api.delete(auth, apiPath('/locations/?', id)),
+            await api.delete(auth, apiPath('/locations/?', id))
         );
         popup.set(null);
         if (onChange !== null) {
@@ -74,54 +81,54 @@
 <div>
     <div class="nav">
         {#if synced}
-            <span use:tooltip={{
-                content: 'Synced',
-                position: 'right'
-            }}>
+            <span
+                use:tooltip="{{
+                    content: 'Synced',
+                    position: 'right'
+                }}"
+            >
                 <Synced size="25" />
             </span>
         {:else}
-            <span use:tooltip={{
-                content: 'Syncing...',
-                position: 'right'
-            }}>
+            <span
+                use:tooltip="{{
+                    content: 'Syncing...',
+                    position: 'right'
+                }}"
+            >
                 <Syncing size="25" class="gradient-icon" />
             </span>
         {/if}
 
         {#if isInDialog}
             <button>
-                <a class="flex-center" href="/location/{id}">
-                    See more
-                </a>
+                <a class="flex-center" href="/location/{id}"> See more </a>
             </button>
         {/if}
         <button
-            on:click={bin}
-            use:tooltip={{
+            on:click="{bin}"
+            use:tooltip="{{
                 content: 'Delete',
-                 position: 'bottom'
-            }}>
+                position: 'bottom'
+            }}"
+        >
             <Bin size="25" />
         </button>
     </div>
     <h2>
         <label>
-            <input
-                bind:value={name}
-                on:change={syncWithServer}
-            >
+            <input bind:value="{name}" on:change="{syncWithServer}" />
         </label>
     </h2>
     <label>
-        <span class="text-light">Radius</span><br>
+        <span class="text-light">Radius</span><br />
         <input
             min="0"
-            on:change={onRadiusChange}
+            on:change="{onRadiusChange}"
             step="0.1"
             type="number"
-            value={round1DP(Location.degreesToMeters(radius))}
-        >
+            value="{round1DP(Location.degreesToMeters(radius))}"
+        />
         m
     </label>
 </div>

@@ -14,7 +14,7 @@ export interface EntryFeature extends Feature<Point> {
     entry: EntryLocation;
 }
 
-export function lastEntry (entries: EntryLocation[]): EntryLocation | null {
+export function lastEntry(entries: EntryLocation[]): EntryLocation | null {
     let lastEntry = null;
     let lastDate = null;
     for (const entry of entries) {
@@ -27,26 +27,23 @@ export function lastEntry (entries: EntryLocation[]): EntryLocation | null {
     return lastEntry;
 }
 
-export function olFeatureFromLocation (location: Location): LocationFeature {
+export function olFeatureFromLocation(location: Location): LocationFeature {
     const feature = new Feature({
-        geometry: new Circle(fromLonLat([
-            location.longitude,
-            location.latitude,
-        ]), Location.degreesToMeters(location.radius)),
+        geometry: new Circle(
+            fromLonLat([location.longitude, location.latitude]),
+            Location.degreesToMeters(location.radius)
+        )
     }) as LocationFeature;
 
     feature.setStyle(
         new Style({
-            renderer (coordinates, state) {
-                const [ p1, p2 ] = coordinates;
-                if (
-                    typeof p1 === 'number'
-                    || typeof p2 === 'number'
-                ) {
+            renderer(coordinates, state) {
+                const [p1, p2] = coordinates;
+                if (typeof p1 === 'number' || typeof p2 === 'number') {
                     return;
                 }
-                const [ x, y ] = p1 as number[];
-                const [ x1, y1 ] = p2 as number[];
+                const [x, y] = p1 as number[];
+                const [x1, y1] = p2 as number[];
 
                 const ctx = state.context;
                 const dx = x1 - x;
@@ -62,7 +59,7 @@ export function olFeatureFromLocation (location: Location): LocationFeature {
                     innerRadius,
                     x,
                     y,
-                    outerRadius,
+                    outerRadius
                 );
                 gradient.addColorStop(0, 'rgba(255,0,0,0)');
                 gradient.addColorStop(0.6, 'rgba(67,25,254,0.1)');
@@ -92,8 +89,8 @@ export function olFeatureFromLocation (location: Location): LocationFeature {
                     ctx.fillText(location.name, x, y - 5);
                     ctx.closePath();
                 }
-            },
-        }),
+            }
+        })
     );
 
     feature.location = location;
@@ -101,15 +98,12 @@ export function olFeatureFromLocation (location: Location): LocationFeature {
     return feature;
 }
 
-export function olFeatureFromEntry (entry: EntryLocation): EntryFeature | null {
+export function olFeatureFromEntry(entry: EntryLocation): EntryFeature | null {
     if (!entry.latitude || !entry.longitude) {
         return null;
     }
     const feature = new Feature({
-        geometry: new Point(fromLonLat([
-            entry.longitude,
-            entry.latitude,
-        ])),
+        geometry: new Point(fromLonLat([entry.longitude, entry.latitude]))
     }) as EntryFeature;
 
     feature.entry = entry;

@@ -19,20 +19,29 @@ export const PUT = (async ({ cookies, request, params }) => {
     const auth = await getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
-    const body = await getUnwrappedReqBody(request, {
-        name: 'string',
-        colour: 'string',
-    }, {
-        name: '',
-        colour: '',
-    });
+    const body = await getUnwrappedReqBody(
+        request,
+        {
+            name: 'string',
+            colour: 'string'
+        },
+        {
+            name: '',
+            colour: ''
+        }
+    );
 
     const { val, err } = await Label.fromId(query, auth, params.labelId);
     if (err) throw error(400, err);
     let label = val;
 
     if (body.name) {
-        const { err, val } = await Label.updateName(query, auth, label, body.name);
+        const { err, val } = await Label.updateName(
+            query,
+            auth,
+            label,
+            body.name
+        );
         if (err) throw error(400, err);
         label = val;
     }
@@ -49,42 +58,43 @@ export const DELETE = (async ({ cookies, params, request }) => {
     const auth = await getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
-    if (!await Label.userHasLabelWithId(query, auth, params.labelId)) {
+    if (!(await Label.userHasLabelWithId(query, auth, params.labelId))) {
         throw error(404, 'Label with that id not found');
     }
 
-    const { val, err } = await Entry.getPage(
-        query, auth,
-        0, 1,
-        {
-            labelId: params.labelId,
-            deleted: 'both',
-        },
-    );
+    const { val, err } = await Entry.getPage(query, auth, 0, 1, {
+        labelId: params.labelId,
+        deleted: 'both'
+    });
     if (err) throw error(400, err);
 
-    const {
-        err: eventsErr,
-        val: eventsWithLabel,
-    } = await Event.withLabel(query, auth, params.labelId);
+    const { err: eventsErr, val: eventsWithLabel } = await Event.withLabel(
+        query,
+        auth,
+        params.labelId
+    );
     if (eventsErr) throw error(400, eventsErr);
 
-    const [ , entriesWithLabel ] = val;
+    const [, entriesWithLabel] = val;
     if (entriesWithLabel < 1 && eventsWithLabel.length < 1) {
         await Label.purgeWithId(query, auth, params.labelId);
         return apiResponse({});
     }
 
-    const { strategy, newLabelId } = await getUnwrappedReqBody(request, {
-        strategy: 'string',
-        newLabelId: 'string',
-    }, {
-        strategy: 'remove',
-        newLabelId: '',
-    });
+    const { strategy, newLabelId } = await getUnwrappedReqBody(
+        request,
+        {
+            strategy: 'string',
+            newLabelId: 'string'
+        },
+        {
+            strategy: 'remove',
+            newLabelId: ''
+        }
+    );
 
     if (strategy === 'reassign') {
-        if (!await Label.userHasLabelWithId(query, auth, newLabelId)) {
+        if (!(await Label.userHasLabelWithId(query, auth, newLabelId))) {
             throw error(400, 'New label not found');
         }
 

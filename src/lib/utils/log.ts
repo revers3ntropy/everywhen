@@ -7,33 +7,43 @@ import { removeAnsi } from './text';
 let maxLogNameLen = 0;
 
 export interface Logger<HasFile extends string | null> {
-    log: (...args: unknown[]) => void,
-    warn: (...args: unknown[]) => void,
-    error: (...args: unknown[]) => void,
-    logToFile: HasFile extends string ? (...args: unknown[]) => Promise<void> : never,
+    log: (...args: unknown[]) => void;
+    warn: (...args: unknown[]) => void;
+    error: (...args: unknown[]) => void;
+    logToFile: HasFile extends string
+        ? (...args: unknown[]) => Promise<void>
+        : never;
 }
 
-function fmt (
+function fmt(
     useUTC: boolean,
     nameLength: number,
     name: string,
     ...args: unknown[]
 ): string {
-    const time = chalk.dim(new Date()[useUTC ? 'toUTCString' : 'toLocaleTimeString']());
-    const padding = ' '.repeat((maxLogNameLen - nameLength) || 0);
-    return `${time} [${name}] ` + padding + args.map((arg) => {
-        if (typeof arg === 'object') {
-            return JSON.stringify(arg);
-        } else {
-            return arg;
-        }
-    }).join(' ');
+    const time = chalk.dim(
+        new Date()[useUTC ? 'toUTCString' : 'toLocaleTimeString']()
+    );
+    const padding = ' '.repeat(maxLogNameLen - nameLength || 0);
+    return (
+        `${time} [${name}] ` +
+        padding +
+        args
+            .map(arg => {
+                if (typeof arg === 'object') {
+                    return JSON.stringify(arg);
+                } else {
+                    return arg;
+                }
+            })
+            .join(' ')
+    );
 }
 
-export function makeLogger<File extends string | null> (
+export function makeLogger<File extends string | null>(
     name: string,
     colour: ChalkInstance = chalk.bold,
-    file: File,
+    file: File
 ): Logger<File> {
     if (name.length > maxLogNameLen) {
         maxLogNameLen = name.length;
@@ -41,21 +51,22 @@ export function makeLogger<File extends string | null> (
     const colouredName = colour(name);
 
     let fileHandle: FileHandle | null = null;
-    const waitForFileHandle = file ? new Promise<void>(resolve => {
-        const interval = setInterval(() => {
-            if (fileHandle) {
-                clearInterval(interval);
-                resolve();
-            }
-        }, 50);
-    }) : null;
+    const waitForFileHandle = file
+        ? new Promise<void>(resolve => {
+              const interval = setInterval(() => {
+                  if (fileHandle) {
+                      clearInterval(interval);
+                      resolve();
+                  }
+              }, 50);
+          })
+        : null;
 
     if (!browser && file) {
         // allow it to be used client and server side
-        void import('fs')
-            .then(async fs => {
-                fileHandle = await fs.promises.open(file, 'a');
-            });
+        void import('fs').then(async fs => {
+            fileHandle = await fs.promises.open(file, 'a');
+        });
     }
     const self = {
         log: (...args: unknown[]) => {
@@ -78,9 +89,11 @@ export function makeLogger<File extends string | null> (
                 return;
             }
             await fileHandle.write(
-                removeAnsi(fmt(true, name.length, name, ...args)) + '\n',
+                removeAnsi(fmt(true, name.length, name, ...args)) + '\n'
             );
-        }) as File extends string ? (...args: unknown[]) => Promise<void> : never,
+        }) as File extends string
+            ? (...args: unknown[]) => Promise<void>
+            : never
     };
     void self.logToFile('SETUP');
     return self;

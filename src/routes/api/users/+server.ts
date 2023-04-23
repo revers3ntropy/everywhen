@@ -4,7 +4,7 @@ import {
     KEY_COOKIE_KEY,
     KEY_COOKIE_OPTIONS,
     USERNAME_COOKIE_KEY,
-    USERNAME_COOKIE_OPTIONS,
+    USERNAME_COOKIE_OPTIONS
 } from '../../../lib/constants';
 import { Backup } from '../../../lib/controllers/backup';
 import { User } from '../../../lib/controllers/user';
@@ -17,7 +17,7 @@ import { getUnwrappedReqBody } from '../../../lib/utils/requestBody';
 export const POST = (async ({ request, cookies }) => {
     const body = await getUnwrappedReqBody(request, {
         username: 'string',
-        password: 'string',
+        password: 'string'
     });
 
     const { err } = await User.create(query, body.username, body.password);
@@ -41,14 +41,14 @@ export const DELETE = (async ({ cookies }) => {
     cookies.delete(KEY_COOKIE_KEY, KEY_COOKIE_OPTIONS);
     cookies.delete(USERNAME_COOKIE_KEY, USERNAME_COOKIE_OPTIONS);
 
-    const {
-        err: backupErr,
-        val: backupEncrypted,
-    } = Backup.asEncryptedString(backup, auth);
+    const { err: backupErr, val: backupEncrypted } = Backup.asEncryptedString(
+        backup,
+        auth
+    );
     if (backupErr) throw error(400, backupErr);
 
     return apiResponse({
-        backup: backupEncrypted,
+        backup: backupEncrypted
     });
 }) satisfies RequestHandler;
 

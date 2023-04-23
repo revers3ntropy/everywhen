@@ -6,16 +6,15 @@ import { api, type ReqBody } from '../../utils/apiRequest';
 import { nowS } from '../../utils/time';
 import type { Mutable, NotificationOptions } from '../../utils/types';
 
-export async function importEvents (
+export async function importEvents(
     contents: string,
     labels: Label[],
-    auth: Auth,
-): Promise<undefined
-           | Partial<NotificationOptions>
-           | Partial<NotificationOptions>[]
+    auth: Auth
+): Promise<
+    undefined | Partial<NotificationOptions> | Partial<NotificationOptions>[]
 > {
     const labelHashMap = new Map<string, string>();
-    labels.forEach((label) => {
+    labels.forEach(label => {
         labelHashMap.set(label.name, label.id);
     });
 
@@ -25,39 +24,45 @@ export async function importEvents (
         json = JSON.parse(contents);
     } catch (e: unknown) {
         return {
-            text: `File was not valid JSON`,
+            text: `File was not valid JSON`
         };
     }
 
     if (!Array.isArray(json)) {
         return {
-            text: `Incorrect JSON structure, expected array`,
+            text: `Incorrect JSON structure, expected array`
         };
     }
 
-    const errors: [ number, string ][] = [];
+    const errors: [number, string][] = [];
     const notifications: Partial<NotificationOptions>[] = [];
 
     let i = -1;
     for (const eventJson of json) {
         i++;
 
-        if (!matches(eventJson, {
-            name: 'string',
-            start: 'number',
-            end: 'number',
-            created: 'number',
-            label: 'string',
-        }, {
-            label: '',
-            created: nowS(),
-        })) {
-            errors.push([ i, `Wrong schema for event` ]);
+        if (
+            !matches(
+                eventJson,
+                {
+                    name: 'string',
+                    start: 'number',
+                    end: 'number',
+                    created: 'number',
+                    label: 'string'
+                },
+                {
+                    label: '',
+                    created: nowS()
+                }
+            )
+        ) {
+            errors.push([i, `Wrong schema for event`]);
             continue;
         }
 
         const postBody: Omit<Mutable<Partial<Event>>, 'label'> & {
-            label?: string,
+            label?: string;
         } & ReqBody = {};
 
         postBody.name = eventJson.name;
@@ -71,14 +76,21 @@ export async function importEvents (
                 notifications.push({
                     text: `Creating label ${eventJson.label}`,
                     type: 'info',
-                    removeAfter: 10000,
+                    removeAfter: 10000
                 });
-                const { err, val: createLabelRes } = await api.post(auth, `/labels`, {
-                    name: eventJson.label,
-                    colour: '#000000',
-                });
+                const { err, val: createLabelRes } = await api.post(
+                    auth,
+                    `/labels`,
+                    {
+                        name: eventJson.label,
+                        colour: '#000000'
+                    }
+                );
                 if (err) {
-                    errors.push([ i, `failed to create label '${eventJson.label}'` ]);
+                    errors.push([
+                        i,
+                        `failed to create label '${eventJson.label}'`
+                    ]);
                     continue;
                 }
 
@@ -96,14 +108,14 @@ export async function importEvents (
 
         const { err } = await api.post(auth, `/events`, postBody);
         if (err) {
-            errors.push([ i, err ]);
+            errors.push([i, err]);
         }
     }
 
     if (errors.length < 0) {
         return {
             text: `Successfully uploaded entries`,
-            type: 'success',
+            type: 'success'
         };
     }
 
@@ -114,5 +126,4 @@ export async function importEvents (
     }
 
     return notifications;
-
 }

@@ -11,7 +11,7 @@
     export let entry: Entry | null = null;
     let error: string | null = null;
 
-    async function getEntry () {
+    async function getEntry() {
         if (entry) return;
 
         const { err, val } = await api.get(auth, apiPath('/entries/?', id));
@@ -29,15 +29,15 @@
     {#if entry}
         <div class="datetime">
             <UtcTime
-                timestamp={entry.created}
+                timestamp="{entry.created}"
                 fmt="ddd Do MMMM YYYY, h:mm a"
-                noTooltip={true}
+                noTooltip="{true}"
             />
             <Dot />
             <UtcTime
-                timestamp={entry.created}
-                relative={true}
-                noTooltip={true}
+                timestamp="{entry.created}"
+                relative="{true}"
+                noTooltip="{true}"
             />
         </div>
         {#if entry.title}

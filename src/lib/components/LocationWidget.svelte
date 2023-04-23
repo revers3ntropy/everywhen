@@ -24,31 +24,30 @@
     let nearby = null as Location[] | null;
     let loaded = false;
 
-    async function load () {
+    async function load() {
         const res = displayNotifOnErr(
             addNotification,
-            await api.get(auth, '/locations', { lat: latitude, lon: longitude }),
+            await api.get(auth, '/locations', { lat: latitude, lon: longitude })
         );
         locations = res.locations;
-        nearby = ('nearby' in res && res.nearby) ? res.nearby : null;
+        nearby = 'nearby' in res && res.nearby ? res.nearby : null;
         loaded = true;
     }
 
     onMount(load);
 
-    $: coordsTooltip = { content: `Created at ${latitude}, ${longitude} (lat, lng)` };
+    $: coordsTooltip = {
+        content: `Created at ${latitude}, ${longitude} (lat, lng)`
+    };
 </script>
 
 <span class="outer">
     {#if entryId}
-        <a
-            use:tooltip={coordsTooltip}
-            href="/journal/{entryId}"
-        >
+        <a use:tooltip="{coordsTooltip}" href="/journal/{entryId}">
             <MapMarker size="20" />
         </a>
     {:else}
-        <span use:tooltip={coordsTooltip}>
+        <span use:tooltip="{coordsTooltip}">
             <MapMarker size="20" />
         </span>
     {/if}
@@ -71,11 +70,12 @@
                         {/if}
                     {:else if i === MAX_LOCATIONS_SHOWN}
                         <span
-                            use:tooltip={{
-                                content: locations.slice(MAX_LOCATIONS_SHOWN)
-                                              .map(l => l.name)
-                                              .join(', '),
-                            }}
+                            use:tooltip="{{
+                                content: locations
+                                    .slice(MAX_LOCATIONS_SHOWN)
+                                    .map(l => l.name)
+                                    .join(', ')
+                            }}"
                         >
                             ...
                         </span>

@@ -12,7 +12,7 @@ import { Label } from './label';
 import type { Auth } from './user';
 
 export class Backup {
-    public constructor (
+    public constructor(
         public entries: {
             title: string;
             label?: string; // label's name
@@ -31,7 +31,7 @@ export class Backup {
                 created: number;
                 createdTZOffset: number;
                 agentData: string;
-            }[],
+            }[];
         }[],
         public labels: {
             name: string;
@@ -46,21 +46,20 @@ export class Backup {
             created: number;
         }[],
         public events: {
-            name: string,
-            label?: string, // label's name
-            start: number,
-            end: number,
-            created: number,
+            name: string;
+            label?: string; // label's name
+            start: number;
+            end: number;
+            created: number;
         }[],
         public created: number,
-        public appVersion: string,
-    ) {
-    }
+        public appVersion: string
+    ) {}
 
-    public static async generate (
+    public static async generate(
         query: QueryFunc,
         auth: Auth,
-        created?: number,
+        created?: number
     ): Promise<Result<Backup>> {
         // use allRaw to keep the label as a string (it's Id)
         const { err: entryErr, val: entries } = await Entry.all(query, auth);
@@ -72,59 +71,62 @@ export class Backup {
         const { err: assetsErr, val: assets } = await Asset.all(query, auth);
         if (assetsErr) return Result.err(assetsErr);
 
-        return Result.ok(new Backup(
-            entries.map((entry) => ({
-                // replace the label with the label's name
-                // can't use ID as will change when labels are restored
-                label: entry.label?.name,
-                entry: entry.entry,
-                created: entry.created,
-                createdTZOffset: entry.createdTZOffset,
-                // not `null`
-                latitude: entry.latitude ?? undefined,
-                longitude: entry.longitude ?? undefined,
-                title: entry.title,
-                agentData: entry.agentData,
-                edits: entry.edits?.map(edit => ({
-                    entry: edit.entry,
-                    created: edit.created,
-                    createdTZOffset: edit.createdTZOffset,
-                    label: edit.label?.name,
-                    latitude: edit.latitude ?? undefined,
-                    longitude: edit.longitude ?? undefined,
-                    title: edit.title,
-                    agentData: edit.agentData,
-                })) || [],
-            })),
-            labels.map((label) => ({
-                name: label.name,
-                colour: label.colour,
-                created: label.created,
-            })),
-            assets.map((asset) => ({
-                publicId: asset.publicId,
-                fileName: asset.fileName,
-                content: asset.content,
-                created: asset.created,
-                contentType: asset.contentType,
-            })),
-            events.map((event) => ({
-                name: event.name,
-                label: event.label?.name,
-                start: event.start,
-                end: event.end,
-                created: event.created,
-            })),
-            created ?? nowS(),
-            __VERSION__,
-        ));
+        return Result.ok(
+            new Backup(
+                entries.map(entry => ({
+                    // replace the label with the label's name
+                    // can't use ID as will change when labels are restored
+                    label: entry.label?.name,
+                    entry: entry.entry,
+                    created: entry.created,
+                    createdTZOffset: entry.createdTZOffset,
+                    // not `null`
+                    latitude: entry.latitude ?? undefined,
+                    longitude: entry.longitude ?? undefined,
+                    title: entry.title,
+                    agentData: entry.agentData,
+                    edits:
+                        entry.edits?.map(edit => ({
+                            entry: edit.entry,
+                            created: edit.created,
+                            createdTZOffset: edit.createdTZOffset,
+                            label: edit.label?.name,
+                            latitude: edit.latitude ?? undefined,
+                            longitude: edit.longitude ?? undefined,
+                            title: edit.title,
+                            agentData: edit.agentData
+                        })) || []
+                })),
+                labels.map(label => ({
+                    name: label.name,
+                    colour: label.colour,
+                    created: label.created
+                })),
+                assets.map(asset => ({
+                    publicId: asset.publicId,
+                    fileName: asset.fileName,
+                    content: asset.content,
+                    created: asset.created,
+                    contentType: asset.contentType
+                })),
+                events.map(event => ({
+                    name: event.name,
+                    label: event.label?.name,
+                    start: event.start,
+                    end: event.end,
+                    created: event.created
+                })),
+                created ?? nowS(),
+                __VERSION__
+            )
+        );
     }
 
-    public static async restore (
+    public static async restore(
         query: QueryFunc,
         auth: Auth,
         backupEncrypted: string,
-        key: string,
+        key: string
     ): Promise<Result> {
         let decryptedData: unknown;
 
@@ -144,32 +146,33 @@ export class Backup {
             return Result.err('data must be a non-null object');
         }
 
-        const {
-            err: migrateErr,
-            val: migratedData,
-        } = Backup.migrate(decryptedData as Record<string, unknown>);
+        const { err: migrateErr, val: migratedData } = Backup.migrate(
+            decryptedData as Record<string, unknown>
+        );
         if (migrateErr) return Result.err(migrateErr);
 
-        if (!schemion.matches(migratedData, {
-            entries: 'object',
-            labels: 'object',
-            assets: 'object',
-            events: 'object',
-            created: 'number',
-            appVersion: 'string',
-        })) {
+        if (
+            !schemion.matches(migratedData, {
+                entries: 'object',
+                labels: 'object',
+                assets: 'object',
+                events: 'object',
+                created: 'number',
+                appVersion: 'string'
+            })
+        ) {
             return Result.err('Invalid backup format');
         }
 
         const { entries, labels, assets, events } = migratedData;
         if (
-            !Array.isArray(entries)
-            || !Array.isArray(labels)
-            || !Array.isArray(assets)
-            || !Array.isArray(events)
+            !Array.isArray(entries) ||
+            !Array.isArray(labels) ||
+            !Array.isArray(assets) ||
+            !Array.isArray(events)
         ) {
             return Result.err(
-                'data must be an object with entries and labels properties',
+                'data must be an object with entries and labels properties'
             );
         }
 
@@ -194,8 +197,9 @@ export class Backup {
 
             if (entry.label) {
                 const { err, val } = await Label.getIdFromName(
-                    query, auth,
-                    entry.label,
+                    query,
+                    auth,
+                    entry.label
                 );
                 if (err) return Result.err(err);
                 entry.label = val;
@@ -214,20 +218,22 @@ export class Backup {
 
             if (event.label) {
                 const { err, val } = await Label.getIdFromName(
-                    query, auth,
-                    event.label,
+                    query,
+                    auth,
+                    event.label
                 );
                 if (err) return Result.err(err);
                 event.label = val;
             }
 
             const { err } = await Event.create(
-                query, auth,
+                query,
+                auth,
                 event.name,
                 event.start,
                 event.end,
                 event.label,
-                event.created,
+                event.created
             );
             if (err) return Result.err(err);
         }
@@ -240,11 +246,14 @@ export class Backup {
             }
 
             const { err } = await Asset.create(
-                query, auth,
-                asset.fileName, asset.content,
+                query,
+                auth,
+                asset.fileName,
+                asset.content,
                 // make sure to preserve id as this is
                 // card coded into entries
-                asset.created, asset.publicId,
+                asset.created,
+                asset.publicId
             );
             if (err) return Result.err(err);
         }
@@ -252,15 +261,12 @@ export class Backup {
         return Result.ok(null);
     }
 
-    public static asEncryptedString (
-        self: Backup,
-        auth: Auth,
-    ): Result<string> {
+    public static asEncryptedString(self: Backup, auth: Auth): Result<string> {
         return encrypt(JSON.stringify(self), auth.key);
     }
 
-    public static migrate (
-        json: Partial<Backup> & Record<string, unknown>,
+    public static migrate(
+        json: Partial<Backup> & Record<string, unknown>
     ): Result<Backup> {
         json.appVersion ||= '0.0.0';
         const version = parseSemVer(json.appVersion);
@@ -273,12 +279,13 @@ export class Backup {
         return Result.ok(json as Backup);
     }
 
-    public static download (data: string, username: string, encrypted: boolean): void {
+    public static download(
+        data: string,
+        username: string,
+        encrypted: boolean
+    ): void {
         const dateFmt = fmtUtc(nowS(), currentTzOffset(), 'yyyyMMDD-HHmm');
         const encryptedExt = encrypted ? '.encrypted' : '';
-        downloadFile(
-            `${dateFmt}-${username}.backup${encryptedExt}.json`,
-            data,
-        );
+        downloadFile(`${dateFmt}-${username}.backup${encryptedExt}.json`, data);
     }
 }

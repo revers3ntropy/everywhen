@@ -19,19 +19,19 @@ const dbLogger = makeLogger('DB', chalk.yellow, 'general.log');
 
 export let dbConnection: mysql.Connection | null = null;
 
-export async function connect () {
+export async function connect() {
     const config = getConfig();
-    dbConnection = await mysql
-        .createConnection(config)
-        .catch((e: unknown) => {
-            void dbLogger.logToFile(`Error connecting to mysql db '${config.database || '?'}'`);
-            void dbLogger.logToFile(e);
-            throw e;
-        });
+    dbConnection = await mysql.createConnection(config).catch((e: unknown) => {
+        void dbLogger.logToFile(
+            `Error connecting to mysql db '${config.database || '?'}'`
+        );
+        void dbLogger.logToFile(e);
+        throw e;
+    });
     void dbLogger.logToFile(`Connected`);
 }
 
-export function getConfig (): mysql.ConnectionOptions {
+export function getConfig(): mysql.ConnectionOptions {
     // define defaults from .env file
     const port = DB_PORT ? parseInt(DB_PORT) : 3306;
     return {
@@ -39,17 +39,17 @@ export function getConfig (): mysql.ConnectionOptions {
         user: DB_USER,
         password: DB_PASS,
         database: DB,
-        port,
+        port
     };
 }
 
-function logQuery (
+function logQuery(
     query: string,
     params: unknown[],
     result: unknown,
-    time: Milliseconds,
+    time: Milliseconds
 ) {
-    params = params.map((p) => {
+    params = params.map(p => {
         if (typeof p === 'string') {
             return `String(${p.length})`;
         } else {
@@ -63,17 +63,18 @@ function logQuery (
 
     void dbLogger.logToFile(
         `\`${query.trim()}\`` +
-        `\n     [${params.join(', ')}]` +
-        `\n     (${time.toPrecision(3)}ms) => ${resultStr}`);
+            `\n     [${params.join(', ')}]` +
+            `\n     (${time.toPrecision(3)}ms) => ${resultStr}`
+    );
 }
 
 export type QueryParam = string | number | null | boolean | undefined;
-export type QueryFunc = <Res extends QueryResult = never> (
+export type QueryFunc = <Res extends QueryResult = never>(
     queryParts: TemplateStringsArray,
     ...params: QueryParam[]
 ) => Promise<Res extends (infer A)[] ? NonFunctionProperties<A>[] : Res>;
 
-export const query = (async <Res extends QueryResult = never> (
+export const query = (async <Res extends QueryResult = never>(
     queryParts: TemplateStringsArray,
     ...params: QueryParam[]
 ): Promise<Res extends (infer A)[] ? NonFunctionProperties<A>[] : Res> => {
@@ -100,27 +101,26 @@ export const query = (async <Res extends QueryResult = never> (
         }
     }, '');
 
-
     // if it's an array, add all the elements of the array in place as params
     // Flatten 2D arrays
     for (let i = 0; i < params.length; i++) {
         const p = params[i];
         if (Array.isArray(p)) {
             // insert the contents of the sub array into the array at it's index
-            params.splice(i, 1, ...p as QueryParam[]);
+            params.splice(i, 1, ...(p as QueryParam[]));
         }
     }
 
-    const result = ((
-        await dbConnection
-            ?.query(query, params)
-            .catch((e: unknown) => {
-                const end = performance.now();
-                logQuery(query, params, null, end - start);
-                void dbLogger.logToFile(`Error querying mysql db '${DB}'`);
-                void dbLogger.logToFile(e);
-            })
-    ) || [])[0] as Res extends (infer A)[] ? NonFunctionProperties<A>[] : Res;
+    const result = ((await dbConnection
+        ?.query(query, params)
+        .catch((e: unknown) => {
+            const end = performance.now();
+            logQuery(query, params, null, end - start);
+            void dbLogger.logToFile(`Error querying mysql db '${DB}'`);
+            void dbLogger.logToFile(e);
+        })) || [])[0] as Res extends (infer A)[]
+        ? NonFunctionProperties<A>[]
+        : Res;
 
     const end = performance.now();
 

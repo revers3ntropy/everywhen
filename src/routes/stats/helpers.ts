@@ -3,17 +3,18 @@ import type { Entry } from '../../lib/controllers/entry';
 import { splitText } from '../../lib/utils/text';
 import type { PickOptionalAndMutable, Seconds } from '../../lib/utils/types';
 
-export type EntryWithWordCount =
-    PickOptionalAndMutable<Entry, 'entry' | 'decrypted' | 'title'>
-    & {
-        wordCount: number,
-    };
+export type EntryWithWordCount = PickOptionalAndMutable<
+    Entry,
+    'entry' | 'decrypted' | 'title'
+> & {
+    wordCount: number;
+};
 
 export interface EntryLocation {
-    id: string,
-    created: number,
-    latitude: number | null,
-    longitude: number | null,
+    id: string;
+    created: number;
+    latitude: number | null;
+    longitude: number | null;
 }
 
 export enum By {
@@ -25,10 +26,10 @@ export enum Bucket {
     Day,
     Week,
     Month,
-    Year,
+    Year
 }
 
-export function bucketiseTime (time: Seconds, bucket: Bucket): Seconds {
+export function bucketiseTime(time: Seconds, bucket: Bucket): Seconds {
     const date = moment(new Date(time * 1000));
     switch (bucket) {
         case Bucket.Year:
@@ -42,7 +43,7 @@ export function bucketiseTime (time: Seconds, bucket: Bucket): Seconds {
     }
 }
 
-export function bucketSize (bucket: Bucket): Seconds {
+export function bucketSize(bucket: Bucket): Seconds {
     switch (bucket) {
         case Bucket.Year:
             return 60 * 60 * 24 * 365;
@@ -55,9 +56,9 @@ export function bucketSize (bucket: Bucket): Seconds {
     }
 }
 
-export function commonWordsFromText (
+export function commonWordsFromText(
     txt: string,
-    words: Record<string, number> = {},
+    words: Record<string, number> = {}
 ): Record<string, number> {
     for (let word of splitText(txt)) {
         word = word.toLowerCase();

@@ -1,6 +1,10 @@
 import { redirect } from '@sveltejs/kit';
 import 'ts-polyfill';
-import { KEY_COOKIE_KEY, NON_AUTH_ROUTES, USERNAME_COOKIE_KEY } from '../lib/constants';
+import {
+    KEY_COOKIE_KEY,
+    NON_AUTH_ROUTES,
+    USERNAME_COOKIE_KEY
+} from '../lib/constants';
 import { Settings } from '../lib/controllers/settings';
 import type { Auth } from '../lib/controllers/user';
 import { User } from '../lib/controllers/user';
@@ -10,9 +14,9 @@ import type { LayoutServerLoad } from './$types';
 export const prerender = false;
 export const ssr = true;
 
-async function isAuthenticated (
+async function isAuthenticated(
     home: boolean,
-    auth: Auth,
+    auth: Auth
 ): Promise<App.PageData> {
     if (home) {
         throw redirect(307, '/home');
@@ -23,16 +27,18 @@ async function isAuthenticated (
 
     return {
         ...auth,
-        settings: JSON.parse(JSON.stringify(
-            Settings.fillWithDefaults(settings as Record<string, Settings>),
-        )) as App.PageData['settings'],
+        settings: JSON.parse(
+            JSON.stringify(
+                Settings.fillWithDefaults(settings as Record<string, Settings>)
+            )
+        ) as App.PageData['settings']
     };
 }
 
 // leave as `: LayoutServerLoad` for type checking
 export const load: LayoutServerLoad = async ({
     cookies,
-    url,
+    url
 }): Promise<App.PageData> => {
     const home = url.pathname.trim() === '/';
     const requireAuth = !NON_AUTH_ROUTES.includes(url.pathname);
@@ -41,12 +47,16 @@ export const load: LayoutServerLoad = async ({
     const username = cookies.get(USERNAME_COOKIE_KEY);
 
     if (key && username) {
-        const { err, val: user } = await User.authenticate(query, username, key);
+        const { err, val: user } = await User.authenticate(
+            query,
+            username,
+            key
+        );
         if (!err) {
             return await isAuthenticated(home, {
                 key,
                 username,
-                id: user.id,
+                id: user.id
             });
         }
     }
@@ -60,8 +70,8 @@ export const load: LayoutServerLoad = async ({
         key: '',
         username: '',
         id: '',
-        settings: JSON.parse(JSON.stringify(
-            Settings.fillWithDefaults({}),
-        )) as App.PageData['settings'],
+        settings: JSON.parse(
+            JSON.stringify(Settings.fillWithDefaults({}))
+        ) as App.PageData['settings']
     };
 };

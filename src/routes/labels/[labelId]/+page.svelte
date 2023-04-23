@@ -15,61 +15,66 @@
     const { addNotification } = getNotificationsContext();
 
     export let data: App.PageData & {
-        label: Label,
-        entryCount: number
-        events: EventController[],
-        labels: Label[],
+        label: Label;
+        entryCount: number;
+        events: EventController[];
+        labels: Label[];
     };
 
-    async function updateName () {
-        displayNotifOnErr(addNotification,
+    async function updateName() {
+        displayNotifOnErr(
+            addNotification,
             await api.put(data, apiPath('/labels/?', data.label.id), {
-                name: data.label.name,
-            }),
+                name: data.label.name
+            })
         );
     }
 
-    async function updateColour () {
-        displayNotifOnErr(addNotification,
+    async function updateColour() {
+        displayNotifOnErr(
+            addNotification,
             await api.put(data, apiPath('/labels/?', data.label.id), {
-                colour: data.label.colour,
-            }),
+                colour: data.label.colour
+            })
         );
     }
 
-    onMount(() => document.title = `${data.label.name} - Label`);
+    onMount(() => (document.title = `${data.label.name} - Label`));
 
     let eventCount = data.events.length;
 
-    function changeEventCount (by: number) {
+    function changeEventCount(by: number) {
         eventCount += by;
     }
 
-    async function deleteLabel () {
-
+    async function deleteLabel() {
         // if there are no entries or events tied to this
         // label, deleting it easy, but if there are then
         // a more complex approach is required to clear the
         // label from the entries and events
         if (data.entryCount + eventCount < 1) {
-            displayNotifOnErr(addNotification,
-                await api.delete(data, apiPath(`/labels/?`, data.label.id)),
+            displayNotifOnErr(
+                addNotification,
+                await api.delete(data, apiPath(`/labels/?`, data.label.id))
             );
             location.assign('../');
             return;
         }
 
-        showPopup(DeleteLabelDialog, {
-            auth: data,
-            id: data.label.id,
-            colour: data.label.colour,
-            name: data.label.name,
-            reloadOnDelete: false,
-        }, () => {
-            location.assign('/labels');
-        });
+        showPopup(
+            DeleteLabelDialog,
+            {
+                auth: data,
+                id: data.label.id,
+                colour: data.label.colour,
+                name: data.label.name,
+                reloadOnDelete: false
+            },
+            () => {
+                location.assign('/labels');
+            }
+        );
     }
-
 </script>
 
 <svelte:head>
@@ -82,20 +87,17 @@
         {data.label.colour}
         <input
             type="color"
-            bind:value={data.label.colour}
-            on:change={updateColour}
-        >
+            bind:value="{data.label.colour}"
+            on:change="{updateColour}"
+        />
     </div>
     <div class="title-line">
         <input
             class="name editable-text"
-            bind:value={data.label.name}
-            on:change={updateName}
-        >
-        <button
-            class="with-circled-icon danger"
-            on:click={deleteLabel}
-        >
+            bind:value="{data.label.name}"
+            on:change="{updateName}"
+        />
+        <button class="with-circled-icon danger" on:click="{deleteLabel}">
             <Delete size="30" />
             Delete this Label
         </button>
@@ -110,11 +112,11 @@
             <div class="events">
                 {#each data.events as event}
                     <Event
-                        auth={data}
-                        event={event}
-                        {changeEventCount}
-                        labels={data.labels}
-                        obfuscated={$obfuscated}
+                        auth="{data}"
+                        event="{event}"
+                        changeEventCount="{changeEventCount}"
+                        labels="{data.labels}"
+                        obfuscated="{$obfuscated}"
                     />
                 {/each}
             </div>
@@ -122,15 +124,14 @@
     {/if}
 
     <section>
-        <h1>{data.entryCount} {data.entryCount === 1 ? "Entry" : "Entries"}</h1>
+        <h1>{data.entryCount} {data.entryCount === 1 ? 'Entry' : 'Entries'}</h1>
         <Entries
-            auth={data}
-            options={{ labelId: data.label.id }}
-            showLabels={false}
-            pageSize={data.settings.entriesPerPage.value}
+            auth="{data}"
+            options="{{ labelId: data.label.id }}"
+            showLabels="{false}"
+            pageSize="{data.settings.entriesPerPage.value}"
         />
     </section>
-
 </main>
 
 <style lang="less">

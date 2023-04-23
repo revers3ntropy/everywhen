@@ -11,7 +11,10 @@
     import { Asset } from '../../lib/controllers/asset';
     import type { Auth } from '../../lib/controllers/user';
     import { api, apiPath } from '../../lib/utils/apiRequest';
-    import { displayNotifOnErr, SUCCESS_NOTIFICATION } from '../../lib/utils/notifications';
+    import {
+        displayNotifOnErr,
+        SUCCESS_NOTIFICATION
+    } from '../../lib/utils/notifications';
     import type { TimestampSecs } from '../../lib/utils/types';
 
     const { addNotification } = getNotificationsContext();
@@ -28,39 +31,45 @@
     let recentlyCopied = false;
     let deleted = false;
 
-    async function deleteImg () {
-        if (!confirm(
-            'Are you sure you want to delete this image? '
-            + 'This action cannot be undone and will leave'
-            + ' broken links in your entries.',
-        )) return;
-        displayNotifOnErr(addNotification,
-            await api.delete(auth, apiPath(`/assets/?`, publicId)),
+    async function deleteImg() {
+        if (
+            !confirm(
+                'Are you sure you want to delete this image? ' +
+                    'This action cannot be undone and will leave' +
+                    ' broken links in your entries.'
+            )
+        )
+            return;
+        displayNotifOnErr(
+            addNotification,
+            await api.delete(auth, apiPath(`/assets/?`, publicId))
         );
         addNotification({
             ...SUCCESS_NOTIFICATION,
-            text: 'Deleted asset',
+            text: 'Deleted asset'
         });
         deleted = true;
         dispatch('delete');
     }
 
-    async function copyToClipBoard () {
+    async function copyToClipBoard() {
         recentlyCopied = true;
-        await navigator.clipboard.writeText(Asset.markDownLink(fileName, publicId));
+        await navigator.clipboard.writeText(
+            Asset.markDownLink(fileName, publicId)
+        );
         addNotification({
             ...SUCCESS_NOTIFICATION,
-            text: 'Copied to clipboard',
+            text: 'Copied to clipboard'
         });
-        setTimeout(() => recentlyCopied = false, 3000);
+        setTimeout(() => (recentlyCopied = false), 3000);
     }
 
-    onMount(() => document.title = 'Assets');
+    onMount(() => (document.title = 'Assets'));
 </script>
 
 <div class="img-wrapper {deleted ? 'deleted' : ''}">
     <img
-        alt={fileName}
+        alt="{fileName}"
         class="{obfuscated ? 'obfuscated' : ''}"
         loading="lazy"
         src="/api/assets/{publicId}"
@@ -68,8 +77,8 @@
     <div class="menu">
         <div>
             <button
-                aria-label={obfuscated ? 'Show asset' : 'Hide asset'}
-                on:click={() => obfuscated = !obfuscated}
+                aria-label="{obfuscated ? 'Show asset' : 'Hide asset'}"
+                on:click="{() => (obfuscated = !obfuscated)}"
             >
                 {#if obfuscated}
                     <Eye size="25" />
@@ -82,13 +91,13 @@
                     <Check size="30" />
                 {:else}
                     <button
-                        on:click={copyToClipBoard}
+                        on:click="{copyToClipBoard}"
                         class="icon-button"
-                        use:tooltip={{
+                        use:tooltip="{{
                             content: 'Copy link',
                             // `overflow: hidden` so needs to show below
-                            position: 'bottom',
-                        }}
+                            position: 'bottom'
+                        }}"
                     >
                         <ContentCopy size="30" />
                     </button>
@@ -99,7 +108,7 @@
             {#if !obfuscated}
                 <!-- TODO use tzOffset from db -->
                 <UtcTime
-                    timestamp={created}
+                    timestamp="{created}"
                     fmt="MMMM Do YYYY, h:mma"
                     tooltipPosition="bottom"
                 />
@@ -107,14 +116,13 @@
         </div>
         <div>
             {#if !obfuscated}
-                <button class="icon-button danger" on:click={deleteImg}>
+                <button class="icon-button danger" on:click="{deleteImg}">
                     <Delete size="30" />
                 </button>
             {/if}
         </div>
     </div>
 </div>
-
 
 <style lang="less">
     @import '../../styles/variables';
@@ -127,7 +135,7 @@
         position: relative;
 
         border-radius: @border-radius;
-        margin: .5rem;
+        margin: 0.5rem;
 
         height: 50vh;
         aspect-ratio: 1/1;

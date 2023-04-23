@@ -32,7 +32,7 @@
     }
 </script>
 
-<svelte:window use:wheel={{ scrollable: !show }} />
+<svelte:window use:wheel="{{ scrollable: !show }}" />
 
 <div class="modal-container {show ? 'show' : ''}">
     {#if loaded}
@@ -41,13 +41,13 @@
             <!-- svelte-ignore a11y-autofocus -->
             <input
                 type="text"
-                bind:value={input}
+                bind:value="{input}"
                 placeholder="Passcode"
                 autocomplete="off"
                 autofocus
                 data-lpignore="true"
                 class="password-input"
-            >
+            />
         </div>
     {/if}
 </div>

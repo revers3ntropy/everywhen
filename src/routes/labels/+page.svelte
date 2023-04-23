@@ -19,7 +19,7 @@
         })[];
     };
 
-    async function newLabel () {
+    async function newLabel() {
         let name = 'New Label';
         let i = 0;
         while (data.labels.some(l => l.name === name)) {
@@ -28,11 +28,12 @@
 
         const newLabel = {
             name,
-            colour: '#000',
+            colour: '#000'
         };
 
-        const { id } = displayNotifOnErr(addNotification,
-            await api.post(data, '/labels', newLabel),
+        const { id } = displayNotifOnErr(
+            addNotification,
+            await api.post(data, '/labels', newLabel)
         );
 
         data = {
@@ -44,21 +45,20 @@
                     id,
                     created: nowS(),
                     entryCount: 0,
-                    eventCount: 0,
-                },
-            ],
+                    eventCount: 0
+                }
+            ]
         };
     }
 
-    function labelDeleted ({ detail: { id } }: { detail: { id: string } }) {
+    function labelDeleted({ detail: { id } }: { detail: { id: string } }) {
         data = {
             ...data,
-            labels: data.labels.filter(l => l.id !== id),
+            labels: data.labels.filter(l => l.id !== id)
         };
     }
 
-    onMount(() => document.title = 'Labels');
-
+    onMount(() => (document.title = 'Labels'));
 </script>
 
 <svelte:head>
@@ -80,8 +80,8 @@
             {#each data.labels as label}
                 <LabelOptions
                     {...label}
-                    auth={data}
-                    on:delete={labelDeleted}
+                    auth="{data}"
+                    on:delete="{labelDeleted}"
                 />
             {/each}
 
@@ -90,10 +90,7 @@
             {/if}
 
             <div class="flex-center">
-                <button
-                    class="primary with-icon"
-                    on:click={newLabel}
-                >
+                <button class="primary with-icon" on:click="{newLabel}">
                     <Plus size="30" />
                     Create Label
                 </button>

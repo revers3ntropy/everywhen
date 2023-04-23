@@ -7,9 +7,9 @@ import { daysSince, nowS } from '../../lib/utils/time';
 import type { PageServerLoad } from './$types';
 import { commonWordsFromText, type EntryWithWordCount } from './helpers';
 
-export const load = cachedPageRoute(async (auth) => {
+export const load = cachedPageRoute(async auth => {
     const { val: entries, err } = await Entry.all(query, auth, {
-        deleted: false,
+        deleted: false
     });
     if (err) throw error(400, err);
 
@@ -40,10 +40,10 @@ export const load = cachedPageRoute(async (auth) => {
         entries: entriesWithWordCount,
         entryCount: entries.length,
         commonWords: Object.entries(commonWords)
-                           .sort(([ , a ], [ , b ]) => b - a)
-                           .slice(0, 100),
+            .sort(([, a], [, b]) => b - a)
+            .slice(0, 100),
         days: daysSince(earliestEntryTimeStamp) || 1,
         wordCount,
-        charCount,
+        charCount
     };
 }) satisfies PageServerLoad;

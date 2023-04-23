@@ -6,11 +6,10 @@
     import EntryForm from '../../EntryForm.svelte';
 
     export let data: App.PageData & {
-        entry: Entry
+        entry: Entry;
     };
 
-    onMount(() => document.title = `Edit Entry`);
-
+    onMount(() => (document.title = `Edit Entry`));
 </script>
 
 <svelte:head>
@@ -30,13 +29,13 @@
     </div>
     <EntryForm
         action="edit"
-        auth={data}
-        entry={data.entry}
-        loadFromLS={false}
-        newEntryBody={data.entry.entry}
-        newEntryLabel={data.entry?.label?.id || ''}
-        newEntryTitle={data.entry.title}
-        obfuscated={$obfuscated}
+        auth="{data}"
+        entry="{data.entry}"
+        loadFromLS="{false}"
+        newEntryBody="{data.entry.entry}"
+        newEntryLabel="{data.entry?.label?.id || ''}"
+        newEntryTitle="{data.entry.title}"
+        obfuscated="{$obfuscated}"
     />
 </main>
 

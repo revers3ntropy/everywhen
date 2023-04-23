@@ -18,12 +18,10 @@ setInterval(() => {
 
 setInterval(cleanupCache, 1000 * 60);
 
-function exitHandler (code: number) {
-    void errorLogger
-        .logToFile(`Exited with code ${code}`)
-        .then(() => {
-            process.exit();
-        });
+function exitHandler(code: number) {
+    void errorLogger.logToFile(`Exited with code ${code}`).then(() => {
+        process.exit();
+    });
 }
 
 process.on('exit', exitHandler);
@@ -33,7 +31,7 @@ process.on('SIGUSR1', exitHandler);
 process.on('SIGUSR2', exitHandler);
 process.on('uncaughtException', exitHandler);
 
-function logReq (time: number, event: RequestEvent) {
+function logReq(time: number, event: RequestEvent) {
     const path = new URL(event.request.url).pathname.split('/');
     path.shift();
     let pathStr = `/${path.shift() || ''}`;
@@ -47,7 +45,7 @@ function logReq (time: number, event: RequestEvent) {
     void reqLogger.logToFile(
         event.request.method,
         `(${time.toPrecision(3)}ms)`,
-        pathStr,
+        pathStr
     );
 }
 
@@ -59,7 +57,7 @@ export const handle = (async ({ event, resolve }) => {
     } catch (e) {
         void errorLogger.logToFile(e);
         result = new Response('An Error has Occurred', {
-            status: 500,
+            status: 500
         });
     }
     const end = performance.now();
@@ -67,4 +65,3 @@ export const handle = (async ({ event, resolve }) => {
 
     return result;
 }) satisfies Handle;
-

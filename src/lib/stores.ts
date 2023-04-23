@@ -5,30 +5,42 @@ import { LS_KEY } from './constants';
 import type { EventsSortKey } from './utils/types';
 
 export const enabledLocation = localStorageWritable(
-    LS_KEY.enabledLocation, false);
+    LS_KEY.enabledLocation,
+    false
+);
 
 export const passcodeLastEntered = localStorageWritable(
-    LS_KEY.passcodeLastEntered, 0);
+    LS_KEY.passcodeLastEntered,
+    0
+);
 export const eventsSortKey = localStorageWritable<EventsSortKey>(
-    LS_KEY.sortEventsKey, 'created',
+    LS_KEY.sortEventsKey,
+    'created'
 );
 export const obfuscated = writable(false);
-export const popup = writable<typeof SvelteComponentDev | null | undefined>(null);
+export const popup = writable<typeof SvelteComponentDev | null | undefined>(
+    null
+);
 
-export function localStorageWritable<T> (
+export function localStorageWritable<T>(
     lsKey: string,
-    initial: T extends (...args: infer _) => infer _ ? never : T,
+    initial: T extends (...args: infer _) => infer _ ? never : T
 ): Writable<T> {
-
     if (typeof initial === 'function') {
-        throw new Error('localStorageWritable does not support setting a function');
+        throw new Error(
+            'localStorageWritable does not support setting a function'
+        );
     }
 
     if (browser) {
         const lsVal = localStorage.getItem(lsKey);
         if (lsVal !== null) {
             try {
-                initial = JSON.parse(lsVal) as T extends (...args: infer _) => infer _ ? never : T;
+                initial = JSON.parse(lsVal) as T extends (
+                    ...args: infer _
+                ) => infer _
+                    ? never
+                    : T;
             } catch (e) {
                 console.error('Error parsing localStorage value', e);
             }
@@ -43,9 +55,11 @@ export function localStorageWritable<T> (
 
     return {
         subscribe,
-        set: (value) => {
+        set: value => {
             if (typeof value === 'function') {
-                throw new Error('localStorageWritable does not support setting a function');
+                throw new Error(
+                    'localStorageWritable does not support setting a function'
+                );
             }
             set(value);
             if (!browser) return;
@@ -55,12 +69,14 @@ export function localStorageWritable<T> (
             }
             localStorage.setItem(lsKey, JSON.stringify(value));
         },
-        update: (fn) => {
-            update((value) => {
+        update: fn => {
+            update(value => {
                 const newValue = fn(value);
 
                 if (typeof newValue === 'function') {
-                    throw new Error('localStorageWritable does not support setting a function');
+                    throw new Error(
+                        'localStorageWritable does not support setting a function'
+                    );
                 }
 
                 if (!browser) return newValue;
@@ -71,6 +87,6 @@ export function localStorageWritable<T> (
                 }
                 return newValue;
             });
-        },
+        }
     };
 }

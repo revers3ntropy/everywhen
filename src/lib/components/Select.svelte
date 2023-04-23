@@ -15,11 +15,7 @@
     let close: () => void;
 </script>
 
-<Dropdown
-    bind:close
-    bind:open
-    unstyledButton
->
+<Dropdown bind:close="{close}" bind:open="{open}" unstyledButton>
     <span class="selector" slot="button">
         {key}
         {#if open}
@@ -31,12 +27,16 @@
 
     <div class="options">
         {#each Object.keys(options) as option}
-            <button on:click={() => { close(); key = option }}>
+            <button
+                on:click="{() => {
+                    close();
+                    key = option;
+                }}"
+            >
                 {option}
             </button>
         {/each}
     </div>
-
 </Dropdown>
 
 <style lang="less">
@@ -45,7 +45,7 @@
 
     button {
         display: block;
-        padding: .3em;
+        padding: 0.3em;
         border-radius: @border-radius;
         border: none;
 
@@ -65,7 +65,7 @@
         background: @light-accent;
 
         button {
-            padding: .4rem 1.2rem;
+            padding: 0.4rem 1.2rem;
         }
     }
 

@@ -7,12 +7,12 @@ import {
     apiRes404,
     apiResponse,
     type GenericResponse,
-    rawApiResponse,
+    rawApiResponse
 } from '../../../../lib/utils/apiResponse';
 import {
     cacheResponse,
     getCachedResponse,
-    invalidateCache,
+    invalidateCache
 } from '../../../../lib/utils/cache';
 
 export const GET = (async ({ params, url, cookies }) => {
@@ -22,32 +22,28 @@ export const GET = (async ({ params, url, cookies }) => {
     if (cached) return cached as GenericResponse<Buffer>;
 
     const { err, val: asset } = await Asset.fromPublicId(
-        query, auth,
-        params.asset || '',
+        query,
+        auth,
+        params.asset || ''
     );
     if (err) throw error(404, err);
 
-    const imgB64 = asset
-        .content
-        .replace(
-            /^data:image\/((jpeg)|(jpg)|(png));base64,/,
-            '',
-        );
+    const imgB64 = asset.content.replace(
+        /^data:image\/((jpeg)|(jpg)|(png));base64,/,
+        ''
+    );
 
     const img = Buffer.from(imgB64, 'base64');
 
-    const response = rawApiResponse(
-        img,
-        {
-            status: 200,
-            headers: {
-                'Content-Type': asset.contentType,
-                'Cache-Control': 'max-age=31536000, immutable',
-                'Content-Length': img.length,
-                // doesn't like Content-Length for some reason
-            } as unknown as HeadersInit,
-        },
-    );
+    const response = rawApiResponse(img, {
+        status: 200,
+        headers: {
+            'Content-Type': asset.contentType,
+            'Cache-Control': 'max-age=31536000, immutable',
+            'Content-Length': img.length
+            // doesn't like Content-Length for some reason
+        } as unknown as HeadersInit
+    });
     cacheResponse(url.href, auth.id, response.clone());
     return response;
 }) satisfies RequestHandler;
@@ -57,8 +53,9 @@ export const DELETE = (async ({ params, cookies }) => {
     invalidateCache(auth.id);
 
     const { err } = await Asset.purgeWithPublicId(
-        query, auth,
-        params.asset || '',
+        query,
+        auth,
+        params.asset || ''
     );
     if (err) throw error(404, err);
 

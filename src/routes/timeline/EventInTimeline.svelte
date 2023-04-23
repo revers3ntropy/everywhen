@@ -1,5 +1,9 @@
 <script lang="ts">
-    import { CanvasState, renderable, START_ZOOM } from '../../lib/canvas/canvasHelpers';
+    import {
+        CanvasState,
+        renderable,
+        START_ZOOM
+    } from '../../lib/canvas/canvasHelpers';
     import type { Label } from '../../lib/controllers/label';
     import { obfuscated } from '../../lib/stores';
 
@@ -18,7 +22,7 @@
 
     export let options = {
         yMargin: 2,
-        textXOffset: 5,
+        textXOffset: 5
     };
 
     if (!start || !end) throw 'Missing required props';
@@ -33,31 +37,20 @@
         const isSingleEvent = duration < 60;
 
         if (isSingleEvent) {
-            state.circle(x, y + HEIGHT,
-                5, { colour });
+            state.circle(x, y + HEIGHT, 5, { colour });
             const h = state.centerLnY() - (y + HEIGHT);
             state.rect(x, y + HEIGHT, 1, h, {
                 radius: 0,
-                colour,
+                colour
             });
         } else {
-            state.rect(
-                x,
-                y,
-                width,
-                HEIGHT,
-                {
-                    colour: '#333',
-                    radius: 5,
-                },
-            );
-            state.rect(
-                x,
-                y + HEIGHT - LABEL_HEIGHT,
-                width,
-                LABEL_HEIGHT,
-                { colour },
-            );
+            state.rect(x, y, width, HEIGHT, {
+                colour: '#333',
+                radius: 5
+            });
+            state.rect(x, y + HEIGHT - LABEL_HEIGHT, width, LABEL_HEIGHT, {
+                colour
+            });
         }
 
         let textColour = '#fff';
@@ -74,20 +67,17 @@
                 name,
                 Math.max(5, x + options.textXOffset),
                 y + HEIGHT / 2 + 5,
-                { c: textColour, maxWidth: width - 2 * options.textXOffset },
+                { c: textColour, maxWidth: width - 2 * options.textXOffset }
             );
         } else if (isSingleEvent && state.zoom > START_ZOOM / 2) {
             state.text(
                 name,
                 x + 5,
-                y + HEIGHT / 2 + (
-                    eventTextParityHeight ? HEIGHT / 2 + 20 : 0
-                ),
-                { c: '#fff', align: 'center' },
+                y + HEIGHT / 2 + (eventTextParityHeight ? HEIGHT / 2 + 20 : 0),
+                { c: '#fff', align: 'center' }
             );
         }
-
     });
 </script>
 
-<slot></slot>
+<slot />

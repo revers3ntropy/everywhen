@@ -10,17 +10,16 @@ import { Settings } from './settings';
 import { UUID } from './uuid';
 
 export class User {
-    public constructor (
+    public constructor(
         public id: string,
         public username: string,
-        public key: string,
-    ) {
-    }
+        public key: string
+    ) {}
 
-    public static async authenticate (
+    public static async authenticate(
         query: QueryFunc,
         username: string,
-        key: string,
+        key: string
     ): Promise<Result<User>> {
         const res = await query<{ id: string }[]>`
             SELECT id
@@ -34,9 +33,9 @@ export class User {
         return Result.ok(new User(res[0].id, username, key));
     }
 
-    public static async userExistsWithUsername (
+    public static async userExistsWithUsername(
         query: QueryFunc,
-        username: string,
+        username: string
     ): Promise<boolean> {
         const res = await query<Record<string, number>[]>`
             SELECT 1
@@ -46,10 +45,10 @@ export class User {
         return res.length === 1;
     }
 
-    public static async newUserIsValid (
+    public static async newUserIsValid(
         query: QueryFunc,
         username: string,
-        password: string,
+        password: string
     ): Promise<Result> {
         if (username.length < 3) {
             return Result.err('Username must be at least 3 characters');
@@ -65,10 +64,10 @@ export class User {
         return Result.ok(null);
     }
 
-    public static async create (
+    public static async create(
         query: QueryFunc,
         username: string,
-        password: string,
+        password: string
     ): Promise<Result<User>> {
         const { err } = await User.newUserIsValid(query, username, password);
         if (err) return Result.err(err);
@@ -88,7 +87,7 @@ export class User {
         return Result.ok(new User(id, username, password));
     }
 
-    public static async purge (query: QueryFunc, auth: Auth): Promise<void> {
+    public static async purge(query: QueryFunc, auth: Auth): Promise<void> {
         await Label.purgeAll(query, auth);
         await Entry.purgeAll(query, auth);
         await Asset.purgeAll(query, auth);
@@ -102,7 +101,7 @@ export class User {
         `;
     }
 
-    private static async generateSalt (query: QueryFunc): Promise<string> {
+    private static async generateSalt(query: QueryFunc): Promise<string> {
         let salt = '';
         let existingSalts: { salt: string }[];
         do {

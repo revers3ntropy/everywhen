@@ -5,7 +5,10 @@
     import type { Label } from '../../controllers/label';
     import type { Auth } from '../../controllers/user';
     import { api } from '../../utils/apiRequest';
-    import { displayNotifOnErr, ERR_NOTIFICATION } from '../../utils/notifications';
+    import {
+        displayNotifOnErr,
+        ERR_NOTIFICATION
+    } from '../../utils/notifications';
     import type { Result } from '../../utils/result';
     import FileDrop from './FileDropDialog.svelte';
     import { importEntries } from './importEntries.js';
@@ -20,13 +23,13 @@
 
     let loading = false;
 
-    async function withContents (result: Result<string>): Promise<void> {
+    async function withContents(result: Result<string>): Promise<void> {
         const contents = displayNotifOnErr(addNotification, result);
 
         if (!labels) {
             addNotification({
                 ...ERR_NOTIFICATION,
-                text: `Failed to load labels`,
+                text: `Failed to load labels`
             });
             return;
         }
@@ -47,13 +50,13 @@
             for (const notification of res) {
                 addNotification({
                     ...ERR_NOTIFICATION,
-                    ...notification,
+                    ...notification
                 });
             }
         } else if (res) {
             addNotification({
                 ...ERR_NOTIFICATION,
-                ...res,
+                ...res
             });
         }
 
@@ -61,19 +64,19 @@
     }
 
     onMount(async () => {
-        const labelRes = displayNotifOnErr(addNotification,
-            await api.get(auth, '/labels'),
+        const labelRes = displayNotifOnErr(
+            addNotification,
+            await api.get(auth, '/labels')
         );
         labels = labelRes.labels;
     });
-
 </script>
 
 {#if labels && !loading}
     <FileDrop
         message="Import {type} from .json file"
-        {withContents}
+        withContents="{withContents}"
     />
 {:else}
-    <Spinner scale={0.5} />
+    <Spinner scale="{0.5}" />
 {/if}

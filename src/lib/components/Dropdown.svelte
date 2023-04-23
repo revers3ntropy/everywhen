@@ -14,7 +14,7 @@
         open = false;
     };
 
-    function globalMouseDown (evt: MouseEvent) {
+    function globalMouseDown(evt: MouseEvent) {
         if (open && !(evt.target as Element).closest('.dropdown')) {
             close();
             evt.preventDefault();
@@ -22,20 +22,22 @@
     }
 </script>
 
-<svelte:window on:mousedown={globalMouseDown} />
+<svelte:window on:mousedown="{globalMouseDown}" />
 
-<div class="dropdown {cn({
-    open,
-    rounded,
-     'unstyled': unstyledButton,
-     'from-right': fromRight,
-     'open-on-hover': openOnHover,
-})}">
+<div
+    class="dropdown {cn({
+        open,
+        rounded,
+        unstyled: unstyledButton,
+        'from-right': fromRight,
+        'open-on-hover': openOnHover
+    })}"
+>
     <button
-        aria-label={ariaLabel || 'Open popup'}
-        on:click={() => open = !open}
+        aria-label="{ariaLabel || 'Open popup'}"
+        on:click="{() => (open = !open)}"
     >
-        <slot name="button"></slot>
+        <slot name="button" />
         <MenuDown class="menu-down" size="30" />
     </button>
     <div class="popup">
@@ -92,7 +94,7 @@
                 .content {
                     border: 1px solid @border-heavy;
                     background: @light-accent;
-                    border-radius: @border-radius
+                    border-radius: @border-radius;
                 }
             }
         }
@@ -137,7 +139,7 @@
         &:not(.rounded) {
             .bordered();
             border-radius: @border-radius;
-            margin: .5em;
+            margin: 0.5em;
 
             &:hover {
                 background: @light-v-accent;
@@ -150,11 +152,11 @@
             }
         }
 
-        &.open, &.open-on-hover:hover {
+        &.open,
+        &.open-on-hover:hover {
             .popup {
                 display: block;
             }
         }
     }
-
 </style>

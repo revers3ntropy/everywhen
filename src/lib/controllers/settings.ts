@@ -7,21 +7,21 @@ import type { Auth } from './user';
 import { UUID } from './uuid';
 
 export interface ISettingsConfig<T> {
-    type: 'string' | 'boolean' | 'number',
-    name: string,
-    description: string,
-    defaultValue: T,
-    unit?: string,
+    type: 'string' | 'boolean' | 'number';
+    name: string;
+    description: string;
+    defaultValue: T;
+    unit?: string;
 }
 
 export type SettingsKey = keyof typeof Settings.config;
-export type SettingsConfig =
-    {
-        [key in SettingsKey]:
-        Settings<typeof Settings.config[key]['defaultValue']>
-    } & {
-        [key: string]: Settings<string | number | boolean>,
-    }
+export type SettingsConfig = {
+    [key in SettingsKey]: Settings<
+        (typeof Settings.config)[key]['defaultValue']
+    >;
+} & {
+    [key: string]: Settings<string | number | boolean>;
+};
 
 export class Settings<T = unknown> {
     public static config = {
@@ -29,58 +29,59 @@ export class Settings<T = unknown> {
             type: 'boolean',
             defaultValue: false,
             name: 'Blur Entries By Default',
-            description: 'Blur entries by default, and manually show them.',
+            description: 'Blur entries by default, and manually show them.'
         } satisfies ISettingsConfig<boolean>,
         autoHideEntriesDelay: {
             type: 'number',
             defaultValue: 60 * 2,
             name: 'Auto Blur Entries After',
-            description: `Blur entries after 'N' seconds without user interaction. ` +
+            description:
+                `Blur entries after 'N' seconds without user interaction. ` +
                 `Set to 0 to disable.`,
-            unit: 'seconds',
+            unit: 'seconds'
         } satisfies ISettingsConfig<Seconds>,
         entriesPerPage: {
             type: 'number',
             defaultValue: 100,
             name: 'Entries per Page',
             description: `Number of entries displayed per page.`,
-            unit: 'entries',
+            unit: 'entries'
         } satisfies ISettingsConfig<Seconds>,
         passcode: {
             type: 'string',
             defaultValue: '',
             name: 'Passcode',
-            description: `Passcode to access the app. Leave blank to disable.`,
+            description: `Passcode to access the app. Leave blank to disable.`
         } satisfies ISettingsConfig<string>,
         passcodeTimeout: {
             type: 'number',
             defaultValue: 0,
             name: 'Passcode Timeout',
-            description: `Delay before passcode is required again. `
-                + `Set to 0 to only require once.`,
-            unit: 'seconds',
+            description:
+                `Delay before passcode is required again. ` +
+                `Set to 0 to only require once.`,
+            unit: 'seconds'
         } satisfies ISettingsConfig<Seconds>,
         yearOfBirth: {
             type: 'number',
             defaultValue: 2000,
             name: 'Year of Birth',
-            description: `The first year in which you lived. Used by the timeline.`,
-        } satisfies ISettingsConfig<number>,
+            description: `The first year in which you lived. Used by the timeline.`
+        } satisfies ISettingsConfig<number>
     } satisfies Record<string, ISettingsConfig<unknown>>;
 
-    constructor (
+    constructor(
         public readonly id: string,
         public readonly created: number,
         public readonly key: string,
-        public readonly value: T,
-    ) {
-    }
+        public readonly value: T
+    ) {}
 
-    public static async update (
+    public static async update(
         query: QueryFunc,
         auth: Auth,
         key: string,
-        value: unknown,
+        value: unknown
     ): Promise<Result<Settings>> {
         const id = await UUID.generateUUId(query);
 
@@ -93,10 +94,14 @@ export class Settings<T = unknown> {
         const expectedType = Settings.config[key as SettingsKey].type;
         if (typeof value !== expectedType) {
             return Result.err(
-                `Invalid setting value, expected ${expectedType} but got ${typeof value}`);
+                `Invalid setting value, expected ${expectedType} but got ${typeof value}`
+            );
         }
 
-        const { err, val: valEncrypted } = encrypt(JSON.stringify(value), auth.key);
+        const { err, val: valEncrypted } = encrypt(
+            JSON.stringify(value),
+            auth.key
+        );
         if (err) return Result.err(err);
 
         await query`
@@ -107,16 +112,18 @@ export class Settings<T = unknown> {
         return Result.ok(new Settings(id, now, key, value));
     }
 
-    public static async all (
+    public static async all(
         query: QueryFunc,
-        auth: Auth,
+        auth: Auth
     ): Promise<Result<Settings[]>> {
-        const settings = await query<{
-            id: string,
-            created: number,
-            key: string,
-            value: string,
-        }[]>`
+        const settings = await query<
+            {
+                id: string;
+                created: number;
+                key: string;
+                value: string;
+            }[]
+        >`
             SELECT created, id, \`key\`, value
             FROM settings
             WHERE user = ${auth.id}
@@ -126,49 +133,55 @@ export class Settings<T = unknown> {
                                AND S.\`key\` = settings.\`key\`)
         `;
 
-        return Result.collect(settings.map((setting) => {
-            const { err, val: unencryptedVal } = decrypt(setting.value, auth.key);
-            if (err) return Result.err(err);
-            return Result.ok(new Settings(
-                setting.id,
-                setting.created,
-                setting.key,
-                JSON.parse(unencryptedVal),
-            ));
-        }));
+        return Result.collect(
+            settings.map(setting => {
+                const { err, val: unencryptedVal } = decrypt(
+                    setting.value,
+                    auth.key
+                );
+                if (err) return Result.err(err);
+                return Result.ok(
+                    new Settings(
+                        setting.id,
+                        setting.created,
+                        setting.key,
+                        JSON.parse(unencryptedVal)
+                    )
+                );
+            })
+        );
     }
 
-    public static async allAsMap (
+    public static async allAsMap(
         query: QueryFunc,
-        auth: Auth,
+        auth: Auth
     ): Promise<Result<Partial<SettingsConfig>>> {
         const res = await Settings.all(query, auth);
         if (res.err) {
             return Result.err(res.err);
         }
-        return Result.ok(Object.fromEntries(
-            res.val.map(s => [ s.key, s ]),
-        ) as Partial<SettingsConfig>);
+        return Result.ok(
+            Object.fromEntries(
+                res.val.map(s => [s.key, s])
+            ) as Partial<SettingsConfig>
+        );
     }
 
-    public static fillWithDefaults (
-        map: Record<string, Settings>,
+    public static fillWithDefaults(
+        map: Record<string, Settings>
     ): SettingsConfig {
         const newMap = { ...map };
-        for (const [ key, config ] of Object.entries(Settings.config)) {
+        for (const [key, config] of Object.entries(Settings.config)) {
             if (!newMap[key]) {
-                newMap[key] = new Settings(
-                    '', 0,
-                    key, config.defaultValue,
-                );
+                newMap[key] = new Settings('', 0, key, config.defaultValue);
             }
         }
         return newMap as SettingsConfig;
     }
 
-    public static async purgeAll (
+    public static async purgeAll(
         query: QueryFunc,
-        auth: Auth,
+        auth: Auth
     ): Promise<Result> {
         await query`
             DELETE

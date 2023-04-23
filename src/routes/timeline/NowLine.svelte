@@ -11,16 +11,13 @@
         }
 
         state.rect(nowLinePos, 0, 1, state.height, {
-            colour: '#79ebe2',
+            colour: '#79ebe2'
         });
 
-        state.text(
-            'now',
-            nowLinePos + 5,
-            state.centerLnY() - 5,
-            { c: '#79ebe2' },
-        );
+        state.text('now', nowLinePos + 5, state.centerLnY() - 5, {
+            c: '#79ebe2'
+        });
     });
 </script>
 
-<slot></slot>
+<slot />

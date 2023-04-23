@@ -16,8 +16,8 @@
     import { addYToEvents, type EventWithYLevel } from './utils';
 
     export let data: App.PageData & {
-        entries: TimelineEntry[],
-        events: Event[],
+        entries: TimelineEntry[];
+        events: Event[];
     };
 
     let events: EventWithYLevel[];
@@ -26,19 +26,15 @@
 
     $: events = addYToEvents(data.events);
 
-    function setInitialZoomAndPos () {
+    function setInitialZoomAndPos() {
         const earliestTimestamp = Math.min(
             ...data.entries.map(e => e.created),
-            ...data.events.map(e => e.start),
+            ...data.events.map(e => e.start)
         );
         const earliestTimestampTimeAgo = nowS() - earliestTimestamp;
-        const daysAgo = Math.round(Math.min(
-            52,
-            Math.max(
-                earliestTimestampTimeAgo / (60 * 60 * 24),
-                0,
-            ),
-        ));
+        const daysAgo = Math.round(
+            Math.min(52, Math.max(earliestTimestampTimeAgo / (60 * 60 * 24), 0))
+        );
 
         // zoom so that there is 1 day of blank space to the left
         // of the last entry/event,
@@ -46,19 +42,22 @@
         // then show 53 days
         $canvasState.zoom = 1 / 60 / (daysAgo + 1);
 
-        $canvasState.cameraOffset = $canvasState.timeToRenderPos(nowS()) - $canvasState.width * 3 / 4;
+        $canvasState.cameraOffset =
+            $canvasState.timeToRenderPos(nowS()) - ($canvasState.width * 3) / 4;
     }
 
     onMount(setInitialZoomAndPos);
 
-    onMount(() => document.title = 'Timeline');
-
+    onMount(() => (document.title = 'Timeline'));
 </script>
 
 <svelte:head>
     <title>Timeline</title>
     <meta content="Timeline" name="description" />
 
+    <!-- put the style here because the styles should all be global,
+        however when switching pages the styles get leaked and cause
+        weird issues (the bar chart not showing on the stats page) -->
     <!-- put the style here because the styles should all be global,
         however when switching pages the styles get leaked and cause
         weird issues (the bar chart not showing on the stats page) -->
@@ -101,27 +100,21 @@
         <Controls />
         <Background />
 
-        <TimeMarkers
-            startYear={data.settings.yearOfBirth.value}
-        />
+        <TimeMarkers startYear="{data.settings.yearOfBirth.value}" />
 
         <NowLine />
 
         {#each data.entries as entry, i}
-            <EntryInTimeline
-                {...entry}
-                entryTextParityHeight={i % 2 === 0}
-            />
+            <EntryInTimeline {...entry} entryTextParityHeight="{i % 2 === 0}" />
         {/each}
 
         {#each events as event, i}
             <EventInTimeline
                 {...event}
-                yLevel={Event.duration(event) < 60
+                yLevel="{Event.duration(event) < 60
                     ? eventBaseY
-                    : eventBaseY + 1 + event.yLevel
-                }
-                eventTextParityHeight={i % 2 === 0}
+                    : eventBaseY + 1 + event.yLevel}"
+                eventTextParityHeight="{i % 2 === 0}"
             />
         {/each}
 

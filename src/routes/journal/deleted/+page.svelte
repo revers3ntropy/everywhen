@@ -17,12 +17,12 @@
     let loaded = false;
     let entries: EntryController[] = [];
 
-    async function reload () {
+    async function reload() {
         const entriesOptions = {
             page: 0,
             pageSize: 10e10,
             search,
-            deleted: 1,
+            deleted: 1
         };
         const res = await api
             .get(data, `/entries`, entriesOptions)
@@ -34,8 +34,7 @@
 
     onMount(reload);
 
-    onMount(() => document.title = `Deleted`);
-
+    onMount(() => (document.title = `Deleted`));
 </script>
 
 <svelte:head>
@@ -54,9 +53,9 @@
     {#each entries as entry}
         <Entry
             {...entry}
-            obfuscated={$obfuscated}
-            on:updated={reload}
-            auth={data}
+            obfuscated="{$obfuscated}"
+            on:updated="{reload}"
+            auth="{data}"
         />
     {/each}
 

@@ -16,23 +16,25 @@
 
     export let data: App.PageData;
 
-    async function deleteAccount () {
-        if (!confirm(
-            'Are you sure you want to delete your account?'
-            + ' A backup of your data will be downloaded.',
-        )) {
+    async function deleteAccount() {
+        if (
+            !confirm(
+                'Are you sure you want to delete your account?' +
+                    ' A backup of your data will be downloaded.'
+            )
+        ) {
             return;
         }
 
-        const { backup: backupData } = displayNotifOnErr(addNotification,
-            await api.delete(data, '/users'),
+        const { backup: backupData } = displayNotifOnErr(
+            addNotification,
+            await api.delete(data, '/users')
         );
         Backup.download(backupData, data.username, true);
         location.assign('/');
     }
 
-    onMount(() => document.title = 'Settings');
-
+    onMount(() => (document.title = 'Settings'));
 </script>
 
 <svelte:head>
@@ -48,19 +50,15 @@
         </h1>
 
         <div class="buttons">
-            <BackupOptions auth={data} />
-            <a
-                aria-label="Log Out"
-                class="danger"
-                href="/logout"
-            >
+            <BackupOptions auth="{data}" />
+            <a aria-label="Log Out" class="danger" href="/logout">
                 <Logout size="30" />
                 Log Out
             </a>
             <button
                 aria-label="Delete Account"
                 class="danger"
-                on:click={deleteAccount}
+                on:click="{deleteAccount}"
             >
                 <Skull size="30" />
                 Delete Account and Erase Data
@@ -68,17 +66,16 @@
         </div>
     </section>
     <section>
-        <i>Please note you will have to reload the page for changes to take effect</i>
+        <i
+            >Please note you will have to reload the page for changes to take
+            effect</i
+        >
         <h1>
             <Cog size="40" />
             <span>General Settings</span>
         </h1>
         {#each Object.entries(SettingsController.config) as [key, config] (key)}
-            <Settings
-                {...config}
-                {...data.settings[key]}
-                auth={data}
-            />
+            <Settings {...config} {...data.settings[key]} auth="{data}" />
         {/each}
     </section>
 </main>
@@ -118,11 +115,12 @@
             // global for the backup buttons,
             // which are in a child component but should have consistent style
             // with the other buttons
-            a, :global(button) {
+            a,
+            :global(button) {
                 .bordered();
                 border-radius: @border-radius;
-                padding: .8rem;
-                margin: .5rem;
+                padding: 0.8rem;
+                margin: 0.5rem;
                 display: grid;
                 place-items: center;
                 grid-template-columns: 35px 1fr;
@@ -136,5 +134,4 @@
             }
         }
     }
-
 </style>

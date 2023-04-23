@@ -6,12 +6,11 @@
     import { obfuscated } from '../../../lib/stores';
 
     export let data: App.PageData & {
-        entry: EntryController,
-        history: boolean,
+        entry: EntryController;
+        history: boolean;
     };
 
-    onMount(() => document.title = `View Entry`);
-
+    onMount(() => (document.title = `View Entry`));
 </script>
 
 <svelte:head>
@@ -28,18 +27,17 @@
 
     <Entry
         {...data.entry}
-        auth={data}
-        obfuscated={$obfuscated}
-        on:updated={() => location.reload()}
-        showFullDate={true}
+        auth="{data}"
+        obfuscated="{$obfuscated}"
+        on:updated="{() => location.reload()}"
+        showFullDate="{true}"
     />
 
     {#if !data.history}
         {#if data.entry.edits?.length}
             <div class="flex-center">
                 <a href="/journal/{data.entry.id}?history=on&obfuscate=0">
-                    Show History
-                    ({data.entry.edits?.length} edits)
+                    Show History ({data.entry.edits?.length} edits)
                 </a>
             </div>
         {/if}
@@ -55,14 +53,13 @@
             </div>
         {:else}
             <i>Older Versions</i>
-            {#each (data.entry.edits || [])
-                .sort((a, b) => b.created - a.created) as edit}
+            {#each (data.entry.edits || []).sort((a, b) => b.created - a.created) as edit}
                 <Entry
                     {...edit}
-                    auth={data}
-                    obfuscated={$obfuscated}
-                    isEdit={true}
-                    showFullDate={true}
+                    auth="{data}"
+                    obfuscated="{$obfuscated}"
+                    isEdit="{true}"
+                    showFullDate="{true}"
                 />
             {/each}
         {/if}

@@ -12,19 +12,23 @@ export const PUT = (async ({ request, params, cookies }) => {
     if (!params.eventId) throw error(400, 'invalid event id');
     invalidateCache(auth.id);
 
-    const body = await getUnwrappedReqBody(request, {
-        name: 'string',
-        start: 'number',
-        end: 'number',
-        label: 'string',
-    }, {
-        name: '',
-        start: 0,
-        end: 0,
-        // not a very nice solution, make sure this
-        // can't be used as a valid ID
-        label: 'NO_CHANGE',
-    });
+    const body = await getUnwrappedReqBody(
+        request,
+        {
+            name: 'string',
+            start: 'number',
+            end: 'number',
+            label: 'string'
+        },
+        {
+            name: '',
+            start: 0,
+            end: 0,
+            // not a very nice solution, make sure this
+            // can't be used as a valid ID
+            label: 'NO_CHANGE'
+        }
+    );
 
     const { err, val: event } = await Event.fromId(query, auth, params.eventId);
     if (err) throw error(404, err);
@@ -38,12 +42,22 @@ export const PUT = (async ({ request, params, cookies }) => {
     // which always means one of them will be 'before'/'after' the other,
     // which is caught by the validation in the controller
     if (body.start && body.end) {
-        const { err } = await Event.updateStartAndEnd(query, auth, event, body.start, body.end);
+        const { err } = await Event.updateStartAndEnd(
+            query,
+            auth,
+            event,
+            body.start,
+            body.end
+        );
         if (err) throw error(400, err);
-
     } else {
         if (body.start) {
-            const { err } = await Event.updateStart(query, auth, event, body.start);
+            const { err } = await Event.updateStart(
+                query,
+                auth,
+                event,
+                body.start
+            );
             if (err) throw error(400, err);
         }
 

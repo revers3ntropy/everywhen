@@ -14,7 +14,10 @@
     import type { Auth } from '../controllers/user';
     import { popup } from '../stores';
     import { api, apiPath } from '../utils/apiRequest';
-    import { displayNotifOnErr, SUCCESS_NOTIFICATION } from '../utils/notifications';
+    import {
+        displayNotifOnErr,
+        SUCCESS_NOTIFICATION
+    } from '../utils/notifications';
     import { obfuscate, rawMdToHtml } from '../utils/text';
     import AgentWidget from './AgentWidget.svelte';
     import Dot from './Dot.svelte';
@@ -29,8 +32,10 @@
     export let entry = '';
     export let created: number;
     export let createdTZOffset = 0;
-    export let label: LabelController | null | undefined =
-        undefined as LabelController | null | undefined;
+    export let label: LabelController | null | undefined = undefined as
+        | LabelController
+        | null
+        | undefined;
     export let latitude: number | null = null;
     export let longitude: number | null = null;
     export let deleted = false;
@@ -52,31 +57,38 @@
     $: if (showLabels && ((l): l is LabelController => !!l)(label)) {
         showLabel = {
             ...label,
-            name: obfuscated ? obfuscate(label.name) : label.name,
+            name: obfuscated ? obfuscate(label.name) : label.name
         };
     }
 
-    async function deleteSelf () {
-        if (!confirm(`Are you sure you want to ${deleted ? 'restore' : 'delete'} this entry?`)) {
+    async function deleteSelf() {
+        if (
+            !confirm(
+                `Are you sure you want to ${
+                    deleted ? 'restore' : 'delete'
+                } this entry?`
+            )
+        ) {
             return;
         }
 
-        displayNotifOnErr(addNotification,
+        displayNotifOnErr(
+            addNotification,
             await api.delete(auth, apiPath('/entries/?', id), {
-                restore: !!deleted,
-            }),
+                restore: !!deleted
+            })
         );
 
         if (isInDialog) popup.set(null);
 
         addNotification({
             ...SUCCESS_NOTIFICATION,
-            text: `Entry ${deleted ? 'restored' : 'deleted'}`,
+            text: `Entry ${deleted ? 'restored' : 'deleted'}`
         });
         dispatch('updated');
     }
 
-    function toggleObfuscation () {
+    function toggleObfuscation() {
         obfuscated = !obfuscated;
     }
 
@@ -85,7 +97,9 @@
     $: restoreDeleteTooltip = deleted ? 'Restore Entry' : 'Delete Entry';
 </script>
 
-<div class="entry {obfuscated ? '' : 'visible'} {isInDialog ? 'in-dialog' : ''}">
+<div
+    class="entry {obfuscated ? '' : 'visible'} {isInDialog ? 'in-dialog' : ''}"
+>
     <p class="mobile-title {obfuscated ? 'obfuscated' : ''}">
         {obfuscated ? obfuscate(title) : title}
     </p>
@@ -93,22 +107,22 @@
         <div class="flex-space-evenly">
             <span class="time">
                 <UtcTime
-                    fmt={showFullDate ? 'ddd DD-MM-YYYY h:mm A' : 'h:mm A'}
-                    timestamp={created}
+                    fmt="{showFullDate ? 'ddd DD-MM-YYYY h:mm A' : 'h:mm A'}"
+                    timestamp="{created}"
                     tooltipPosition="right"
-                    tzOffset={createdTZOffset}
+                    tzOffset="{createdTZOffset}"
                 />
             </span>
 
-            <AgentWidget data={agentData} />
+            <AgentWidget data="{agentData}" />
 
             {#if latitude && longitude && showLocations}
                 <LocationWidget
-                    {auth}
-                    entryId={id}
-                    {latitude}
-                    {longitude}
-                    {obfuscated}
+                    auth="{auth}"
+                    entryId="{id}"
+                    latitude="{latitude}"
+                    longitude="{longitude}"
+                    obfuscated="{obfuscated}"
                 />
             {/if}
 
@@ -123,7 +137,7 @@
             {/if}
 
             {#if showLabels}
-                <Label label={showLabel} obfuscated={obfuscated} />
+                <Label label="{showLabel}" obfuscated="{obfuscated}" />
             {/if}
         </div>
 
@@ -134,9 +148,9 @@
         <div class="flex-center">
             {#if !obfuscated && !isEdit}
                 <button
-                    on:click={deleteSelf}
-                    aria-label={deleted ? 'Restore' : 'Delete'}
-                    use:tooltip={{ content: restoreDeleteTooltip }}
+                    on:click="{deleteSelf}"
+                    aria-label="{deleted ? 'Restore' : 'Delete'}"
+                    use:tooltip="{{ content: restoreDeleteTooltip }}"
                 >
                     {#if deleted}
                         <Restore size="25" />
@@ -147,7 +161,7 @@
                 {#if !deleted}
                     <a
                         href="/journal/{id}/edit?obfuscate=0"
-                        use:tooltip={{ content: 'Edit Entry' }}
+                        use:tooltip="{{ content: 'Edit Entry' }}"
                     >
                         <NoteEditOutline size="25" />
                     </a>
@@ -155,8 +169,8 @@
             {/if}
 
             <button
-                aria-label={obfuscated ? 'Show entry' : 'Hide entry'}
-                on:click={toggleObfuscation}
+                aria-label="{obfuscated ? 'Show entry' : 'Hide entry'}"
+                on:click="{toggleObfuscation}"
             >
                 {#if obfuscated}
                     <Eye size="25" />
@@ -176,13 +190,14 @@
     @import '../../styles/variables';
 
     .entry {
-        padding: .8em 0;
+        padding: 0.8em 0;
         margin: 0;
         height: fit-content;
         white-space: pre-wrap;
         border: 1px solid transparent;
 
-        &, * {
+        &,
+        * {
             .font-dosis();
             font-size: 1.05rem;
         }
@@ -243,7 +258,7 @@
             max-width: 700px;
 
             @media @mobile {
-                margin: 0 .5rem;
+                margin: 0 0.5rem;
             }
 
             // inner <p> element is created when using @html
@@ -255,9 +270,10 @@
 
             // generated from markdown
 
-            :global(ul), :global(ol) {
+            :global(ul),
+            :global(ol) {
                 // ugh
-                margin: -2.5rem 0 -2.5rem .8rem;
+                margin: -2.5rem 0 -2.5rem 0.8rem;
                 padding: 0;
                 border: none;
 
@@ -272,8 +288,8 @@
                 border-collapse: collapse;
 
                 :global(tr) {
-
-                    :global(td), :global(th) {
+                    :global(td),
+                    :global(th) {
                         border: 1px solid @border;
 
                         margin: 0;
@@ -289,14 +305,14 @@
 
             :global(blockquote) {
                 border-left: 3px solid @accent-color-secondary;
-                margin: 0 0 0 .5em;
+                margin: 0 0 0 0.5em;
                 padding: 0 0 0 1em;
             }
         }
 
         .mobile-title {
             display: none;
-            margin: 2rem 0 -1.2rem .5rem;
+            margin: 2rem 0 -1.2rem 0.5rem;
             font-size: 1.1em;
             text-align: center;
 

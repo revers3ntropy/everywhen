@@ -7,16 +7,8 @@
 
 <footer>
     <div class="links-on-line">
-        <a
-            aria-label="about"
-            href="/about"
-        >
-            About
-        </a>
-        <a
-            aria-label="version history"
-            href="/about/history"
-        >
+        <a aria-label="about" href="/about"> About </a>
+        <a aria-label="version history" href="/about/history">
             v{version}
         </a>
         <a
@@ -72,12 +64,15 @@
         text-align: center;
 
         &.gh-link {
-            &, :global(svg), :global(svg *) {
+            &,
+            :global(svg),
+            :global(svg *) {
                 transition: @transition;
             }
 
             &:hover {
-                :global(svg), :global(svg *) {
+                :global(svg),
+                :global(svg *) {
                     fill: @accent-color-secondary;
                 }
             }

@@ -25,9 +25,9 @@
         {#each data.assets as asset}
             <Asset
                 {...asset}
-                auth={data}
-                on:delete={() => numAssets--}
-                obfuscated={$obfuscated}
+                auth="{data}"
+                on:delete="{() => numAssets--}"
+                obfuscated="{$obfuscated}"
             />
         {/each}
     </div>

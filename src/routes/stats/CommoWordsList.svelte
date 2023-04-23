@@ -1,5 +1,5 @@
 <script lang="ts">
-    export let words: [ string, number ][];
+    export let words: [string, number][];
     export let entryCount: number;
 </script>
 
@@ -7,10 +7,7 @@
     {#each words as [word, count], i}
         <div>#{i + 1}</div>
 
-        <a
-            href="/stats/{encodeURIComponent(word)}"
-            class="word"
-        >
+        <a href="/stats/{encodeURIComponent(word)}" class="word">
             {word}
         </a>
 
@@ -30,10 +27,10 @@
     @import '../../styles/variables';
 
     .common-words {
-        margin: .5em 0;
+        margin: 0.5em 0;
         display: grid;
         grid-template-columns: 3rem 1fr 4rem 8rem;
-        grid-row-gap: .3rem;
+        grid-row-gap: 0.3rem;
         max-width: 900px;
 
         @media @mobile {

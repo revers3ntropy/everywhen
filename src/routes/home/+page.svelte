@@ -8,27 +8,38 @@
     import EntryTitles from '../../lib/components/EntryTitles.svelte';
     import type { Entry } from '../../lib/controllers/entry';
     import { obfuscated } from '../../lib/stores.js';
-    import { currentTzOffset, dayUtcFromTimestamp, fmtUtc, nowS } from '../../lib/utils/time';
+    import {
+        currentTzOffset,
+        dayUtcFromTimestamp,
+        fmtUtc,
+        nowS
+    } from '../../lib/utils/time';
 
     export let data: App.PageData & {
-        titles: Record<number, Entry[]>,
-        entries: Entry[],
+        titles: Record<number, Entry[]>;
+        entries: Entry[];
     };
 
-    onMount(() => document.title = `Home`);
+    onMount(() => (document.title = `Home`));
 
-    function entriesYearsAgoToday (
-        entries: Entry[],
-    ): Record<string, Entry[]> {
+    function entriesYearsAgoToday(entries: Entry[]): Record<string, Entry[]> {
         const res: Record<string, Entry[]> = {};
         const nowDate = fmtUtc(nowS(), currentTzOffset(), 'MM-DD');
         const nowYear = fmtUtc(nowS(), currentTzOffset(), 'YYYY');
 
         for (const entry of entries) {
-            const entryDate = fmtUtc(entry.created, entry.createdTZOffset, 'MM-DD');
+            const entryDate = fmtUtc(
+                entry.created,
+                entry.createdTZOffset,
+                'MM-DD'
+            );
             // entries on the same day and month, but not this year
             if (entryDate === nowDate) {
-                const entryYear = fmtUtc(entry.created, entry.createdTZOffset, 'YYYY');
+                const entryYear = fmtUtc(
+                    entry.created,
+                    entry.createdTZOffset,
+                    'YYYY'
+                );
                 if (entryYear !== nowYear) {
                     const yearsAgo = parseInt(nowYear) - parseInt(entryYear);
                     if (!res[yearsAgo]) {
@@ -67,17 +78,18 @@
         <section>
             <h1>Recent Entries</h1>
             <EntryTitles
-                auth={data}
-                titles={data.titles}
-                obfuscated={$obfuscated}
+                auth="{data}"
+                titles="{data.titles}"
+                obfuscated="{$obfuscated}"
             />
         </section>
     {:else}
         <section>
             <h1 class="recent-entries">Recent Entries</h1>
             <p class="recent-entries-text">
-                Doesn't look like you have any entries yet,
-                why not <a href="/journal?obfuscate=0">write one</a>?
+                Doesn't look like you have any entries yet, why not <a
+                    href="/journal?obfuscate=0">write one</a
+                >?
             </p>
         </section>
     {/if}
@@ -87,15 +99,15 @@
                 {yearsAgo === '1' ? `A Year` : `${yearsAgo} Years`} Ago Today
             </h1>
             <EntryTitles
-                titles={{
+                titles="{{
                     [dayUtcFromTimestamp(
                         titles[0].created,
-                         titles[0].createdTZOffset
+                        titles[0].createdTZOffset
                     )]: titles
-                }}
-                obfuscated={$obfuscated}
-                showTimeAgo={false}
-                auth={data}
+                }}"
+                obfuscated="{$obfuscated}"
+                showTimeAgo="{false}"
+                auth="{data}"
             />
         </section>
     {/each}
@@ -114,7 +126,8 @@
             flex-direction: column;
         }
 
-        a, button {
+        a,
+        button {
             display: grid;
             align-items: center;
             justify-content: space-between;
@@ -131,7 +144,6 @@
             }
 
             &:not(.primary) {
-
                 border-radius: @border-radius;
                 border: 1px solid @light-accent;
 
@@ -171,7 +183,6 @@
     }
 
     .recent-entries-text {
-        margin: .5rem;
+        margin: 0.5rem;
     }
-
 </style>

@@ -10,7 +10,7 @@ import { getUnwrappedReqBody } from '../../../lib/utils/requestBody';
 import { nowS } from '../../../lib/utils/time';
 import type { RequestHandler } from './$types';
 
-export const GET = cachedApiRoute((async (auth, { url }) => {
+export const GET = cachedApiRoute(async (auth, { url }) => {
     const pageSize = parseInt(url.searchParams.get('pageSize') || '50');
     const page = parseInt(url.searchParams.get('page') || '0');
     const deleted = GETParamIsTruthy(url.searchParams.get('deleted'));
@@ -20,61 +20,64 @@ export const GET = cachedApiRoute((async (auth, { url }) => {
     if (page < 0) throw error(400, 'Invalid page number');
     if (!pageSize || pageSize < 0) throw error(400, 'Invalid page size');
 
-    const { val, err } = await Entry.getPage(
-        query, auth,
-        page, pageSize,
-        { deleted, labelId, search, locationId },
-    );
+    const { val, err } = await Entry.getPage(query, auth, page, pageSize, {
+        deleted,
+        labelId,
+        search,
+        locationId
+    });
     if (err) throw error(400, err);
-    const [ entries, numEntries ] = val;
+    const [entries, numEntries] = val;
 
     return {
         entries,
         page,
         pageSize,
         totalPages: Math.ceil(numEntries / pageSize),
-        totalEntries: numEntries,
+        totalEntries: numEntries
     };
-})) satisfies RequestHandler;
+}) satisfies RequestHandler;
 
 export const POST = (async ({ request, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
-    const body = await getUnwrappedReqBody(request, {
-        created: 'number',
-        latitude: 'number',
-        longitude: 'number',
-        title: 'string',
-        entry: 'string',
-        label: 'string',
-        timezoneUtcOffset: 'number',
-        agentData: 'string',
-    }, {
-        title: '',
-        label: '',
-        latitude: 0,
-        longitude: 0,
-        created: nowS(),
-        timezoneUtcOffset: 0,
-        agentData: '',
-    });
+    const body = await getUnwrappedReqBody(
+        request,
+        {
+            created: 'number',
+            latitude: 'number',
+            longitude: 'number',
+            title: 'string',
+            entry: 'string',
+            label: 'string',
+            timezoneUtcOffset: 'number',
+            agentData: 'string'
+        },
+        {
+            title: '',
+            label: '',
+            latitude: 0,
+            longitude: 0,
+            created: nowS(),
+            timezoneUtcOffset: 0,
+            agentData: ''
+        }
+    );
 
     if (body.label) {
-        if (!await Label.userHasLabelWithId(query, auth, body.label)) {
+        if (!(await Label.userHasLabelWithId(query, auth, body.label))) {
             throw error(400, `Label doesn't exist`);
         }
     }
 
-    const { val: entry, err } = await Entry.create(
-        query, auth, {
-            ...body,
-            latitude: body.latitude || null,
-            longitude: body.longitude || null,
-            // timezoneUtcOffset is automatically added to every req
-            createdTZOffset: body.timezoneUtcOffset,
-        },
-    );
+    const { val: entry, err } = await Entry.create(query, auth, {
+        ...body,
+        latitude: body.latitude || null,
+        longitude: body.longitude || null,
+        // timezoneUtcOffset is automatically added to every req
+        createdTZOffset: body.timezoneUtcOffset
+    });
     if (err) throw error(400, err);
 
     return apiResponse({ id: entry.id });

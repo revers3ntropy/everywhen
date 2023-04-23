@@ -6,7 +6,12 @@
     import type { Auth } from '../../lib/controllers/user';
     import { api } from '../../lib/utils/apiRequest';
     import { displayNotifOnErr } from '../../lib/utils/notifications.js';
-    import { currentTzOffset, fmtDuration, fmtUtc, nowS } from '../../lib/utils/time.js';
+    import {
+        currentTzOffset,
+        fmtDuration,
+        fmtUtc,
+        nowS
+    } from '../../lib/utils/time.js';
 
     const { addNotification } = getNotificationsContext();
 
@@ -41,23 +46,24 @@
             throw new Error(`Unknown input type: ${key}`);
     }
 
-    async function updateValue (newValue: string | number | boolean) {
+    async function updateValue(newValue: string | number | boolean) {
         saving = true;
 
         value = newValue;
         created = nowS();
 
-        displayNotifOnErr(addNotification,
+        displayNotifOnErr(
+            addNotification,
             await api.put(auth, '/settings', {
                 key,
-                value: newValue,
-            }),
+                value: newValue
+            })
         );
 
         saving = false;
     }
 
-    async function onInput (event: Event) {
+    async function onInput(event: Event) {
         let target = event.target as HTMLInputElement;
         let newValue: boolean | string | number = target.value;
         if (type === 'boolean') {
@@ -77,12 +83,9 @@
             <div>
                 <h3>
                     {#if saving}
-                        <Sync
-                            size={20}
-                            class="gradient-icon"
-                        />
+                        <Sync size="{20}" class="gradient-icon" />
                     {:else}
-                        <CloudCheckOutline size={20} />
+                        <CloudCheckOutline size="{20}" />
                     {/if}
                     {name}
                 </h3>
@@ -91,9 +94,13 @@
             {#if created}
                 <p
                     class="last-updated hide-mobile"
-                    use:tooltip={{
-                        content: fmtUtc(created, currentTzOffset(), 'DD/MM/YYYY h:mm A')
-                    }}
+                    use:tooltip="{{
+                        content: fmtUtc(
+                            created,
+                            currentTzOffset(),
+                            'DD/MM/YYYY h:mm A'
+                        )
+                    }}"
                 >
                     Last updated
                     {fmtDuration(nowS() - created)}
@@ -102,7 +109,7 @@
             {/if}
             {#if value !== defaultValue}
                 <p class="restore hide-mobile">
-                    <button on:click={() => updateValue(defaultValue)}>
+                    <button on:click="{() => updateValue(defaultValue)}">
                         Restore default ({JSON.stringify(defaultValue)})
                     </button>
                 </p>
@@ -113,11 +120,11 @@
     <div class="right">
         <label class="label-for-{inputType}">
             <input
-                checked={inputType === 'checkbox' && !!value}
+                checked="{inputType === 'checkbox' && !!value}"
                 class="text-box"
-                on:change={onInput}
-                type={inputType}
-                value={value}
+                on:change="{onInput}"
+                type="{inputType}"
+                value="{value}"
             />
             <span class="checkmark"></span>
             {unit}
@@ -138,7 +145,8 @@
             display: block;
         }
 
-        .left, .right {
+        .left,
+        .right {
             margin: 0.5em;
 
             @media @mobile {
@@ -192,7 +200,7 @@
         }
 
         & .checkmark:after {
-            content: "";
+            content: '';
             position: absolute;
             display: none;
             left: 9px;
@@ -212,14 +220,14 @@
     }
 
     input {
-        margin: 0 0 .5rem 0;
+        margin: 0 0 0.5rem 0;
         border-radius: @border-radius;
 
         @media @mobile {
             margin-top: 0.5rem;
         }
 
-        &:not([type="text"]) {
+        &:not([type='text']) {
             cursor: pointer;
         }
     }
@@ -234,7 +242,7 @@
         width: fit-content;
         display: flex;
         flex-direction: row;
-        margin: .1em 0;
+        margin: 0.1em 0;
 
         @media @mobile {
             flex-direction: column;
@@ -242,7 +250,7 @@
 
         & > * {
             padding: 0 1em;
-            margin: .3em 0;
+            margin: 0.3em 0;
             border-right: 1px solid @border;
             text-align: center;
             display: grid;
@@ -275,7 +283,7 @@
             color: @accent-color-primary;
 
             &:hover {
-                color: @accent-color-secondary
+                color: @accent-color-secondary;
             }
         }
     }
