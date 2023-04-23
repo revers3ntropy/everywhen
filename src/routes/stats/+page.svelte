@@ -89,7 +89,7 @@
                 />
                 <StatPill
                     value={(data.entryCount / Math.max(data.days / 7, 1)).toFixed(1)}
-                    label="words / week"
+                    label="entries / week"
                 />
             </div>
         </section>
