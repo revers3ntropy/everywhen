@@ -7,32 +7,31 @@ import type { Auth } from './user';
 import { UUID } from './uuid';
 
 export class Asset {
+    public static readonly fileExtToContentType: Readonly<
+        Record<string, string>
+    > = Object.freeze({
+        png: 'image/png',
+        jpg: 'image/jpeg',
+        jpeg: 'image/jpeg'
+    });
 
-    public static readonly fileExtToContentType: Readonly<Record<string, string>> =
-        Object.freeze({
-            'png': 'image/png',
-            'jpg': 'image/jpeg',
-            'jpeg': 'image/jpeg',
-        });
-
-    public constructor (
+    public constructor(
         public id: string,
         public publicId: string,
         public content: string,
         public fileName: string,
         public contentType: string,
-        public created: number,
-    ) {
-    }
+        public created: number
+    ) {}
 
-    public static async create (
+    public static async create(
         query: QueryFunc,
         auth: Auth,
         fileNamePlainText: string,
         contentsPlainText: string,
         created?: number,
-        publicId?: string,
-    ): Promise<Result<string>> {
+        publicId?: string
+    ): P,romise<Result<string>> {
         publicId ??= await UUID.generateUUId(query);
         const id = await UUID.generateUUId(query);
         const fileExt = fileNamePlainText.split('.').pop();
@@ -41,20 +40,23 @@ export class Asset {
         }
         const contentType = Asset.fileExtToContentType[fileExt.toLowerCase()];
         if (!contentType) {
-            return Result.err('Unsupported file type. Supported are ' +
-                Object.keys(Asset.fileExtToContentType).join(', ') + '.');
+            return Result.err(
+                'Unsupported file type. Supported are ' +
+                    Object.keys(Asset.fileExtToContentType).join(', ') +
+                    '.',
+            );
         }
 
-        const {
-            err: contentsErr,
-            val: encryptedContents,
-        } = encrypt(contentsPlainText, auth.key);
+        const { err: contentsErr, val: encryptedContents } = encrypt(
+            contentsPlainText,
+            auth.key,
+        );
         if (contentsErr) return Result.err(contentsErr);
 
-        const {
-            err: fileNameErr,
-            val: encryptedFileName,
-        } = encrypt(fileNamePlainText, auth.key);
+        const { err: fileNameErr, val: encryptedFileName } = encrypt(
+            fileNamePlainText,
+            auth.key,
+        );
         if (fileNameErr) return Result.err(fileNameErr);
 
         await query`
@@ -72,12 +74,11 @@ export class Asset {
         return Result.ok(publicId);
     }
 
-    public static async fromPublicId (
+    public static async fromPublicId(
         query: QueryFunc,
         auth: Auth,
-        publicId: string,
+        publicId: string
     ): Promise<Result<Asset>> {
-
         const res = await query<Asset[]>`
             SELECT id,
                    publicId,
@@ -94,27 +95,35 @@ export class Asset {
             return Result.err('Asset not found');
         }
 
-        const [ row ] = res;
+        const [row] = res;
 
-        const { err: contentsErr, val: contents } = decrypt(row.content, auth.key);
+        const { err: contentsErr, val: contents } = decrypt(
+            row.content,
+            auth.key
+        );
         if (contentsErr) return Result.err(contentsErr);
 
-        const { err: fileNameErr, val: fileName } = decrypt(row.fileName, auth.key);
+        const { err: fileNameErr, val: fileName } = decrypt(
+            row.fileName,
+            auth.key
+        );
         if (fileNameErr) return Result.err(fileNameErr);
 
-        return Result.ok(new Asset(
-            row.id,
-            row.publicId,
-            contents,
-            fileName,
-            row.contentType,
-            row.created,
-        ));
+        return Result.ok(
+            new Asset(
+                row.id,
+                row.publicId,
+                contents,
+                fileName,
+                row.contentType,
+                row.created
+            )
+        );
     }
 
-    public static async all (
+    public static async all(
         query: QueryFunc,
-        auth: Auth,
+        auth: Auth
     ): Promise<Result<Asset[]>> {
         const res = await query<Asset[]>`
             SELECT id,
@@ -127,27 +136,37 @@ export class Asset {
             WHERE user = ${auth.id}
         `;
 
-        return Result.collect(res.map(row => {
-            const { err: contentErr, val: content } = decrypt(row.content, auth.key);
-            if (contentErr) return Result.err(contentErr);
+        return Result.collect(
+            res.map(row => {
+                const { err: contentErr, val: content } = decrypt(
+                    row.content,
+                    auth.key
+                );
+                if (contentErr) return Result.err(contentErr);
 
-            const { err: fileNameErr, val: fileName } = decrypt(row.fileName, auth.key);
-            if (fileNameErr) return Result.err(fileNameErr);
+                const { err: fileNameErr, val: fileName } = decrypt(
+                    row.fileName,
+                    auth.key
+                );
+                if (fileNameErr) return Result.err(fileNameErr);
 
-            return Result.ok(new Asset(
-                row.id,
-                row.publicId,
-                content,
-                fileName,
-                row.contentType,
-                row.created,
-            ));
-        }));
+                return Result.ok(
+                    new Asset(
+                        row.id,
+                        row.publicId,
+                        content,
+                        fileName,
+                        row.contentType,
+                        row.created
+                    )
+                );
+            })
+        );
     }
 
-    public static async allMetadata (
+    public static async allMetadata(
         query: QueryFunc,
-        auth: Auth,
+        auth: Auth
     ): Promise<Result<Omit<Asset, 'content'>[]>> {
         const res = await query<Omit<Asset, 'content'>[]>`
             SELECT id,
@@ -159,22 +178,29 @@ export class Asset {
             WHERE user = ${auth.id}
         `;
 
-        return Result.collect(res.map(row => {
-            const { err: fileNameErr, val: fileName } = decrypt(row.fileName, auth.key);
-            if (fileNameErr) return Result.err(fileNameErr);
+        return Result.collect(
+            res.map(row => {
+                const { err: fileNameErr, val: fileName } = decrypt(
+                    row.fileName,
+                    auth.key
+                );
+                if (fileNameErr) return Result.err(fileNameErr);
 
-            return Result.ok(new Asset(
-                row.id,
-                row.publicId,
-                undefined as unknown as string,
-                fileName,
-                row.contentType,
-                row.created,
-            ));
-        }));
+                return Result.ok(
+                    new Asset(
+                        row.id,
+                        row.publicId,
+                        undefined as unknown as string,
+                        fileName,
+                        row.contentType,
+                        row.created
+                    )
+                );
+            })
+        );
     }
 
-    public static async purgeAll (query: QueryFunc, auth: Auth): Promise<void> {
+    public static async purgeAll(query: QueryFunc, auth: Auth): Promise<void> {
         await query`
             DELETE
             FROM assets
@@ -182,10 +208,10 @@ export class Asset {
         `;
     }
 
-    public static async purgeWithPublicId (
+    public static async purgeWithPublicId(
         query: QueryFunc,
         auth: Auth,
-        publicId: string,
+        publicId: string
     ): Promise<Result> {
         const res = await query<ResultSetHeader>`
             DELETE
@@ -200,10 +226,9 @@ export class Asset {
         return Result.ok(null);
     }
 
-    public static jsonIsRawAsset (
-        json: unknown,
-    ): json is Omit<Asset, 'id'> {
-        return typeof json === 'object' &&
+    public static jsonIsRawAsset(json: unknown): json is Omit<Asset, 'id'> {
+        return (
+            typeof json === 'object' &&
             json !== null &&
             'publicId' in json &&
             typeof json.publicId === 'string' &&
@@ -214,10 +239,11 @@ export class Asset {
             'contentType' in json &&
             typeof json.contentType === 'string' &&
             'created' in json &&
-            typeof json.created === 'number';
+            typeof json.created === 'number'
+        );
     }
 
-    public static markDownLink (fileName: string, publicId: string): string {
+    public static markDownLink(fileName: string, publicId: string): string {
         return `![${fileName}](/api/assets/${publicId})`;
     }
 }

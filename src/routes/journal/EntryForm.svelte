@@ -1,314 +1,17 @@
-<script lang="ts">
-    import { browser } from '$app/environment';
-    import { beforeNavigate } from '$app/navigation';
-    import { tooltip } from '@svelte-plugins/tooltips';
-    import { filedrop, type FileDropOptions, type Files } from 'filedrop-svelte';
-    import { createEventDispatcher, onMount } from 'svelte';
-    import Eye from 'svelte-material-icons/Eye.svelte';
-    import EyeOff from 'svelte-material-icons/EyeOff.svelte';
-    import ImageArea from 'svelte-material-icons/ImageArea.svelte';
-    import Send from 'svelte-material-icons/Send.svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
-    import LabelSelect from '../../lib/components/LabelSelect.svelte';
-    import { LS_KEY, MAX_IMAGE_SIZE } from '../../lib/constants';
-    import { Asset } from '../../lib/controllers/asset';
-    import type { Entry } from '../../lib/controllers/entry';
-    import type { Label } from '../../lib/controllers/label';
-    import type { Auth } from '../../lib/controllers/user';
-    import { enabledLocation } from '../../lib/stores.js';
-    import { api, apiPath } from '../../lib/utils/apiRequest';
-    import { getFileContents } from '../../lib/utils/files';
-    import { getLocation } from '../../lib/utils/geolocation';
-    import { displayNotifOnErr, ERR_NOTIFICATION, SUCCESS_NOTIFICATION } from '../../lib/utils/notifications';
-    import { obfuscate } from '../../lib/utils/text';
-    import { nowS } from '../../lib/utils/time';
-    import LocationToggle from './LocationToggle.svelte';
-
-    const { addNotification } = getNotificationsContext();
-    const dispatch = createEventDispatcher();
-
-    let mounted = false;
-
-    // as this form is used in entry editing and creating
-    export let action: 'create' | 'edit' = 'create';
-
-    export let entry: Entry | null = null;
-    if (entry && action !== 'edit') {
-        throw new Error('eventID can only be set when action is edit');
-    }
-
-    export let loadFromLS = true;
-
-    export let newEntryTitle = '';
-    export let newEntryBody = '';
-    export let newEntryLabel = '';
-
-    export let auth: Auth;
-    export let obfuscated = true;
-
-    let newEntryInputElement: HTMLTextAreaElement;
-
-    export function reset () {
-        newEntryTitle = '';
-        newEntryBody = '';
-        newEntryLabel = '';
-    }
-
-    $: if (mounted && browser && loadFromLS) {
-        // be reactive on these
-        [ newEntryTitle, newEntryBody, newEntryLabel ];
-        saveToLS();
-    }
-
-    function saveToLS () {
-        if (loadFromLS) {
-            localStorage.setItem(LS_KEY.newEntryTitle, newEntryTitle);
-            localStorage.setItem(LS_KEY.newEntryBody, newEntryBody);
-            localStorage.setItem(LS_KEY.newEntryLabel, newEntryLabel);
-        }
-    }
-
-    onMount(() => {
-        if (loadFromLS) {
-            newEntryTitle = localStorage.getItem(LS_KEY.newEntryTitle) || '';
-            newEntryBody = localStorage.getItem(LS_KEY.newEntryBody) || '';
-            newEntryLabel = localStorage.getItem(LS_KEY.newEntryLabel) || '';
-
-            if (!newEntryBody && !newEntryLabel && !newEntryTitle) {
-                obfuscated = false;
-            }
-        }
-        mounted = true;
-    });
-
-    function serializeAgentData (): string {
-        return JSON.stringify({
-            userAgent: navigator.userAgent,
-            language: navigator.language,
-            appVersion: navigator.appVersion,
-            platform: navigator.platform,
-        });
-    }
-
-    function areUnsavedChanges () {
-        if (entry && !loadFromLS) {
-            // check for unsaved changes
-            if (entry.title !== newEntryTitle
-                || entry.entry !== newEntryBody
-                || ((entry.label?.id || '') !== newEntryLabel)
-            ) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * @src https://stackoverflow.com/questions/11076975
-     */
-    function insertAtCursor (
-        input: HTMLInputElement | HTMLTextAreaElement,
-        text: string,
-    ) {
-        if (input.selectionStart || input.selectionStart === 0) {
-            const startPos = input.selectionStart ?? undefined;
-            const endPos = input.selectionEnd ?? 0;
-            input.value = input.value.substring(0, startPos)
-                + text
-                + input.value.substring(endPos, input.value.length);
-            // restore cursor to after inserted text
-            input.selectionStart = startPos + text.length;
-            input.selectionEnd = startPos + text.length;
-        } else {
-            input.value += text;
-        }
-
-        newEntryBody = input.value;
-    }
-
-    let submitted = false;
-
-    beforeNavigate(({ cancel }) => {
-        // would save to LS here, except sometimes we want to navigate away
-        // after editing something in LS, for example making 'Dream' entry from navbar
-        // in which case saving would override anything we set there.
-        // Should be fine, as we always save whenever the local variables which store the form
-        // contents are changed.
-
-        if (!submitted && areUnsavedChanges()) {
-            if (!confirm('You have unsaved changes, are you sure you want to leave?')) {
-                cancel();
-            }
-        }
-    });
-
-    async function submit () {
-        submitted = true;
-
-        const currentLocation = $enabledLocation
-            ? await getLocation(addNotification)
-            : [ null, null ];
-
-        const body = {
-            title: newEntryTitle,
-            entry: newEntryBody,
-            label: newEntryLabel,
-            latitude: currentLocation[0],
-            longitude: currentLocation[1],
-            created: nowS(),
-            agentData: serializeAgentData(),
-        };
-
-        let res;
-        switch (action) {
-            case 'create':
-                res = displayNotifOnErr(addNotification,
-                    await api.post(auth, '/entries', body),
-                );
-                submitted = false;
-                if (res.id) {
-                    // make really sure it's saved before resetting
-                    reset();
-                } else {
-                    console.error(res);
-                    addNotification({
-                        ...ERR_NOTIFICATION,
-                        text: `Failed to create entry: ${JSON.stringify(res)}`,
-                    });
-                }
-                addNotification({
-                    ...SUCCESS_NOTIFICATION,
-                    removeAfter: 1000,
-                    text: `Entry created`,
-                });
-                break;
-            case 'edit':
-                if (!entry) throw new Error('entry must be set when action is edit');
-                if (!areUnsavedChanges()) {
-                    if (!confirm('No changes have been made, are you sure you want to edit this entry?')) {
-                        return;
-                    }
-                }
-                res = displayNotifOnErr(addNotification,
-                    await api.put(auth, apiPath('/entries/?', entry.id), body),
-                );
-                location.assign(`/journal/${entry.id}?obfuscate=0`);
-                break;
-            default:
-                throw new Error(`Unknown action: ${action as string}`);
-        }
-
-        dispatch('updated');
-    }
-
-    const fileOptions: FileDropOptions = {
-        fileLimit: 1,
-        windowDrop: false,
-        hideInput: true,
-        clickToUpload: false,
-        tabIndex: -1,
-        multiple: false,
-        accept: 'image/*',
-        id: 'entry-file-drop',
-    };
-
-    async function onFileDrop (e: CustomEvent<{ files: Files }>) {
-        const files = e.detail.files;
-        if (files.rejected.length > 0) {
-            addNotification({
-                ...ERR_NOTIFICATION,
-                text: 'File could not be read, please try again',
-            });
-            return;
-        }
-        if (files.accepted.length < 1) return;
-        if (files.accepted.length !== 1) {
-            addNotification({
-                ...ERR_NOTIFICATION,
-                text: 'Please select exactly one file',
-            });
-            return;
-        }
-        const file = files.accepted[0];
-        const content = displayNotifOnErr(addNotification,
-            await getFileContents(file, 'b64'),
-        );
-
-        if (!content) return;
-        if (content.length > MAX_IMAGE_SIZE) {
-            addNotification({
-                ...ERR_NOTIFICATION,
-                text: 'File too large',
-            });
-            return;
-        }
-
-        const { id } = displayNotifOnErr(addNotification,
-            await api.post(auth, '/assets', {
-                fileName: file.name,
-                content,
-            }),
-        );
-
-        // insert markdown to link to image
-        insertAtCursor(newEntryInputElement, `\n${Asset.markDownLink(file.name, id)}\n`);
-    }
-
-    async function stopSpaceAndEnterBeingInterceptedByFileDrop () {
-        // TODO do this properly
-        while (!document.getElementsByClassName('entry-file-drop')) {
-            await new Promise(r => setTimeout(r, 100));
-        }
-        // https://stackoverflow.com/questions/19469881
-        document.getElementsByClassName('entry-file-drop')[0]
-            .addEventListener('keydown', (event: Event) => {
-                const e = event as KeyboardEvent;
-                // same check as lib uses
-                if (e.key === ' ' || e.key === 'Enter') {
-                    e.stopImmediatePropagation();
-                }
-            }, true);
-    }
-
-    function triggerFileDrop () {
-        // bit hacky... TODO make less hacky
-        (document.querySelector('.entry-file-drop > input') as HTMLInputElement)
-            .click();
-    }
-
-    let labels: Label[] | null = null;
-
-    async function loadLabels () {
-        const labelsRes = displayNotifOnErr(addNotification,
-            await api.get(auth, '/labels'),
-        );
-        labels = labelsRes.labels;
-    }
-
-    function handleEntryInputKeydown (event: KeyboardEvent) {
-        if (event.key !== 'Tab') return;
-        event.preventDefault();
-        insertAtCursor(newEntryInputElement, '\t');
-    }
-
-    onMount(async () => {
-        await Promise.all([
-            loadLabels(),
-            stopSpaceAndEnterBeingInterceptedByFileDrop(),
-        ]);
-    });
-</script>
+<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgeyBicm93c2VyIH0gZnJvbSAnJGFwcC9lbnZpcm9ubWVudCc7CiAgICBpbXBvcnQgeyBiZWZvcmVOYXZpZ2F0ZSB9IGZyb20gJyRhcHAvbmF2aWdhdGlvbic7CiAgICBpbXBvcnQgeyB0b29sdGlwIH0gZnJvbSAnQHN2ZWx0ZS1wbHVnaW5zL3Rvb2x0aXBzJzsKICAgIGltcG9ydCB7CiAgICAgICAgZmlsZWRyb3AsCiAgICAgICAgdHlwZSBGaWxlRHJvcE9wdGlvbnMsCiAgICAgICAgdHlwZSBGaWxlcywKICAgIH0gZnJvbSAnZmlsZWRyb3Atc3ZlbHRlJzsKICAgIGltcG9ydCB7IGNyZWF0ZUV2ZW50RGlzcGF0Y2hlciwgb25Nb3VudCB9IGZyb20gJ3N2ZWx0ZSc7CiAgICBpbXBvcnQgRXllIGZyb20gJ3N2ZWx0ZS1tYXRlcmlhbC1pY29ucy9FeWUuc3ZlbHRlJzsKICAgIGltcG9ydCBFeWVPZmYgZnJvbSAnc3ZlbHRlLW1hdGVyaWFsLWljb25zL0V5ZU9mZi5zdmVsdGUnOwogICAgaW1wb3J0IEltYWdlQXJlYSBmcm9tICdzdmVsdGUtbWF0ZXJpYWwtaWNvbnMvSW1hZ2VBcmVhLnN2ZWx0ZSc7CiAgICBpbXBvcnQgU2VuZCBmcm9tICdzdmVsdGUtbWF0ZXJpYWwtaWNvbnMvU2VuZC5zdmVsdGUnOwogICAgaW1wb3J0IHsgZ2V0Tm90aWZpY2F0aW9uc0NvbnRleHQgfSBmcm9tICdzdmVsdGUtbm90aWZpY2F0aW9ucyc7CiAgICBpbXBvcnQgTGFiZWxTZWxlY3QgZnJvbSAnLi4vLi4vbGliL2NvbXBvbmVudHMvTGFiZWxTZWxlY3Quc3ZlbHRlJzsKICAgIGltcG9ydCB7IExTX0tFWSwgTUFYX0lNQUdFX1NJWkUgfSBmcm9tICcuLi8uLi9saWIvY29uc3RhbnRzJzsKICAgIGltcG9ydCB7IEFzc2V0IH0gZnJvbSAnLi4vLi4vbGliL2NvbnRyb2xsZXJzL2Fzc2V0JzsKICAgIGltcG9ydCB0eXBlIHsgRW50cnkgfSBmcm9tICcuLi8uLi9saWIvY29udHJvbGxlcnMvZW50cnknOwogICAgaW1wb3J0IHR5cGUgeyBMYWJlbCB9IGZyb20gJy4uLy4uL2xpYi9jb250cm9sbGVycy9sYWJlbCc7CiAgICBpbXBvcnQgdHlwZSB7IEF1dGggfSBmcm9tICcuLi8uLi9saWIvY29udHJvbGxlcnMvdXNlcic7CiAgICBpbXBvcnQgeyBlbmFibGVkTG9jYXRpb24gfSBmcm9tICcuLi8uLi9saWIvc3RvcmVzLmpzJzsKICAgIGltcG9ydCB7IGFwaSwgYXBpUGF0aCB9IGZyb20gJy4uLy4uL2xpYi91dGlscy9hcGlSZXF1ZXN0JzsKICAgIGltcG9ydCB7IGdldEZpbGVDb250ZW50cyB9IGZyb20gJy4uLy4uL2xpYi91dGlscy9maWxlcyc7CiAgICBpbXBvcnQgeyBnZXRMb2NhdGlvbiB9IGZyb20gJy4uLy4uL2xpYi91dGlscy9nZW9sb2NhdGlvbic7CiAgICBpbXBvcnQgewogICAgICAgIGRpc3BsYXlOb3RpZk9uRXJyLAogICAgICAgIEVSUl9OT1RJRklDQVRJT04sCiAgICAgICAgU1VDQ0VTU19OT1RJRklDQVRJT04sCiAgICB9IGZyb20gJy4uLy4uL2xpYi91dGlscy9ub3RpZmljYXRpb25zJzsKICAgIGltcG9ydCB7IG9iZnVzY2F0ZSB9IGZyb20gJy4uLy4uL2xpYi91dGlscy90ZXh0JzsKICAgIGltcG9ydCB7IG5vd1MgfSBmcm9tICcuLi8uLi9saWIvdXRpbHMvdGltZSc7CiAgICBpbXBvcnQgTG9jYXRpb25Ub2dnbGUgZnJvbSAnLi9Mb2NhdGlvblRvZ2dsZS5zdmVsdGUnOwoKICAgIGNvbnN0IHsgYWRkTm90aWZpY2F0aW9uIH0gPSBnZXROb3RpZmljYXRpb25zQ29udGV4dCgpOwogICAgY29uc3QgZGlzcGF0Y2ggPSBjcmVhdGVFdmVudERpc3BhdGNoZXIoKTsKCiAgICBsZXQgbW91bnRlZCA9IGZhbHNlOwoKICAgIC8vIGFzIHRoaXMgZm9ybSBpcyB1c2VkIGluIGVudHJ5IGVkaXRpbmcgYW5kIGNyZWF0aW5nCiAgICBleHBvcnQgbGV0IGFjdGlvbjogJ2NyZWF0ZScgfCAnZWRpdCcgPSAnY3JlYXRlJzsKCiAgICBleHBvcnQgbGV0IGVudHJ5OiBFbnRyeSB8IG51bGwgPSBudWxsOwogICAgaWYgKGVudHJ5ICYmIGFjdGlvbiAhPT0gJ2VkaXQnKSB7CiAgICAgICAgdGhyb3cgbmV3IEVycm9yKCdldmVudElEIGNhbiBvbmx5IGJlIHNldCB3aGVuIGFjdGlvbiBpcyBlZGl0Jyk7CiAgICB9CgogICAgZXhwb3J0IGxldCBsb2FkRnJvbUxTID0gdHJ1ZTsKCiAgICBleHBvcnQgbGV0IG5ld0VudHJ5VGl0bGUgPSAnJzsKICAgIGV4cG9ydCBsZXQgbmV3RW50cnlCb2R5ID0gJyc7CiAgICBleHBvcnQgbGV0IG5ld0VudHJ5TGFiZWwgPSAnJzsKCiAgICBleHBvcnQgbGV0IGF1dGg6IEF1dGg7CiAgICBleHBvcnQgbGV0IG9iZnVzY2F0ZWQgPSB0cnVlOwoKICAgIGxldCBuZXdFbnRyeUlucHV0RWxlbWVudDogSFRNTFRleHRBcmVhRWxlbWVudDsKCiAgICBleHBvcnQgZnVuY3Rpb24gcmVzZXQgKCkgewogICAgICAgIG5ld0VudHJ5VGl0bGUgPSAnJzsKICAgICAgICBuZXdFbnRyeUJvZHkgPSAnJzsKICAgICAgICBuZXdFbnRyeUxhYmVsID0gJyc7CiAgICB9CgogICAgJDogaWYgKG1vdW50ZWQgJiYgYnJvd3NlciAmJiBsb2FkRnJvbUxTKSB7CiAgICAgICAgLy8gYmUgcmVhY3RpdmUgb24gdGhlc2UKICAgICAgICBbIG5ld0VudHJ5VGl0bGUsIG5ld0VudHJ5Qm9keSwgbmV3RW50cnlMYWJlbCBdOwogICAgICAgIHNhdmVUb0xTKCk7CiAgICB9CgogICAgZnVuY3Rpb24gc2F2ZVRvTFMgKCkgewogICAgICAgIGlmIChsb2FkRnJvbUxTKSB7CiAgICAgICAgICAgIGxvY2FsU3RvcmFnZS5zZXRJdGVtKExTX0tFWS5uZXdFbnRyeVRpdGxlLCBuZXdFbnRyeVRpdGxlKTsKICAgICAgICAgICAgbG9jYWxTdG9yYWdlLnNldEl0ZW0oTFNfS0VZLm5ld0VudHJ5Qm9keSwgbmV3RW50cnlCb2R5KTsKICAgICAgICAgICAgbG9jYWxTdG9yYWdlLnNldEl0ZW0oTFNfS0VZLm5ld0VudHJ5TGFiZWwsIG5ld0VudHJ5TGFiZWwpOwogICAgICAgIH0KICAgIH0KCiAgICBvbk1vdW50KCgpID0+IHsKICAgICAgICBpZiAobG9hZEZyb21MUykgewogICAgICAgICAgICBuZXdFbnRyeVRpdGxlID0gbG9jYWxTdG9yYWdlLmdldEl0ZW0oTFNfS0VZLm5ld0VudHJ5VGl0bGUpIHx8ICcnOwogICAgICAgICAgICBuZXdFbnRyeUJvZHkgPSBsb2NhbFN0b3JhZ2UuZ2V0SXRlbShMU19LRVkubmV3RW50cnlCb2R5KSB8fCAnJzsKICAgICAgICAgICAgbmV3RW50cnlMYWJlbCA9IGxvY2FsU3RvcmFnZS5nZXRJdGVtKExTX0tFWS5uZXdFbnRyeUxhYmVsKSB8fCAnJzsKCiAgICAgICAgICAgIGlmICghbmV3RW50cnlCb2R5ICYmICFuZXdFbnRyeUxhYmVsICYmICFuZXdFbnRyeVRpdGxlKSB7CiAgICAgICAgICAgICAgICBvYmZ1c2NhdGVkID0gZmFsc2U7CiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICAgICAgbW91bnRlZCA9IHRydWU7CiAgICB9KTsKCiAgICBmdW5jdGlvbiBzZXJpYWxpemVBZ2VudERhdGEgKCk6IHN0cmluZyB7CiAgICAgICAgcmV0dXJuIEpTT04uc3RyaW5naWZ5KHsKICAgICAgICAgICAgdXNlckFnZW50OiBuYXZpZ2F0b3IudXNlckFnZW50LAogICAgICAgICAgICBsYW5ndWFnZTogbmF2aWdhdG9yLmxhbmd1YWdlLAogICAgICAgICAgICBhcHBWZXJzaW9uOiBuYXZpZ2F0b3IuYXBwVmVyc2lvbiwKICAgICAgICAgICAgcGxhdGZvcm06IG5hdmlnYXRvci5wbGF0Zm9ybQogICAgICAgIH0pOwogICAgfQoKICAgIGZ1bmN0aW9uIGFyZVVuc2F2ZWRDaGFuZ2VzICgpIHsKICAgICAgICBpZiAoZW50cnkgJiYgIWxvYWRGcm9tTFMpIHsKICAgICAgICAgICAgLy8gY2hlY2sgZm9yIHVuc2F2ZWQgY2hhbmdlcwogICAgICAgICAgICBpZiAoCiAgICAgICAgICAgICAgICBlbnRyeS50aXRsZSAhPT0gbmV3RW50cnlUaXRsZSB8fAogICAgICAgICAgICAgICAgZW50cnkuZW50cnkgIT09IG5ld0VudHJ5Qm9keSB8fAogICAgICAgICAgICAgICAgKGVudHJ5LmxhYmVsPy5pZCB8fCAnJykgIT09IG5ld0VudHJ5TGFiZWwKICAgICAgICAgICAgKSB7CiAgICAgICAgICAgICAgICByZXR1cm4gdHJ1ZTsKICAgICAgICAgICAgfQogICAgICAgIH0KICAgICAgICByZXR1cm4gZmFsc2U7CiAgICB9CgogICAgLyoqCiAgICAgKiBAc3JjIGh0dHBzOi8vc3RhY2tvdmVyZmxvdy5jb20vcXVlc3Rpb25zLzExMDc2OTc1CiAgICAgKi8KICAgIGZ1bmN0aW9uIGluc2VydEF0Q3Vyc29yICgKICAgICAgICBpbnB1dDogSFRNTElucHV0RWxlbWVudCB8IEhUTUxUZXh0QXJlYUVsZW1lbnQsCiAgICAgICAgdGV4dDogc3RyaW5nCiAgICApIHsKICAgICAgICBpZiAoaW5wdXQuc2VsZWN0aW9uU3RhcnQgfHwgaW5wdXQuc2VsZWN0aW9uU3RhcnQgPT09IDApIHsKICAgICAgICAgICAgY29uc3Qgc3RhcnRQb3MgPSBpbnB1dC5zZWxlY3Rpb25TdGFydCA/PyB1bmRlZmluZWQ7CiAgICAgICAgICAgIGNvbnN0IGVuZFBvcyA9IGlucHV0LnNlbGVjdGlvbkVuZCA/PyAwOwogICAgICAgICAgICBpbnB1dC52YWx1ZSA9CiAgICAgICAgICAgICAgICBpbnB1dC52YWx1ZS5zdWJzdHJpbmcoMCwgc3RhcnRQb3MpICsKICAgICAgICAgICAgICAgIHRleHQgKwogICAgICAgICAgICAgICAgaW5wdXQudmFsdWUuc3Vic3RyaW5nKGVuZFBvcywgaW5wdXQudmFsdWUubGVuZ3RoKTsKICAgICAgICAgICAgLy8gcmVzdG9yZSBjdXJzb3IgdG8gYWZ0ZXIgaW5zZXJ0ZWQgdGV4dAogICAgICAgICAgICBpbnB1dC5zZWxlY3Rpb25TdGFydCA9IHN0YXJ0UG9zICsgdGV4dC5sZW5ndGg7CiAgICAgICAgICAgIGlucHV0LnNlbGVjdGlvbkVuZCA9IHN0YXJ0UG9zICsgdGV4dC5sZW5ndGg7CiAgICAgICAgfSBlbHNlIHsKICAgICAgICAgICAgaW5wdXQudmFsdWUgKz0gdGV4dDsKICAgICAgICB9CgogICAgICAgIG5ld0VudHJ5Qm9keSA9IGlucHV0LnZhbHVlOwogICAgfQoKICAgIGxldCBzdWJtaXR0ZWQgPSBmYWxzZTsKCiAgICBiZWZvcmVOYXZpZ2F0ZSgoeyBjYW5jZWwgfSkgPT4gewogICAgICAgIC8vIHdvdWxkIHNhdmUgdG8gTFMgaGVyZSwgZXhjZXB0IHNvbWV0aW1lcyB3ZSB3YW50IHRvIG5hdmlnYXRlIGF3YXkKICAgICAgICAvLyBhZnRlciBlZGl0aW5nIHNvbWV0aGluZyBpbiBMUywgZm9yIGV4YW1wbGUgbWFraW5nICdEcmVhbScgZW50cnkgZnJvbSBuYXZiYXIKICAgICAgICAvLyBpbiB3aGljaCBjYXNlIHNhdmluZyB3b3VsZCBvdmVycmlkZSBhbnl0aGluZyB3ZSBzZXQgdGhlcmUuCiAgICAgICAgLy8gU2hvdWxkIGJlIGZpbmUsIGFzIHdlIGFsd2F5cyBzYXZlIHdoZW5ldmVyIHRoZSBsb2NhbCB2YXJpYWJsZXMgd2hpY2ggc3RvcmUgdGhlIGZvcm0KICAgICAgICAvLyBjb250ZW50cyBhcmUgY2hhbmdlZC4KCiAgICAgICAgaWYgKCFzdWJtaXR0ZWQgJiYgYXJlVW5zYXZlZENoYW5nZXMoKSkgewogICAgICAgICAgICBpZiAoCiAgICAgICAgICAgICAgICAhY29uZmlybSgKICAgICAgICAgICAgICAgICAgICAnWW91IGhhdmUgdW5zYXZlZCBjaGFuZ2VzLCBhcmUgeW91IHN1cmUgeW91IHdhbnQgdG8gbGVhdmU/JwogICAgICAgICAgICAgICAgKQogICAgICAgICAgICApIHsKICAgICAgICAgICAgICAgIGNhbmNlbCgpOwogICAgICAgICAgICB9CiAgICAgICAgfQogICAgfSk7CgogICAgYXN5bmMgZnVuY3Rpb24gc3VibWl0ICgpIHsKICAgICAgICBzdWJtaXR0ZWQgPSB0cnVlOwoKICAgICAgICBjb25zdCBjdXJyZW50TG9jYXRpb24gPSAkZW5hYmxlZExvY2F0aW9uCiAgICAgICAgICAgID8gYXdhaXQgZ2V0TG9jYXRpb24oYWRkTm90aWZpY2F0aW9uKQogICAgICAgICAgICA6IFsgbnVsbCwgbnVsbCBdOwoKICAgICAgICBjb25zdCBib2R5ID0gewogICAgICAgICAgICB0aXRsZTogbmV3RW50cnlUaXRsZSwKICAgICAgICAgICAgZW50cnk6IG5ld0VudHJ5Qm9keSwKICAgICAgICAgICAgbGFiZWw6IG5ld0VudHJ5TGFiZWwsCiAgICAgICAgICAgIGxhdGl0dWRlOiBjdXJyZW50TG9jYXRpb25bMF0sCiAgICAgICAgICAgIGxvbmdpdHVkZTogY3VycmVudExvY2F0aW9uWzFdLAogICAgICAgICAgICBjcmVhdGVkOiBub3dTKCksCiAgICAgICAgICAgIGFnZW50RGF0YTogc2VyaWFsaXplQWdlbnREYXRhKCkKICAgICAgICB9OwoKICAgICAgICBsZXQgcmVzOwogICAgICAgIHN3aXRjaCAoYWN0aW9uKSB7CiAgICAgICAgICAgIGNhc2UgJ2NyZWF0ZSc6CiAgICAgICAgICAgICAgICByZXMgPSBkaXNwbGF5Tm90aWZPbkVycigKICAgICAgICAgICAgICAgICAgICBhZGROb3RpZmljYXRpb24sCiAgICAgICAgICAgICAgICAgICAgYXdhaXQgYXBpLnBvc3QoYXV0aCwgJy9lbnRyaWVzJywgYm9keSkKICAgICAgICAgICAgICAgICk7CiAgICAgICAgICAgICAgICBzdWJtaXR0ZWQgPSBmYWxzZTsKICAgICAgICAgICAgICAgIGlmIChyZXMuaWQpIHsKICAgICAgICAgICAgICAgICAgICAvLyBtYWtlIHJlYWxseSBzdXJlIGl0J3Mgc2F2ZWQgYmVmb3JlIHJlc2V0dGluZwogICAgICAgICAgICAgICAgICAgIHJlc2V0KCk7CiAgICAgICAgICAgICAgICB9IGVsc2UgewogICAgICAgICAgICAgICAgICAgIGNvbnNvbGUuZXJyb3IocmVzKTsKICAgICAgICAgICAgICAgICAgICBhZGROb3RpZmljYXRpb24oewogICAgICAgICAgICAgICAgICAgICAgICAuLi5FUlJfTk9USUZJQ0FUSU9OLAogICAgICAgICAgICAgICAgICAgICAgICB0ZXh0OiBgRmFpbGVkIHRvIGNyZWF0ZSBlbnRyeTogJHtKU09OLnN0cmluZ2lmeShyZXMpfWAKICAgICAgICAgICAgICAgICAgICB9KTsKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIGFkZE5vdGlmaWNhdGlvbih7CiAgICAgICAgICAgICAgICAgICAgLi4uU1VDQ0VTU19OT1RJRklDQVRJT04sCiAgICAgICAgICAgICAgICAgICAgcmVtb3ZlQWZ0ZXI6IDEwMDAsCiAgICAgICAgICAgICAgICAgICAgdGV4dDogYEVudHJ5IGNyZWF0ZWRgCiAgICAgICAgICAgICAgICB9KTsKICAgICAgICAgICAgICAgIGJyZWFrOwogICAgICAgICAgICBjYXNlICdlZGl0JzoKICAgICAgICAgICAgICAgIGlmICghZW50cnkpCiAgICAgICAgICAgICAgICAgICAgdGhyb3cgbmV3IEVycm9yKCdlbnRyeSBtdXN0IGJlIHNldCB3aGVuIGFjdGlvbiBpcyBlZGl0Jyk7CiAgICAgICAgICAgICAgICBpZiAoIWFyZVVuc2F2ZWRDaGFuZ2VzKCkpIHsKICAgICAgICAgICAgICAgICAgICBpZiAoCiAgICAgICAgICAgICAgICAgICAgICAgICFjb25maXJtKAogICAgICAgICAgICAgICAgICAgICAgICAgICAgJ05vIGNoYW5nZXMgaGF2ZSBiZWVuIG1hZGUsIGFyZSB5b3Ugc3VyZSB5b3Ugd2FudCB0byBlZGl0IHRoaXMgZW50cnk/JwogICAgICAgICAgICAgICAgICAgICAgICApCiAgICAgICAgICAgICAgICAgICAgKSB7CiAgICAgICAgICAgICAgICAgICAgICAgIHJldHVybjsKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICByZXMgPSBkaXNwbGF5Tm90aWZPbkVycigKICAgICAgICAgICAgICAgICAgICBhZGROb3RpZmljYXRpb24sCiAgICAgICAgICAgICAgICAgICAgYXdhaXQgYXBpLnB1dChhdXRoLCBhcGlQYXRoKCcvZW50cmllcy8/JywgZW50cnkuaWQpLCBib2R5KQogICAgICAgICAgICAgICAgKTsKICAgICAgICAgICAgICAgIGxvY2F0aW9uLmFzc2lnbihgL2pvdXJuYWwvJHtlbnRyeS5pZH0/b2JmdXNjYXRlPTBgKTsKICAgICAgICAgICAgICAgIGJyZWFrOwogICAgICAgICAgICBkZWZhdWx0OgogICAgICAgICAgICAgICAgdGhyb3cgbmV3IEVycm9yKGBVbmtub3duIGFjdGlvbjogJHthY3Rpb24gYXMgc3RyaW5nfWApOwogICAgICAgIH0KCiAgICAgICAgZGlzcGF0Y2goJ3VwZGF0ZWQnKTsKICAgIH0KCiAgICBjb25zdCBmaWxlT3B0aW9uczogRmlsZURyb3BPcHRpb25zID0gewogICAgICAgIGZpbGVMaW1pdDogMSwKICAgICAgICB3aW5kb3dEcm9wOiBmYWxzZSwKICAgICAgICBoaWRlSW5wdXQ6IHRydWUsCiAgICAgICAgY2xpY2tUb1VwbG9hZDogZmFsc2UsCiAgICAgICAgdGFiSW5kZXg6IC0xLAogICAgICAgIG11bHRpcGxlOiBmYWxzZSwKICAgICAgICBhY2NlcHQ6ICdpbWFnZS8qJywKICAgICAgICBpZDogJ2VudHJ5LWZpbGUtZHJvcCcKICAgIH07CgogICAgYXN5bmMgZnVuY3Rpb24gb25GaWxlRHJvcCAoZTogQ3VzdG9tRXZlbnQ8eyBmaWxlczogRmlsZXMgfT4pIHsKICAgICAgICBjb25zdCBmaWxlcyA9IGUuZGV0YWlsLmZpbGVzOwogICAgICAgIGlmIChmaWxlcy5yZWplY3RlZC5sZW5ndGggPiAwKSB7CiAgICAgICAgICAgIGFkZE5vdGlmaWNhdGlvbih7CiAgICAgICAgICAgICAgICAuLi5FUlJfTk9USUZJQ0FUSU9OLAogICAgICAgICAgICAgICAgdGV4dDogJ0ZpbGUgY291bGQgbm90IGJlIHJlYWQsIHBsZWFzZSB0cnkgYWdhaW4nCiAgICAgICAgICAgIH0pOwogICAgICAgICAgICByZXR1cm47CiAgICAgICAgfQogICAgICAgIGlmIChmaWxlcy5hY2NlcHRlZC5sZW5ndGggPCAxKSByZXR1cm47CiAgICAgICAgaWYgKGZpbGVzLmFjY2VwdGVkLmxlbmd0aCAhPT0gMSkgewogICAgICAgICAgICBhZGROb3RpZmljYXRpb24oewogICAgICAgICAgICAgICAgLi4uRVJSX05PVElGSUNBVElPTiwKICAgICAgICAgICAgICAgIHRleHQ6ICdQbGVhc2Ugc2VsZWN0IGV4YWN0bHkgb25lIGZpbGUnCiAgICAgICAgICAgIH0pOwogICAgICAgICAgICByZXR1cm47CiAgICAgICAgfQogICAgICAgIGNvbnN0IGZpbGUgPSBmaWxlcy5hY2NlcHRlZFswXTsKICAgICAgICBjb25zdCBjb250ZW50ID0gZGlzcGxheU5vdGlmT25FcnIoCiAgICAgICAgICAgIGFkZE5vdGlmaWNhdGlvbiwKICAgICAgICAgICAgYXdhaXQgZ2V0RmlsZUNvbnRlbnRzKGZpbGUsICdiNjQnKQogICAgICAgICk7CgogICAgICAgIGlmICghY29udGVudCkgcmV0dXJuOwogICAgICAgIGlmIChjb250ZW50Lmxlbmd0aCA+IE1BWF9JTUFHRV9TSVpFKSB7CiAgICAgICAgICAgIGFkZE5vdGlmaWNhdGlvbih7CiAgICAgICAgICAgICAgICAuLi5FUlJfTk9USUZJQ0FUSU9OLAogICAgICAgICAgICAgICAgdGV4dDogJ0ZpbGUgdG9vIGxhcmdlJwogICAgICAgICAgICB9KTsKICAgICAgICAgICAgcmV0dXJuOwogICAgICAgIH0KCiAgICAgICAgY29uc3QgeyBpZCB9ID0gZGlzcGxheU5vdGlmT25FcnIoCiAgICAgICAgICAgIGFkZE5vdGlmaWNhdGlvbiwKICAgICAgICAgICAgYXdhaXQgYXBpLnBvc3QoYXV0aCwgJy9hc3NldHMnLCB7CiAgICAgICAgICAgICAgICBmaWxlTmFtZTogZmlsZS5uYW1lLAogICAgICAgICAgICAgICAgY29udGVudAogICAgICAgICAgICB9KQogICAgICAgICk7CgogICAgICAgIC8vIGluc2VydCBtYXJrZG93biB0byBsaW5rIHRvIGltYWdlCiAgICAgICAgaW5zZXJ0QXRDdXJzb3IoCiAgICAgICAgICAgIG5ld0VudHJ5SW5wdXRFbGVtZW50LAogICAgICAgICAgICBgXG4ke0Fzc2V0Lm1hcmtEb3duTGluayhmaWxlLm5hbWUsIGlkKX1cbmAKICAgICAgICApOwogICAgfQoKICAgIGFzeW5jIGZ1bmN0aW9uIHN0b3BTcGFjZUFuZEVudGVyQmVpbmdJbnRlcmNlcHRlZEJ5RmlsZURyb3AgKCkgewogICAgICAgIC8vIFRPRE8gZG8gdGhpcyBwcm9wZXJseQogICAgICAgIHdoaWxlICghZG9jdW1lbnQuZ2V0RWxlbWVudHNCeUNsYXNzTmFtZSgnZW50cnktZmlsZS1kcm9wJykpIHsKICAgICAgICAgICAgYXdhaXQgbmV3IFByb21pc2UociA9PiBzZXRUaW1lb3V0KHIsIDEwMCkpOwogICAgICAgIH0KICAgICAgICAvLyBodHRwczovL3N0YWNrb3ZlcmZsb3cuY29tL3F1ZXN0aW9ucy8xOTQ2OTg4MQogICAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRzQnlDbGFzc05hbWUoJ2VudHJ5LWZpbGUtZHJvcCcpWzBdLmFkZEV2ZW50TGlzdGVuZXIoCiAgICAgICAgICAgICdrZXlkb3duJywKICAgICAgICAgICAgKGV2ZW50OiBFdmVudCkgPT4gewogICAgICAgICAgICAgICAgY29uc3QgZSA9IGV2ZW50IGFzIEtleWJvYXJkRXZlbnQ7CiAgICAgICAgICAgICAgICAvLyBzYW1lIGNoZWNrIGFzIGxpYiB1c2VzCiAgICAgICAgICAgICAgICBpZiAoZS5rZXkgPT09ICcgJyB8fCBlLmtleSA9PT0gJ0VudGVyJykgewogICAgICAgICAgICAgICAgICAgIGUuc3RvcEltbWVkaWF0ZVByb3BhZ2F0aW9uKCk7CiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0sCiAgICAgICAgICAgIHRydWUKICAgICAgICApOwogICAgfQoKICAgIGZ1bmN0aW9uIHRyaWdnZXJGaWxlRHJvcCAoKSB7CiAgICAgICAgLy8gYml0IGhhY2t5Li4uIFRPRE8gbWFrZSBsZXNzIGhhY2t5CiAgICAgICAgKAogICAgICAgICAgICBkb2N1bWVudC5xdWVyeVNlbGVjdG9yKAogICAgICAgICAgICAgICAgJy5lbnRyeS1maWxlLWRyb3AgPiBpbnB1dCcKICAgICAgICAgICAgKSBhcyBIVE1MSW5wdXRFbGVtZW50CiAgICAgICAgKS5jbGljaygpOwogICAgfQoKICAgIGxldCBsYWJlbHM6IExhYmVsW10gfCBudWxsID0gbnVsbDsKCiAgICBhc3luYyBmdW5jdGlvbiBsb2FkTGFiZWxzICgpIHsKICAgICAgICBjb25zdCBsYWJlbHNSZXMgPSBkaXNwbGF5Tm90aWZPbkVycigKICAgICAgICAgICAgYWRkTm90aWZpY2F0aW9uLAogICAgICAgICAgICBhd2FpdCBhcGkuZ2V0KGF1dGgsICcvbGFiZWxzJykKICAgICAgICApOwogICAgICAgIGxhYmVscyA9IGxhYmVsc1Jlcy5sYWJlbHM7CiAgICB9CgogICAgZnVuY3Rpb24gaGFuZGxlRW50cnlJbnB1dEtleWRvd24gKGV2ZW50OiBLZXlib2FyZEV2ZW50KSB7CiAgICAgICAgaWYgKGV2ZW50LmtleSAhPT0gJ1RhYicpIHJldHVybjsKICAgICAgICBldmVudC5wcmV2ZW50RGVmYXVsdCgpOwogICAgICAgIGluc2VydEF0Q3Vyc29yKG5ld0VudHJ5SW5wdXRFbGVtZW50LCAnXHQnKTsKICAgIH0KCiAgICBvbk1vdW50KGFzeW5jICgpID0+IHsKICAgICAgICBhd2FpdCBQcm9taXNlLmFsbChbCiAgICAgICAgICAgIGxvYWRMYWJlbHMoKSwKICAgICAgICAgICAgc3RvcFNwYWNlQW5kRW50ZXJCZWluZ0ludGVyY2VwdGVkQnlGaWxlRHJvcCgpCiAgICAgICAgXSk7CiAgICB9KTsK">{}</script>
 
 <div
     class="container entry-file-drop"
-    on:filedrop={onFileDrop}
-    use:filedrop={fileOptions}
+    on:filedrop="{onFileDrop}"
+    use:filedrop="{fileOptions}"
 >
     <div class="head">
         <div class="left-options">
             <button
-                aria-label={obfuscated ? 'Show entry form' : 'Hide entry form'}
-                on:click={() => obfuscated = !obfuscated}
+                aria-label="{obfuscated
+                    ? 'Show entry form'
+                    : 'Hide entry form'}"
+                on:click="{() => (obfuscated = !obfuscated)}"
             >
                 {#if obfuscated}
                     <Eye size="25" />
@@ -319,7 +22,7 @@
             {#if obfuscated}
                 <input
                     aria-label="Entry Title"
-                    value={obfuscate(newEntryTitle)}
+                    value="{obfuscate(newEntryTitle)}"
                     class="title obfuscated"
                     disabled
                     placeholder="..."
@@ -327,22 +30,22 @@
             {:else}
                 <input
                     aria-label="Entry Title"
-                    bind:value={newEntryTitle}
+                    bind:value="{newEntryTitle}"
                     class="title"
                     placeholder="Title"
-                    disabled={submitted}
+                    disabled="{submitted}"
                 />
             {/if}
         </div>
         <div class="right-options {obfuscated ? 'blur' : ''}">
             <button
                 aria-label="Insert Image"
-                disabled={submitted}
-                on:click={triggerFileDrop}
-                use:tooltip={{
+                disabled="{submitted}"
+                on:click="{triggerFileDrop}"
+                use:tooltip="{{
                     content: 'Insert Image',
-                     position: 'bottom'
-                }}
+                    position: 'bottom'
+                }}"
             >
                 <ImageArea size="30" />
             </button>
@@ -350,16 +53,16 @@
             <LocationToggle />
 
             <LabelSelect
-                {auth}
-                bind:value={newEntryLabel}
-                {labels}
+                auth="{auth}"
+                bind:value="{newEntryLabel}"
+                labels="{labels}"
             />
 
             <button
                 aria-label="Submit Entry"
                 class="send"
-                disabled={submitted}
-                on:click={submit}
+                disabled="{submitted}"
+                on:click="{submit}"
             >
                 <Send size="30" />
             </button>
@@ -367,19 +70,16 @@
     </div>
     <div class="entry-container">
         {#if obfuscated}
-            <textarea
-                placeholder="..."
-                disabled
-                class="obfuscated"
-            >{obfuscate(newEntryBody)}</textarea>
+            <textarea placeholder="..." disabled class="obfuscated"
+            >{obfuscate(newEntryBody)}</textarea
+            >
         {:else}
             <textarea
-                bind:this={newEntryInputElement}
-                bind:value={newEntryBody}
-                on:keydown={handleEntryInputKeydown}
+                bind:this="{newEntryInputElement}"
+                bind:value="{newEntryBody}"
+                on:keydown="{handleEntryInputKeydown}"
                 placeholder="Entry"
-                disabled={submitted}
-            ></textarea>
+                disabled="{submitted}"></textarea>
         {/if}
     </div>
 
@@ -387,8 +87,8 @@
         <button
             aria-label="Submit Entry"
             class="primary with-icon"
-            disabled={submitted}
-            on:click={submit}
+            disabled="{submitted}"
+            on:click="{submit}"
         >
             <Send size="30" />
             Submit Entry
@@ -396,134 +96,4 @@
     </div>
 </div>
 
-<style lang="less">
-    @import '../../styles/variables';
-    @import '../../styles/layout';
-    @import '../../styles/input';
-
-    .container {
-        margin: 0;
-
-        @media @mobile {
-            border: none;
-        }
-    }
-
-    .head {
-        margin: 0;
-        padding: 0 0.4em;
-        border-bottom: 1px solid @border-light;
-        display: grid;
-        grid-template-columns: 1fr 23.5rem;
-
-        @media @mobile {
-            display: flex;
-            flex-wrap: wrap;
-            border: none;
-        }
-
-        .left-options {
-            height: 100%;
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
-            justify-content: start;
-            align-items: center;
-
-            .title {
-                border: none;
-                font-size: 20px;
-                width: calc(100% - 50px);
-                margin: 0 0 .2rem .3em;
-
-                @media @mobile {
-                    width: calc(100vw - 70px);
-                    margin: 0.3em;
-                    border-bottom: 1px solid @border-light;
-                }
-            }
-        }
-
-        .right-options {
-            height: 100%;
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
-            justify-content: end;
-            align-items: center;
-
-            &.blur {
-                filter: blur(4px);
-            }
-        }
-    }
-
-    .send {
-        .flex-center();
-        border-radius: @border-radius;
-        margin: 0 0 0 .2rem;
-        padding: 0.1rem;
-        aspect-ratio: 1/1;
-        background: @accent-gradient;
-
-        :global(svg), :global(svg *) {
-            fill: @text-color-invert;
-        }
-
-        @media @mobile {
-            display: none;
-        }
-
-        &:hover {
-            .glow();
-        }
-    }
-
-    .send-mobile {
-        display: none;
-
-        @media @mobile {
-            display: flex;
-        }
-    }
-
-    .entry-container {
-        .flex-center();
-        padding: 1rem;
-
-        textarea {
-            width: min(100%, 700px);
-            max-width: 100%;
-            min-width: 200px;
-            resize: both;
-            padding: 1rem;
-            margin: 0;
-
-            // fills page
-            height: calc(100vh - 12rem);
-
-            @media @mobile {
-                // annoying on mobile to resize horizontally
-                resize: vertical;
-
-                // puts submit button at bottom of screen nicely
-                height: calc(100vh - 19rem);
-                width: calc(100% - .8em);
-                overflow-y: scroll;
-                margin: 0;
-                background: none;
-            }
-
-            outline: none;
-            border: none;
-            font-size: 20px;
-            background: @light-v-accent;
-            border-radius: 8px;
-        }
-
-        @media @mobile {
-            padding: 0;
-        }
-    }
-
-</style>
+<style lang="less" ✂prettier:content✂="CiAgICBAaW1wb3J0ICcuLi8uLi9zdHlsZXMvdmFyaWFibGVzJzsKICAgIEBpbXBvcnQgJy4uLy4uL3N0eWxlcy9sYXlvdXQnOwogICAgQGltcG9ydCAnLi4vLi4vc3R5bGVzL2lucHV0JzsKCiAgICAuY29udGFpbmVyIHsKICAgICAgICBtYXJnaW46IDA7CgogICAgICAgIEBtZWRpYSBAbW9iaWxlIHsKICAgICAgICAgICAgYm9yZGVyOiBub25lOwogICAgICAgIH0KICAgIH0KCiAgICAuaGVhZCB7CiAgICAgICAgbWFyZ2luOiAwOwogICAgICAgIHBhZGRpbmc6IDAgMC40ZW07CiAgICAgICAgYm9yZGVyLWJvdHRvbTogMXB4IHNvbGlkIEBib3JkZXItbGlnaHQ7CiAgICAgICAgZGlzcGxheTogZ3JpZDsKICAgICAgICBncmlkLXRlbXBsYXRlLWNvbHVtbnM6IDFmciAyMy41cmVtOwoKICAgICAgICBAbWVkaWEgQG1vYmlsZSB7CiAgICAgICAgICAgIGRpc3BsYXk6IGZsZXg7CiAgICAgICAgICAgIGZsZXgtd3JhcDogd3JhcDsKICAgICAgICAgICAgYm9yZGVyOiBub25lOwogICAgICAgIH0KCiAgICAgICAgLmxlZnQtb3B0aW9ucyB7CiAgICAgICAgICAgIGhlaWdodDogMTAwJTsKICAgICAgICAgICAgZGlzcGxheTogZmxleDsKICAgICAgICAgICAgZmxleC1kaXJlY3Rpb246IHJvdzsKICAgICAgICAgICAgZmxleC13cmFwOiB3cmFwOwogICAgICAgICAgICBqdXN0aWZ5LWNvbnRlbnQ6IHN0YXJ0OwogICAgICAgICAgICBhbGlnbi1pdGVtczogY2VudGVyOwoKICAgICAgICAgICAgLnRpdGxlIHsKICAgICAgICAgICAgICAgIGJvcmRlcjogbm9uZTsKICAgICAgICAgICAgICAgIGZvbnQtc2l6ZTogMjBweDsKICAgICAgICAgICAgICAgIHdpZHRoOiBjYWxjKDEwMCUgLSA1MHB4KTsKICAgICAgICAgICAgICAgIG1hcmdpbjogMCAwIDAuMnJlbSAwLjNlbTsKCiAgICAgICAgICAgICAgICBAbWVkaWEgQG1vYmlsZSB7CiAgICAgICAgICAgICAgICAgICAgd2lkdGg6IGNhbGMoMTAwdncgLSA3MHB4KTsKICAgICAgICAgICAgICAgICAgICBtYXJnaW46IDAuM2VtOwogICAgICAgICAgICAgICAgICAgIGJvcmRlci1ib3R0b206IDFweCBzb2xpZCBAYm9yZGVyLWxpZ2h0OwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CiAgICAgICAgfQoKICAgICAgICAucmlnaHQtb3B0aW9ucyB7CiAgICAgICAgICAgIGhlaWdodDogMTAwJTsKICAgICAgICAgICAgZGlzcGxheTogZmxleDsKICAgICAgICAgICAgZmxleC1kaXJlY3Rpb246IHJvdzsKICAgICAgICAgICAgZmxleC13cmFwOiB3cmFwOwogICAgICAgICAgICBqdXN0aWZ5LWNvbnRlbnQ6IGVuZDsKICAgICAgICAgICAgYWxpZ24taXRlbXM6IGNlbnRlcjsKCiAgICAgICAgICAgICYuYmx1ciB7CiAgICAgICAgICAgICAgICBmaWx0ZXI6IGJsdXIoNHB4KTsKICAgICAgICAgICAgfQogICAgICAgIH0KICAgIH0KCiAgICAuc2VuZCB7CiAgICAgICAgLmZsZXgtY2VudGVyKCk7CiAgICAgICAgYm9yZGVyLXJhZGl1czogQGJvcmRlci1yYWRpdXM7CiAgICAgICAgbWFyZ2luOiAwIDAgMCAwLjJyZW07CiAgICAgICAgcGFkZGluZzogMC4xcmVtOwogICAgICAgIGFzcGVjdC1yYXRpbzogMS8xOwogICAgICAgIGJhY2tncm91bmQ6IEBhY2NlbnQtZ3JhZGllbnQ7CgogICAgICAgIDpnbG9iYWwoc3ZnKSwKICAgICAgICA6Z2xvYmFsKHN2ZyAqKSB7CiAgICAgICAgICAgIGZpbGw6IEB0ZXh0LWNvbG9yLWludmVydDsKICAgICAgICB9CgogICAgICAgIEBtZWRpYSBAbW9iaWxlIHsKICAgICAgICAgICAgZGlzcGxheTogbm9uZTsKICAgICAgICB9CgogICAgICAgICY6aG92ZXIgewogICAgICAgICAgICAuZ2xvdygpOwogICAgICAgIH0KICAgIH0KCiAgICAuc2VuZC1tb2JpbGUgewogICAgICAgIGRpc3BsYXk6IG5vbmU7CgogICAgICAgIEBtZWRpYSBAbW9iaWxlIHsKICAgICAgICAgICAgZGlzcGxheTogZmxleDsKICAgICAgICB9CiAgICB9CgogICAgLmVudHJ5LWNvbnRhaW5lciB7CiAgICAgICAgLmZsZXgtY2VudGVyKCk7CiAgICAgICAgcGFkZGluZzogMXJlbTsKCiAgICAgICAgdGV4dGFyZWEgewogICAgICAgICAgICB3aWR0aDogbWluKDEwMCUsIDcwMHB4KTsKICAgICAgICAgICAgbWF4LXdpZHRoOiAxMDAlOwogICAgICAgICAgICBtaW4td2lkdGg6IDIwMHB4OwogICAgICAgICAgICByZXNpemU6IGJvdGg7CiAgICAgICAgICAgIHBhZGRpbmc6IDFyZW07CiAgICAgICAgICAgIG1hcmdpbjogMDsKCiAgICAgICAgICAgIC8vIGZpbGxzIHBhZ2UKICAgICAgICAgICAgaGVpZ2h0OiBjYWxjKDEwMHZoIC0gMTJyZW0pOwoKICAgICAgICAgICAgQG1lZGlhIEBtb2JpbGUgewogICAgICAgICAgICAgICAgLy8gYW5ub3lpbmcgb24gbW9iaWxlIHRvIHJlc2l6ZSBob3Jpem9udGFsbHkKICAgICAgICAgICAgICAgIHJlc2l6ZTogdmVydGljYWw7CgogICAgICAgICAgICAgICAgLy8gcHV0cyBzdWJtaXQgYnV0dG9uIGF0IGJvdHRvbSBvZiBzY3JlZW4gbmljZWx5CiAgICAgICAgICAgICAgICBoZWlnaHQ6IGNhbGMoMTAwdmggLSAxOXJlbSk7CiAgICAgICAgICAgICAgICB3aWR0aDogY2FsYygxMDAlIC0gMC44ZW0pOwogICAgICAgICAgICAgICAgb3ZlcmZsb3cteTogc2Nyb2xsOwogICAgICAgICAgICAgICAgbWFyZ2luOiAwOwogICAgICAgICAgICAgICAgYmFja2dyb3VuZDogbm9uZTsKICAgICAgICAgICAgfQoKICAgICAgICAgICAgb3V0bGluZTogbm9uZTsKICAgICAgICAgICAgYm9yZGVyOiBub25lOwogICAgICAgICAgICBmb250LXNpemU6IDIwcHg7CiAgICAgICAgICAgIGJhY2tncm91bmQ6IEBsaWdodC12LWFjY2VudDsKICAgICAgICAgICAgYm9yZGVyLXJhZGl1czogOHB4OwogICAgICAgIH0KCiAgICAgICAgQG1lZGlhIEBtb2JpbGUgewogICAgICAgICAgICBwYWRkaW5nOiAwOwogICAgICAgIH0KICAgIH0K"></style>

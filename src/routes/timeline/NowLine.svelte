@@ -1,26 +1,3 @@
-<script lang="ts">
-    import { renderable } from '../../lib/canvas/canvasHelpers';
-    import { nowS } from '../../lib/utils/time';
+<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgeyByZW5kZXJhYmxlIH0gZnJvbSAnLi4vLi4vbGliL2NhbnZhcy9jYW52YXNIZWxwZXJzJzsKICAgIGltcG9ydCB7IG5vd1MgfSBmcm9tICcuLi8uLi9saWIvdXRpbHMvdGltZSc7CgogICAgcmVuZGVyYWJsZShzdGF0ZSA9PiB7CiAgICAgICAgY29uc3Qgbm93TGluZVBvcyA9IHN0YXRlLnRpbWVUb1JlbmRlclBvcyhub3dTKCkpOwoKICAgICAgICBpZiAobm93TGluZVBvcyA8PSAwKSB7CiAgICAgICAgICAgIC8vIG5vdCBvbiBzY3JlZW4KICAgICAgICAgICAgcmV0dXJuOwogICAgICAgIH0KCiAgICAgICAgc3RhdGUucmVjdChub3dMaW5lUG9zLCAwLCAxLCBzdGF0ZS5oZWlnaHQsIHsKICAgICAgICAgICAgY29sb3VyOiAnIzc5ZWJlMicsCiAgICAgICAgfSk7CgogICAgICAgIHN0YXRlLnRleHQoJ25vdycsIG5vd0xpbmVQb3MgKyA1LCBzdGF0ZS5jZW50ZXJMblkoKSAtIDUsIHsKICAgICAgICAgICAgYzogJyM3OWViZTInLAogICAgICAgIH0pOwogICAgfSk7Cg==">{}</script>
 
-    renderable(state => {
-        const nowLinePos = state.timeToRenderPos(nowS());
-
-        if (nowLinePos <= 0) {
-            // not on screen
-            return;
-        }
-
-        state.rect(nowLinePos, 0, 1, state.height, {
-            colour: '#79ebe2',
-        });
-
-        state.text(
-            'now',
-            nowLinePos + 5,
-            state.centerLnY() - 5,
-            { c: '#79ebe2' },
-        );
-    });
-</script>
-
-<slot></slot>
+<slot />

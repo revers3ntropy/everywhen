@@ -10,10 +10,12 @@ import type { RequestHandler } from './$types';
 export const GET = cachedApiRoute(async (auth, { params }) => {
     if (!params.entryId) throw error(400, 'invalid id');
 
-    const {
-        err,
-        val: entry,
-    } = await Entry.fromId(query, auth, params.entryId, true);
+    const { err, val: entry } = await Entry.fromId(
+        query,
+        auth,
+        params.entryId,
+        true
+    );
 
     if (err) throw error(400, err);
 
@@ -26,12 +28,14 @@ export const DELETE = (async ({ request, params, cookies }) => {
     invalidateCache(auth.id);
 
     const body = await getUnwrappedReqBody(request, {
-        restore: 'boolean',
+        restore: 'boolean'
     });
 
     const { err: deleteErr } = await Entry.delete(
-        query, auth,
-        params.entryId, body.restore,
+        query,
+        auth,
+        params.entryId,
+        body.restore
     );
     if (deleteErr) throw error(400, deleteErr);
 
@@ -43,32 +47,39 @@ export const PUT = (async ({ request, params, cookies }) => {
     if (!params.entryId) throw error(400, 'invalid id');
     invalidateCache(auth.id);
 
-    const body = await getUnwrappedReqBody(request, {
-        title: 'string',
-        entry: 'string',
-        label: 'string',
-        latitude: 'number',
-        longitude: 'number',
-        timezoneUtcOffset: 'number',
-        agentData: 'string',
-    }, {
-        title: '',
-        entry: '',
-        label: '',
-        latitude: 0,
-        longitude: 0,
-        timezoneUtcOffset: 0,
-        agentData: '',
-    });
+    const body = await getUnwrappedReqBody(
+        request,
+        {
+            title: 'string',
+            entry: 'string',
+            label: 'string',
+            latitude: 'number',
+            longitude: 'number',
+            timezoneUtcOffset: 'number',
+            agentData: 'string'
+        },
+        {
+            title: '',
+            entry: '',
+            label: '',
+            latitude: 0,
+            longitude: 0,
+            timezoneUtcOffset: 0,
+            agentData: ''
+        }
+    );
 
-    const {
-        err: entryErr,
-        val: entry,
-    } = await Entry.fromId(query, auth, params.entryId, true);
+    const { err: entryErr, val: entry } = await Entry.fromId(
+        query,
+        auth,
+        params.entryId,
+        true
+    );
     if (entryErr) throw error(400, entryErr);
 
     const { err } = await Entry.edit(
-        query, auth,
+        query,
+        auth,
         entry,
         body.title,
         body.entry,
@@ -76,7 +87,7 @@ export const PUT = (async ({ request, params, cookies }) => {
         body.longitude || undefined,
         body.label,
         body.timezoneUtcOffset,
-        body.agentData,
+        body.agentData
     );
 
     if (err) throw error(400, err);

@@ -5,13 +5,16 @@ import { query } from '../../lib/db/mysql';
 import { cachedPageRoute } from '../../lib/utils/cache';
 import type { PageServerLoad } from './$types';
 
-export const load = cachedPageRoute(async (auth) => {
+export const load = cachedPageRoute(async auth => {
     const { val: entries, err } = await Entry.all(query, auth, {
-        deleted: false,
+        deleted: false
     });
     if (err) throw error(400, err);
 
-    const { err: locationErr, val: locations } = await Location.all(query, auth);
+    const { err: locationErr, val: locations } = await Location.all(
+        query,
+        auth
+    );
     if (locationErr) throw error(400, locationErr);
 
     return {
@@ -19,8 +22,8 @@ export const load = cachedPageRoute(async (auth) => {
             created: e.created,
             id: e.id,
             latitude: e.latitude,
-            longitude: e.longitude,
+            longitude: e.longitude
         })),
-        locations,
+        locations
     };
 }) satisfies PageServerLoad;

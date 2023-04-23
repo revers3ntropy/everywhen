@@ -1,18 +1,4 @@
-<script lang="ts">
-    import { onMount } from 'svelte';
-    import type { App } from '../../../app';
-    import Entry from '../../../lib/components/Entry.svelte';
-    import type { Entry as EntryController } from '../../../lib/controllers/entry';
-    import { obfuscated } from '../../../lib/stores';
-
-    export let data: App.PageData & {
-        entry: EntryController,
-        history: boolean,
-    };
-
-    onMount(() => document.title = `View Entry`);
-
-</script>
+<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgeyBvbk1vdW50IH0gZnJvbSAnc3ZlbHRlJzsKICAgIGltcG9ydCB0eXBlIHsgQXBwIH0gZnJvbSAnLi4vLi4vLi4vYXBwJzsKICAgIGltcG9ydCBFbnRyeSBmcm9tICcuLi8uLi8uLi9saWIvY29tcG9uZW50cy9FbnRyeS5zdmVsdGUnOwogICAgaW1wb3J0IHR5cGUgeyBFbnRyeSBhcyBFbnRyeUNvbnRyb2xsZXIgfSBmcm9tICcuLi8uLi8uLi9saWIvY29udHJvbGxlcnMvZW50cnknOwogICAgaW1wb3J0IHsgb2JmdXNjYXRlZCB9IGZyb20gJy4uLy4uLy4uL2xpYi9zdG9yZXMnOwoKICAgIGV4cG9ydCBsZXQgZGF0YTogQXBwLlBhZ2VEYXRhICYgewogICAgICAgIGVudHJ5OiBFbnRyeUNvbnRyb2xsZXI7CiAgICAgICAgaGlzdG9yeTogYm9vbGVhbjsKICAgIH07CgogICAgb25Nb3VudCgoKSA9PiAoZG9jdW1lbnQudGl0bGUgPSBgVmlldyBFbnRyeWApKTsK">{}</script>
 
 <svelte:head>
     <title>View Entry</title>
@@ -28,18 +14,17 @@
 
     <Entry
         {...data.entry}
-        auth={data}
-        obfuscated={$obfuscated}
-        on:updated={() => location.reload()}
-        showFullDate={true}
+        auth="{data}"
+        obfuscated="{$obfuscated}"
+        on:updated="{() => location.reload()}"
+        showFullDate="{true}"
     />
 
     {#if !data.history}
         {#if data.entry.edits?.length}
             <div class="flex-center">
                 <a href="/journal/{data.entry.id}?history=on&obfuscate=0">
-                    Show History
-                    ({data.entry.edits?.length} edits)
+                    Show History ({data.entry.edits?.length} edits)
                 </a>
             </div>
         {/if}
@@ -50,19 +35,16 @@
             </a>
         </div>
         {#if !data.entry.edits?.length}
-            <div class="flex-center">
-                No edits have been made to this entry
-            </div>
+            <div class="flex-center">No edits have been made to this entry</div>
         {:else}
             <i>Older Versions</i>
-            {#each (data.entry.edits || [])
-                .sort((a, b) => b.created - a.created) as edit}
+            {#each (data.entry.edits || []).sort((a, b) => b.created - a.created) as edit}
                 <Entry
                     {...edit}
-                    auth={data}
-                    obfuscated={$obfuscated}
-                    isEdit={true}
-                    showFullDate={true}
+                    auth="{data}"
+                    obfuscated="{$obfuscated}"
+                    isEdit="{true}"
+                    showFullDate="{true}"
                 />
             {/each}
         {/if}

@@ -3,11 +3,8 @@ import DomPurify from 'dompurify';
 import { marked } from 'marked';
 import { OBFUSCATE_CHARS } from '../constants';
 
-export function obfuscate (
-    str: string,
-    alphabet = OBFUSCATE_CHARS,
-): string {
-    return str.replace(/./g, (char) => {
+export function obfuscate(str: string, alphabet = OBFUSCATE_CHARS): string {
+    return str.replace(/./g, char => {
         if (char === '\n') {
             return char;
         }
@@ -19,36 +16,32 @@ export function obfuscate (
  * Split into 'words' as best as possible
  */
 export function splitText (text: string): string[] {
-    return text.split(/[\s,.\-:;!"*()=+[\]{}?|]+/)
-               .filter(Boolean);
+    return text.split(/[\s,.\-:;!"*()=+[\]{}?|]+/).filter(Boolean);
 }
 
-export function wordCount (text: string): number {
+export function wordCount(text: string): number {
     return splitText(text).length;
 }
 
-export function cryptoRandomStr (length = 32): string {
-    return crypto
-        .randomBytes(length)
-        .toString('base64url');
+export function cryptoRandomStr(length = 32): string {
+    return crypto.randomBytes(length).toString('base64url');
 }
 
-export function numberAsSignedStr (num: number): string {
+export function numberAsSignedStr(num: number): string {
     return num >= 0 ? `+${num}` : `${num}`;
 }
 
-export function round1DP (num: number): number {
+export function round1DP(num: number): number {
     return Math.round(num * 10) / 10;
 }
 
-export function rawMdToHtml (md: string, obfuscated = false): string {
-    return DomPurify.sanitize(
-        marked(obfuscated ? obfuscate(md) : md),
-        { USE_PROFILES: { html: true } },
-    );
+export function rawMdToHtml(md: string, obfuscated = false): string {
+    return DomPurify.sanitize(marked(obfuscated ? obfuscate(md) : md), {
+        USE_PROFILES: { html: true }
+    });
 }
 
-export function fmtBytes (bytes: number): string {
+export function fmtBytes(bytes: number): string {
     if (bytes < 0) {
         return `-${fmtBytes(-bytes)}`;
     }
@@ -64,10 +57,10 @@ export function fmtBytes (bytes: number): string {
     return `${round1DP(bytes / 1000 / 1000 / 1000)}GB`;
 }
 
-export function removeAnsi (str: string): string {
+export function removeAnsi(str: string): string {
     return str.replace(
         // eslint-disable-next-line no-control-regex
         /[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g,
-        '',
+        ''
     );
 }

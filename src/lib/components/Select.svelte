@@ -1,25 +1,6 @@
-<script lang="ts">
-    import MenuDown from 'svelte-material-icons/MenuDown.svelte';
-    import MenuUp from 'svelte-material-icons/MenuUp.svelte';
-    import Dropdown from '../../lib/components/Dropdown.svelte';
+<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgTWVudURvd24gZnJvbSAnc3ZlbHRlLW1hdGVyaWFsLWljb25zL01lbnVEb3duLnN2ZWx0ZSc7CiAgICBpbXBvcnQgTWVudVVwIGZyb20gJ3N2ZWx0ZS1tYXRlcmlhbC1pY29ucy9NZW51VXAuc3ZlbHRlJzsKICAgIGltcG9ydCBEcm9wZG93biBmcm9tICcuLi8uLi9saWIvY29tcG9uZW50cy9Ecm9wZG93bi5zdmVsdGUnOwoKICAgIGV4cG9ydCBsZXQgb3B0aW9uczogUmVjb3JkPHN0cmluZywgc3RyaW5nIHwgbnVtYmVyPjsKICAgIGV4cG9ydCBsZXQga2V5OiBzdHJpbmc7CiAgICBleHBvcnQgbGV0IG9wZW4gPSBmYWxzZTsKCiAgICBleHBvcnQgbGV0IHZhbHVlID0gbnVsbDsKICAgICQ6IHZhbHVlID0gb3B0aW9uc1trZXldOwoKICAgICQ6IGlmICghKGtleSBpbiBvcHRpb25zKSkga2V5ID0gT2JqZWN0LmtleXMob3B0aW9ucylbMF07CgogICAgbGV0IGNsb3NlOiAoKSA9PiB2b2lkOwo=">{}</script>
 
-    export let options: Record<string, string | number>;
-    export let key: string;
-    export let open = false;
-
-    export let value = null;
-    $: value = options[key];
-
-    $: if (!(key in options)) key = Object.keys(options)[0];
-
-    let close: () => void;
-</script>
-
-<Dropdown
-    bind:close
-    bind:open
-    unstyledButton
->
+<Dropdown bind:close="{close}" bind:open="{open}" unstyledButton>
     <span class="selector" slot="button">
         {key}
         {#if open}
@@ -31,47 +12,16 @@
 
     <div class="options">
         {#each Object.keys(options) as option}
-            <button on:click={() => { close(); key = option }}>
+            <button
+                on:click="{() => {
+                    close();
+                    key = option;
+                }}"
+            >
                 {option}
             </button>
         {/each}
     </div>
-
 </Dropdown>
 
-<style lang="less">
-    @import '../../styles/variables';
-    @import '../../styles/layout';
-
-    button {
-        display: block;
-        padding: .3em;
-        border-radius: @border-radius;
-        border: none;
-
-        &:hover {
-            background-color: @accent-color-primary;
-            color: black;
-        }
-    }
-
-    .options {
-        display: flex;
-        flex-direction: column;
-        padding: 0;
-        border: 1px solid @border-heavy;
-        border-top-color: @border-light;
-        border-radius: @border-radius;
-        background: @light-accent;
-
-        button {
-            padding: .4rem 1.2rem;
-        }
-    }
-
-    .selector {
-        &:extend(button.primary);
-        cursor: pointer;
-        margin: 0.5em;
-    }
-</style>
+<style lang="less" ✂prettier:content✂="CiAgICBAaW1wb3J0ICcuLi8uLi9zdHlsZXMvdmFyaWFibGVzJzsKICAgIEBpbXBvcnQgJy4uLy4uL3N0eWxlcy9sYXlvdXQnOwoKICAgIGJ1dHRvbiB7CiAgICAgICAgZGlzcGxheTogYmxvY2s7CiAgICAgICAgcGFkZGluZzogMC4zZW07CiAgICAgICAgYm9yZGVyLXJhZGl1czogQGJvcmRlci1yYWRpdXM7CiAgICAgICAgYm9yZGVyOiBub25lOwoKICAgICAgICAmOmhvdmVyIHsKICAgICAgICAgICAgYmFja2dyb3VuZC1jb2xvcjogQGFjY2VudC1jb2xvci1wcmltYXJ5OwogICAgICAgICAgICBjb2xvcjogYmxhY2s7CiAgICAgICAgfQogICAgfQoKICAgIC5vcHRpb25zIHsKICAgICAgICBkaXNwbGF5OiBmbGV4OwogICAgICAgIGZsZXgtZGlyZWN0aW9uOiBjb2x1bW47CiAgICAgICAgcGFkZGluZzogMDsKICAgICAgICBib3JkZXI6IDFweCBzb2xpZCBAYm9yZGVyLWhlYXZ5OwogICAgICAgIGJvcmRlci10b3AtY29sb3I6IEBib3JkZXItbGlnaHQ7CiAgICAgICAgYm9yZGVyLXJhZGl1czogQGJvcmRlci1yYWRpdXM7CiAgICAgICAgYmFja2dyb3VuZDogQGxpZ2h0LWFjY2VudDsKCiAgICAgICAgYnV0dG9uIHsKICAgICAgICAgICAgcGFkZGluZzogMC40cmVtIDEuMnJlbTsKICAgICAgICB9CiAgICB9CgogICAgLnNlbGVjdG9yIHsKICAgICAgICAmOmV4dGVuZChidXR0b24ucHJpbWFyeSk7CiAgICAgICAgY3Vyc29yOiBwb2ludGVyOwogICAgICAgIG1hcmdpbjogMC41ZW07CiAgICB9Cg=="></style>

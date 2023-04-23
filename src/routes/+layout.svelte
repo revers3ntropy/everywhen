@@ -1,189 +1,50 @@
-<script lang="ts">
-    import { browser } from '$app/environment';
-    import { page } from '$app/stores';
-    import { parse } from 'cookie';
-    import { onMount } from 'svelte';
-    import Notifications from 'svelte-notifications';
-    import Modal from 'svelte-simple-modal';
-    import 'ts-polyfill';
-    import '../app.less';
-    import { NON_AUTH_ROUTES, USERNAME_COOKIE_KEY } from '../lib/constants';
-    import { Backup } from '../lib/controllers/backup';
-    import { obfuscated, passcodeLastEntered, popup } from '../lib/stores';
-    import { api } from '../lib/utils/apiRequest';
-    import { GETParamIsFalsy } from '../lib/utils/GETArgs';
-    import { displayNotifOnErr, INFO_NOTIFICATION } from '../lib/utils/notifications';
-    import { nowS } from '../lib/utils/time';
-    import type { NotificationOptions } from '../lib/utils/types';
-    import Footer from './Footer.svelte';
-    import Nav from './Nav.svelte';
-    import NewVersionAvailable from './NewVersionAvailable.svelte';
-    import NoAuthNav from './NoAuthNav.svelte';
-    import Notifier from './Notifier.svelte';
-    import PasscodeModal from './PasscodeModal.svelte';
-
-    $: home = $page.url.pathname.trim() === '/';
-    $: requireAuth = !NON_AUTH_ROUTES.includes($page.url.pathname);
-
-    export let data: App.PageData;
-
-    let lastActivity = nowS();
-
-    let addNotification: <T>(props: Record<string, T> | NotificationOptions) => void;
-
-    $: obfuscated.set(data.settings.hideEntriesByDefault.value);
-
-    $: if (GETParamIsFalsy($page.url.searchParams.get('obfuscate'))) {
-        obfuscated.set(false);
-    }
-
-    $: $page && popup.set(null);
-
-    let showPasscodeModal = true;
-    let newVersionAvailable = false;
-    let newVersion = '<error>';
-    let downloadingBackup = false;
-
-    function checkObfuscatedTimeout () {
-        if (!requireAuth) return;
-        if ($obfuscated) return;
-
-        const hideAfter = data.settings.autoHideEntriesDelay.value;
-        if (hideAfter < 1) return;
-
-        if (nowS() - lastActivity >= hideAfter) {
-            addNotification({
-                ...INFO_NOTIFICATION,
-                removeAfter: 0,
-                text: 'Hidden due to inactivity',
-            });
-            $obfuscated = true;
-        }
-    }
-
-    function checkCookies () {
-        if (!requireAuth) return;
-
-        const cookies = parse(document.cookie);
-
-        // the key cookie is HttpOnly, so we can't read it from JS
-        // https://owasp.org/www-community/HttpOnly
-        if (!cookies[USERNAME_COOKIE_KEY]) {
-            console.error('Cookies have expired');
-            location.assign('/?redirect=' + encodeURIComponent(location.pathname.substring(1) + location.search));
-        }
-    }
-
-    function checkPasscode () {
-        if (!requireAuth) return;
-
-        const secondsSinceLastEntered = nowS() - $passcodeLastEntered;
-        showPasscodeModal = secondsSinceLastEntered > data.settings.passcodeTimeout.value;
-    }
-
-    async function checkForUpdate () {
-        const currentVersion = __VERSION__;
-        const versionResult = displayNotifOnErr(addNotification,
-            await api.get(data, '/version'),
-        );
-
-        newVersionAvailable = versionResult.version !== currentVersion;
-        newVersion = versionResult.version;
-    }
-
-    onMount(() => {
-        setInterval(() => {
-            if (home) return;
-
-            checkObfuscatedTimeout();
-            checkCookies();
-            checkPasscode();
-        }, 1000);
-
-        setInterval(() => {
-            void checkForUpdate();
-        }, 1000 * 10);
-    });
-
-
-    function activity () {
-        lastActivity = nowS();
-    }
-
-    async function downloadBackup () {
-        if (downloadingBackup) return;
-        downloadingBackup = true;
-        const { data: backupData } = displayNotifOnErr(addNotification,
-            await api.get(data, '/backups', { encrypted: 1 }),
-        );
-        Backup.download(backupData, data.username, true);
-        downloadingBackup = false;
-    }
-
-    function keydown (e: KeyboardEvent) {
-        lastActivity = nowS();
-        if (e.ctrlKey || e.metaKey) {
-            if (e.key === 'Escape') {
-                obfuscated.set(!$obfuscated);
-                e.preventDefault();
-                return;
-            }
-
-            if (e.key === 's') {
-                void downloadBackup();
-                e.preventDefault();
-                return;
-            }
-        }
-    }
-</script>
+<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgeyBicm93c2VyIH0gZnJvbSAnJGFwcC9lbnZpcm9ubWVudCc7CiAgICBpbXBvcnQgeyBwYWdlIH0gZnJvbSAnJGFwcC9zdG9yZXMnOwogICAgaW1wb3J0IHsgcGFyc2UgfSBmcm9tICdjb29raWUnOwogICAgaW1wb3J0IHsgb25Nb3VudCB9IGZyb20gJ3N2ZWx0ZSc7CiAgICBpbXBvcnQgTm90aWZpY2F0aW9ucyBmcm9tICdzdmVsdGUtbm90aWZpY2F0aW9ucyc7CiAgICBpbXBvcnQgTW9kYWwgZnJvbSAnc3ZlbHRlLXNpbXBsZS1tb2RhbCc7CiAgICBpbXBvcnQgJ3RzLXBvbHlmaWxsJzsKICAgIGltcG9ydCAnLi4vYXBwLmxlc3MnOwogICAgaW1wb3J0IHsgTk9OX0FVVEhfUk9VVEVTLCBVU0VSTkFNRV9DT09LSUVfS0VZIH0gZnJvbSAnLi4vbGliL2NvbnN0YW50cyc7CiAgICBpbXBvcnQgeyBCYWNrdXAgfSBmcm9tICcuLi9saWIvY29udHJvbGxlcnMvYmFja3VwJzsKICAgIGltcG9ydCB7IG9iZnVzY2F0ZWQsIHBhc3Njb2RlTGFzdEVudGVyZWQsIHBvcHVwIH0gZnJvbSAnLi4vbGliL3N0b3Jlcyc7CiAgICBpbXBvcnQgeyBhcGkgfSBmcm9tICcuLi9saWIvdXRpbHMvYXBpUmVxdWVzdCc7CiAgICBpbXBvcnQgeyBHRVRQYXJhbUlzRmFsc3kgfSBmcm9tICcuLi9saWIvdXRpbHMvR0VUQXJncyc7CiAgICBpbXBvcnQgewogICAgICAgIGRpc3BsYXlOb3RpZk9uRXJyLAogICAgICAgIElORk9fTk9USUZJQ0FUSU9OLAogICAgfSBmcm9tICcuLi9saWIvdXRpbHMvbm90aWZpY2F0aW9ucyc7CiAgICBpbXBvcnQgeyBub3dTIH0gZnJvbSAnLi4vbGliL3V0aWxzL3RpbWUnOwogICAgaW1wb3J0IHR5cGUgeyBOb3RpZmljYXRpb25PcHRpb25zIH0gZnJvbSAnLi4vbGliL3V0aWxzL3R5cGVzJzsKICAgIGltcG9ydCBGb290ZXIgZnJvbSAnLi9Gb290ZXIuc3ZlbHRlJzsKICAgIGltcG9ydCBOYXYgZnJvbSAnLi9OYXYuc3ZlbHRlJzsKICAgIGltcG9ydCBOZXdWZXJzaW9uQXZhaWxhYmxlIGZyb20gJy4vTmV3VmVyc2lvbkF2YWlsYWJsZS5zdmVsdGUnOwogICAgaW1wb3J0IE5vQXV0aE5hdiBmcm9tICcuL05vQXV0aE5hdi5zdmVsdGUnOwogICAgaW1wb3J0IE5vdGlmaWVyIGZyb20gJy4vTm90aWZpZXIuc3ZlbHRlJzsKICAgIGltcG9ydCBQYXNzY29kZU1vZGFsIGZyb20gJy4vUGFzc2NvZGVNb2RhbC5zdmVsdGUnOwoKICAgICQ6IGhvbWUgPSAkcGFnZS51cmwucGF0aG5hbWUudHJpbSgpID09PSAnLyc7CiAgICAkOiByZXF1aXJlQXV0aCA9ICFOT05fQVVUSF9ST1VURVMuaW5jbHVkZXMoJHBhZ2UudXJsLnBhdGhuYW1lKTsKCiAgICBleHBvcnQgbGV0IGRhdGE6IEFwcC5QYWdlRGF0YTsKCiAgICBsZXQgbGFzdEFjdGl2aXR5ID0gbm93UygpOwoKICAgIGxldCBhZGROb3RpZmljYXRpb246IDxUPigKICAgICAgICBwcm9wczogUmVjb3JkPHN0cmluZywgVD4gfCBOb3RpZmljYXRpb25PcHRpb25zLAogICAgKSA9PiB2b2lkOwoKICAgICQ6IG9iZnVzY2F0ZWQuc2V0KGRhdGEuc2V0dGluZ3MuaGlkZUVudHJpZXNCeURlZmF1bHQudmFsdWUpOwoKICAgICQ6IGlmIChHRVRQYXJhbUlzRmFsc3koJHBhZ2UudXJsLnNlYXJjaFBhcmFtcy5nZXQoJ29iZnVzY2F0ZScpKSkgewogICAgICAgIG9iZnVzY2F0ZWQuc2V0KGZhbHNlKTsKICAgIH0KCiAgICAkOiAkcGFnZSAmJiBwb3B1cC5zZXQobnVsbCk7CgogICAgbGV0IHNob3dQYXNzY29kZU1vZGFsID0gdHJ1ZTsKICAgIGxldCBuZXdWZXJzaW9uQXZhaWxhYmxlID0gZmFsc2U7CiAgICBsZXQgbmV3VmVyc2lvbiA9ICc8ZXJyb3I+JzsKICAgIGxldCBkb3dubG9hZGluZ0JhY2t1cCA9IGZhbHNlOwoKICAgIGZ1bmN0aW9uIGNoZWNrT2JmdXNjYXRlZFRpbWVvdXQgKCkgewogICAgICAgIGlmICghcmVxdWlyZUF1dGgpIHJldHVybjsKICAgICAgICBpZiAoJG9iZnVzY2F0ZWQpIHJldHVybjsKCiAgICAgICAgY29uc3QgaGlkZUFmdGVyID0gZGF0YS5zZXR0aW5ncy5hdXRvSGlkZUVudHJpZXNEZWxheS52YWx1ZTsKICAgICAgICBpZiAoaGlkZUFmdGVyIDwgMSkgcmV0dXJuOwoKICAgICAgICBpZiAobm93UygpIC0gbGFzdEFjdGl2aXR5ID49IGhpZGVBZnRlcikgewogICAgICAgICAgICBhZGROb3RpZmljYXRpb24oewogICAgICAgICAgICAgICAgLi4uSU5GT19OT1RJRklDQVRJT04sCiAgICAgICAgICAgICAgICByZW1vdmVBZnRlcjogMCwKICAgICAgICAgICAgICAgIHRleHQ6ICdIaWRkZW4gZHVlIHRvIGluYWN0aXZpdHknCiAgICAgICAgICAgIH0pOwogICAgICAgICAgICAkb2JmdXNjYXRlZCA9IHRydWU7CiAgICAgICAgfQogICAgfQoKICAgIGZ1bmN0aW9uIGNoZWNrQ29va2llcyAoKSB7CiAgICAgICAgaWYgKCFyZXF1aXJlQXV0aCkgcmV0dXJuOwoKICAgICAgICBjb25zdCBjb29raWVzID0gcGFyc2UoZG9jdW1lbnQuY29va2llKTsKCiAgICAgICAgLy8gdGhlIGtleSBjb29raWUgaXMgSHR0cE9ubHksIHNvIHdlIGNhbid0IHJlYWQgaXQgZnJvbSBKUwogICAgICAgIC8vIGh0dHBzOi8vb3dhc3Aub3JnL3d3dy1jb21tdW5pdHkvSHR0cE9ubHkKICAgICAgICBpZiAoIWNvb2tpZXNbVVNFUk5BTUVfQ09PS0lFX0tFWV0pIHsKICAgICAgICAgICAgY29uc29sZS5lcnJvcignQ29va2llcyBoYXZlIGV4cGlyZWQnKTsKICAgICAgICAgICAgbG9jYXRpb24uYXNzaWduKAogICAgICAgICAgICAgICAgJy8/cmVkaXJlY3Q9JyArCiAgICAgICAgICAgICAgICBlbmNvZGVVUklDb21wb25lbnQoCiAgICAgICAgICAgICAgICAgICAgbG9jYXRpb24ucGF0aG5hbWUuc3Vic3RyaW5nKDEpICsgbG9jYXRpb24uc2VhcmNoCiAgICAgICAgICAgICAgICApCiAgICAgICAgICAgICk7CiAgICAgICAgfQogICAgfQoKICAgIGZ1bmN0aW9uIGNoZWNrUGFzc2NvZGUgKCkgewogICAgICAgIGlmICghcmVxdWlyZUF1dGgpIHJldHVybjsKCiAgICAgICAgY29uc3Qgc2Vjb25kc1NpbmNlTGFzdEVudGVyZWQgPSBub3dTKCkgLSAkcGFzc2NvZGVMYXN0RW50ZXJlZDsKICAgICAgICBzaG93UGFzc2NvZGVNb2RhbCA9CiAgICAgICAgICAgIHNlY29uZHNTaW5jZUxhc3RFbnRlcmVkID4gZGF0YS5zZXR0aW5ncy5wYXNzY29kZVRpbWVvdXQudmFsdWU7CiAgICB9CgogICAgYXN5bmMgZnVuY3Rpb24gY2hlY2tGb3JVcGRhdGUgKCkgewogICAgICAgIGNvbnN0IGN1cnJlbnRWZXJzaW9uID0gX19WRVJTSU9OX187CiAgICAgICAgY29uc3QgdmVyc2lvblJlc3VsdCA9IGRpc3BsYXlOb3RpZk9uRXJyKAogICAgICAgICAgICBhZGROb3RpZmljYXRpb24sCiAgICAgICAgICAgIGF3YWl0IGFwaS5nZXQoZGF0YSwgJy92ZXJzaW9uJykKICAgICAgICApOwoKICAgICAgICBuZXdWZXJzaW9uQXZhaWxhYmxlID0gdmVyc2lvblJlc3VsdC52ZXJzaW9uICE9PSBjdXJyZW50VmVyc2lvbjsKICAgICAgICBuZXdWZXJzaW9uID0gdmVyc2lvblJlc3VsdC52ZXJzaW9uOwogICAgfQoKICAgIG9uTW91bnQoKCkgPT4gewogICAgICAgIHNldEludGVydmFsKCgpID0+IHsKICAgICAgICAgICAgaWYgKGhvbWUpIHJldHVybjsKCiAgICAgICAgICAgIGNoZWNrT2JmdXNjYXRlZFRpbWVvdXQoKTsKICAgICAgICAgICAgY2hlY2tDb29raWVzKCk7CiAgICAgICAgICAgIGNoZWNrUGFzc2NvZGUoKTsKICAgICAgICB9LCAxMDAwKTsKCiAgICAgICAgc2V0SW50ZXJ2YWwoKCkgPT4gewogICAgICAgICAgICB2b2lkIGNoZWNrRm9yVXBkYXRlKCk7CiAgICAgICAgfSwgMTAwMCAqIDEwKTsKICAgIH0pOwoKICAgIGZ1bmN0aW9uIGFjdGl2aXR5ICgpIHsKICAgICAgICBsYXN0QWN0aXZpdHkgPSBub3dTKCk7CiAgICB9CgogICAgYXN5bmMgZnVuY3Rpb24gZG93bmxvYWRCYWNrdXAgKCkgewogICAgICAgIGlmIChkb3dubG9hZGluZ0JhY2t1cCkgcmV0dXJuOwogICAgICAgIGRvd25sb2FkaW5nQmFja3VwID0gdHJ1ZTsKICAgICAgICBjb25zdCB7IGRhdGE6IGJhY2t1cERhdGEgfSA9IGRpc3BsYXlOb3RpZk9uRXJyKAogICAgICAgICAgICBhZGROb3RpZmljYXRpb24sCiAgICAgICAgICAgIGF3YWl0IGFwaS5nZXQoZGF0YSwgJy9iYWNrdXBzJywgeyBlbmNyeXB0ZWQ6IDEgfSkKICAgICAgICApOwogICAgICAgIEJhY2t1cC5kb3dubG9hZChiYWNrdXBEYXRhLCBkYXRhLnVzZXJuYW1lLCB0cnVlKTsKICAgICAgICBkb3dubG9hZGluZ0JhY2t1cCA9IGZhbHNlOwogICAgfQoKICAgIGZ1bmN0aW9uIGtleWRvd24gKGU6IEtleWJvYXJkRXZlbnQpIHsKICAgICAgICBsYXN0QWN0aXZpdHkgPSBub3dTKCk7CiAgICAgICAgaWYgKGUuY3RybEtleSB8fCBlLm1ldGFLZXkpIHsKICAgICAgICAgICAgaWYgKGUua2V5ID09PSAnRXNjYXBlJykgewogICAgICAgICAgICAgICAgb2JmdXNjYXRlZC5zZXQoISRvYmZ1c2NhdGVkKTsKICAgICAgICAgICAgICAgIGUucHJldmVudERlZmF1bHQoKTsKICAgICAgICAgICAgICAgIHJldHVybjsKICAgICAgICAgICAgfQoKICAgICAgICAgICAgaWYgKGUua2V5ID09PSAncycpIHsKICAgICAgICAgICAgICAgIHZvaWQgZG93bmxvYWRCYWNrdXAoKTsKICAgICAgICAgICAgICAgIGUucHJldmVudERlZmF1bHQoKTsKICAgICAgICAgICAgICAgIHJldHVybjsKICAgICAgICAgICAgfQogICAgICAgIH0KICAgIH0K">{}</script>
 
 <svelte:window
-    on:keydown|nonpassive={keydown}
-    on:mousemove|passive={activity}
-    on:scroll|passive={activity}
+    on:keydown|nonpassive="{keydown}"
+    on:mousemove|passive="{activity}"
+    on:scroll|passive="{activity}"
 />
 
 <svelte:head>
     <title>Halcyon.Land</title>
-    <meta content="Halcyon.Land - Journal and Life Logging" name="description" />
+    <meta
+        content="Halcyon.Land - Journal and Life Logging"
+        name="description"
+    />
 
-    <link href="https://fonts.googleapis.com" rel="preconnect">
-    <link crossorigin="anonymous" href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link
+        crossorigin="anonymous"
+        href="https://fonts.gstatic.com"
+        rel="preconnect"
+    />
     <link
         href="https://fonts.googleapis.com/css2?family=Quicksand&family=Dosis&family=Edu+NSW+ACT+Foundation:wght@500&family=Raleway:wght@300&display=swap"
         rel="stylesheet"
-    >
+    />
 </svelte:head>
 
-<svg class="accent-gradient-svg" height={0} width={0}>
-    <linearGradient id="accent-gradient" x1={1} x2={1} y1={0} y2={1}>
-        <stop offset={0} stop-color="rgb(121, 235, 226)" />
-        <stop offset={1} stop-color="rgb(189, 176, 255)" />
+<svg class="accent-gradient-svg" height="{0}" width="{0}">
+    <linearGradient id="accent-gradient" x1="{1}" x2="{1}" y1="{0}" y2="{1}">
+        <stop offset="{0}" stop-color="rgb(121, 235, 226)"></stop>
+        <stop offset="{1}" stop-color="rgb(189, 176, 255)"></stop>
     </linearGradient>
 </svg>
 
 <Notifications>
-
-    {#if data.settings.passcode.value
-    && nowS() - $passcodeLastEntered > data.settings.passcodeTimeout.value
-    && showPasscodeModal
-    && !home
-    && (data.settings.passcodeTimeout.value > 0
-        || !$passcodeLastEntered
-        || !browser)
-    }
+    {#if data.settings.passcode.value && nowS() - $passcodeLastEntered > data.settings.passcodeTimeout.value && showPasscodeModal && !home && (data.settings.passcodeTimeout.value > 0 || !$passcodeLastEntered || !browser)}
         <PasscodeModal
-            bind:show={showPasscodeModal}
-            passcode={data.settings.passcode.value}
+            bind:show="{showPasscodeModal}"
+            passcode="{data.settings.passcode.value}"
         />
     {/if}
 
-    <Notifier bind:addNotification />
+    <Notifier bind:addNotification="{addNotification}" />
 
     {#if !home}
         {#if data.id}
-            <Nav auth={data} />
+            <Nav auth="{data}" />
         {:else}
             <NoAuthNav />
         {/if}
@@ -194,13 +55,13 @@
     </div>
 
     {#if newVersionAvailable}
-        <NewVersionAvailable {newVersion} />
+        <NewVersionAvailable newVersion="{newVersion}" />
     {/if}
 
     <Modal
         classContent="popup-background"
         classWindow="popup-background"
-        show={$popup}
+        show="{$popup}"
     />
 
     <Footer />

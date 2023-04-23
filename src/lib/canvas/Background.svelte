@@ -1,15 +1,3 @@
-<script lang="ts">
-    import { renderable } from './canvasHelpers';
+<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgeyByZW5kZXJhYmxlIH0gZnJvbSAnLi9jYW52YXNIZWxwZXJzJzsKCiAgICBleHBvcnQgbGV0IGNvbG9yOiBzdHJpbmcgfCBudWxsID0gbnVsbDsKCiAgICByZW5kZXJhYmxlKCh7IGN0eCwgd2lkdGgsIGhlaWdodCB9KSA9PiB7CiAgICAgICAgY3R4LmNsZWFyUmVjdCgwLCAwLCB3aWR0aCwgaGVpZ2h0KTsKICAgICAgICBpZiAoY29sb3IpIHsKICAgICAgICAgICAgY3R4LmZpbGxTdHlsZSA9IGNvbG9yOwogICAgICAgICAgICBjdHguZmlsbFJlY3QoMCwgMCwgd2lkdGgsIGhlaWdodCk7CiAgICAgICAgfQogICAgfSk7Cg==">{}</script>
 
-    export let color: string | null = null;
-
-    renderable(({ ctx, width, height }) => {
-        ctx.clearRect(0, 0, width, height);
-        if (color) {
-            ctx.fillStyle = color;
-            ctx.fillRect(0, 0, width, height);
-        }
-    });
-</script>
-
-<slot></slot>
+<slot />

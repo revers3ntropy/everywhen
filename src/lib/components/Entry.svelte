@@ -1,91 +1,8 @@
-<script lang="ts">
-    import { browser } from '$app/environment';
-    import { tooltip } from '@svelte-plugins/tooltips';
-    import { createEventDispatcher } from 'svelte';
-    import Bin from 'svelte-material-icons/Delete.svelte';
-    import Restore from 'svelte-material-icons/DeleteRestore.svelte';
-    import Eye from 'svelte-material-icons/Eye.svelte';
-    import EyeOff from 'svelte-material-icons/EyeOff.svelte';
-    import NoteEditOutline from 'svelte-material-icons/NoteEditOutline.svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
-    import UtcTime from '../../lib/components/UtcTime.svelte';
-    import type { Entry } from '../controllers/entry';
-    import type { Label as LabelController } from '../controllers/label';
-    import type { Auth } from '../controllers/user';
-    import { popup } from '../stores';
-    import { api, apiPath } from '../utils/apiRequest';
-    import { displayNotifOnErr, SUCCESS_NOTIFICATION } from '../utils/notifications';
-    import { obfuscate, rawMdToHtml } from '../utils/text';
-    import AgentWidget from './AgentWidget.svelte';
-    import Dot from './Dot.svelte';
-    import Label from './Label.svelte';
-    import LocationWidget from './LocationWidget.svelte';
+<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgeyBicm93c2VyIH0gZnJvbSAnJGFwcC9lbnZpcm9ubWVudCc7CiAgICBpbXBvcnQgeyB0b29sdGlwIH0gZnJvbSAnQHN2ZWx0ZS1wbHVnaW5zL3Rvb2x0aXBzJzsKICAgIGltcG9ydCB7IGNyZWF0ZUV2ZW50RGlzcGF0Y2hlciB9IGZyb20gJ3N2ZWx0ZSc7CiAgICBpbXBvcnQgQmluIGZyb20gJ3N2ZWx0ZS1tYXRlcmlhbC1pY29ucy9EZWxldGUuc3ZlbHRlJzsKICAgIGltcG9ydCBSZXN0b3JlIGZyb20gJ3N2ZWx0ZS1tYXRlcmlhbC1pY29ucy9EZWxldGVSZXN0b3JlLnN2ZWx0ZSc7CiAgICBpbXBvcnQgRXllIGZyb20gJ3N2ZWx0ZS1tYXRlcmlhbC1pY29ucy9FeWUuc3ZlbHRlJzsKICAgIGltcG9ydCBFeWVPZmYgZnJvbSAnc3ZlbHRlLW1hdGVyaWFsLWljb25zL0V5ZU9mZi5zdmVsdGUnOwogICAgaW1wb3J0IE5vdGVFZGl0T3V0bGluZSBmcm9tICdzdmVsdGUtbWF0ZXJpYWwtaWNvbnMvTm90ZUVkaXRPdXRsaW5lLnN2ZWx0ZSc7CiAgICBpbXBvcnQgeyBnZXROb3RpZmljYXRpb25zQ29udGV4dCB9IGZyb20gJ3N2ZWx0ZS1ub3RpZmljYXRpb25zJzsKICAgIGltcG9ydCBVdGNUaW1lIGZyb20gJy4uLy4uL2xpYi9jb21wb25lbnRzL1V0Y1RpbWUuc3ZlbHRlJzsKICAgIGltcG9ydCB0eXBlIHsgRW50cnkgfSBmcm9tICcuLi9jb250cm9sbGVycy9lbnRyeSc7CiAgICBpbXBvcnQgdHlwZSB7IExhYmVsIGFzIExhYmVsQ29udHJvbGxlciB9IGZyb20gJy4uL2NvbnRyb2xsZXJzL2xhYmVsJzsKICAgIGltcG9ydCB0eXBlIHsgQXV0aCB9IGZyb20gJy4uL2NvbnRyb2xsZXJzL3VzZXInOwogICAgaW1wb3J0IHsgcG9wdXAgfSBmcm9tICcuLi9zdG9yZXMnOwogICAgaW1wb3J0IHsgYXBpLCBhcGlQYXRoIH0gZnJvbSAnLi4vdXRpbHMvYXBpUmVxdWVzdCc7CiAgICBpbXBvcnQgewogICAgICAgIGRpc3BsYXlOb3RpZk9uRXJyLAogICAgICAgIFNVQ0NFU1NfTk9USUZJQ0FUSU9OLAogICAgfSBmcm9tICcuLi91dGlscy9ub3RpZmljYXRpb25zJzsKICAgIGltcG9ydCB7IG9iZnVzY2F0ZSwgcmF3TWRUb0h0bWwgfSBmcm9tICcuLi91dGlscy90ZXh0JzsKICAgIGltcG9ydCBBZ2VudFdpZGdldCBmcm9tICcuL0FnZW50V2lkZ2V0LnN2ZWx0ZSc7CiAgICBpbXBvcnQgRG90IGZyb20gJy4vRG90LnN2ZWx0ZSc7CiAgICBpbXBvcnQgTGFiZWwgZnJvbSAnLi9MYWJlbC5zdmVsdGUnOwogICAgaW1wb3J0IExvY2F0aW9uV2lkZ2V0IGZyb20gJy4vTG9jYXRpb25XaWRnZXQuc3ZlbHRlJzsKCiAgICBjb25zdCBkaXNwYXRjaCA9IGNyZWF0ZUV2ZW50RGlzcGF0Y2hlcigpOwogICAgY29uc3QgeyBhZGROb3RpZmljYXRpb24gfSA9IGdldE5vdGlmaWNhdGlvbnNDb250ZXh0KCk7CgogICAgZXhwb3J0IGxldCBpZCA9ICcnOwogICAgZXhwb3J0IGxldCB0aXRsZSA9ICcnOwogICAgZXhwb3J0IGxldCBlbnRyeSA9ICcnOwogICAgZXhwb3J0IGxldCBjcmVhdGVkOiBudW1iZXI7CiAgICBleHBvcnQgbGV0IGNyZWF0ZWRUWk9mZnNldCA9IDA7CiAgICBleHBvcnQgbGV0IGxhYmVsOiBMYWJlbENvbnRyb2xsZXIgfCBudWxsIHwgdW5kZWZpbmVkID0gdW5kZWZpbmVkIGFzCiAgICAgICAgfCBMYWJlbENvbnRyb2xsZXIKICAgICAgICB8IG51bGwKICAgICAgICB8IHVuZGVmaW5lZDsKICAgIGV4cG9ydCBsZXQgbGF0aXR1ZGU6IG51bWJlciB8IG51bGwgPSBudWxsOwogICAgZXhwb3J0IGxldCBsb25naXR1ZGU6IG51bWJlciB8IG51bGwgPSBudWxsOwogICAgZXhwb3J0IGxldCBkZWxldGVkID0gZmFsc2U7CiAgICBleHBvcnQgbGV0IGRlY3J5cHRlZCA9IHRydWU7Ci,AgICBleHBvcnQgbGV0IGFnZW50RGF0YSA9ICcnOwogICAgZXhwb3J0IGxldCBlZGl0czogRW50cnlbXSA9IFtdOwogICAgZXhwb3J0IGxldCBpc0VkaXQgPSBmYWxzZTsKICAgIGV4cG9ydCBsZXQgc2hvd0Z1bGxEYXRlID0gZmFsc2U7CgogICAgZXhwb3J0IGxldCBvYmZ1c2NhdGVkI,D0gdHJ1ZTsKICAgIGV4cG9ydCBsZXQgc2hvd0xhYmVscyA9IHRydWU7CiAgICBleHBvcnQgbGV0IHNob3dMb2NhdGlvbnMgPSB0cnVlOwogICAgZXhwb3J0IGxldCBpc0luRGlhbG9nID0gZmFsc2U7CgogICAgZXhwb3J0IGxldCBhdXRoOiBBdXRoOwoKICAgIC8vIHNob3cgcmFuZ,G9tIHN0cmluZyBp,bnN0ZWFkIG9mIHRleHQgY29udGVudCBpZiBvYmZ1c2NhdGVkCiAgICBleHBvcnQgbGV0IHNob3dMYWJlbDogTGFiZWxDb250cm9sbGVyIHwgbnVsbCB8IHVuZGVmaW5lZCA9IGxhYmVsOwogICAgJDogaWYgKHNob3dMYWJlbHMgJiYgKCh,sKTogbCBpcyBMYWJlbENvbnRyb2xsZXIgPT4gISFsKShsYWJlbCkpIHsKICAgICAgICBzaG93TGFiZWwgPSB7CiAgICAgICAgICAgIC4uLmxhYmVsLAogICAgICAgICAgICBuYW1lOiBvYmZ1c2NhdGVkID8gb2JmdXNjYXRlKGxhYmVsLm5hbWUpIDogbGFiZWwubmFtZQogICAgICAgIH07CiAgICB9CgogICAgYXN5bmMgZnVuY3Rpb24gZGVsZXRlU2VsZiAoKSB7CiAgICAgICAgaWYgKAogICAgICAgICAgICAhY29uZmlybSgKICAgICAgICAgICAgICAgIGBBcmUgeW91IHN1cmUgeW91IHdhbnQgdG8gJHsKICAgICAgICAgICAgICAgICAgICBkZWxldGVkID8gJ3Jlc3RvcmUnIDogJ2RlbGV0ZScKICAgICAgICAgICAgICAgIH0gdGhpcyBlbnRyeT9gCiAgICAgICAgICAgICkKICAgICAgICApIHsKICAgICAgICAgICAgcmV0dXJuOwogICAgICAgIH0KCiAgICAgICAgZGlzcGxheU5vdGlmT25FcnIoCiAgICAgICAgICAgIGFkZE5vdGlmaWNhdGlvbiwKICAgICAgICAgICAgYXdhaXQgYXBpLmRlbGV0ZShhdXRoLCBhcGlQYXRoKCcvZW50cmllcy8/JywgaWQpLCB7CiAgICAgICAgICAgICAgICByZXN0b3JlOiAhIWRlbGV0ZWQKICAgICAgICAgICAgfSkKICAgICAgICApOwoKICAgICAgICBpZiAoaXNJbkRpYWxvZykgcG9wdXAuc2V0KG51bGwpOwoKICAgICAgICBhZGROb3RpZmljYXRpb24oewogICAgICAgICAgICAuLi5TVUNDRVNTX05PVElGSUNBVElPTiwKICAgICAgICAgICAgdGV4dDogYEVudHJ5ICR7ZGVsZXRlZCA/ICdyZXN0b3JlZCcgOiAnZGVsZXRlZCd9YAogICAgICAgIH0pOwogICAgICAgIGRpc3BhdGNoKCd1cGRhdGVkJyk7CiAgICB9CgogICAgZnVuY3Rpb24gdG9nZ2xlT2JmdXNjYXRpb24gKCkgewogICAgICAgIG9iZnVzY2F0ZWQgPSAhb2JmdXNjYXRlZDsKICAgIH0KCiAgICAkOiBlbnRyeUh0bWwgPSBicm93c2VyID8gcmF3TWRUb0h0bWwoZW50cnksIG9iZnVzY2F0ZWQpIDogJyc7CiAgICAvLyBkb2Vzbid0IHNldCByZWFjdGl2ZWx5IG9uIHRvb2x0aXAgY29udGVudCBpZiBpbiBwcm9wcz8/PwogICAgJDogcmVzdG9yZURlbGV0ZVRvb2x0aXAgPSBkZWxldGVkID8gJ1Jlc3RvcmUgRW50cnknIDogJ0RlbGV0ZSBFbnRyeSc7Cg==">{}</script>
 
-    const dispatch = createEventDispatcher();
-    const { addNotification } = getNotificationsContext();
-
-    export let id = '';
-    export let title = '';
-    export let entry = '';
-    export let created: number;
-    export let createdTZOffset = 0;
-    export let label: LabelController | null | undefined =
-        undefined as LabelController | null | undefined;
-    export let latitude: number | null = null;
-    export let longitude: number | null = null;
-    export let deleted = false;
-    export let decrypted = true;
-    export let agentData = '';
-    export let edits: Entry[] = [];
-    export let isEdit = false;
-    export let showFullDate = false;
-
-    export let obfuscated = true;
-    export let showLabels = true;
-    export let showLocations = true;
-    export let isInDialog = false;
-
-    export let auth: Auth;
-
-    // show random string instead of text content if obfuscated
-    export let showLabel: LabelController | null | undefined = label;
-    $: if (showLabels && ((l): l is LabelController => !!l)(label)) {
-        showLabel = {
-            ...label,
-            name: obfuscated ? obfuscate(label.name) : label.name,
-        };
-    }
-
-    async function deleteSelf () {
-        if (!confirm(`Are you sure you want to ${deleted ? 'restore' : 'delete'} this entry?`)) {
-            return;
-        }
-
-        displayNotifOnErr(addNotification,
-            await api.delete(auth, apiPath('/entries/?', id), {
-                restore: !!deleted,
-            }),
-        );
-
-        if (isInDialog) popup.set(null);
-
-        addNotification({
-            ...SUCCESS_NOTIFICATION,
-            text: `Entry ${deleted ? 'restored' : 'deleted'}`,
-        });
-        dispatch('updated');
-    }
-
-    function toggleObfuscation () {
-        obfuscated = !obfuscated;
-    }
-
-    $: entryHtml = browser ? rawMdToHtml(entry, obfuscated) : '';
-    // doesn't set reactively on tooltip content if in props???
-    $: restoreDeleteTooltip = deleted ? 'Restore Entry' : 'Delete Entry';
-</script>
-
-<div class="entry {obfuscated ? '' : 'visible'} {isInDialog ? 'in-dialog' : ''}">
+<div
+    class="entry {obfuscated ? '' : 'visible'} {isInDialog ? 'in-dialog' : ''}"
+>
     <p class="mobile-title {obfuscated ? 'obfuscated' : ''}">
         {obfuscated ? obfuscate(title) : title}
     </p>
@@ -93,22 +10,22 @@
         <div class="flex-space-evenly">
             <span class="time">
                 <UtcTime
-                    fmt={showFullDate ? 'ddd DD-MM-YYYY h:mm A' : 'h:mm A'}
-                    timestamp={created}
+                    fmt="{showFullDate ? 'ddd DD-MM-YYYY h:mm A' : 'h:mm A'}"
+                    timestamp="{created}"
                     tooltipPosition="right"
-                    tzOffset={createdTZOffset}
+                    tzOffset="{createdTZOffset}"
                 />
             </span>
 
-            <AgentWidget data={agentData} />
+            <AgentWidget data="{agentData}" />
 
             {#if latitude && longitude && showLocations}
                 <LocationWidget
-                    {auth}
-                    entryId={id}
-                    {latitude}
-                    {longitude}
-                    {obfuscated}
+                    auth="{auth}"
+                    entryId="{id}"
+                    latitude="{latitude}"
+                    longitude="{longitude}"
+                    obfuscated="{obfuscated}"
                 />
             {/if}
 
@@ -123,7 +40,7 @@
             {/if}
 
             {#if showLabels}
-                <Label label={showLabel} obfuscated={obfuscated} />
+                <Label label="{showLabel}" obfuscated="{obfuscated}" />
             {/if}
         </div>
 
@@ -134,9 +51,9 @@
         <div class="flex-center">
             {#if !obfuscated && !isEdit}
                 <button
-                    on:click={deleteSelf}
-                    aria-label={deleted ? 'Restore' : 'Delete'}
-                    use:tooltip={{ content: restoreDeleteTooltip }}
+                    on:click="{deleteSelf}"
+                    aria-label="{deleted ? 'Restore' : 'Delete'}"
+                    use:tooltip="{{ content: restoreDeleteTooltip }}"
                 >
                     {#if deleted}
                         <Restore size="25" />
@@ -147,7 +64,7 @@
                 {#if !deleted}
                     <a
                         href="/journal/{id}/edit?obfuscate=0"
-                        use:tooltip={{ content: 'Edit Entry' }}
+                        use:tooltip="{{ content: 'Edit Entry' }}"
                     >
                         <NoteEditOutline size="25" />
                     </a>
@@ -155,8 +72,8 @@
             {/if}
 
             <button
-                aria-label={obfuscated ? 'Show entry' : 'Hide entry'}
-                on:click={toggleObfuscation}
+                aria-label="{obfuscated ? 'Show entry' : 'Hide entry'}"
+                on:click="{toggleObfuscation}"
             >
                 {#if obfuscated}
                     <Eye size="25" />
@@ -171,142 +88,4 @@
     </p>
 </div>
 
-<style lang="less">
-    @import '../../styles/text';
-    @import '../../styles/variables';
-
-    .entry {
-        padding: .8em 0;
-        margin: 0;
-        height: fit-content;
-        white-space: pre-wrap;
-        border: 1px solid transparent;
-
-        &, * {
-            .font-dosis();
-            font-size: 1.05rem;
-        }
-
-        //&.visible:not(.in-dialog) {
-        //    border-image: linear-gradient(transparent,
-        //    @accent-color-secondary,
-        //    transparent) 1 100%;
-        //}
-
-        @media @mobile {
-            padding: 0;
-        }
-
-        // so images don't appear too large
-        :global(img) {
-            max-width: 100%;
-            max-height: 50vh;
-        }
-
-        .header {
-            border-bottom: 1px solid @border;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 0.5em 2em 0 0;
-            padding: 0.3em;
-
-            @media @mobile {
-                margin: 0;
-                padding: 0;
-            }
-
-            :global(svg) {
-                color: @text-color-light;
-            }
-        }
-
-        .title {
-            font-size: 1.2em;
-            white-space: nowrap;
-            overflow-x: scroll;
-
-            @media @mobile {
-                display: none;
-            }
-        }
-
-        .time {
-            margin: 0 0 0 0.5rem;
-            font-size: 0.8em;
-            color: @text-color-light;
-        }
-
-        .body {
-            margin: 0 2rem;
-            word-break: break-word;
-            max-width: 700px;
-
-            @media @mobile {
-                margin: 0 .5rem;
-            }
-
-            // inner <p> element is created when using @html
-            :global(p) {
-                margin: 0;
-                padding: 0;
-                border: none;
-            }
-
-            // generated from markdown
-
-            :global(ul), :global(ol) {
-                // ugh
-                margin: -2.5rem 0 -2.5rem .8rem;
-                padding: 0;
-                border: none;
-
-                :global(li) {
-                    margin: 0;
-                    padding: 0;
-                    border: none;
-                }
-            }
-
-            :global(table) {
-                border-collapse: collapse;
-
-                :global(tr) {
-
-                    :global(td), :global(th) {
-                        border: 1px solid @border;
-
-                        margin: 0;
-                        padding: 0.3rem;
-                        text-align: center;
-                    }
-
-                    :global(th) {
-                        font-size: 1.2rem;
-                    }
-                }
-            }
-
-            :global(blockquote) {
-                border-left: 3px solid @accent-color-secondary;
-                margin: 0 0 0 .5em;
-                padding: 0 0 0 1em;
-            }
-        }
-
-        .mobile-title {
-            display: none;
-            margin: 2rem 0 -1.2rem .5rem;
-            font-size: 1.1em;
-            text-align: center;
-
-            @media @mobile {
-                display: block;
-            }
-        }
-    }
-
-    .edits-link {
-        font-size: 0.95rem;
-    }
-</style>
+<style lang="less" ✂prettier:content✂="CiAgICBAaW1wb3J0ICcuLi8uLi9zdHlsZXMvdGV4dCc7CiAgICBAaW1wb3J0ICcuLi8uLi9zdHlsZXMvdmFyaWFibGVzJzsKCiAgICAuZW50cnkgewogICAgICAgIHBhZGRpbmc6IDAuOGVtIDA7CiAgICAgICAgbWFyZ2luOiAwOwogICAgICAgIGhlaWdodDogZml0LWNvbnRlbnQ7CiAgICAgICAgd2hpdGUtc3BhY2U6IHByZS13cmFwOwogICAgICAgIGJvcmRlcjogMXB4IHNvbGlkIHRyYW5zcGFyZW50OwoKICAgICAgICAmLAogICAgICAgICogewogICAgICAgICAgICAuZm9udC1kb3NpcygpOwogICAgICAgICAgICBmb250LXNpemU6IDEuMDVyZW07CiAgICAgICAgfQoKICAgICAgICAvLyYudmlzaWJsZTpub3QoLmluLWRpYWxvZykgewogICAgICAgIC8vICAgIGJvcmRlci1pbWFnZTogbGluZWFyLWdyYWRpZW50KHRyYW5zcGFyZW50LAogICAgICAgIC8vICAgIEBhY2NlbnQtY29sb3Itc2Vjb25kYXJ5LAogICAgICAgIC8vICAgIHRyYW5zcGFyZW50KSAxIDEwMCU7CiAgICAgICAgLy99CgogICAgICAgIEBtZWRpYSBAbW9iaWxlIHsKICAgICAgICAgICAgcGFkZGluZzogMDsKICAgICAgICB9CgogICAgICAgIC8vIHNvIGltYWdlcyBkb24ndCBhcHBlYXIgdG9vIGxhcmdlCiAgICAgICAgOmdsb2JhbChpbWcpIHsKICAgICAgICAgICAgbWF4LXdpZHRoOiAxMDAlOwogICAgICAgICAgICBtYXgtaGVpZ2h0OiA1MHZoOwogICAgICAgIH0KCiAgICAgICAgLmhlYWRlciB7CiAgICAgICAgICAgIGJvcmRlci1ib3R0b206IDFweCBzb2xpZCBAYm9yZGVyOwogICAgICAgICAgICBkaXNwbGF5OiBmbGV4OwogICAgICAgICAgICBqdXN0aWZ5LWNvbnRlbnQ6IHNwYWNlLWJldHdlZW47CiAgICAgICAgICAgIGFsaWduLWl0ZW1zOiBjZW50ZXI7CiAgICAgICAgICAgIG1hcmdpbjogMC41ZW0gMmVtIDAgMDsKICAgICAgICAgICAgcGFkZGluZzogMC4zZW07CgogICAgICAgICAgICBAbWVkaWEgQG1vYmlsZSB7CiAgICAgICAgICAgICAgICBtYXJnaW46IDA7CiAgICAgICAgICAgICAgICBwYWRkaW5nOiAwOwogICAgICAgICAgICB9CgogICAgICAgICAgICA6Z2xvYmFsKHN2ZykgewogICAgICAgICAgICAgICAgY29sb3I6IEB0ZXh0LWNvbG9yLWxpZ2h0OwogICAgICAgICAgICB9CiAgICAgICAgfQoKICAgICAgICAudGl0bGUgewogICAgICAgICAgICBmb250LXNpemU6IDEuMmVtOwogICAgICAgICAgICB3aGl0ZS1zcGFjZTogbm93cmFwOwogICAgICAgICAgICBvdmVyZmxvdy14OiBzY3JvbGw7CgogICAgICAgICAgICBAbWVkaWEgQG1vYmlsZSB7CiAgICAgICAgICAgICAgICBkaXNwbGF5OiBub25lOwogICAgICAgICAgICB9CiAgICAgICAgfQoKICAgICAgICAudGltZSB7CiAgICAgICAgICAgIG1hcmdpbjogMCAwIDAgMC41cmVtOwogICAgICAgICAgICBmb250LXNpemU6IDAuOGVtOwogICAgICAgICAgICBjb2xvcjogQHRleHQtY29sb3ItbGlnaHQ7CiAgICAgICAgfQoKICAgICAgICAuYm9keSB7CiAgICAgICAgICAgIG1hcmdpbjogMCAycmVtOwogICAgICAgICAgICB3b3JkLWJyZWFrOiBicmVhay13b3JkOwogICAgICAgICAgICBtYXgtd2lkdGg6IDcwMHB4OwoKICAgICAgICAgICAgQG1lZGlhIEBtb2JpbGUgewogICAgICAgICAgICAgICAgbWFyZ2luOiAwIDAuNXJlbTsKICAgICAgICAgICAgfQoKICAgICAgICAgICAgLy8gaW5uZXIgPHA+IGVsZW1lbnQgaXMgY3JlYXRlZCB3aGVuIHVzaW5nIEBodG1sCiAgICAgICAgICAgIDpnbG9iYWwocCkgewogICAgICAgICAgICAgICAgbWFyZ2luOiAwOwogICAgICAgICAgICAgICAgcGFkZGluZzogMDsKICAgICAgICAgICAgICAgIGJvcmRlcjogbm9uZTsKICAgICAgICAgICAgfQoKICAgICAgICAgICAgLy8gZ2VuZXJhdGVkIGZyb20gbWFya2Rvd24KCiAgICAgICAgICAgIDpnbG9iYWwodWwpLAogICAgICAgICAgICA6Z2xvYmFsKG9sKSB7CiAgICAgICAgICAgICAgICAvLyB1Z2gKICAgICAgICAgICAgICAgIG1hcmdpbjogLTIuNXJlbSAwIC0yLjVyZW0gMC44cmVtOwogICAgICAgICAgICAgICAgcGFkZGluZzogMDsKICAgICAgICAgICAgICAgIGJvcmRlcjogbm9uZTsKCiAgICAgICAgICAgICAgICA6Z2xvYmFsKGxpKSB7CiAgICAgICAgICAgICAgICAgICAgbWFyZ2luOiAwOwogICAgICAgICAgICAgICAgICAgIHBhZGRpbmc6IDA7CiAgICAgICAgICAgICAgICAgICAgYm9yZGVyOiBub25lOwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICB9CgogICAgICAgICAgICA6Z2xvYmFsKHRhYmxlKSB7CiAgICAgICAgICAgICAgICBib3JkZXItY29sbGFwc2U6IGNvbGxhcHNlOwoKICAgICAgICAgICAgICAgIDpnbG9iYWwodHIpIHsKICAgICAgICAgICAgICAgICAgICA6Z2xvYmFsKHRkKSwKICAgICAgICAgICAgICAgICAgICA6Z2xvYmFsKHRoKSB7CiAgICAgICAgICAgICAgICAgICAgICAgIGJvcmRlcjogMXB4IHNvbGlkIEBib3JkZXI7CgogICAgICAgICAgICAgICAgICAgICAgICBtYXJnaW46IDA7CiAgICAgICAgICAgICAgICAgICAgICAgIHBhZGRpbmc6IDAuM3JlbTsKICAgICAgICAgICAgICAgICAgICAgICAgdGV4dC1hbGlnbjogY2VudGVyOwogICAgICAgICAgICAgICAgICAgIH0KCiAgICAgICAgICAgICAgICAgICAgOmdsb2JhbCh0aCkgewogICAgICAgICAgICAgICAgICAgICAgICBmb250LXNpemU6IDEuMnJlbTsKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KCiAgICAgICAgICAgIDpnbG9iYWwoYmxvY2txdW90ZSkgewogICAgICAgICAgICAgICAgYm9yZGVyLWxlZnQ6IDNweCBzb2xpZCBAYWNjZW50LWNvbG9yLXNlY29uZGFyeTsKICAgICAgICAgICAgICAgIG1hcmdpbjogMCAwIDAgMC41ZW07CiAgICAgICAgICAgICAgICBwYWRkaW5nOiAwIDAgMCAxZW07CiAgICAgICAgICAgIH0KICAgICAgICB9CgogICAgICAgIC5tb2JpbGUtdGl0bGUgewogICAgICAgICAgICBkaXNwbGF5OiBub25lOwogICAgICAgICAgICBtYXJnaW46IDJyZW0gMCAtMS4ycmVtIDAuNXJlbTsKICAgICAgICAgICAgZm9udC1zaXplOiAxLjFlbTsKICAgICAgICAgICAgdGV4dC1hbGlnbjogY2VudGVyOwoKICAgICAgICAgICAgQG1lZGlhIEBtb2JpbGUgewogICAgICAgICAgICAgICAgZGlzcGxheTogYmxvY2s7CiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICB9CgogICAgLmVkaXRzLWxpbmsgewogICAgICAgIGZvbnQtc2l6ZTogMC45NXJlbTsKICAgIH0K"></style>

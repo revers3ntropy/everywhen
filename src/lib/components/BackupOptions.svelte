@@ -1,91 +1,14 @@
-<script lang="ts">
-    import Download from 'svelte-material-icons/Download.svelte';
-    import DownloadLock from 'svelte-material-icons/DownloadLock.svelte';
-    import Upload from 'svelte-material-icons/Upload.svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
-    import { Backup } from '../controllers/backup';
-    import type { Auth } from '../controllers/user';
-    import { encryptionKeyFromPassword } from '../security/authUtils';
-    import { api } from '../utils/apiRequest';
-    import { displayNotifOnErr, SUCCESS_NOTIFICATION } from '../utils/notifications';
-    import { showPopup } from '../utils/popups';
-    import type { Result } from '../utils/result';
-    import FileDropDialog from './dialogs/FileDropDialog.svelte';
+<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgRG93bmxvYWQgZnJvbSAnc3ZlbHRlLW1hdGVyaWFsLWljb25zL0Rvd25sb2FkLnN2ZWx0ZSc7CiAgICBpbXBvcnQgRG93bmxvYWRMb2NrIGZyb20gJ3N2ZWx0ZS1tYXRlcmlhbC1pY29ucy9Eb3dubG9hZExvY2suc3ZlbHRlJzsKICAgIGltcG9ydCBVcGxvYWQgZnJvbSAnc3ZlbHRlLW1hdGVyaWFsLWljb25zL1VwbG9hZC5zdmVsdGUnOwogICAgaW1wb3J0IHsgZ2V0Tm90aWZpY2F0aW9uc0NvbnRleHQgfSBmcm9tICdzdmVsdGUtbm90aWZpY2F0aW9ucyc7CiAgICBpbXBvcnQgeyBCYWNrdXAgfSBmcm9tICcuLi9jb250cm9sbGVycy9iYWNrdXAnOwogICAgaW1wb3J0IHR5cGUgeyBBdXRoIH0gZnJvbSAnLi4vY29udHJvbGxlcnMvdXNlcic7CiAgICBpbXBvcnQgeyBlbmNyeXB0aW9uS2V5RnJvbVBhc3N3b3JkIH0gZnJvbSAnLi4vc2VjdXJpdHkvYXV0aFV0aWxzJzsKICAgIGltcG9ydCB7IGFwaSB9IGZyb20gJy4uL3V0aWxzL2FwaVJlcXVlc3QnOwogICAgaW1wb3J0IHsKICAgICAgICBkaXNwbGF5Tm90aWZPbkVyciwKICAgICAgICBTVUNDRVNTX05PVElGSUNBVElPTiwKICAgIH0gZnJvbSAnLi4vdXRpbHMvbm90aWZpY2F0aW9ucyc7CiAgICBpbXBvcnQgeyBzaG93UG9wdXAgfSBmcm9tICcuLi91dGlscy9wb3B1cHMnOwogICAgaW1wb3J0IHR5cGUgeyBSZXN1bHQgfSBmcm9tICcuLi91dGlscy9yZXN1bHQnOwogICAgaW1wb3J0IEZpbGVEcm9wRGlhbG9nIGZyb20gJy4vZGlhbG9ncy9GaWxlRHJvcERpYWxvZy5zdmVsdGUnOwoKICAgIGNvbnN0IHsgYWRkTm90aWZpY2F0aW9uIH0gPSBnZXROb3RpZmljYXRpb25zQ29udGV4dCgpOwoKICAgIGV4cG9ydCBsZ,XQgYXV0aDogQXV0aDsKCiAgICBsZXQgZG93bmxvYWRpbmcgPSBmYWxzZTsKCiAgICBhc3luYyBmdW5jdGlvbiBkb3dubG9hZCAoZW5jcnlwdGVkOiBib29sZWFuKSB7CiAgICAgICAgaWYgKGRvd25sb2FkaW5nKSByZXR1cm47CiAgICAgICAgZG93bmxvYWRpbmcgPSB0cnVlOwogICAgICAgIGNvbnN0IHsgZGF0YTogYmFja3VwRGF0YSB9ID0gZGlzcGxheU5vdGlmT25FcnIoCiAgICAgICAgICAgIGFkZE5vdGlmaWNhdGlvbiwKICAgICAgICAgICAgYXdhaXQgYXBpLmdldChhdXRoLCAnL2JhY2t1cHMnLCB7IGVuY3J5cHRlZCB9KQogICAgICAgICk7CiAgICAgICAgQmFja3VwLmRvd25sb2FkKGJhY2t1cERhdGEsIGF1dGgudXNlcm5hbWUsIGVuY3J5cHRlZCk7CiAgICAgICAgZG93bmxvYWRpbmcgPSBmYWxzZTsKICAgIH0KCiAgICBmdW5jdGlvbiB1cGxvYWQgKCkgewogICAgICAgIHNob3dQb3B1cChGaWxlRHJvcERpYWxvZywgewogICAgICAgICAgICBhdXRoLAogICAgICAgICAgICBtZXNzYWdlOiAnRHJvcCBlbmNyeXB0ZWQgLmpzb24gZmlsZSBoZXJlJywKICAgICAgICAgICAgc2hvd1RleHRCb3g6IHRydWUsCiAgICAgICAgICAgIHRleHRCb3hUeXBlOiAncGFzc3dvcmQnLAogICAgICAgICAgICB0ZXh0Qm94TGFiZWw6CiAgICAgICAgICAgICAgICAnUGFzc3dvcmQgb2YgYWNjb3VudCB0aGUgYmFja3VwIGNhbWUgZnJvbSAnICsKICAgICAgICAgICAgICAgICcobGVhdmUgYmxhbmsgaWYgc2FtZSBhY2NvdW50KScsCiAgICAgICAgICAgIHdpdGhDb250ZW50czogYXN5bmMgKHJlczogUmVzdWx0PHN0cmluZz4sIHBhc3N3b3JkPzogc3RyaW5nKSA9PiB7CiAgICAgICAgICAgICAgICBsZXQgY29udGVudHMgPSBkaXNwbGF5Tm90aWZPbkVycihhZGROb3RpZmljYXRpb24sIHJlcyk7CgogICAgICAgICAgICAgICAgaWYgKAogICAgICAgICAgICAgICAgICAgICFjb25maXJtKAogICAgICAgICAgICAgICAgICAgICAgICAnQXJlIHlvdSBzdXJlIHlvdSB3YW50IHRvIHJlc3RvcmUgZnJvbSB0aGlzIGJhY2t1cD8nICsKICAgICAgICAgICAgICAgICAgICAgICAgJyBUaGlzIHdpbGwgb3ZlcndyaXRlIGFsbCB5b3VyIGV4aXN0aW5nIGRhdGEuJwogICAgICAgICAgICAgICAgICAgICkKICAgICAgICAgICAgICAgICkgewogICAgICAgICAgICAgICAgICAgIHJldHVybjsKICAgICAgICAgICAgICAgIH0KCiAgICAgICAgICAgICAgICBpZiAoIXBhc3N3b3JkKSB7CiAgICAgICAgICAgICAgICAgICAgcGFzc3dvcmQgPSBhdXRoLmtleTsKICAgICAgICAgICAgICAgIH0gZWxzZSB7CiAgICAgICAgICAgICAgICAgICAgcGFzc3dvcmQgPSBlbmNyeXB0aW9uS2V5RnJvbVBhc3N3b3JkKHBhc3N3b3JkKTsKICAgICAgICAgICAgICAgIH0KCiAgICAgICAgICAgICAgICBkaXNwbGF5Tm90aWZPbkVycigKICAgICAgICAgICAgICAgICAgICBhZGROb3RpZmljYXRpb24sCiAgICAgICAgICAgICAgICAgICAgYXdhaXQgYXBpLnBvc3QoYXV0aCwgJy9iYWNrdXBzJywgewogICAgICAgICAgICAgICAgICAgICAgICBkYXRhOiBjb250ZW50cywKICAgICAgICAgICAgICAgICAgICAgICAga2V5OiBwYXNzd29yZAogICAgICAgICAgICAgICAgICAgIH0pCiAgICAgICAgICAgICAgICApOwoKICAgICAgICAgICAgICAgIGFkZE5vdGlmaWNhdGlvbih7CiAgICAgICAgICAgICAgICAgICAgLi4uU1VDQ0VTU19OT1RJRklDQVRJT04sCiAgICAgICAgICAgICAgICAgICAgdGV4dDogJ0ZpbGUgdXBsb2FkZWQgc3VjY2Vzc2Z1bGx5JwogICAgICAgICAgICAgICAgfSk7CiAgICAgICAgICAgIH0KICAgICAgICB9KTsKICAgIH0K">{}</script>
 
-    const { addNotification } = getNotificationsContext();
-
-    export let auth: Auth;
-
-    let downloading = false;
-
-    async function download (encrypted: boolean) {
-        if (downloading) return;
-        downloading = true;
-        const { data: backupData } = displayNotifOnErr(addNotification,
-            await api.get(auth, '/backups', { encrypted }),
-        );
-        Backup.download(backupData, auth.username, encrypted);
-        downloading = false;
-    }
-
-    function upload () {
-        showPopup(FileDropDialog, {
-            auth,
-            message: 'Drop encrypted .json file here',
-            showTextBox: true,
-            textBoxType: 'password',
-            textBoxLabel: 'Password of account the backup came from ' +
-                '(leave blank if same account)',
-            withContents: async (res: Result<string>, password?: string) => {
-                let contents = displayNotifOnErr(addNotification, res);
-
-                if (!confirm(
-                    'Are you sure you want to restore from this backup?'
-                    + ' This will overwrite all your existing data.',
-                )) {
-                    return;
-                }
-
-                if (!password) {
-                    password = auth.key;
-                } else {
-                    password = encryptionKeyFromPassword(password);
-                }
-
-                displayNotifOnErr(addNotification,
-                    await api.post(auth, '/backups', {
-                        data: contents,
-                        key: password,
-                    }),
-                );
-
-                addNotification({
-                    ...SUCCESS_NOTIFICATION,
-                    text: 'File uploaded successfully',
-                });
-            },
-        });
-    }
-</script>
-
-<button
-    disabled={downloading}
-    on:click={() => download(true)}
->
+<button disabled="{downloading}" on:click="{() => download(true)}">
     <DownloadLock size="30" />
     Download Backup
 </button>
-<button
-    disabled={downloading}
-    on:click={() => download(false)}
->
+<button disabled="{downloading}" on:click="{() => download(false)}">
     <Download size="30" />
     Download Unencrypted Backup
 </button>
-<button
-    disabled={downloading}
-    on:click={upload}
->
+<button disabled="{downloading}" on:click="{upload}">
     <Upload size="30" />
     Restore from Backup
 </button>

@@ -16,14 +16,12 @@ export const GET = cachedApiRoute(async (auth, { url }) => {
 
     if (!encrypt) {
         return {
-            data: JSON.stringify(backup),
+            data: JSON.stringify(backup)
         };
     }
 
-    const {
-        err: encryptErr,
-        val: encryptedResponse,
-    } = Backup.asEncryptedString(backup, auth);
+    const { err: encryptErr, val: encryptedResponse } =
+        Backup.asEncryptedString(backup, auth);
     if (encryptErr) throw error(400, encryptErr);
 
     return { data: encryptedResponse };
@@ -33,20 +31,20 @@ export const POST = (async ({ request, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
-    const body = await getUnwrappedReqBody(request, {
-        data: 'string',
-        key: 'string',
-        isEncrypted: 'boolean',
-    }, {
-        key: auth.key,
-        isEncrypted: true,
-    });
-
-    const { err } = await Backup.restore(
-        query, auth,
-        body.data,
-        body.key,
+    const body = await getUnwrappedReqBody(
+        request,
+        {
+            data: 'string',
+            key: 'string',
+            isEncrypted: 'boolean'
+        },
+        {
+            key: auth.key,
+            isEncrypted: true
+        }
     );
+
+    const { err } = await Backup.restore(query, auth, body.data, body.key);
     if (err) throw error(400, err);
 
     return apiResponse({});

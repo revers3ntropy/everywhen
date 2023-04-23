@@ -1,41 +1,21 @@
-<script lang="ts">
-    import cn from 'classnames';
-    import MenuDown from 'svelte-material-icons/MenuDown.svelte';
+<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgY24gZnJvbSAnY2xhc3NuYW1lcyc7CiAgICBpbXBvcnQgTWVudURvd24gZnJvbSAnc3ZlbHRlLW1hdGVyaWFsLWljb25zL01lbnVEb3duLnN2ZWx0ZSc7CgogICAgZXhwb3J0IGxldCBvcGVuID0gZmFsc2U7CiAgICBleHBvcnQgbGV0IHJvdW5kZWQgPSBmYWxzZTsKICAgIGV4cG9ydCBsZXQgYXJpYUxhYmVsID0gJyc7CiAgICBleHBvcnQgbGV0IHVuc3R5bGVkQnV0dG9uID0gZmFsc2U7CiAgICBleHBvcnQgbGV0IHdpZHRoID0gJzEwMCUnOwogICAgZXhwb3J0IGxldCBmcm9tUmlnaHQgPSBmYWxzZTsKICAgIGV4cG9ydCBsZXQgb3Blbk9uSG92ZXIgPSBmYWxzZTsKCiAgICBleHBvcnQgbGV0IGNsb3NlID0gKCkgPT4gewogICAgICAgIG9wZW4gPSBmYWxzZTsKICAgIH07CgogICAgZnVuY3Rpb24gZ2xvYmFsTW91c2VEb3duIChldnQ6IE1vdXNlRXZlbnQpIHsKICAgICAgICBpZiAob3BlbiAmJiAhKGV2dC50YXJnZXQgYXMgRWxlbWVudCkuY2xvc2VzdCgnLmRyb3Bkb3duJykpIHsKICAgICAgICAgICAgY2xvc2UoKTsKICAgICAgICAgICAgZXZ0LnByZXZlbnREZWZhdWx0KCk7CiAgICAgICAgfQogICAgfQo=">{}</script>
 
-    export let open = false;
-    export let rounded = false;
-    export let ariaLabel = '';
-    export let unstyledButton = false;
-    export let width = '100%';
-    export let fromRight = false;
-    export let openOnHover = false;
+<svelte:window on:mousedown="{globalMouseDown}" />
 
-    export let close = () => {
-        open = false;
-    };
-
-    function globalMouseDown (evt: MouseEvent) {
-        if (open && !(evt.target as Element).closest('.dropdown')) {
-            close();
-            evt.preventDefault();
-        }
-    }
-</script>
-
-<svelte:window on:mousedown={globalMouseDown} />
-
-<div class="dropdown {cn({
-    open,
-    rounded,
-     'unstyled': unstyledButton,
-     'from-right': fromRight,
-     'open-on-hover': openOnHover,
-})}">
+<div
+    class="dropdown {cn({
+        open,
+        rounded,
+        unstyled: unstyledButton,
+        'from-right': fromRight,
+        'open-on-hover': openOnHover
+    })}"
+>
     <button
-        aria-label={ariaLabel || 'Open popup'}
-        on:click={() => open = !open}
+        aria-label="{ariaLabel || 'Open popup'}"
+        on:click="{() => (open = !open)}"
     >
-        <slot name="button"></slot>
+        <slot name="button" />
         <MenuDown class="menu-down" size="30" />
     </button>
     <div class="popup">
@@ -45,116 +25,4 @@
     </div>
 </div>
 
-<style lang="less">
-    @import '../../styles/variables.less';
-    @import '../../styles/layout.less';
-
-    .dropdown {
-        position: relative;
-        width: 200px;
-
-        button {
-            background: none;
-            border: none;
-            padding: 0 0.2em;
-            font: inherit;
-            cursor: pointer;
-            outline: inherit;
-            display: inline-grid;
-            width: 100%;
-            grid-template-columns: 1fr 30px;
-            justify-content: space-between;
-            align-items: center;
-
-            border-radius: @border-radius;
-        }
-
-        &.unstyled {
-            button {
-                padding: 0;
-                border-radius: 0;
-                border: none;
-                display: flex;
-                align-items: center;
-                justify-content: flex-end;
-                background: none;
-
-                :global(.menu-down) {
-                    display: none;
-                }
-            }
-
-            border: none !important;
-            width: fit-content;
-            background: none !important;
-
-            .popup {
-                .content {
-                    border: 1px solid @border-heavy;
-                    background: @light-accent;
-                    border-radius: @border-radius
-                }
-            }
-        }
-
-        &.popup {
-            .popup {
-                left: 0;
-            }
-        }
-
-        &.from-right {
-            .popup {
-                right: 0;
-            }
-        }
-
-        .popup {
-            .flex-center();
-            position: absolute;
-            top: 100%;
-            z-index: 15;
-            display: none;
-
-            .content {
-                background: @light-accent;
-                border-radius: 0 0 @border-radius @border-radius;
-                border-top: none;
-                min-width: 100%;
-            }
-        }
-
-        &.rounded {
-            .popup {
-                transform: translateY(0.5em);
-
-                .content {
-                    border-radius: @border-radius;
-                }
-            }
-        }
-
-        &:not(.rounded) {
-            .bordered();
-            border-radius: @border-radius;
-            margin: .5em;
-
-            &:hover {
-                background: @light-v-accent;
-            }
-
-            &.open {
-                background: @light-accent;
-                border-radius: @border-radius @border-radius 0 0;
-                border: 1px solid @border-heavy;
-            }
-        }
-
-        &.open, &.open-on-hover:hover {
-            .popup {
-                display: block;
-            }
-        }
-    }
-
-</style>
+<style lang="less" ✂prettier:content✂="CiAgICBAaW1wb3J0ICcuLi8uLi9zdHlsZXMvdmFyaWFibGVzLmxlc3MnOwogICAgQGltcG9ydCAnLi4vLi4vc3R5bGVzL2xheW91dC5sZXNzJzsKCiAgICAuZHJvcGRvd24gewogICAgICAgIHBvc2l0aW9uOiByZWxhdGl2ZTsKICAgICAgICB3aWR0aDogMjAwcHg7CgogICAgICAgIGJ1dHRvbiB7CiAgICAgICAgICAgIGJhY2tncm91bmQ6IG5vbmU7CiAgICAgICAgICAgIGJvcmRlcjogbm9uZTsKICAgICAgICAgICAgcGFkZGluZzogMCAwLjJlbTsKICAgICAgICAgICAgZm9udDogaW5oZXJpdDsKICAgICAgICAgICAgY3Vyc29yOiBwb2ludGVyOwogICAgICAgICAgICBvdXRsaW5lOiBpbmhlcml0OwogICAgICAgICAgICBkaXNwbGF5OiBpbmxpbmUtZ3JpZDsKICAgICAgICAgICAgd2lkdGg6IDEwMCU7CiAgICAgICAgICAgIGdyaWQtdGVtcGxhdGUtY29sdW1uczogMWZyIDMwcHg7CiAgICAgICAgICAgIGp1c3RpZnktY29udGVudDogc3BhY2UtYmV0d2VlbjsKICAgICAgICAgICAgYWxpZ24taXRlbXM6IGNlbnRlcjsKCiAgICAgICAgICAgIGJvcmRlci1yYWRpdXM6IEBib3JkZXItcmFkaXVzOwogICAgICAgIH0KCiAgICAgICAgJi51bnN0eWxlZCB7CiAgICAgICAgICAgIGJ1dHRvbiB7CiAgICAgICAgICAgICAgICBwYWRkaW5nOiAwOwogICAgICAgICAgICAgICAgYm9yZGVyLXJhZGl1czogMDsKICAgICAgICAgICAgICAgIGJvcmRlcjogbm9uZTsKICAgICAgICAgICAgICAgIGRpc3BsYXk6IGZsZXg7CiAgICAgICAgICAgICAgICBhbGlnbi1pdGVtczogY2VudGVyOwogICAgICAgICAgICAgICAganVzdGlmeS1jb250ZW50OiBmbGV4LWVuZDsKICAgICAgICAgICAgICAgIGJhY2tncm91bmQ6IG5vbmU7CgogICAgICAgICAgICAgICAgOmdsb2JhbCgubWVudS1kb3duKSB7CiAgICAgICAgICAgICAgICAgICAgZGlzcGxheTogbm9uZTsKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQoKICAgICAgICAgICAgYm9yZGVyOiBub25lICFpbXBvcnRhbnQ7CiAgICAgICAgICAgIHdpZHRoOiBmaXQtY29udGVudDsKICAgICAgICAgICAgYmFja2dyb3VuZDogbm9uZSAhaW1wb3J0YW50OwoKICAgICAgICAgICAgLnBvcHVwIHsKICAgICAgICAgICAgICAgIC5jb250ZW50IHsKICAgICAgICAgICAgICAgICAgICBib3JkZXI6IDFweCBzb2xpZCBAYm9yZGVyLWhlYXZ5OwogICAgICAgICAgICAgICAgICAgIGJhY2tncm91bmQ6IEBsaWdodC1hY2NlbnQ7CiAgICAgICAgICAgICAgICAgICAgYm9yZGVyLXJhZGl1czogQGJvcmRlci1yYWRpdXM7CiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KICAgICAgICB9CgogICAgICAgICYucG9wdXAgewogICAgICAgICAgICAucG9wdXAgewogICAgICAgICAgICAgICAgbGVmdDogMDsKICAgICAgICAgICAgfQogICAgICAgIH0KCiAgICAgICAgJi5mcm9tLXJpZ2h0IHsKICAgICAgICAgICAgLnBvcHVwIHsKICAgICAgICAgICAgICAgIHJpZ2h0OiAwOwogICAgICAgICAgICB9CiAgICAgICAgfQoKICAgICAgICAucG9wdXAgewogICAgICAgICAgICAuZmxleC1jZW50ZXIoKTsKICAgICAgICAgICAgcG9zaXRpb246IGFic29sdXRlOwogICAgICAgICAgICB0b3A6IDEwMCU7CiAgICAgICAgICAgIHotaW5kZXg6IDE1OwogICAgICAgICAgICBkaXNwbGF5OiBub25lOwoKICAgICAgICAgICAgLmNvbnRlbnQgewogICAgICAgICAgICAgICAgYmFja2dyb3VuZDogQGxpZ2h0LWFjY2VudDsKICAgICAgICAgICAgICAgIGJvcmRlci1yYWRpdXM6IDAgMCBAYm9yZGVyLXJhZGl1cyBAYm9yZGVyLXJhZGl1czsKICAgICAgICAgICAgICAgIGJvcmRlci10b3A6IG5vbmU7CiAgICAgICAgICAgICAgICBtaW4td2lkdGg6IDEwMCU7CiAgICAgICAgICAgIH0KICAgICAgICB9CgogICAgICAgICYucm91bmRlZCB7CiAgICAgICAgICAgIC5wb3B1cCB7CiAgICAgICAgICAgICAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZVkoMC41ZW0pOwoKICAgICAgICAgICAgICAgIC5jb250ZW50IHsKICAgICAgICAgICAgICAgICAgICBib3JkZXItcmFkaXVzOiBAYm9yZGVyLXJhZGl1czsKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQogICAgICAgIH0KCiAgICAgICAgJjpub3QoLnJvdW5kZWQpIHsKICAgICAgICAgICAgLmJvcmRlcmVkKCk7CiAgICAgICAgICAgIGJvcmRlci1yYWRpdXM6IEBib3JkZXItcmFkaXVzOwogICAgICAgICAgICBtYXJnaW46IDAuNWVtOwoKICAgICAgICAgICAgJjpob3ZlciB7CiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kOiBAbGlnaHQtdi1hY2NlbnQ7CiAgICAgICAgICAgIH0KCiAgICAgICAgICAgICYub3BlbiB7CiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kOiBAbGlnaHQtYWNjZW50OwogICAgICAgICAgICAgICAgYm9yZGVyLXJhZGl1czogQGJvcmRlci1yYWRpdXMgQGJvcmRlci1yYWRpdXMgMCAwOwogICAgICAgICAgICAgICAgYm9yZGVyOiAxcHggc29saWQgQGJvcmRlci1oZWF2eTsKICAgICAgICAgICAgfQogICAgICAgIH0KCiAgICAgICAgJi5vcGVuLAogICAgICAgICYub3Blbi1vbi1ob3Zlcjpob3ZlciB7CiAgICAgICAgICAgIC5wb3B1cCB7CiAgICAgICAgICAgICAgICBkaXNwbGF5OiBibG9jazsKICAgICAgICAgICAgfQogICAgICAgIH0KICAgIH0K"></style>

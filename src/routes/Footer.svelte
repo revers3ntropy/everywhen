@@ -1,22 +1,9 @@
-<script>
-    import Github from 'svelte-material-icons/Github.svelte';
-    import OpenInNew from 'svelte-material-icons/OpenInNew.svelte';
-
-    const version = __VERSION__;
-</script>
+<script ✂prettier:content✂="CiAgICBpbXBvcnQgR2l0aHViIGZyb20gJ3N2ZWx0ZS1tYXRlcmlhbC1pY29ucy9HaXRodWIuc3ZlbHRlJzsKICAgIGltcG9ydCBPcGVuSW5OZXcgZnJvbSAnc3ZlbHRlLW1hdGVyaWFsLWljb25zL09wZW5Jbk5ldy5zdmVsdGUnOwoKICAgIGNvbnN0IHZlcnNpb24gPSBfX1ZFUlNJT05fXzsK">{}</script>
 
 <footer>
     <div class="links-on-line">
-        <a
-            aria-label="about"
-            href="/about"
-        >
-            About
-        </a>
-        <a
-            aria-label="version history"
-            href="/about/history"
-        >
+        <a aria-label="about" href="/about"> About </a>
+        <a aria-label="version history" href="/about/history">
             v{version}
         </a>
         <a
@@ -42,45 +29,4 @@
     </div>
 </footer>
 
-<style lang="less">
-    @import '../styles/variables';
-    @import '../styles/layout.less';
-
-    footer {
-        background-color: @header-bg;
-        height: 200px;
-        display: grid;
-        grid-template-columns: 100%;
-
-        div {
-            .flex-center();
-        }
-
-        .links-on-line {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            align-items: center;
-
-            @media @mobile {
-                grid-template-columns: 1fr;
-                grid-template-rows: 1fr 1fr 1fr;
-            }
-        }
-    }
-
-    a {
-        text-align: center;
-
-        &.gh-link {
-            &, :global(svg), :global(svg *) {
-                transition: @transition;
-            }
-
-            &:hover {
-                :global(svg), :global(svg *) {
-                    fill: @accent-color-secondary;
-                }
-            }
-        }
-    }
-</style>
+<style lang="less" ✂prettier:content✂="CiAgICBAaW1wb3J0ICcuLi9zdHlsZXMvdmFyaWFibGVzJzsKICAgIEBpbXBvcnQgJy4uL3N0eWxlcy9sYXlvdXQubGVzcyc7CgogICAgZm9vdGVyIHsKICAgICAgICBiYWNrZ3JvdW5kLWNvbG9yOiBAaGVhZGVyLWJnOwogICAgICAgIGhlaWdodDogMjAwcHg7CiAgICAgICAgZGlzcGxheTogZ3JpZDsKICAgICAgICBncmlkLXRlbXBsYXRlLWNvbHVtbnM6IDEwMCU7CgogICAgICAgIGRpdiB7CiAgICAgICAgICAgIC5mbGV4LWNlbnRlcigpOwogICAgICAgIH0KCiAgICAgICAgLmxpbmtzLW9uLWxpbmUgewogICAgICAgICAgICBkaXNwbGF5OiBncmlkOwogICAgICAgICAgICBncmlkLXRlbXBsYXRlLWNvbHVtbnM6IDFmciAxZnIgMWZyOwogICAgICAgICAgICBhbGlnbi1pdGVtczogY2VudGVyOwoKICAgICAgICAgICAgQG1lZGlhIEBtb2JpbGUgewogICAgICAgICAgICAgICAgZ3JpZC10ZW1wbGF0ZS1jb2x1bW5zOiAxZnI7CiAgICAgICAgICAgICAgICBncmlkLXRlbXBsYXRlLXJvd3M6IDFmciAxZnIgMWZyOwogICAgICAgICAgICB9CiAgICAgICAgfQogICAgfQoKICAgIGEgewogICAgICAgIHRleHQtYWxpZ246IGNlbnRlcjsKCiAgICAgICAgJi5naC1saW5rIHsKICAgICAgICAgICAgJiwKICAgICAgICAgICAgOmdsb2JhbChzdmcpLAogICAgICAgICAgICA6Z2xvYmFsKHN2ZyAqKSB7CiAgICAgICAgICAgICAgICB0cmFuc2l0aW9uOiBAdHJhbnNpdGlvbjsKICAgICAgICAgICAgfQoKICAgICAgICAgICAgJjpob3ZlciB7CiAgICAgICAgICAgICAgICA6Z2xvYmFsKHN2ZyksCiAgICAgICAgICAgICAgICA6Z2xvYmFsKHN2ZyAqKSB7CiAgICAgICAgICAgICAgICAgICAgZmlsbDogQGFjY2VudC1jb2xvci1zZWNvbmRhcnk7CiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICB9Cg=="></style>

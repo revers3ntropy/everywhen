@@ -7,7 +7,7 @@ import { cachedApiRoute, invalidateCache } from '../../../lib/utils/cache';
 import { getUnwrappedReqBody } from '../../../lib/utils/requestBody';
 import type { RequestHandler } from './$types';
 
-export const GET = cachedApiRoute(async (auth) => {
+export const GET = cachedApiRoute(async auth => {
     const { err, val: labels } = await Label.all(query, auth);
     if (err) throw error(400, err);
     return { labels };
@@ -17,12 +17,16 @@ export const POST = (async ({ request, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
-    const body = await getUnwrappedReqBody(request, {
-        name: 'string',
-        colour: 'string',
-    }, {
-        colour: 'black',
-    });
+    const body = await getUnwrappedReqBody(
+        request,
+        {
+            name: 'string',
+            colour: 'string'
+        },
+        {
+            colour: 'black'
+        }
+    );
 
     const { val: label, err } = await Label.create(query, auth, body);
     if (err) throw error(400, err);

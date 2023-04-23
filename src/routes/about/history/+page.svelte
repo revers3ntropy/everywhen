@@ -1,6 +1,4 @@
-<script lang="ts">
-    const version = __VERSION__;
-</script>
+<script lang="ts" ✂prettier:content✂="CiAgICBjb25zdCB2ZXJzaW9uID0gX19WRVJTSU9OX187Cg==">{}</script>
 
 <main class="flex-center">
     <div>
@@ -26,7 +24,10 @@
                 <li>Allow app to be installed on mobile (PWA)</li>
                 <li>Sync with Google Fit</li>
                 <li>2-Factor authentication</li>
-                <li>Opt in to allowing account to be recovered at expense of security</li>
+                <li>
+                    Opt in to allowing account to be recovered at expense of
+                    security
+                </li>
                 <li>Achievements/Badges</li>
                 <li>Opt in to sharing stats with other users - Leaderboards</li>
                 <li>Only show differences when showing entry edits</li>
@@ -67,7 +68,9 @@
                 <li>Better default zoom for timeline</li>
                 <li>'n' Years Ago Today entries</li>
                 <li>Better 'buckets' for barchart in analytics</li>
-                <li>Ask to leave page with unsaved changes when editing entry</li>
+                <li>
+                    Ask to leave page with unsaved changes when editing entry
+                </li>
             </ul>
         </section>
         <section>
@@ -79,7 +82,9 @@
                 <li>Better default zoom for timeline</li>
                 <li>'n' Years Ago Today entries</li>
                 <li>Better 'buckets' for barchart in analytics</li>
-                <li>Ask to leave page with unsaved changes when editing entry</li>
+                <li>
+                    Ask to leave page with unsaved changes when editing entry
+                </li>
             </ul>
         </section>
         <section>

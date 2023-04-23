@@ -18,7 +18,12 @@ export const GET = cachedApiRoute(async (auth, { url }) => {
         return { locations };
     }
 
-    const { err, val: locations } = await Location.search(query, auth, lat, lon);
+    const { err, val: locations } = await Location.search(
+        query,
+        auth,
+        lat,
+        lon
+    );
     if (err) throw error(500, err);
     return { ...locations };
 }) satisfies RequestHandler;
@@ -27,26 +32,32 @@ export const POST = (async ({ request, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
-    const body = await getUnwrappedReqBody(request, {
-        latitude: 'number',
-        longitude: 'number',
-        radius: 'number',
-        created: 'number',
-        name: 'string',
-        timezoneUtcOffset: 'number',
-    }, {
-        radius: 0.0001,
-        created: nowS(),
-        timezoneUtcOffset: 0,
-    });
+    const body = await getUnwrappedReqBody(
+        request,
+        {
+            latitude: 'number',
+            longitude: 'number',
+            radius: 'number',
+            created: 'number',
+            name: 'string',
+            timezoneUtcOffset: 'number'
+        },
+        {
+            radius: 0.0001,
+            created: nowS(),
+            timezoneUtcOffset: 0
+        }
+    );
 
-    const { val, err } = await Location.create(query, auth,
+    const { val, err } = await Location.create(
+        query,
+        auth,
         body.created,
         body.timezoneUtcOffset,
         body.name,
         body.latitude,
         body.longitude,
-        body.radius,
+        body.radius
     );
     if (err) throw error(400, err);
 

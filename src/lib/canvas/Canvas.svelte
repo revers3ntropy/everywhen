@@ -1,155 +1,18 @@
-<script lang="ts">
-    import { onMount, setContext } from 'svelte';
-    import {
-        type CanvasContext,
-        CanvasState,
-        canvasState,
-        type ICanvasState,
-        key,
-        type Listener,
-    } from './canvasHelpers';
-
-    export let killLoopOnError = true;
-    export let attributes: CanvasRenderingContext2DSettings = {};
-
-    let listeners: Listener[] = [];
-    let frame: number;
-    let canvas: HTMLCanvasElement;
-
-    let setupCanvas = false;
-
-    onMount(async () => {
-        const empty = CanvasState.empty();
-        empty.canvas = canvas;
-        empty.ctx = canvas.getContext("2d", attributes);
-        canvasState.set(empty);
-
-        // setup entities
-        for (const entity of listeners) {
-            if (entity.setup) {
-                let p = entity.setup($canvasState.asRenderProps());
-                if (p && 'then' in p) await p;
-            }
-            entity.ready = true;
-        }
-
-        setupCanvas = true;
-
-        // start game loop
-        return createLoop((elapsed, dt) => {
-            canvasState.update(s => {
-                s.time = elapsed;
-                return s;
-            });
-            render(dt);
-        });
-    });
-
-    setContext<CanvasContext>(key, {
-        async add (fn: Listener) {
-            if (setupCanvas) {
-                if (fn.setup) {
-                    let p = fn.setup($canvasState.asRenderProps());
-                    if (p && 'then' in p) await p;
-                }
-                fn.ready = true;
-            }
-            this.remove(fn);
-            listeners.push(fn);
-        },
-        remove (fn: Listener) {
-            const idx = listeners.indexOf(fn);
-            if (idx >= 0) {
-                listeners.splice(idx, 1);
-            }
-        },
-    });
-
-    function render (dt: number) {
-        if (!$canvasState.ctx) throw 'Canvas context not initialized';
-        $canvasState.ctx.save();
-        $canvasState.ctx.scale($canvasState.pixelRatio, $canvasState.pixelRatio);
-        for (const entity of listeners) {
-            try {
-                if (entity.mounted && entity.ready && entity.render) {
-                    void entity.render($canvasState.asRenderProps(), dt);
-                }
-            } catch (err) {
-                console.error(err);
-                if (killLoopOnError) {
-                    cancelAnimationFrame(frame);
-                    console.warn("Animation loop stopped due to an error");
-                }
-            }
-        }
-        $canvasState.ctx.restore();
-    }
-
-    function handleResize () {
-        canvasState.update(s => {
-            s.width = window.innerWidth;
-            s.height = window.innerHeight;
-            s.pixelRatio = window.devicePixelRatio;
-            return s;
-        });
-    }
-
-    function createLoop (fn: (elapsed: number, dt: number) => void) {
-        let elapsed = 0;
-        let lastTime = performance.now();
-
-        function loop () {
-            frame = requestAnimationFrame(loop);
-            const beginTime = performance.now();
-            const dt = (beginTime - lastTime) / 1000;
-            lastTime = beginTime;
-            elapsed += dt;
-            fn(elapsed, dt);
-        }
-
-        loop();
-        return () => {
-            cancelAnimationFrame(frame);
-        };
-    }
-
-    function executeListeners (event: Event, fn: keyof ICanvasState) {
-        const listeners = $canvasState[fn];
-        if (!listeners) throw `No listeners found for ${fn}`;
-        if (!Array.isArray(listeners)) throw `Listeners for ${fn} is not an array`;
-        for (const listener of listeners) {
-            if (!listener || typeof listener !== 'function') {
-                console.error(`Invalid listener for ${fn}`, listener);
-                throw new Error();
-            }
-            listener(event as MouseEvent & TouchEvent & WheelEvent);
-        }
-    }
-
-    function canvasListener (fn: keyof ICanvasState) {
-        return (event: Event) => {
-            executeListeners(event, fn);
-        };
-    }
-</script>
+<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgeyBvbk1vdW50LCBzZXRDb250ZXh0IH0gZnJvbSAnc3ZlbHRlJzsKICAgIGltcG9ydCB7CiAgICAgICAgdHlwZSBDYW52YXNDb250ZXh0LAogICAgICAgIENhbnZhc1N0YXRlLAogICAgICAgIGNhbnZhc1N0YXRlLAogICAgICAgIHR5cGUgSUNhbnZhc1N0YXRlLAogICAgICAgIGtleSwKICAgICAgICB0eXBlIExpc3RlbmVyLAogICAgfSBmcm9tICcuL2NhbnZhc0hlbHBlcnMnOwoKICAgIGV4cG9ydCBsZXQga2lsbExvb3BPbkVycm9yID0gdHJ1ZTsKICAgIGV4cG9ydCBsZXQgYXR0cmlidXRlczogQ2FudmFzUmVuZGVyaW5nQ29udGV4dDJEU2V0dGluZ3MgPSB7fTsKCiAgICBsZXQgbGlzdGVuZXJzOiBMaXN0ZW5lcltdID0gW107CiAgICBsZXQgZnJhbWU6IG51bWJlcjsKICAgIGxldCBjYW52YXM6IEhUTUxDYW52YXNFbGVtZW50OwoKICAgIGxldCBzZXR1cENhbnZhcyA9IGZhbHNlOwoKICAgIG9uTW91bnQoYXN5bmMgKCkgPT4gewogICAgICAgIGNvbnN0IGVtcHR5ID0gQ2FudmFzU3RhdGUuZW1wdHkoKTsKICAgICAgICBlbXB0eS5jYW52YXMgPSBjYW52YXM7CiAgICAgICAgZW1wdHkuY3R4ID0gY2FudmFzLmdldENvbnRleHQoJzJkJywgYXR0cmlidXRlcyk7CiAgICAgICAgY2FudmFzU3RhdGUuc2V0KGVtcHR5KTsKCiAgICAgICAgLy8gc2V0dXAgZW50aXRpZXMKICAgICAgICBmb3IgKGNvbnN0IGVudGl0eSBvZiBsaXN0ZW5lcnMpIHsKICAgICAgICAgICAgaWYgKGVudGl0eS5zZXR1cCkgewogICAgICAgICAgICAgICAgbGV0IHAgPSBlbnRpdHkuc2V0dXAoJGNhbnZhc1N0YXRlLmFzUmVuZGVyUHJvcHMoKSk7CiAgICAgICAgICAgICAgICBpZiAocCAmJiAndGhlbicgaW4gcCkgYXdhaXQgcDsKICAgICAgICAgICAgfQogICAgICAgICAgICBlbnRpdHkucmVhZHkgPSB0cnVlOwogICAgICAgIH0KCiAgICAgICAgc2V0dXBDYW52YXMgPSB0cnVlOwoKICAgICAgICAvLyBzdGFydCBnYW1lIGxvb3AKICAgICAgICByZXR1cm4gY3JlYXRlTG9vcCgoZWxhcHNlZCwgZHQpID0+IHsKICAgICAgICAgICAgY2FudmFzU3RhdGUudXBkYXRlKHMgPT4gewogICAgICAgICAgICAgICAgcy50aW1lID0gZWxhcHNlZDsKICAgICAgICAgICAgICAgIHJldHVybiBzOwogICAgICAgICAgICB9KTsKICAgICAgICAgICAgcmVuZGVyKGR0KTsKICAgICAgICB9KTsKICAgIH0pOwoKICAgIHNldENvbnRleHQ8Q2FudmFzQ29udGV4dD4oa2V5LCB7CiAgICAgICAgYXN5bmMgYWRkIChmbjogTGlzdGVuZXIpIHsKICAgICAgICAgICAgaWYgKHNldHVwQ2FudmFzKSB7CiAgICAgICAgICAgICAgICBpZiAoZm4uc2V0dXApIHsKICAgICAgICAgICAgICAgICAgICBsZXQgcCA9IGZuLnNldHVwKCRjYW52YXNTdGF0ZS5hc1JlbmRlclByb3BzKCkpOwogICAgICAgICAgICAgICAgICAgIGlmIChwICYmICd0aGVuJyBpbiBwKSBhd2FpdCBwOwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgZm4ucmVhZHkgPSB0cnVlOwogICAgICAgICAgICB9CiAgICAgICAgICAgIHRoaXMucmVtb3ZlKGZuKTsKICAgICAgICAgICAgbGlzdGVuZXJzLnB1c2goZm4pOwogICAgICAgIH0sCiAgICAgICAgcmVtb3ZlIChmbjogTGlzdGVuZXIpIHsKICAgICAgICAgICAgY29uc3QgaWR4ID0gbGlzdGVuZXJzLmluZGV4T2YoZm4pOwogICAgICAgICAgICBpZiAoaWR4ID49IDApIHsKICAgICAgICAgICAgICAgIGxpc3RlbmVycy5zcGxpY2UoaWR4LCAxKTsKICAgICAgICAgICAgfQogICAgICAgIH0KICAgIH0pOwoKICAgIGZ1bmN0aW9uIHJlbmRlciAoZHQ6IG51bWJlcikgewogICAgICAgIGlmICghJGNhbnZhc1N0YXRlLmN0eCkgdGhyb3cgJ0NhbnZhcyBjb250ZXh0IG5vdCBpbml0aWFsaXplZCc7CiAgICAgICAgJGNhbnZhc1N0YXRlLmN0eC5zYXZlKCk7CiAgICAgICAgJGNhbnZhc1N0YXRlLmN0eC5zY2FsZSgKICAgICAgICAgICAgJGNhbnZhc1N0YXRlLnBpeGVsUmF0aW8sCiAgICAgICAgICAgICRjYW52YXNTdGF0ZS5waXhlbFJhdGlvCiAgICAgICAgKTsKICAgICAgICBmb3IgKGNvbnN0IGVudGl0eSBvZiBsaXN0ZW5lcnMpIHsKICAgICAgICAgICAgdHJ5IHsKICAgICAgICAgICAgICAgIGlmIChlbnRpdHkubW91bnRlZCAmJiBlbnRpdHkucmVhZHkgJiYgZW50aXR5LnJlbmRlcikgewogICAgICAgICAgICAgICAgICAgIHZvaWQgZW50aXR5LnJlbmRlcigkY2FudmFzU3RhdGUuYXNSZW5kZXJQcm9wcygpLCBkdCk7CiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0gY2F0Y2ggKGVycikgewogICAgICAgICAgICAgICAgY29uc29sZS5lcnJvcihlcnIpOwogICAgICAgICAgICAgICAgaWYgKGtpbGxMb29wT25FcnJvcikgewogICAgICAgICAgICAgICAgICAgIGNhbmNlbEFuaW1hdGlvbkZyYW1lKGZyYW1lKTsKICAgICAgICAgICAgICAgICAgICBjb25zb2xlLndhcm4oJ0FuaW1hdGlvbiBsb29wIHN0b3BwZWQgZHVlIHRvIGFuIGVycm9yJyk7CiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICAgICAgJGNhbnZhc1N0YXRlLmN0eC5yZXN0b3JlKCk7CiAgICB9CgogICAgZnVuY3Rpb24gaGFuZGxlUmVzaXplICgpIHsKICAgICAgICBjYW52YXNTdGF0ZS51cGRhdGUocyA9PiB7CiAgICAgICAgICAgIHMud2lkdGggPSB3aW5kb3cuaW5uZXJXaWR0aDsKICAgICAgICAgICAgcy5oZWlnaHQgPSB3aW5kb3cuaW5uZXJIZWlnaHQ7CiAgICAgICAgICAgIHMucGl4ZWxSYXRpbyA9IHdpbmRvdy5kZXZpY2VQaXhlbFJhdGlvOwogICAgICAgICAgICByZXR1cm4gczsKICAgICAgICB9KTsKICAgIH0KCiAgICBmdW5jdGlvbiBjcmVhdGVMb29wIChmbjogKGVsYXBzZWQ6IG51bWJlciwgZHQ6IG51bWJlcikgPT4gdm9pZCkgewogICAgICAgIGxldCBlbGFwc2VkID0gMDsKICAgICAgICBsZXQgbGFzdFRpbWUgPSBwZXJmb3JtYW5jZS5ub3coKTsKCiAgICAgICAgZnVuY3Rpb24gbG9vcCAoKSB7CiAgICAgICAgICAgIGZyYW1lID0gcmVxdWVzdEFuaW1hdGlvbkZyYW1lKGxvb3ApOwogICAgICAgICAgICBjb25zdCBiZWdpblRpbWUgPSBwZXJmb3JtYW5jZS5ub3coKTsKICAgICAgICAgICAgY29uc3QgZHQgPSAoYmVnaW5UaW1lIC0gbGFzdFRpbWUpIC8gMTAwMDsKICAgICAgICAgICAgbGFzdFRpbWUgPSBiZWdpblRpbWU7CiAgICAgICAgICAgIGVsYXBzZWQgKz0gZHQ7CiAgICAgICAgICAgIGZuKGVsYXBzZWQsIGR0KTsKICAgICAgICB9CgogICAgICAgIGxvb3AoKTsKICAgICAgICByZXR1cm4gKCkgPT4gewogICAgICAgICAgICBjYW5jZWxBbmltYXRpb25GcmFtZShmcmFtZSk7CiAgICAgICAgfTsKICAgIH0KCiAgICBmdW5jdGlvbiBleGVjdXRlTGlzdGVuZXJzIChldmVudDogRXZlbnQsIGZuOiBrZXlvZiBJQ2FudmFzU3RhdGUpIHsKICAgICAgICBjb25zdCBsaXN0ZW5lcnMgPSAkY2FudmFzU3RhdGVbZm5dOwogICAgICAgIGlmICghbGlzdGVuZXJzKSB0aHJvdyBgTm8gbGlzdGVuZXJzIGZvdW5kIGZvciAke2ZufWA7CiAgICAgICAgaWYgKCFBcnJheS5pc0FycmF5KGxpc3RlbmVycykpCiAgICAgICAgICAgIHRocm93IGBMaXN0ZW5lcnMgZm9yICR7Zm59IGlzIG5vdCBhbiBhcnJheWA7CiAgICAgICAgZm9yIChjb25zdCBsaXN0ZW5lciBvZiBsaXN0ZW5lcnMpIHsKICAgICAgICAgICAgaWYgKCFsaXN0ZW5lciB8fCB0eXBlb2YgbGlzdGVuZXIgIT09ICdmdW5jdGlvbicpIHsKICAgICAgICAgICAgICAgIGNvbnNvbGUuZXJyb3IoYEludmFsaWQgbGlzdGVuZXIgZm9yICR7Zm59YCwgbGlzdGVuZXIpOwogICAgICAgICAgICAgICAgdGhyb3cgbmV3IEVycm9yKCk7CiAgICAgICAgICAgIH0KICAgICAgICAgICAgbGlzdGVuZXIoZXZlbnQgYXMgTW91c2VFdmVudCAmIFRvdWNoRXZlbnQgJiBXaGVlbEV2ZW50KTsKICAgICAgICB9CiAgICB9CgogICAgZnVuY3Rpb24gY2FudmFzTGlzdGVuZXIgKGZuOiBrZXlvZiBJQ2FudmFzU3RhdGUpIHsKICAgICAgICByZXR1cm4gKGV2ZW50OiBFdmVudCkgPT4gewogICAgICAgICAgICBleGVjdXRlTGlzdGVuZXJzKGV2ZW50LCBmbik7CiAgICAgICAgfTsKICAgIH0K">{}</script>
 
 <canvas
-    bind:this={canvas}
-
-    width={$canvasState.width * $canvasState.pixelRatio}
-    height={$canvasState.height * $canvasState.pixelRatio}}
+    bind:this="{canvas}"
+    width="{$canvasState.width * $canvasState.pixelRatio}"
+    height="{$canvasState.height * $canvasState.pixelRatio}}"
     style="width: {$canvasState.width}px; height: {$canvasState.height}px;"
     class="fullscreen"
+    on:mousedown="{canvasListener('mousedown')}"
+    on:mouseup="{canvasListener('mouseup')}"
+    on:mousemove="{canvasListener('mousemove')}"
+    on:touchstart="{canvasListener('touchstart')}"
+    on:touchend="{canvasListener('touchend')}"
+    on:touchmove="{canvasListener('touchmove')}"
+    on:wheel="{canvasListener('wheel')}"></canvas>
 
-    on:mousedown={canvasListener('mousedown')}
-    on:mouseup={canvasListener('mouseup')}
-    on:mousemove={canvasListener('mousemove')}
-    on:touchstart={canvasListener('touchstart')}
-    on:touchend={canvasListener('touchend')}
-    on:touchmove={canvasListener('touchmove')}
-    on:wheel={canvasListener('wheel')}
-
-></canvas>
-
-<svelte:window on:resize|passive={handleResize} />
-<slot></slot>
+<svelte:window on:resize|passive="{handleResize}" />
+<slot />

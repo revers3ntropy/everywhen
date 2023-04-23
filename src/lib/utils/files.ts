@@ -1,6 +1,6 @@
 import { Result } from './result';
 
-function readFileAsB64 (file: File): Promise<Result<string>> {
+function readFileAsB64(file: File): Promise<Result<string>> {
     return new Promise(resolve => {
         const reader = new FileReader();
         reader.onload = () => {
@@ -13,14 +13,14 @@ function readFileAsB64 (file: File): Promise<Result<string>> {
     });
 }
 
-export async function getFileContents (
+export async function getFileContents(
     file: File,
-    encoding: 'UTF-8' | 'b64' = 'UTF-8',
+    encoding: 'UTF-8' | 'b64' = 'UTF-8'
 ): Promise<Result<string>> {
     if (encoding === 'b64') {
         return await readFileAsB64(file);
     }
-    return await new Promise((resolve) => {
+    return await new Promise(resolve => {
         const reader = new FileReader();
         reader.onload = evt => {
             const res = evt.target?.result?.toString?.();
@@ -36,7 +36,7 @@ export async function getFileContents (
     });
 }
 
-export function download (filename: string, text: string): void {
+export function download(filename: string, text: string): void {
     const element = document.createElement('a');
     const elData = 'data:text/plain;charset=utf-8,' + encodeURIComponent(text);
     element.setAttribute('href', elData);

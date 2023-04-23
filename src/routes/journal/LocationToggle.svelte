@@ -1,76 +1,22 @@
-<script lang="ts">
-    import { tooltip } from '@svelte-plugins/tooltips';
-    import { onMount } from 'svelte';
-    import MapMarkerOffOutline from 'svelte-material-icons/MapMarkerOffOutline.svelte';
-    import MapMarkerOutline from 'svelte-material-icons/MapMarkerOutline.svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
-    import { enabledLocation } from '../../lib/stores';
-
-    const { addNotification } = getNotificationsContext();
-
-    export let tooltipPosition = 'bottom';
-
-    async function watchLocationPermissions () {
-        const permissionStatus = await navigator
-            .permissions
-            .query({ name: 'geolocation' });
-
-        function checkPermission () {
-            if (permissionStatus.state !== 'granted') {
-                enabledLocation.set(false);
-            }
-        }
-
-        permissionStatus.onchange = checkPermission;
-        checkPermission();
-    }
-
-    function enableLocation (): Promise<boolean> {
-        return new Promise(resolve => {
-            // trigger the permission request
-            navigator.geolocation.getCurrentPosition(() => {
-                enabledLocation.set(true);
-                resolve(true);
-            }, () => {
-                enabledLocation.set(false);
-                resolve(false);
-                addNotification({
-                    text: 'Something went wrong enabling location'
-                        + ' - please check your browser settings',
-                    removeAfter: 8000,
-                    type: 'error',
-                    position: 'top-center',
-                });
-            });
-        });
-    }
-
-    function disableLocation () {
-        enabledLocation.set(false);
-    }
-
-    onMount(async () => {
-        await watchLocationPermissions();
-    });
-</script>
+<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgeyB0b29sdGlwIH0gZnJvbSAnQHN2ZWx0ZS1wbHVnaW5zL3Rvb2x0aXBzJzsKICAgIGltcG9ydCB7IG9uTW91bnQgfSBmcm9tICdzdmVsdGUnOwogICAgaW1wb3J0IE1hcE1hcmtlck9mZk91dGxpbmUgZnJvbSAnc3ZlbHRlLW1hdGVyaWFsLWljb25zL01hcE1hcmtlck9mZk91dGxpbmUuc3ZlbHRlJzsKICAgIGltcG9ydCBNYXBNYXJrZXJPdXRsaW5lIGZyb20gJ3N2ZWx0ZS1tYXRlcmlhbC1pY29ucy9NYXBNYXJrZXJPdXRsaW5lLnN2ZWx0ZSc7CiAgICBpbXBvcnQgeyBnZXROb3RpZmljYXRpb25zQ29udGV4dCB9IGZyb20gJ3N2ZWx0ZS1ub3RpZmljYXRpb25zJzsKICAgIGltcG9ydCB7IGVuYWJsZWRMb2NhdGlvbiB9IGZyb20gJy4uLy4uL2xpYi9zdG9yZXMnOwoKICAgIGNvbnN0IHsgYWRkTm90aWZpY2F0aW9uIH0gPSBnZXROb3RpZmljYXRpb25zQ29udGV4dCgpOwoKICAgIGV4cG9ydCBsZXQgdG9vbHRpcFBvc2l0aW9uID0gJ2JvdHRvbSc7CgogICAgYXN5bmMgZnVuY3Rpb24gd2F0Y2hMb2NhdGlvblBlcm1pc3Npb25zICgpIHsKICAgICAgICBjb25zdCBwZXJtaXNzaW9uU3RhdHVzID0gYXdhaXQgbmF2aWdhdG9yLnBlcm1pc3Npb25zLnF1ZXJ5KHsKICAgICAgICAgICAgbmFtZTogJ2dlb2xvY2F0aW9uJywKICAgICAgICB9KTsKCiAgICAgICAgZnVuY3Rpb24gY2hlY2tQZXJtaXNzaW9uICgpIHsKICAgICAgICAgICAgaWYgKHBlcm1pc3Npb25TdGF0dXMuc3RhdGUgIT09ICdncmFudGVkJykgewogICAgICAgICAgICAgICAgZW5hYmxlZExvY2F0aW9uLnNldChmYWxzZSk7CiAgICAgICAgICAgIH0KICAgICAgICB9CgogICAgICAgIHBlcm1pc3Npb25TdGF0dXMub25jaGFuZ2UgPSBjaGVja1Blcm1pc3Npb247CiAgICAgICAgY2hlY2tQZXJtaXNzaW9uKCk7CiAgICB9CgogICAgZnVuY3Rpb24gZW5hYmxlTG9jYXRpb24gKCk6IFByb21pc2U8Ym9vbGVhbj4gewogICAgICAgIHJldHVybiBuZXcgUHJvbWlzZShyZXNvbHZlID0+IHsKICAgICAgICAgICAgLy8gdHJpZ2dlciB0aGUgcGVybWlzc2lvbiByZXF1ZXN0CiAgICAgICAgICAgIG5hdmlnYXRvci5nZW9sb2NhdGlvbi5nZXRDdXJyZW50UG9zaXRpb24oCiAgICAgICAgICAgICAgICAoKSA9PiB7CiAgICAgICAgICAgICAgICAgICAgZW5hYmxlZExvY2F0aW9uLnNldCh0cnVlKTsKICAgICAgICAgICAgICAgICAgICByZXNvbHZlKHRydWUpOwogICAgICAgICAgICAgICAgfSwKICAgICAgICAgICAg,ICAgICgpID0+IHsKICAgICAgICAgICAgICAgICAgIC,BlbmFibGVkTG9jYXRpb24uc2V0KGZhbHNlKTsKICAgICAgICAgICAgICAgICAgICByZXNvbHZlKGZhbHNlKTsKICAgICAgICAgICAgICAgICAgICBhZGROb3RpZmljYXRpb24oewogICAgICAgICAgICAgICAgICAgICAgICB0ZXh0OgogICAgICAgICAgICAgICAgICAgICAgICAgICAgJ1NvbWV0aGluZyB3ZW50IHdyb25nIGVuYWJsaW5nIGxvY2F0aW9uJyArCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAnIC0gcGxlYXNlIGNoZWNrIHlvdXIgYnJvd3NlciBzZXR0aW5ncycsCiAgICAgICAgICAgICAgICAgICAgICAgIHJlbW92ZUFmdGVyOiA4MDAwLAogICAgICAgICAgICAgICAgICAgICAgICB0eXBlOiAnZXJyb3InLAogICAgICAgICAgICAgICAgICAgICAgICBwb3NpdGlvbjogJ3RvcC1jZW50ZXInCiAgICAgICAgICAgICAgICAgICAgfSk7CiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICk7CiAgICAgICAgfSk7CiAgICB9CgogICAgZnVuY3Rpb24gZGlzYWJsZUxvY2F0aW9uICgpIHsKICAgICAgICBlbmFibGVkTG9jYXRpb24uc2V0KGZhbHNlKTsKICAgIH0KCiAgICBvbk1vdW50KGFzeW5jICgpID0+IHsKICAgICAgICBhd2FpdCB3YXRjaExvY2F0aW9uUGVybWlzc2lvbnMoKTsKICAgIH0pOwo=">{}</script>
 
 {#if $enabledLocation}
     <button
-        on:click={disableLocation}
-        use:tooltip={{
+        on:click="{disableLocation}"
+        use:tooltip="{{
             content: 'Location will be recorded, click to turn off location',
             position: tooltipPosition
-        }}
+        }}"
         aria-label="Turn off Location"
     >
         <MapMarkerOutline size="25" />
     </button>
 {:else}
     <button
-        on:click={enableLocation}
-        use:tooltip={{
+        on:click="{enableLocation}"
+        use:tooltip="{{
             content: 'Location is disabled, click to record location with entry'
-        }}
+        }}"
         aria-label="Turn on Location"
     >
         <MapMarkerOffOutline size="25" />
