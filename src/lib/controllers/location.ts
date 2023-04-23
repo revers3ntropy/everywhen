@@ -25,7 +25,7 @@ export class Location {
         latitude: number,
         longitude: number,
         radius: number
-    ): ,Promise<Result<Location>> {
+    ): Promise<Result<Location>> {
         if (radius < 0) {
             return Result.err('Radius cannot be negative');
         }
@@ -65,11 +65,11 @@ export class Location {
         return Location.fromRaw(
             auth,
             await query<Location[]>`
-                SELECT id, created, createdTZOffset, name, latitude, longitude, radius
-                FROM locations
-                WHERE user = ${auth.id}
-                ORDER BY created DESC
-            `
+            SELECT id, created, createdTZOffset, name, latitude, longitude, radius
+            FROM locations
+            WHERE user = ${auth.id}
+            ORDER BY created DESC
+        `
         );
     }
 
@@ -82,12 +82,12 @@ export class Location {
         const { err, val: locations } = Location.fromRaw(
             auth,
             await query<Location[]>`
-                SELECT id, created, createdTZOffset, name, latitude, longitude, radius
-                FROM locations
-                WHERE user = ${auth.id}
-                  AND SQRT(POW(latitude - ${lat}, 2) + POW(longitude - ${lng}, 2)) <= radius
-                ORDER BY radius, created DESC
-            `
+            SELECT id, created, createdTZOffset, name, latitude, longitude, radius
+            FROM locations
+            WHERE user = ${auth.id}
+              AND SQRT(POW(latitude - ${lat}, 2) + POW(longitude - ${lng}, 2)) <= radius
+            ORDER BY radius, created DESC
+        `
         );
 
         if (err) return Result.err(err);
@@ -96,13 +96,13 @@ export class Location {
         const { err: nearbyErr, val: nearby } = Location.fromRaw(
             auth,
             await query<Location[]>`
-                SELECT id, created, createdTZOffset, name, latitude, longitude, radius
-                FROM locations
-                WHERE user = ${auth.id}
-                  AND SQRT(POW(latitude - ${lat}, 2) + POW(longitude - ${lng}, 2)) <=
-                      radius * 2
-                ORDER BY radius, created DESC
-            `
+            SELECT id, created, createdTZOffset, name, latitude, longitude, radius
+            FROM locations
+            WHERE user = ${auth.id}
+              AND SQRT(POW(latitude - ${lat}, 2) + POW(longitude - ${lng}, 2)) <=
+                  radius * 2
+            ORDER BY radius, created DESC
+        `
         );
         if (nearbyErr) return Result.err(nearbyErr);
 
@@ -117,11 +117,11 @@ export class Location {
         return Location.fromRaw(
             auth,
             await query<Location[]>`
-                SELECT id, created, createdTZOffset, name, latitude, longitude, radius
-                FROM locations
-                WHERE user = ${auth.id}
-                  AND id = ${id}
-            `
+            SELECT id, created, createdTZOffset, name, latitude, longitude, radius
+            FROM locations
+            WHERE user = ${auth.id}
+              AND id = ${id}
+        `
         ).map(labels => labels[0]);
     }
 
@@ -144,7 +144,7 @@ export class Location {
         `;
         return Result.ok({
             ...location,
-            name: newName,
+            name: newName
         });
     }
 
@@ -164,7 +164,7 @@ export class Location {
         `;
         return Result.ok({
             ...location,
-            radius: newRadius,
+            radius: newRadius
         });
     }
 
@@ -192,7 +192,7 @@ export class Location {
         return Result.ok({
             ...location,
             latitude: newLatitude,
-            longitude: newLongitude,
+            longitude: newLongitude
         });
     }
 

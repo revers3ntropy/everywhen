@@ -31,7 +31,7 @@ export class Asset {
         contentsPlainText: string,
         created?: number,
         publicId?: string
-    ): P,romise<Result<string>> {
+    ): Promise<Result<string>> {
         publicId ??= await UUID.generateUUId(query);
         const id = await UUID.generateUUId(query);
         const fileExt = fileNamePlainText.split('.').pop();
@@ -43,19 +43,19 @@ export class Asset {
             return Result.err(
                 'Unsupported file type. Supported are ' +
                     Object.keys(Asset.fileExtToContentType).join(', ') +
-                    '.',
+                    '.'
             );
         }
 
         const { err: contentsErr, val: encryptedContents } = encrypt(
             contentsPlainText,
-            auth.key,
+            auth.key
         );
         if (contentsErr) return Result.err(contentsErr);
 
         const { err: fileNameErr, val: encryptedFileName } = encrypt(
             fileNamePlainText,
-            auth.key,
+            auth.key
         );
         if (fileNameErr) return Result.err(fileNameErr);
 

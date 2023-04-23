@@ -1,4 +1,29 @@
-<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgeyBvbk1vdW50IH0gZnJvbSAnc3ZlbHRlJzsKICAgIGltcG9ydCBEb3QgZnJvbSAnLi4vLi4vLi4vbGliL2NvbXBvbmVudHMvRG90LnN2ZWx0ZSc7CiAgICBpbXBvcnQgdHlwZSB7IEVudHJ5IH0gZnJvbSAnLi4vLi4vY29udHJvbGxlcnMvZW50cnknOwogICAgaW1wb3J0IHR5cGUgeyBBdXRoIH0gZnJvbSAnLi4vLi4vY29udHJvbGxlcnMvdXNlcic7CiAgICBpbXBvcnQgeyBhcGksIGFwaVBhdGggfSBmcm9tICcuLi8uLi91dGlscy9hcGlSZXF1ZXN0JzsKICAgIGltcG9ydCBVdGNUaW1lIGZyb20gJy4uL1V0Y1RpbWUuc3ZlbHRlJzsKCiAgICBleHBvcnQgbGV0IGlkOiBzdHJpbmc7CiAgICBleHBvcnQgbGV0IGF1dGg6IEF1dGg7CiAgICBleHBvcnQgbGV0IGVudHJ5OiBFbnRyeSB8IG51bGwgPSBudWxsOwogICAgbGV0IGVycm9yOiBzdHJpbmcgfCBudWxsID0gbnVsbDsKCiAgICBhc3luYyBmdW5jdGlvbiBnZXRFbnRyeSAoKSB7CiAgICAgICAgaWYgKGVudHJ5KSByZXR1cm47CgogICAgICAgIGNvbnN0IHsgZXJyLCB2YWwgfSA9IGF3YWl0IGFwaS5nZXQoYXV0aCwgYXBpUGF0aCgnL2VudHJpZXMvPycsIGlkKSk7CiAgICAgICAgaWYgKGVycikgewogICAgICAgICAgICBlcnJvciA9IGVycjsKICAgICAgICAgICAgcmV0dXJuOwogICAgICAgIH0KICAgICAgICBlbnRyeSA9IHZhbDsKICAgIH0KCiAgICBvbk1vdW50KGdldEVudHJ5KTsK">{}</script>
+<script lang="ts">
+    import { onMount } from 'svelte';
+    import Dot from '../../../lib/components/Dot.svelte';
+    import type { Entry } from '../../controllers/entry';
+    import type { Auth } from '../../controllers/user';
+    import { api, apiPath } from '../../utils/apiRequest';
+    import UtcTime from '../UtcTime.svelte';
+
+    export let id: string;
+    export let auth: Auth;
+    export let entry: Entry | null = null;
+    let error: string | null = null;
+
+    async function getEntry() {
+        if (entry) return;
+
+        const { err, val } = await api.get(auth, apiPath('/entries/?', id));
+        if (err) {
+            error = err;
+            return;
+        }
+        entry = val;
+    }
+
+    onMount(getEntry);
+</script>
 
 <div class="wrapper">
     {#if entry}
@@ -26,4 +51,16 @@
     {/if}
 </div>
 
-<style lang="less" ✂prettier:content✂="CiAgICAud3JhcHBlciB7CiAgICAgICAgbWluLXdpZHRoOiAyMDBweDsKICAgICAgICBtYXgtd2lkdGg6IG1pbig0MHZ3LCA3MDBweCk7CiAgICB9CgogICAgLmRhdGV0aW1lIHsKICAgICAgICA6Z2xvYmFsKCopIHsKICAgICAgICAgICAgZm9udC1zaXplOiAwLjlyZW07CiAgICAgICAgICAgIGNvbG9yOiAjNDQ0ICFpbXBvcnRhbnQ7CiAgICAgICAgfQogICAgfQo="></style>
+<style lang="less">
+    .wrapper {
+        min-width: 200px;
+        max-width: min(40vw, 700px);
+    }
+
+    .datetime {
+        :global(*) {
+            font-size: 0.9rem;
+            color: #444 !important;
+        }
+    }
+</style>

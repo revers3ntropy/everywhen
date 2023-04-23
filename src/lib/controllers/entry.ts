@@ -6,7 +6,7 @@ import type {
     Hours,
     Mutable,
     PickOptionalAndMutable,
-    TimestampSecs,
+    TimestampSecs
 } from '../utils/types';
 import { Label } from './label';
 import { Location } from './location';
@@ -63,7 +63,7 @@ export class Entry {
         auth: Auth,
         id: string,
         restore: boolean
-    ): ,Promise<Result> {
+    ): Promise<Result> {
         const entry = await query<{ deleted: boolean }[]>`
             SELECT deleted
             FROM entries
@@ -107,14 +107,14 @@ export class Entry {
     public static async allRaw(
         query: QueryFunc,
         auth: Auth,
-        filter: Omit<EntryFilter, 'search'> = {},
+        filter: Omit<EntryFilter, 'search'> = {}
     ): Promise<Result<RawEntry[]>> {
         let location: Location | undefined;
         if (filter.locationId) {
             const locationResult = await Location.fromId(
                 query,
                 auth,
-                filter.locationId,
+                filter.locationId
             );
             if (locationResult.err) return Result.err(locationResult.err);
             location = locationResult.val;
@@ -152,19 +152,19 @@ export class Entry {
                 ))
               AND user = ${auth.id}
             ORDER BY created DESC, id
-        `,
+        `
         );
     }
 
     public static async all(
         query: QueryFunc,
         auth: Auth,
-        filter: EntryFilter = {},
+        filter: EntryFilter = {}
     ): Promise<Result<Entry[]>> {
         const { err, val: rawEntries } = await Entry.allRaw(
             query,
             auth,
-            filter,
+            filter
         );
         if (err) return Result.err(err);
         return Entry.fromRawMulti(query, auth, rawEntries);
@@ -175,12 +175,12 @@ export class Entry {
         auth: Auth,
         page: number,
         pageSize: number,
-        filters: EntryFilter = {},
+        filters: EntryFilter = {}
     ): Promise<Result<[Entry[], number]>> {
         const { val: rawEntries, err: rawErr } = await Entry.allRaw(
             query,
             auth,
-            filters,
+            filters
         );
         if (rawErr) return Result.err(rawErr);
         const { val, err } = await Entry.fromRawMulti(query, auth, rawEntries);
@@ -191,7 +191,7 @@ export class Entry {
             entries = entries.filter(
                 e =>
                     e.title.toLowerCase().includes(filters.search || '') ||
-                    e.entry.toLowerCase().includes(filters.search || ''),
+                    e.entry.toLowerCase().includes(filters.search || '')
             );
         }
 
@@ -205,23 +205,23 @@ export class Entry {
         query: QueryFunc,
         auth: Auth,
         rawEntry: RawEntry,
-        isEdit = false,
+        isEdit = false
     ): Promise<Result<Entry>> {
         const { err: titleErr, val: decryptedTitle } = decrypt(
             rawEntry.title,
-            auth.key,
+            auth.key
         );
         if (titleErr) return Result.err(titleErr);
 
         const { err: entryErr, val: decryptedEntry } = decrypt(
             rawEntry.entry,
-            auth.key,
+            auth.key
         );
         if (entryErr) return Result.err(entryErr);
 
         const { err: agentErr, val: decryptedAgent } = decrypt(
             rawEntry.agentData,
-            auth.key,
+            auth.key
         );
         if (agentErr) return Result.err(agentErr);
 
@@ -234,7 +234,7 @@ export class Entry {
             rawEntry.deleted,
             rawEntry.latitude,
             rawEntry.longitude,
-            decryptedAgent,
+            decryptedAgent
         );
 
         if (rawEntry.label) {
@@ -242,7 +242,7 @@ export class Entry {
                 query,
                 auth,
                 entry,
-                rawEntry.label,
+                rawEntry.label
             );
             if (err) return Result.err(err);
             entry = val;
@@ -269,7 +269,7 @@ export class Entry {
             const localDate = fmtUtc(
                 entry.created,
                 entry.createdTZOffset,
-                'YYYY-MM-DD',
+                'YYYY-MM-DD'
             );
             const dayTimeStamp =
                 new Date(localDate).setHours(12, 0, 0, 0) / 1000;
@@ -294,7 +294,7 @@ export class Entry {
         query: QueryFunc,
         auth: Auth,
         id: string,
-        mustNotBeDeleted = true,
+        mustNotBeDeleted = true
     ): Promise<Result<Entry>> {
         const entries = await query<RawEntry[]>`
             SELECT label,
@@ -324,7 +324,7 @@ export class Entry {
 
     public static jsonIsRawEntry(
         json: unknown,
-        isEdit = false,
+        isEdit = false
     ): json is Omit<Entry, 'id' | 'label'> & {
         label?: string;
     } {
@@ -362,11 +362,11 @@ export class Entry {
         json_: PickOptionalAndMutable<
             DecryptedRawEntry,
             'id' | 'deleted' | 'decrypted' | 'created'
-        >,
+        >
     ): Promise<Result<Entry>> {
         const json: typeof json_ & { id: string } = {
             ...json_,
-            id: await UUID.generateUUId(query),
+            id: await UUID.generateUUId(query)
         };
         json.created ??= nowS();
 
@@ -379,7 +379,7 @@ export class Entry {
             !!json.deleted,
             json.latitude,
             json.longitude,
-            json.agentData,
+            json.agentData
         );
 
         entry.edits = await Promise.all(
@@ -394,9 +394,9 @@ export class Entry {
                         false,
                         e.latitude,
                         e.longitude,
-                        e.agentData,
-                    ),
-            ) ?? [],
+                        e.agentData
+                    )
+            ) ?? []
         );
 
         if (json.label) {
@@ -404,26 +404,26 @@ export class Entry {
                 query,
                 auth,
                 entry,
-                json.label,
+                json.label
             );
             if (err) return Result.err(err);
         }
 
         const { err: titleErr, val: encryptedTitle } = encrypt(
             entry.title,
-            auth.key,
+            auth.key
         );
         if (titleErr) return Result.err(titleErr);
 
         const { err: entryErr, val: encryptedEntry } = encrypt(
             entry.entry,
-            auth.key,
+            auth.key
         );
         if (entryErr) return Result.err(entryErr);
 
         const { err: agentErr, val: encryptedAgent } = encrypt(
             entry.agentData,
-            auth.key,
+            auth.key
         );
         if (agentErr) return Result.err(agentErr);
 
@@ -447,19 +447,19 @@ export class Entry {
         for (const edit of entry.edits) {
             const { err: editTitleErr, val: encryptedEditTitle } = encrypt(
                 edit.title,
-                auth.key,
+                auth.key
             );
             if (editTitleErr) return Result.err(editTitleErr);
 
             const { err: editEntryErr, val: encryptedEditEntry } = encrypt(
                 edit.entry,
-                auth.key,
+                auth.key
             );
             if (editEntryErr) return Result.err(editEntryErr);
 
             const { err: editAgentErr, val: encryptedAgentData } = encrypt(
                 edit.agentData,
-                auth.key,
+                auth.key
             );
             if (editAgentErr) return Result.err(editAgentErr);
 
@@ -486,7 +486,7 @@ export class Entry {
     public static async removeLabel(
         query: QueryFunc,
         auth: Auth,
-        self: Entry,
+        self: Entry
     ): Promise<Result<Entry>> {
         if (!self.label) {
             return Result.err('Entry does not have a label to remove');
@@ -507,7 +507,7 @@ export class Entry {
         query: QueryFunc,
         auth: Auth,
         self: Entry,
-        label: Label | string | null,
+        label: Label | string | null
     ): Promise<Result<Entry>> {
         if (label == null) {
             return Entry.removeLabel(query, auth, self);
@@ -540,7 +540,7 @@ export class Entry {
             self.deleted,
             self.latitude,
             self.longitude,
-            self.agentData,
+            self.agentData
         );
         entry.label = self.label;
         return entry;
@@ -556,14 +556,14 @@ export class Entry {
         newLongitude: number | undefined,
         newLabel: Label | string,
         tzOffset: number,
-        agentData: string,
+        agentData: string
     ): Promise<Result> {
         const { err, val: encryptionResults } = encryptMulti(
             auth.key,
             newTitle,
             newEntry,
             entry.title,
-            entry.entry,
+            entry.entry
         );
         if (err) return Result.err(err);
         const [encryptedNewTitle, encryptedNewEntry, oldTitle, oldEntry] =
@@ -623,7 +623,7 @@ export class Entry {
         query: QueryFunc,
         auth: Auth,
         oldLabel: string,
-        newLabel: string,
+        newLabel: string
     ): Promise<Result> {
         await query`
             UPDATE entryEdits
@@ -647,7 +647,7 @@ export class Entry {
     public static async removeAllLabel(
         query: QueryFunc,
         auth: Auth,
-        labelId: string,
+        labelId: string
     ): Promise<Result> {
         await query`
             UPDATE entryEdits
@@ -670,7 +670,7 @@ export class Entry {
 
     public static async getStreaks(
         query: QueryFunc,
-        auth: Auth,
+        auth: Auth
     ): Promise<Result<Streaks>> {
         const entries = await query<
             { created: number; createdTZOffset: number }[]
@@ -686,7 +686,7 @@ export class Entry {
             return Result.ok({
                 current: 0,
                 longest: 0,
-                runningOut: false,
+                runningOut: false
             });
         }
 
@@ -694,7 +694,7 @@ export class Entry {
         const yesterday = fmtUtc(
             nowS() - 86400,
             currentTzOffset(),
-            'YYYY-MM-DD',
+            'YYYY-MM-DD'
         );
 
         let current = 0;
@@ -717,7 +717,7 @@ export class Entry {
             currentDay = fmtUtc(
                 new Date(currentDay).getTime() / 1000 - 86400,
                 0,
-                'YYYY-MM-DD',
+                'YYYY-MM-DD'
             );
         }
 
@@ -728,7 +728,7 @@ export class Entry {
         const firstDay = fmtUtc(
             firstEntry.created,
             firstEntry.createdTZOffset,
-            'YYYY-MM-DD',
+            'YYYY-MM-DD'
         );
 
         currentDay = today;
@@ -736,7 +736,7 @@ export class Entry {
             currentDay = fmtUtc(
                 new Date(currentDay).getTime() / 1000 - 86400,
                 0,
-                'YYYY-MM-DD',
+                'YYYY-MM-DD'
             );
             if (entriesOnDay[currentDay]) {
                 currentStreak++;
@@ -751,7 +751,7 @@ export class Entry {
         return Result.ok({
             current,
             longest,
-            runningOut,
+            runningOut
         });
     }
 
@@ -759,7 +759,7 @@ export class Entry {
         query: QueryFunc,
         auth: Auth,
         location: Location,
-        deleted: boolean | 'both' = false,
+        deleted: boolean | 'both' = false
     ): Promise<Result<Entry[]>> {
         return await Entry.fromRawMulti(
             query,
@@ -784,14 +784,14 @@ export class Entry {
                               POW(latitude - ${location.latitude}, 2)
                               + POW(longitude - ${location.longitude}, 2)
                       ) <= ${location.radius}
-        `,
+        `
         );
     }
 
     private static async fromRawMulti(
         query: QueryFunc,
         auth: Auth,
-        raw: RawEntry[],
+        raw: RawEntry[]
     ): Promise<Result<Entry[]>> {
         const edits = await query<EntryEdit[]>`
             SELECT entryEdits.created,
@@ -816,7 +816,7 @@ export class Entry {
                 prev[edit.entryId].push(edit);
                 return prev;
             },
-            {},
+            {}
         );
 
         const { err, val: labels } = await Label.all(query, auth);
@@ -827,26 +827,26 @@ export class Entry {
                 prev[label.id] = label;
                 return prev;
             },
-            {},
+            {}
         );
 
         return Result.collect(
             raw.map(rawEntry => {
                 const { err: titleErr, val: decryptedTitle } = decrypt(
                     rawEntry.title,
-                    auth.key,
+                    auth.key
                 );
                 if (titleErr) return Result.err(titleErr);
 
                 const { err: entryErr, val: decryptedEntry } = decrypt(
                     rawEntry.entry,
-                    auth.key,
+                    auth.key
                 );
                 if (entryErr) return Result.err(entryErr);
 
                 const { err: agentErr, val: decryptedAgent } = decrypt(
                     rawEntry.agentData,
-                    auth.key,
+                    auth.key
                 );
                 if (agentErr) return Result.err(agentErr);
 
@@ -859,7 +859,7 @@ export class Entry {
                     rawEntry.deleted,
                     rawEntry.latitude,
                     rawEntry.longitude,
-                    decryptedAgent,
+                    decryptedAgent
                 );
 
                 entry.edits = groupedEdits[rawEntry.id];
@@ -869,7 +869,7 @@ export class Entry {
                 }
 
                 return Result.ok(entry);
-            }),
+            })
         );
     }
 
@@ -877,7 +877,7 @@ export class Entry {
         query: QueryFunc,
         auth: Auth,
         self: Entry,
-        label: Label | string,
+        label: Label | string
     ): Promise<Result<Entry>> {
         if (typeof label === 'string') {
             const { val, err } = await Label.fromId(query, auth, label);
@@ -895,7 +895,7 @@ export class Entry {
     private static async addEdits(
         query: QueryFunc,
         auth: Auth,
-        self: Entry,
+        self: Entry
     ): Promise<Result<EntryEdit>> {
         const rawEdits = await query<RawEntry[]>`
             SELECT created, createdTZOffset, latitude, longitude, title, entry, label
@@ -905,8 +905,8 @@ export class Entry {
 
         const { err, val: edits } = Result.collect(
             await Promise.all(
-                rawEdits.map(e => Entry.fromRaw(query, auth, e, true)),
-            ),
+                rawEdits.map(e => Entry.fromRaw(query, auth, e, true))
+            )
         );
         if (err) return Result.err(err);
 

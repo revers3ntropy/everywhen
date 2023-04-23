@@ -1,4 +1,105 @@
-<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgeyBicm93c2VyIH0gZnJvbSAnJGFwcC9lbnZpcm9ubWVudCc7CiAgICBpbXBvcnQgJ2NoYXJ0LmpzL2F1dG8nOwogICAgLy8gaHR0cHM6Ly93d3cubnBtanMuY29tL3BhY2thZ2Uvc3ZlbHRlLWNoYXJ0anMKICAgIGltcG9ydCB7IEJhciB9IGZyb20gJ3N2ZWx0ZS1jaGFydGpzJzsKICAgIGltcG9ydCBUb2dnbGVTd2l0Y2ggZnJvbSAnc3ZlbHRlLW1hdGVyaWFsLWljb25zL1RvZ2dsZVN3aXRjaC5zdmVsdGUnOwogICAgaW1wb3J0IFRvZ2dsZVN3aXRjaE9mZiBmcm9tICdzdmVsdGUtbWF0ZXJpYWwtaWNvbnMvVG9nZ2xlU3dpdGNoT2ZmLnN2ZWx0ZSc7CiAgICBpbXBvcnQgU2VsZWN0IGZyb20gJy4uLy4uL2xpYi9jb21wb25lbnRzL1NlbGVjdC5zdmVsdGUnOwogICAgaW1wb3J0IHsgY3VycmVudFR6T2Zmc2V0LCBmbXRVdGMsIG5vd1MgfSBmcm9tICcuLi8uLi9saWIvdXRpbHMvdGltZSc7CiAgICBpbXBvcnQgdHlwZSB7IFNlY29uZHMgfSBmcm9tICcuLi8uLi9saWIvdXRpbHMvdHlwZXMnOwogICAgaW1wb3J0IHsKICAgICAgICBCdWNrZXQsCiAgICAgICAgYnVja2V0aXNlVGltZSwKICAgICAgICBidWNrZXRTaXplLAogICAgICAgIEJ5LAogICAgICAgIHR5cGUgRW50cnlXaXRoV29yZENvdW50LAogICAgfSBmcm9tICcuL2hlbHBlcnMnOwoKICAgIGV4cG9ydCBsZXQgZW50cmllczogRW50cnlXaXRoV29yZENvdW50W107CiAgICBleHBvcnQgbGV0IGJ5OiBCeTsKCiAgICBpbnRlcmZhY2UgQ2hhcnREYXRhIHsKICAgICAgICBkYXRhc2V0czogewogICAgICAgICAgICBkYXRhOiBudW1iZXJbXTsKICAgICAgICAgICAgbGFiZWw6IHN0cmluZzsKICAgICAgICB9W107CiAgICAgICAgbGFiZWxzOiBzdHJpbmdbXTsKICAgIH0KCiAgICBsZXQgc2VsZWN0ZWRCdWNrZXQgPSBCdWNrZXQuV2VlazsKCiAgICBsZXQgZGF0YTogQ2hhcnREYXRhOwoKICAgIGZ1bmN0aW9uIHRvZ2dsZUJ5ICgpIHsKICAgICAgICBieSA9IGJ5ID09PSBCeS5FbnRyaWVzID8gQnkuV29yZHMgOiBCeS5FbnRyaWVzOwogICAgfQoKICAgIGZ1bmN0aW9uIGdlbmVyYXRlTGFiZWxzIChzdGFydDogU2Vjb25kcywgYnVja2V0czogU2Vjb25kc1tdKSB7CiAgICAgICAgbGV0IHllYXIgPSBwYXJzZUludChmbXRVdGMoc3RhcnQsIGN1cnJlbnRUek9mZnNldCgpLCAnWVlZWScpKTsKICAgICAgICByZXR1cm4gYnVja2V0cy5tYXAoayA9PiB7CiAgICAgICAgICAgIGlmIChzZWxlY3RlZEJ1Y2tldCA9PT0gQnVja2V0LlllYXIpIHsKICAgICAgICAgICAgICAgIHJldHVybiBmbXRVdGMoaywgY3VycmVudFR6T2Zmc2V0KCksICdZWVlZJyk7CiAgICAgICAgICAgIH0KCiAgICAgICAgICAgIGNvbnN0IHRoaXNZZWFyID0gcGFyc2VJbnQoZm10VXRjKGssIGN1cnJlbnRUek9mZnNldCgpLCAnWVlZWScpKTsKICAgICAgICAgICAgaWYgKHNlbGVjdGVkQnVja2V0ID09PSBCdWNrZXQuTW9udGgpIHsKICAgICAgICAgICAgICAgIGlmICh0aGlzWWVhciAhPT0geWVhcikgewogICAgICAgICAgICAgICAgI,CAgIHllYXIgPSB0aGlzWWVhcjsKICAgICAgICAgICAgICAgICAgICByZXR1cm4gZm10VXRjKGssIGN1cnJlbnRUek9mZnNldCgpLCAnTU1NIFlZWVknKTsKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIHJldHVybiBmbXRVdGMoaywgY3VycmVudFR6T2Zmc2V0KCksICdNTU0nKTsKICAgICAgICAgICAgfQoKICAgICAgICAgICAgaWYgKHRoaXNZZWFyICE9PSB5ZWFyKSB7CiAgICAgICAgICAgICAgICB5ZWFyID0gdGhpc1llYXI7CiAgICAgICAgICAgICAgICByZXR1cm4gZm10VXRjKGssIGN1cnJlbnRUek9mZnNldCgpLCAnRG8gTU1NIFlZWVknKTsKICAgICAgICAgICAgfQogICAgICAgICAgICByZXR1cm4gZm10VXRjKGssIGN1cnJlbnRUek9mZnNldCgpLCAnRG8gTU1NJyk7CiAgICAgICAgfSk7CiAgICB9CgogICAgZnVuY3Rpb24gZ2V0R3JhcGhEYXRhICgKICAgICAgICBlbnRyaWVzOiBFbnRyeVdpdGhXb3JkQ291bnRbXSwKICAgICAgICBzZWxlY3RlZEJ1Y2tldDogQnVja2V0LAogICAgICAgIGJ5OiBCeQogICAgKTogQ2hhcnREYXRhIHsKICAgICAgICBjb25zdCBzb3J0ZWRFbnRyaWVzID0gZW50cmllcy5zb3J0KChhLCBiKSA9PiBhLmNyZWF0ZWQgLSBiLmNyZWF0ZWQpOwoKICAgICAgICBjb25zdCBidWNrZXRzOiBSZWNvcmQ8c3RyaW5nLCBudW1iZXI+ID0ge307CiAgICAgICAgY29uc3Qgc3RhcnQgPSBzb3J0ZWRFbnRyaWVzWzBdLmNyZWF0ZWQ7CiAgICAgICAgY29uc3QgZW5kID0gbm93UygpOwogICAgICAgIGZvciAobGV0IGkgPSBzdGFydDsgaSA8IGVuZDsgaSArPSBidWNrZXRTaXplKHNlbGVjdGVkQnVja2V0KSkgewogICAgICAgICAgICBidWNrZXRzW2J1Y2tldGlzZVRpbWUoaSwgc2VsZWN0ZWRCdWNrZXQpLnRvU3RyaW5nKCldID0gMDsKICAgICAgICB9CgogICAgICAgIGZvciAoY29uc3QgZW50cnkgb2Ygc29ydGVkRW50cmllcykgewogICAgICAgICAgICBjb25zdCBidWNrZXQgPSBidWNrZXRpc2VUaW1lKGVudHJ5LmNyZWF0ZWQsIHNlbGVjdGVkQnVja2V0KTsKICAgICAgICAgICAgYnVja2V0c1tidWNrZXQudG9TdHJpbmcoKV0gKz0KICAgICAgICAgICAgICAgIGJ5ID09PSBCeS5FbnRyaWVzID8gMSA6IGVudHJ5LndvcmRDb3VudDsKICAgICAgICB9CgogICAgICAgIGNvbnN0IGxhYmVscyA9IGdlbmVyYXRlTGFiZWxzKAogICAgICAgICAgICBzdGFydCwKICAgICAgICAgICAgT2JqZWN0LmtleXMoYnVja2V0cykubWFwKGsgPT4gcGFyc2VJbnQoaykpCiAgICAgICAgKTsKCiAgICAgICAgY29uc3QgZGF0YXNldCA9IHsKICAgICAgICAgICAgZGF0YTogT2JqZWN0LnZhbHVlcyhidWNrZXRzKSwKICAgICAgICAgICAgbGFiZWw6IGJ5ID09PSBCeS5FbnRyaWVzID8gJ0VudHJpZXMnIDogJ1dvcmRzJwogICAgICAgIH07CgogICAgICAgIHJldHVybiB7CiAgICAgICAgICAgIGxhYmVscywKICAgICAgICAgICAgZGF0YXNldHM6IFsgZGF0YXNldCBdCiAgICAgICAgfTsKICAgIH0KCiAgICAvLyBubyBkYXRhIGZldGNoaW5nIHNvIHRvcCBsZXZlbAogICAgJDogaWYgKGVudHJpZXMgfHwgYnkgfHwgc2VsZWN0ZWRCdWNrZXQpIHsKICAgICAgICBkYXRhID0gZ2V0R3JhcGhEYXRhKGVudHJpZXMsIHNlbGVjdGVkQnVja2V0LCBieSk7CiAgICB9Cg==">{}</script>
+<script lang="ts">
+    import { browser } from '$app/environment';
+    import 'chart.js/auto';
+    // https://www.npmjs.com/package/svelte-chartjs
+    import { Bar } from 'svelte-chartjs';
+    import ToggleSwitch from 'svelte-material-icons/ToggleSwitch.svelte';
+    import ToggleSwitchOff from 'svelte-material-icons/ToggleSwitchOff.svelte';
+    import Select from '../../lib/components/Select.svelte';
+    import { currentTzOffset, fmtUtc, nowS } from '../../lib/utils/time';
+    import type { Seconds } from '../../lib/utils/types';
+    import {
+        Bucket,
+        bucketiseTime,
+        bucketSize,
+        By,
+        type EntryWithWordCount
+    } from './helpers';
+
+    export let entries: EntryWithWordCount[];
+    export let by: By;
+
+    interface ChartData {
+        datasets: {
+            data: number[];
+            label: string;
+        }[];
+        labels: string[];
+    }
+
+    let selectedBucket = Bucket.Week;
+
+    let data: ChartData;
+
+    function toggleBy() {
+        by = by === By.Entries ? By.Words : By.Entries;
+    }
+
+    function generateLabels(start: Seconds, buckets: Seconds[]) {
+        let year = parseInt(fmtUtc(start, currentTzOffset(), 'YYYY'));
+        return buckets.map(k => {
+            if (selectedBucket === Bucket.Year) {
+                return fmtUtc(k, currentTzOffset(), 'YYYY');
+            }
+
+            const thisYear = parseInt(fmtUtc(k, currentTzOffset(), 'YYYY'));
+            if (selectedBucket === Bucket.Month) {
+                if (thisYear !== year) {
+                    year = thisYear;
+                    return fmtUtc(k, currentTzOffset(), 'MMM YYYY');
+                }
+                return fmtUtc(k, currentTzOffset(), 'MMM');
+            }
+
+            if (thisYear !== year) {
+                year = thisYear;
+                return fmtUtc(k, currentTzOffset(), 'Do MMM YYYY');
+            }
+            return fmtUtc(k, currentTzOffset(), 'Do MMM');
+        });
+    }
+
+    function getGraphData(
+        entries: EntryWithWordCount[],
+        selectedBucket: Bucket,
+        by: By
+    ): ChartData {
+        const sortedEntries = entries.sort((a, b) => a.created - b.created);
+
+        const buckets: Record<string, number> = {};
+        const start = sortedEntries[0].created;
+        const end = nowS();
+        for (let i = start; i < end; i += bucketSize(selectedBucket)) {
+            buckets[bucketiseTime(i, selectedBucket).toString()] = 0;
+        }
+
+        for (const entry of sortedEntries) {
+            const bucket = bucketiseTime(entry.created, selectedBucket);
+            buckets[bucket.toString()] +=
+                by === By.Entries ? 1 : entry.wordCount;
+        }
+
+        const labels = generateLabels(
+            start,
+            Object.keys(buckets).map(k => parseInt(k))
+        );
+
+        const dataset = {
+            data: Object.values(buckets),
+            label: by === By.Entries ? 'Entries' : 'Words'
+        };
+
+        return {
+            labels,
+            datasets: [dataset]
+        };
+    }
+
+    // no data fetching so top level
+    $: if (entries || by || selectedBucket) {
+        data = getGraphData(entries, selectedBucket, by);
+    }
+</script>
 
 <Bar
     data="{data}"
@@ -33,4 +134,32 @@
     </div>
 </div>
 
-<style lang="less" ✂prettier:content✂="CiAgICBAaW1wb3J0ICcuLi8uLi9zdHlsZXMvdmFyaWFibGVzJzsKCiAgICAub3B0aW9ucyB7CiAgICAgICAgZGlzcGxheTogZmxleDsKICAgICAgICBqdXN0aWZ5LWNvbnRlbnQ6IHNwYWNlLWJldHdlZW47CiAgICAgICAgYWxpZ24taXRlbXM6IGNlbnRlcjsKICAgICAgICBwYWRkaW5nOiAwOwoKICAgICAgICBAbWVkaWEgQG1vYmlsZSB7CiAgICAgICAgICAgIGZsZXgtZGlyZWN0aW9uOiBjb2x1bW47CiAgICAgICAgfQogICAgfQoKICAgIC5jb250YWluZXIgewogICAgICAgIG1hcmdpbjogMDsKICAgICAgICBwYWRkaW5nOiAwLjNlbTsKICAgIH0KCiAgICAudG9nZ2xlLWJ5LWJ1dHRvbiB7CiAgICAgICAgZGlzcGxheTogZmxleDsKICAgICAgICBhbGlnbi1pdGVtczogY2VudGVyOwogICAgICAgIGp1c3RpZnktY29udGVudDogc3BhY2UtYmV0d2VlbjsKCiAgICAgICAgOmdsb2JhbChzdmcpIHsKICAgICAgICAgICAgbWFyZ2luOiAwIDAuMnJlbTsKICAgICAgICB9CiAgICB9Cg=="></style>
+<style lang="less">
+    @import '../../styles/variables';
+
+    .options {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0;
+
+        @media @mobile {
+            flex-direction: column;
+        }
+    }
+
+    .container {
+        margin: 0;
+        padding: 0.3em;
+    }
+
+    .toggle-by-button {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        :global(svg) {
+            margin: 0 0.2rem;
+        }
+    }
+</style>

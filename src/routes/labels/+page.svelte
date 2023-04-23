@@ -1,4 +1,65 @@
-<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgeyBvbk1vdW50IH0gZnJvbSAnc3ZlbHRlJzsKICAgIGltcG9ydCBMYWJlbE91dGxpbmUgZnJvbSAnc3ZlbHRlLW1hdGVyaWFsLWljb25zL0xhYmVsT3V0bGluZS5zdmVsdGUnOwogICAgaW1wb3J0IFBsdXMgZnJvbSAnc3ZlbHRlLW1hdGVyaWFsLWljb25zL1BsdXMuc3ZlbHRlJzsKICAgIGltcG9ydCB7IGdldE5vdGlmaWNhdGlvbnNDb250ZXh0IH0gZnJvbSAnc3ZlbHRlLW5vdGlmaWNhdGlvbnMnOwogICAgaW1wb3J0IERvdCBmcm9tICcuLi8uLi9saWIvY29tcG9uZW50cy9Eb3Quc3ZlbHRlJzsKICAgIGltcG9ydCB0eXBlIHsgTGFiZWwgYXMgTGFiZWxDb250cm9sbGVyIH0gZnJvbSAnLi4vLi4vbGliL2NvbnRyb2xsZXJzL2xhYmVsJzsKICAgIGltcG9ydCB7IGFwaSB9IGZyb20gJy4uLy4uL2xpYi91dGlscy9hcGlSZXF1ZXN0JzsKICAgIGltcG9ydCB7IGRpc3BsYXlOb3RpZk9uRXJyIH0gZnJvbSAnLi4vLi4vbGliL3V0aWxzL25vdGlmaWNhdGlvbnMnOwogICAgaW1wb3J0IHsgbm93UyB9IGZyb20gJy4uLy4uL2xpYi91dGlscy90aW1lJzsKICAgIGltcG9ydCBMYWJlbE9wdGlvbnMgZnJvbSAnLi9MYWJlbE9wdGlvbnMuc3ZlbHRlJzsKCiAgICBjb25zdCB7IGFkZE5vdGlmaWNhdGlvbiB9ID0gZ2V0Tm90aWZpY2F0aW9uc0NvbnRleHQoKTsKCiAgICBleHBvcnQgbGV0IGRhdGE6IEFwcC5QYWdlRGF0YSAmIHsKICAgICAgICBsYWJlbHM6IChMYWJlbENvbnRyb2xsZXIgJiB7CiAgICAgICAgICAgIGVudHJ5Q291bnQ6IG51bWJlcjsKICAgICAgICAgICAgZXZlbnRDb3VudDogbnVtYmVyOwogICAgICAgIH0pW107CiAgICB9OwoKICAgIGFzeW5jIGZ1bmN0aW9uIG5ld0xhYmVsICgpIHsKICAgICAgICBsZXQgbmFtZSA9ICdOZXcgTGFiZWwnOwogICAgICAgIGxldCBpID0gMDsKICAgICAgICB3aGlsZSAoZGF0YS5sYWJlbHMuc29tZShsID0+IGwubmFtZSA9PT0gbmFtZSkpIHsKICAgICAgICAgICAgbmFtZSA9IGBOZXcgTGFiZWwgJHsrK2l9YDsKICAgICAgICB9CgogICAgICAgIGNvbnN0IG5ld0xhYmVsID0gewogICAgICAgICAgICBuYW1lLAogICAgICAgICAgICBjb2xvdXI6ICcjMDAwJywKICAgICAgICB9OwoKICAgICAgICBjb25zdCB7IGlkIH0gPSBkaXNwbGF5Tm90aWZPbkVycigKICAgICAgICAgICAgYWRkTm90aWZpY2F0aW9uLAogICAgICAgICAgICBhd2FpdCBhcGkucG9zdChkYXRhLCAnL2xhYmVscycsIG5ld0xhYmVsKSwKICAgICAgICApOwoKICAgICAgICBkYXRhID0gewogICAgICAgICAgICAuLi5kYXRhLAogICAgICAgICAg,ICBsYWJlbHM6IFsKICAgICAgICAgICAgICAgIC4uLmRhdGEubGFiZWxzLAogICAgICAgICAgICAgICAgewogICAgICAgICAgICAgICAgICAgIC4uLm5ld0xhYmVsLAogICAgICAgICAgICAgICAgICAgIGlkLAogICAgICAgICAgICAgICAgICAgIGNyZWF0ZWQ6IG5vd1MoKSwKICAgICAgICAgICAgICAgICAgICBlbnRyeUNvdW50OiAwLAogICAgICAgICAgICAgICAgICAgIGV2ZW50Q291bnQ6IDAsCiAgICAgICAgICAgICAgICB9LAogICAgICAgICAgICBdLAogICAgICAgIH07CiAgICB9CgogICAgZnVuY3Rpb24gbGFiZWxEZWxldGVkICh7IGRldGFpbDogeyBpZCB9IH06IHsgZGV0YWlsOiB7IGlkOiBzdHJpbmcgfSB9KSB7CiAgICAgICAgZGF0YSA9IHsKICAgICAgICAgICAgLi4uZGF0YSwKICAgICAgICAgICAgbGFiZWxzOiBkYXRhLmxhYmVscy5maWx0ZXIobCA9PiBsLmlkICE9PSBpZCkKICAgICAgICB9OwogICAgfQoKICAgIG9uTW91bnQoKCkgPT4gKGRvY3VtZW50LnRpdGxlID0gJ0xhYmVscycpKTsK">{}</script>
+<script lang="ts">
+    import { onMount } from 'svelte';
+    import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
+    import Plus from 'svelte-material-icons/Plus.svelte';
+    import { getNotificationsContext } from 'svelte-notifications';
+    import Dot from '../../lib/components/Dot.svelte';
+    import type { Label as LabelController } from '../../lib/controllers/label';
+    import { api } from '../../lib/utils/apiRequest';
+    import { displayNotifOnErr } from '../../lib/utils/notifications';
+    import { nowS } from '../../lib/utils/time';
+    import LabelOptions from './LabelOptions.svelte';
+
+    const { addNotification } = getNotificationsContext();
+
+    export let data: App.PageData & {
+        labels: (LabelController & {
+            entryCount: number;
+            eventCount: number;
+        })[];
+    };
+
+    async function newLabel() {
+        let name = 'New Label';
+        let i = 0;
+        while (data.labels.some(l => l.name === name)) {
+            name = `New Label ${++i}`;
+        }
+
+        const newLabel = {
+            name,
+            colour: '#000'
+        };
+
+        const { id } = displayNotifOnErr(
+            addNotification,
+            await api.post(data, '/labels', newLabel)
+        );
+
+        data = {
+            ...data,
+            labels: [
+                ...data.labels,
+                {
+                    ...newLabel,
+                    id,
+                    created: nowS(),
+                    entryCount: 0,
+                    eventCount: 0
+                }
+            ]
+        };
+    }
+
+    function labelDeleted({ detail: { id } }: { detail: { id: string } }) {
+        data = {
+            ...data,
+            labels: data.labels.filter(l => l.id !== id)
+        };
+    }
+
+    onMount(() => (document.title = 'Labels'));
+</script>
 
 <svelte:head>
     <title>Labels</title>
@@ -38,4 +99,31 @@
     </div>
 </main>
 
-<style lang="less" ✂prettier:content✂="CiAgICBAaW1wb3J0ICcuLi8uLi9zdHlsZXMvbGF5b3V0JzsKICAgIEBpbXBvcnQgJy4uLy4uL3N0eWxlcy92YXJpYWJsZXMnOwoKICAgIGgxIHsKICAgICAgICAuZmxleC1jZW50ZXIoKTsKICAgICAgICBtYXJnaW46IDAgMCAxcmVtIDA7CiAgICAgICAgZm9udC1zaXplOiA0MHB4OwoKICAgICAgICBpIHsKICAgICAgICAgICAgZm9udC1zaXplOiAwLjVlbTsKICAgICAgICAgICAgbWFyZ2luLWxlZnQ6IDAuNWVtOwogICAgICAgIH0KCiAgICAgICAgc3BhbiB7CiAgICAgICAgICAgIG1hcmdpbi1sZWZ0OiAwLjJlbTsKICAgICAgICB9CiAgICB9CgogICAgLmxhYmVscyB7CiAgICAgICAgZGlzcGxheTogZ3JpZDsKICAgICAgICBwbGFjZS1jb250ZW50OiBjZW50ZXI7CgogICAgICAgICYgPiAqIHsKICAgICAgICAgICAgbWF4LXdpZHRoOiA1MHJlbTsKICAgICAgICB9CiAgICB9Cg=="></style>
+<style lang="less">
+    @import '../../styles/layout';
+    @import '../../styles/variables';
+
+    h1 {
+        .flex-center();
+        margin: 0 0 1rem 0;
+        font-size: 40px;
+
+        i {
+            font-size: 0.5em;
+            margin-left: 0.5em;
+        }
+
+        span {
+            margin-left: 0.2em;
+        }
+    }
+
+    .labels {
+        display: grid;
+        place-content: center;
+
+        & > * {
+            max-width: 50rem;
+        }
+    }
+</style>

@@ -127,7 +127,7 @@ export class Backup {
         auth: Auth,
         backupEncrypted: string,
         key: string
-    ): ,Promise<Result> {
+    ): Promise<Result> {
         let decryptedData: unknown;
 
         try {
@@ -147,7 +147,7 @@ export class Backup {
         }
 
         const { err: migrateErr, val: migratedData } = Backup.migrate(
-            decryptedData as Record<string, unknown>,
+            decryptedData as Record<string, unknown>
         );
         if (migrateErr) return Result.err(migrateErr);
 
@@ -158,7 +158,7 @@ export class Backup {
                 assets: 'object',
                 events: 'object',
                 created: 'number',
-                appVersion: 'string',
+                appVersion: 'string'
             })
         ) {
             return Result.err('Invalid backup format');
@@ -172,7 +172,7 @@ export class Backup {
             !Array.isArray(events)
         ) {
             return Result.err(
-                'data must be an object with entries and labels properties',
+                'data must be an object with entries and labels properties'
             );
         }
 
@@ -199,7 +199,7 @@ export class Backup {
                 const { err, val } = await Label.getIdFromName(
                     query,
                     auth,
-                    entry.label,
+                    entry.label
                 );
                 if (err) return Result.err(err);
                 entry.label = val;
@@ -220,7 +220,7 @@ export class Backup {
                 const { err, val } = await Label.getIdFromName(
                     query,
                     auth,
-                    event.label,
+                    event.label
                 );
                 if (err) return Result.err(err);
                 event.label = val;
@@ -233,7 +233,7 @@ export class Backup {
                 event.start,
                 event.end,
                 event.label,
-                event.created,
+                event.created
             );
             if (err) return Result.err(err);
         }
@@ -253,7 +253,7 @@ export class Backup {
                 // make sure to preserve id as this is
                 // card coded into entries
                 asset.created,
-                asset.publicId,
+                asset.publicId
             );
             if (err) return Result.err(err);
         }
@@ -266,7 +266,7 @@ export class Backup {
     }
 
     public static migrate(
-        json: Partial<Backup> & Record<string, unknown>,
+        json: Partial<Backup> & Record<string, unknown>
     ): Result<Backup> {
         json.appVersion ||= '0.0.0';
         const version = parseSemVer(json.appVersion);
@@ -282,7 +282,7 @@ export class Backup {
     public static download(
         data: string,
         username: string,
-        encrypted: boolean,
+        encrypted: boolean
     ): void {
         const dateFmt = fmtUtc(nowS(), currentTzOffset(), 'yyyyMMDD-HHmm');
         const encryptedExt = encrypted ? '.encrypted' : '';

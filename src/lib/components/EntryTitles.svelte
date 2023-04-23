@@ -1,4 +1,31 @@
-<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgeyB0b29sdGlwIH0gZnJvbSAnQHN2ZWx0ZS1wbHVnaW5zL3Rvb2x0aXBzJzsKICAgIGltcG9ydCBFeWUgZnJvbSAnc3ZlbHRlLW1hdGVyaWFsLWljb25zL0V5ZS5zdmVsdGUnOwogICAgaW1wb3J0IEV5ZU9mZiBmcm9tICdzdmVsdGUtbWF0ZXJpYWwtaWNvbnMvRXllT2ZmLnN2ZWx0ZSc7CiAgICBpbXBvcnQgeyBFbnRyeSB9IGZyb20gJy4uL2NvbnRyb2xsZXJzL2VudHJ5JzsKICAgIGltcG9ydCB0eXBlIHsgQXV0aCB9IGZyb20gJy4uL2NvbnRyb2xsZXJzL3VzZXInOwogICAgaW1wb3J0IHsgc2hvd1BvcHVwIH0gZnJvbSAnLi4vdXRpbHMvcG9wdXBzJzsKICAgIGltcG9ydCB7IG9iZnVzY2F0ZSB9IGZyb20gJy4uL3V0aWxzL3RleHQnOwogICAgaW1wb3J0IHsgbm93UywgdXRjRXEgfSBmcm9tICcuLi91dGlscy90aW1lJzsKICAgIGltcG9ydCBFbnRyeURpYWxvZyBmcm9tICcuL2RpYWxvZ3MvRW50cnlEaWFsb2cuc3ZlbHRlJzsKICAgIGltcG9ydCBEb3QgZnJvbSAnLi9Eb3Quc3ZlbHRlJzsKICAgIGltcG9ydCBVdGNUaW1lIGZyb20gJy4vVXRjVGltZS5zdmVsdGUnOwoKICAgIGV4cG9ydCBsZXQgdGl0bGVzOiBSZWNvcmQ8bnVtYmVyLCBFbnRyeVtdPjsKICAgIGV4cG9ydCBsZXQgb2JmdXNjYXRlZCA9IHRydWU7CiAgICBleHBvcnQgbGV0IHNob3dUaW1lQWdvID0gdHJ1ZTsKICAgIGV4cG9ydCBsZXQgYXV0aDogQXV0aDsKICAgIGV4cG9ydCBsZXQgYmx1clRvZ2dsZU9uTGVmdCA9IGZhbHNlOwogICAgZXhwb3J0IGxldCBoaWRlQmx1clRvZ2dsZSA9IGZhbHNlOwoKICAgIGZ1bmN0aW9uIHNob3dFbnRyeVBvcHVwIChlbnRyeUlkOiBzdHJpbmcpIHsKICAgICAgICBzaG93UG9wdXAoRW50cnlEaWFsb2csIHsKICAgICAgICAgICAgaWQ6IGVudHJ5SWQsCiAgICAgICAgICAgIGF1dGgsCiAgICAgICAgICAgIG9iZnVzY2F0ZWQsCiAgICAgICAgfSk7CiAgICB9Cg==">{}</script>
+<script lang="ts">
+    import { tooltip } from '@svelte-plugins/tooltips';
+    import Eye from 'svelte-material-icons/Eye.svelte';
+    import EyeOff from 'svelte-material-icons/EyeOff.svelte';
+    import { Entry } from '../controllers/entry';
+    import type { Auth } from '../controllers/user';
+    import { showPopup } from '../utils/popups';
+    import { obfuscate } from '../utils/text';
+    import { nowS, utcEq } from '../utils/time';
+    import EntryDialog from './dialogs/EntryDialog.svelte';
+    import Dot from './Dot.svelte';
+    import UtcTime from './UtcTime.svelte';
+
+    export let titles: Record<number, Entry[]>;
+    export let obfuscated = true;
+    export let showTimeAgo = true;
+    export let auth: Auth;
+    export let blurToggleOnLeft = false;
+    export let hideBlurToggle = false;
+
+    function showEntryPopup(entryId: string) {
+        showPopup(EntryDialog, {
+            id: entryId,
+            auth,
+            obfuscated
+        });
+    }
+</script>
 
 <div>
     {#if !hideBlurToggle}
@@ -87,9 +114,66 @@
 
     {#if Object.keys(titles).length === 0}
         <div class="day">
-            <h2>No entries yet</h2>
+            <h2> No entries yet </h2>
         </div>
     {/if}
 </div>
 
-<style lang="less" ✂prettier:content✂="CiAgICBAaW1wb3J0ICcuLi8uLi9zdHlsZXMvdmFyaWFibGVzJzsKCiAgICAubWVudSB7CiAgICAgICAgZGlzcGxheTogZmxleDsKICAgICAgICBqdXN0aWZ5LWNvbnRlbnQ6IGZsZXgtZW5kOwogICAgICAgIG1hcmdpbjogMC41cmVtIDA7CgogICAgICAgICYubGVmdCB7CiAgICAgICAgICAgIGp1c3RpZnktY29udGVudDogZmxleC1zdGFydDsKICAgICAgICB9CiAgICB9CgogICAgLmRheSB7CiAgICAgICAgbWFyZ2luOiAwLjZyZW0gMCAwLjllbSAwOwoKICAgICAgICAmOmxhc3QtY2hpbGQgewogICAgICAgICAgICBib3JkZXItYm90dG9tOiBub25lOwogICAgICAgIH0KCiAgICAgICAgaDIgewogICAgICAgICAgICBmb250LXNpemU6IDFyZW07CiAgICAgICAgICAgIHBhZGRpbmc6IDA7CiAgICAgICAgICAgIG1hcmdpbjogMC41ZW0gMCAwLjVlbSAyZW07CiAgICAgICAgfQoKICAgICAgICAuZW50cnkgewogICAgICAgICAgICBkaXNwbGF5OiBncmlkOwogICAgICAgICAgICBncmlkLXRlbXBsYXRlLWNvbHVtbnM6IDY1cHggMThweCAxZnI7CiAgICAgICAgICAgIHBhZGRpbmc6IDJweCAycHg7CiAgICAgICAgICAgIGFsaWduLWl0ZW1zOiBjZW50ZXI7CiAgICAgICAgICAgIGNvbG9yOiBAdGV4dC1jb2xvcjsKICAgICAgICAgICAgYm9yZGVyLXJhZGl1czogMnB4OwogICAgICAgICAgICB3aWR0aDogMTAwJTsKICAgICAgICAgICAgdGV4dC1hbGlnbjogbGVmdDsKCiAgICAgICAgICAgICY6YWZ0ZXIgewogICAgICAgICAgICAgICAgZGlzcGxheTogbm9uZTsKICAgICAgICAgICAgfQoKICAgICAgICAgICAgJjpob3ZlciB7CiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kLWNvbG9yOiBAbGlnaHQtYWNjZW50OwogICAgICAgICAgICB9CgogICAgICAgICAgICAuZW50cnktdGltZSB7CiAgICAgICAgICAgICAgICBmb250LXNpemU6IDAuN3JlbTsKICAgICAgICAgICAgICAgIGNvbG9yOiBAdGV4dC1jb2xvci1saWdodDsKICAgICAgICAgICAgICAgIHdpZHRoOiAxMDAlOwogICAgICAgICAgICAgICAgdGV4dC1hbGlnbjogY2VudGVyOwogICAgICAgICAgICB9CgogICAgICAgICAgICAuZW50cnktcHJldmlldyB7CiAgICAgICAgICAgICAgICBjb2xvcjogQHRleHQtY29sb3ItbGlnaHQ7CiAgICAgICAgICAgICAgICBmb250LXN0eWxlOiBpdGFsaWM7CiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICB9Cg=="></style>
+<style lang="less">
+    @import '../../styles/variables';
+
+    .menu {
+        display: flex;
+        justify-content: flex-end;
+        margin: 0.5rem 0;
+
+        &.left {
+            justify-content: flex-start;
+        }
+    }
+
+    .day {
+        margin: 0.6rem 0 0.9em 0;
+
+        &:last-child {
+            border-bottom: none;
+        }
+
+        h2 {
+            font-size: 1rem;
+            padding: 0;
+            margin: 0.5em 0 0.5em 2em;
+        }
+
+        .entry {
+            display: grid;
+            grid-template-columns: 65px 18px 1fr;
+            padding: 2px 2px;
+            align-items: center;
+            color: @text-color;
+            border-radius: 2px;
+            width: 100%;
+            text-align: left;
+
+            &:after {
+                display: none;
+            }
+
+            &:hover {
+                background-color: @light-accent;
+            }
+
+            .entry-time {
+                font-size: 0.7rem;
+                color: @text-color-light;
+                width: 100%;
+                text-align: center;
+            }
+
+            .entry-preview {
+                color: @text-color-light;
+                font-style: italic;
+            }
+        }
+    }
+</style>

@@ -1,4 +1,12 @@
-<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgeyB0b29sdGlwIGFzIHVzZVRvb2x0aXAgfSBmcm9tICdAc3ZlbHRlLXBsdWdpbnMvdG9vbHRpcHMnOwoKICAgIGV4cG9ydCBsZXQgdmFsdWU6IG51bWJlciB8IHN0cmluZzsKICAgIGV4cG9ydCBsZXQgYmVmb3JlTGFiZWwgPSAnJzsKICAgIGV4cG9ydCBsZXQgbGFiZWw6IHN0cmluZzsKICAgIGV4cG9ydCBsZXQgcHJpbWFyeSA9IGZhbHNlOwogICAgZXhwb3J0IGxldCB0b29sdGlwID0gJyc7Cg==">{}</script>
+<script lang="ts">
+    import { tooltip as useTooltip } from '@svelte-plugins/tooltips';
+
+    export let value: number | string;
+    export let beforeLabel = '';
+    export let label: string;
+    export let primary = false;
+    export let tooltip = '';
+</script>
 
 {#if tooltip}
     <div
@@ -17,4 +25,31 @@
     </div>
 {/if}
 
-<style lang="less" ✂prettier:content✂="CiAgICBAaW1wb3J0ICcuLi8uLi9zdHlsZXMvdmFyaWFibGVzJzsKICAgIEBpbXBvcnQgJy4uLy4uL3N0eWxlcy9sYXlvdXQnOwoKICAgIGRpdiB7CiAgICAgICAgYmFja2dyb3VuZDogQGxpZ2h0LWFjY2VudDsKICAgICAgICBwYWRkaW5nOiAwLjNyZW07CiAgICAgICAgYm9yZGVyLXJhZGl1czogMC41cmVtOwogICAgICAgIG1hcmdpbjogMC41cmVtOwogICAgICAgIGZvbnQtc2l6ZTogMC45cmVtOwoKICAgICAgICBzcGFuIHsKICAgICAgICAgICAgZm9udC13ZWlnaHQ6IGJvbGQ7CiAgICAgICAgICAgIGZvbnQtc2l6ZTogMXJlbTsKICAgICAgICB9CgogICAgICAgICYucHJpbWFyeSB7CiAgICAgICAgICAgIGJhY2tncm91bmQ6IEBhY2NlbnQtZ3JhZGllbnQ7CiAgICAgICAgICAgIGNvbG9yOiBAdGV4dC1jb2xvci1pbnZlcnQ7CiAgICAgICAgICAgIGJvcmRlcjogMXB4IHNvbGlkIEBib3JkZXItbGlnaHQ7CiAgICAgICAgICAgIC5nbG93KCk7CgogICAgICAgICAgICBzcGFuIHsKICAgICAgICAgICAgICAgIGNvbG9yOiBAdGV4dC1jb2xvci1pbnZlcnQ7CiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICB9Cg=="></style>
+<style lang="less">
+    @import '../../styles/variables';
+    @import '../../styles/layout';
+
+    div {
+        background: @light-accent;
+        padding: 0.3rem;
+        border-radius: 0.5rem;
+        margin: 0.5rem;
+        font-size: 0.9rem;
+
+        span {
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        &.primary {
+            background: @accent-gradient;
+            color: @text-color-invert;
+            border: 1px solid @border-light;
+            .glow();
+
+            span {
+                color: @text-color-invert;
+            }
+        }
+    }
+</style>

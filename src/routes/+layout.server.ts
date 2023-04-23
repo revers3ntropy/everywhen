@@ -1,6 +1,10 @@
 import { redirect } from '@sveltejs/kit';
 import 'ts-polyfill';
-import { KEY_COOKIE_KEY, NON_AUTH_ROUTES, USERNAME_COOKIE_KEY } from '../lib/constants';
+import {
+    KEY_COOKIE_KEY,
+    NON_AUTH_ROUTES,
+    USERNAME_COOKIE_KEY
+} from '../lib/constants';
 import { Settings } from '../lib/controllers/settings';
 import type { Auth } from '../lib/controllers/user';
 import { User } from '../lib/controllers/user';
@@ -35,7 +39,7 @@ async function isAuthenticated(
 export const load: LayoutServerLoad = async ({
     cookies,
     url
-}),: Promise<App.PageData> => {
+}): Promise<App.PageData> => {
     const home = url.pathname.trim() === '/';
     const requireAuth = !NON_AUTH_ROUTES.includes(url.pathname);
 
@@ -46,13 +50,13 @@ export const load: LayoutServerLoad = async ({
         const { err, val: user } = await User.authenticate(
             query,
             username,
-            key,
+            key
         );
         if (!err) {
             return await isAuthenticated(home, {
                 key,
                 username,
-                id: user.id,
+                id: user.id
             });
         }
     }
@@ -67,7 +71,7 @@ export const load: LayoutServerLoad = async ({
         username: '',
         id: '',
         settings: JSON.parse(
-            JSON.stringify(Settings.fillWithDefaults({})),
-        ) as App.PageData['settings'],
+            JSON.stringify(Settings.fillWithDefaults({}))
+        ) as App.PageData['settings']
     };
 };

@@ -20,7 +20,7 @@ export class User {
         query: QueryFunc,
         username: string,
         key: string
-    ): ,Promise<Result<User>> {
+    ): Promise<Result<User>> {
         const res = await query<{ id: string }[]>`
             SELECT id
             FROM users

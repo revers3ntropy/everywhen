@@ -48,7 +48,7 @@ function logQuery(
     params: unknown[],
     result: unknown,
     time: Milliseconds
-) ,{
+) {
     params = params.map(p => {
         if (typeof p === 'string') {
             return `String(${p.length})`;
@@ -64,7 +64,7 @@ function logQuery(
     void dbLogger.logToFile(
         `\`${query.trim()}\`` +
             `\n     [${params.join(', ')}]` +
-            `\n     (${time.toPrecision(3)}ms) => ${resultStr}`,
+            `\n     (${time.toPrecision(3)}ms) => ${resultStr}`
     );
 }
 
@@ -74,7 +74,7 @@ export type QueryFunc = <Res extends QueryResult = never>(
     ...params: QueryParam[]
 ) => Promise<Res extends (infer A)[] ? NonFunctionProperties<A>[] : Res>;
 
-export const query = (async <Res extends QueryResult = never> (
+export const query = (async <Res extends QueryResult = never>(
     queryParts: TemplateStringsArray,
     ...params: QueryParam[]
 ): Promise<Res extends (infer A)[] ? NonFunctionProperties<A>[] : Res> => {

@@ -24,17 +24,17 @@ export function apiResponse<T extends Record<string, unknown>>(
     }) as GenericResponse<T>;
 }
 
-export function rawApiResponse<T extends BodyInit | null> (
+export function rawApiResponse<T extends BodyInit | null>(
     body: T,
     init: ResponseInit = {}
-):, GenericResponse<T> {
+): GenericResponse<T> {
     return new Response(body, {
         status: 200,
         ...init
-  ,  }) as GenericResponse<T>;
+    }) as GenericResponse<T>;
 }
 
-export function apiRes404 () {
+export function apiRes404() {
     return apiResponse({ status: 404 }, { status: 404 });
 }
 

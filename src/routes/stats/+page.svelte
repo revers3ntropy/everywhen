@@ -1,4 +1,26 @@
-<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgeyBvbk1vdW50IH0gZnJvbSAnc3ZlbHRlJzsKICAgIGltcG9ydCBDb3VudGVyIGZyb20gJ3N2ZWx0ZS1tYXRlcmlhbC1pY29ucy9Db3VudGVyLnN2ZWx0ZSc7CiAgICBpbXBvcnQgQ29tbW9uV29yZHNMaXN0IGZyb20gJy4vQ29tbW9Xb3Jkc0xpc3Quc3ZlbHRlJzsKICAgIGltcG9ydCBFbnRyeUJhckNoYXJ0IGZyb20gJy4vRW50cnlCYXJDaGFydC5zdmVsdGUnOwogICAgaW1wb3J0IEVudHJ5SGVhdE1hcCBmcm9tICcuL0VudHJ5SGVhdE1hcC5zdmVsdGUnOwogICAgaW1wb3J0IHsgQnksIHR5cGUgRW50cnlXaXRoV29yZENvdW50IH0gZnJvbSAnLi9oZWxwZXJzJzsKICAgIGltcG9ydCBTZWFyY2hGb3JXb3JkIGZyb20gJy4vU2VhcmNoRm9yV29yZC5zdmVsdGUnOwogICAgaW1wb3J0IFN0YXRQaWxsIGZyb20gJy4vU3RhdFBpbGwuc3ZlbHRlJzsKCiAgICBsZXQgYnk6IEJ5ID0gQnkuRW50cmllczsKCiAgICBleHBvcnQgbGV0IGRhdGE6IEFwcC5QYWdlRGF0YSAmIHsKICAgICAgICBlbnRyaWVzOiBFbnRyeVdpdGhXb3JkQ291bnRbXTsKICAgICAgICBlbnRyeUNvdW50OiBudW1iZXI7CiAgICAgICAgd29yZENvdW50OiBudW1iZXI7CiAgICAgICAgY2hhckNvdW50OiBudW1iZXI7CiAgICAgICAgY29tbW9uV29yZHM6IFsgc3RyaW5nLCBudW1iZXIgXVtdOwogICAgICAgIGRheXM6IG51bWJlcjsKICAgIH07CgogICAgb25Nb3VudCgoKSA9PiAoZG9jdW1lbnQudGl0bGUgPSAnQW5hbHl0aWNzJykpOwo=">{}</script>
+<script lang="ts">
+    import { onMount } from 'svelte';
+    import Counter from 'svelte-material-icons/Counter.svelte';
+    import CommonWordsList from './CommoWordsList.svelte';
+    import EntryBarChart from './EntryBarChart.svelte';
+    import EntryHeatMap from './EntryHeatMap.svelte';
+    import { By, type EntryWithWordCount } from './helpers';
+    import SearchForWord from './SearchForWord.svelte';
+    import StatPill from './StatPill.svelte';
+
+    let by: By = By.Entries;
+
+    export let data: App.PageData & {
+        entries: EntryWithWordCount[];
+        entryCount: number;
+        wordCount: number;
+        charCount: number;
+        commonWords: [string, number][];
+        days: number;
+    };
+
+    onMount(() => (document.title = 'Analytics'));
+</script>
 
 <svelte:head>
     <title>Analytics</title>
@@ -88,4 +110,68 @@
     {/if}
 </main>
 
-<style lang="less" ✂prettier:content✂="CiAgICBAaW1wb3J0ICcuLi8uLi9zdHlsZXMvbGF5b3V0JzsKICAgIEBpbXBvcnQgJy4uLy4uL3N0eWxlcy92YXJpYWJsZXMnOwoKICAgIC50aXRsZS1saW5lIHsKICAgICAgICBkaXNwbGF5OiBncmlkOwogICAgICAgIGdyaWQtdGVtcGxhdGUtY29sdW1uczogMWZyIDFmciAxZnI7CiAgICAgICAgYWxpZ24taXRlbXM6IGNlbnRlcjsKCiAgICAgICAgLnNlYXJjaC1mb3Itd29yZCB7CiAgICAgICAgICAgIHRleHQtYWxpZ246IHJpZ2h0OwogICAgICAgIH0KCiAgICAgICAgQG1lZGlhIEBtb2JpbGUgewogICAgICAgICAgICBkaXNwbGF5OiBibG9jazsKCiAgICAgICAgICAgICYgPiAqIHsKICAgICAgICAgICAgICAgIG1hcmdpbjogMC41cmVtIDA7CiAgICAgICAgICAgIH0KCiAgICAgICAgICAgIC5zZWFyY2gtZm9yLXdvcmQgewogICAgICAgICAgICAgICAgdGV4dC1hbGlnbjogY2VudGVyOwogICAgICAgICAgICB9CiAgICAgICAgfQogICAgfQoKICAgIGgxIHsKICAgICAgICAuZmxleC1jZW50ZXIoKTsKICAgICAgICBmb250LXNpemU6IDQwcHg7CiAgICAgICAgbWFyZ2luOiAwOwogICAgICAgIHBhZGRpbmc6IDA7CgogICAgICAgIHNwYW4gewogICAgICAgICAgICBtYXJnaW4tbGVmdDogMC41cmVtOwogICAgICAgIH0KICAgIH0KCiAgICAuc3RhdHMgewogICAgICAgIHRleHQtYWxpZ246IGNlbnRlcjsKICAgICAgICBkaXNwbGF5OiBmbGV4OwogICAgICAgIGp1c3RpZnktY29udGVudDogY2VudGVyOwogICAgICAgIGZsZXgtd3JhcDogd3JhcDsKICAgIH0KCiAgICAuY2hhcnRzIHsKICAgICAgICAmID4gKiB7CiAgICAgICAgICAgIG1hcmdpbjogMC41ZW0gMDsKICAgICAgICB9CgogICAgICAgIC5lbnRyeS1iYXItY2hhcnQtd3JhcHBlciB7CiAgICAgICAgICAgIHBhZGRpbmctYm90dG9tOiAwOwogICAgICAgIH0KICAgIH0KCiAgICAuY29udGFpbmVyIHsKICAgICAgICBwYWRkaW5nOiAxZW07CiAgICAgICAgbWFyZ2luOiAxZW07CgogICAgICAgIEBtZWRpYSBAbW9iaWxlIHsKICAgICAgICAgICAgcGFkZGluZzogMCAwLjZyZW07CiAgICAgICAgICAgIG1hcmdpbjogMWVtIDA7CiAgICAgICAgICAgIGJvcmRlcjogbm9uZTsKICAgICAgICB9CiAgICB9Cg=="></style>
+<style lang="less">
+    @import '../../styles/layout';
+    @import '../../styles/variables';
+
+    .title-line {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        align-items: center;
+
+        .search-for-word {
+            text-align: right;
+        }
+
+        @media @mobile {
+            display: block;
+
+            & > * {
+                margin: 0.5rem 0;
+            }
+
+            .search-for-word {
+                text-align: center;
+            }
+        }
+    }
+
+    h1 {
+        .flex-center();
+        font-size: 40px;
+        margin: 0;
+        padding: 0;
+
+        span {
+            margin-left: 0.5rem;
+        }
+    }
+
+    .stats {
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .charts {
+        & > * {
+            margin: 0.5em 0;
+        }
+
+        .entry-bar-chart-wrapper {
+            padding-bottom: 0;
+        }
+    }
+
+    .container {
+        padding: 1em;
+        margin: 1em;
+
+        @media @mobile {
+            padding: 0 0.6rem;
+            margin: 1em 0;
+            border: none;
+        }
+    }
+</style>

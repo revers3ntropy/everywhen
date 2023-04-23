@@ -1,3 +1,83 @@
-<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgewogICAgICAgIENhbnZhc1N0YXRlLAogICAgICAgIHJlbmRlcmFibGUsCiAgICAgICAgU1RBUlRfWk9PTSwKICAgIH0gZnJvbSAnLi4vLi4vbGliL2NhbnZhcy9jYW52YXNIZWxwZXJzJzsKICAgIGltcG9ydCB0eXBlIHsgTGFiZWwgfSBmcm9tICcuLi8uLi9saWIvY29udHJvbGxlcnMvbGFiZWwnOwogICAgaW1wb3J0IHsgb2JmdXNjYXRlZCB9IGZyb20gJy4uLy4uL2xpYi9zdG9yZXMnOwoKICAgIGNvbnN0IEhFSUdIVCA9IDMwOwogICAgY29uc3QgTEFCRUxfSEVJR0hUID0gNDsKCiAgICBleHBvcnQgbGV0IGlkOiBzdHJpbmc7CiAgICBleHBvcnQgbGV0IHN0YXJ0OiBudW1iZXI7CiAgICBleHBvcnQgbGV0IGVuZDogbnVtYmVyOwogICAgZXhwb3J0IGxldCBuYW1lOiBzdHJpbmc7CiAgICBleHBvcnQgbGV0IGxhYmVsID0gdW5kZWZpbmVkIGFzIExhYmVsIHwgdW5kZWZpbmVkOwogICAgZXhwb3J0IGxldCB5TGV2ZWw6IG51bWJlcjsKIC,AgIGV4cG9ydCBsZXQgZXZlbnRUZXh0UGFyaXR5SGVpZ2h0OiBib29sZWFuOwogICAgZXhwb3J0IGxldCBjcmVhdGVkOiBudW1iZXI7CiAgICBleHBvcnQgbGV0IGRlY3J5cHRlZDogYm9vbGVhbjsKCiAgICBleHBvcnQgbGV0IG9wdGlvbnMgPSB7CiAgICAgICAgeU1hcmdpbjogMiwKICAgICAgICB0ZXh0WE9mZnNldDogNQogICAgfTsKCiAgICBpZiAoIXN0YXJ0IHx8ICFlbmQpIHRocm93ICdNaXNzaW5nIHJlcXVpcmVkIHByb3BzJzsKCiAgICBjb25zdCBkdXJhdGlvbiA9IGVuZCAtIHN0YXJ0OwogICAgY29uc3QgY29sb3VyID0gbGFiZWwgPyBsYWJlbC5jb2xvdXIgOiBDYW52YXNTdGF0ZS5jX1ByaW1hcnk7CgogICAgcmVuZGVyYWJsZShzdGF0ZSA9PiB7CiAgICAgICAgY29uc3QgeCA9IHN0YXRlLnRpbWVUb1JlbmRlclBvcyhzdGFydCk7CiAgICAgICAgY29uc3QgeSA9IHN0YXRlLmNlbnRlckxuWSgpIC0geUxldmVsICogKEhFSUdIVCArIG9wdGlvbnMueU1hcmdpbik7CiAgICAgICAgY29uc3Qgd2lkdGggPSBkdXJhdGlvbiAqIHN0YXRlLnpvb207CiAgICAgICAgY29uc3QgaXNTaW5nbGVFdmVudCA9IGR1cmF0aW9uIDwgNjA7CgogICAgICAgIGlmIChpc1NpbmdsZUV2ZW50KSB7CiAgICAgICAgICAgIHN0YXRlLmNpcmNsZSh4LCB5ICsgSEVJR0hULCA1LCB7IGNvbG91ciB9KTsKICAgICAgICAgICAgY29uc3QgaCA9IHN0YXRlLmNlbnRlckxuWSgpIC0gKHkgKyBIRUlHSFQpOwogICAgICAgICAgICBzdGF0ZS5yZWN0KHgsIHkgKyBIRUlHSFQsIDEsIGgsIHsKICAgICAgICAgICAgICAgIHJhZGl1czogMCwKICAgICAgICAgICAgICAgIGNvbG91cgogICAgICAgICAgICB9KTsKICAgICAgICB9IGVsc2UgewogICAgICAgICAgICBzdGF0ZS5yZWN0KHgsIHksIHdpZHRoLCBIRUlHSFQsIHsKICAgICAgICAgICAgICAgIGNvbG91cjogJyMzMzMnLAogICAgICAgICAgICAgICAgcmFkaXVzOiA1CiAgICAgICAgICAgIH0pOwogICAgICAgICAgICBzdGF0ZS5yZWN0KHgsIHkgKyBIRUlHSFQgLSBMQUJFTF9IRUlHSFQsIHdpZHRoLCBMQUJFTF9IRUlHSFQsIHsKICAgICAgICAgICAgICAgIGNvbG91cgogICAgICAgICAgICB9KTsKICAgICAgICB9CgogICAgICAgIGxldCB0ZXh0Q29sb3VyID0gJyNmZmYnOwoKICAgICAgICBpZiAoeCArIHdpZHRoIDw9IDApIHsKICAgICAgICAgICAgLy8gbm90IG9uIHNjcmVlbgogICAgICAgICAgICByZXR1cm47CiAgICAgICAgfQoKICAgICAgICBpZiAoJG9iZnVzY2F0ZWQpIHJldHVybjsKCiAgICAgICAgaWYgKHdpZHRoID4gNTAgJiYgIWlzU2luZ2xlRXZlbnQpIHsKICAgICAgICAgICAgc3RhdGUudGV4dCgKICAgICAgICAgICAgICAgIG5hbWUsCiAgICAgICAgICAgICAgICBNYXRoLm1heCg1LCB4ICsgb3B0aW9ucy50ZXh0WE9mZnNldCksCiAgICAgICAgICAgICAgICB5ICsgSEVJR0hUIC8gMiArIDUsCiAgICAgICAgICAgICAgICB7IGM6IHRleHRDb2xvdXIsIG1heFdpZHRoOiB3aWR0aCAtIDIgKiBvcHRpb25zLnRleHRYT2Zmc2V0IH0KICAgICAgICAgICAgKTsKICAgICAgICB9IGVsc2UgaWYgKGlzU2luZ2xlRXZlbnQgJiYgc3RhdGUuem9vbSA+IFNUQVJUX1pPT00gLyAyKSB7CiAgICAgICAgICAgIHN0YXRlLnRleHQoCiAgICAgICAgICAgICAgICBuYW1lLAogICAgICAgICAgICAgICAgeCArIDUsCiAgICAgICAgICAgICAgICB5ICsgSEVJR0hUIC8gMiArIChldmVudFRleHRQYXJpdHlIZWlnaHQgPyBIRUlHSFQgLyAyICsgMjAgOiAwKSwKICAgICAgICAgICAgICAgIHsgYzogJyNmZmYnLCBhbGlnbjogJ2NlbnRlcicgfQogICAgICAgICAgICApOwogICAgICAgIH0KICAgIH0pOwo=">{}</script>
+<script lang="ts">
+    import {
+        CanvasState,
+        renderable,
+        START_ZOOM
+    } from '../../lib/canvas/canvasHelpers';
+    import type { Label } from '../../lib/controllers/label';
+    import { obfuscated } from '../../lib/stores';
+
+    const HEIGHT = 30;
+    const LABEL_HEIGHT = 4;
+
+    export let id: string;
+    export let start: number;
+    export let end: number;
+    export let name: string;
+    export let label = undefined as Label | undefined;
+    export let yLevel: number;
+    export let eventTextParityHeight: boolean;
+    export let created: number;
+    export let decrypted: boolean;
+
+    export let options = {
+        yMargin: 2,
+        textXOffset: 5
+    };
+
+    if (!start || !end) throw 'Missing required props';
+
+    const duration = end - start;
+    const colour = label ? label.colour : CanvasState.c_Primary;
+
+    renderable(state => {
+        const x = state.timeToRenderPos(start);
+        const y = state.centerLnY() - yLevel * (HEIGHT + options.yMargin);
+        const width = duration * state.zoom;
+        const isSingleEvent = duration < 60;
+
+        if (isSingleEvent) {
+            state.circle(x, y + HEIGHT, 5, { colour });
+            const h = state.centerLnY() - (y + HEIGHT);
+            state.rect(x, y + HEIGHT, 1, h, {
+                radius: 0,
+                colour
+            });
+        } else {
+            state.rect(x, y, width, HEIGHT, {
+                colour: '#333',
+                radius: 5
+            });
+            state.rect(x, y + HEIGHT - LABEL_HEIGHT, width, LABEL_HEIGHT, {
+                colour
+            });
+        }
+
+        let textColour = '#fff';
+
+        if (x + width <= 0) {
+            // not on screen
+            return;
+        }
+
+        if ($obfuscated) return;
+
+        if (width > 50 && !isSingleEvent) {
+            state.text(
+                name,
+                Math.max(5, x + options.textXOffset),
+                y + HEIGHT / 2 + 5,
+                { c: textColour, maxWidth: width - 2 * options.textXOffset }
+            );
+        } else if (isSingleEvent && state.zoom > START_ZOOM / 2) {
+            state.text(
+                name,
+                x + 5,
+                y + HEIGHT / 2 + (eventTextParityHeight ? HEIGHT / 2 + 20 : 0),
+                { c: '#fff', align: 'center' }
+            );
+        }
+    });
+</script>
 
 <slot />

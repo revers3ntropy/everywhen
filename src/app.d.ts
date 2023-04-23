@@ -110,14 +110,14 @@ declare global {
     }
 
     declare module '@svelte-plugins/tooltips' {
-        export function tooltip (
+        export function tooltip(
             el: HTMLElement,
             props: {
                 content: string;
                 placement?: 'top' | 'bottom' | 'left' | 'right';
                 offset?: number;
             }
-        ),: unknown;
+        ): unknown;
     }
 
     // Very annoying, but otherwise `svelte-check` complains about

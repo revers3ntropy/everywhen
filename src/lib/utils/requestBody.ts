@@ -50,7 +50,7 @@ export async function getUnwrappedReqBody<
     request: Request,
     valueType: T,
     defaults: { [P in keyof T]?: SchemaResult<T[P]> } = {}
-): Promise<Readonly<Schem, aResult<T>>> {
+): Promise<Readonly<SchemaResult<T>>> {
     const res = await bodyFromReq(request, valueType, defaults);
     if (res.err) {
         throw error(400, res.err);

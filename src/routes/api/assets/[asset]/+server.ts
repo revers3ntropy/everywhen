@@ -7,12 +7,12 @@ import {
     apiRes404,
     apiResponse,
     type GenericResponse,
-    rawApiResponse,
+    rawApiResponse
 } from '../../../../lib/utils/apiResponse';
 import {
     cacheResponse,
     getCachedResponse,
-    invalidateCache,
+    invalidateCache
 } from '../../../../lib/utils/cache';
 
 export const GET = (async ({ params, url, cookies }) => {
@@ -40,7 +40,8 @@ export const GET = (async ({ params, url, cookies }) => {
         headers: {
             'Content-Type': asset.contentType,
             'Cache-Control': 'max-age=31536000, immutable',
-            'Content-Length': img.length // doesn't like Content-Length for some reason
+            'Content-Length': img.length
+            // doesn't like Content-Length for some reason
         } as unknown as HeadersInit
     });
     cacheResponse(url.href, auth.id, response.clone());
@@ -56,7 +57,7 @@ export const DELETE = (async ({ params, cookies }) => {
         auth,
         params.asset || ''
     );
-    if (,err) throw error(404, err);
+    if (err) throw error(404, err);
 
     return apiResponse({});
 }) satisfies RequestHandler;

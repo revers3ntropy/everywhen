@@ -1,4 +1,17 @@
-<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgeyB0b29sdGlwIH0gZnJvbSAnQHN2ZWx0ZS1wbHVnaW5zL3Rvb2x0aXBzJzsKICAgIGltcG9ydCAqIGFzIHRpbWVhZ28gZnJvbSAndGltZWFnby5qcyc7CiAgICBpbXBvcnQgeyBudW1iZXJBc1NpZ25lZFN0ciB9IGZyb20gJy4uL3V0aWxzL3RleHQnOwogICAgaW1wb3J0IHsgY3VycmVudFR6T2Zmc2V0LCBmbXRVdGMgfSBmcm9tICcuLi91dGlscy90aW1lJzsKICAgIGltcG9ydCB0eXBlIHsgSG91cnMsIFNlY29uZHMgfSBmcm9tICcuLi91dGlscy90eXBlcyc7CgogICAgZXhwb3J0IGxldCB0aW1lc3RhbXA6IFNlY29uZHM7CiAgICBleHBvcnQgbGV0IHR6T2Zmc2V0OiBIb3VycyA9IGN1cnJlbnRUek9mZnNldCgpOwogICAgZXhwb3J0IGxldCBmbXQgPSAnaDptbSBBJzsKICAgIGV4cG9ydCBsZXQgcmVsYXRpdmUgPSBmYWxzZTsKICAgIGV4cG9ydCBsZXQgbm9Ub29sdGlwID0gZmFsc2U7CiAgICBleHBvcnQgbGV0IHRvb2x0aXBQb3NpdGlvbiA9ICd0b3AnOwo=">{}</script>
+<script lang="ts">
+    import { tooltip } from '@svelte-plugins/tooltips';
+    import * as timeago from 'timeago.js';
+    import { numberAsSignedStr } from '../utils/text';
+    import { currentTzOffset, fmtUtc } from '../utils/time';
+    import type { Hours, Seconds } from '../utils/types';
+
+    export let timestamp: Seconds;
+    export let tzOffset: Hours = currentTzOffset();
+    export let fmt = 'h:mm A';
+    export let relative = false;
+    export let noTooltip = false;
+    export let tooltipPosition = 'top';
+</script>
 
 {#if !noTooltip}
     <span
@@ -31,4 +44,12 @@
     </span>
 {/if}
 
-<style lang="less" ✂prettier:content✂="CiAgICAqIHsKICAgICAgICBjb2xvcjogaW5oZXJpdDsKICAgICAgICBmb250LXN0eWxlOiBpbmhlcml0OwogICAgICAgIGZvbnQtc2l6ZTogaW5oZXJpdDsKCiAgICAgICAgd2hpdGUtc3BhY2U6IG5vd3JhcDsKICAgIH0K"></style>
+<style lang="less">
+    * {
+        color: inherit;
+        font-style: inherit;
+        font-size: inherit;
+
+        white-space: nowrap;
+    }
+</style>

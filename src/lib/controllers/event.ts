@@ -1,7 +1,11 @@
 import type { QueryFunc } from '../db/mysql';
-import type { TimestampSecs } from '../utils/types';
+import { decrypt, encrypt } from '../security/encryption';
+import { Result } from '../utils/result';
+import { nowS } from '../utils/time';
+import type { Seconds, TimestampSecs } from '../utils/types';
 import { Label } from './label';
 import type { Auth } from './user';
+import { UUID } from './uuid';
 
 // RawEvent is the raw data from the database,
 // Event is the data after decryption and links to labels
@@ -25,7 +29,7 @@ export class Event {
     public static async allRaw(
         query: QueryFunc,
         auth: Auth
-    ): ,Promise<RawEvent[]> {
+    ): Promise<RawEvent[]> {
         return await query<RawEvent[]>`
             SELECT id,
                    name,
@@ -149,7 +153,7 @@ export class Event {
         await query`
             DELETE
             FROM events
-            WHERE user = ${auth.id;}
+            WHERE user = ${auth.id}
         `;
     }
 

@@ -40,11 +40,11 @@ function fmt(
     );
 }
 
-export function makeLogger<File extends string | null> (
+export function makeLogger<File extends string | null>(
     name: string,
     colour: ChalkInstance = chalk.bold,
     file: File
-),: Logger<File> {
+): Logger<File> {
     if (name.length > maxLogNameLen) {
         maxLogNameLen = name.length;
     }
@@ -53,13 +53,13 @@ export function makeLogger<File extends string | null> (
     let fileHandle: FileHandle | null = null;
     const waitForFileHandle = file
         ? new Promise<void>(resolve => {
-            const interval = setInterval(() => {
-                if (fileHandle) {
-                    clearInterval(interval);
-                    resolve();
-                }
-            }, 50);
-        })
+              const interval = setInterval(() => {
+                  if (fileHandle) {
+                      clearInterval(interval);
+                      resolve();
+                  }
+              }, 50);
+          })
         : null;
 
     if (!browser && file) {
@@ -89,7 +89,7 @@ export function makeLogger<File extends string | null> (
                 return;
             }
             await fileHandle.write(
-                removeAnsi(fmt(true, name.length, name, ...args)) + '\n',
+                removeAnsi(fmt(true, name.length, name, ...args)) + '\n'
             );
         }) as File extends string
             ? (...args: unknown[]) => Promise<void>

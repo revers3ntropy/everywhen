@@ -1,4 +1,30 @@
-<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgbW9tZW50IGZyb20gJ21vbWVudCc7CiAgICBpbXBvcnQgU3ZlbHRlSGVhdG1hcCBmcm9tICdzdmVsdGUtaGVhdG1hcCc7CiAgICBpbXBvcnQgeyBCeSwgdHlwZSBFbnRyeVdpdGhXb3JkQ291bnQgfSBmcm9tICcuL2hlbHBlcnMnOwoKICAgIGV4cG9ydCBsZXQgZW50cmllczogRW50cnlXaXRoV29yZENvdW50W107CiAgICBleHBvcnQgbGV0IGJ5OiBCeTsKICAgIGxldCBkYXRhOiB7IGRhdGU6IERhdGU7IHZhbHVlOiBudW1iZXIgfVtdID0gW107CgogICAgZnVuY3Rpb24gcmVsb2FkQ2hhcnQgKCkgewogICAgICAgIGRhdGEgPSBlbnRyaWVzLm1hcChlbnRyeSA9PiB7CiAgICAgICAgICAgIHJldHVybiB7CiAgICAgICAgICAgICAgICBkYXRlOiBuZXcgRGF0ZShlbnRyeS5jcmVhdGVkICogMTAwMCksCiAgICAgICAgICAgICAgICB2YWx1ZTogYnkgPT09IEJ5LkVudHJpZXMgPyAxIDogZW50cnkud29yZENvdW50LAogICAgICAgICAgICB9OwogICAgICAgIH0pOwogICAgfQoKICAgICQ6IGlmIChlbnRyaWVzICYmIHR5cGVvZiBieSA9PT0gJ251bWJlcicpIHJlbG9hZENoYXJ0KCk7CgogICAgY29uc3Qgc2hvd01vbnRocyA9IDY7CiAgICBjb25zdCBjdXJyZW50TW9udGggPSBuZXcgRGF0ZSgpLmdldE1vbnRoKCk7CiAgICBjb25zdCBsYXN0SmFuSW5DdXJyZW50WWVhciA9IGN1cnJlbnRNb250aCA8PSBzaG93TW9udGhzOwogICAgY29uc3QgbGFzdEphblllYXIgPSBsYXN0SmFuSW5DdXJyZW50WWVhcgogICAgICAgID8gbmV3IERhdGUoKS5nZXRGdWxsWWVhcigpCiAgICAgICAgOiBuZXcgRGF0ZSgpLmdldEZ1bGxZZWFyKCkgLSAxOwo=">{}</script>
+<script lang="ts">
+    import moment from 'moment';
+    import SvelteHeatmap from 'svelte-heatmap';
+    import { By, type EntryWithWordCount } from './helpers';
+
+    export let entries: EntryWithWordCount[];
+    export let by: By;
+    let data: { date: Date; value: number }[] = [];
+
+    function reloadChart() {
+        data = entries.map(entry => {
+            return {
+                date: new Date(entry.created * 1000),
+                value: by === By.Entries ? 1 : entry.wordCount
+            };
+        });
+    }
+
+    $: if (entries && typeof by === 'number') reloadChart();
+
+    const showMonths = 6;
+    const currentMonth = new Date().getMonth();
+    const lastJanInCurrentYear = currentMonth <= showMonths;
+    const lastJanYear = lastJanInCurrentYear
+        ? new Date().getFullYear()
+        : new Date().getFullYear() - 1;
+</script>
 
 <div class="outer">
     <div class="inner">
@@ -35,4 +61,17 @@
     </div>
 </div>
 
-<style lang="less" ✂prettier:content✂="CiAgICBAaW1wb3J0ICcuLi8uLi9zdHlsZXMvdmFyaWFibGVzJzsKCiAgICBAbWVkaWEgQG1vYmlsZSB7CiAgICAgICAgLm91dGVyIHsKICAgICAgICAgICAgb3ZlcmZsb3cteDogYXV0bzsKICAgICAgICAgICAgZGlyZWN0aW9uOiBydGw7CgogICAgICAgICAgICAuaW5uZXIgewogICAgICAgICAgICAgICAgd2lkdGg6IDEyMDBweDsKICAgICAgICAgICAgfQogICAgICAgIH0KICAgIH0K"></style>
+<style lang="less">
+    @import '../../styles/variables';
+
+    @media @mobile {
+        .outer {
+            overflow-x: auto;
+            direction: rtl;
+
+            .inner {
+                width: 1200px;
+            }
+        }
+    }
+</style>

@@ -23,7 +23,7 @@ export class Label {
         query: QueryFunc,
         auth: Auth,
         id: string
-    ): ,Promise<Result<Label>> {
+    ): Promise<Result<Label>> {
         const res = await query<Required<Label>[]>`
             SELECT id, colour, name, created
             FROM labels
@@ -40,7 +40,7 @@ export class Label {
 
         return Result.ok(
             new Label(res[0].id, res[0].colour, nameDecrypted, res[0].created)
-       , );
+        );
     }
 
     public static async getIdFromName(

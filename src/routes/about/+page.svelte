@@ -1,4 +1,10 @@
-<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgQ29udGVudENvcHkgZnJvbSAnc3ZlbHRlLW1hdGVyaWFsLWljb25zL0NvbnRlbnRDb3B5LnN2ZWx0ZSc7CiAgICBpbXBvcnQgSW1hZ2VBcmVhIGZyb20gJ3N2ZWx0ZS1tYXRlcmlhbC1pY29ucy9JbWFnZUFyZWEuc3ZlbHRlJzsKICAgIGltcG9ydCBOb3RlRWRpdE91dGxpbmUgZnJvbSAnc3ZlbHRlLW1hdGVyaWFsLWljb25zL05vdGVFZGl0T3V0bGluZS5zdmVsdGUnOwogICAgaW1wb3J0IE9wZW5Jbk5ldyBmcm9tICdzdmVsdGUtbWF0ZXJpYWwtaWNvbnMvT3BlbkluTmV3LnN2ZWx0ZSc7CiAgICBpbXBvcnQgeyBBUElfRE9DU19MSU5LIH0gZnJvbSAnLi4vLi4vbGliL2NvbnN0YW50cyc7Cg==">{}</script>
+<script lang="ts">
+    import ContentCopy from 'svelte-material-icons/ContentCopy.svelte';
+    import ImageArea from 'svelte-material-icons/ImageArea.svelte';
+    import NoteEditOutline from 'svelte-material-icons/NoteEditOutline.svelte';
+    import OpenInNew from 'svelte-material-icons/OpenInNew.svelte';
+    import { API_DOCS_LINK } from '../../lib/constants';
+</script>
 
 <main class="flex-center">
     <section>
@@ -41,10 +47,10 @@
             even if the entire server was leaked, no-one could read your
             entries.
         </p>
-        <p>However this security comes with a compromise:</p>
+        <p> However this security comes with a compromise: </p>
         <p>
             <b
-            >If you lose your password, there is no way to recover your
+                >If you lose your password, there is no way to recover your
                 data!</b
             >
         </p>
@@ -205,4 +211,16 @@
     </section>
 </main>
 
-<style lang="less" ✂prettier:content✂="CiAgICBAaW1wb3J0ICcuLi8uLi9zdHlsZXMvdmFyaWFibGVzJzsKCiAgICBAbWVkaWEgQG1vYmlsZSB7CiAgICAgICAgbWFpbiB7CiAgICAgICAgICAgIHBhZGRpbmc6IDFyZW07CiAgICAgICAgfQogICAgfQoKICAgIHAgewogICAgICAgIG1heC13aWR0aDogNjAwcHg7CiAgICB9Cg=="></style>
+<style lang="less">
+    @import '../../styles/variables';
+
+    @media @mobile {
+        main {
+            padding: 1rem;
+        }
+    }
+
+    p {
+        max-width: 600px;
+    }
+</style>

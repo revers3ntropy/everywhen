@@ -1,1 +1,13 @@
-<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgeyBnZXROb3RpZmljYXRpb25zQ29udGV4dCB9IGZyb20gJ3N2ZWx0ZS1ub3RpZmljYXRpb25zJzsKCiAgICBleHBvcnQgY29uc3QgeyBhZGROb3RpZmljYXRpb246IGFkZCB9ID0gZ2V0Tm90aWZpY2F0aW9uc0NvbnRleHQoKTsKCiAgICBleHBvcnQgZnVuY3Rpb24gYWRkTm90aWZpY2F0aW9uPFQ+IChwcm9wczogUmVjb3JkPHN0cmluZywgVD4pIHsKICAgICAgICBhZGQoewogICAgICAgICAgICByZW1vdmVBZnRlcjogNDAwMCwKICAgICAgICAgICAgcG9zaXRpb246ICd0b3AtY2VudGVyJywKICAgICAgICAgICAgLi4ucHJvcHMsCiAgICAgICAgfSk7CiAgICB9Cg==">{}</script>
+<script lang="ts">
+    import { getNotificationsContext } from 'svelte-notifications';
+
+    export const { addNotification: add } = getNotificationsContext();
+
+    export function addNotification<T>(props: Record<string, T>) {
+        add({
+            removeAfter: 4000,
+            position: 'top-center',
+            ...props
+        });
+    }
+</script>

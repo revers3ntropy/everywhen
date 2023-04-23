@@ -1,4 +1,57 @@
-<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgeyBvbk1vdW50IH0gZnJvbSAnc3ZlbHRlJzsKICAgIGltcG9ydCBDb2cgZnJvbSAnc3ZlbHRlLW1hdGVyaWFsLWljb25zL0NvZy5zdmVsdGUnOwogICAgaW1wb3J0IEltYWdlT3V0bGluZSBmcm9tICdzdmVsdGUtbWF0ZXJpYWwtaWNvbnMvSW1hZ2VPdXRsaW5lLnN2ZWx0ZSc7CiAgICBpbXBvcnQgTGFiZWxPdXRsaW5lIGZyb20gJ3N2ZWx0ZS1tYXRlcmlhbC1pY29ucy9MYWJlbE91dGxpbmUuc3ZlbHRlJzsKICAgIGltcG9ydCBOb3RlYm9vayBmcm9tICdzdmVsdGUtbWF0ZXJpYWwtaWNvbnMvTm90ZWJvb2suc3ZlbHRlJzsKICAgIGltcG9ydCB0eXBlIHsgQXBwIH0gZnJvbSAnLi4vLi4vYXBwJzsKICAgIGltcG9ydCBFbnRyeVRpdGxlcyBmcm9tICcuLi8uLi9saWIvY29tcG9uZW50cy9FbnRyeVRpdGxlcy5zdmVsdGUnOwogICAgaW1wb3J0IHR5cGUgeyBFbnRyeSB9IGZyb20gJy4uLy4uL2xpYi9jb250cm9sbGVycy9lbnRyeSc7CiAgICBpbXBvcnQgeyBvYmZ1c2NhdGVkIH0gZnJvbSAnLi4vLi4vbGliL3N0b3Jlcy5qcyc7CiAgICBpbXBvcnQgewogICAgICAgIGN1cnJlbnRUek9mZnNldCwKICAgICAgICBkYXlVdGNGcm9tVGltZXN0YW1wLAogICAgICAgIGZtdFV0YywKICAgICAgICBub3dTLAogICAgfSBmcm9tICcuLi8uLi9saWIvdXRpbHMvdGltZSc7CgogICAgZXhwb3J0IGxldCBkYXRhOiBBcHAuUGFnZURhdGEgJiB7CiAgICAgICAgdGl0bGVzOiBSZWNvcmQ8bnVtYmVyLCBFbnRyeVtdPjsKICAgICAgICBlbnRyaWVzOiBFbnRyeVtdOwogICAgfTsKCiAgICBvbk1vdW50KCgpID0+IChkb2N1bWVudC50aXRsZSA9IGBIb21lYCkpOwoKICAgIGZ1bmN0aW9uIGVudHJpZXNZZWFyc0Fnb1RvZGF5IChlbnRyaWVzOiBFbnRyeVtdKTogUmVjb3JkPHN0cmluZywgRW50cnlbXT4gewogICAgICAgIGNvbnN0IHJlczogUmVjb3JkPHN0cmluZywgRW50cnlbXT4gPSB7fTsKICAgICAgICBjb25zdCBub3dEYXRlID0gZm10VXRjKG5vd1MoKSwgY3VycmVudFR6T2Zmc2V0KCksICdNTS1ERCcpOwogICAgICAgIGNvbnN0IG5vd1llYXIgPSBmbXRVdGMobm93UygpLCBjdXJyZW50VHpPZmZzZXQoKSwgJ1lZWVknKTsKCiAgICAgICAgZm9yIChjb25zdCBlbnRyeSBvZiBlbnRyaWVzKSB7CiAgICAgICAgICAgIGNvbnN0IGVudHJ5RGF0ZSA9IGZtdFV0YygKICAgICAgICAgICAgICAgIGVudHJ5LmNyZWF0ZWQsCiAgICAgICAgICAgICAgICBlbnRyeS5jcmVhdGVkVFpPZmZzZXQsCiAgICAgICAgICAgICAgICAnTU0tREQnLAogICAgICAgICAgICApOwogICAgICAgICAgICAvLyBlbnRyaWVzIG9uIHRoZSBzYW1lIGRheSBhbmQgbW9udGgsIGJ1dCBub3QgdGhpcyB5ZWFyCiAgICAgICAgICAgIGlmIChlbnRyeURhdGUgPT09IG5vd0RhdGUpIHsKICAgICAgICAgICAgICAgIGNvbnN0IGVudHJ5WWVhciA9IGZtdFV0YygKICAgICAgICAgICAgICAgICAgICBlbnRyeS5jcmVhdGVkLAogICAgICAgICAgICAgICAgICAgIGVudHJ5LmNyZWF0ZWRUWk9mZnNldCwKICAgICAgICAgICAgICAgICAgICAnWVlZWScsCiAgICAgICAgICAgICAgICApOwogICAgICAgICAgICAgICAgaWYgKGVudHJ5WWVhciAhPT0gbm93WWVhcikgewogICAgICAgICAgICAgICAgICAgIGNvbnN0IHllYXJzQWdvID0gcGFyc2VJbnQobm93WWVhcikgLSBwYXJzZUludChlbnRyeVllYXIpOwogICAgICAgICAgICAgICAgICAgIGlmICghcmVzW3llYXJzQWdvXSkgewogICAgICAgICAgICAgICAgICAgICAgICByZXNbeWVhcnNBZ29dID0gW107CiAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgIHJlc1t5ZWFyc0Fnb10ucHVzaChlbnRyeSk7CiAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICAgICAgcmV0dXJuIHJlczsKICAgIH0K">{}</script>
+<script lang="ts">
+    import { onMount } from 'svelte';
+    import Cog from 'svelte-material-icons/Cog.svelte';
+    import ImageOutline from 'svelte-material-icons/ImageOutline.svelte';
+    import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
+    import Notebook from 'svelte-material-icons/Notebook.svelte';
+    import type { App } from '../../app';
+    import EntryTitles from '../../lib/components/EntryTitles.svelte';
+    import type { Entry } from '../../lib/controllers/entry';
+    import { obfuscated } from '../../lib/stores.js';
+    import {
+        currentTzOffset,
+        dayUtcFromTimestamp,
+        fmtUtc,
+        nowS
+    } from '../../lib/utils/time';
+
+    export let data: App.PageData & {
+        titles: Record<number, Entry[]>;
+        entries: Entry[];
+    };
+
+    onMount(() => (document.title = `Home`));
+
+    function entriesYearsAgoToday(entries: Entry[]): Record<string, Entry[]> {
+        const res: Record<string, Entry[]> = {};
+        const nowDate = fmtUtc(nowS(), currentTzOffset(), 'MM-DD');
+        const nowYear = fmtUtc(nowS(), currentTzOffset(), 'YYYY');
+
+        for (const entry of entries) {
+            const entryDate = fmtUtc(
+                entry.created,
+                entry.createdTZOffset,
+                'MM-DD'
+            );
+            // entries on the same day and month, but not this year
+            if (entryDate === nowDate) {
+                const entryYear = fmtUtc(
+                    entry.created,
+                    entry.createdTZOffset,
+                    'YYYY'
+                );
+                if (entryYear !== nowYear) {
+                    const yearsAgo = parseInt(nowYear) - parseInt(entryYear);
+                    if (!res[yearsAgo]) {
+                        res[yearsAgo] = [];
+                    }
+                    res[yearsAgo].push(entry);
+                }
+            }
+        }
+        return res;
+    }
+</script>
 
 <main>
     <section>
@@ -35,8 +88,8 @@
             <h1 class="recent-entries">Recent Entries</h1>
             <p class="recent-entries-text">
                 Doesn't look like you have any entries yet, why not <a
-                href="/journal?obfuscate=0">write one</a
-            >?
+                    href="/journal?obfuscate=0">write one</a
+                >?
             </p>
         </section>
     {/if}
@@ -60,4 +113,76 @@
     {/each}
 </main>
 
-<style lang="less" ✂prettier:content✂="CiAgICBAaW1wb3J0ICcuLi8uLi9zdHlsZXMvdmFyaWFibGVzJzsKICAgIEBpbXBvcnQgJy4uLy4uL3N0eWxlcy9sYXlvdXQnOwoKICAgIC5idXR0b25zIHsKICAgICAgICBkaXNwbGF5OiBmbGV4OwogICAgICAgIGZsZXgtZGlyZWN0aW9uOiByb3c7CiAgICAgICAgZmxleC13cmFwOiB3cmFwOwoKICAgICAgICBAbWVkaWEgQG1vYmlsZSB7CiAgICAgICAgICAgIGZsZXgtZGlyZWN0aW9uOiBjb2x1bW47CiAgICAgICAgfQoKICAgICAgICBhLAogICAgICAgIGJ1dHRvbiB7CiAgICAgICAgICAgIGRpc3BsYXk6IGdyaWQ7CiAgICAgICAgICAgIGFsaWduLWl0ZW1zOiBjZW50ZXI7CiAgICAgICAgICAgIGp1c3RpZnktY29udGVudDogc3BhY2UtYmV0d2VlbjsKICAgICAgICAgICAgLy8gYXNzdW1lZCBvbmUgc3ZnIGljb24gYW5kIHRoZW4gdGV4dAogICAgICAgICAgICBncmlkLXRlbXBsYXRlLWNvbHVtbnM6IDM1cHggMWZyOwogICAgICAgICAgICBmb250LXNpemU6IDEuMnJlbTsKICAgICAgICAgICAgcGFkZGluZzogMC42ZW0gMC44ZW07CiAgICAgICAgICAgIG1hcmdpbjogMWVtOwogICAgICAgICAgICB0ZXh0LWRlY29yYXRpb246IG5vbmU7CiAgICAgICAgICAgIHRyYW5zaXRpb246IGFsbCBAdHJhbnNpdGlvbjsKCiAgICAgICAgICAgICY6YWZ0ZXIgewogICAgICAgICAgICAgICAgZGlzcGxheTogbm9uZTsKICAgICAgICAgICAgfQoKICAgICAgICAgICAgJjpub3QoLnByaW1hcnkpIHsKICAgICAgICAgICAgICAgIGJvcmRlci1yYWRpdXM6IEBib3JkZXItcmFkaXVzOwogICAgICAgICAgICAgICAgYm9yZGVyOiAxcHggc29saWQgQGxpZ2h0LWFjY2VudDsKCiAgICAgICAgICAgICAgICAmOmhvdmVyIHsKICAgICAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kOiBAbGlnaHQtdi1hY2NlbnQ7CiAgICAgICAgICAgICAgICAgICAgY29sb3I6IEBhY2NlbnQtY29sb3Itc2Vjb25kYXJ5OwogICAgICAgICAgICAgICAgICAgIHRleHQtZGVjb3JhdGlvbjogbm9uZTsKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQoKICAgICAgICAgICAgQG1lZGlhIEBtb2JpbGUgewogICAgICAgICAgICAgICAgLmJvcmRlcmVkKCk7CgogICAgICAgICAgICAgICAgcGFkZGluZzogMC41ZW07CiAgICAgICAgICAgICAgICBtYXJnaW46IDAuMmVtOwogICAgICAgICAgICAgICAgdGV4dC1hbGlnbjogY2VudGVyOwogICAgICAgICAgICB9CiAgICAgICAgfQogICAgfQoKICAgIGgxIHsKICAgICAgICBmb250LXNpemU6IDEuNXJlbTsKICAgICAgICAvLyBuZWdhdGl2ZSBvbiB0aGUgYm90dG9tIHRvIHB1dCBpbiBsaW5lIHdpdGggdGhlIHRpdGxlcyBkdWUKICAgICAgICAvLyB0byB0aGUgdmlzaWJpbGl0eSB0b2dnbGUgYmVpbmcgaW5saW5lCiAgICAgICAgbWFyZ2luOiAxZW0gMWVtIC0yMnB4IDFlbTsKICAgICAgICBwYWRkaW5nOiAwLjVlbTsKICAgICAgICBib3JkZXItYm90dG9tOiAxcHggc29saWQgQGxpZ2h0LWFjY2VudDsKICAgICAgICB0ZXh0LWFsaWduOiBzdGFydDsKCiAgICAgICAgQG1lZGlhIEBtb2JpbGUgewogICAgICAgICAgICBmb250LXNpemU6IDEuMnJlbTsKICAgICAgICB9CgogICAgICAgICYucmVjZW50LWVudHJpZXMgewogICAgICAgICAgICBtYXJnaW46IDFyZW07CiAgICAgICAgfQogICAgfQoKICAgIC5yZWNlbnQtZW50cmllcy10ZXh0IHsKICAgICAgICBtYXJnaW46IDAuNXJlbTsKICAgIH0K"></style>
+<style lang="less">
+    @import '../../styles/variables';
+    @import '../../styles/layout';
+
+    .buttons {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+
+        @media @mobile {
+            flex-direction: column;
+        }
+
+        a,
+        button {
+            display: grid;
+            align-items: center;
+            justify-content: space-between;
+            // assumed one svg icon and then text
+            grid-template-columns: 35px 1fr;
+            font-size: 1.2rem;
+            padding: 0.6em 0.8em;
+            margin: 1em;
+            text-decoration: none;
+            transition: all @transition;
+
+            &:after {
+                display: none;
+            }
+
+            &:not(.primary) {
+                border-radius: @border-radius;
+                border: 1px solid @light-accent;
+
+                &:hover {
+                    background: @light-v-accent;
+                    color: @accent-color-secondary;
+                    text-decoration: none;
+                }
+            }
+
+            @media @mobile {
+                .bordered();
+
+                padding: 0.5em;
+                margin: 0.2em;
+                text-align: center;
+            }
+        }
+    }
+
+    h1 {
+        font-size: 1.5rem;
+        // negative on the bottom to put in line with the titles due
+        // to the visibility toggle being inline
+        margin: 1em 1em -22px 1em;
+        padding: 0.5em;
+        border-bottom: 1px solid @light-accent;
+        text-align: start;
+
+        @media @mobile {
+            font-size: 1.2rem;
+        }
+
+        &.recent-entries {
+            margin: 1rem;
+        }
+    }
+
+    .recent-entries-text {
+        margin: 0.5rem;
+    }
+</style>

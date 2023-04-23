@@ -1,13 +1,41 @@
-<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgUmVsb2FkIGZyb20gJ3N2ZWx0ZS1tYXRlcmlhbC1pY29ucy9SZWxvYWQuc3ZlbHRlJzsKCiAgICBleHBvcnQgbGV0IG5ld1ZlcnNpb246IHN0cmluZzsK">{}</script>
+<script lang="ts">
+    import Reload from 'svelte-material-icons/Reload.svelte';
+
+    export let newVersion: string;
+</script>
 
 <div class="outer">
     <button class="inner" on:click="{() => location.reload()}">
         <span
-        >A new version ({newVersion}) is available! Click to apply the
+            >A new version ({newVersion}) is available! Click to apply the
             update
         </span>
         <Reload size="40" />
     </button>
 </div>
 
-<style lang="less" ✂prettier:content✂="CiAgICBAaW1wb3J0ICcuLi9zdHlsZXMvbGF5b3V0JzsKICAgIEBpbXBvcnQgJy4uL3N0eWxlcy92YXJpYWJsZXMnOwoKICAgIC5vdXRlciB7CiAgICAgICAgcG9zaXRpb246IGZpeGVkOwogICAgICAgIGJvdHRvbTogMDsKICAgICAgICBsZWZ0OiAwOwogICAgICAgIHotaW5kZXg6IDIwMDA7CiAgICAgICAgcGFkZGluZzogMXJlbTsKCiAgICAgICAgLmlubmVyIHsKICAgICAgICAgICAgLmZsZXgtY2VudGVyKCk7CiAgICAgICAgICAgIGJhY2tncm91bmQ6IEBsaWdodC1hY2NlbnQ7CiAgICAgICAgICAgIGJvcmRlcjogMXB4IHNvbGlkIEBhY2NlbnQtY29sb3Itc2Vjb25kYXJ5OwogICAgICAgICAgICBwYWRkaW5nOiAxcmVtOwogICAgICAgICAgICBmb250LXNpemU6IDEuMDVyZW07CiAgICAgICAgICAgIGJvcmRlci1yYWRpdXM6IEBib3JkZXItcmFkaXVzOwoKICAgICAgICAgICAgc3BhbiB7CiAgICAgICAgICAgICAgICBtYXJnaW46IDAgMXJlbSAwIDA7CiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICB9Cg=="></style>
+<style lang="less">
+    @import '../styles/layout';
+    @import '../styles/variables';
+
+    .outer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        z-index: 2000;
+        padding: 1rem;
+
+        .inner {
+            .flex-center();
+            background: @light-accent;
+            border: 1px solid @accent-color-secondary;
+            padding: 1rem;
+            font-size: 1.05rem;
+            border-radius: @border-radius;
+
+            span {
+                margin: 0 1rem 0 0;
+            }
+        }
+    }
+</style>

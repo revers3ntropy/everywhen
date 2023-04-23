@@ -1,3 +1,9 @@
-<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgeyByZW5kZXJhYmxlIH0gZnJvbSAnLi4vLi4vbGliL2NhbnZhcy9jYW52YXNIZWxwZXJzJzsKCiAgICByZW5kZXJhYmxlKHN0YXRlID0+IHsKICAgICAgICBzdGF0ZS5yZWN0KDAsIHN0YXRlLmNlbnRlckxuWSgpIC0gMSwgc3RhdGUud2lkdGgsIDMpOwogICAgfSk7Cg==">{}</script>
+<script lang="ts">
+    import { renderable } from '../../lib/canvas/canvasHelpers';
+
+    renderable(state => {
+        state.rect(0, state.centerLnY() - 1, state.width, 3);
+    });
+</script>
 
 <slot />

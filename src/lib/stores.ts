@@ -25,11 +25,11 @@ export const popup = writable<typeof SvelteComponentDev | null | undefined>(
 export function localStorageWritable<T>(
     lsKey: string,
     initial: T extends (...args: infer _) => infer _ ? never : T
-),: Writable<T> {
+): Writable<T> {
     if (typeof initial === 'function') {
         throw new Error(
             'localStorageWritable does not support setting a function'
- ,       );
+        );
     }
 
     if (browser) {
@@ -58,7 +58,7 @@ export function localStorageWritable<T>(
         set: value => {
             if (typeof value === 'function') {
                 throw new Error(
-                    'localStorageWritable does not support setting a function',
+                    'localStorageWritable does not support setting a function'
                 );
             }
             set(value);
@@ -75,7 +75,7 @@ export function localStorageWritable<T>(
 
                 if (typeof newValue === 'function') {
                     throw new Error(
-                        'localStorageWritable does not support setting a function',
+                        'localStorageWritable does not support setting a function'
                     );
                 }
 

@@ -1,4 +1,53 @@
-<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgeyB0b29sdGlwIH0gZnJvbSAnQHN2ZWx0ZS1wbHVnaW5zL3Rvb2x0aXBzJzsKICAgIGltcG9ydCB7IG9uTW91bnQgfSBmcm9tICdzdmVsdGUnOwogICAgaW1wb3J0IEFwcGxlIGZyb20gJ3N2ZWx0ZS1tYXRlcmlhbC1pY29ucy9BcHBsZS5zdmVsdGUnOwogICAgaW1wb3J0IENlbGxwaG9uZSBmcm9tICdzdmVsdGUtbWF0ZXJpYWwtaWNvbnMvQ2VsbHBob25lLnN2ZWx0ZSc7CiAgICBpbXBvcnQgTGludXggZnJvbSAnc3ZlbHRlLW1hdGVyaWFsLWljb25zL0xpbnV4LnN2ZWx0ZSc7CiAgICBpbXBvcnQgV2luZG93cyBmcm9tICdzdmVsdGUtbWF0ZXJpYWwtaWNvbnMvTWljcm9zb2Z0V2luZG93cy5zdmVsdGUnOwogICAgaW1wb3J0IFRlbGV2aXNpb24gZnJvbSAnc3ZlbHRlLW1hdGVyaWFsLWljb25zL1RlbGV2aXNpb24uc3ZlbHRlJzsKICAgIGltcG9ydCBXYXRjaCBmcm9tICdzdmVsdGUtbWF0ZXJpYWwtaWNvbnMvV2F0Y2guc3ZlbHRlJzsKICAgIGltcG9ydCBVQVBhcnNlciBmcm9tICd1YS1wYXJzZXItanMnOwogICAgaW1wb3J0IHR5cGUgeyBQaXhlbHMgfSBmcm9tICcuLi91dGlscy90eXBlcyc7CgogICAgY29uc3QgbW9iaWxlT1NzID0gWwogICAgICAgICdBbmRyb2lkJywKICAgICAgICAnQW5kcm9pZC14ODYnLAogICAgICAgICdCbGFja0JlcnJ5JywKICAgICAgICAnaU9TJywKICAgICAgICAnV2luZG93cyBQaG9uZScsCiAgICAgICAgJ1dpbmRvd3MgTW9iaWxlJywKICAgICAgICAnUGFsbScsCiAgICBdOwogICAgY29uc3Qgd2F0Y2hPU3MgPSBbICd3YXRjaE9TJyBdOwogICAgY29uc3QgdHZPU3MgPSBbICd0dk9TJywgJ05ldFRWJyBdOwogICAgY29uc3QgY29uc29sZU9TcyA9IFsgJ1BsYXlTdGF0aW9uJywgJ1hib3gnIF07CiAgICBjb25zdCBtYWNPU3MgPSBbICdNYWMgT1MnIF07CiAgICBjb25zdCB3aW5kb3dzT1NzID0gWyAnV2luZG93cycgXTsKCiAgICBleHBvcnQgbGV0IGRhdGEgPSAnJzsKICAgIGV4cG9ydCBsZXQgc2l6ZTogUGl4ZWxzID0gMjA7CgogICAgbGV0IHBhcnNlZDogdW5rbm93biA9IHt9OwogICAgbGV0IHVhID0gbnVsbCBhcyBSZXR1cm5UeXBlPHR5cGVvZiBVQVBhcnNlcj4gfCBudWxsOwoKICAgIG9uTW91bnQoKCkgPT4gewogICAgICAgIGlmICghZGF0YSkgcmV0dXJuOwoKICAgICAgICB0cnkgewogICAgICAgICAgICBwYXJzZWQgPSBKU09OLnBhcnNlKGRhdGEpOwogICAgICAgIH0gY2F0Y2ggKGUpIHsKICAgICAgICAgICAgLyogZW1wdHkgKi8KICAgICAgICB9CgogICAgICAgIGlmICh0eXBlb2YgcGFyc2VkICE9PSAnb2JqZWN0JyB8fCBwYXJzZWQgPT09IG51bGwpIHJldHVybjsKICAgICAgICBpZiAoISgndXNlckFnZW50JyBpbiBwYXJzZWQpKSByZXR1cm47CiAgICAgICAgaWYgKHR5cGVvZiBwYXJzZWQudXNlckFnZW50ICE9PSAnc3RyaW5nJykgcmV0dXJuOwogICAgICAgIHVhID0gbmV3IFVBUGFyc2VyKHBhcnNlZC51c2VyQWdlbnQpLmdldFJlc3VsdCgpOwogICAgfSk7CgogICAgJDogb3NOYW1lID0gdWEgIT09IG51bGwgPyB1YT8ub3M/Lm5hbWUgfHwgJ1Vua25vd24gT1MnIDogJyc7Cg==">{}</script>
+<script lang="ts">
+    import { tooltip } from '@svelte-plugins/tooltips';
+    import { onMount } from 'svelte';
+    import Apple from 'svelte-material-icons/Apple.svelte';
+    import Cellphone from 'svelte-material-icons/Cellphone.svelte';
+    import Linux from 'svelte-material-icons/Linux.svelte';
+    import Windows from 'svelte-material-icons/MicrosoftWindows.svelte';
+    import Television from 'svelte-material-icons/Television.svelte';
+    import Watch from 'svelte-material-icons/Watch.svelte';
+    import UAParser from 'ua-parser-js';
+    import type { Pixels } from '../utils/types';
+
+    const mobileOSs = [
+        'Android',
+        'Android-x86',
+        'BlackBerry',
+        'iOS',
+        'Windows Phone',
+        'Windows Mobile',
+        'Palm'
+    ];
+    const watchOSs = ['watchOS'];
+    const tvOSs = ['tvOS', 'NetTV'];
+    const consoleOSs = ['PlayStation', 'Xbox'];
+    const macOSs = ['Mac OS'];
+    const windowsOSs = ['Windows'];
+
+    export let data = '';
+    export let size: Pixels = 20;
+
+    let parsed: unknown = {};
+    let ua = null as ReturnType<typeof UAParser> | null;
+
+    onMount(() => {
+        if (!data) return;
+
+        try {
+            parsed = JSON.parse(data);
+        } catch (e) {
+            /* empty */
+        }
+
+        if (typeof parsed !== 'object' || parsed === null) return;
+        if (!('userAgent' in parsed)) return;
+        if (typeof parsed.userAgent !== 'string') return;
+        ua = new UAParser(parsed.userAgent).getResult();
+    });
+
+    $: osName = ua !== null ? ua?.os?.name || 'Unknown OS' : '';
+</script>
 
 {#if ua}
     <span
@@ -24,4 +73,8 @@
     </span>
 {/if}
 
-<style lang="less" ✂prettier:content✂="CiAgICBzcGFuIHsKICAgICAgICBtYXJnaW46IDAuNXJlbTsKICAgIH0K"></style>
+<style lang="less">
+    span {
+        margin: 0.5rem;
+    }
+</style>

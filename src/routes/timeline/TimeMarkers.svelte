@@ -1,3 +1,249 @@
-<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgeyBicm93c2VyIH0gZnJvbSAnJGFwcC9lbnZpcm9ubWVudCc7CiAgICBpbXBvcnQgewogICAgICAgIHJlbmRlcmFibGUsCiAgICAgICAgdHlwZSBSZW5kZXJQcm9wcywKICAgIH0gZnJvbSAnLi4vLi4vbGliL2NhbnZhcy9jYW52YXNIZWxwZXJzJzsKICAgIGltcG9ydCB7IE5BVkJBUl9IRUlHSFQgfSBmcm9tICcuLi8uLi9saWIvY29uc3RhbnRzJzsKICAgIGltcG9ydCB7IGN1cnJlbnRUek9mZnNldCwgZm10VXRjLCBub3dTIH0gZnJvbSAnLi4vLi4vbGliL3V0aWxzL3RpbWUuanMnOwogICAgaW1wb3J0IHsgbW9udGhJZHhUb05hbWUgfSBmcm9tICcuL3V0aWxzJzsKCiAgICBleHBvcnQgbGV0IHN0YXJ0WWVhcjogbnVtYmVyOwoKICAgIGNvbnN0IHNob3dZZWFycyA9IDIwMDs,KCiAgICBjb25zdCBjb2xvdXJzID0gewogICAgICAgIHllYXI6ICdyZ2JhKDI1NSwgMjU1LCAyNTUsIDAuNSknLAogICAgICAgIG1vbnRoOiAnI2ZmZicsCiAgICAgICAgd2VlazogJyNhYWEnLAogICAgICAgIGRheTogJyM2NjYnLAogICAgICAgIGhvdXI6ICcjNDQ0JwogICAgfTsKCiAgICAkOiBpZiAoc3RhcnRZZWFyICsgc2hvd1llYXJzIDwgbmV3IERhdGUoKS5nZXRGdWxsWWVhcigpKSB7CiAgICAgICAgaWYgKGJyb3dzZXIpIGFsZXJ0KGBCb3JuIGluICR7c3RhcnRZZWFyfT8/IFlvdSBhcmUgb2xkIWApOwogICAgICAgIHN0YXJ0WWVhciA9IG5ldyBEYXRlKCkuZ2V0RnVsbFllYXIoKSAtIHNob3dZZWFyczsKICAgIH0KCiAgICAkOiBpZiAoc3RhcnRZZWFyID4gbmV3IERhdGUoKS5nZXRGdWxsWWVhcigpKSB7CiAgICAgICAgaWYgKGJyb3dzZXIpIGFsZXJ0KGBCb3JuIGluICR7c3RhcnRZZWFyfT8/IFlvdSBhcmUgeW91bmchYCk7CiAgICAgICAgc3RhcnRZZWFyID0gbmV3IERhdGUoKS5nZXRGdWxsWWVhcigpOwogICAgfQoKICAgIGZ1bmN0aW9uIGRyYXdZZWFycyAoc3RhdGU6IFJlbmRlclByb3BzKSB7CiAgICAgICAgbGV0IHllYXIgPSBNYXRoLm1heCgKICAgICAgICAgICAgbmV3IERhdGUoc3RhdGUucmVuZGVyUG9zVG9UaW1lKDApICogMTAwMCkuZ2V0RnVsbFllYXIoKSB8fCAwLAogICAgICAgICAgICBzdGFydFllYXIKICAgICAgICApOwoKICAgICAgICBsZXQgc2hvd1llYXJUZXh0ID0gc3RhdGUuem9vbSA+PSAyZS02OwogICAgICAgIGxldCBzaG93Qm90aFNpZGVzVGV4dCA9IHN0YXRlLnpvb20gPj0gMWUtNTsKCiAgICAgICAgd2hpbGUgKHRydWUpIHsKICAgICAgICAgICAgbGV0IHJlbmRlclBvcyA9IHN0YXRlLmRhdGVUb1JlbmRlclBvcyh5ZWFyLCAwLCAxKTsKCiAgICAgICAgICAgIGlmIChyZW5kZXJQb3MgPiBzdGF0ZS53aWR0aCkgYnJlYWs7CiAgICAgICAgICAgIGlmICh5ZWFyIC0gc3RhcnRZZWFyID4gc2hvd1llYXJzKSBicmVhazsKCiAgICAgICAgICAgIC8vIC0xIHRvIGNlbnRlciwgYXMgaGFzIHdpZHRoIDMKICAgICAgICAgICAgc3RhdGUucmVjdChyZW5kZXJQb3MgLSAxLCAwLCAzLCBzdGF0ZS5oZWlnaHQsIHsKICAgICAgICAgICAgICAgIHJhZGl1czogMCwKICAgICAgICAgICAgICAgIGNvbG91cjogY29sb3Vycy55ZWFyCiAgICAgICAgICAgIH0pOwoKICAgICAgICAgICAgaWYgKHNob3dZZWFyVGV4dCkgewogICAgICAgICAgICAgICAgc3RhdGUudGV4dCh5ZWFyLnRvU3RyaW5nKCksIHJlbmRlclBvcyArIDUsIE5BVkJBUl9IRUlHSFQgKyAxMCk7CiAgICAgICAgICAgIH0KICAgICAgICAgICAgaWYgKHNob3dCb3RoU2lkZXNUZXh0KSB7CiAgICAgICAgICAgICAgICBzdGF0ZS50ZXh0KAogICAgICAgICAgICAgICAgICAgICh5ZWFyIC0gMSkudG9TdHJpbmcoKSwKICAgICAgICAgICAgICAgICAgICByZW5kZXJQb3MgLSAyNSwKICAgICAgICAgICAgICAgICAgICBOQVZCQVJfSEVJR0hUICsgMTAKICAgICAgICAgICAgICAgICk7CiAgICAgICAgICAgIH0KCiAgICAgICAgICAgIHllYXIrKzsKICAgICAgICB9CiAgICB9CgogICAgZnVuY3Rpb24gZHJhd01vbnRocyAoc3RhdGU6IFJlbmRlclByb3BzKSB7CiAgICAgICAgaWYgKHN0YXRlLnpvb20gPCAxZS01KSByZXR1cm47CgogICAgICAgIGxldCB5ZWFyID0gTWF0aC5tYXgoCiAgICAgICAgICAgIG5ldyBEYXRlKHN0YXRlLnJlbmRlclBvc1RvVGltZSgwKSAqIDEwMDApLmdldEZ1bGxZZWFyKCkgfHwgMCwKICAgICAgICAgICAgc3RhcnRZZWFyCiAgICAgICAgKTsKCiAgICAgICAgbGV0IG1vbnRoID0gMDsKCiAgICAgICAgbGV0IHNob3dNb250aFRleHQgPSBzdGF0ZS56b29tID49IDFlLTU7CiAgICAgICAgbGV0IHNob3dZZWFyID0gc3RhdGUuem9vbSA+PSAxZS00OwoKICAgICAgICB3aGlsZSAodHJ1ZSkgewogICAgICAgICAgICBsZXQgcmVuZGVyUG9zID0gc3RhdGUuZGF0ZVRvUmVuZGVyUG9zKHllYXIsIG1vbnRoLCAxKTsKCiAgICAgICAgICAgIGlmIChyZW5kZXJQb3MgPiBzdGF0ZS53aWR0aCkgYnJlYWs7CgogICAgICAgICAgICBzdGF0ZS5yZWN0KHJlbmRlclBvcywgMCwgMSwgc3RhdGUuaGVpZ2h0LCB7CiAgICAgICAgICAgICAgICBjb2xvdXI6IGNvbG91cnMubW9udGgKICAgICAgICAgICAgfSk7CgogICAgICAgICAgICBpZiAoc2hvd01vbnRoVGV4dCkgewogICAgICAgICAgICAgICAgbGV0IHRleHQgPSBtb250aElkeFRvTmFtZShtb250aCk7CiAgICAgICAgICAgICAgICBpZiAoc2hvd1llYXIpIHRleHQgKz0gYCAke3llYXJ9YDsKICAgICAgICAgICAgICAgIHN0YXRlLnRleHQodGV4dCwgcmVuZGVyUG9zICsgNiwgTkFWQkFSX0hFSUdIVCArIDIwKTsKICAgICAgICAgICAgfQoKICAgICAgICAgICAgbW9udGgrKzsKICAgICAgICAgICAgaWYgKG1vbnRoID4gMTEpIHsKICAgICAgICAgICAgICAgIG1vbnRoID0gMDsKICAgICAgICAgICAgICAgIHllYXIrKzsKICAgICAgICAgICAgfQogICAgICAgIH0KICAgIH0KCiAgICBmdW5jdGlvbiBkcmF3RGF5cyAoc3RhdGU6IFJlbmRlclByb3BzKSB7CiAgICAgICAgaWYgKHN0YXRlLnpvb20gPCA1ZS01KSByZXR1cm47CgogICAgICAgIGxldCBsZWZ0TW9zdCA9IHN0YXRlLnJlbmRlclBvc1RvVGltZSgwKTsKICAgICAgICBjb25zdCB0aGlzV2VlayA9IGZtdFV0Yyhub3dTKCksIGN1cnJlbnRUek9mZnNldCgpLCAnWVlZWS1XVycpOwogICAgICAgIGNvbnN0IGxhc3RXZWVrID0gZm10VXRjKG5vd1MoKSAtIDYwNDgwMCwgY3VycmVudFR6T2Zmc2V0KCksICdZWVlZLVdXJyk7CiAgICAgICAgY29uc3QgbmV4dFdlZWsgPSBmbXRVdGMobm93UygpICsgNjA0ODAwLCBjdXJyZW50VHpPZmZzZXQoKSwgJ1lZWVktV1cnKTsKCiAgICAgICAgY29uc3QgZmlyc3REYXlUaW1lc3RhbXAgPSBuZXcgRGF0ZShzdGFydFllYXIsIDAsIDEpLmdldFRpbWUoKSAvIDEwMDA7CiAgICAgICAgaWYgKGxlZnRNb3N0IDwgZmlyc3REYXlUaW1lc3RhbXApIHsKICAgICAgICAgICAgbGVmdE1vc3QgPSBmaXJzdERheVRpbWVzdGFtcDsKICAgICAgICB9CgogICAgICAgIGxldCBkYXkgPSBNYXRoLmZsb29yKGxlZnRNb3N0IC8gODY0MDApICogODY0MDA7CiAgICAgICAgLy8gZGVhbCB3aXRoIHRpbWV6b25lcwogICAgICAgIGRheSAtPSBjdXJyZW50VHpPZmZzZXQoKSAqIDYwICogNjA7CiAgICAgICAgLy8gcHV0IGF0IG1pZGRheSBmb3IgZGF5bGlnaHQgc2F2aW5nJ3MgaXNzdWVzCiAgICAgICAgZGF5ICs9IDEyICogNjAgKiA2MDsKCiAgICAgICAgY29uc3Qgc2hvd0RheVRleHQgPSBzdGF0ZS56b29tID49IDEuMmUtMzsKICAgICAgICBjb25zdCBzaG93RGF5cyA9IHN0YXRlLnpvb20gPj0gNWUtNDsKICAgICAgICBjb25zdCBzaG93V2Vla1RleHQgPSBzdGF0ZS56b29tID49IDEuMmUtNDsKCiAgICAgICAgd2hpbGUgKHRydWUpIHsKICAgICAgICAgICAgY29uc3QgZGF5RGF0ZSA9IG5ldyBEYXRlKGRheSAqIDEwMDApOwogICAgICAgICAgICBsZXQgZGF5U3RhcnQgPQogICAgICAgICAgICAgICAgbmV3IERhdGUoCiAgICAgICAgICAgICAgICAgICAgZGF5RGF0ZS5nZXRGdWxsWWVhcigpLAogICAgICAgICAgICAgICAgICAgIGRheURhdGUuZ2V0TW9udGgoKSwKICAgICAgICAgICAgICAgICAgICBkYXlEYXRlLmdldERhdGUoKQogICAgICAgICAgICAgICAgKS5nZXRUaW1lKCkgLyAxMDAwOwogICAgICAgICAgICBsZXQgcmVuZGVyUG9zID0gc3RhdGUudGltZVRvUmVuZGVyUG9zKGRheVN0YXJ0KTsKCiAgICAgICAgICAgIGlmIChyZW5kZXJQb3MgPiBzdGF0ZS53aWR0aCkgYnJlYWs7CgogICAgICAgICAgICBjb25zdCBpc01vbmRheSA9CiAgICAgICAgICAgICAgICBmbXRVdGMoZGF5U3RhcnQsIGN1cnJlbnRUek9mZnNldCgpLCAnZGRkJykgPT09ICdNb24nOwoKICAgICAgICAgICAgY29uc3Qgc2hvdWxkU2hvdyA9IGlzTW9uZGF5IHx8IHNob3dEYXlzOwoKICAgICAgICAgICAgaWYgKHNob3VsZFNob3cpIHsKICAgICAgICAgICAgICAgIHN0YXRlLnJlY3QocmVuZGVyUG9zLCAwLCAxLCBzdGF0ZS5oZWlnaHQsIHsKICAgICAgICAgICAgICAgICAgICBjb2xvdXI6IGlzTW9uZGF5ID8gY29sb3Vycy53ZWVrIDogY29sb3Vycy5kYXkKICAgICAgICAgICAgICAgIH0pOwogICAgICAgICAgICB9CgogICAgICAgICAgICBpZiAoc2hvd0RheVRleHQgJiYgc2hvdWxkU2hvdykgewogICAgICAgICAgICAgICAgbGV0IHRleHQgPSBmbXRVdGMoZGF5U3RhcnQsIGN1cnJlbnRUek9mZnNldCgpLCAnZGRkIERvJyk7CgogICAgICAgICAgICAgICAgaWYgKAogICAgICAgICAgICAgICAgICAgIGZtdFV0YyhkYXlTdGFydCwgY3VycmVudFR6T2Zmc2V0KCksICdZWVktTU0tREQnKSA9PT0KICAgICAgICAgICAgICAgICAgICBmbXRVdGMobm93UygpLCBjdXJyZW50VHpPZmZzZXQoKSwgJ1lZWS1NTS1ERCcpCiAgICAgICAgICAgICAgICApIHsKICAgICAgICAgICAgICAgICAgICB0ZXh0ICs9ICcgKFRvZGF5KSc7CiAgICAgICAgICAgICAgICB9IGVsc2UgaWYgKAogICAgICAgICAgICAgICAgICAgIGZtdFV0YyhkYXlTdGFydCwgY3VycmVudFR6T2Zmc2V0KCksICdZWVktTU0tREQnKSA9PT0KICAgICAgICAgICAgICAgICAgICBmbXRVdGMobm93UygpIC0gODY0MDAsIGN1cnJlbnRUek9mZnNldCgpLCAnWVlZLU1NLUREJykKICAgICAgICAgICAgICAgICkgewogICAgICAgICAgICAgICAgICAgIHRleHQgKz0gJyAoWWVzdGVyZGF5KSc7CiAgICAgICAgICAgICAgICB9IGVsc2UgaWYgKAogICAgICAgICAgICAgICAgICAgIGZtdFV0YyhkYXlTdGFydCwgY3VycmVudFR6T2Zmc2V0KCksICdZWVktTU0tREQnKSA9PT0KICAgICAgICAgICAgICAgICAgICBmbXRVdGMobm93UygpICsgODY0MDAsIGN1cnJlbnRUek9mZnNldCgpLCAnWVlZLU1NLUREJykKICAgICAgICAgICAgICAgICkgewogICAgICAgICAgICAgICAgICAgIHRleHQgKz0gJyAoVG9tb3Jyb3cpJzsKICAgICAgICAgICAgICAgIH0KCiAgICAgICAgICAgICAgICBzdGF0ZS50ZXh0KHRleHQsIHJlbmRlclBvcyArIDYsIE5BVkJBUl9IRUlHSFQgKyA0MCk7CiAgICAgICAgICAgIH0KCiAgICAgICAgICAgIGNvbnN0IHdlZWsgPSBmbXRVdGMoZGF5U3RhcnQsIGN1cnJlbnRUek9mZnNldCgpLCAnWVlZWS1XVycpOwoKICAgICAgICAgICAgaWYgKHNob3dXZWVrVGV4dCAmJiBpc01vbmRheSkgewogICAgICAgICAgICAgICAgbGV0IHRleHQ7CiAgICAgICAgICAgICAgICBpZiAod2VlayA9PT0gdGhpc1dlZWspIHsKICAgICAgICAgICAgICAgICAgICB0ZXh0ID0gJ1RoaXMgd2Vlayc7CiAgICAgICAgICAgICAgICB9IGVsc2UgaWYgKHdlZWsgPT09IGxhc3RXZWVrKSB7CiAgICAgICAgICAgICAgICAgICAgdGV4dCA9ICdMYXN0IHdlZWsnOwogICAgICAgICAgICAgICAgfSBlbHNlIGlmICh3ZWVrID09PSBuZXh0V2VlaykgewogICAgICAgICAgICAgICAgICAgIHRleHQgPSAnTmV4dCB3ZWVrJzsKICAgICAgICAgICAgICAgIH0gZWxzZSB7CiAgICAgICAgICAgICAgICAgICAgY29uc3QgWyB0aGlzWWVhciwgdGhpc1dlZWtJZHggXSA9IHRoaXNXZWVrCiAgICAgICAgICAgICAgICAgICAgICAgIC5zcGxpdCgnLScpCiAgICAgICAgICAgICAgICAgICAgICAgIC5tYXAocGFyc2VJbnQpOwogICAgICAgICAgICAgICAgICAgIGNvbnN0IFsgd2Vla1llYXIsIHdlZWtJZHggXSA9IHdlZWsuc3BsaXQoJy0nKS5tYXAocGFyc2VJbnQpOwoKICAgICAgICAgICAgICAgICAgICBpZiAodGhpc1llYXIgPT09IHdlZWtZZWFyICYmIHRoaXNXZWVrSWR4ID4gd2Vla0lkeCkgewogICAgICAgICAgICAgICAgICAgICAgICB0ZXh0ID0gYCR7dGhpc1dlZWtJZHggLSB3ZWVrSWR4fSB3ZWVrcyBhZ29gOwogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIH0KCiAgICAgICAgICAgICAgICBpZiAodGV4dCkgewogICAgICAgICAgICAgICAgICAgIHN0YXRlLnRleHQodGV4dCwgcmVuZGVyUG9zICsgNiwgTkFWQkFSX0hFSUdIVCArIDMwKTsKICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgfQoKICAgICAgICAgICAgZGF5ICs9IDg2NDAwOwogICAgICAgIH0KICAgIH0KCiAgICBmdW5jdGlvbiBkcmF3SG91cnMgKHN0YXRlOiBSZW5kZXJQcm9wcykgewogICAgICAgIGlmIChzdGF0ZS56b29tIDwgNWUtMykgcmV0dXJuOwoKICAgICAgICBsZXQgbGVmdE1vc3QgPSBzdGF0ZS5yZW5kZXJQb3NUb1RpbWUoMCk7CgogICAgICAgIGNvbnN0IGZpcnN0SG91clRpbWVzdGFtcCA9IG5ldyBEYXRlKHN0YXJ0WWVhciwgMCwgMSkuZ2V0VGltZSgpIC8gMTAwMDsKICAgICAgICBpZiAobGVmdE1vc3QgPCBmaXJzdEhvdXJUaW1lc3RhbXApIHsKICAgICAgICAgICAgbGVmdE1vc3QgPSBmaXJzdEhvdXJUaW1lc3RhbXA7CiAgICAgICAgfQoKICAgICAgICBsZXQgaG91ciA9IE1hdGguZmxvb3IobGVmdE1vc3QgLyAoNjAgKiA2MCkpICogKDYwICogNjApOwogICAgICAgIC8vIGRlYWwgd2l0aCB0aW1lem9uZXMKICAgICAgICBob3VyIC09IGN1cnJlbnRUek9mZnNldCgpICogNjAgKiA2MDsKCiAgICAgICAgY29uc3Qgc2hvd0hvdXJUZXh0ID0gc3RhdGUuem9vbSA+PSAxLjJlLTI7CgogICAgICAgIHdoaWxlICh0cnVlKSB7CiAgICAgICAgICAgIGxldCByZW5kZXJQb3MgPSBzdGF0ZS50aW1lVG9SZW5kZXJQb3MoaG91cik7CgogICAgICAgICAgICBpZiAocmVuZGVyUG9zID4gc3RhdGUud2lkdGgpIGJyZWFrOwoKICAgICAgICAgICAgc3RhdGUucmVjdChyZW5kZXJQb3MsIDAsIDEsIHN0YXRlLmhlaWdodCwgewogICAgICAgICAgICAgICAgY29sb3VyOiBjb2xvdXJzLmhvdXIKICAgICAgICAgICAgfSk7CgogICAgICAgICAgICBpZiAoc2hvd0hvdXJUZXh0KSB7CiAgICAgICAgICAgICAgICBzdGF0ZS50ZXh0KAogICAgICAgICAgICAgICAgICAgIGZtdFV0Yyhob3VyLCBjdXJyZW50VHpPZmZzZXQoKSwgJ2hhJyksCiAgICAgICAgICAgICAgICAgICAgcmVuZGVyUG9zICsgNiwKICAgICAgICAgICAgICAgICAgICBOQVZCQVJfSEVJR0hUICsgNTAKICAgICAgICAgICAgICAgICk7CiAgICAgICAgICAgIH0KCiAgICAgICAgICAgIGhvdXIgKz0gNjAgKiA2MDsKICAgICAgICB9CiAgICB9CgogICAgcmVuZGVyYWJsZShzdGF0ZSA9PiB7CiAgICAgICAgZHJhd0hvdXJzKHN0YXRlKTsKICAgICAgICBkcmF3RGF5cyhzdGF0ZSk7CiAgICAgICAgZHJhd01vbnRocyhzdGF0ZSk7CiAgICAgICAgZHJhd1llYXJzKHN0YXRlKTsKICAgIH0pOwo=">{}</script>
+<script lang="ts">
+    import { browser } from '$app/environment';
+    import {
+        renderable,
+        type RenderProps
+    } from '../../lib/canvas/canvasHelpers';
+    import { NAVBAR_HEIGHT } from '../../lib/constants';
+    import { currentTzOffset, fmtUtc, nowS } from '../../lib/utils/time.js';
+    import { monthIdxToName } from './utils';
+
+    export let startYear: number;
+
+    const showYears = 200;
+
+    const colours = {
+        year: 'rgba(255, 255, 255, 0.5)',
+        month: '#fff',
+        week: '#aaa',
+        day: '#666',
+        hour: '#444'
+    };
+
+    $: if (startYear + showYears < new Date().getFullYear()) {
+        if (browser) alert(`Born in ${startYear}?? You are old!`);
+        startYear = new Date().getFullYear() - showYears;
+    }
+
+    $: if (startYear > new Date().getFullYear()) {
+        if (browser) alert(`Born in ${startYear}?? You are young!`);
+        startYear = new Date().getFullYear();
+    }
+
+    function drawYears(state: RenderProps) {
+        let year = Math.max(
+            new Date(state.renderPosToTime(0) * 1000).getFullYear() || 0,
+            startYear
+        );
+
+        let showYearText = state.zoom >= 2e-6;
+        let showBothSidesText = state.zoom >= 1e-5;
+
+        while (true) {
+            let renderPos = state.dateToRenderPos(year, 0, 1);
+
+            if (renderPos > state.width) break;
+            if (year - startYear > showYears) break;
+
+            // -1 to center, as has width 3
+            state.rect(renderPos - 1, 0, 3, state.height, {
+                radius: 0,
+                colour: colours.year
+            });
+
+            if (showYearText) {
+                state.text(year.toString(), renderPos + 5, NAVBAR_HEIGHT + 10);
+            }
+            if (showBothSidesText) {
+                state.text(
+                    (year - 1).toString(),
+                    renderPos - 25,
+                    NAVBAR_HEIGHT + 10
+                );
+            }
+
+            year++;
+        }
+    }
+
+    function drawMonths(state: RenderProps) {
+        if (state.zoom < 1e-5) return;
+
+        let year = Math.max(
+            new Date(state.renderPosToTime(0) * 1000).getFullYear() || 0,
+            startYear
+        );
+
+        let month = 0;
+
+        let showMonthText = state.zoom >= 1e-5;
+        let showYear = state.zoom >= 1e-4;
+
+        while (true) {
+            let renderPos = state.dateToRenderPos(year, month, 1);
+
+            if (renderPos > state.width) break;
+
+            state.rect(renderPos, 0, 1, state.height, {
+                colour: colours.month
+            });
+
+            if (showMonthText) {
+                let text = monthIdxToName(month);
+                if (showYear) text += ` ${year}`;
+                state.text(text, renderPos + 6, NAVBAR_HEIGHT + 20);
+            }
+
+            month++;
+            if (month > 11) {
+                month = 0;
+                year++;
+            }
+        }
+    }
+
+    function drawDays(state: RenderProps) {
+        if (state.zoom < 5e-5) return;
+
+        let leftMost = state.renderPosToTime(0);
+        const thisWeek = fmtUtc(nowS(), currentTzOffset(), 'YYYY-WW');
+        const lastWeek = fmtUtc(nowS() - 604800, currentTzOffset(), 'YYYY-WW');
+        const nextWeek = fmtUtc(nowS() + 604800, currentTzOffset(), 'YYYY-WW');
+
+        const firstDayTimestamp = new Date(startYear, 0, 1).getTime() / 1000;
+        if (leftMost < firstDayTimestamp) {
+            leftMost = firstDayTimestamp;
+        }
+
+        let day = Math.floor(leftMost / 86400) * 86400;
+        // deal with timezones
+        day -= currentTzOffset() * 60 * 60;
+        // put at midday for daylight saving's issues
+        day += 12 * 60 * 60;
+
+        const showDayText = state.zoom >= 1.2e-3;
+        const showDays = state.zoom >= 5e-4;
+        const showWeekText = state.zoom >= 1.2e-4;
+
+        while (true) {
+            const dayDate = new Date(day * 1000);
+            let dayStart =
+                new Date(
+                    dayDate.getFullYear(),
+                    dayDate.getMonth(),
+                    dayDate.getDate()
+                ).getTime() / 1000;
+            let renderPos = state.timeToRenderPos(dayStart);
+
+            if (renderPos > state.width) break;
+
+            const isMonday =
+                fmtUtc(dayStart, currentTzOffset(), 'ddd') === 'Mon';
+
+            const shouldShow = isMonday || showDays;
+
+            if (shouldShow) {
+                state.rect(renderPos, 0, 1, state.height, {
+                    colour: isMonday ? colours.week : colours.day
+                });
+            }
+
+            if (showDayText && shouldShow) {
+                let text = fmtUtc(dayStart, currentTzOffset(), 'ddd Do');
+
+                if (
+                    fmtUtc(dayStart, currentTzOffset(), 'YYY-MM-DD') ===
+                    fmtUtc(nowS(), currentTzOffset(), 'YYY-MM-DD')
+                ) {
+                    text += ' (Today)';
+                } else if (
+                    fmtUtc(dayStart, currentTzOffset(), 'YYY-MM-DD') ===
+                    fmtUtc(nowS() - 86400, currentTzOffset(), 'YYY-MM-DD')
+                ) {
+                    text += ' (Yesterday)';
+                } else if (
+                    fmtUtc(dayStart, currentTzOffset(), 'YYY-MM-DD') ===
+                    fmtUtc(nowS() + 86400, currentTzOffset(), 'YYY-MM-DD')
+                ) {
+                    text += ' (Tomorrow)';
+                }
+
+                state.text(text, renderPos + 6, NAVBAR_HEIGHT + 40);
+            }
+
+            const week = fmtUtc(dayStart, currentTzOffset(), 'YYYY-WW');
+
+            if (showWeekText && isMonday) {
+                let text;
+                if (week === thisWeek) {
+                    text = 'This week';
+                } else if (week === lastWeek) {
+                    text = 'Last week';
+                } else if (week === nextWeek) {
+                    text = 'Next week';
+                } else {
+                    const [thisYear, thisWeekIdx] = thisWeek
+                        .split('-')
+                        .map(parseInt);
+                    const [weekYear, weekIdx] = week.split('-').map(parseInt);
+
+                    if (thisYear === weekYear && thisWeekIdx > weekIdx) {
+                        text = `${thisWeekIdx - weekIdx} weeks ago`;
+                    }
+                }
+
+                if (text) {
+                    state.text(text, renderPos + 6, NAVBAR_HEIGHT + 30);
+                }
+            }
+
+            day += 86400;
+        }
+    }
+
+    function drawHours(state: RenderProps) {
+        if (state.zoom < 5e-3) return;
+
+        let leftMost = state.renderPosToTime(0);
+
+        const firstHourTimestamp = new Date(startYear, 0, 1).getTime() / 1000;
+        if (leftMost < firstHourTimestamp) {
+            leftMost = firstHourTimestamp;
+        }
+
+        let hour = Math.floor(leftMost / (60 * 60)) * (60 * 60);
+        // deal with timezones
+        hour -= currentTzOffset() * 60 * 60;
+
+        const showHourText = state.zoom >= 1.2e-2;
+
+        while (true) {
+            let renderPos = state.timeToRenderPos(hour);
+
+            if (renderPos > state.width) break;
+
+            state.rect(renderPos, 0, 1, state.height, {
+                colour: colours.hour
+            });
+
+            if (showHourText) {
+                state.text(
+                    fmtUtc(hour, currentTzOffset(), 'ha'),
+                    renderPos + 6,
+                    NAVBAR_HEIGHT + 50
+                );
+            }
+
+            hour += 60 * 60;
+        }
+    }
+
+    renderable(state => {
+        drawHours(state);
+        drawDays(state);
+        drawMonths(state);
+        drawYears(state);
+    });
+</script>
 
 <slot />

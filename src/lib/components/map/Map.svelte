@@ -1,6 +1,359 @@
-<script context="module" lang="ts" ✂prettier:content✂="CiAgICBsZXQgaWQgPSAyMDsKCiAgICBleHBvcnQgZnVuY3Rpb24gZ2V0SWQgKCk6IHN0cmluZyB7CiAgICAgICAgcmV0dXJuIChpZCsrKS50b1N0cmluZygpOwogICAgfQo=">{}</script>
+<script context="module" lang="ts">
+    let id = 20;
 
-<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgeyBDb2xsZWN0aW9uIH0gZnJvbSAnb2wnOwogICAgaW1wb3J0IHR5cGUgeyBDYWxsYmFja09iamVjdCB9IGZyb20gJ29sLWNvbnRleHRtZW51L2Rpc3QvdHlwZXMnOwogICAgaW1wb3J0IHR5cGUgeyBDaXJjbGUgfSBmcm9tICdvbC9nZW9tJzsKICAgIGltcG9ydCB7IE1vZGlmeSB9IGZyb20gJ29sL2ludGVyYWN0aW9uJzsKICAgIGltcG9ydCB7IFN0eWxlIH0gZnJvbSAnb2wvc3R5bGUnOwogICAgaW1wb3J0IHsgZ2V0Tm90aWZpY2F0aW9uc0NvbnRleHQgfSBmcm9tICdzdmVsdGUtbm90aWZpY2F0aW9ucyc7CiAgICBpbXBvcnQgeyB3cml0YWJsZSB9IGZyb20gJ3N2ZWx0ZS9zdG9yZSc7CiAgICBpbXBvcnQgeyBlcnJvckxvZ2dlciB9IGZyb20gJy4uLy4uL3V0aWxzL2xvZyc7CiAgICBpbXBvcnQgeyBkaXNwbGF5Tm90aWZPbkVyciB9IGZyb20gJy4uLy4uL3V0aWxzL25vdGlmaWNhdGlvbnMnOwogICAgaW1wb3J0IHR5cGUgeyBNYXBCcm93c2VyRXZlbnQgfSBmcm9tICdvbCc7CiAgICBpbXBvcnQgTWFwIGZyb20gJ29sL01hcCc7CiAgICBpbXBvcnQgVGlsZUxheWVyIGZyb20gJ29sL2xheWVyL1RpbGUnOwogICAgaW1wb3J0IFZpZXcgZnJvbSAnb2wvVmlldyc7CiAgICBpbXBvcnQgT1NNIGZyb20gJ29sL3NvdXJjZS9PU00nOwogICAgaW1wb3J0IFNvdXJjZVZlY3RvciBmcm9tICdvbC9zb3VyY2UvVmVjdG9yJzsKICAgIGltcG9ydCBMYXllclZlY3RvciBmcm9tICdvbC9sYXllci9WZWN0b3InOwogICAgaW1wb3J0IE92ZXJsYXkgZnJvbSAnb2wvT3ZlcmxheSc7CiAgICBpbXBvcnQgQ29udGV4dE1lbnUgZnJvbSAnb2wtY29udGV4dG1lbnUnOwogICAgaW1wb3J0IHsgZnJvbUxvbkxhdCwgdG9Mb25MYXQgfSBmcm9tICdvbC9wcm9qJzsKICAgIGltcG9ydCB0eXBlIHsgRW50cnlMb2NhdGlvbiB9IGZyb20gJy4uLy4uLy4uL3JvdXRlcy9zdGF0cy9oZWxwZXJzJzsKICAgIGltcG9ydCB0eXBlIHsgQXV0aCB9IGZyb20gJy4uLy4uL2NvbnRyb2xsZXJzL3VzZXInOwogICAgaW1wb3J0IHsgTG9jYXRpb24gfSBmcm9tICcuLi8uLi9jb250cm9sbGVycy9sb2NhdGlvbic7CiAgICBpbXBvcnQgeyBwb3B1cCB9IGZyb20gJy4uLy4uL3N0b3Jlcyc7CiAgICBpbXBvcnQgeyBhcGksIGFwaVBhdGggfSBmcm9tICcuLi8uLi91dGlscy9hcGlSZXF1ZXN0JzsKICAgIGltcG9ydCB7IHNob3dQb3B1cCB9IGZyb20gJy4uLy4uL3V0aWxzL3BvcHVwcyc7CiAgICBpbXBvcnQgRWRpdExvY2F0aW9uIGZyb20gJy4uL0VkaXRMb2NhdGlvbi5zdmVsdGUnOwogICAgaW1wb3J0IEVudHJ5RGlhbG9nIGZyb20gJy4uL2RpYWxvZ3MvRW50cnlEaWFsb2cuc3ZlbHRlJzsKICAgIGltcG9ydCBFbnRyeVRvb2x0aXBPbk1hcCBmcm9tICcuL0VudHJ5VG9vbHRpcE9uTWFwLnN2ZWx0ZSc7CiAgICBpbXBvcnQgewogICAgICAgIHR5cGUgRW50cnlGZWF0dXJlLAogICAgICAgIGxhc3RFbnRyeSwKICAgICAgICB0eXBlIExvY2F0aW9uRmVhdHVyZSwKICAgICAgICBvbEZlYXR1cmVGcm9tRW50cnksCiAgICAgICAgb2xGZWF0dXJlRnJvbUxvY2F0aW9uCiAgICB9IGZyb20gJy4vbWFwJzsKCiAgICBjb25zdCB7IGFkZE5vdGlmaWNhdGlvbiB9ID0gZ2V0Tm90aWZpY2F0aW9uc0NvbnRleHQoKTsKCiAgICBleHBvcnQgbGV0IGVudHJpZXM6IEVudHJ5TG9jYXRpb25bXSA9IFtdOwogICAgZXhwb3J0IGxldCBsb2NhdGlvbnM6IExvY2F0aW9uW10gPSBbXTsKICAgIGV4cG9ydCBsZXQgYXV0aDogQXV0aDsKCiAgICBsZXQgbWFwSWQgPSBnZXRJZCgpOwogICAgbGV0IHRvb2x0aXA6IEhUTUxFbGVtZW50OwogICAgbGV0IGhvdmVyaW5nRW50cnlJZDogc3RyaW5nIHwgbnVsbCA9IG51bGw7CiAgICBsZXQgcG9wdXBPblJpZ2h0ID0gZmFsc2U7CiAgICBsZXQgaG92ZXJpbmdTb21ldGhpbmcgPSBmYWxzZTsKICAgIGxldCBtYXBab29tID0gd3JpdGFibGU8bnVtYmVyIHwgdW5kZWZpbmVkPih1bmRlZmluZWQpOwogICAgbGV0IG1hcENlbnRlciA9IHdyaXRhYmxlPG51bWJlcltdIHwgdW5kZWZpbmVkPih1bmRlZmluZWQpOwoKICAgIGxldCBsb2NhdGlvbkNoYW5nZVF1ZXVlOiBSZWNvcmQ8CiAgICAgICAgc3RyaW5nLAogICAgICAgIHsKICAgICAgICAgICAgcmFkaXVzOiBudW1iZXI7CiAgICAgICAgICAgIGxhdGl0dWRlOiBudW1iZXI7CiAgICAgICAgICAgIGxvbmdpdHVkZTogbnVtYmVyOwogICAgICAgIH1bXQogICAgPiA9IHt9OwoKICAgIGFzeW5jIGZ1bmN0aW9uIHJlbG9hZExvY2F0aW9ucyAoKSB7CiAgICAgICAgY29uc3QgcmVzID0gZGlzcGxheU5vdGlmT25FcnIoCiAgICAgICAgICAgIGFkZE5vdGlmaWNhdGlvbiwKICAgICAgICAgICAgYXdhaXQgYXBpLmdldChhdXRoLCAnL2xvY2F0aW9ucycpCiAgICAgICAgKTsKICAgICAgICBsb2NhdGlvbnMgPSByZXMubG9jYXRpb25zOwogICAgfQoKICAgIGFzeW5jIGZ1bmN0aW9uIHN5bmNMb2NhdGlvbkluQmFja2dyb3VuZCAoCiAgICAgICAgaWQ6IHN0cmluZywKICAgICAgICBsYXRpdHVkZTogbnVtYmVyLAogICAgICAgIGxvbmdpdHVkZTogbnVtYmVyLAogICAgICAgIHJhZGl1czogbnVtYmVyCiAgICApOiBQcm9taXNlPHZvaWQ+IHsKICAgICAgICBkaXNwbGF5Tm90aWZPbkVycigKICAgICAgICAgICAgYWRkTm90aWZpY2F0aW9uLAogICAgICAgICAgICBhd2FpdCBhcGkucHV0KGF1dGgsIGFwaVBhdGgoJy9sb2NhdGlvbnMvPycsIGlkKSwgewogICAgICAgICAgICAgICAgbGF0aXR1ZGUsCiAgICAgICAgICAgICAgICBsb25naXR1ZGUsCiAgICAgICAgICAgICAgICByYWRpdXMKICAgICAgICAgICAgfSkKICAgICAgICApOwogICAgfQoKICAgIHNldEludGVydmFsKCgpID0+IHsKICAgICAgICBmb3IgKGNvbnN0IFsgaWQsIGNoYW5nZXMgXSBvZiBPYmplY3QuZW50cmllcyhsb2NhdGlvbkNoYW5nZVF1ZXVlKSkgewogICAgICAgICAgICBjb25zdCBsYXN0ID0gY2hhbmdlc1tjaGFuZ2VzLmxlbmd0aCAtIDFdOwogICAgICAgICAgICB2b2lkIHN5bmNMb2NhdGlvbkluQmFja2dyb3VuZCgKICAgICAgICAgICAgICAgIGlkLAogICAgICAgICAgICAgICAgbGFzdC5sYXRpdHVkZSwKICAgICAgICAgICAgICAgIGxhc3QubG9uZ2l0dWRlLAogICAgICAgICAgICAgICAgbGFzdC5yYWRpdXMKICAgICAgICAgICAgKTsKICAgICAgICB9CiAgICAgICAgbG9jYXRpb25DaGFuZ2VRdWV1ZSA9IHt9OwogICAgfSwgNTAwKTsKCiAgICBhc3luYyBmdW5jdGlvbiBhZGROYW1lZExvY2F0aW9uIChvYmplY3Q6IENhbGxiYWNrT2JqZWN0KSB7CiAgICAgICAgY29uc3QgY29vcmRpbmF0ZSA9IG9iamVjdC5jb29yZGluYXRlOwogICAgICAgIGNvbnN0IFsgbG9uZywgbGF0IF0gPSB0b0xvbkxhdChjb29yZGluYXRlKTsKCiAgICAgICAgZGlzcGxheU5vdGlmT25FcnIoCiAgICAgICAgICAgIGFkZE5vdGlmaWNhdGlvbiwKICAgICAgICAgICAgYXdhaXQgYXBpLnBvc3QoYXV0aCwgJy9sb2NhdGlvbnMnLCB7CiAgICAgICAgICAgICAgICBsYXRpdHVkZTogbGF0LAogICAgICAgICAgICAgICAgbG9uZ2l0dWRlOiBsb25nLAogICAgICAgICAgICAgICAgbmFtZTogJ05ldyBMb2NhdGlvbicsCiAgICAgICAgICAgICAgICByYWRpdXM6IExvY2F0aW9uLm1ldGVyc1RvRGVncmVlcyg1MCkKICAgICAgICAgICAgfSkKICAgICAgICApOwoKICAgICAgICBhd2FpdCByZWxvYWRMb2NhdGlvbnMoKTsKICAgIH0KCiAgICBmdW5jdGlvbiBzZXR1cE1hcCAoCiAgICAgICAgbm9kZTogSFRNTEVsZW1lbnQsCiAgICAgICAgewogICAgICAgICAgICBsb2NhdGlvbnMsCiAgICAgICAgICAgIGVudHJpZXMKICAgICAgICB9OiB7CiAgICAgICAgICAgIGxvY2F0aW9uczogTG9jYXRpb25bXTsKICAgICAgICAgICAgZW50cmllczogRW50cnlMb2NhdGlvbltdOwogICAgICAgIH0KICAgICk6IE1hcCB7CiAgICAgICAgY29uc3Qgb3NtTGF5ZXIgPSBuZXcgVGlsZUxheWVyKHsKICAgICAgICAgICAgc291cmNlOiBuZXcgT1NNKCkKICAgICAgICB9KTsKCiAgICAgICAgY29uc3QgbGFzdCA9IGxhc3RFbnRyeShlbnRyaWVzKTsKCiAgICAgICAgbGV0IGNlbnRlciA9IFsgMCwgMCBdOwogICAgICAgIGlmICgkbWFwQ2VudGVyKSB7CiAgICAgICAgICAgIGNlbnRlciA9ICRtYXBDZW50ZXI7CiAgICAgICAgfSBlbHNlIGlmIChsYXN0ICYmIGxhc3QubGF0aXR1ZGUgJiYgbGFzdC5sb25naXR1ZGUpIHsKICAgICAgICAgICAgY2VudGVyID0gZnJvbUxvbkxhdChbIGxhc3QubG9uZ2l0dWRlLCBsYXN0LmxhdGl0dWRlIF0pOwogICAgICAgIH0KCiAgICAgICAgbGV0IHpvb20gPSAxOwogICAgICAgIGlmICgkbWFwWm9vbSkgewogICAgICAgICAgICB6b29tID0gJG1hcFpvb207CiAgICAgICAgfSBlbHNlIGlmIChsYXN0KSB7CiAgICAgICAgICAgIC8vIHpvb20gaW4gaWYgZm9jdXNlZCBvbiBsYXN0IG9uZSwgZWxzZSBnbyB3aWRlCiAgICAgICAgICAgIHpvb20gPSAxOTsKICAgICAgICB9CgogICAgICAgIGxldCBtYXAgPSBuZXcgTWFwKHsKICAgICAgICAgICAgdGFyZ2V0OiBub2RlLmlkLAogICAgICAgICAgICBsYXllcnM6IFsgb3NtTGF5ZXIgXSwKICAgICAgICAgICAgdmlldzogbmV3IFZpZXcoeyBjZW50ZXIsIHpvb20gfSkKICAgICAgICB9KTsKCiAgICAgICAgY29uc3QgbG9jYXRpb25GZWF0dXJlcyA9IGxvY2F0aW9ucy5tYXAob2xGZWF0dXJlRnJvbUxvY2F0aW9uKTsKCiAgICAgICAgbWFwLmFkZExheWVyKAogICAgICAgICAgICBuZXcgTGF5ZXJWZWN0b3IoewogICAgICAgICAgICAgICAgc291cmNlOiBuZXcgU291cmNlVmVjdG9yKHsKICAgICAgICAgICAgICAgICAgICBmZWF0dXJlczogbG9jYXRpb25GZWF0dXJlcwogICAgICAgICAgICAgICAgfSkKICAgICAgICAgICAgfSkKICAgICAgICApOwoKICAgICAgICBmb3IgKGNvbnN0IGZlYXR1cmUgb2YgbG9jYXRpb25GZWF0dXJlcykgewogICAgICAgICAgICBjb25zdCBkcmFnSW50ZXJhY3Rpb24gPSBuZXcgTW9kaWZ5KHsKICAgICAgICAgICAgICAgIGZlYXR1cmVzOiBuZXcgQ29sbGVjdGlvbihbIGZlYXR1cmUgXSksCiAgICAgICAgICAgICAgICBzdHlsZTogbmV3IFN0eWxlKHsKICAgICAgICAgICAgICAgICAgICByZW5kZXJlciAoWyB4LCB5IF0sIHN0YXRlKSB7CiAgICAgICAgICAgICAgICAgICAgICAgIGNvbnN0IGN0eCA9IHN0YXRlLmNvbnRleHQ7CgogICAgICAgICAgICAgICAgICAgICAgICBpZiAodHlwZW9mIHggIT09ICdudW1iZXInIHx8IHR5cGVvZiB5ICE9PSAnbnVtYmVyJykgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgZXJyb3JMb2dnZXIuZXJyb3IoJ3ggb3IgeSBpcyBub3QgYSBudW1iZXInLCB4LCB5KTsKICAgICAgICAgICAgICAgICAgICAgICAgICAgIHJldHVybjsKICAgICAgICAgICAgICAgICAgICAgICAgfQoKICAgICAgICAgICAgICAgICAgICAgICAgY3R4LmJlZ2luUGF0aCgpOwogICAgICAgICAgICAgICAgICAgICAgICBjdHguYXJjKHgsIHksIDUsIDAsIDIgKiBNYXRoLlBJKTsKICAgICAgICAgICAgICAgICAgICAgICAgY3R4LnN0cm9rZVN0eWxlID0gJ3JnYmEoNzQsNzQsNzQsMC42KSc7CiAgICAgICAgICAgICAgICAgICAgICAgIGN0eC5zdHJva2UoKTsKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICB9KQogICAgICAgICAgICB9KTsKICAgICAgICAgICAgbWFwLmFkZEludGVyYWN0aW9uKGRyYWdJbnRlcmFjdGlvbik7CgogICAgICAgICAgICBmZWF0dXJlLm9uKCdjaGFuZ2UnLCBldnQgPT4gewogICAgICAgICAgICAgICAgY29uc3QgdGFyZ2V0ID0gZXZ0LnRhcmdldCBhcyBMb2NhdGlvbkZlYXR1cmU7CiAgICAgICAgICAgICAgICBjb25zdCBnZW9tZXRyeSA9IHRhcmdldC5nZXRHZW9tZXRyeSgpIGFzIENpcmNsZTsKICAgICAgICAgICAgICAgIGNvbnN0IGNlbnRlciA9IGdlb21ldHJ5LmdldENlbnRlcigpOwogICAgICAgICAgICAgICAgY29uc3QgWyBsb25nLCBsYXQgXSA9IHRvTG9uTGF0KGNlbnRlcik7CiAgICAgICAgICAgICAgICBjb25zdCByYWRpdXMgPSBMb2NhdGlvbi5tZXRlcnNUb0RlZ3JlZXMoZ2VvbWV0cnkuZ2V0UmFkaXVzKCkpOwogICAgICAgICAgICAgICAgY29uc3QgaWQgPSBmZWF0dXJlLmxvY2F0aW9uLmlkOwoKICAgICAgICAgICAgICAgIGlmICghbG9jYXRpb25DaGFuZ2VRdWV1ZVtpZF0pIHsKICAgICAgICAgICAgICAgICAgICBsb2NhdGlvbkNoYW5nZVF1ZXVlW2lkXSA9IFtdOwogICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgbG9jYXRpb25DaGFuZ2VRdWV1ZVtpZF0ucHVzaCh7CiAgICAgICAgICAgICAgICAgICAgbGF0aXR1ZGU6IGxhdCwKICAgICAgICAgICAgICAgICAgICBsb25naXR1ZGU6IGxvbmcsCiAgICAgICAgICAgICAgICAgICAgcmFkaXVzCiAgICAgICAgICAgICAgICB9KTsKCiAgICAgICAgICAgICAgICB0YXJnZXQubG9jYXRpb24ubGF0aXR1ZGUgPSBsYXQ7CiAgICAgICAgICAgICAgICB0YXJnZXQubG9jYXRpb24ubG9uZ2l0dWRlID0gbG9uZzsKICAgICAgICAgICAgICAgIHRhcmdldC5sb2NhdGlvbi5yYWRpdXMgPSByYWRpdXM7CiAgICAgICAgICAgIH0pOwogICAgICAgIH0KCiAgICAgICAgbWFwLmFkZExheWVyKAogICAgICAgICAgICBuZXcgTGF5ZXJWZWN0b3IoewogICAgICAgICAgICAgICAgc291cmNlOiBuZXcgU291cmNlVmVjdG9yKHsKICAgICAgICAgICAgICAgICAgICBmZWF0dXJlczogZW50cmllcy5tYXAob2xGZWF0dXJlRnJvbUVudHJ5KS5maWx0ZXIoQm9vbGVhbikKICAgICAgICAgICAgICAgIH0pCiAgICAgICAgICAgIH0pCiAgICAgICAgKTsKCiAgICAgICAgbWFwLm9uKCdzaW5nbGVjbGljaycsIChldmVudDogTWFwQnJvd3NlckV2ZW50PFVJRXZlbnQ+KSA9PiB7CiAgICAgICAgICAgIGlmICghbWFwKSByZXR1cm47CgogICAgICAgICAgICBsZXQgZmVhdHVyZXMgPSBtYXAuZ2V0RmVhdHVyZXNBdFBpeGVsKGV2ZW50LnBpeGVsKTsKCiAgICAgICAgICAgIGlmICghZmVhdHVyZXMubGVuZ3RoKSB7CiAgICAgICAgICAgICAgICBwb3B1cC5zZXQobnVsbCk7CiAgICAgICAgICAgICAgICByZXR1cm47CiAgICAgICAgICAgIH0KCiAgICAgICAgICAgIGZlYXR1cmVzID0gZmVhdHVyZXMKICAgICAgICAgICAgICAgIC5maWx0ZXIoCiAgICAgICAgICAgICAgICAgICAgKGZlYXR1cmUpOiBmZWF0dXJlIGlzIExvY2F0aW9uRmVhdHVyZSB8IEVudHJ5RmVhdHVyZSA9PiB7CiAgICAgICAgICAgICAgICAgICAgICAgIC8vIG9ubHkgbG9jYXRpb25zIGFuZCBlbnRyaWVzIGFyZSBjbGlja2FibGUKICAgICAgICAgICAgICAgICAgICAgICAgaWYgKCdlbnRyeScgaW4gZmVhdHVyZSkgewogICAgICAgICAgICAgICAgICAgICAgICAgICAgcmV0dXJuIHRydWU7CiAgICAgICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICAgICAgcmV0dXJuICdsb2NhdGlvbicgaW4gZmVhdHVyZTsKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICApCiAgICAgICAgICAgICAgICAuc29ydCgoYSwgYikgPT4gewogICAgICAgICAgICAgICAgICAgIC8vIHBpY2sgZW50cmllcyBvdmVyIGxvY2F0aW9ucwogICAgICAgICAgICAgICAgICAgIGlmICgnZW50cnknIGluIGEgJiYgJ2VudHJ5JyBpbiBiKSB7CiAgICAgICAgICAgICAgICAgICAgICAgIHJldHVybiAwOwogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgICAgICBpZiAoJ2VudHJ5JyBpbiBhKSB7CiAgICAgICAgICAgICAgICAgICAgICAgIHJldHVybiAtMTsKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgcmV0dXJuIDE7CiAgICAgICAgICAgICAgICB9KQogICAgICAgICAgICAgICAgLnNvcnQoKGEsIGIpID0+IHsKICAgICAgICAgICAgICAgICAgICBpZiAoISgnbG9jYXRpb24nIGluIGEpIHx8ICEoJ2xvY2F0aW9uJyBpbiBiKSkgewogICAgICAgICAgICAgICAgICAgICAgICByZXR1cm4gMDsKICAgICAgICAgICAgICAgICAgICB9CiAgICAgICAgICAgICAgICAgICAgLy8gcGljayBzbWFsbGVyIGxvY2F0aW9ucyBvdmVyIGxhcmdlciBvbmVzCiAgICAgICAgICAgICAgICAgICAgcmV0dXJuIGEubG9jYXRpb24ucmFkaXVzIC0gYi5sb2NhdGlvbi5yYWRpdXM7CiAgICAgICAgICAgICAgICB9KTsKCiAgICAgICAgICAgIGNvbnN0IGhvdmVyaW5nID0gZmVhdHVyZXNbMF0gYXMgRW50cnlGZWF0dXJlIHwgTG9jYXRpb25GZWF0dXJlOwoKICAgICAgICAgICAgaWYgKCdlbnRyeScgaW4gaG92ZXJpbmcpIHsKICAgICAgICAgICAgICAgIHNob3dQb3B1cChFbnRyeURpYWxvZywgewogICAgICAgICAgICAgICAgICAgIGlkOiBob3ZlcmluZy5lbnRyeS5pZCwKICAgICAgICAgICAgICAgICAgICBhdXRoLAogICAgICAgICAgICAgICAgICAgIG9iZnVzY2F0ZWQ6IGZhbHNlCiAgICAgICAgICAgICAgICB9KTsKICAgICAgICAgICAgICAgIHJldHVybjsKICAgICAgICAgICAgfQoKICAgICAgICAgICAgaWYgKCdsb2NhdGlvbicgaW4gaG92ZXJpbmcpIHsKICAgICAgICAgICAgICAgIHNob3dQb3B1cChFZGl0TG9jYXRpb24sIHsKICAgICAgICAgICAgICAgICAgICAuLi5ob3ZlcmluZy5sb2NhdGlvbiwKICAgICAgICAgICAgICAgICAgICBhdXRoLAogICAgICAgICAgICAgICAgICAgIG9uQ2hhbmdlOiByZWxvYWRMb2NhdGlvbnMsCiAgICAgICAgICAgICAgICAgICAgaXNJbkRpYWxvZzogdHJ1ZQogICAgICAgICAgICAgICAgfSk7CiAgICAgICAgICAgIH0KICAgICAgICB9KTsKCiAgICAgICAgbWFwLmFkZENvbnRyb2woCiAgICAgICAgICAgIG5ldyBDb250ZXh0TWVudSh7CiAgICAgICAgICAgICAgICB3aWR0aDogMTgwLAogICAgICAgICAgICAgICAgaXRlbXM6IFsKICAgICAgICAgICAgICAgICAgICB7CiAgICAgICAgICAgICAgICAgICAgICAgIHRleHQ6ICdBZGQgTmFtZWQgTG9jYXRpb24nLAogICAgICAgICAgICAgICAgICAgICAgICBjbGFzc25hbWU6ICdjb250ZXh0LW1lbnUtb3B0aW9uJywKICAgICAgICAgICAgICAgICAgICAgICAgY2FsbGJhY2s6IChvOiBDYWxsYmFja09iamVjdCkgPT4KICAgICAgICAgICAgICAgICAgICAgICAgICAgIHZvaWQgYWRkTmFtZWRMb2NhdGlvbihvKQogICAgICAgICAgICAgICAgICAgIH0KICAgICAgICAgICAgICAgIF0KICAgICAgICAgICAgfSkKICAgICAgICApOwoKICAgICAgICBtYXAuYWRkT3ZlcmxheSgKICAgICAgICAgICAgbmV3IE92ZXJsYXkoewogICAgICAgICAgICAgICAgZWxlbWVudDogdG9vbHRpcCwKICAgICAgICAgICAgICAgIGF1dG9QYW46IHRydWUKICAgICAgICAgICAgfSkKICAgICAgICApOwoKICAgICAgICBtYXAub24oJ3BvaW50ZXJtb3ZlJywgKGV2ZW50OiBNYXBCcm93c2VyRXZlbnQ8VUlFdmVudD4pID0+IHsKICAgICAgICAgICAgaWYgKCFtYXApIHJldHVybjsKCiAgICAgICAgICAgIGNvbnN0IGZlYXR1cmVzID0gbWFwLmdldEZlYXR1cmVzQXRQaXhlbChldmVudC5waXhlbCk7CgogICAgICAgICAgICBpZiAoIWZlYXR1cmVzLmxlbmd0aCkgewogICAgICAgICAgICAgICAgaG92ZXJpbmdFbnRyeUlkID0gbnVsbDsKICAgICAgICAgICAgICAgIGhvdmVyaW5nU29tZXRoaW5nID0gZmFsc2U7CiAgICAgICAgICAgICAgICByZXR1cm47CiAgICAgICAgICAgIH0KCiAgICAgICAgICAgIGhvdmVyaW5nU29tZXRoaW5nID0gdHJ1ZTsKCiAgICAgICAgICAgIGNvbnN0IGhvdmVyaW5nID0gZmVhdHVyZXNbMF0gYXMgRW50cnlGZWF0dXJlIHwgTG9jYXRpb25GZWF0dXJlOwoKICAgICAgICAgICAgaWYgKCEoJ2VudHJ5JyBpbiBob3ZlcmluZykpIHsKICAgICAgICAgICAgICAgIGhvdmVyaW5nRW50cnlJZCA9IG51bGw7CiAgICAgICAgICAgICAgICByZXR1cm47CiAgICAgICAgICAgIH0KCiAgICAgICAgICAgIGNvbnN0IG1hcFdpZHRoID0gbWFwLmdldFNpemUoKT8uWzBdIHx8IHdpbmRvdy5pbm5lcldpZHRoOwogICAgICAgICAgICAvLyBuZXZlciBoaWRlcyB0aGUgaG92ZXJlZCBlbnRyeQogICAgICAgICAgICBwb3B1cE9uUmlnaHQgPSBldmVudC5waXhlbFswXSA8IG1hcFdpZHRoIC8gMjsKICAgICAgICAgICAgaG92ZXJpbmdFbnRyeUlkID0gaG92ZXJpbmcuZW50cnkuaWQ7CiAgICAgICAgfSk7CgogICAgICAgIC8vIHNhdmUgdGhlIG1hcCB2aWV3CiAgICAgICAgbWFwLm9uKCdwb3N0cmVuZGVyJywgKCkgPT4gewogICAgICAgICAgICBjb25zdCB2aWV3ID0gbWFwLmdldFZpZXcoKTsKICAgICAgICAgICAgJG1hcFpvb20gPSB2aWV3LmdldFpvb20oKTsKICAgICAgICAgICAgJG1hcENlbnRlciA9IHZpZXcuZ2V0Q2VudGVyKCk7CiAgICAgICAgfSk7CgogICAgICAgIHJldHVybiBtYXA7CiAgICB9CgogICAgZnVuY3Rpb24gbWFwICgKICAgICAgICBub2RlOiBIVE1MRWxlbWVudCwKICAgICAgICB7CiAgICAgICAgICAgIGxvY2F0aW9ucywKICAgICAgICAgICAgZW50cmllcwogICAgICAgIH06IHsgbG9jYXRpb25zOiBMb2NhdGlvbltdOyBlbnRyaWVzOiBFbnRyeUxvY2F0aW9uW10gfQogICAgKSB7CiAgICAgICAgbGV0IG1hcCA9IHNldHVwTWFwKG5vZGUsIHsgbG9jYXRpb25zLCBlbnRyaWVzIH0pOwogICAgICAgIHJldHVybiB7CiAgICAgICAgICAgIGRlc3Ryb3kgKCkgewogICAgICAgICAgICAgICAgbWFwLnNldFRhcmdldCh1bmRlZmluZWQgYXMgdW5rbm93biBhcyBIVE1MRWxlbWVudCk7CiAgICAgICAgICAgIH0sCiAgICAgICAgICAgIHVwZGF0ZSAocHJvcHM6IHsgbG9jYXRpb25zOiBMb2NhdGlvbltdOyBlbnRyaWVzOiBFbnRyeUxvY2F0aW9uW10gfSkgewogICAgICAgICAgICAgICAgbWFwLnNldFRhcmdldCh1bmRlZmluZWQgYXMgdW5rbm93biBhcyBIVE1MRWxlbWVudCk7CiAgICAgICAgICAgICAgICBtYXAgPSBzZXR1cE1hcChub2RlLCBwcm9wcyk7CiAgICAgICAgICAgIH0KICAgICAgICB9OwogICAgfQo=">{}</script>
+    export function getId(): string {
+        return (id++).toString();
+    }
+</script>
+
+<script lang="ts">
+    import { Collection } from 'ol';
+    import type { CallbackObject } from 'ol-contextmenu/dist/types';
+    import type { Circle } from 'ol/geom';
+    import { Modify } from 'ol/interaction';
+    import { Style } from 'ol/style';
+    import { getNotificationsContext } from 'svelte-notifications';
+    import { writable } from 'svelte/store';
+    import { errorLogger } from '../../utils/log';
+    import { displayNotifOnErr } from '../../utils/notifications';
+    import type { MapBrowserEvent } from 'ol';
+    import Map from 'ol/Map';
+    import TileLayer from 'ol/layer/Tile';
+    import View from 'ol/View';
+    import OSM from 'ol/source/OSM';
+    import SourceVector from 'ol/source/Vector';
+    import LayerVector from 'ol/layer/Vector';
+    import Overlay from 'ol/Overlay';
+    import ContextMenu from 'ol-contextmenu';
+    import { fromLonLat, toLonLat } from 'ol/proj';
+    import type { EntryLocation } from '../../../routes/stats/helpers';
+    import type { Auth } from '../../controllers/user';
+    import { Location } from '../../controllers/location';
+    import { popup } from '../../stores';
+    import { api, apiPath } from '../../utils/apiRequest';
+    import { showPopup } from '../../utils/popups';
+    import EditLocation from '../EditLocation.svelte';
+    import EntryDialog from '../dialogs/EntryDialog.svelte';
+    import EntryTooltipOnMap from './EntryTooltipOnMap.svelte';
+    import {
+        type EntryFeature,
+        lastEntry,
+        type LocationFeature,
+        olFeatureFromEntry,
+        olFeatureFromLocation
+    } from './map';
+
+    const { addNotification } = getNotificationsContext();
+
+    export let entries: EntryLocation[] = [];
+    export let locations: Location[] = [];
+    export let auth: Auth;
+
+    let mapId = getId();
+    let tooltip: HTMLElement;
+    let hoveringEntryId: string | null = null;
+    let popupOnRight = false;
+    let hoveringSomething = false;
+    let mapZoom = writable<number | undefined>(undefined);
+    let mapCenter = writable<number[] | undefined>(undefined);
+
+    let locationChangeQueue: Record<
+        string,
+        {
+            radius: number;
+            latitude: number;
+            longitude: number;
+        }[]
+    > = {};
+
+    async function reloadLocations() {
+        const res = displayNotifOnErr(
+            addNotification,
+            await api.get(auth, '/locations')
+        );
+        locations = res.locations;
+    }
+
+    async function syncLocationInBackground(
+        id: string,
+        latitude: number,
+        longitude: number,
+        radius: number
+    ): Promise<void> {
+        displayNotifOnErr(
+            addNotification,
+            await api.put(auth, apiPath('/locations/?', id), {
+                latitude,
+                longitude,
+                radius
+            })
+        );
+    }
+
+    setInterval(() => {
+        for (const [id, changes] of Object.entries(locationChangeQueue)) {
+            const last = changes[changes.length - 1];
+            void syncLocationInBackground(
+                id,
+                last.latitude,
+                last.longitude,
+                last.radius
+            );
+        }
+        locationChangeQueue = {};
+    }, 500);
+
+    async function addNamedLocation(object: CallbackObject) {
+        const coordinate = object.coordinate;
+        const [long, lat] = toLonLat(coordinate);
+
+        displayNotifOnErr(
+            addNotification,
+            await api.post(auth, '/locations', {
+                latitude: lat,
+                longitude: long,
+                name: 'New Location',
+                radius: Location.metersToDegrees(50)
+            })
+        );
+
+        await reloadLocations();
+    }
+
+    function setupMap(
+        node: HTMLElement,
+        {
+            locations,
+            entries
+        }: {
+            locations: Location[];
+            entries: EntryLocation[];
+        }
+    ): Map {
+        const osmLayer = new TileLayer({
+            source: new OSM()
+        });
+
+        const last = lastEntry(entries);
+
+        let center = [0, 0];
+        if ($mapCenter) {
+            center = $mapCenter;
+        } else if (last && last.latitude && last.longitude) {
+            center = fromLonLat([last.longitude, last.latitude]);
+        }
+
+        let zoom = 1;
+        if ($mapZoom) {
+            zoom = $mapZoom;
+        } else if (last) {
+            // zoom in if focused on last one, else go wide
+            zoom = 19;
+        }
+
+        let map = new Map({
+            target: node.id,
+            layers: [osmLayer],
+            view: new View({ center, zoom })
+        });
+
+        const locationFeatures = locations.map(olFeatureFromLocation);
+
+        map.addLayer(
+            new LayerVector({
+                source: new SourceVector({
+                    features: locationFeatures
+                })
+            })
+        );
+
+        for (const feature of locationFeatures) {
+            const dragInteraction = new Modify({
+                features: new Collection([feature]),
+                style: new Style({
+                    renderer([x, y], state) {
+                        const ctx = state.context;
+
+                        if (typeof x !== 'number' || typeof y !== 'number') {
+                            errorLogger.error('x or y is not a number', x, y);
+                            return;
+                        }
+
+                        ctx.beginPath();
+                        ctx.arc(x, y, 5, 0, 2 * Math.PI);
+                        ctx.strokeStyle = 'rgba(74,74,74,0.6)';
+                        ctx.stroke();
+                    }
+                })
+            });
+            map.addInteraction(dragInteraction);
+
+            feature.on('change', evt => {
+                const target = evt.target as LocationFeature;
+                const geometry = target.getGeometry() as Circle;
+                const center = geometry.getCenter();
+                const [long, lat] = toLonLat(center);
+                const radius = Location.metersToDegrees(geometry.getRadius());
+                const id = feature.location.id;
+
+                if (!locationChangeQueue[id]) {
+                    locationChangeQueue[id] = [];
+                }
+                locationChangeQueue[id].push({
+                    latitude: lat,
+                    longitude: long,
+                    radius
+                });
+
+                target.location.latitude = lat;
+                target.location.longitude = long;
+                target.location.radius = radius;
+            });
+        }
+
+        map.addLayer(
+            new LayerVector({
+                source: new SourceVector({
+                    features: entries.map(olFeatureFromEntry).filter(Boolean)
+                })
+            })
+        );
+
+        map.on('singleclick', (event: MapBrowserEvent<UIEvent>) => {
+            if (!map) return;
+
+            let features = map.getFeaturesAtPixel(event.pixel);
+
+            if (!features.length) {
+                popup.set(null);
+                return;
+            }
+
+            features = features
+                .filter(
+                    (feature): feature is LocationFeature | EntryFeature => {
+                        // only locations and entries are clickable
+                        if ('entry' in feature) {
+                            return true;
+                        }
+                        return 'location' in feature;
+                    }
+                )
+                .sort((a, b) => {
+                    // pick entries over locations
+                    if ('entry' in a && 'entry' in b) {
+                        return 0;
+                    }
+                    if ('entry' in a) {
+                        return -1;
+                    }
+                    return 1;
+                })
+                .sort((a, b) => {
+                    if (!('location' in a) || !('location' in b)) {
+                        return 0;
+                    }
+                    // pick smaller locations over larger ones
+                    return a.location.radius - b.location.radius;
+                });
+
+            const hovering = features[0] as EntryFeature | LocationFeature;
+
+            if ('entry' in hovering) {
+                showPopup(EntryDialog, {
+                    id: hovering.entry.id,
+                    auth,
+                    obfuscated: false
+                });
+                return;
+            }
+
+            if ('location' in hovering) {
+                showPopup(EditLocation, {
+                    ...hovering.location,
+                    auth,
+                    onChange: reloadLocations,
+                    isInDialog: true
+                });
+            }
+        });
+
+        map.addControl(
+            new ContextMenu({
+                width: 180,
+                items: [
+                    {
+                        text: 'Add Named Location',
+                        classname: 'context-menu-option',
+                        callback: (o: CallbackObject) =>
+                            void addNamedLocation(o)
+                    }
+                ]
+            })
+        );
+
+        map.addOverlay(
+            new Overlay({
+                element: tooltip,
+                autoPan: true
+            })
+        );
+
+        map.on('pointermove', (event: MapBrowserEvent<UIEvent>) => {
+            if (!map) return;
+
+            const features = map.getFeaturesAtPixel(event.pixel);
+
+            if (!features.length) {
+                hoveringEntryId = null;
+                hoveringSomething = false;
+                return;
+            }
+
+            hoveringSomething = true;
+
+            const hovering = features[0] as EntryFeature | LocationFeature;
+
+            if (!('entry' in hovering)) {
+                hoveringEntryId = null;
+                return;
+            }
+
+            const mapWidth = map.getSize()?.[0] || window.innerWidth;
+            // never hides the hovered entry
+            popupOnRight = event.pixel[0] < mapWidth / 2;
+            hoveringEntryId = hovering.entry.id;
+        });
+
+        // save the map view
+        map.on('postrender', () => {
+            const view = map.getView();
+            $mapZoom = view.getZoom();
+            $mapCenter = view.getCenter();
+        });
+
+        return map;
+    }
+
+    function map(
+        node: HTMLElement,
+        {
+            locations,
+            entries
+        }: { locations: Location[]; entries: EntryLocation[] }
+    ) {
+        let map = setupMap(node, { locations, entries });
+        return {
+            destroy() {
+                map.setTarget(undefined as unknown as HTMLElement);
+            },
+            update(props: { locations: Location[]; entries: EntryLocation[] }) {
+                map.setTarget(undefined as unknown as HTMLElement);
+                map = setupMap(node, props);
+            }
+        };
+    }
+</script>
 
 <div
     class="map {hoveringSomething ? 'hovering' : ''}"
@@ -17,4 +370,78 @@
     {/if}
 </div>
 
-<style lang="less" ✂prettier:content✂="CiAgICBAaW1wb3J0ICdvbC1jb250ZXh0bWVudS9vbC1jb250ZXh0bWVudS5jc3MnOwogICAgQGltcG9ydCAnLi4vLi4vLi4vc3R5bGVzL3ZhcmlhYmxlcyc7CiAgICBAaW1wb3J0ICcuLi8uLi8uLi9zdHlsZXMvbGF5b3V0JzsKCiAgICAubWFwIHsKICAgICAgICAuY29udGFpbmVyKCk7CiAgICAgICAgcGFkZGluZzogMDsKICAgICAgICBoZWlnaHQ6IDg5dmg7CiAgICAgICAgbWFyZ2luOiAwIDAgMCAxcmVtOwogICAgICAgIHdpZHRoOiBjYWxjKDEwMHZ3IC0gNXJlbSk7CiAgICAgICAgYm9yZGVyOiBub25lOwogICAgICAgIHBvc2l0aW9uOiByZWxhdGl2ZTsKICAgICAgICBvdmVyZmxvdzogaGlkZGVuOwoKICAgICAgICBAbWVkaWEgQG1vYmlsZSB7CiAgICAgICAgICAgIHdpZHRoOiAxMDAlOwogICAgICAgICAgICBoZWlnaHQ6IGNhbGMoMTAwdmggLSB2YXIoLS1uYXYtaGVpZ2h0KSk7CiAgICAgICAgICAgIG1hcmdpbjogMDsKICAgICAgICAgICAgYm9yZGVyLXJhZGl1czogMDsKICAgICAgICB9CgogICAgICAgICYuaG92ZXJpbmcgewogICAgICAgICAgICBjdXJzb3I6IHBvaW50ZXI7CiAgICAgICAgfQoKICAgICAgICA6Z2xvYmFsKCopIHsKICAgICAgICAgICAgY29sb3I6IGJsYWNrOwogICAgICAgIH0KCiAgICAgICAgOmdsb2JhbCguY29udGV4dC1tZW51LW9wdGlvbiksCiAgICAgICAgOmdsb2JhbCgub2wtY3R4LW1lbnUtem9vbS1pbiksCiAgICAgICAgOmdsb2JhbCgub2wtY3R4LW1lbnUtem9vbS1vdXQpIHsKICAgICAgICAgICAgbWFyZ2luOiAwOwoKICAgICAgICAgICAgJjpob3ZlciB7CiAgICAgICAgICAgICAgICBiYWNrZ3JvdW5kOiAjZjBmMGYwOwogICAgICAgICAgICB9CiAgICAgICAgfQoKICAgICAgICA6Z2xvYmFsKC5vbC1hdHRyaWJ1dGlvbikgewogICAgICAgICAgICAvLyBzb3JyeSBidXQgaXQncyByZWFsbHkgbWVzc3kgOi8KICAgICAgICAgICAgZGlzcGxheTogbm9uZTsKICAgICAgICB9CiAgICB9CgogICAgLm9sLXBvcHVwIHsKICAgICAgICB6LWluZGV4OiAxMDsKICAgICAgICBwb3NpdGlvbjogYWJzb2x1dGU7CiAgICAgICAgdG9wOiAwLjVyZW07CiAgICAgICAgbGVmdDogMC41cmVtOwogICAgICAgIGJhY2tncm91bmQ6IHJnYmEoMjU1LCAyNTUsIDI1NSwgMC40KTsKICAgICAgICBiYWNrZHJvcC1maWx0ZXI6IGJsdXIoNXB4KTsKICAgICAgICBwYWRkaW5nOiAxNXB4OwogICAgICAgIGJvcmRlci1yYWRpdXM6IDEwcHg7CiAgICAgICAgYm94LXNoYWRvdzogMCAxcHggNHB4IHJnYmEoMCwgMCwgMCwgMC4yKTsKICAgICAgICBwb2ludGVyLWV2ZW50czogbm9uZTsKCiAgICAgICAgJiwKICAgICAgICA6Z2xvYmFsKCopIHsKICAgICAgICAgICAgY29sb3I6IGJsYWNrOwogICAgICAgIH0KCiAgICAgICAgJi5yaWdodCB7CiAgICAgICAgICAgIGxlZnQ6IGF1dG87CiAgICAgICAgICAgIHJpZ2h0OiAwLjVyZW07CiAgICAgICAgfQogICAgfQoKICAgIEBtZWRpYSBAbW9iaWxlIHsKICAgICAgICA6Z2xvYmFsKG1haW4pIHsKICAgICAgICAgICAgcGFkZGluZzogMDsKICAgICAgICB9CiAgICB9Cg=="></style>
+<style lang="less">
+    @import 'ol-contextmenu/ol-contextmenu.css';
+    @import '../../../styles/variables';
+    @import '../../../styles/layout';
+
+    .map {
+        .container();
+        padding: 0;
+        height: 89vh;
+        margin: 0 0 0 1rem;
+        width: calc(100vw - 5rem);
+        border: none;
+        position: relative;
+        overflow: hidden;
+
+        @media @mobile {
+            width: 100%;
+            height: calc(100vh - var(--nav-height));
+            margin: 0;
+            border-radius: 0;
+        }
+
+        &.hovering {
+            cursor: pointer;
+        }
+
+        :global(*) {
+            color: black;
+        }
+
+        :global(.context-menu-option),
+        :global(.ol-ctx-menu-zoom-in),
+        :global(.ol-ctx-menu-zoom-out) {
+            margin: 0;
+
+            &:hover {
+                background: #f0f0f0;
+            }
+        }
+
+        :global(.ol-attribution) {
+            // sorry but it's really messy :/
+            display: none;
+        }
+    }
+
+    .ol-popup {
+        z-index: 10;
+        position: absolute;
+        top: 0.5rem;
+        left: 0.5rem;
+        background: rgba(255, 255, 255, 0.4);
+        backdrop-filter: blur(5px);
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+        pointer-events: none;
+
+        &,
+        :global(*) {
+            color: black;
+        }
+
+        &.right {
+            left: auto;
+            right: 0.5rem;
+        }
+    }
+
+    @media @mobile {
+        :global(main) {
+            padding: 0;
+        }
+    }
+</style>

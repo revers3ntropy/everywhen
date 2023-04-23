@@ -1,4 +1,76 @@
-<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgeyBvbk1vdW50IH0gZnJvbSAnc3ZlbHRlJzsKICAgIGltcG9ydCB7IGdldE5vdGlmaWNhdGlvbnNDb250ZXh0IH0gZnJvbSAnc3ZlbHRlLW5vdGlmaWNhdGlvbnMnOwogICAgaW1wb3J0IFNwaW5uZXIgZnJvbSAnLi4vLi4vLi4vbGliL2NvbXBvbmVudHMvQm9va1NwaW5uZXIuc3ZlbHRlJzsKICAgIGltcG9ydCB0eXBlIHsgTGFiZWwgfSBmcm9tICcuLi8uLi9jb250cm9sbGVycy9sYWJlbCc7CiAgICBpbXBvcnQgdHlwZSB7IEF1dGggfSBmcm9tICcuLi8uLi9jb250cm9sbGVycy91c2VyJzsKICAgIGltcG9ydCB7IGFwaSB9IGZyb20gJy4uLy4uL3V0aWxzL2FwaVJlcXVlc3QnOwogICAgaW1wb3J0IHsKICAgICAgICBkaXNwbGF5Tm90aWZPbkVyciwKICAgICAgICBFUlJfTk9USUZJQ0FUSU9OLAogICAgfSBmcm9tICcuLi8uLi91dGlscy9ub3RpZmljYXRpb25zJzsKICAgIGltcG9ydCB0eXBlIHsgUmVzdWx0IH0gZnJvbSAnLi4vLi4vdXRpbHMvcmVzdWx0JzsKICAgIGltcG9ydCBGaWxlRHJvcCBmcm9tICcuL0ZpbGVEcm9wRGlhbG9nLnN2ZWx0ZSc7CiAgICBpbXBvcnQgeyBpbXBvcnRFbnRyaWVzIH0gZnJvbSAnLi9pbXBvcnRFbnRyaWVzLmpzJzsKICAgIGltcG9ydCB7IGltcG9ydEV2ZW50cyB9IGZyb20gJy4vaW1wb3J0RXZlbnRzJzsKCiAgICBjb25zdCB7IGFkZE5vdGlmaWNhdGlvbiB9ID0gZ2V0Tm90aWZpY2F0aW9uc0NvbnRleHQoKTsKCiAgICBleHBvcnQgbGV0IGF1dGg6IEF1dGg7CiAgICBleHBvcnQgbGV0IHR5cGU6ICdldmVudHMnIHwgJ2VudHJpZXMnOwoKICAgIGxldCBsYWJlbHM6IExhYmVsW10gfCBudWxsID0gbnVsbDsKCiAgICBsZ,XQgbG9hZGluZyA9IGZhbHNlOwoKICAgIGFzeW5jIGZ1bmN0aW9uIHdpdGhDb250ZW50cyAocmVzdWx0OiBSZXN1bHQ8c3RyaW5nPik6IFByb21pc2U8dm9pZD4gewogICAgICAgIGNvbnN0IGNvbnRlbnRzID0gZGlzcGxheU5vdGlmT25FcnIoYWRkTm90aWZpY2F0aW9uLCByZXN1bHQpOwoKICAgICAgICBpZiAoIWxhYmVscykgewogICAgICAgICAgICBhZGROb3RpZmljYXRpb24oewogICAgICAgICAgICAgICAgLi4uRVJSX05PVElGSUNBVElPTiwKICAgICAgICAgICAgICAgIHRleHQ6IGBGYWlsZWQgdG8gbG9hZCBsYWJlbHNgCiAgICAgICAgICAgIH0pOwogICAgICAgICAgICByZXR1cm47CiAgICAgICAgfQoKICAgICAgICBsb2FkaW5nID0gdHJ1ZTsKCiAgICAgICAgbGV0IHJlczsKICAgICAgICBpZiAodHlwZSA9PT0gJ2V2ZW50cycpIHsKICAgICAgICAgICAgcmVzID0gYXdhaXQgaW1wb3J0RXZlbnRzKGNvbnRlbnRzLCBsYWJlbHMsIGF1dGgpOwogICAgICAgIH0gZWxzZSBpZiAodHlwZSA9PT0gJ2VudHJpZXMnKSB7CiAgICAgICAgICAgIHJlcyA9IGF3YWl0IGltcG9ydEVudHJpZXMoY29udGVudHMsIGxhYmVscywgYXV0aCk7CiAgICAgICAgfSBlbHNlIHsKICAgICAgICAgICAgdGhyb3cgbmV3IEVycm9yKCdJbnZhbGlkIHR5cGUnKTsKICAgICAgICB9CgogICAgICAgIC8vIGhhbmRsZSBlcnJvciBtZXNzYWdlcwogICAgICAgIGlmIChBcnJheS5pc0FycmF5KHJlcykpIHsKICAgICAgICAgICAgZm9yIChjb25zdCBub3RpZmljYXRpb24gb2YgcmVzKSB7CiAgICAgICAgICAgICAgICBhZGROb3RpZmljYXRpb24oewogICAgICAgICAgICAgICAgICAgIC4uLkVSUl9OT1RJRklDQVRJT04sCiAgICAgICAgICAgICAgICAgICAgLi4ubm90aWZpY2F0aW9uCiAgICAgICAgICAgICAgICB9KTsKICAgICAgICAgICAgfQogICAgICAgIH0gZWxzZSBpZiAocmVzKSB7CiAgICAgICAgICAgIGFkZE5vdGlmaWNhdGlvbih7CiAgICAgICAgICAgICAgICAuLi5FUlJfTk9USUZJQ0FUSU9OLAogICAgICAgICAgICAgICAgLi4ucmVzCiAgICAgICAgICAgIH0pOwogICAgICAgIH0KCiAgICAgICAgbG9hZGluZyA9IGZhbHNlOwogICAgfQoKICAgIG9uTW91bnQoYXN5bmMgKCkgPT4gewogICAgICAgIGNvbnN0IGxhYmVsUmVzID0gZGlzcGxheU5vdGlmT25FcnIoCiAgICAgICAgICAgIGFkZE5vdGlmaWNhdGlvbiwKICAgICAgICAgICAgYXdhaXQgYXBpLmdldChhdXRoLCAnL2xhYmVscycpCiAgICAgICAgKTsKICAgICAgICBsYWJlbHMgPSBsYWJlbFJlcy5sYWJlbHM7CiAgICB9KTsK">{}</script>
+<script lang="ts">
+    import { onMount } from 'svelte';
+    import { getNotificationsContext } from 'svelte-notifications';
+    import Spinner from '../../../lib/components/BookSpinner.svelte';
+    import type { Label } from '../../controllers/label';
+    import type { Auth } from '../../controllers/user';
+    import { api } from '../../utils/apiRequest';
+    import {
+        displayNotifOnErr,
+        ERR_NOTIFICATION
+    } from '../../utils/notifications';
+    import type { Result } from '../../utils/result';
+    import FileDrop from './FileDropDialog.svelte';
+    import { importEntries } from './importEntries.js';
+    import { importEvents } from './importEvents';
+
+    const { addNotification } = getNotificationsContext();
+
+    export let auth: Auth;
+    export let type: 'events' | 'entries';
+
+    let labels: Label[] | null = null;
+
+    let loading = false;
+
+    async function withContents(result: Result<string>): Promise<void> {
+        const contents = displayNotifOnErr(addNotification, result);
+
+        if (!labels) {
+            addNotification({
+                ...ERR_NOTIFICATION,
+                text: `Failed to load labels`
+            });
+            return;
+        }
+
+        loading = true;
+
+        let res;
+        if (type === 'events') {
+            res = await importEvents(contents, labels, auth);
+        } else if (type === 'entries') {
+            res = await importEntries(contents, labels, auth);
+        } else {
+            throw new Error('Invalid type');
+        }
+
+        // handle error messages
+        if (Array.isArray(res)) {
+            for (const notification of res) {
+                addNotification({
+                    ...ERR_NOTIFICATION,
+                    ...notification
+                });
+            }
+        } else if (res) {
+            addNotification({
+                ...ERR_NOTIFICATION,
+                ...res
+            });
+        }
+
+        loading = false;
+    }
+
+    onMount(async () => {
+        const labelRes = displayNotifOnErr(
+            addNotification,
+            await api.get(auth, '/labels')
+        );
+        labels = labelRes.labels;
+    });
+</script>
 
 {#if labels && !loading}
     <FileDrop

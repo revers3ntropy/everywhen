@@ -1,3 +1,86 @@
-<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgeyBjYW52YXNTdGF0ZSwgcmVuZGVyYWJsZSB9IGZyb20gJy4uLy4uL2xpYi9jYW52YXMvY2FudmFzSGVscGVycyc7CgogICAgcmVuZGVyYWJsZSh7CiAgICAgICAgc2V0dXAgKCkgewogICAgICAgICAgICBsZXQgZHJhZ2dpbmcgPSBmYWxzZTsKICAgICAgICAgICAgbGV0IGRyYWdTdGFydCA9IDA7CiAgICAgICAgICAgIGxldCBkcmFnRW5kID0gMDsKICAgICAgICAgICAgbGV0IGRyYWdZU3RhcnQgPSAwOwogICAgICAgICAgICBsZXQgZHJhZ1lFbmQgPSAwOwoKICAgICAgICAgICAgZnVuY3Rpb24gZG9ab29tIChkZWx0YVo6IG51bWJlcikgewogICAgICAgICAgICAgICAgY2FudmFzU3RhdGUudXBkYXRlKHMgPT4gewogICAgICAgICAgICAgICAgICAgIGxldCBjZW50ZXJUaW1lID0gcy5yZW5kZXJQb3NUb1RpbWUocy53aWR0aCAvIDIpOwogICAgICAgICAgICAgICAgICAgIHMuem9vbSAqPSBkZWx0YVo7CgogICAgICAgICAgICAgICAgICAgIHMuem9vbSA9IE1hdGgubWF4KE1hdGgubWluKDEwMCwgcy56b29tKSwgMWUtMTApOwoKICAgICAgICAgICAgICAgICAgICBsZXQgbmV3Q2VudGVyVGltZSA9IHMucmVuZGVyUG9zVG9UaW1lKHMud2lkdGggLyAyKTsKICAgICAgICAgICAgICAgICAgICBzLmNhbWVyYU9mZnNldCAtPSAobmV3Q2VudGVyVGltZSAtIGNlbnRlclRpbWUpICogcy56b29tOwoKICAgICAgICAgICAgICAgICAgICByZXR1cm4gczsKICAgICAgICAgICAgICAgIH0pOwogICAgICAgICAgICB9CgogICAgICAgICAgICAkY2FudmFzU3RhdGUubGlzdGVuKCd3aGVlbCcsIGV2dCA9PiB7CiAgICAgICAgICAgICAgICBldnQucHJldmVudERlZmF1bHQoKTsKICAgICAgICAgICAgICAgIGRvWm9vbSgxICsgZXZ0LmRlbHRhWSAqIC0wLjAwMSk7CiAgICAgICAgICAgIH0pOwoKICAgICAgICAgICAgLy8gZGVza3RvcAogICAgICAgICAgICAkY2FudmFzU3RhdGUubGlzdGVuKCdtb3VzZWRvd24nLCBldmVudCA9PiB7CiAgICAgICAgICAgICAgICBkcmFnU3RhcnQgPSAkY2FudmFzU3RhdGUuZ2V0TW91c2VQb3NSYXcoZXZlbnQpOwogICAgICAgICAgICAgICAgZHJhZ2dpbmcgPSB0cnVlOwogICAgICAgICAgICB9KTsKCiAgICAgICAgICAgICRjYW52YXNTdGF0ZS5saXN0ZW4oJ21vdXNldXAnLCAoKSA9PiB7CiAgICAgICAgICAgICAgICBkcmFnZ2luZyA9IGZhbHNlOwogICAgICAgICAgICB9KTsKCiAgICAgICAgICAgICRjYW52YXNTdGF0ZS5saXN0ZW4oJ21vdXNlbW92ZScsIGV2dCA9PiB7CiAgICAgICAgICAgICAgICBpZiAoIWRyYWdnaW5nKSByZXR1cm47CiAgICAgICAgICAgICAgICBjYW52YXNTdGF0ZS51cGRhdGUocyA9PiB7CiAgICAgICAgICAgICAgICAgICAgZHJhZ0VuZCA9IHMuZ2V0TW91c2VQb3NSYXcoZXZ0KTsKICAgICAgICAgICAgICAgICAgICBzLmNhbWVyYU9mZnNldCAtPSAoZHJhZ0VuZCAtIGRyYWdTdGFydCkgKiBzLnpvb207CiAgICAgICAgICAgICAgICAgICAgcmV0dXJuIHM7CiAgICAgICAgICAgICAgICB9KTsKICAgICAgICAgICAgICAgIGRyYWdTdGFydCA9IGRyYWdFbmQ7CiAgICAgICAgICAgIH0pOwoKICAgICAgICAgICAgLy8gbW9iaWxlCiAgICAgICAgICAgICRjYW52YXNTdGF0ZS5saXN0ZW4oJ3RvdWNoc3RhcnQnLCBldmVudCA9PiB7CiAgICAgICAgICAgICAgICBkcmFnU3RhcnQgPSAkY2FudmFzU3RhdGUuZ2V0TW91c2VQb3NSYXcoZXZlbnQpOwogICAgICAgICAgICAgICAgZHJhZ1lTdGFydCA9ICRjYW52YXNTdGF0ZS5nZXRNb3VzZVlSYXcoZXZlbnQpOwogICAgICAgICAgICAgICAgZHJhZ2dpbmcgPSB0cnVlOwogICAgICAgICAgICB9KTsKCiAgICAgICAgICAgICRjYW52YXNTdGF0ZS5saXN0ZW4oJ3RvdWNoZW5kJywgKCkgPT4gewogICAgICAgICAgICAgICAgZHJhZ2dpbmcgPSBmYWxzZTsKICAgICAgICAgICAgfSk7CgogICAgICAgICAgICAkY2FudmFzU3RhdGUubGlzdGVuKCd0b3VjaG1vdmUnLCBldnQgPT4gewogICAgICAgICAgICAgICAgZXZ0LnByZXZlbnREZWZhdWx0KCk7CiAgICAgICAgICAgICAgICBpZiAoIWRyYWdnaW5nKSByZXR1cm47CgogICAgICAgICAgICAgICAgZHJhZ0VuZCA9ICRjYW52YXNTdGF0ZS5nZXRNb3VzZVBvc1JhdyhldnQpOwoKICAgICAgICAgICAgICAgIGNhbnZhc1N0YXRlLnVwZGF0ZShzID0+IHsKICAgICAgICAgICAgICAgICAgICBzLmNhbWVyYU9mZnNldCAtPSAoZHJhZ0VuZCAtIGRyYWdTdGFydCkgKiBzLnpvb20gKiAwLjM7CiAgICAgICAgICAgICAgICAgICAgcmV0dXJuIHM7CiAgICAgICAgICAgICAgICB9KTsKICAgICAgICAgICAgICAgIGRyYWdTdGFydCA9IGRyYWdFbmQ7CgogICAgICAgICAgICAgICAgZHJhZ1lFbmQgPSAkY2FudmFzU3RhdGUuZ2V0TW91c2VZUmF3KGV2dCk7CiAgICAgICAgICAgICAgICBsZXQgbW9kID0gMSArIChkcmFnWUVuZCAtIGRyYWdZU3RhcnQpIC8gMTAwMDsKICAgICAgICAgICAgICAgIGlmIChtb2QgPiAwICYmIG1vZCA8IDIpIHsKICAgICAgICAgICAgICAgICAgICBkb1pvb20obW9kKTsKICAgICAgICAgICAgICAgIH0KCiAgICAgICAgICAgICAgICBkcmFnWVN0YXJ0ID0gZHJhZ1lFbmQ7CiAgICAgICAgICAgIH0pOwogICAgICAgIH0KICAgIH0pOwo=">{}</script>
+<script lang="ts">
+    import { canvasState, renderable } from '../../lib/canvas/canvasHelpers';
+
+    renderable({
+        setup() {
+            let dragging = false;
+            let dragStart = 0;
+            let dragEnd = 0;
+            let dragYStart = 0;
+            let dragYEnd = 0;
+
+            function doZoom(deltaZ: number) {
+                canvasState.update(s => {
+                    let centerTime = s.renderPosToTime(s.width / 2);
+                    s.zoom *= deltaZ;
+
+                    s.zoom = Math.max(Math.min(100, s.zoom), 1e-10);
+
+                    let newCenterTime = s.renderPosToTime(s.width / 2);
+                    s.cameraOffset -= (newCenterTime - centerTime) * s.zoom;
+
+                    return s;
+                });
+            }
+
+            $canvasState.listen('wheel', evt => {
+                evt.preventDefault();
+                doZoom(1 + evt.deltaY * -0.001);
+            });
+
+            // desktop
+            $canvasState.listen('mousedown', event => {
+                dragStart = $canvasState.getMousePosRaw(event);
+                dragging = true;
+            });
+
+            $canvasState.listen('mouseup', () => {
+                dragging = false;
+            });
+
+            $canvasState.listen('mousemove', evt => {
+                if (!dragging) return;
+                canvasState.update(s => {
+                    dragEnd = s.getMousePosRaw(evt);
+                    s.cameraOffset -= (dragEnd - dragStart) * s.zoom;
+                    return s;
+                });
+                dragStart = dragEnd;
+            });
+
+            // mobile
+            $canvasState.listen('touchstart', event => {
+                dragStart = $canvasState.getMousePosRaw(event);
+                dragYStart = $canvasState.getMouseYRaw(event);
+                dragging = true;
+            });
+
+            $canvasState.listen('touchend', () => {
+                dragging = false;
+            });
+
+            $canvasState.listen('touchmove', evt => {
+                evt.preventDefault();
+                if (!dragging) return;
+
+                dragEnd = $canvasState.getMousePosRaw(evt);
+
+                canvasState.update(s => {
+                    s.cameraOffset -= (dragEnd - dragStart) * s.zoom * 0.3;
+                    return s;
+                });
+                dragStart = dragEnd;
+
+                dragYEnd = $canvasState.getMouseYRaw(evt);
+                let mod = 1 + (dragYEnd - dragYStart) / 1000;
+                if (mod > 0 && mod < 2) {
+                    doZoom(mod);
+                }
+
+                dragYStart = dragYEnd;
+            });
+        }
+    });
+</script>
 
 <slot />

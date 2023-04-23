@@ -1,4 +1,26 @@
-<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgeyBvbk1vdW50IH0gZnJvbSAnc3ZlbHRlJzsKICAgIGltcG9ydCBBcnJvd0xlZnQgZnJvbSAnc3ZlbHRlLW1hdGVyaWFsLWljb25zL0Fycm93TGVmdC5zdmVsdGUnOwogICAgaW1wb3J0IENvdW50ZXIgZnJvbSAnc3ZlbHRlLW1hdGVyaWFsLWljb25zL0NvdW50ZXIuc3ZlbHRlJzsKICAgIGltcG9ydCBFbnRyaWVzIGZyb20gJy4uLy4uLy4uL2xpYi9jb21wb25lbnRzL0VudHJpZXMuc3ZlbHRlJzsKICAgIGltcG9ydCB7IEJ5LCB0eXBlIEVudHJ5V2l0aFdvcmRDb3VudCB9IGZyb20gJy4uL2hlbHBlcnMnOwogICAgaW1wb3J0IFNlYXJjaEZvcldvcmQgZnJvbSAnLi4vU2VhcmNoRm9yV29yZC5zdmVsdGUnOwogICAgaW1wb3J0IFN0YXRQaWxsIGZyb20gJy4uL1N0YXRQaWxsLnN2ZWx0ZSc7CiAgICBpbXBvcnQgRW50cnlCYXJDaGFydCBmcm9tICcuLy4uL0VudHJ5QmFyQ2hhcnQuc3ZlbHRlJzsKICAgIGltcG9ydCBFbnRyeUhlYXRNYXAgZnJvbSAnLi8uLi9FbnRyeUhlYXRNYXAuc3ZlbHRlJzsKCiAgICBsZXQgYnk6IEJ5ID0gQnkuV29yZHM7CgogICAgZXhwb3J0IGxldCBkYXRhOiBBcHAuUGFnZURhdGEgJiB7CiAgICAgICAgZW50cmllczogRW50cnlXaXRoV29yZENvdW50W107CiAgICAgICAgd29yZENvdW50OiBudW1iZXI7CiAgICAgICAgd29yZEluc3RhbmNlczogbnVtYmVyOwogICAgICAgIHRoZVdvcmQ6IHN0cmluZzsKICAgICAgICB0b3RhbEVudHJpZXM6IG51bWJlcjsKICAgIH07CgogICAgb25Nb3VudCgoKSA9PiAoZG9jdW1lbnQudGl0bGUgPSAnQW5hbHl0aWNzJykpOwo=">{}</script>
+<script lang="ts">
+    import { onMount } from 'svelte';
+    import ArrowLeft from 'svelte-material-icons/ArrowLeft.svelte';
+    import Counter from 'svelte-material-icons/Counter.svelte';
+    import Entries from '../../../lib/components/Entries.svelte';
+    import { By, type EntryWithWordCount } from '../helpers';
+    import SearchForWord from '../SearchForWord.svelte';
+    import StatPill from '../StatPill.svelte';
+    import EntryBarChart from './../EntryBarChart.svelte';
+    import EntryHeatMap from './../EntryHeatMap.svelte';
+
+    let by: By = By.Words;
+
+    export let data: App.PageData & {
+        entries: EntryWithWordCount[];
+        wordCount: number;
+        wordInstances: number;
+        theWord: string;
+        totalEntries: number;
+    };
+
+    onMount(() => (document.title = 'Analytics'));
+</script>
 
 <svelte:head>
     <title>Analytics</title>
@@ -86,4 +108,86 @@
     {/if}
 </main>
 
-<style lang="less" ✂prettier:content✂="CiAgICBAaW1wb3J0ICcuLi8uLi8uLi9zdHlsZXMvbGF5b3V0JzsKICAgIEBpbXBvcnQgJy4uLy4uLy4uL3N0eWxlcy92YXJpYWJsZXMnOwoKICAgIC50aXRsZS1saW5lIHsKICAgICAgICBkaXNwbGF5OiBncmlkOwogICAgICAgIGdyaWQtdGVtcGxhdGUtY29sdW1uczogMWZyIDFmciAxZnI7CiAgICAgICAgYWxpZ24taXRlbXM6IGNlbnRlcjsKCiAgICAgICAgLnNlYXJjaC1mb3Itd29yZCB7CiAgICAgICAgICAgIHRleHQtYWxpZ246IHJpZ2h0OwogICAgICAgIH0KCiAgICAgICAgQG1lZGlhIEBtb2JpbGUgewogICAgICAgICAgICBtYXJnaW46IDFyZW07CiAgICAgICAgICAgIGdyaWQtdGVtcGxhdGUtY29sdW1uczogMTBweCAxZnI7CgogICAgICAgICAgICAuc2VhcmNoLWZvci13b3JkIHsKICAgICAgICAgICAgICAgIGZvbnQtc2l6ZTogMS41cmVtOwogICAgICAgICAgICAgICAgbWFyZ2luOiAwLjRyZW0gMDsKICAgICAgICAgICAgfQoKICAgICAgICAgICAgLnN0YXRzLWljb24sCiAgICAgICAgICAgIC50aGUtd29yZC13aXRoLXF1b3RlcyB7CiAgICAgICAgICAgICAgICBkaXNwbGF5OiBub25lOwogICAgICAgICAgICB9CiAgICAgICAgfQogICAgfQoKICAgIGgxIHsKICAgICAgICAuZmxleC1jZW50ZXIoKTsKICAgICAgICBmb250LXNpemU6IDQwcHg7CiAgICAgICAgbWFyZ2luOiAwOwogICAgICAgIHBhZGRpbmc6IDA7CgogICAgICAgIHNwYW4gewogICAgICAgICAgICBtYXJnaW4tbGVmdDogMC41cmVtOwogICAgICAgIH0KICAgIH0KCiAgICAuc3RhdHMgewogICAgICAgIHRleHQtYWxpZ246IGNlbnRlcjsKICAgICAgICBkaXNwbGF5OiBmbGV4OwogICAgICAgIGp1c3RpZnktY29udGVudDogY2VudGVyOwogICAgICAgIGZsZXgtd3JhcDogd3JhcDsKICAgIH0KCiAgICAuY2hhcnRzIHsKICAgICAgICAmID4gKiB7CiAgICAgICAgICAgIG1hcmdpbjogMC41ZW0gMDsKICAgICAgICB9CgogICAgICAgIC5lbnRyeS1iYXItY2hhcnQtd3JhcHBlciB7CiAgICAgICAgICAgIHBhZGRpbmctYm90dG9tOiAwOwogICAgICAgIH0KICAgIH0KCiAgICAuY29udGFpbmVyIHsKICAgICAgICBwYWRkaW5nOiAxZW07CiAgICAgICAgbWFyZ2luOiAxZW07CgogICAgICAgIEBtZWRpYSBAbW9iaWxlIHsKICAgICAgICAgICAgcGFkZGluZzogMCAwLjZyZW07CiAgICAgICAgICAgIG1hcmdpbjogMWVtIDA7CiAgICAgICAgICAgIGJvcmRlcjogbm9uZTsKICAgICAgICB9CiAgICB9CgogICAgLnRoZS13b3JkLXdpdGgtcXVvdGVzIHsKICAgICAgICBtYXgtd2lkdGg6IGNhbGMoMTAwdncgLSA0MDBweCk7CiAgICAgICAgdGV4dC1vdmVyZmxvdzogZWxsaXBzaXM7CiAgICAgICAgb3ZlcmZsb3c6IGhpZGRlbjsKICAgICAgICB3aGl0ZS1zcGFjZTogbm93cmFwOwogICAgfQoKICAgIC5lbnRyaWVzIHsKICAgICAgICBwYWRkaW5nOiAxcmVtOwoKICAgICAgICBAbWVkaWEgQG1vYmlsZSB7CiAgICAgICAgICAgIHBhZGRpbmc6IDA7CiAgICAgICAgfQogICAgfQo="></style>
+<style lang="less">
+    @import '../../../styles/layout';
+    @import '../../../styles/variables';
+
+    .title-line {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        align-items: center;
+
+        .search-for-word {
+            text-align: right;
+        }
+
+        @media @mobile {
+            margin: 1rem;
+            grid-template-columns: 10px 1fr;
+
+            .search-for-word {
+                font-size: 1.5rem;
+                margin: 0.4rem 0;
+            }
+
+            .stats-icon,
+            .the-word-with-quotes {
+                display: none;
+            }
+        }
+    }
+
+    h1 {
+        .flex-center();
+        font-size: 40px;
+        margin: 0;
+        padding: 0;
+
+        span {
+            margin-left: 0.5rem;
+        }
+    }
+
+    .stats {
+        text-align: center;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .charts {
+        & > * {
+            margin: 0.5em 0;
+        }
+
+        .entry-bar-chart-wrapper {
+            padding-bottom: 0;
+        }
+    }
+
+    .container {
+        padding: 1em;
+        margin: 1em;
+
+        @media @mobile {
+            padding: 0 0.6rem;
+            margin: 1em 0;
+            border: none;
+        }
+    }
+
+    .the-word-with-quotes {
+        max-width: calc(100vw - 400px);
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+
+    .entries {
+        padding: 1rem;
+
+        @media @mobile {
+            padding: 0;
+        }
+    }
+</style>

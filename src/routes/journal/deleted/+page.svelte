@@ -1,4 +1,41 @@
-<script lang="ts" ✂prettier:content✂="CiAgICBpbXBvcnQgeyBvbk1vdW50IH0gZnJvbSAnc3ZlbHRlJzsKICAgIGltcG9ydCB7IGdldE5vdGlmaWNhdGlvbnNDb250ZXh0IH0gZnJvbSAnc3ZlbHRlLW5vdGlmaWNhdGlvbnMnOwogICAgaW1wb3J0IHR5cGUgeyBBcHAgfSBmcm9tICcuLi8uLi8uLi9hcHAnOwogICAgaW1wb3J0IERvdCBmcm9tICcuLi8uLi8uLi9saWIvY29tcG9uZW50cy9Eb3Quc3ZlbHRlJzsKICAgIGltcG9ydCBFbnRyeSBmcm9tICcuLi8uLi8uLi9saWIvY29tcG9uZW50cy9FbnRyeS5zdmVsdGUnOwogICAgaW1wb3J0IHR5cGUgeyBFbnRyeSBhcyBFbnRyeUNvbnRyb2xsZXIgfSBmcm9tICcuLi8uLi8uLi9saWIvY29udHJvbGxlcnMvZW50cnknOwogICAgaW1wb3J0IHsgb2JmdXNjYXRlZCB9IGZyb20gJy4uLy4uLy4uL2xpYi9zdG9yZXMnOwogICAgaW1wb3J0IHsgYXBpIH0gZnJvbSAnLi4vLi4vLi4vbGliL3V0aWxzL2FwaVJlcXVlc3QnOwogICAgaW1wb3J0IHsgZGlzcGxheU5vdGlmT25FcnIgfSBmcm9tICcuLi8uLi8uLi9saWIvdXRpbHMvbm90aWZpY2F0aW9ucyc7CgogICAgY29uc3QgeyBhZGROb3RpZmljYXRpb24gfSA9IGdldE5vdGlmaWNhdGlvbnNDb250ZXh0KCk7CgogICAgZXhwb3J0IGxldCBkYXRhOiBBcHAuUGFnZURhdGE7CgogICAgbGV0IHNlYXJjaCA9ICcnOwogICAgbGV0IGxvYWRlZCA9IGZhbHNlOwogICAgbGV0IGVudHJpZXM6IEVudHJ5Q29udHJvbGxlcltdID0gW107CgogICAgYXN5bmMgZnVuY3Rpb24gcmVsb2FkICgpIHsKICAgICAgICBjb25zdCBlbnRyaWVzT3B0aW9ucyA9IHsKICAgICAgICAgICAgcGFnZTogMCwKICAgICAgICAgICAgcGFnZVNpemU6IDEwZTEwLAogICAgICAgICAgICBzZWFyY2gsCiAgICAgICAgICAgIGRlbGV0ZWQ6IDEsCiAgICAgICAgfTsKICAgICAgICBjb25zdCByZXMgPSBhd2FpdCBhcGkKICAgICAgICAgICAgLmdldChkYXRhLCBgL2VudHJpZXNgLCBlbnRyaWVzT3B0aW9ucykKICAgICAgICAgICAgLnRoZW4ocmVzID0+IGRpc3BsYXlOb3RpZk9uRXJyKGFkZE5vdGlmaWNhdGlvbiwgcmVzKSk7CgogICAgICAgIGVudHJpZXMgPSByZXMuZW50cmllczsKICAgICAgICBsb2FkZWQgPSB0cnVlOwogICAgfQoKICAgIG9uTW91bnQocmVsb2FkKTsKCiAgICBvbk1vdW50KCgpID0+IChkb2N1bWVudC50aXRsZSA9IGBEZWxldGVkYCkpOwo=">{}</script>
+<script lang="ts">
+    import { onMount } from 'svelte';
+    import { getNotificationsContext } from 'svelte-notifications';
+    import type { App } from '../../../app';
+    import Dot from '../../../lib/components/Dot.svelte';
+    import Entry from '../../../lib/components/Entry.svelte';
+    import type { Entry as EntryController } from '../../../lib/controllers/entry';
+    import { obfuscated } from '../../../lib/stores';
+    import { api } from '../../../lib/utils/apiRequest';
+    import { displayNotifOnErr } from '../../../lib/utils/notifications';
+
+    const { addNotification } = getNotificationsContext();
+
+    export let data: App.PageData;
+
+    let search = '';
+    let loaded = false;
+    let entries: EntryController[] = [];
+
+    async function reload() {
+        const entriesOptions = {
+            page: 0,
+            pageSize: 10e10,
+            search,
+            deleted: 1
+        };
+        const res = await api
+            .get(data, `/entries`, entriesOptions)
+            .then(res => displayNotifOnErr(addNotification, res));
+
+        entries = res.entries;
+        loaded = true;
+    }
+
+    onMount(reload);
+
+    onMount(() => (document.title = `Deleted`));
+</script>
 
 <svelte:head>
     <title>Deleted</title>
@@ -29,4 +66,9 @@
     {/if}
 </main>
 
-<style lang="less" ✂prettier:content✂="CiAgICBoMiB7CiAgICAgICAgd2lkdGg6IDEwMCU7CiAgICAgICAgdGV4dC1hbGlnbjogY2VudGVyOwogICAgfQo="></style>
+<style lang="less">
+    h2 {
+        width: 100%;
+        text-align: center;
+    }
+</style>

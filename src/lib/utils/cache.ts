@@ -134,10 +134,10 @@ export function cachedApiRoute<
     Res extends NonNullable<unknown>
 >(
     handler: (auth: Auth, event: RequestEvent<Params, RouteId>) => Promise<Res>
-),: (event: RequestEvent<Params, RouteId>) => Promise<GenericResponse<Res>> {
+): (event: RequestEvent<Params, RouteId>) => Promise<GenericResponse<Res>> {
     return (async (
         props: RequestEvent<Params, RouteId>
- ,   ): Promise<GenericResponse<Res>> => {
+    ): Promise<GenericResponse<Res>> => {
         const url = props.url.href;
         const auth = await getAuthFromCookies(props.cookies);
         const cached = getCachedResponse<Response>(url, auth.id)?.clone();
@@ -154,12 +154,12 @@ export function cachedApiRoute<
         const responseString = JSON.stringify(response);
         const responseObj = new Response(responseString, {
             status: 200
- ,       }) as GenericResponse<Res>;
+        }) as GenericResponse<Res>;
         cacheResponse(url, auth.id, responseObj.clone());
         return responseObj;
     }) satisfies (
         event: RequestEvent<Params, RouteId>
- ,   ) => Promise<GenericResponse<Res>>;
+    ) => Promise<GenericResponse<Res>>;
 }
 
 export function cachedPageRoute<
@@ -167,18 +167,18 @@ export function cachedPageRoute<
     ParentData extends Record<string, unknown>,
     OutputData extends Record<string, unknown>,
     RouteId extends string
-> (
+>(
     handler: (
         auth: Auth,
-        event: ServerLoadEvent<Params, ParentData, RouteId>,
-    ) => MaybePromise<OutputData>,
+        event: ServerLoadEvent<Params, ParentData, RouteId>
+    ) => MaybePromise<OutputData>
     // doesn't actually return `OutputData & App.PageData`,
     // but needs to act like it to satisfy the type checker with `svelte-check`
 ): (
-    event: ServerLoadEvent<Params, ParentData, RouteId>,
+    event: ServerLoadEvent<Params, ParentData, RouteId>
 ) => MaybePromise<OutputData & App.PageData> {
     return (async (
-        props: ServerLoadEvent<Params, ParentData, RouteId>,
+        props: ServerLoadEvent<Params, ParentData, RouteId>
     ): Promise<OutputData & App.PageData> => {
         const url = props.url.href;
         const auth = await getAuthFromCookies(props.cookies);
@@ -188,11 +188,11 @@ export function cachedPageRoute<
         }
         // stringify and parse to turn into a plain object
         const response = JSON.parse(
-            JSON.stringify(await handler(auth, props)),
+            JSON.stringify(await handler(auth, props))
         ) as OutputData;
         cacheResponse(url, auth.id, response);
         return response as OutputData & App.PageData;
     }) satisfies (
-        event: ServerLoadEvent<Params, ParentData, RouteId>,
+        event: ServerLoadEvent<Params, ParentData, RouteId>
     ) => MaybePromise<OutputData & App.PageData>;
 }

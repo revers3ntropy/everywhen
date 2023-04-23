@@ -15,7 +15,7 @@ export function obfuscate(str: string, alphabet = OBFUSCATE_CHARS): string {
 /**
  * Split into 'words' as best as possible
  */
-export function splitText (text: string): string[] {
+export function splitText(text: string): string[] {
     return text.split(/[\s,.\-:;!"*()=+[\]{}?|]+/).filter(Boolean);
 }
 
