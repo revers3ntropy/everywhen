@@ -11,7 +11,7 @@ import type { Bytes, Seconds } from './types';
 
 const cacheLogger = makeLogger('CACHE', chalk.magentaBright, 'general.log');
 
-const cache: Record<string, Record<string, unknown>> = {};
+const cache: Record<string, Record<string, unknown> | undefined> = {};
 const cacheLastUsed: Record<string, number> = {};
 
 function roughSizeOfObject (object: unknown): number {
@@ -48,8 +48,8 @@ export function cacheResponse<T> (
     userId: string,
     response: T,
 ): void {
-    cache[userId] = cache[userId] || {};
-    cache[userId][url] = response;
+    const userCache = cache[userId] || {};
+    userCache[url] = response;
     cacheLastUsed[userId] = nowS();
 }
 
@@ -75,9 +75,10 @@ export function getCachedResponse<T> (
     userId: string,
 ): T | undefined {
     cacheLastUsed[userId] = nowS();
-    if (url in cache[userId]) {
+    const userCache = cache[userId] || {};
+    if (url in userCache) {
         logReq(true, new URL(url));
-        return cache[userId][url] as T;
+        return userCache[url] as T;
     } else {
         logReq(false, new URL(url));
         return undefined;
