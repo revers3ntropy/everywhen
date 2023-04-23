@@ -55,13 +55,12 @@
     <title>Timeline</title>
     <meta content="Timeline" name="description" />
 
-    <!-- put the style here because the styles should all be global,
-        however when switching pages the styles get leaked and cause
-        weird issues (the bar chart not showing on the stats page) -->
-    <!-- put the style here because the styles should all be global,
-        however when switching pages the styles get leaked and cause
-        weird issues (the bar chart not showing on the stats page) -->
     <style lang="less">
+        /*
+            put the style here because the styles should all be global,
+            however when switching pages the styles get leaked and cause
+            weird issues (the bar chart not showing on the stats page)
+         */
         @import '../../styles/variables';
 
         /*
