@@ -7,7 +7,7 @@
     import type { Label as LabelController } from '../../lib/controllers/label';
     import { api } from '../../lib/utils/apiRequest';
     import { displayNotifOnErr } from '../../lib/utils/notifications';
-    import { nowS } from '../../lib/utils/time';
+    import { nowUtc } from '../../lib/utils/time';
     import LabelOptions from './LabelOptions.svelte';
 
     const { addNotification } = getNotificationsContext();
@@ -43,7 +43,7 @@
                 {
                     ...newLabel,
                     id,
-                    created: nowS(),
+                    created: nowUtc(),
                     entryCount: 0,
                     eventCount: 0
                 }

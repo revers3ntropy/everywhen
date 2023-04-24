@@ -7,7 +7,7 @@ import { apiRes404, apiResponse } from '../../../lib/utils/apiResponse';
 import { cachedApiRoute, invalidateCache } from '../../../lib/utils/cache';
 import { GETParamIsTruthy } from '../../../lib/utils/GETArgs';
 import { getUnwrappedReqBody } from '../../../lib/utils/requestBody';
-import { nowS } from '../../../lib/utils/time';
+import { nowUtc } from '../../../lib/utils/time';
 import type { RequestHandler } from './$types';
 
 export const GET = cachedApiRoute(async (auth, { url }) => {
@@ -59,7 +59,7 @@ export const POST = (async ({ request, cookies }) => {
             label: '',
             latitude: 0,
             longitude: 0,
-            created: nowS(),
+            created: nowUtc(),
             timezoneUtcOffset: 0,
             agentData: ''
         }

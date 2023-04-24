@@ -5,8 +5,9 @@ import type { Hours, Seconds, TimestampSecs } from './types';
  * Get the UTC timestamp of now in seconds
  * @returns {TimestampSecs}
  */
-export function nowS(): TimestampSecs {
-    return Math.floor(Date.now() / 1000);
+export function nowUtc(rounded=true): TimestampSecs {
+    const s = Date.now() / 1000;
+    return rounded ? Math.floor(s) : s;
 }
 
 export function currentTzOffset(): Hours {
@@ -61,5 +62,5 @@ export function utcEq(
 }
 
 export function daysSince(timestamp: TimestampSecs): number {
-    return Math.floor((nowS() - timestamp) / 60 / 60 / 24);
+    return Math.floor((nowUtc() - timestamp) / 60 / 60 / 24);
 }

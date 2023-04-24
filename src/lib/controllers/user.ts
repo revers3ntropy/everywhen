@@ -1,7 +1,7 @@
 import type { QueryFunc } from '../db/mysql';
 import { Result } from '../utils/result';
 import { cryptoRandomStr } from '../utils/text';
-import { nowS } from '../utils/time';
+import { nowUtc } from '../utils/time';
 import { Asset } from './asset';
 import { Entry } from './entry';
 import { Event } from './event';
@@ -81,7 +81,7 @@ export class User {
                     ${username},
                     SHA2(${password + salt}, 256),
                     ${salt},
-                    ${nowS()});
+                    ${nowUtc()});
         `;
 
         return Result.ok(new User(id, username, password));

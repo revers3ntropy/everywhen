@@ -12,7 +12,7 @@ export function renderable (
         | RenderCallback
         | Renderable
 ): void {
-    const api: CanvasContext = getContext(key);
+    const ctx: CanvasContext = getContext(key);
     const element = {
         ready: false,
         mounted: false
@@ -29,11 +29,11 @@ export function renderable (
         }
     }
 
-    void api.add(element);
+    void ctx.add(element);
     onMount(() => {
         element.mounted = true;
         return () => {
-            api.remove(element);
+            ctx.remove(element);
             element.mounted = false;
         };
     });

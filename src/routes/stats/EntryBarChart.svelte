@@ -6,7 +6,7 @@
     import ToggleSwitch from 'svelte-material-icons/ToggleSwitch.svelte';
     import ToggleSwitchOff from 'svelte-material-icons/ToggleSwitchOff.svelte';
     import Select from '../../lib/components/Select.svelte';
-    import { currentTzOffset, fmtUtc, nowS } from '../../lib/utils/time';
+    import { currentTzOffset, fmtUtc, nowUtc } from '../../lib/utils/time';
     import type { Seconds } from '../../lib/utils/types';
     import {
         Bucket,
@@ -68,7 +68,7 @@
 
         const buckets: Record<string, number> = {};
         const start = sortedEntries[0].created;
-        const end = nowS();
+        const end = nowUtc();
         for (let i = start; i < end; i += bucketSize(selectedBucket)) {
             buckets[bucketiseTime(i, selectedBucket).toString()] = 0;
         }

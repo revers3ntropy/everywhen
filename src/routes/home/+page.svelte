@@ -12,7 +12,7 @@
         currentTzOffset,
         dayUtcFromTimestamp,
         fmtUtc,
-        nowS
+        nowUtc
     } from '../../lib/utils/time';
 
     export let data: App.PageData & {
@@ -24,8 +24,8 @@
 
     function entriesYearsAgoToday(entries: Entry[]): Record<string, Entry[]> {
         const res: Record<string, Entry[]> = {};
-        const nowDate = fmtUtc(nowS(), currentTzOffset(), 'MM-DD');
-        const nowYear = fmtUtc(nowS(), currentTzOffset(), 'YYYY');
+        const nowDate = fmtUtc(nowUtc(), currentTzOffset(), 'MM-DD');
+        const nowYear = fmtUtc(nowUtc(), currentTzOffset(), 'YYYY');
 
         for (const entry of entries) {
             const entryDate = fmtUtc(

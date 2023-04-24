@@ -1,7 +1,7 @@
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { Result } from '../utils/result';
-import { nowS } from '../utils/time';
+import { nowUtc } from '../utils/time';
 import type { PickOptional } from '../utils/types';
 import type { Auth } from './user';
 import { UUID } from './uuid';
@@ -180,7 +180,7 @@ export class Label {
 
         json = { ...json };
         json.id ??= await UUID.generateUUId(query);
-        json.created ??= nowS();
+        json.created ??= nowUtc();
 
         const { err, val: encryptedName } = encrypt(json.name, auth.key);
         if (err) return Result.err(err);

@@ -2,7 +2,7 @@
     import { browser } from '$app/environment';
     import { onMount } from 'svelte';
     import { passcodeLastEntered } from '../lib/stores';
-    import { nowS } from '../lib/utils/time';
+    import { nowUtc } from '../lib/utils/time';
     import { wheel } from '../lib/utils/toggleScrollable';
 
     export let show = true;
@@ -19,7 +19,7 @@
 
     $: if (input === passcode && browser) {
         input = '';
-        passcodeLastEntered.set(nowS());
+        passcodeLastEntered.set(nowUtc());
         show = false;
         setTimeout(() => {
             window.scrollTo(0, lastYScroll);

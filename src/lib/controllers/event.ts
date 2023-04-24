@@ -1,7 +1,7 @@
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { Result } from '../utils/result';
-import { nowS } from '../utils/time';
+import { nowUtc } from '../utils/time';
 import type { Seconds, TimestampSecs } from '../utils/types';
 import { Label } from './label';
 import type { Auth } from './user';
@@ -122,7 +122,7 @@ export class Event {
         created?: TimestampSecs
     ): Promise<Result<Event>> {
         const id = await UUID.generateUUId(query);
-        created ??= nowS();
+        created ??= nowUtc();
 
         if (!name) {
             return Result.err('Event name cannot be empty');

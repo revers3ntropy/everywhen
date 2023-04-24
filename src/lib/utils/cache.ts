@@ -6,7 +6,7 @@ import { getAuthFromCookies } from '../security/getAuthFromCookies';
 import type { GenericResponse } from './apiResponse';
 import { makeLogger } from './log';
 import { fmtBytes } from './text';
-import { nowS } from './time';
+import { nowUtc } from './time';
 import type { Bytes, Seconds } from './types';
 
 const cacheLogger = makeLogger('CACHE', chalk.magentaBright, 'general.log');
@@ -49,7 +49,7 @@ export function cacheResponse<T>(
 ): void {
     const userCache = cache[userId] || {};
     userCache[url] = response;
-    cacheLastUsed[userId] = nowS();
+    cacheLastUsed[userId] = nowUtc();
 }
 
 function logReq(hit: boolean, url: URL) {
@@ -73,7 +73,7 @@ export function getCachedResponse<T>(
     url: string,
     userId: string
 ): T | undefined {
-    cacheLastUsed[userId] = nowS();
+    cacheLastUsed[userId] = nowUtc();
     const userCache = cache[userId] || {};
     if (url in userCache) {
         logReq(true, new URL(url));
@@ -90,7 +90,7 @@ export function invalidateCache(userId: string): void {
 }
 
 export function cleanupCache(): number {
-    const now = nowS();
+    const now = nowUtc();
     const cacheSize = roughSizeOfObject(cache);
     const timeout = cacheTimeout(cacheSize);
 

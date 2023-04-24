@@ -3,10 +3,9 @@
     import { renderable } from '../../lib/canvas/renderable';
 
     renderable({
-        setup() {
+        setup(state) {
             let dragging = false;
             let dragStart = 0;
-            let dragEnd = 0;
             let dragYStart = 0;
             let dragYEnd = 0;
 
@@ -31,7 +30,7 @@
 
             // desktop
             $canvasState.listen('mousedown', event => {
-                dragStart = $canvasState.getMousePosRaw(event);
+                dragStart = $canvasState.getMouseXRaw(event);
                 dragging = true;
             });
 
@@ -41,9 +40,11 @@
 
             $canvasState.listen('mousemove', evt => {
                 if (!dragging) return;
+                const dragEnd = state.getMouseXRaw(evt);
                 canvasState.update(s => {
-                    dragEnd = s.getMousePosRaw(evt);
-                    s.cameraOffset -= (dragEnd - dragStart) * s.zoom;
+                    const diff = dragStart - dragEnd;
+                    if (diff === 0) return s;
+                    s.cameraOffset += diff;
                     return s;
                 });
                 dragStart = dragEnd;
@@ -51,7 +52,7 @@
 
             // mobile
             $canvasState.listen('touchstart', event => {
-                dragStart = $canvasState.getMousePosRaw(event);
+                dragStart = $canvasState.getMouseXRaw(event);
                 dragYStart = $canvasState.getMouseYRaw(event);
                 dragging = true;
             });
@@ -64,10 +65,10 @@
                 evt.preventDefault();
                 if (!dragging) return;
 
-                dragEnd = $canvasState.getMousePosRaw(evt);
+                const dragEnd = $canvasState.getMouseXRaw(evt);
 
                 canvasState.update(s => {
-                    s.cameraOffset -= (dragEnd - dragStart) * s.zoom * 0.3;
+                    s.cameraOffset += (dragStart - dragEnd) * 0.25;
                     return s;
                 });
                 dragStart = dragEnd;

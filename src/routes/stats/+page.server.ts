@@ -3,7 +3,7 @@ import { Entry } from '../../lib/controllers/entry';
 import { query } from '../../lib/db/mysql';
 import { cachedPageRoute } from '../../lib/utils/cache';
 import { wordCount as txtWordCount } from '../../lib/utils/text';
-import { daysSince, nowS } from '../../lib/utils/time';
+import { daysSince, nowUtc } from '../../lib/utils/time';
 import type { PageServerLoad } from './$types';
 import { commonWordsFromText, type EntryWithWordCount } from './helpers';
 
@@ -13,7 +13,7 @@ export const load = cachedPageRoute(async auth => {
     });
     if (err) throw error(400, err);
 
-    let earliestEntryTimeStamp = nowS();
+    let earliestEntryTimeStamp = nowUtc();
 
     const entriesWithWordCount: EntryWithWordCount[] = [];
     let wordCount = 0;

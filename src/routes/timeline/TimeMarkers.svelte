@@ -3,7 +3,7 @@
     import type { RenderProps } from '../../lib/canvas/canvasHelpers';
     import { renderable } from '../../lib/canvas/renderable';
     import { NAVBAR_HEIGHT } from '../../lib/constants';
-    import { currentTzOffset, fmtUtc, nowS } from '../../lib/utils/time.js';
+    import { currentTzOffset, fmtUtc, nowUtc } from '../../lib/utils/time.js';
     import { monthIdxToName } from './utils';
 
     export let startYear = 2000;
@@ -104,9 +104,9 @@
         if (state.zoom < 5e-5) return;
 
         let leftMost = state.renderPosToTime(0);
-        const thisWeek = fmtUtc(nowS(), currentTzOffset(), 'YYYY-WW');
-        const lastWeek = fmtUtc(nowS() - 604800, currentTzOffset(), 'YYYY-WW');
-        const nextWeek = fmtUtc(nowS() + 604800, currentTzOffset(), 'YYYY-WW');
+        const thisWeek = fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-WW');
+        const lastWeek = fmtUtc(nowUtc() - 604800, currentTzOffset(), 'YYYY-WW');
+        const nextWeek = fmtUtc(nowUtc() + 604800, currentTzOffset(), 'YYYY-WW');
 
         const firstDayTimestamp = new Date(startYear, 0, 1).getTime() / 1000;
         if (leftMost < firstDayTimestamp) {
@@ -151,17 +151,17 @@
 
                 if (
                     fmtUtc(dayStart, currentTzOffset(), 'YYY-MM-DD') ===
-                    fmtUtc(nowS(), currentTzOffset(), 'YYY-MM-DD')
+                    fmtUtc(nowUtc(), currentTzOffset(), 'YYY-MM-DD')
                 ) {
                     text += ' (Today)';
                 } else if (
                     fmtUtc(dayStart, currentTzOffset(), 'YYY-MM-DD') ===
-                    fmtUtc(nowS() - 86400, currentTzOffset(), 'YYY-MM-DD')
+                    fmtUtc(nowUtc() - 86400, currentTzOffset(), 'YYY-MM-DD')
                 ) {
                     text += ' (Yesterday)';
                 } else if (
                     fmtUtc(dayStart, currentTzOffset(), 'YYY-MM-DD') ===
-                    fmtUtc(nowS() + 86400, currentTzOffset(), 'YYY-MM-DD')
+                    fmtUtc(nowUtc() + 86400, currentTzOffset(), 'YYY-MM-DD')
                 ) {
                     text += ' (Tomorrow)';
                 }

@@ -1,9 +1,10 @@
 <script lang="ts">
+    import { BoxCollider, interactable } from '../../lib/canvas/interactable';
     import { renderable } from '../../lib/canvas/renderable';
-    import { nowS } from '../../lib/utils/time';
+    import { nowUtc } from '../../lib/utils/time';
 
     renderable(state => {
-        const nowLinePos = state.timeToRenderPos(nowS());
+        const nowLinePos = state.timeToRenderPos(nowUtc(false));
 
         if (nowLinePos <= 0) {
             // not on screen

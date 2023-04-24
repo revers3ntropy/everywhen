@@ -6,7 +6,7 @@
     import type { Auth } from '../controllers/user';
     import { showPopup } from '../utils/popups';
     import { obfuscate } from '../utils/text';
-    import { nowS, utcEq } from '../utils/time';
+    import { nowUtc, utcEq } from '../utils/time';
     import EntryDialog from './dialogs/EntryDialog.svelte';
     import Dot from './Dot.svelte';
     import UtcTime from './UtcTime.svelte';
@@ -54,9 +54,9 @@
                 {#if showTimeAgo}
                     <Dot />
                     <span class="text-light">
-                        {#if utcEq(nowS(), parseInt(day))}
+                        {#if utcEq(nowUtc(), parseInt(day))}
                             <span>Today</span>
-                        {:else if utcEq(nowS() - 60 * 60 * 24, parseInt(day))}
+                        {:else if utcEq(nowUtc() - 60 * 60 * 24, parseInt(day))}
                             <span>Yesterday</span>
                         {:else}
                             <UtcTime

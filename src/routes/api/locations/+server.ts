@@ -5,7 +5,7 @@ import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
 import { apiRes404, apiResponse } from '../../../lib/utils/apiResponse';
 import { cachedApiRoute, invalidateCache } from '../../../lib/utils/cache';
 import { getUnwrappedReqBody } from '../../../lib/utils/requestBody';
-import { nowS } from '../../../lib/utils/time';
+import { nowUtc } from '../../../lib/utils/time';
 import type { RequestHandler } from './$types';
 
 export const GET = cachedApiRoute(async (auth, { url }) => {
@@ -44,7 +44,7 @@ export const POST = (async ({ request, cookies }) => {
         },
         {
             radius: 0.0001,
-            created: nowS(),
+            created: nowUtc(),
             timezoneUtcOffset: 0
         }
     );

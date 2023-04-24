@@ -3,8 +3,9 @@
     import Background from '../../lib/canvas/Background.svelte';
     import Canvas from '../../lib/canvas/Canvas.svelte';
     import { canvasState } from '../../lib/canvas/canvasHelpers';
+    import { BoxCollider, interactable } from '../../lib/canvas/interactable';
     import { Event } from '../../lib/controllers/event';
-    import { nowS } from '../../lib/utils/time';
+    import { nowUtc } from '../../lib/utils/time';
     import type { TimelineEntry } from './+page.server';
     import CenterLine from './CenterLine.svelte';
     import Controls from './Controls.svelte';
@@ -31,7 +32,7 @@
             ...data.entries.map(e => e.created),
             ...data.events.map(e => e.start)
         );
-        const earliestTimestampTimeAgo = nowS() - earliestTimestamp;
+        const earliestTimestampTimeAgo = nowUtc() - earliestTimestamp;
         const daysAgo = Math.round(
             Math.min(52, Math.max(earliestTimestampTimeAgo / (60 * 60 * 24), 0))
         );
@@ -43,7 +44,7 @@
         $canvasState.zoom = 1 / 60 / (daysAgo + 1);
 
         $canvasState.cameraOffset =
-            $canvasState.timeToRenderPos(nowS()) - ($canvasState.width * 3) / 4;
+            $canvasState.timeToRenderPos(nowUtc()) - ($canvasState.width * 3) / 4;
     }
 
     onMount(setInitialZoomAndPos);

@@ -29,7 +29,7 @@
         SUCCESS_NOTIFICATION
     } from '../../lib/utils/notifications';
     import { obfuscate } from '../../lib/utils/text';
-    import { nowS } from '../../lib/utils/time';
+    import { nowUtc } from '../../lib/utils/time';
     import LocationToggle from './LocationToggle.svelte';
 
     const { addNotification } = getNotificationsContext();
@@ -169,7 +169,7 @@
             label: newEntryLabel,
             latitude: currentLocation[0],
             longitude: currentLocation[1],
-            created: nowS(),
+            created: nowUtc(),
             agentData: serializeAgentData()
         };
 

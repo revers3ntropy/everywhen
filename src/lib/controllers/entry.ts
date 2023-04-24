@@ -1,7 +1,7 @@
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt, encryptMulti } from '../security/encryption';
 import { Result } from '../utils/result';
-import { currentTzOffset, fmtUtc, nowS } from '../utils/time';
+import { currentTzOffset, fmtUtc, nowUtc } from '../utils/time';
 import type {
     Hours,
     Mutable,
@@ -368,7 +368,7 @@ export class Entry {
             ...json_,
             id: await UUID.generateUUId(query)
         };
-        json.created ??= nowS();
+        json.created ??= nowUtc();
 
         const entry = new Entry(
             json.id,
@@ -577,7 +577,7 @@ export class Entry {
              label, agentData)
             VALUES (${editId},
                     ${entry.id},
-                    ${nowS()},
+                    ${nowUtc()},
                     ${tzOffset},
                     ${newLatitude ?? null},
                     ${newLongitude ?? null},
@@ -690,9 +690,9 @@ export class Entry {
             });
         }
 
-        const today = fmtUtc(nowS(), currentTzOffset(), 'YYYY-MM-DD');
+        const today = fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD');
         const yesterday = fmtUtc(
-            nowS() - 86400,
+            nowUtc() - 86400,
             currentTzOffset(),
             'YYYY-MM-DD'
         );

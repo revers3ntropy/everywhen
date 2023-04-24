@@ -3,7 +3,7 @@ import type { Event } from '../../controllers/event';
 import type { Label } from '../../controllers/label';
 import type { Auth } from '../../controllers/user';
 import { api, type ReqBody } from '../../utils/apiRequest';
-import { nowS } from '../../utils/time';
+import { nowUtc } from '../../utils/time';
 import type { Mutable, NotificationOptions } from '../../utils/types';
 
 export async function importEvents(
@@ -53,7 +53,7 @@ export async function importEvents(
                 },
                 {
                     label: '',
-                    created: nowS()
+                    created: nowUtc()
                 }
             )
         ) {

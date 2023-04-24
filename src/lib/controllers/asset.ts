@@ -2,7 +2,7 @@ import type { ResultSetHeader } from 'mysql2';
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { Result } from '../utils/result';
-import { nowS } from '../utils/time';
+import { nowUtc } from '../utils/time';
 import type { Auth } from './user';
 import { UUID } from './uuid';
 
@@ -65,7 +65,7 @@ export class Asset {
             VALUES (${id},
                     ${publicId},
                     ${auth.id},
-                    ${created ?? nowS()},
+                    ${created ?? nowUtc()},
                     ${encryptedFileName},
                     ${contentType},
                     ${encryptedContents})

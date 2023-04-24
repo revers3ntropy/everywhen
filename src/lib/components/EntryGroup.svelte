@@ -4,7 +4,7 @@
     import Entry from '../../lib/components/Entry.svelte';
     import type { Entry as EntryController } from '../../lib/controllers/entry';
     import type { Auth } from '../controllers/user';
-    import { nowS, utcEq } from '../utils/time';
+    import { nowUtc, utcEq } from '../utils/time';
     import Dot from './Dot.svelte';
     import UtcTime from './UtcTime.svelte';
 
@@ -54,9 +54,9 @@
         </div>
         <div>
             <p class="text-light">
-                {#if utcEq(nowS(), day)}
+                {#if utcEq(nowUtc(), day)}
                     <span>Today</span>
-                {:else if utcEq(nowS() - 60 * 60 * 24, day)}
+                {:else if utcEq(nowUtc() - 60 * 60 * 24, day)}
                     <span>Yesterday</span>
                 {:else}
                     <UtcTime relative timestamp="{day}" />

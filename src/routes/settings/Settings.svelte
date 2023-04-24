@@ -10,7 +10,7 @@
         currentTzOffset,
         fmtDuration,
         fmtUtc,
-        nowS
+        nowUtc
     } from '../../lib/utils/time.js';
 
     const { addNotification } = getNotificationsContext();
@@ -50,7 +50,7 @@
         saving = true;
 
         value = newValue;
-        created = nowS();
+        created = nowUtc();
 
         displayNotifOnErr(
             addNotification,
@@ -103,7 +103,7 @@
                     }}"
                 >
                     Last updated
-                    {fmtDuration(nowS() - created)}
+                    {fmtDuration(nowUtc() - created)}
                     ago
                 </p>
             {/if}

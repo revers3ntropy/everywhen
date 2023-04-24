@@ -16,7 +16,7 @@
         displayNotifOnErr,
         INFO_NOTIFICATION
     } from '../lib/utils/notifications';
-    import { nowS } from '../lib/utils/time';
+    import { nowUtc } from '../lib/utils/time';
     import type { NotificationOptions } from '../lib/utils/types';
     import Footer from './Footer.svelte';
     import Nav from './Nav.svelte';
@@ -30,7 +30,7 @@
 
     export let data: App.PageData;
 
-    let lastActivity = nowS();
+    let lastActivity = nowUtc();
 
     let addNotification: <T>(
         props: Record<string, T> | NotificationOptions
@@ -56,7 +56,7 @@
         const hideAfter = data.settings.autoHideEntriesDelay.value;
         if (hideAfter < 1) return;
 
-        if (nowS() - lastActivity >= hideAfter) {
+        if (nowUtc() - lastActivity >= hideAfter) {
             addNotification({
                 ...INFO_NOTIFICATION,
                 removeAfter: 0,
@@ -87,7 +87,7 @@
     function checkPasscode() {
         if (!requireAuth) return;
 
-        const secondsSinceLastEntered = nowS() - $passcodeLastEntered;
+        const secondsSinceLastEntered = nowUtc() - $passcodeLastEntered;
         showPasscodeModal =
             secondsSinceLastEntered > data.settings.passcodeTimeout.value;
     }
@@ -118,7 +118,7 @@
     });
 
     function activity() {
-        lastActivity = nowS();
+        lastActivity = nowUtc();
     }
 
     async function downloadBackup() {
@@ -133,7 +133,7 @@
     }
 
     function keydown(e: KeyboardEvent) {
-        lastActivity = nowS();
+        lastActivity = nowUtc();
         if (e.ctrlKey || e.metaKey) {
             if (e.key === 'Escape') {
                 obfuscated.set(!$obfuscated);
@@ -183,7 +183,7 @@
 </svg>
 
 <Notifications>
-    {#if data.settings.passcode.value && nowS() - $passcodeLastEntered > data.settings.passcodeTimeout.value && showPasscodeModal && !home && (data.settings.passcodeTimeout.value > 0 || !$passcodeLastEntered || !browser)}
+    {#if data.settings.passcode.value && nowUtc() - $passcodeLastEntered > data.settings.passcodeTimeout.value && showPasscodeModal && !home && (data.settings.passcodeTimeout.value > 0 || !$passcodeLastEntered || !browser)}
         <PasscodeModal
             bind:show="{showPasscodeModal}"
             passcode="{data.settings.passcode.value}"

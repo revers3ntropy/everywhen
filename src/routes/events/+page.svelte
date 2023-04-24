@@ -14,7 +14,7 @@
     import { api } from '../../lib/utils/apiRequest';
     import { displayNotifOnErr } from '../../lib/utils/notifications';
     import { showPopup } from '../../lib/utils/popups';
-    import { nowS } from '../../lib/utils/time';
+    import { nowUtc } from '../../lib/utils/time';
     import type { EventsSortKey } from '../../lib/utils/types';
     import Event from './Event.svelte';
 
@@ -59,7 +59,7 @@
     $: events = sortEvents(events, $eventsSortKey);
 
     async function newEvent() {
-        const now = nowS();
+        const now = nowUtc();
         displayNotifOnErr(
             addNotification,
             await api.post(data, '/events', {

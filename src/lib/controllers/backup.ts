@@ -4,7 +4,7 @@ import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { download as downloadFile } from '../utils/files';
 import { Result } from '../utils/result';
-import { currentTzOffset, fmtUtc, nowS } from '../utils/time';
+import { currentTzOffset, fmtUtc, nowUtc } from '../utils/time';
 import { Asset } from './asset';
 import { Entry } from './entry';
 import { Event } from './event';
@@ -116,7 +116,7 @@ export class Backup {
                     end: event.end,
                     created: event.created
                 })),
-                created ?? nowS(),
+                created ?? nowUtc(),
                 __VERSION__
             )
         );
@@ -284,7 +284,7 @@ export class Backup {
         username: string,
         encrypted: boolean
     ): void {
-        const dateFmt = fmtUtc(nowS(), currentTzOffset(), 'yyyyMMDD-HHmm');
+        const dateFmt = fmtUtc(nowUtc(), currentTzOffset(), 'yyyyMMDD-HHmm');
         const encryptedExt = encrypted ? '.encrypted' : '';
         downloadFile(`${dateFmt}-${username}.backup${encryptedExt}.json`, data);
     }

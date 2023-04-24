@@ -1,7 +1,7 @@
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { Result } from '../utils/result';
-import { nowS } from '../utils/time';
+import { nowUtc } from '../utils/time';
 import type { Seconds } from '../utils/types';
 import type { Auth } from './user';
 import { UUID } from './uuid';
@@ -89,7 +89,7 @@ export class Settings<T = unknown> {
             return Result.err(`Invalid setting key`);
         }
 
-        const now = nowS();
+        const now = nowUtc();
 
         const expectedType = Settings.config[key as SettingsKey].type;
         if (typeof value !== expectedType) {
