@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { renderable, START_ZOOM } from '../../lib/canvas/canvasHelpers';
+    import { START_ZOOM } from '../../lib/canvas/canvasHelpers';
+    import { renderable } from '../../lib/canvas/renderable';
     import { currentTzOffset, fmtUtc } from '../../lib/utils/time';
 
     renderable(state => {

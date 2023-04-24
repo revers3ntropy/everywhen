@@ -1,14 +1,12 @@
 <script lang="ts">
     import { browser } from '$app/environment';
-    import {
-        renderable,
-        type RenderProps
-    } from '../../lib/canvas/canvasHelpers';
+    import type { RenderProps } from '../../lib/canvas/canvasHelpers';
+    import { renderable } from '../../lib/canvas/renderable';
     import { NAVBAR_HEIGHT } from '../../lib/constants';
     import { currentTzOffset, fmtUtc, nowS } from '../../lib/utils/time.js';
     import { monthIdxToName } from './utils';
 
-    export let startYear: number;
+    export let startYear = 2000;
 
     const showYears = 200;
 

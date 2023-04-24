@@ -185,6 +185,10 @@ export class Label {
         const { err, val: encryptedName } = encrypt(json.name, auth.key);
         if (err) return Result.err(err);
 
+        if (encryptedName.length > 256) {
+            return Result.err('Name too long');
+        }
+
         await query`
             INSERT INTO labels (id, user, name, colour, created)
             VALUES (${json.id},
@@ -211,6 +215,10 @@ export class Label {
 
         const { err, val: encryptedName } = encrypt(name, auth.key);
         if (err) return Result.err(err);
+
+        if (encryptedName.length > 256) {
+            return Result.err('Name too long');
+        }
 
         await query`
             UPDATE labels

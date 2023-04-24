@@ -1,9 +1,9 @@
 <script lang="ts">
     import {
         CanvasState,
-        renderable,
         START_ZOOM
     } from '../../lib/canvas/canvasHelpers';
+    import { renderable } from '../../lib/canvas/renderable';
     import type { Label } from '../../lib/controllers/label';
     import { obfuscated } from '../../lib/stores';
 
@@ -27,8 +27,8 @@
 
     if (!start || !end) throw 'Missing required props';
 
-    const duration = end - start;
-    const colour = label ? label.colour : CanvasState.c_Primary;
+    const duration = end - start;``
+    const colour = label ? label.colour : CanvasState.colours.primary;
 
     renderable(state => {
         const x = state.timeToRenderPos(start);

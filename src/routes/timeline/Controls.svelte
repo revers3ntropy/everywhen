@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { canvasState, renderable } from '../../lib/canvas/canvasHelpers';
+    import { canvasState } from '../../lib/canvas/canvasHelpers';
+    import { renderable } from '../../lib/canvas/renderable';
 
     renderable({
         setup() {

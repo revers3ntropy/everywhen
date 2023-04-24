@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { renderable, START_ZOOM } from '../../lib/canvas/canvasHelpers';
+    import { START_ZOOM } from '../../lib/canvas/canvasHelpers';
+    import { renderable } from '../../lib/canvas/renderable';
     import type { EntryEdit } from '../../lib/controllers/entry';
     import type { Label } from '../../lib/controllers/label';
     import { obfuscated } from '../../lib/stores';
@@ -17,6 +18,8 @@
     export let edits: EntryEdit[] = [];
     export let createdTZOffset = 0;
     export let agentData = '';
+    export let latitude = null as number | null;
+    export let longitude = null as number | null;
 
     renderable(state => {
         const renderPos = state.timeToRenderPos(created);

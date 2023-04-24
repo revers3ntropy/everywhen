@@ -1,5 +1,4 @@
 import { browser } from '$app/environment';
-import { getContext, onMount } from 'svelte';
 import { writable } from 'svelte/store';
 import { nowS } from '../utils/time';
 import type { TimestampSecs } from '../utils/types';
@@ -54,9 +53,11 @@ export interface ICanvasState extends ICanvasListeners {
 }
 
 export class CanvasState implements ICanvasListeners {
-    static c_Primary = '#DDD';
-    static c_Text = '#FFF';
-    static c_Secondary = '#CCC';
+    static colours = {
+        primary: '#DDD',
+        text: '#FFF',
+    };
+
     width: number;
     height: number;
     cameraOffset: number;
@@ -224,7 +225,7 @@ export class CanvasState implements ICanvasListeners {
         y: number,
         w: number,
         h: number,
-        { radius = 0, colour = CanvasState.c_Primary } = {}
+        { radius = 0, colour = CanvasState.colours.primary } = {}
     ) {
         if (!this.ctx) throw new Error('Canvas not set');
         this.ctx.beginPath();
@@ -238,7 +239,7 @@ export class CanvasState implements ICanvasListeners {
         x: number,
         y: number,
         {
-            c = CanvasState.c_Text,
+            c = CanvasState.colours.text,
             maxWidth = undefined,
             align = 'left'
         }: {
@@ -259,7 +260,9 @@ export class CanvasState implements ICanvasListeners {
         x: number,
         y: number,
         r: number,
-        { colour = CanvasState.c_Primary } = {}
+        {
+            colour = CanvasState.colours.primary
+        } = {}
     ) {
         if (!this.ctx) throw new Error('Canvas not set');
         this.ctx.beginPath();
@@ -276,38 +279,3 @@ export class CanvasState implements ICanvasListeners {
 
 export const canvasState = writable(CanvasState.empty());
 export const key = Symbol();
-
-export const renderable = (
-    render?:
-        | RenderCallback
-        | {
-              render?: RenderCallback;
-              setup?: SetupCallback;
-          }
-) => {
-    const api: CanvasContext = getContext(key);
-    const element = {
-        ready: false,
-        mounted: false
-    } as Listener;
-
-    if (typeof render === 'function') {
-        element.render = render;
-    } else if (render) {
-        if (render.render) {
-            element.render = render.render;
-        }
-        if (render.setup) {
-            element.setup = render.setup;
-        }
-    }
-
-    void api.add(element);
-    onMount(() => {
-        element.mounted = true;
-        return () => {
-            api.remove(element);
-            element.mounted = false;
-        };
-    });
-};

@@ -124,6 +124,10 @@ export class Event {
         const id = await UUID.generateUUId(query);
         created ??= nowS();
 
+        if (!name) {
+            return Result.err('Event name cannot be empty');
+        }
+
         const event = new Event(id, name, start, end, created);
 
         if (label) {
@@ -133,6 +137,10 @@ export class Event {
 
         const { err: nameErr, val: nameEncrypted } = encrypt(name, auth.key);
         if (nameErr) return Result.err(nameErr);
+
+        if (nameEncrypted.length > 256) {
+            return Result.err('Name too long');
+        }
 
         await query`
             INSERT INTO events
@@ -245,6 +253,10 @@ export class Event {
 
         const { err, val: nameEncrypted } = encrypt(namePlaintext, auth.key);
         if (err) return Result.err(err);
+
+        if (nameEncrypted.length > 256) {
+            return Result.err('Name too long');
+        }
 
         await query`
             UPDATE events

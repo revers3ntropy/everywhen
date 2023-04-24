@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { renderable } from '../../lib/canvas/canvasHelpers';
+    import { renderable } from '../../lib/canvas/renderable';
     import { nowS } from '../../lib/utils/time';
 
     renderable(state => {

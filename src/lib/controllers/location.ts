@@ -38,6 +38,10 @@ export class Location {
         const { err: nameErr, val: encryptedName } = encrypt(name, auth.key);
         if (nameErr) return Result.err(nameErr);
 
+        if (encryptedName.length > 256) {
+            return Result.err('Name too long');
+        }
+
         await query`
             INSERT INTO locations (id, user, created, createdTZOffset, name,
                                    latitude, longitude, radius)
@@ -135,6 +139,10 @@ export class Location {
 
         const { err, val: encryptedName } = encrypt(newName, auth.key);
         if (err) return Result.err(err);
+
+        if (encryptedName.length > 256) {
+            return Result.err('Name too long');
+        }
 
         await query`
             UPDATE locations

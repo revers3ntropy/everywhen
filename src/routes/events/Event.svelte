@@ -168,7 +168,9 @@
     }
 
     onMount(() => {
-        if (selectNameId === event.id) {
+        // nameInput should be defined by this point,
+        // but just in case...
+        if (selectNameId === event.id && nameInput) {
             nameInput.focus();
             nameInput.select();
         }

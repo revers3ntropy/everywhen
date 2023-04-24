@@ -113,6 +113,25 @@
     use:wheel="{{ scrollable: !showingNavPopup }}"
 />
 
+<svg class="accent-gradient-svg" height="{0}" width="{0}">
+    <linearGradient id="dream-gradient" x1="{1}" x2="{1}" y1="{0}" y2="{1}">
+        <stop offset="{0}" stop-color="rgb(252,233,255)"></stop>
+        <stop offset="{1}" stop-color="rgb(196,197,255)"></stop>
+    </linearGradient>
+</svg>
+<svg class="accent-gradient-svg" height="{0}" width="{0}">
+    <linearGradient id="idea-gradient" x1="{1}" x2="{1}" y1="{0}" y2="{1}">
+        <stop offset="{0}" stop-color="white"></stop>
+        <stop offset="{1}" stop-color="yellow"></stop>
+    </linearGradient>
+</svg>
+<svg class="accent-gradient-svg" height="{0}" width="{0}">
+    <linearGradient id="thought-gradient" x1="{1}" x2="{1}" y1="{0}" y2="{1}">
+        <stop offset="{0}" stop-color="rgb(155,208,198)"></stop>
+        <stop offset="{1}" stop-color="rgb(213,231,227)"></stop>
+    </linearGradient>
+</svg>
+
 <nav class="{showingNavPopup ? 'showing-dropdown' : ''}">
     <div class="menu-button-mobile">
         <button aria-label="Show nav menu" on:click="{toggleNavPopup}">
@@ -460,6 +479,7 @@
             border-radius: 0;
             text-align: left;
             color: @text-color;
+            transition: @transition;
         }
 
         .record-entry:hover {
@@ -476,7 +496,7 @@
 
             :global(svg),
             :global(svg *) {
-                fill: @accent-color-secondary;
+                fill: url(#dream-gradient);
             }
         }
 
@@ -485,16 +505,16 @@
 
             :global(svg),
             :global(svg *) {
-                fill: yellow;
+                fill: url(#idea-gradient);
             }
         }
 
         .record-thought:hover {
-            background: rgba(220, 105, 33, 0.1);
+            background: rgba(170, 212, 205, 0.1);
 
             :global(svg),
             :global(svg *) {
-                fill: rgb(147, 81, 9);
+                fill: url(#thought-gradient);
             }
         }
     }
