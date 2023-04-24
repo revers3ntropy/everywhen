@@ -1,5 +1,6 @@
 import { browser } from '$app/environment';
 import { writable } from 'svelte/store';
+import type { CursorStyle } from '../../app';
 import { nowUtc } from '../utils/time';
 import type { TimestampSecs } from '../utils/types';
 
@@ -66,6 +67,7 @@ export class CanvasState implements ICanvasListeners {
     public canvas: HTMLCanvasElement | null;
     public pixelRatio: number;
     public time: number;
+    public cursor: CursorStyle = 'default';
 
     public readonly mousemove: CanvasListener[];
     public readonly mouseup: CanvasListener[];

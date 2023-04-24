@@ -1,9 +1,9 @@
 <script lang="ts">
+    import type { Label } from '../../lib/controllers/label';
     import { onMount } from 'svelte';
     import Background from '../../lib/canvas/Background.svelte';
     import Canvas from '../../lib/canvas/Canvas.svelte';
     import { canvasState } from '../../lib/canvas/canvasHelpers';
-    import { BoxCollider, interactable } from '../../lib/canvas/interactable';
     import { Event } from '../../lib/controllers/event';
     import { nowUtc } from '../../lib/utils/time';
     import type { TimelineEntry } from './+page.server';
@@ -19,6 +19,7 @@
     export let data: App.PageData & {
         entries: TimelineEntry[];
         events: Event[];
+        labels: Label[],
     };
 
     let events: EventWithYLevel[];
@@ -105,11 +106,17 @@
         <NowLine />
 
         {#each data.entries as entry, i}
-            <EntryInTimeline {...entry} entryTextParityHeight="{i % 2 === 0}" />
+            <EntryInTimeline
+                {...entry}
+                entryTextParityHeight="{i % 2 === 0}"
+                auth="{data}"
+            />
         {/each}
 
         {#each events as event, i}
             <EventInTimeline
+                auth="{data}"
+                labels={data.labels}
                 {...event}
                 yLevel="{Event.duration(event) < 60
                     ? eventBaseY

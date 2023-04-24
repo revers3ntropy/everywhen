@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { BoxCollider, interactable } from '../../lib/canvas/interactable';
     import { renderable } from '../../lib/canvas/renderable';
     import { nowUtc } from '../../lib/utils/time';
 

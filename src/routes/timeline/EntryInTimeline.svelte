@@ -3,9 +3,12 @@
     import { renderable } from '../../lib/canvas/renderable';
     import type { EntryEdit } from '../../lib/controllers/entry';
     import type { Label } from '../../lib/controllers/label';
+    import type { Auth } from '../../lib/controllers/user';
     import { obfuscated } from '../../lib/stores';
 
     const WIDTH = 4;
+
+    export let auth: Auth;
 
     export let id: string;
     export let created: number;

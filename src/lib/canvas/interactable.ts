@@ -1,6 +1,7 @@
 import { getContext, onMount } from 'svelte';
+import type { CursorStyle } from '../../app';
 import type { Seconds, TimestampSecs } from '../utils/types';
-import { type CanvasContext, key, type Listener } from './canvasHelpers';
+import { type CanvasContext, canvasState, key, type Listener } from './canvasHelpers';
 import type { RenderProps, SetupCallback } from './canvasHelpers';
 
 interface Collider {
@@ -35,11 +36,12 @@ export interface Interactable {
         dt: number
     ) => void | Promise<void>;
     setup?: SetupCallback;
-    collider: (
+    collider?: (
         props: RenderProps,
         hovering: boolean,
         dt: number
-    ) => Collider;
+    ) => Collider | null;
+    cursorOnHover?: CursorStyle
 }
 
 export function interactable (
@@ -47,23 +49,37 @@ export function interactable (
 ): void {
     let hovering = false;
 
+    function isHovering (props: RenderProps, dt: number): boolean {
+        if (!interactable.collider) return false;
+
+        const collider = interactable.collider(props, hovering, dt);
+
+        if (!collider) return false;
+        return collider.colliding(
+            props.mouseTime,
+            props.mouseY
+        );
+    }
+
     const ctx: CanvasContext = getContext(key);
     const element = {
         ready: false,
         mounted: false,
         render (props, dt) {
-            const collider = interactable.collider(props, hovering, dt);
+            const hoveringThisTick = isHovering(props, dt);
+            if (hoveringThisTick) {
+                if (interactable.cursorOnHover) {
+                    canvasState.update(s => {
+                        s.cursor = interactable.cursorOnHover || 'default';
+                        return s;
+                    });
+                }
 
-            const colliding = collider.colliding(
-                props.mouseTime,
-                props.mouseY
-            );
-
-            if (colliding && !hovering && interactable.onHover) {
-                interactable.onHover(props.mouseTime, props.mouseY);
+                if (!hovering && interactable.onHover) {
+                    interactable.onHover(props.mouseTime, props.mouseY);
+                }
             }
-
-            hovering = colliding;
+            hovering = hoveringThisTick;
 
             return interactable.render?.(
                 props,

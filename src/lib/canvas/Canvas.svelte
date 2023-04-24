@@ -85,6 +85,10 @@
                 }
             }
         }
+
+        canvas.style.cursor = $canvasState.cursor;
+        $canvasState.cursor = 'default';
+
         $canvasState.ctx.restore();
     }
 

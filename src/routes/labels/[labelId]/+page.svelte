@@ -9,7 +9,7 @@
     import { api, apiPath } from '../../../lib/utils/apiRequest';
     import { displayNotifOnErr } from '../../../lib/utils/notifications';
     import { showPopup } from '../../../lib/utils/popups';
-    import Event from '../../events/Event.svelte';
+    import Event from '../../../lib/components/Event.svelte';
     import DeleteLabelDialog from '../DeleteLabelDialog.svelte';
 
     const { addNotification } = getNotificationsContext();

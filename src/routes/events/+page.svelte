@@ -16,7 +16,7 @@
     import { showPopup } from '../../lib/utils/popups';
     import { nowUtc } from '../../lib/utils/time';
     import type { EventsSortKey } from '../../lib/utils/types';
-    import Event from './Event.svelte';
+    import Event from '../../lib/components/Event.svelte';
 
     const NEW_EVENT_NAME = 'New Event';
 
@@ -31,7 +31,7 @@
 
     let events: EventData[] = data.events;
 
-    function sortEvents<T extends Event | EventData>(
+    function sortEvents<T extends EventController | EventData>(
         events: T[],
         key: EventsSortKey & keyof T
     ): T[] {
@@ -42,7 +42,7 @@
             });
         } else if (typeof events[0][key] === 'number') {
             return events.sort((a, b) => {
-                return b[key] - a[key];
+                return b[key] as number - <number>a[key];
             });
         }
         throw new Error('Invalid sort key');

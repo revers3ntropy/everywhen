@@ -1,6 +1,7 @@
 import { error } from '@sveltejs/kit';
 import { Entry } from '../../lib/controllers/entry';
 import { Event } from '../../lib/controllers/event';
+import { Label } from '../../lib/controllers/label';
 import { query } from '../../lib/db/mysql';
 import { cachedPageRoute } from '../../lib/utils/cache';
 import { wordCount } from '../../lib/utils/text';
@@ -17,12 +18,16 @@ export const load = cachedPageRoute(async auth => {
     const { val: events, err: eventsErr } = await Event.all(query, auth);
     if (eventsErr) throw error(400, eventsErr);
 
+    const { val: labels, err: labelsErr } = await Label.all(query, auth);
+    if (labelsErr) throw error(400, labelsErr);
+
     return {
         entries: entries.map(e => ({
             ...e,
             wordCount: wordCount(e.entry),
             entry: undefined
         })) as TimelineEntry[],
-        events
+        events,
+        labels
     };
 }) satisfies PageServerLoad;

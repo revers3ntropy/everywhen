@@ -14,37 +14,39 @@
     import TimelineOutline from 'svelte-material-icons/TimelineOutline.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import type { ChangeEventHandler } from 'svelte/elements';
-    import Label from '../../lib/components/Label.svelte';
-    import LabelSelect from '../../lib/components/LabelSelect.svelte';
-    import UtcTime from '../../lib/components/UtcTime.svelte';
-    import type { Event as EventController } from '../../lib/controllers/event';
-    import { Event } from '../../lib/controllers/event';
-    import type { Label as LabelController } from '../../lib/controllers/label';
-    import type { Auth } from '../../lib/controllers/user';
-    import { api, apiPath } from '../../lib/utils/apiRequest';
-    import { displayNotifOnErr } from '../../lib/utils/notifications';
-    import { obfuscate } from '../../lib/utils/text';
+    import Label from './Label.svelte';
+    import LabelSelect from './LabelSelect.svelte';
+    import UtcTime from './UtcTime.svelte';
+    import type { Event as EventController } from '../controllers/event';
+    import { Event } from '../controllers/event';
+    import type { Label as LabelController } from '../controllers/label';
+    import type { Auth } from '../controllers/user';
+    import { api, apiPath } from '../utils/apiRequest';
+    import { displayNotifOnErr } from '../utils/notifications';
+    import { obfuscate } from '../utils/text';
     import {
         fmtDuration,
         fmtTimestampForInput,
         parseTimestampFromInputUtc
-    } from '../../lib/utils/time';
-    import type { Seconds } from '../../lib/utils/types';
+    } from '../utils/time';
+    import type { Seconds } from '../utils/types';
 
     const { addNotification } = getNotificationsContext();
     const dispatch = createEventDispatcher();
 
     export let auth: Auth;
+    export let labels: LabelController[];
     export let obfuscated = true;
+
+    export let bordered = true;
     export let event: EventController & { deleted?: true };
     export let selectNameId = '';
-    export let changeEventCount: (by: number) => void;
     export let editingLabel = false;
+    export let expanded = false;
+
+    export let changeEventCount: (by: number) => void;
 
     let nameInput: HTMLInputElement;
-    export let labels: LabelController[];
-
-    let panelOpen = false;
 
     async function updateEvent(changes: {
         name?: string;
@@ -181,7 +183,7 @@
     }
 </script>
 
-<div class="event {panelOpen ? 'open' : ''}">
+<div class="event {expanded ? 'open' : ''} {bordered ? 'bordered' : ''}">
     {#if event.deleted}
         <div class="restore-menu">
             <i>'{event.name}' has been deleted</i>
@@ -190,7 +192,7 @@
                 Undo Deletion
             </button>
         </div>
-    {:else if panelOpen}
+    {:else if expanded}
         <div class="header">
             <button
                 aria-label="{obfuscated ? 'Show entry' : 'Hide entry'}"
@@ -240,7 +242,7 @@
                     </button>
                 {/if}
             {/if}
-            <button on:click="{() => (panelOpen = false)}" class="icon-button">
+            <button on:click="{() => (expanded = false)}" class="icon-button">
                 <ChevronUp size="25" />
             </button>
         </div>
@@ -401,7 +403,7 @@
 
             <div>
                 <button
-                    on:click="{() => (panelOpen = true)}"
+                    on:click="{() => (expanded = true)}"
                     class="icon-button"
                 >
                     <ChevronDown size="25" />
@@ -416,7 +418,6 @@
     @import '../../styles/layout';
 
     .event {
-        .bordered();
         margin: 0.3rem 0.3em;
         padding: 0.4em;
         border-radius: @border-radius;
@@ -439,10 +440,6 @@
                 flex-direction: row;
                 justify-content: space-between;
                 align-items: center;
-
-                //@media @mobile {
-                //    display: block;
-                //}
             }
         }
     }
