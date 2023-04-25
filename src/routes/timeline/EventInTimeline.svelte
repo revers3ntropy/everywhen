@@ -107,7 +107,7 @@
                         (eventTextParityHeight ? HEIGHT / 2 + 15 : -5),
                     {
                         align: 'center',
-                        backgroundColour: this.hovering ? '#222' : undefined,
+                        backgroundColour: this.hovering ? '#223' : undefined,
                         fontSize: this.hovering ? 14 : 12,
                         backgroundPadding: 4,
                         backgroundRadius: 2

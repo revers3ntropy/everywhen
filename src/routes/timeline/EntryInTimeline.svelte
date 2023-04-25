@@ -73,7 +73,7 @@
                     y += height + 12;
                 }
 
-                state.text(title, renderPos - 5, y - 5, {
+                state.text(title, renderPos, y - 5, {
                     align: 'center',
                     backgroundColour: this.hovering ? '#223' : undefined,
                     fontSize: this.hovering ? 14 : 12,
@@ -85,10 +85,10 @@
 
         collider(state) {
             return new RectCollider(
-                state.timeToRenderPos(created) - WIDTH / 2,
+                state.timeToRenderPos(created) - WIDTH / 2 - 1,
                 state.centerLnY(),
-                WIDTH,
-                height
+                WIDTH + 2,
+                state.height - state.centerLnY()
             );
         },
 
