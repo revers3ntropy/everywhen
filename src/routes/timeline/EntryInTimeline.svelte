@@ -56,7 +56,7 @@
                 y += size + 12;
             }
 
-            state.text(title, renderPos - 5, y, {
+            state.text(title, renderPos - 5, y - 5, {
                 align: 'center'
             });
         }

@@ -90,7 +90,7 @@
                 state.text(
                     name,
                     Math.max(5, x + TEXT_X_OFFSET),
-                    y + HEIGHT / 2 + 5,
+                    y + HEIGHT / 2,
                     {
                         c: textColour
                     }
@@ -104,7 +104,7 @@
                     x + 5,
                     y +
                         HEIGHT / 2 +
-                        (eventTextParityHeight ? HEIGHT / 2 + 20 : 0),
+                        (eventTextParityHeight ? HEIGHT / 2 + 15 : -5),
                     {
                         align: 'center',
                         backgroundColour: this.hovering ? '#222' : undefined,

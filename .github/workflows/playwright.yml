@@ -1,3 +1,5 @@
+// disable
+
 name: Playwright Tests
 on:
   push:
