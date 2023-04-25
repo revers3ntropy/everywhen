@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { beforeNavigate } from '$app/navigation';
     import { onMount, setContext } from 'svelte';
     import {
         type CanvasContext,
@@ -7,7 +8,7 @@
         type ICanvasState,
         key,
         type Listener
-    } from './canvasHelpers';
+    } from './canvasState';
 
     export let killLoopOnError = true;
     export let attributes: CanvasRenderingContext2DSettings = {};
@@ -67,11 +68,13 @@
 
     function render(dt: number) {
         if (!$canvasState.ctx) throw 'Canvas context not initialized';
+
         $canvasState.ctx.save();
         $canvasState.ctx.scale(
             $canvasState.pixelRatio,
             $canvasState.pixelRatio
         );
+
         for (const entity of listeners) {
             try {
                 if (entity.mounted && entity.ready && entity.render) {
@@ -86,7 +89,11 @@
             }
         }
 
-        canvas.style.cursor = $canvasState.cursor;
+        $canvasState.flushRenderQueue();
+
+        if (canvas) {
+            canvas.style.cursor = $canvasState.cursor;
+        }
         $canvasState.cursor = 'default';
 
         $canvasState.ctx.restore();
@@ -139,6 +146,10 @@
             executeListeners(event, fn);
         };
     }
+
+    beforeNavigate(() => {
+        cancelAnimationFrame(frame);
+    });
 </script>
 
 <canvas

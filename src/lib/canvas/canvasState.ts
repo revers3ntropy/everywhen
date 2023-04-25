@@ -1,8 +1,10 @@
 import { browser } from '$app/environment';
 import { writable } from 'svelte/store';
 import type { CursorStyle } from '../../app';
+import { errorLogger } from '../utils/log';
 import { nowUtc } from '../utils/time';
-import type { TimestampSecs } from '../utils/types';
+import type { Pixels, TimestampSecs } from '../utils/types';
+import type { Interactable } from './interactable';
 
 export const START_ZOOM = 1 / (60 * 60);
 
@@ -22,8 +24,9 @@ export type RenderCallback = (
 export interface Listener {
     setup?: SetupCallback;
     render?: RenderCallback;
-    ready: boolean;
-    mounted: boolean;
+    ready?: boolean;
+    mounted?: boolean;
+    hovering?: boolean;
 }
 
 export interface CanvasContext {
@@ -53,10 +56,15 @@ export interface ICanvasState extends ICanvasListeners {
     zoom: number;
 }
 
+export interface RenderRequest {
+    zIndex: number;
+    cb: (state: CanvasState) => void;
+}
+
 export class CanvasState implements ICanvasListeners {
     static colours = {
         primary: '#DDD',
-        text: '#FFF',
+        text: '#FFF'
     };
 
     public width: number;
@@ -80,6 +88,9 @@ export class CanvasState implements ICanvasListeners {
     public mouseTime = 0;
     public mouseY = 0;
 
+    private interactables: Interactable[] = [];
+    private renderQueue: RenderRequest[] = [];
+
     public constructor(props: Required<CanvasState>) {
         this.width = props.width;
         this.height = props.height;
@@ -98,10 +109,59 @@ export class CanvasState implements ICanvasListeners {
         this.touchend = props.touchend;
         this.wheel = props.wheel;
 
-        this.listen('mousemove', (e) => {
+        this.listen('mousemove', e => {
             this.mouseTime = this.getMouseTime(e);
             this.mouseY = this.getMouseYRaw(e);
+
+            this.updateHoveringOnInteractables();
+
+            this.listen('mouseup', () => {
+                for (const interactable of this.interactables) {
+                    if (!interactable.hovering) continue;
+                    interactable.onMouseUp?.(this.mouseTime, this.mouseY);
+                }
+            });
         });
+    }
+
+    private updateHoveringOnInteractables() {
+        const queue = this.interactables
+            .map(i =>
+                i.collider
+                    ? ([i.collider?.(this.asRenderProps()), i] as const)
+                    : null
+            )
+            .filter(Boolean)
+            .sort(([a], [b]) => (b?.zIndex || 0) - (a?.zIndex || 0));
+
+        while (queue.length) {
+            const next = queue.shift();
+            if (!next) continue;
+            const [collider, interactable] = next;
+
+            const hovering = collider?.colliding?.(
+                this.asRenderProps(),
+                this.mouseTime,
+                this.mouseY
+            );
+
+            interactable.hovering = hovering;
+            if (hovering) {
+                // only hover one thing at a time
+                for (const [, other] of queue) {
+                    other.hovering = false;
+                }
+                return;
+            }
+        }
+    }
+
+    public flushRenderQueue() {
+        this.renderQueue.sort((a, b) => a.zIndex - b.zIndex);
+        for (const req of this.renderQueue) {
+            req.cb(this);
+        }
+        this.renderQueue = [];
     }
 
     static empty(): CanvasState {
@@ -130,6 +190,10 @@ export class CanvasState implements ICanvasListeners {
         callback: CanvasListener<WindowEventMap[EvtT]>
     ) {
         this[event].push(callback);
+    }
+
+    public registerInteractable(interactable: Interactable) {
+        this.interactables.push(interactable);
     }
 
     public center(): number {
@@ -171,10 +235,12 @@ export class CanvasState implements ICanvasListeners {
     public renderPosToTime(pos: number): TimestampSecs {
         pos = this.width - pos;
         pos = this.zoomScaledPosition(pos, 1 / this.zoom, this.cameraOffset);
-        return nowUtc(false) -
-                pos +
-                this.cameraOffset +
-                new Date().getTimezoneOffset() * 60
+        return (
+            nowUtc(false) -
+            pos +
+            this.cameraOffset +
+            new Date().getTimezoneOffset() * 60
+        );
     }
 
     public getMouseXRaw(event: MouseEvent | TouchEvent): number {
@@ -193,18 +259,16 @@ export class CanvasState implements ICanvasListeners {
                     ? (event.originalEvent as TouchEvent)
                     : (event as TouchEvent);
             pageX =
-                evt.touches?.[0]?.pageX
-                || evt.changedTouches?.[0]?.pageX
-                || 0;
+                evt.touches?.[0]?.pageX || evt.changedTouches?.[0]?.pageX || 0;
         } else {
             pageX = (event as MouseEvent).pageX;
         }
 
-        return (pageX - rect.left) * this.canvas.width / rect.width;
-    }
-
-    public getMouseTime(event: MouseEvent | TouchEvent): number {
-        return this.renderPosToTime(this.getMouseXRaw(event));
+        return (
+            ((pageX - rect.left) * this.canvas.width) /
+            rect.width /
+            this.pixelRatio
+        );
     }
 
     public getMouseYRaw(event: MouseEvent | TouchEvent): number {
@@ -228,7 +292,15 @@ export class CanvasState implements ICanvasListeners {
             pageY = (event as MouseEvent).pageY;
         }
 
-        return ((pageY - rect.top) * this.canvas.height) / rect.height;
+        return (
+            ((pageY - rect.top) * this.canvas.height) /
+            rect.height /
+            this.pixelRatio
+        );
+    }
+
+    public getMouseTime(event: MouseEvent | TouchEvent): number {
+        return this.renderPosToTime(this.getMouseXRaw(event));
     }
 
     public rect(
@@ -238,13 +310,28 @@ export class CanvasState implements ICanvasListeners {
         h: number,
         {
             radius = 0,
-            colour = CanvasState.colours.primary
+            colour = CanvasState.colours.primary,
+            wireframe = false,
+            zIndex = 0
         } = {}
     ) {
         if (!this.ctx) throw new Error('Canvas not set');
+        if (zIndex !== 0) {
+            this.renderQueue.push({
+                zIndex,
+                cb: () => this.rect(x, y, w, h, { radius, colour, wireframe })
+            });
+            return;
+        }
+
         this.ctx.beginPath();
         this.ctx.fillStyle = colour;
+        this.ctx.strokeStyle = colour;
         this.ctx.roundRect(x, y, w, h, radius);
+        if (wireframe) {
+            this.ctx.stroke();
+            return;
+        }
         this.ctx.fill();
     }
 
@@ -255,15 +342,76 @@ export class CanvasState implements ICanvasListeners {
         {
             c = CanvasState.colours.text,
             maxWidth = undefined,
-            align = 'left'
+            align = 'left',
+            backgroundColour = undefined,
+            backgroundPadding = 2,
+            fontSize = 10,
+            font = 'sans-serif',
+            backgroundRadius = 0,
+            zIndex = 1
         }: {
             c?: string;
             maxWidth?: number;
             align?: CanvasTextAlign;
+            backgroundColour?: string;
+            backgroundPadding?: Pixels;
+            fontSize?: Pixels;
+            font?: string;
+            backgroundRadius?: number;
+            zIndex?: number;
         } = {}
     ) {
         if (!this.ctx) throw new Error('Canvas not set');
+        if (zIndex !== 0) {
+            this.renderQueue.push({
+                zIndex,
+                cb: () =>
+                    this.text(txt, x, y, {
+                        c,
+                        maxWidth,
+                        align,
+                        backgroundColour,
+                        backgroundPadding,
+                        fontSize,
+                        font,
+                        backgroundRadius,
+                        zIndex: 0
+                    })
+            });
+            return;
+        }
+
+        const fontFmt = `${fontSize}px ${font}`;
+
+        if (backgroundColour) {
+            this.ctx.font = fontFmt;
+            const { width } = this.ctx.measureText(txt);
+
+            let backgroundX = x;
+            switch (align) {
+                case 'center':
+                    backgroundX -= width / 2;
+                    break;
+                case 'right':
+                    backgroundX -= width;
+                    break;
+            }
+
+            this.rect(
+                backgroundX - backgroundPadding,
+                y - backgroundPadding,
+                width + backgroundPadding * 2,
+                fontSize + backgroundPadding,
+                {
+                    colour: backgroundColour,
+                    radius: backgroundRadius
+                }
+            );
+        }
+
         this.ctx.beginPath();
+        this.ctx.font = fontFmt;
+        this.ctx.textBaseline = 'hanging';
         this.ctx.textAlign = align;
         this.ctx.fillStyle = c;
         this.ctx.fillText(txt, x, y, maxWidth);
@@ -274,11 +422,17 @@ export class CanvasState implements ICanvasListeners {
         x: number,
         y: number,
         r: number,
-        {
-            colour = CanvasState.colours.primary
-        } = {}
+        { colour = CanvasState.colours.primary, zIndex = 0 } = {}
     ) {
         if (!this.ctx) throw new Error('Canvas not set');
+        if (zIndex !== 0) {
+            this.renderQueue.push({
+                zIndex,
+                cb: () => this.circle(x, y, r, { colour })
+            });
+            return;
+        }
+
         this.ctx.beginPath();
         this.ctx.fillStyle = colour;
         this.ctx.arc(x, y, r, 0, 2 * Math.PI);
@@ -286,7 +440,10 @@ export class CanvasState implements ICanvasListeners {
     }
 
     public asRenderProps(): RenderProps {
-        if (!this.ctx) throw new Error('Canvas not set');
+        if (!this.ctx) {
+            errorLogger.error('Canvas not set');
+            throw new Error('Canvas not set');
+        }
         return this as unknown as RenderProps;
     }
 }

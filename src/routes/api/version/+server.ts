@@ -1,7 +1,4 @@
-import {
-    apiRes404,
-    apiResponse,
-} from '../../../lib/utils/apiResponse';
+import { apiRes404, apiResponse } from '../../../lib/utils/apiResponse';
 import type { RequestHandler } from './$types';
 
 const GET_RES = {

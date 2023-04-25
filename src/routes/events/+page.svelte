@@ -42,7 +42,7 @@
             });
         } else if (typeof events[0][key] === 'number') {
             return events.sort((a, b) => {
-                return b[key] as number - <number>a[key];
+                return (b[key] as number) - <number>a[key];
             });
         }
         throw new Error('Invalid sort key');

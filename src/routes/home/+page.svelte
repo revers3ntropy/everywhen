@@ -4,6 +4,7 @@
     import ImageOutline from 'svelte-material-icons/ImageOutline.svelte';
     import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
     import Notebook from 'svelte-material-icons/Notebook.svelte';
+    import Calendar from 'svelte-material-icons/Calendar.svelte';
     import type { App } from '../../app';
     import EntryTitles from '../../lib/components/EntryTitles.svelte';
     import type { Entry } from '../../lib/controllers/entry';
@@ -63,6 +64,10 @@
             <a class="icon-gradient-on-hover" href="/labels">
                 <LabelOutline size="25" />
                 Labels
+            </a>
+            <a class="icon-gradient-on-hover" href="/events">
+                <Calendar size="25" />
+                Events
             </a>
             <a class="icon-gradient-on-hover" href="/assets">
                 <ImageOutline size="25" />

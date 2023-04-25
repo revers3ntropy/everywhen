@@ -1,73 +1,35 @@
 import { getContext, onMount } from 'svelte';
 import type { CursorStyle } from '../../app';
-import type { Seconds, TimestampSecs } from '../utils/types';
-import { type CanvasContext, canvasState, key, type Listener } from './canvasHelpers';
-import type { RenderProps, SetupCallback } from './canvasHelpers';
+import type { TimestampSecs } from '../utils/types';
+import {
+    type CanvasContext,
+    canvasState,
+    key,
+    type Listener
+} from './canvasState';
+import type { RenderProps } from './canvasState';
+import type { Collider } from './collider';
 
-interface Collider {
-    colliding(x: number, y: number): boolean;
-}
+const DEBUG_RENDER_COLLIDERS = false;
 
-export class BoxCollider implements Collider {
-    constructor (
-        public readonly time: TimestampSecs,
-        public readonly y: number,
-        public readonly duration: Seconds,
-        public readonly height: number
-    ) {
-    }
-
-    colliding (time: number, y: number): boolean {
-        return (
-            time >= this.time &&
-            time <= this.time + this.duration &&
-            y >= this.y &&
-            y <= this.y + this.height
-        );
-    }
-}
-
-export interface Interactable {
+export interface Interactable extends Listener {
     onHover?: (time: TimestampSecs, y: number) => void;
-    onClick?: (time: TimestampSecs, y: number) => void;
-    render?: (
-        props: RenderProps,
-        hovering: boolean,
-        dt: number
-    ) => void | Promise<void>;
-    setup?: SetupCallback;
-    collider?: (
-        props: RenderProps,
-        hovering: boolean,
-        dt: number
-    ) => Collider | null;
-    cursorOnHover?: CursorStyle
+    onMouseUp?: (time: TimestampSecs, y: number) => void;
+    collider?: (props: RenderProps) => Collider | null;
+    cursorOnHover?: CursorStyle;
 }
 
-export function interactable (
-    interactable: Interactable
-): void {
-    let hovering = false;
-
-    function isHovering (props: RenderProps, dt: number): boolean {
-        if (!interactable.collider) return false;
-
-        const collider = interactable.collider(props, hovering, dt);
-
-        if (!collider) return false;
-        return collider.colliding(
-            props.mouseTime,
-            props.mouseY
-        );
-    }
+export function interactable(interactable: Interactable): void {
+    let wasHovering = false;
 
     const ctx: CanvasContext = getContext(key);
+
     const element = {
         ready: false,
         mounted: false,
-        render (props, dt) {
-            const hoveringThisTick = isHovering(props, dt);
-            if (hoveringThisTick) {
+        hovering: false,
+        render(state, dt) {
+            if (interactable.hovering) {
                 if (interactable.cursorOnHover) {
                     canvasState.update(s => {
                         s.cursor = interactable.cursorOnHover || 'default';
@@ -75,31 +37,25 @@ export function interactable (
                     });
                 }
 
-                if (!hovering && interactable.onHover) {
-                    interactable.onHover(props.mouseTime, props.mouseY);
+                if (!wasHovering && interactable.onHover) {
+                    interactable.onHover(state.mouseTime, state.mouseY);
                 }
             }
-            hovering = hoveringThisTick;
+            wasHovering = !!interactable.hovering;
 
-            return interactable.render?.(
-                props,
-                hovering,
-                dt
-            );
+            if (DEBUG_RENDER_COLLIDERS) {
+                const collider = interactable.collider?.(state);
+                if (collider) {
+                    collider.debugDraw(state);
+                }
+            }
+
+            return interactable.render?.(state, dt);
         },
 
-        setup (props) {
-            if (interactable.onClick) {
-                props.listen('mouseup', (event) => {
-                    if (!hovering) return;
-
-                    interactable.onClick?.(
-                        props.getMouseTime(event),
-                        props.getMouseYRaw(event)
-                    );
-                })
-            }
-            return interactable.setup?.(props);
+        setup(state) {
+            state.registerInteractable(interactable);
+            return interactable.setup?.(state);
         }
     } as Listener;
 

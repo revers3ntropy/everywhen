@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { canvasState } from '../../lib/canvas/canvasHelpers';
+    import { canvasState } from '../../lib/canvas/canvasState';
     import { renderable } from '../../lib/canvas/renderable';
 
     renderable({

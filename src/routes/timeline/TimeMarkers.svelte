@@ -1,6 +1,6 @@
 <script lang="ts">
     import { browser } from '$app/environment';
-    import type { RenderProps } from '../../lib/canvas/canvasHelpers';
+    import type { RenderProps } from '../../lib/canvas/canvasState';
     import { renderable } from '../../lib/canvas/renderable';
     import { NAVBAR_HEIGHT } from '../../lib/constants';
     import { currentTzOffset, fmtUtc, nowUtc } from '../../lib/utils/time.js';
@@ -105,8 +105,16 @@
 
         let leftMost = state.renderPosToTime(0);
         const thisWeek = fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-WW');
-        const lastWeek = fmtUtc(nowUtc() - 604800, currentTzOffset(), 'YYYY-WW');
-        const nextWeek = fmtUtc(nowUtc() + 604800, currentTzOffset(), 'YYYY-WW');
+        const lastWeek = fmtUtc(
+            nowUtc() - 604800,
+            currentTzOffset(),
+            'YYYY-WW'
+        );
+        const nextWeek = fmtUtc(
+            nowUtc() + 604800,
+            currentTzOffset(),
+            'YYYY-WW'
+        );
 
         const firstDayTimestamp = new Date(startYear, 0, 1).getTime() / 1000;
         if (leftMost < firstDayTimestamp) {

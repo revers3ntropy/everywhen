@@ -3,7 +3,7 @@
     import { onMount } from 'svelte';
     import Background from '../../lib/canvas/Background.svelte';
     import Canvas from '../../lib/canvas/Canvas.svelte';
-    import { canvasState } from '../../lib/canvas/canvasHelpers';
+    import { canvasState } from '../../lib/canvas/canvasState';
     import { Event } from '../../lib/controllers/event';
     import { nowUtc } from '../../lib/utils/time';
     import type { TimelineEntry } from './+page.server';
@@ -19,7 +19,7 @@
     export let data: App.PageData & {
         entries: TimelineEntry[];
         events: Event[];
-        labels: Label[],
+        labels: Label[];
     };
 
     let events: EventWithYLevel[];
@@ -45,7 +45,8 @@
         $canvasState.zoom = 1 / 60 / (daysAgo + 1);
 
         $canvasState.cameraOffset =
-            $canvasState.timeToRenderPos(nowUtc()) - ($canvasState.width * 3) / 4;
+            $canvasState.timeToRenderPos(nowUtc()) -
+            ($canvasState.width * 3) / 4;
     }
 
     onMount(setInitialZoomAndPos);
@@ -116,7 +117,7 @@
         {#each events as event, i}
             <EventInTimeline
                 auth="{data}"
-                labels={data.labels}
+                labels="{data.labels}"
                 {...event}
                 yLevel="{Event.duration(event) < 60
                     ? eventBaseY

@@ -2,7 +2,6 @@
     import { page } from '$app/stores';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import Brain from 'svelte-material-icons/Brain.svelte';
-    import Calendar from 'svelte-material-icons/Calendar.svelte';
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
     import Close from 'svelte-material-icons/Close.svelte';
     import Cog from 'svelte-material-icons/Cog.svelte';
@@ -148,7 +147,7 @@
             class="icon {$page.url.pathname === '/home' ? 'current' : ''}"
             href="/home"
         >
-            <Home size="40" />
+            <Home size="35" />
             <span class="name">Home</span>
         </a>
         <a
@@ -156,23 +155,15 @@
             class="icon {$page.url.pathname === '/journal' ? 'current' : ''}"
             href="/journal"
         >
-            <Notebook size="40" />
+            <Notebook size="35" />
             <span class="name">Journal</span>
-        </a>
-        <a
-            aria-label="events"
-            class="icon {$page.url.pathname === '/events' ? 'current' : ''}"
-            href="/events"
-        >
-            <Calendar size="40" />
-            <span class="name">Events</span>
         </a>
         <a
             aria-label="timeline"
             class="icon {$page.url.pathname === '/timeline' ? 'current' : ''}"
             href="/timeline"
         >
-            <ChartTimeline size="40" />
+            <ChartTimeline size="35" />
             <span class="name">Timeline</span>
         </a>
         <a
@@ -180,7 +171,7 @@
             class="icon {$page.url.pathname === '/location' ? 'current' : ''}"
             href="/location"
         >
-            <MapMarkerOutline size="40" />
+            <MapMarkerOutline size="35" />
             <span class="name">Map</span>
         </a>
         <a
@@ -188,15 +179,15 @@
             class="icon {$page.url.pathname === '/stats' ? 'current' : ''}"
             href="/stats"
         >
-            <Counter size="40" />
+            <Counter size="35" />
             <span class="name">Analytics</span>
         </a>
     </div>
 
     <div>
         <Dropdown openOnHover unstyledButton width="170px">
-            <span class="create-button icon-gradient-on-hover" slot="button">
-                <Plus size="40" />
+            <span class="create-button" slot="button">
+                <Plus size="25" />
             </span>
 
             <div class="record-something-buttons">
@@ -333,7 +324,7 @@
 
         &.current {
             &:after {
-                background-color: @accent-color-secondary;
+                background: @accent-color-secondary;
             }
         }
 
@@ -462,9 +453,15 @@
     }
 
     .create-button {
+        .flex-center();
+
+        border-radius: 50%;
+        background: @light-accent;
+        width: 30px;
+        height: 30px;
+
         &:hover {
-            background-color: @bg;
-            border-radius: @border-radius;
+            background: none;
         }
     }
 

@@ -1,9 +1,7 @@
 <script lang="ts">
-    import {
-        CanvasState,
-        START_ZOOM
-    } from '../../lib/canvas/canvasHelpers';
-    import { BoxCollider, interactable } from '../../lib/canvas/interactable';
+    import { CanvasState, START_ZOOM } from '../../lib/canvas/canvasState';
+    import { DurationRectCollider } from '../../lib/canvas/collider';
+    import { interactable } from '../../lib/canvas/interactable';
     import type { Auth } from '../../lib/controllers/user';
     import Event from '../../lib/components/Event.svelte';
     import type { Label } from '../../lib/controllers/label';
@@ -12,6 +10,9 @@
 
     const HEIGHT = 30;
     const LABEL_HEIGHT = 4;
+    const SINGLE_EVENT_CIRCLE_RADIUS = 5;
+    const Y_MARGIN = 2;
+    const TEXT_X_OFFSET = 0;
 
     export let auth: Auth;
     export let labels: Label[];
@@ -26,26 +27,21 @@
     export let created: number;
     export let decrypted: boolean;
 
-    export let options = {
-        yMargin: 2,
-        textXOffset: 5
-    };
-
     let thisIsDeleted = false;
 
     if (!start || !end) throw 'Missing required props';
 
     const duration = end - start;
     const isSingleEvent = duration < 60;
-    const colour = label ? label.colour : CanvasState.colours.primary;
+    const colour = label?.colour || CanvasState.colours.primary;
 
-    function yRenderPos (centerLineY: number) {
-        return centerLineY - yLevel * (HEIGHT + options.yMargin);
+    function yRenderPos(centerLineY: number) {
+        return centerLineY - yLevel * (HEIGHT + Y_MARGIN);
     }
 
     interactable({
         cursorOnHover: 'pointer',
-        render(state, hovering) {
+        render(state) {
             if (thisIsDeleted) return;
 
             const x = state.timeToRenderPos(start);
@@ -53,7 +49,19 @@
             const width = duration * state.zoom;
 
             if (isSingleEvent) {
-                state.circle(x, y + HEIGHT, 5, { colour });
+                if (this.hovering) {
+                    state.circle(
+                        x,
+                        y + HEIGHT,
+                        SINGLE_EVENT_CIRCLE_RADIUS + 1,
+                        {
+                            colour: 'white'
+                        }
+                    );
+                }
+                state.circle(x, y + HEIGHT, SINGLE_EVENT_CIRCLE_RADIUS, {
+                    colour
+                });
                 const h = state.centerLnY() - (y + HEIGHT);
                 state.rect(x, y + HEIGHT, 1, h, {
                     radius: 0,
@@ -61,7 +69,7 @@
                 });
             } else {
                 state.rect(x, y, width, HEIGHT, {
-                    colour: hovering ? '#333' : '#222',
+                    colour: this.hovering ? '#333' : '#222',
                     radius: 5
                 });
                 state.rect(x, y + HEIGHT - LABEL_HEIGHT, width, LABEL_HEIGHT, {
@@ -78,21 +86,32 @@
 
             if ($obfuscated) return;
 
-            if ((width > 50 || hovering) && !isSingleEvent) {
+            if (!isSingleEvent && (width > 50 || this.hovering)) {
                 state.text(
                     name,
-                    Math.max(5, x + options.textXOffset),
+                    Math.max(5, x + TEXT_X_OFFSET),
                     y + HEIGHT / 2 + 5,
                     {
                         c: textColour
                     }
                 );
-            } else if (isSingleEvent && state.zoom > START_ZOOM / 2) {
+            } else if (
+                isSingleEvent &&
+                (state.zoom > START_ZOOM / 2 || this.hovering)
+            ) {
                 state.text(
                     name,
                     x + 5,
-                    y + HEIGHT / 2 + (eventTextParityHeight ? HEIGHT / 2 + 20 : 0),
-                    { c: '#fff', align: 'center' }
+                    y +
+                        HEIGHT / 2 +
+                        (eventTextParityHeight ? HEIGHT / 2 + 20 : 0),
+                    {
+                        align: 'center',
+                        backgroundColour: this.hovering ? '#222' : undefined,
+                        fontSize: this.hovering ? 14 : 12,
+                        backgroundPadding: 4,
+                        backgroundRadius: 2
+                    }
                 );
             }
         },
@@ -100,21 +119,27 @@
         collider(state) {
             if (thisIsDeleted) return null;
             if (isSingleEvent) {
-                return new BoxCollider(
-                    start - 5,
-                    yRenderPos(state.centerLnY()) - 5,
-                    10,
-                    10
+                const h =
+                    state.centerLnY() -
+                    (yRenderPos(state.centerLnY()) + HEIGHT);
+                return new DurationRectCollider(
+                    state.renderPosToTime(state.timeToRenderPos(start) - 5),
+                    yRenderPos(state.centerLnY()) +
+                        HEIGHT -
+                        SINGLE_EVENT_CIRCLE_RADIUS,
+                    10 / state.zoom,
+                    h + SINGLE_EVENT_CIRCLE_RADIUS
                 );
             }
-            return new BoxCollider(
+            return new DurationRectCollider(
                 start,
                 yRenderPos(state.centerLnY()),
                 duration,
                 HEIGHT
-            )
+            );
         },
-        onClick() {
+
+        onMouseUp() {
             showPopup(Event, {
                 auth,
                 obfuscated: false,
@@ -124,19 +149,19 @@
                     end,
                     name,
                     label,
-                    created,
+                    created
                 },
                 labels,
                 expanded: true,
-                changeEventCount (by: number) {
+                changeEventCount(by: number) {
                     if (by === -1) {
                         thisIsDeleted = true;
                     } else if (by === 1) {
                         thisIsDeleted = false;
                     }
                 },
-                bordered: false,
-            })
+                bordered: false
+            });
         }
     });
 </script>

@@ -5,7 +5,7 @@ import type { Hours, Seconds, TimestampSecs } from './types';
  * Get the UTC timestamp of now in seconds
  * @returns {TimestampSecs}
  */
-export function nowUtc(rounded=true): TimestampSecs {
+export function nowUtc(rounded = true): TimestampSecs {
     const s = Date.now() / 1000;
     return rounded ? Math.floor(s) : s;
 }
