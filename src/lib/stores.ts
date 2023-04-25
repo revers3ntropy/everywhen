@@ -2,6 +2,7 @@ import { browser } from '$app/environment';
 import type { SvelteComponentDev } from 'svelte/internal';
 import { type Writable, writable } from 'svelte/store';
 import { LS_KEY } from './constants';
+import { errorLogger } from './utils/log';
 import type { EventsSortKey } from './utils/types';
 
 export const enabledLocation = localStorageWritable(
@@ -42,7 +43,7 @@ export function localStorageWritable<T>(
                     ? never
                     : T;
             } catch (e) {
-                console.error('Error parsing localStorage value', e);
+                errorLogger.error('Error parsing localStorage value', e);
             }
         }
 

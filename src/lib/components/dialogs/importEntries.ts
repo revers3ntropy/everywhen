@@ -3,6 +3,7 @@ import type { Entry } from '../../controllers/entry';
 import type { Label } from '../../controllers/label';
 import type { Auth } from '../../controllers/user';
 import { api, type ReqBody } from '../../utils/apiRequest';
+import { errorLogger } from '../../utils/log';
 import type { Mutable, NotificationOptions } from '../../utils/types';
 
 export async function importEntries(
@@ -83,6 +84,7 @@ export async function importEntries(
                 }
             )
         ) {
+            errorLogger.log('entryJSON', entryJSON);
             errors.push([i, `entry is not valid object`]);
             continue;
         }
@@ -156,7 +158,7 @@ export async function importEntries(
 
     for (const error of errors) {
         const text = `#${error[0]}: ${error[1]}`;
-        console.error(text);
+        errorLogger.error(text);
         notifications.push({ text });
     }
 

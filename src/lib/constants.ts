@@ -36,11 +36,11 @@ export const NON_AUTH_ROUTES = Object.freeze(['/', '/about', '/about/history']);
 
 export const MAX_IMAGE_SIZE: Bytes = 1024 * 1024 * 8; // 8MiB
 
-export const EVENT_IN_TIMELINE_HEIGHT: Pixels = 30;
-
 export const NAVBAR_HEIGHT: Pixels = 60;
 
 export const ANIMATION_DURATION: Milliseconds = 200;
 
 export const API_DOCS_LINK =
     'https://docs.google.com/spreadsheets/d/1eLjbfXnzAXRz08qJPRGnM_IsezMKcuT6anuy_qwP-Uo/edit?usp=sharing';
+
+export const DEBUG_RENDER_COLLIDERS = false;

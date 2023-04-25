@@ -44,6 +44,9 @@
         display: grid;
         grid-template-columns: 100%;
 
+        padding: 5rem 0 0 0;
+        border-top: 1px solid @border;
+
         div {
             .flex-center();
         }

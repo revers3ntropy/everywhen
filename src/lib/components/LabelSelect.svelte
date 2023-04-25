@@ -6,6 +6,7 @@
     import type { Label } from '../controllers/label';
     import type { Auth } from '../controllers/user';
     import { api } from '../utils/apiRequest';
+    import { errorLogger } from '../utils/log';
     import {
         displayNotifOnErr,
         ERR_NOTIFICATION
@@ -41,7 +42,7 @@
     }
 
     $: if (labels && value !== '' && !labels.find(l => l.id === value)) {
-        console.error(`Label ${value} not found`);
+        errorLogger.error(`Label ${value} not found`);
         value = '';
         addNotification({
             ...ERR_NOTIFICATION,

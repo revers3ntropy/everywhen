@@ -12,6 +12,7 @@
     import { obfuscated, passcodeLastEntered, popup } from '../lib/stores';
     import { api } from '../lib/utils/apiRequest';
     import { GETParamIsFalsy } from '../lib/utils/GETArgs';
+    import { errorLogger } from '../lib/utils/log';
     import {
         displayNotifOnErr,
         INFO_NOTIFICATION
@@ -74,7 +75,7 @@
         // the key cookie is HttpOnly, so we can't read it from JS
         // https://owasp.org/www-community/HttpOnly
         if (!cookies[USERNAME_COOKIE_KEY]) {
-            console.error('Cookies have expired');
+            errorLogger.error('Cookies have expired');
             location.assign(
                 '/?redirect=' +
                     encodeURIComponent(

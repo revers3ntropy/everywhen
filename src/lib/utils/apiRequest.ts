@@ -10,6 +10,7 @@ import {
 import type { Auth } from '../controllers/user';
 import type { apiRes404, GenericResponse } from './apiResponse';
 import { serializeGETArgs } from './GETArgs';
+import { errorLogger } from './log';
 import { Result } from './result';
 import { nowUtc } from './time';
 
@@ -152,7 +153,7 @@ export async function makeApiReq<
     if (response.ok) {
         const res = await response.json();
         if (typeof res !== 'object' || res === null) {
-            console.error(
+            errorLogger.error(
                 `Error on api fetch (${browser ? 'client' : 'server'} side)`,
                 method,
                 url,
@@ -163,7 +164,7 @@ export async function makeApiReq<
         }
         return Result.ok(res as ApiResponse[Verb][Path]);
     }
-    console.error(
+    errorLogger.error(
         `Error on api fetch (${browser ? 'client' : 'server'} side)`,
         method,
         url,

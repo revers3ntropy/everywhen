@@ -91,7 +91,7 @@
             transition: background-color @transition;
 
             &:hover {
-                background-color: @header-bg;
+                background-color: @light-v-accent;
             }
         }
     </style>

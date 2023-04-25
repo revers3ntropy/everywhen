@@ -1,3 +1,4 @@
+import { errorLogger } from './log';
 import { Result } from './result';
 
 function readFileAsB64(file: File): Promise<Result<string>> {
@@ -6,7 +7,8 @@ function readFileAsB64(file: File): Promise<Result<string>> {
         reader.onload = () => {
             resolve(Result.ok(reader.result?.toString() || ''));
         };
-        reader.onerror = () => {
+        reader.onerror = err => {
+            errorLogger.log(err);
             resolve(Result.err('Error reading file'));
         };
         reader.readAsDataURL(file);

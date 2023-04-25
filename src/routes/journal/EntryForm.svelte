@@ -23,6 +23,7 @@
     import { api, apiPath } from '../../lib/utils/apiRequest';
     import { getFileContents } from '../../lib/utils/files';
     import { getLocation } from '../../lib/utils/geolocation';
+    import { errorLogger } from '../../lib/utils/log';
     import {
         displayNotifOnErr,
         ERR_NOTIFICATION,
@@ -185,7 +186,7 @@
                     // make really sure it's saved before resetting
                     reset();
                 } else {
-                    console.error(res);
+                    errorLogger.error(res);
                     addNotification({
                         ...ERR_NOTIFICATION,
                         text: `Failed to create entry: ${JSON.stringify(res)}`

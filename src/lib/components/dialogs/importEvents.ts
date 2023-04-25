@@ -3,6 +3,7 @@ import type { Event } from '../../controllers/event';
 import type { Label } from '../../controllers/label';
 import type { Auth } from '../../controllers/user';
 import { api, type ReqBody } from '../../utils/apiRequest';
+import { errorLogger } from '../../utils/log';
 import { nowUtc } from '../../utils/time';
 import type { Mutable, NotificationOptions } from '../../utils/types';
 
@@ -121,7 +122,7 @@ export async function importEvents(
 
     for (const error of errors) {
         const text = `#${error[0]}: ${error[1]}`;
-        console.error(text);
+        errorLogger.error(text);
         notifications.push({ text });
     }
 

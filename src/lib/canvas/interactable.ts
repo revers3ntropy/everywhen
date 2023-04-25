@@ -1,5 +1,6 @@
 import { getContext, onMount } from 'svelte';
 import type { CursorStyle } from '../../app';
+import { DEBUG_RENDER_COLLIDERS } from '../constants';
 import type { TimestampSecs } from '../utils/types';
 import {
     type CanvasContext,
@@ -9,8 +10,6 @@ import {
 } from './canvasState';
 import type { RenderProps } from './canvasState';
 import type { Collider } from './collider';
-
-const DEBUG_RENDER_COLLIDERS = false;
 
 export interface Interactable extends Listener {
     onHover?: (time: TimestampSecs, y: number) => void;

@@ -21,7 +21,7 @@ export class Backup {
             longitude?: number;
             created: number;
             createdTZOffset: number;
-            agentData: string;
+            agentData?: string;
             edits: {
                 title: string;
                 label?: string; // label's name
@@ -30,7 +30,7 @@ export class Backup {
                 longitude?: number;
                 created: number;
                 createdTZOffset: number;
-                agentData: string;
+                agentData?: string;
             }[];
         }[],
         public labels: {

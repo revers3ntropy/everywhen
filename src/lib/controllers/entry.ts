@@ -55,7 +55,7 @@ export class Entry {
         public readonly deleted: boolean,
         public readonly latitude: number | null,
         public readonly longitude: number | null,
-        public readonly agentData: string
+        public readonly agentData: string | undefined
     ) {}
 
     public static async delete(
@@ -219,11 +219,15 @@ export class Entry {
         );
         if (entryErr) return Result.err(entryErr);
 
-        const { err: agentErr, val: decryptedAgent } = decrypt(
-            rawEntry.agentData,
-            auth.key
-        );
-        if (agentErr) return Result.err(agentErr);
+        let decryptedAgent = '';
+        if (rawEntry.agentData) {
+            const { err: agentErr, val } = decrypt(
+                rawEntry.agentData,
+                auth.key
+            );
+            if (agentErr) return Result.err(agentErr);
+            decryptedAgent = val;
+        }
 
         let entry = new Entry(
             rawEntry.id,
@@ -422,7 +426,7 @@ export class Entry {
         if (entryErr) return Result.err(entryErr);
 
         const { err: agentErr, val: encryptedAgent } = encrypt(
-            entry.agentData,
+            entry.agentData || '',
             auth.key
         );
         if (agentErr) return Result.err(agentErr);
@@ -458,7 +462,7 @@ export class Entry {
             if (editEntryErr) return Result.err(editEntryErr);
 
             const { err: editAgentErr, val: encryptedAgentData } = encrypt(
-                edit.agentData,
+                edit.agentData || '',
                 auth.key
             );
             if (editAgentErr) return Result.err(editAgentErr);
@@ -562,12 +566,18 @@ export class Entry {
             auth.key,
             newTitle,
             newEntry,
+            agentData,
             entry.title,
             entry.entry
         );
         if (err) return Result.err(err);
-        const [encryptedNewTitle, encryptedNewEntry, oldTitle, oldEntry] =
-            encryptionResults;
+        const [
+            encryptedNewTitle,
+            encryptedNewEntry,
+            encryptedEditAgentData,
+            oldTitle,
+            oldEntry
+        ] = encryptionResults;
 
         const editId = await UUID.generateUUId(query);
 
@@ -584,7 +594,7 @@ export class Entry {
                     ${oldTitle},
                     ${oldEntry},
                     ${entry.label?.id ?? null},
-                    ${agentData || ''})
+                    ${encryptedEditAgentData || ''})
         `;
 
         if (newLabel instanceof Label) {
@@ -793,7 +803,7 @@ export class Entry {
         auth: Auth,
         raw: RawEntry[]
     ): Promise<Result<Entry[]>> {
-        const edits = await query<EntryEdit[]>`
+        const rawEdits = await query<(RawEntry & { entryId: string })[]>`
             SELECT entryEdits.created,
                    entryEdits.entryId,
                    entryEdits.createdTZOffset,
@@ -808,6 +818,22 @@ export class Entry {
             WHERE entries.user = ${auth.id}
               AND entries.id = entryEdits.entryId
         `;
+
+        const { err: editsErr, val: edits } = Result.collect(
+            await Promise.all(
+                rawEdits.map(
+                    async (e): Promise<Result<Entry & { entryId: string }>> => {
+                        const entry = await Entry.fromRaw(query, auth, e, true);
+                        if (entry.err) return Result.err(entry.err);
+                        return Result.ok({
+                            ...entry.val,
+                            entryId: e.entryId
+                        });
+                    }
+                )
+            )
+        );
+        if (editsErr) return Result.err(editsErr);
 
         const groupedEdits = edits.reduce<Record<string, EntryEdit[]>>(
             (prev, edit) => {
@@ -844,11 +870,15 @@ export class Entry {
                 );
                 if (entryErr) return Result.err(entryErr);
 
-                const { err: agentErr, val: decryptedAgent } = decrypt(
-                    rawEntry.agentData,
-                    auth.key
-                );
-                if (agentErr) return Result.err(agentErr);
+                let decryptedAgentData = '';
+                if (rawEntry.agentData) {
+                    const { err: agentErr, val } = decrypt(
+                        rawEntry.agentData,
+                        auth.key
+                    );
+                    if (agentErr) return Result.err(agentErr);
+                    decryptedAgentData = val;
+                }
 
                 const entry = new Entry(
                     rawEntry.id,
@@ -859,7 +889,7 @@ export class Entry {
                     rawEntry.deleted,
                     rawEntry.latitude,
                     rawEntry.longitude,
-                    decryptedAgent
+                    decryptedAgentData
                 );
 
                 entry.edits = groupedEdits[rawEntry.id];
@@ -898,7 +928,7 @@ export class Entry {
         self: Entry
     ): Promise<Result<EntryEdit>> {
         const rawEdits = await query<RawEntry[]>`
-            SELECT created, createdTZOffset, latitude, longitude, title, entry, label
+            SELECT created, createdTZOffset, latitude, longitude, title, entry, label, agentData
             FROM entryEdits
             WHERE entryId = ${self.id}
         `;
