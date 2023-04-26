@@ -154,7 +154,7 @@
                 padding: 0.3rem;
 
                 &:hover {
-                    background: @accent-color-danger;
+                    background: @accent-danger;
                 }
             }
 

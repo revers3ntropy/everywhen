@@ -304,7 +304,7 @@
             }
 
             :global(blockquote) {
-                border-left: 3px solid @accent-color-secondary;
+                border-left: 3px solid @accent-secondary;
                 margin: 0 0 0 0.5em;
                 padding: 0 0 0 1em;
             }

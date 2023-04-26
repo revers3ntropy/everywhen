@@ -34,7 +34,7 @@
         background: @border;
 
         &:hover {
-            background: @accent-color-primary;
+            background: @accent-primary;
             * {
                 color: black;
             }

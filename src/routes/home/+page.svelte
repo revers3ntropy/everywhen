@@ -154,7 +154,7 @@
 
                 &:hover {
                     background: @light-v-accent;
-                    color: @accent-color-secondary;
+                    color: @accent-secondary;
                     text-decoration: none;
                 }
             }

@@ -50,7 +50,7 @@
         border: none;
 
         &:hover {
-            background-color: @accent-color-primary;
+            background-color: @accent-primary;
             color: black;
         }
     }

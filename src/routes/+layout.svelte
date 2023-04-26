@@ -149,6 +149,8 @@
             }
         }
     }
+
+    console.log(data.settings.darkMode.value);
 </script>
 
 <svelte:window
@@ -201,7 +203,7 @@
         {/if}
     {/if}
 
-    <div style="min-height: calc(100vh - var(--nav-height))">
+    <div class="page-content">
         <slot />
     </div>
 
@@ -217,3 +219,9 @@
 
     <Footer />
 </Notifications>
+
+<style lang="less">
+    .page-content {
+        min-height: calc(100vh - var(--nav-height));
+    }
+</style>

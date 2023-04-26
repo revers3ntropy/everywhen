@@ -192,7 +192,7 @@
         }
 
         &:hover input:checked ~ .checkmark {
-            background: @accent-color-secondary;
+            background: @accent-secondary;
         }
 
         input:checked ~ .checkmark {
@@ -280,10 +280,10 @@
         }
 
         .restore button {
-            color: @accent-color-primary;
+            color: @accent-primary;
 
             &:hover {
-                color: @accent-color-secondary;
+                color: @accent-secondary;
             }
         }
     }

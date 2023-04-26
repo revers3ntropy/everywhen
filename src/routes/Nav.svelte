@@ -343,7 +343,7 @@
             height: 3px;
             position: fixed;
             top: 0;
-            background: @accent-color-secondary;
+            background: @accent-secondary;
             transition: width 12s cubic-bezier(0, 1, 0.5, 0.5);
             z-index: 10000;
         }
@@ -367,7 +367,7 @@
 
         &.current {
             &:after {
-                background: @accent-color-secondary;
+                background: @accent-secondary;
             }
         }
 
@@ -490,7 +490,7 @@
 
             :global(svg),
             :global(svg *) {
-                fill: @accent-color-secondary;
+                fill: @accent-secondary;
             }
         }
     }

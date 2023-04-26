@@ -25,6 +25,12 @@ export type SettingsConfig = {
 
 export class Settings<T = unknown> {
     public static config = {
+        darkMode: {
+            type: 'boolean',
+            defaultValue: true,
+            name: 'Dark Mode',
+            description: 'Use a darker theme.'
+        } satisfies ISettingsConfig<boolean>,
         hideEntriesByDefault: {
             type: 'boolean',
             defaultValue: false,

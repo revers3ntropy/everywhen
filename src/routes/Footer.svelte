@@ -76,7 +76,7 @@
             &:hover {
                 :global(svg),
                 :global(svg *) {
-                    fill: @accent-color-secondary;
+                    fill: @accent-secondary;
                 }
             }
         }

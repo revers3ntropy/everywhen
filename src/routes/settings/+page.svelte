@@ -124,11 +124,11 @@
                 display: grid;
                 place-items: center;
                 grid-template-columns: 35px 1fr;
-                color: @accent-color-primary;
+                color: @accent-primary;
 
                 &:hover {
                     text-decoration: none;
-                    color: @accent-color-secondary;
+                    color: @accent-secondary;
                     background: @light-v-accent;
                 }
             }
