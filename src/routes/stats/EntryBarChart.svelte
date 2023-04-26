@@ -101,28 +101,24 @@
     }
 </script>
 
-<Bar
-    data="{data}"
-    height="400"
-    width="{browser ? document.body.clientWidth : 1000}"
-/>
+<Bar {data} height="400" width={browser ? document.body.clientWidth : 1000} />
 
 <div class="options">
     <div class="flex-center">
         <div>Group by</div>
         <Select
-            bind:value="{selectedBucket}"
+            bind:value={selectedBucket}
             key="Week"
-            options="{{
+            options={{
                 Year: Bucket.Year,
                 Month: Bucket.Month,
                 Week: Bucket.Week,
                 Day: Bucket.Day
-            }}"
+            }}
         />
     </div>
     <div>
-        <button class="toggle-by-button" on:click="{toggleBy}">
+        <button class="toggle-by-button" on:click={toggleBy}>
             By Words
             {#if by === By.Entries}
                 <ToggleSwitch size="30" />

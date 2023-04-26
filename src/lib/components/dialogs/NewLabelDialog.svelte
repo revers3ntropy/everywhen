@@ -11,5 +11,5 @@
 </script>
 
 <div>
-    <NewLabelForm auth="{auth}" on:submit="{closeHandler}" />
+    <NewLabelForm {auth} on:submit={closeHandler} />
 </div>

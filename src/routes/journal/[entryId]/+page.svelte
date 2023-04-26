@@ -27,10 +27,10 @@
 
     <Entry
         {...data.entry}
-        auth="{data}"
-        obfuscated="{$obfuscated}"
-        on:updated="{() => location.reload()}"
-        showFullDate="{true}"
+        auth={data}
+        obfuscated={$obfuscated}
+        on:updated={() => location.reload()}
+        showFullDate={true}
     />
 
     {#if !data.history}
@@ -56,10 +56,10 @@
             {#each (data.entry.edits || []).sort((a, b) => b.created - a.created) as edit}
                 <Entry
                     {...edit}
-                    auth="{data}"
-                    obfuscated="{$obfuscated}"
-                    isEdit="{true}"
-                    showFullDate="{true}"
+                    auth={data}
+                    obfuscated={$obfuscated}
+                    isEdit={true}
+                    showFullDate={true}
                 />
             {/each}
         {/if}

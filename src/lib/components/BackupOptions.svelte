@@ -76,15 +76,15 @@
     }
 </script>
 
-<button disabled="{downloading}" on:click="{() => download(true)}">
+<button disabled={downloading} on:click={() => download(true)}>
     <DownloadLock size="30" />
     Download Backup
 </button>
-<button disabled="{downloading}" on:click="{() => download(false)}">
+<button disabled={downloading} on:click={() => download(false)}>
     <Download size="30" />
     Download Unencrypted Backup
 </button>
-<button disabled="{downloading}" on:click="{upload}">
+<button disabled={downloading} on:click={upload}>
     <Upload size="30" />
     Restore from Backup
 </button>

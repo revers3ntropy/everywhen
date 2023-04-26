@@ -20,7 +20,7 @@
     <div class="floating-button">
         <button
             aria-label="Show sidebar menu"
-            on:click="{() => (showing = !showing)}"
+            on:click={() => (showing = !showing)}
         >
             <Menu size="40" />
         </button>
@@ -28,15 +28,15 @@
     {#if showing}
         <div
             class="sidebar"
-            transition:fly="{{
+            transition:fly={{
                 duration: ANIMATION_DURATION,
                 x: -200
-            }}"
+            }}
         >
             <div class="header">
                 <button
-                    aria-label="{obfuscated ? 'Show entries' : 'Hide entries'}"
-                    on:click="{() => (obfuscated = !obfuscated)}"
+                    aria-label={obfuscated ? 'Show entries' : 'Hide entries'}
+                    on:click={() => (obfuscated = !obfuscated)}
                 >
                     {#if obfuscated}
                         <Eye size="25" />
@@ -46,18 +46,13 @@
                 </button>
                 <button
                     aria-label="Close sidebar menu"
-                    on:click="{() => (showing = !showing)}"
+                    on:click={() => (showing = !showing)}
                 >
                     <Close size="30" />
                 </button>
             </div>
             <div class="content">
-                <EntryTitles
-                    auth="{auth}"
-                    obfuscated="{obfuscated}"
-                    titles="{titles}"
-                    hideBlurToggle
-                />
+                <EntryTitles {auth} {obfuscated} {titles} hideBlurToggle />
             </div>
         </div>
     {/if}

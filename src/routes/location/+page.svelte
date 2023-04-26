@@ -11,10 +11,6 @@
 
 <main>
     <section>
-        <Map
-            auth="{data}"
-            entries="{data.entries}"
-            locations="{data.locations}"
-        />
+        <Map auth={data} entries={data.entries} locations={data.locations} />
     </section>
 </main>

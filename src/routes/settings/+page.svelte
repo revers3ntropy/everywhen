@@ -50,7 +50,7 @@
         </h1>
 
         <div class="buttons">
-            <BackupOptions auth="{data}" />
+            <BackupOptions auth={data} />
             <a aria-label="Log Out" class="danger" href="/logout">
                 <Logout size="30" />
                 Log Out
@@ -58,7 +58,7 @@
             <button
                 aria-label="Delete Account"
                 class="danger"
-                on:click="{deleteAccount}"
+                on:click={deleteAccount}
             >
                 <Skull size="30" />
                 Delete Account and Erase Data
@@ -75,7 +75,7 @@
             <span>General Settings</span>
         </h1>
         {#each Object.entries(SettingsController.config) as [key, config] (key)}
-            <Settings {...config} {...data.settings[key]} auth="{data}" />
+            <Settings {...config} {...data.settings[key]} auth={data} />
         {/each}
     </section>
 </main>

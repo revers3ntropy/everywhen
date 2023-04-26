@@ -83,9 +83,9 @@
             <div>
                 <h3>
                     {#if saving}
-                        <Sync size="{20}" class="gradient-icon" />
+                        <Sync size={20} class="gradient-icon" />
                     {:else}
-                        <CloudCheckOutline size="{20}" />
+                        <CloudCheckOutline size={20} />
                     {/if}
                     {name}
                 </h3>
@@ -94,13 +94,13 @@
             {#if created}
                 <p
                     class="last-updated hide-mobile"
-                    use:tooltip="{{
+                    use:tooltip={{
                         content: fmtUtc(
                             created,
                             currentTzOffset(),
                             'DD/MM/YYYY h:mm A'
                         )
-                    }}"
+                    }}
                 >
                     Last updated
                     {fmtDuration(nowUtc() - created)}
@@ -109,7 +109,7 @@
             {/if}
             {#if value !== defaultValue}
                 <p class="restore hide-mobile">
-                    <button on:click="{() => updateValue(defaultValue)}">
+                    <button on:click={() => updateValue(defaultValue)}>
                         Restore default ({JSON.stringify(defaultValue)})
                     </button>
                 </p>
@@ -120,13 +120,13 @@
     <div class="right">
         <label class="label-for-{inputType}">
             <input
-                checked="{inputType === 'checkbox' && !!value}"
+                checked={inputType === 'checkbox' && !!value}
                 class="text-box"
-                on:change="{onInput}"
-                type="{inputType}"
-                value="{value}"
+                on:change={onInput}
+                type={inputType}
+                {value}
             />
-            <span class="checkmark"></span>
+            <span class="checkmark" />
             {unit}
         </label>
     </div>

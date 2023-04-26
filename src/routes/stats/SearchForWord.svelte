@@ -10,7 +10,7 @@
 </script>
 
 <input
-    bind:value="{value}"
-    on:change="{searchWordChange}"
+    bind:value
+    on:change={searchWordChange}
     placeholder="Search for Word..."
 />

@@ -19,12 +19,12 @@
         days: number;
     };
 
-    onMount(() => (document.title = 'Analytics'));
+    onMount(() => (document.title = 'Insights'));
 </script>
 
 <svelte:head>
-    <title>Analytics</title>
-    <meta content="Analytics" name="description" />
+    <title>Insights</title>
+    <meta content="Insights" name="description" />
 </svelte:head>
 
 <main>
@@ -33,19 +33,18 @@
             <h1>No Entries</h1>
             <div class="flex-center">
                 <p>
-                    You need to create some entries before you can see
-                    analytics,
+                    You need to create some entries before you can see insights,
                     <a href="/journal">why not create one?</a>
                 </p>
             </div>
         </section>
     {:else}
         <div class="title-line">
-            <div></div>
+            <div />
             <div>
                 <h1>
                     <Counter size="40" />
-                    <span>Analytics</span>
+                    <span>Insights</span>
                 </h1>
             </div>
             <div class="search-for-word">
@@ -55,36 +54,32 @@
 
         <section class="container unbordered">
             <div class="stats">
-                <StatPill primary value="{data.entryCount}" label="entries" />
-                <StatPill value="{data.charCount}" label="characters" />
+                <StatPill primary value={data.entryCount} label="entries" />
+                <StatPill value={data.charCount} label="characters" />
                 <StatPill
                     primary
-                    value="{data.wordCount}"
+                    value={data.wordCount}
                     label="words"
                     tooltip="A typical novel is 100,000 words"
                 />
                 <StatPill
-                    value="{(data.wordCount / (data.entryCount || 1)).toFixed(
-                        1
-                    )}"
+                    value={(data.wordCount / (data.entryCount || 1)).toFixed(1)}
                     label="words / entry"
                 />
                 <StatPill
-                    value="{(data.charCount / (data.wordCount || 1)).toFixed(
-                        1
-                    )}"
+                    value={(data.charCount / (data.wordCount || 1)).toFixed(1)}
                     label="letters / word"
                     tooltip="The average English word is 4.7 letters long"
                 />
                 <StatPill
                     primary
-                    value="{(data.wordCount / data.days).toFixed(1)}"
+                    value={(data.wordCount / data.days).toFixed(1)}
                     label="words / day"
                 />
                 <StatPill
-                    value="{(
+                    value={(
                         data.entryCount / Math.max(data.days / 7, 1)
-                    ).toFixed(1)}"
+                    ).toFixed(1)}
                     label="entries / week"
                 />
             </div>
@@ -92,19 +87,19 @@
 
         <section class="charts">
             <div class="entry-heatmap-wrapper container">
-                <EntryHeatMap by="{by}" entries="{data.entries}" />
+                <EntryHeatMap {by} entries={data.entries} />
             </div>
             {#if data.entryCount > 4}
                 <div class="entry-bar-chart-wrapper container">
-                    <EntryBarChart by="{by}" entries="{data.entries}" />
+                    <EntryBarChart {by} entries={data.entries} />
                 </div>
             {/if}
         </section>
 
         <section class="container">
             <CommonWordsList
-                entryCount="{data.entryCount}"
-                words="{data.commonWords}"
+                entryCount={data.entryCount}
+                words={data.commonWords}
             />
         </section>
     {/if}

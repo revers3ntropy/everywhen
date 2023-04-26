@@ -358,14 +358,11 @@
 <div
     class="map {hoveringSomething ? 'hovering' : ''}"
     id="ol-map-{mapId}"
-    use:map="{{ locations, entries }}"
+    use:map={{ locations, entries }}
 >
     {#if hoveringEntryId !== null}
-        <div
-            bind:this="{tooltip}"
-            class="ol-popup {popupOnRight ? 'right' : ''}"
-        >
-            <EntryTooltipOnMap auth="{auth}" id="{hoveringEntryId}" />
+        <div bind:this={tooltip} class="ol-popup {popupOnRight ? 'right' : ''}">
+            <EntryTooltipOnMap {auth} id={hoveringEntryId} />
         </div>
     {/if}
 </div>

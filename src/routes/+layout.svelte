@@ -152,9 +152,9 @@
 </script>
 
 <svelte:window
-    on:keydown|nonpassive="{keydown}"
-    on:mousemove|passive="{activity}"
-    on:scroll|passive="{activity}"
+    on:keydown|nonpassive={keydown}
+    on:mousemove|passive={activity}
+    on:scroll|passive={activity}
 />
 
 <svelte:head>
@@ -176,26 +176,26 @@
     />
 </svelte:head>
 
-<svg class="accent-gradient-svg" height="{0}" width="{0}">
-    <linearGradient id="accent-gradient" x1="{1}" x2="{1}" y1="{0}" y2="{1}">
-        <stop offset="{0}" stop-color="rgb(121, 235, 226)"></stop>
-        <stop offset="{1}" stop-color="rgb(189, 176, 255)"></stop>
+<svg class="accent-gradient-svg" height={0} width={0}>
+    <linearGradient id="accent-gradient" x1={1} x2={1} y1={0} y2={1}>
+        <stop offset={0} stop-color="rgb(121, 235, 226)" />
+        <stop offset={1} stop-color="rgb(189, 176, 255)" />
     </linearGradient>
 </svg>
 
 <Notifications>
     {#if data.settings.passcode.value && nowUtc() - $passcodeLastEntered > data.settings.passcodeTimeout.value && showPasscodeModal && !home && (data.settings.passcodeTimeout.value > 0 || !$passcodeLastEntered || !browser)}
         <PasscodeModal
-            bind:show="{showPasscodeModal}"
-            passcode="{data.settings.passcode.value}"
+            bind:show={showPasscodeModal}
+            passcode={data.settings.passcode.value}
         />
     {/if}
 
-    <Notifier bind:addNotification="{addNotification}" />
+    <Notifier bind:addNotification />
 
     {#if !home}
         {#if data.id}
-            <Nav auth="{data}" />
+            <Nav auth={data} />
         {:else}
             <NoAuthNav />
         {/if}
@@ -206,13 +206,13 @@
     </div>
 
     {#if newVersionAvailable}
-        <NewVersionAvailable newVersion="{newVersion}" />
+        <NewVersionAvailable {newVersion} />
     {/if}
 
     <Modal
         classContent="popup-background"
         classWindow="popup-background"
-        show="{$popup}"
+        show={$popup}
     />
 
     <Footer />

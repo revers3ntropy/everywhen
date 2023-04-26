@@ -73,10 +73,7 @@
 </script>
 
 {#if labels && !loading}
-    <FileDrop
-        message="Import {type} from .json file"
-        withContents="{withContents}"
-    />
+    <FileDrop message="Import {type} from .json file" {withContents} />
 {:else}
-    <Spinner scale="{0.5}" />
+    <Spinner scale={0.5} />
 {/if}

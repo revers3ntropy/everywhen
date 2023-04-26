@@ -31,8 +31,8 @@
     {#if !hideBlurToggle}
         <div class="menu {blurToggleOnLeft ? 'left' : ''}">
             <button
-                aria-label="{obfuscated ? 'Show entries' : 'Hide entries'}"
-                on:click="{() => (obfuscated = !obfuscated)}"
+                aria-label={obfuscated ? 'Show entries' : 'Hide entries'}
+                on:click={() => (obfuscated = !obfuscated)}
             >
                 {#if obfuscated}
                     <Eye size="25" />
@@ -47,9 +47,9 @@
         <div class="day">
             <h2>
                 <UtcTime
-                    timestamp="{parseInt(day)}"
+                    timestamp={parseInt(day)}
                     fmt="dddd DD/MM/YY"
-                    noTooltip="{true}"
+                    noTooltip={true}
                 />
                 {#if showTimeAgo}
                     <Dot />
@@ -61,8 +61,8 @@
                         {:else}
                             <UtcTime
                                 relative
-                                timestamp="{parseInt(day)}"
-                                noTooltip="{true}"
+                                timestamp={parseInt(day)}
+                                noTooltip={true}
                             />
                         {/if}
                     </span>
@@ -70,15 +70,12 @@
             </h2>
 
             {#each titles[parseInt(day)] as entry}
-                <button
-                    class="entry"
-                    on:click="{() => showEntryPopup(entry.id)}"
-                >
+                <button class="entry" on:click={() => showEntryPopup(entry.id)}>
                     <span class="entry-time">
                         <UtcTime
-                            timestamp="{entry.created}"
+                            timestamp={entry.created}
                             fmt="h:mm A"
-                            tzOffset="{entry.createdTZOffset}"
+                            tzOffset={entry.createdTZOffset}
                             tooltipPosition="right"
                         />
                     </span>
@@ -87,10 +84,10 @@
                             class="entry-label-colour"
                             style="background: {entry.label?.colour ||
                                 'transparent'}"
-                            use:tooltip="{{ content: entry.label?.name }}"
-                        ></span>
+                            use:tooltip={{ content: entry.label?.name }}
+                        />
                     {:else}
-                        <span class="entry-label-colour"></span>
+                        <span class="entry-label-colour" />
                     {/if}
 
                     <span class="title {obfuscated ? 'obfuscated' : ''}">

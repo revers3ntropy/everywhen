@@ -69,16 +69,16 @@
 
 <div class="img-wrapper {deleted ? 'deleted' : ''}">
     <img
-        alt="{fileName}"
-        class="{obfuscated ? 'obfuscated' : ''}"
+        alt={fileName}
+        class={obfuscated ? 'obfuscated' : ''}
         loading="lazy"
         src="/api/assets/{publicId}"
     />
     <div class="menu">
         <div>
             <button
-                aria-label="{obfuscated ? 'Show asset' : 'Hide asset'}"
-                on:click="{() => (obfuscated = !obfuscated)}"
+                aria-label={obfuscated ? 'Show asset' : 'Hide asset'}
+                on:click={() => (obfuscated = !obfuscated)}
             >
                 {#if obfuscated}
                     <Eye size="25" />
@@ -91,13 +91,13 @@
                     <Check size="30" />
                 {:else}
                     <button
-                        on:click="{copyToClipBoard}"
+                        on:click={copyToClipBoard}
                         class="icon-button"
-                        use:tooltip="{{
+                        use:tooltip={{
                             content: 'Copy link',
                             // `overflow: hidden` so needs to show below
                             position: 'bottom'
-                        }}"
+                        }}
                     >
                         <ContentCopy size="30" />
                     </button>
@@ -108,7 +108,7 @@
             {#if !obfuscated}
                 <!-- TODO use tzOffset from db -->
                 <UtcTime
-                    timestamp="{created}"
+                    timestamp={created}
                     fmt="MMMM Do YYYY, h:mma"
                     tooltipPosition="bottom"
                 />
@@ -116,7 +116,7 @@
         </div>
         <div>
             {#if !obfuscated}
-                <button class="icon-button danger" on:click="{deleteImg}">
+                <button class="icon-button danger" on:click={deleteImg}>
                     <Delete size="30" />
                 </button>
             {/if}

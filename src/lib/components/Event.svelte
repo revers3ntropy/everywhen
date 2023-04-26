@@ -1,7 +1,7 @@
 <script lang="ts">
     import { browser } from '$app/environment';
     import { tooltip } from '@svelte-plugins/tooltips';
-    import { createEventDispatcher, onMount } from 'svelte';
+    import { onMount } from 'svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
     import Bin from 'svelte-material-icons/Delete.svelte';
@@ -17,7 +17,7 @@
     import Label from './Label.svelte';
     import LabelSelect from './LabelSelect.svelte';
     import UtcTime from './UtcTime.svelte';
-    import type { Event as EventController } from '../controllers/event';
+    import { Event as EventController } from '../controllers/event';
     import { Event } from '../controllers/event';
     import type { Label as LabelController } from '../controllers/label';
     import type { Auth } from '../controllers/user';
@@ -32,19 +32,22 @@
     import type { Seconds } from '../utils/types';
 
     const { addNotification } = getNotificationsContext();
-    const dispatch = createEventDispatcher();
 
     export let auth: Auth;
     export let labels: LabelController[];
     export let obfuscated = true;
 
     export let bordered = true;
-    export let event: EventController & { deleted?: true };
+    export let event: EventController & { deleted?: boolean };
     export let selectNameId = '';
     export let editingLabel = false;
     export let expanded = false;
 
     export let changeEventCount: (by: number) => void;
+    export let onChange: (
+        newEvent: EventController
+    ) => void | Promise<void> = () => void 0;
+    export let onDelete: () => void | Promise<void> = () => void 0;
 
     let nameInput: HTMLInputElement;
 
@@ -58,7 +61,22 @@
             addNotification,
             await api.put(auth, apiPath('/events/?', event.id), changes)
         );
-        dispatch('update');
+
+        const label = changes.label
+            ? labels?.find(l => l.id === changes.label)
+            : event.label;
+
+        event = {
+            ...new EventController(
+                event.id,
+                changes.name || event.name,
+                changes.start || event.start,
+                changes.end || event.end,
+                event.created
+            ),
+            label
+        };
+        await onChange(event);
     }
 
     const updateName = (async ({ target }) => {
@@ -115,15 +133,13 @@
     }) satisfies ChangeEventHandler<HTMLInputElement>;
 
     async function deleteEvent() {
-        if (!confirm('Are you sure you want to delete this event?')) {
-            return;
-        }
         changeEventCount(-1);
+        event.deleted = true;
         displayNotifOnErr(
             addNotification,
             await api.delete(auth, apiPath('/events/?', event.id))
         );
-        dispatch('delete', event);
+        await onDelete();
     }
 
     async function restoreEvent() {
@@ -138,8 +154,12 @@
                 labels: event.label?.id
             })
         );
-        event.id = id;
-        dispatch('update');
+        event = {
+            ...event,
+            id,
+            deleted: undefined
+        };
+        await onChange(event);
     }
 
     async function makeDurationEvent() {
@@ -183,20 +203,22 @@
     }
 </script>
 
-<div class="event {expanded ? 'open' : ''} {bordered ? 'bordered' : ''}">
-    {#if event.deleted}
-        <div class="restore-menu">
+{#if event.deleted}
+    <div class="restore-event {bordered ? 'bordered' : ''}">
+        <button class="with-icon" on:click={restoreEvent}>
+            <Restore />
+            Undo Deletion
+        </button>
+        <div>
             <i>'{event.name}' has been deleted</i>
-            <button class="primary unbordered" on:click="{restoreEvent}">
-                <Restore />
-                Undo Deletion
-            </button>
         </div>
-    {:else if expanded}
+    </div>
+{:else if expanded}
+    <div class="event open {bordered ? 'bordered' : ''}">
         <div class="header">
             <button
-                aria-label="{obfuscated ? 'Show entry' : 'Hide entry'}"
-                on:click="{() => (obfuscated = !obfuscated)}"
+                aria-label={obfuscated ? 'Show entry' : 'Hide entry'}
+                on:click={() => (obfuscated = !obfuscated)}
             >
                 {#if obfuscated}
                     <Eye size="25" />
@@ -205,19 +227,19 @@
                 {/if}
             </button>
             {#if !obfuscated}
-                <button class="danger" on:click="{deleteEvent}">
+                <button class="danger" on:click={deleteEvent}>
                     <Bin size="25" />
                 </button>
                 {#if editingLabel}
                     <div class="flex-center">
                         <LabelSelect
-                            on:change="{updateLabel}"
-                            value="{event.label?.id || ''}"
-                            labels="{labels}"
-                            auth="{auth}"
+                            on:change={updateLabel}
+                            value={event.label?.id || ''}
+                            {labels}
+                            {auth}
                         />
                         <button
-                            on:click="{() => (editingLabel = false)}"
+                            on:click={() => (editingLabel = false)}
                             class="icon-button"
                         >
                             <PencilOff size="20" />
@@ -225,31 +247,25 @@
                     </div>
                 {:else if event.label}
                     <span>
-                        <Label
-                            obfuscated="{obfuscated}"
-                            label="{event.label}"
-                        />
-                        <button on:click="{() => (editingLabel = true)}">
+                        <Label {obfuscated} label={event.label} />
+                        <button on:click={() => (editingLabel = true)}>
                             <Pencil size="15" />
                         </button>
                     </span>
                 {:else}
-                    <button
-                        class="link"
-                        on:click="{() => (editingLabel = true)}"
-                    >
+                    <button class="link" on:click={() => (editingLabel = true)}>
                         Add Label
                     </button>
                 {/if}
             {/if}
-            <button on:click="{() => (expanded = false)}" class="icon-button">
+            <button on:click={() => (expanded = false)} class="icon-button">
                 <ChevronUp size="25" />
             </button>
         </div>
         <i>
             Created
             <!-- TODO use tz from db -->
-            <UtcTime timestamp="{event.created}" fmt="hh:mm DD/MM/YYYY" />
+            <UtcTime timestamp={event.created} fmt="hh:mm DD/MM/YYYY" />
         </i>
         <div class="middle-row">
             {#if obfuscated}
@@ -258,11 +274,11 @@
                 </p>
             {:else}
                 <input
-                    bind:this="{nameInput}"
+                    bind:this={nameInput}
                     class="editable-text event-name-inp"
-                    on:change="{updateName}"
+                    on:change={updateName}
                     placeholder="Event Name"
-                    value="{event.name}"
+                    value={event.name}
                 />
             {/if}
         </div>
@@ -272,7 +288,7 @@
                     <div>
                         <span>
                             <UtcTime
-                                timestamp="{event.start}"
+                                timestamp={event.start}
                                 fmt="DD/MM/YYYY HH:mm"
                             />
                         </span>
@@ -281,18 +297,18 @@
                     <div>
                         <input
                             class="editable-text"
-                            on:change="{updateStartAndEnd}"
+                            on:change={updateStartAndEnd}
                             placeholder="Start"
                             type="datetime-local"
-                            value="{fmtTimestampForInput(event.start)}"
+                            value={fmtTimestampForInput(event.start)}
                         />
                     </div>
                     <button
                         class="instant-duration-toggle"
-                        on:click="{makeDurationEvent}"
-                        use:tooltip="{{
+                        on:click={makeDurationEvent}
+                        use:tooltip={{
                             content: 'Give this event a duration'
-                        }}"
+                        }}
                     >
                         <TimelineOutline size="30" />
                         <span class="instant-duration-toggle-text">
@@ -305,7 +321,7 @@
                     from
                     <span>
                         <UtcTime
-                            timestamp="{event.start}"
+                            timestamp={event.start}
                             fmt="DD/MM/YYYY HH:mm"
                         />
                     </span>
@@ -313,10 +329,7 @@
                 <div>
                     to
                     <span>
-                        <UtcTime
-                            timestamp="{event.end}"
-                            fmt="DD/MM/YYYY HH:mm"
-                        />
+                        <UtcTime timestamp={event.end} fmt="DD/MM/YYYY HH:mm" />
                     </span>
                 </div>
             {:else}
@@ -324,20 +337,20 @@
                     from
                     <input
                         class="editable-text"
-                        on:change="{updateStart}"
+                        on:change={updateStart}
                         placeholder="Start"
                         type="datetime-local"
-                        value="{fmtTimestampForInput(event.start)}"
+                        value={fmtTimestampForInput(event.start)}
                     />
                 </div>
                 <div>
                     to
                     <input
                         class="editable-text"
-                        on:change="{updateEnd}"
+                        on:change={updateEnd}
                         placeholder="End"
                         type="datetime-local"
-                        value="{fmtTimestampForInput(event.end)}"
+                        value={fmtTimestampForInput(event.end)}
                     />
                 </div>
                 <p>
@@ -348,10 +361,10 @@
                 <div>
                     <button
                         class="instant-duration-toggle"
-                        on:click="{makeInstantEvent}"
-                        use:tooltip="{{
+                        on:click={makeInstantEvent}
+                        use:tooltip={{
                             content: 'Make this event instantaneous'
-                        }}"
+                        }}
                     >
                         <TimelineClockOutline size="30" />
                         <span class="instant-duration-toggle-text">
@@ -361,10 +374,12 @@
                 </div>
             {/if}
         </div>
-    {:else}
+    </div>
+{:else}
+    <div class="event {bordered ? 'bordered' : ''}">
         <button
-            aria-label="{obfuscated ? 'Show entry' : 'Hide entry'}"
-            on:click="{() => (obfuscated = !obfuscated)}"
+            aria-label={obfuscated ? 'Show entry' : 'Hide entry'}
+            on:click={() => (obfuscated = !obfuscated)}
         >
             {#if obfuscated}
                 <Eye size="25" />
@@ -379,11 +394,11 @@
             </p>
         {:else}
             <input
-                bind:this="{nameInput}"
+                bind:this={nameInput}
                 class="editable-text event-name-inp"
-                on:change="{updateName}"
+                on:change={updateName}
                 placeholder="Event Name"
-                value="{event.name}"
+                value={event.name}
             />
         {/if}
         <div class="label-and-open-container">
@@ -391,27 +406,28 @@
                 <span
                     class="entry-label-colour big"
                     style="background: {event.label?.colour || 'transparent'}"
-                ></span>
+                />
             {:else if event.label}
-                <span
-                    class="entry-label-colour big"
-                    style="background: {event.label.colour || 'transparent'}"
-                    use:tooltip="{{ content: event.label.name }}"></span>
+                <a href="/labels/{event.label?.id}">
+                    <span
+                        class="entry-label-colour big"
+                        style="background: {event.label.colour ||
+                            'transparent'}"
+                        use:tooltip={{ content: event.label.name }}
+                    />
+                </a>
             {:else}
-                <span class="entry-label-colour big"></span>
+                <span class="entry-label-colour big" />
             {/if}
 
             <div>
-                <button
-                    on:click="{() => (expanded = true)}"
-                    class="icon-button"
-                >
+                <button on:click={() => (expanded = true)} class="icon-button">
                     <ChevronDown size="25" />
                 </button>
             </div>
         </div>
-    {/if}
-</div>
+    </div>
+{/if}
 
 <style lang="less">
     @import '../../styles/variables';
@@ -424,7 +440,7 @@
 
         @media @mobile {
             margin: 0.3rem 0;
-            padding: 0.5em 0 1em 0;
+            padding: 0.5rem 0 1rem 0;
             border-radius: 0;
             border: none;
             border-top: 1px solid @border;
@@ -444,6 +460,16 @@
         }
     }
 
+    .restore-event {
+        border-radius: @border-radius;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
+        margin: 0.3rem 0.3rem;
+        padding: 1.3rem 0.4rem;
+    }
+
     i {
         font-size: 0.8em;
         color: @text-color-light;
@@ -454,12 +480,6 @@
         display: block;
         margin: 0.4em;
         width: 100%;
-    }
-
-    .restore-menu {
-        display: block;
-        text-align: center;
-        margin: 0.4em;
     }
 
     .from-to-menu {

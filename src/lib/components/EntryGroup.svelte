@@ -26,10 +26,7 @@
     <div class="title">
         <div>
             <h3>
-                <button
-                    class="flex-center not-link"
-                    on:click="{toggleCollapse}"
-                >
+                <button class="flex-center not-link" on:click={toggleCollapse}>
                     {#if collapsed}
                         <ChevronDown size="30" />
                     {:else}
@@ -39,7 +36,7 @@
                     <UtcTime
                         fmt="ddd, Do MMMM YYYY"
                         noTooltip
-                        timestamp="{day}"
+                        timestamp={day}
                     />
 
                     {#if collapsed}
@@ -59,7 +56,7 @@
                 {:else if utcEq(nowUtc() - 60 * 60 * 24, day)}
                     <span>Yesterday</span>
                 {:else}
-                    <UtcTime relative timestamp="{day}" />
+                    <UtcTime relative timestamp={day} />
                 {/if}
             </p>
         </div>
@@ -70,10 +67,10 @@
                 <Entry
                     {...entry}
                     on:updated
-                    obfuscated="{obfuscated}"
-                    showLabels="{showLabels}"
-                    showLocations="{showLocations}"
-                    auth="{auth}"
+                    {obfuscated}
+                    {showLabels}
+                    {showLocations}
+                    {auth}
                 />
             {/each}
         </div>

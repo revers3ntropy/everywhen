@@ -31,10 +31,10 @@
     {#if entry}
         <Entry
             {...entry}
-            isInDialog="{true}"
-            auth="{auth}"
-            obfuscated="{obfuscated}"
-            showFullDate="{true}"
+            isInDialog={true}
+            {auth}
+            {obfuscated}
+            showFullDate={true}
         />
     {:else}
         <BookSpinner />

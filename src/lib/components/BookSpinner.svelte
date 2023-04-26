@@ -16,13 +16,13 @@
 >
     <div class="book">
         <div class="inner">
-            <div class="left"></div>
-            <div class="middle"></div>
-            <div class="right"></div>
+            <div class="left" />
+            <div class="middle" />
+            <div class="right" />
         </div>
         <ul>
             {#each { length: 17 } as _}
-                <li></li>
+                <li />
             {/each}
         </ul>
     </div>

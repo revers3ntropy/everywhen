@@ -83,9 +83,9 @@
         <section>
             <h1>Recent Entries</h1>
             <EntryTitles
-                auth="{data}"
-                titles="{data.titles}"
-                obfuscated="{$obfuscated}"
+                auth={data}
+                titles={data.titles}
+                obfuscated={$obfuscated}
             />
         </section>
     {:else}
@@ -104,15 +104,15 @@
                 {yearsAgo === '1' ? `A Year` : `${yearsAgo} Years`} Ago Today
             </h1>
             <EntryTitles
-                titles="{{
+                titles={{
                     [dayUtcFromTimestamp(
                         titles[0].created,
                         titles[0].createdTZOffset
                     )]: titles
-                }}"
-                obfuscated="{$obfuscated}"
-                showTimeAgo="{false}"
-                auth="{data}"
+                }}
+                obfuscated={$obfuscated}
+                showTimeAgo={false}
+                auth={data}
             />
         </section>
     {/each}

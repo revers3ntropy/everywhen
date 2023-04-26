@@ -82,19 +82,19 @@
     <div class="nav">
         {#if synced}
             <span
-                use:tooltip="{{
+                use:tooltip={{
                     content: 'Synced',
                     position: 'right'
-                }}"
+                }}
             >
                 <Synced size="25" />
             </span>
         {:else}
             <span
-                use:tooltip="{{
+                use:tooltip={{
                     content: 'Syncing...',
                     position: 'right'
-                }}"
+                }}
             >
                 <Syncing size="25" class="gradient-icon" />
             </span>
@@ -106,28 +106,28 @@
             </button>
         {/if}
         <button
-            on:click="{bin}"
-            use:tooltip="{{
+            on:click={bin}
+            use:tooltip={{
                 content: 'Delete',
                 position: 'bottom'
-            }}"
+            }}
         >
             <Bin size="25" />
         </button>
     </div>
     <h2>
         <label>
-            <input bind:value="{name}" on:change="{syncWithServer}" />
+            <input bind:value={name} on:change={syncWithServer} />
         </label>
     </h2>
     <label>
         <span class="text-light">Radius</span><br />
         <input
             min="0"
-            on:change="{onRadiusChange}"
+            on:change={onRadiusChange}
             step="0.1"
             type="number"
-            value="{round1DP(Location.degreesToMeters(radius))}"
+            value={round1DP(Location.degreesToMeters(radius))}
         />
         m
     </label>

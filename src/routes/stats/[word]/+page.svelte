@@ -19,12 +19,12 @@
         totalEntries: number;
     };
 
-    onMount(() => (document.title = 'Analytics'));
+    onMount(() => (document.title = 'Insights'));
 </script>
 
 <svelte:head>
-    <title>Analytics</title>
-    <meta content="Analytics" name="description" />
+    <title>Insights</title>
+    <meta content="Insights" name="description" />
 </svelte:head>
 
 <main>
@@ -45,7 +45,7 @@
             </h1>
         </div>
         <div class="search-for-word">
-            <SearchForWord value="{data.theWord}" />
+            <SearchForWord value={data.theWord} />
         </div>
     </div>
     {#if data.wordInstances === 0}
@@ -63,26 +63,24 @@
                 <StatPill
                     primary
                     beforeLabel="appears"
-                    value="{data.wordInstances}"
+                    value={data.wordInstances}
                     label="times"
                 />
                 <StatPill
                     beforeLabel="in"
-                    value="{data.entries.length}"
+                    value={data.entries.length}
                     label="entries"
                 />
                 <StatPill
-                    value="{(data.wordInstances / data.totalEntries).toFixed(
-                        1
-                    )}"
+                    value={(data.wordInstances / data.totalEntries).toFixed(1)}
                     label="/ entry"
                 />
                 <StatPill
                     beforeLabel="appears in"
-                    value="{(
+                    value={(
                         (data.entries.length / data.totalEntries) *
                         100
-                    ).toFixed(1)}"
+                    ).toFixed(1)}
                     label="% of entries"
                 />
             </div>
@@ -90,19 +88,19 @@
 
         <section class="charts">
             <div class="entry-heatmap-wrapper container">
-                <EntryHeatMap by="{by}" entries="{data.entries}" />
+                <EntryHeatMap {by} entries={data.entries} />
             </div>
             <div class="entry-bar-chart-wrapper container">
-                <EntryBarChart by="{by}" entries="{data.entries}" />
+                <EntryBarChart {by} entries={data.entries} />
             </div>
         </section>
 
         <section class="entries">
             <Entries
-                auth="{data}"
-                options="{{ search: data.theWord }}"
-                pageSize="{data.settings.entriesPerPage.value}"
-                showSearch="{false}"
+                auth={data}
+                options={{ search: data.theWord }}
+                pageSize={data.settings.entriesPerPage.value}
+                showSearch={false}
             />
         </section>
     {/if}

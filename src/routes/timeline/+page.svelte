@@ -102,27 +102,27 @@
         <Controls />
         <Background />
 
-        <TimeMarkers startYear="{data.settings.yearOfBirth.value}" />
+        <TimeMarkers startYear={data.settings.yearOfBirth.value} />
 
         <NowLine />
 
         {#each data.entries as entry, i}
             <EntryInTimeline
                 {...entry}
-                entryTextParityHeight="{i % 2 === 0}"
-                auth="{data}"
+                entryTextParityHeight={i % 2 === 0}
+                auth={data}
             />
         {/each}
 
         {#each events as event, i}
             <EventInTimeline
-                auth="{data}"
-                labels="{data.labels}"
+                auth={data}
+                labels={data.labels}
                 {...event}
-                yLevel="{Event.duration(event) < 60
+                yLevel={Event.duration(event) < 60
                     ? eventBaseY
-                    : eventBaseY + 1 + event.yLevel}"
-                eventTextParityHeight="{i % 2 === 0}"
+                    : eventBaseY + 1 + event.yLevel}
+                eventTextParityHeight={i % 2 === 0}
             />
         {/each}
 

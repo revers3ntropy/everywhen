@@ -51,24 +51,24 @@
 
 {#if ua}
     <span
-        use:tooltip="{{
+        use:tooltip={{
             content: `Created on ${osName}`
-        }}"
+        }}
     >
         {#if mobileOSs.includes(osName)}
-            <Cellphone size="{size}" />
+            <Cellphone {size} />
         {:else if watchOSs.includes(osName)}
-            <Watch size="{size}" />
+            <Watch {size} />
         {:else if tvOSs.includes(osName)}
-            <Television size="{size}" />
+            <Television {size} />
         {:else if consoleOSs.includes(osName)}
-            <Television size="{size}" />
+            <Television {size} />
         {:else if macOSs.includes(osName)}
-            <Apple size="{size}" />
+            <Apple {size} />
         {:else if windowsOSs.includes(osName)}
-            <Windows size="{size}" />
+            <Windows {size} />
         {:else}
-            <Linux size="{size}" />
+            <Linux {size} />
         {/if}
     </span>
 {/if}

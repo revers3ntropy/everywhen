@@ -2,7 +2,7 @@
     "arrowParens": "avoid",
     "bracketSpacing": true,
     "svelteSortOrder": "options-scripts-markup-styles",
-    "svelteStrictMode": true,
+    "svelteStrictMode": false,
     "svelteAllowShorthand": true,
     "svelteIndentScriptAndStyle": true,
     "trailingComma": "none",

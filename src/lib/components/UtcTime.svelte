@@ -15,7 +15,7 @@
 
 {#if !noTooltip}
     <span
-        use:tooltip="{{
+        use:tooltip={{
             content:
                 `UTC ${fmtUtc(timestamp, 0, 'hh:mma')}` +
                 ` (${numberAsSignedStr(tzOffset)}h)` +
@@ -26,7 +26,7 @@
                 )} local time</p>`,
             autoPosition: true,
             position: tooltipPosition
-        }}"
+        }}
     >
         {#if relative}
             {timeago.format(timestamp * 1000)}

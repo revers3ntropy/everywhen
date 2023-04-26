@@ -124,26 +124,26 @@
 </script>
 
 <svelte:window
-    on:click="{onClick}"
-    use:wheel="{{ scrollable: !showingNavPopup }}"
+    on:click={onClick}
+    use:wheel={{ scrollable: !showingNavPopup }}
 />
 
-<svg class="accent-gradient-svg" height="{0}" width="{0}">
-    <linearGradient id="dream-gradient" x1="{1}" x2="{1}" y1="{0}" y2="{1}">
-        <stop offset="{0}" stop-color="rgb(252,233,255)"></stop>
-        <stop offset="{1}" stop-color="rgb(196,197,255)"></stop>
+<svg class="accent-gradient-svg" height={0} width={0}>
+    <linearGradient id="dream-gradient" x1={1} x2={1} y1={0} y2={1}>
+        <stop offset={0} stop-color="rgb(252,233,255)" />
+        <stop offset={1} stop-color="rgb(196,197,255)" />
     </linearGradient>
 </svg>
-<svg class="accent-gradient-svg" height="{0}" width="{0}">
-    <linearGradient id="idea-gradient" x1="{1}" x2="{1}" y1="{0}" y2="{1}">
-        <stop offset="{0}" stop-color="white"></stop>
-        <stop offset="{1}" stop-color="yellow"></stop>
+<svg class="accent-gradient-svg" height={0} width={0}>
+    <linearGradient id="idea-gradient" x1={1} x2={1} y1={0} y2={1}>
+        <stop offset={0} stop-color="white" />
+        <stop offset={1} stop-color="yellow" />
     </linearGradient>
 </svg>
-<svg class="accent-gradient-svg" height="{0}" width="{0}">
-    <linearGradient id="thought-gradient" x1="{1}" x2="{1}" y1="{0}" y2="{1}">
-        <stop offset="{0}" stop-color="rgb(155,208,198)"></stop>
-        <stop offset="{1}" stop-color="rgb(213,231,227)"></stop>
+<svg class="accent-gradient-svg" height={0} width={0}>
+    <linearGradient id="thought-gradient" x1={1} x2={1} y1={0} y2={1}>
+        <stop offset={0} stop-color="rgb(155,208,198)" />
+        <stop offset={1} stop-color="rgb(213,231,227)" />
     </linearGradient>
 </svg>
 
@@ -153,7 +153,7 @@
         : ''} {finishedNavigation ? 'finished-navigation' : ''}"
 >
     <div class="menu-button-mobile">
-        <button aria-label="Show nav menu" on:click="{toggleNavPopup}">
+        <button aria-label="Show nav menu" on:click={toggleNavPopup}>
             {#if showingNavPopup}
                 <Close size="40" />
             {:else}
@@ -200,7 +200,7 @@
             href="/stats"
         >
             <Counter size="35" />
-            <span class="name">Analytics</span>
+            <span class="name">Insights</span>
         </a>
     </div>
 
@@ -214,7 +214,7 @@
                 <div>
                     <button
                         class="with-icon oneline record-entry"
-                        on:click="{makeEntry}"
+                        on:click={makeEntry}
                     >
                         <Pencil size="30" />
                         Record Entry
@@ -223,7 +223,7 @@
                 <div>
                     <button
                         class="with-icon oneline record-dream"
-                        on:click="{makeDream}"
+                        on:click={makeDream}
                     >
                         <Moon size="30" />
                         Record Dream
@@ -232,7 +232,7 @@
                 <div>
                     <button
                         class="with-icon oneline record-idea"
-                        on:click="{makeIdea}"
+                        on:click={makeIdea}
                     >
                         <Lightbulb size="30" />
                         Record Idea
@@ -241,7 +241,7 @@
                 <div>
                     <button
                         class="with-icon oneline record-thought"
-                        on:click="{makeThought}"
+                        on:click={makeThought}
                     >
                         <Brain size="30" />
                         Record Thought
@@ -251,8 +251,8 @@
         </Dropdown>
 
         <button
-            aria-label="{$obfuscated ? 'Show all' : 'Hide all'}"
-            on:click="{() => ($obfuscated = !$obfuscated)}"
+            aria-label={$obfuscated ? 'Show all' : 'Hide all'}
+            on:click={() => ($obfuscated = !$obfuscated)}
         >
             {#if $obfuscated}
                 <Eye size="25" />
@@ -265,7 +265,7 @@
             <span class="account-button" slot="button">
                 <span class="username-span">
                     <span class="streaks">
-                        <Streaks auth="{auth}" />
+                        <Streaks {auth} />
                     </span>
                     <span class="username">
                         {auth.username}
@@ -279,8 +279,8 @@
             <button
                 aria-label="download encrypted backup"
                 class="account-dropdown-button with-icon"
-                disabled="{downloadingBackup}"
-                on:click="{downloadBackup}"
+                disabled={downloadingBackup}
+                on:click={downloadBackup}
             >
                 <DownloadLock size="30" />
                 {#if downloadingBackup}
@@ -340,11 +340,11 @@
         &::after {
             content: '';
             width: 0;
-            height: 2px;
-            bottom: 0;
-            background: @accent-color-primary;
-            transition: width 2s ease-out;
-            position: absolute;
+            height: 3px;
+            position: fixed;
+            top: 0;
+            background: @accent-color-secondary;
+            transition: width 12s cubic-bezier(0, 1, 0.5, 0.5);
             z-index: 10000;
         }
 

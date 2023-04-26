@@ -335,16 +335,14 @@
 
 <div
     class="container entry-file-drop"
-    on:filedrop="{onFileDrop}"
-    use:filedrop="{fileOptions}"
+    on:filedrop={onFileDrop}
+    use:filedrop={fileOptions}
 >
     <div class="head">
         <div class="left-options">
             <button
-                aria-label="{obfuscated
-                    ? 'Show entry form'
-                    : 'Hide entry form'}"
-                on:click="{() => (obfuscated = !obfuscated)}"
+                aria-label={obfuscated ? 'Show entry form' : 'Hide entry form'}
+                on:click={() => (obfuscated = !obfuscated)}
             >
                 {#if obfuscated}
                     <Eye size="25" />
@@ -355,7 +353,7 @@
             {#if obfuscated}
                 <input
                     aria-label="Entry Title"
-                    value="{obfuscate(newEntryTitle)}"
+                    value={obfuscate(newEntryTitle)}
                     class="title obfuscated"
                     disabled
                     placeholder="..."
@@ -363,39 +361,35 @@
             {:else}
                 <input
                     aria-label="Entry Title"
-                    bind:value="{newEntryTitle}"
+                    bind:value={newEntryTitle}
                     class="title"
                     placeholder="Title"
-                    disabled="{submitted}"
+                    disabled={submitted}
                 />
             {/if}
         </div>
         <div class="right-options {obfuscated ? 'blur' : ''}">
             <button
                 aria-label="Insert Image"
-                disabled="{submitted}"
-                on:click="{triggerFileDrop}"
-                use:tooltip="{{
+                disabled={submitted}
+                on:click={triggerFileDrop}
+                use:tooltip={{
                     content: 'Insert Image',
                     position: 'bottom'
-                }}"
+                }}
             >
                 <ImageArea size="30" />
             </button>
 
             <LocationToggle />
 
-            <LabelSelect
-                auth="{auth}"
-                bind:value="{newEntryLabel}"
-                labels="{labels}"
-            />
+            <LabelSelect {auth} bind:value={newEntryLabel} {labels} />
 
             <button
                 aria-label="Submit Entry"
                 class="send"
-                disabled="{submitted}"
-                on:click="{submit}"
+                disabled={submitted}
+                on:click={submit}
             >
                 <Send size="30" />
             </button>
@@ -408,11 +402,12 @@
             >
         {:else}
             <textarea
-                bind:this="{newEntryInputElement}"
-                bind:value="{newEntryBody}"
-                on:keydown="{handleEntryInputKeydown}"
+                bind:this={newEntryInputElement}
+                bind:value={newEntryBody}
+                on:keydown={handleEntryInputKeydown}
                 placeholder="Entry"
-                disabled="{submitted}"></textarea>
+                disabled={submitted}
+            />
         {/if}
     </div>
 
@@ -420,8 +415,8 @@
         <button
             aria-label="Submit Entry"
             class="primary with-icon"
-            disabled="{submitted}"
-            on:click="{submit}"
+            disabled={submitted}
+            on:click={submit}
         >
             <Send size="30" />
             Submit Entry

@@ -8,13 +8,13 @@
 
 {#if label}
     <a class="label has-label" href="/labels/{label.id}">
-        <span class="colour" style="background: {label.colour}"></span>
+        <span class="colour" style="background: {label.colour}" />
         <span class="name {obfuscated ? 'obfuscated' : ''}">
             {label.name}
         </span>
     </a>
 {:else}
-    <span style="margin: 0 .5em"></span>
+    <span style="margin: 0 .5em" />
 {/if}
 
 <style lang="less">

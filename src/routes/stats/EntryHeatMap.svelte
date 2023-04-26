@@ -29,19 +29,19 @@
 <div class="outer">
     <div class="inner">
         <SvelteHeatmap
-            allowOverflow="{true}"
-            cellGap="{2}"
+            allowOverflow={true}
+            cellGap={2}
             cellRadius="50%"
-            colors="{['#95eab0', '#52d8bd', '#3397bd', '#0051cf']}"
-            data="{data}"
-            dayLabelWidth="{20}"
-            emptyColor="{'#dfdfdf'}"
-            endDate="{moment().toDate()}"
-            fontColor="{'#9c9c9c'}"
+            colors={['#95eab0', '#52d8bd', '#3397bd', '#0051cf']}
+            {data}
+            dayLabelWidth={20}
+            emptyColor={'#dfdfdf'}
+            endDate={moment().toDate()}
+            fontColor={'#9c9c9c'}
             fontSize="12"
-            monthGap="{20}"
-            monthLabelHeight="{20}"
-            monthLabels="{[
+            monthGap={20}
+            monthLabelHeight={20}
+            monthLabels={[
                 `Jan ${lastJanYear}`,
                 'Feb',
                 'Mar',
@@ -54,9 +54,9 @@
                 'Oct',
                 'Nov',
                 'Dec'
-            ]}"
-            startDate="{moment().subtract(showMonths, 'months').toDate()}"
-            view="{'monthly'}"
+            ]}
+            startDate={moment().subtract(showMonths, 'months').toDate()}
+            view={'monthly'}
         />
     </div>
 </div>

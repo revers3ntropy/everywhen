@@ -15,8 +15,8 @@
     <div class="page-counter">
         <div>
             <button
-                on:click="{() => page--}"
-                disabled="{page <= 0}"
+                on:click={() => page--}
+                disabled={page <= 0}
                 class="flex-center"
                 aria-label="Previous page"
             >
@@ -31,8 +31,8 @@
         </div>
         <div>
             <button
-                on:click="{() => page++}"
-                disabled="{page >= pages - 1}"
+                on:click={() => page++}
+                disabled={page >= pages - 1}
                 class="flex-center"
                 aria-label="Next page"
             >

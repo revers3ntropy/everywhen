@@ -72,21 +72,6 @@
         await reloadEvents();
     }
 
-    async function handleDeleteEvent({
-        detail: event
-    }: CustomEvent<EventController>) {
-        await reloadEvents();
-
-        const deletedEvent: EventData = {
-            ...event,
-            deleted: true
-        };
-
-        events = [...events, deletedEvent].sort(
-            (a, b) => b.created - a.created
-        );
-    }
-
     function importPopup() {
         showPopup(
             ImportDialog,
@@ -128,13 +113,13 @@
 <main>
     <div class="menu">
         <div class="flex-center">
-            <button class="primary with-icon" on:click="{newEvent}">
+            <button class="primary with-icon" on:click={newEvent}>
                 <Plus size="30" />
                 New Event
             </button>
             <button
                 class="with-icon icon-gradient-on-hover"
-                on:click="{importPopup}"
+                on:click={importPopup}
             >
                 <TrayArrowUp size="30" />
                 Import
@@ -152,23 +137,21 @@
             </span>
         </h1>
 
-        <div class="flex-center">
+        <div class="sort-by">
             Sort by
-            <Select bind:key="{$eventsSortKey}" options="{sortEventsKeys}" />
+            <Select bind:key={$eventsSortKey} options={sortEventsKeys} />
         </div>
     </div>
     <ul>
         {#each events as event}
             <li>
                 <Event
-                    event="{event}"
-                    auth="{data}"
-                    selectNameId="{selectNameId}"
-                    changeEventCount="{changeEventCount}"
-                    on:update="{reloadEvents}"
-                    on:delete="{handleDeleteEvent}"
-                    labels="{data.labels}"
-                    obfuscated="{$obfuscated}"
+                    {event}
+                    auth={data}
+                    {selectNameId}
+                    {changeEventCount}
+                    labels={data.labels}
+                    obfuscated={$obfuscated}
                 />
             </li>
         {/each}
@@ -226,5 +209,11 @@
                 margin-bottom: 1em;
             }
         }
+    }
+
+    .sort-by {
+        .flex-center();
+        .bordered();
+        padding: 0 0 0 1rem;
     }
 </style>

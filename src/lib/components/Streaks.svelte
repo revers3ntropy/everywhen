@@ -41,10 +41,10 @@
     {:else if streaks}
         <span
             class="flex-center"
-            use:tooltip="{{
+            use:tooltip={{
                 content: makeTooltip(streaks.longest, streaks.runningOut),
                 position: tooltipPosition
-            }}"
+            }}
         >
             {#if streaks.runningOut}
                 <TimerSand size="25" />
@@ -61,10 +61,10 @@
 {:else}
     <span
         class="flex-center"
-        use:tooltip="{{
+        use:tooltip={{
             content: '...',
             position: tooltipPosition
-        }}"
+        }}
     >
         <Fire size="25" />
         <b>...</b>

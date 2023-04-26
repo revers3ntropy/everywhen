@@ -15,7 +15,7 @@
     let close: () => void;
 </script>
 
-<Dropdown bind:close="{close}" bind:open="{open}" unstyledButton>
+<Dropdown bind:close bind:open unstyledButton>
     <span class="selector" slot="button">
         {key}
         {#if open}
@@ -28,10 +28,10 @@
     <div class="options">
         {#each Object.keys(options) as option}
             <button
-                on:click="{() => {
+                on:click={() => {
                     close();
                     key = option;
-                }}"
+                }}
             >
                 {option}
             </button>

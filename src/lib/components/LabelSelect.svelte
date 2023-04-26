@@ -52,12 +52,13 @@
 </script>
 
 <div class="select-label">
-    <Dropdown bind:close="{closeDropDown}" rounded ariaLabel="Select label">
+    <Dropdown bind:close={closeDropDown} rounded ariaLabel="Select label">
         <span slot="button" class="select-button">
             <span
                 class="entry-label-colour"
                 style="background: {(labels ?? []).find(l => l.id === value)
-                    ?.colour || 'transparent'}"></span>
+                    ?.colour || 'transparent'}"
+            />
             {#if labels}
                 {labels.find(l => l.id === value)?.name || '(No Label)'}
             {:else}
@@ -66,10 +67,10 @@
         </span>
         <div class="list-container">
             <button
-                on:click="{() => {
+                on:click={() => {
                     closeDropDown();
                     value = '';
-                }}"
+                }}
                 class="label-button single"
                 aria-label="Remove label"
             >
@@ -77,16 +78,17 @@
             </button>
             {#each (labels ?? []).filter(filter) as label (label.id)}
                 <button
-                    on:click="{() => {
+                    on:click={() => {
                         closeDropDown();
                         value = label.id;
-                    }}"
+                    }}
                     class="label-button"
                     aria-label="Select label {label.name}"
                 >
                     <span
                         class="entry-label-colour"
-                        style="background: {label.colour}"></span>
+                        style="background: {label.colour}"
+                    />
                     {#if value === label.id}
                         <b>{label.name}</b>
                     {:else}
@@ -98,7 +100,7 @@
     </Dropdown>
     {#if showAddButton}
         <button
-            on:click="{showNewLabelPopup}"
+            on:click={showNewLabelPopup}
             class="icon-button"
             aria-label="Create new label"
         >

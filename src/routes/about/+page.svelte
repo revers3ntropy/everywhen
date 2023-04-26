@@ -201,7 +201,7 @@
             The docs to the public API can be found on
             <a
                 aria-label="Link to API docs"
-                href="{API_DOCS_LINK}"
+                href={API_DOCS_LINK}
                 rel="noreferrer"
                 target="_blank">this</a
             >

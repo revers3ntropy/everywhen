@@ -2,6 +2,7 @@
     import { onMount } from 'svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../../../app';
+    import BookSpinner from '../../../lib/components/BookSpinner.svelte';
     import Dot from '../../../lib/components/Dot.svelte';
     import Entry from '../../../lib/components/Entry.svelte';
     import type { Entry as EntryController } from '../../../lib/controllers/entry';
@@ -53,16 +54,16 @@
     {#each entries as entry}
         <Entry
             {...entry}
-            obfuscated="{$obfuscated}"
-            on:updated="{reload}"
-            auth="{data}"
+            obfuscated={$obfuscated}
+            on:updated={reload}
+            auth={data}
         />
     {/each}
 
     {#if !loaded}
-        <h2><i>Loading...</i></h2>
+        <BookSpinner />
     {:else if entries.length === 0}
-        <h2><i>No deleted entries.</i></h2>
+        <i>No deleted entries.</i>
     {/if}
 </main>
 

@@ -9,16 +9,13 @@
 </script>
 
 {#if tooltip}
-    <div
-        class="{primary ? 'primary' : ''}"
-        use:useTooltip="{{ content: tooltip }}"
-    >
+    <div class={primary ? 'primary' : ''} use:useTooltip={{ content: tooltip }}>
         {beforeLabel}
         <span>{value}</span>
         {label}
     </div>
 {:else}
-    <div class="{primary ? 'primary' : ''}">
+    <div class={primary ? 'primary' : ''}>
         {beforeLabel}
         <span>{value}</span>
         {label}

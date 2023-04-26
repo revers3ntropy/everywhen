@@ -58,18 +58,18 @@
         {#if editable}
             <input
                 type="color"
-                bind:value="{colour}"
-                on:change="{() => updateLabel({ colour })}"
+                bind:value={colour}
+                on:change={() => updateLabel({ colour })}
             />
             <input
-                bind:value="{name}"
+                bind:value={name}
                 class="editable-text"
                 autocomplete="none"
                 type="text"
-                on:change="{() => updateLabel({ name })}"
+                on:change={() => updateLabel({ name })}
             />
         {:else}
-            <div class="entry-label-colour" style="background: {colour}"></div>
+            <div class="entry-label-colour" style="background: {colour}" />
             <div>{name}</div>
         {/if}
         <a href="/labels/{id}">
@@ -81,7 +81,7 @@
             {/if}
         </a>
         <div>
-            <button on:click="{deleteLabel}" class="icon-button">
+            <button on:click={deleteLabel} class="icon-button">
                 <Delete size="30" />
             </button>
         </div>

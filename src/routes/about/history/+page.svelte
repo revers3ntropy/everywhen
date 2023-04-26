@@ -49,7 +49,7 @@
                 <li>'/about' and '/about/history' pages</li>
                 <li>Caching</li>
                 <li>'+' button in navbar</li>
-                <li>More general stats on analytics page</li>
+                <li>More general stats on insights page</li>
                 <li>Don't blur by default</li>
                 <li>Keyboard shortcuts for Macs</li>
                 <li>Clear entry form when logging out</li>
@@ -69,7 +69,7 @@
                 <li>Better mobile support</li>
                 <li>Better default zoom for timeline</li>
                 <li>'n' Years Ago Today entries</li>
-                <li>Better 'buckets' for barchart in analytics</li>
+                <li>Better 'buckets' for barchart in insights</li>
                 <li
                     >Ask to leave page with unsaved changes when editing entry</li
                 >
@@ -83,7 +83,7 @@
                 <li>Better mobile support</li>
                 <li>Better default zoom for timeline</li>
                 <li>'n' Years Ago Today entries</li>
-                <li>Better 'buckets' for barchart in analytics</li>
+                <li>Better 'buckets' for barchart in insights</li>
                 <li
                     >Ask to leave page with unsaved changes when editing entry</li
                 >
@@ -111,7 +111,7 @@
                 <li>Instant/Duration events</li>
                 <li>Create events</li>
                 <li>Upload images</li>
-                <li>Stats (Analytics) page</li>
+                <li>Stats (Insights) page</li>
                 <li>Search entries</li>
                 <li>Filter entries by label</li>
                 <li>Blur entries</li>

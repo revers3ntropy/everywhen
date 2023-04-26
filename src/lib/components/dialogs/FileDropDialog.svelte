@@ -68,19 +68,15 @@
                 {textBoxLabel}
                 <input
                     class="text-box"
-                    on:input="{handleTextBoxInput}"
-                    placeholder="{textBoxPlaceholder}"
-                    type="{textBoxType}"
+                    on:input={handleTextBoxInput}
+                    placeholder={textBoxPlaceholder}
+                    type={textBoxType}
                 />
             </label>
         {/if}
     </div>
 
-    <div
-        class="dropzone"
-        on:filedrop="{onFileDrop}"
-        use:filedrop="{fileOptions}"
-    >
+    <div class="dropzone" on:filedrop={onFileDrop} use:filedrop={fileOptions}>
         {message}
     </div>
 </div>

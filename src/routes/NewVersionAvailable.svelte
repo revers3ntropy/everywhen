@@ -5,7 +5,7 @@
 </script>
 
 <div class="outer">
-    <button class="inner" on:click="{() => location.reload()}">
+    <button class="inner" on:click={() => location.reload()}>
         <span
             >A new version ({newVersion}) is available! Click to apply the
             update

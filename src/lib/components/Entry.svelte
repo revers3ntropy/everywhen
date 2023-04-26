@@ -107,22 +107,22 @@
         <div class="flex-space-evenly">
             <span class="time">
                 <UtcTime
-                    fmt="{showFullDate ? 'ddd DD-MM-YYYY h:mma' : 'h:mma'}"
-                    timestamp="{created}"
+                    fmt={showFullDate ? 'ddd DD-MM-YYYY h:mma' : 'h:mma'}
+                    timestamp={created}
                     tooltipPosition="right"
-                    tzOffset="{createdTZOffset}"
+                    tzOffset={createdTZOffset}
                 />
             </span>
 
-            <AgentWidget data="{agentData}" />
+            <AgentWidget data={agentData} />
 
             {#if latitude && longitude && showLocations}
                 <LocationWidget
-                    auth="{auth}"
-                    entryId="{id}"
-                    latitude="{latitude}"
-                    longitude="{longitude}"
-                    obfuscated="{obfuscated}"
+                    {auth}
+                    entryId={id}
+                    {latitude}
+                    {longitude}
+                    {obfuscated}
                 />
             {/if}
 
@@ -137,7 +137,7 @@
             {/if}
 
             {#if showLabels}
-                <Label label="{showLabel}" obfuscated="{obfuscated}" />
+                <Label label={showLabel} {obfuscated} />
             {/if}
         </div>
 
@@ -148,9 +148,9 @@
         <div class="flex-center">
             {#if !obfuscated && !isEdit}
                 <button
-                    on:click="{deleteSelf}"
-                    aria-label="{deleted ? 'Restore' : 'Delete'}"
-                    use:tooltip="{{ content: restoreDeleteTooltip }}"
+                    on:click={deleteSelf}
+                    aria-label={deleted ? 'Restore' : 'Delete'}
+                    use:tooltip={{ content: restoreDeleteTooltip }}
                 >
                     {#if deleted}
                         <Restore size="25" />
@@ -161,7 +161,7 @@
                 {#if !deleted}
                     <a
                         href="/journal/{id}/edit?obfuscate=0"
-                        use:tooltip="{{ content: 'Edit Entry' }}"
+                        use:tooltip={{ content: 'Edit Entry' }}
                     >
                         <NoteEditOutline size="25" />
                     </a>
@@ -169,8 +169,8 @@
             {/if}
 
             <button
-                aria-label="{obfuscated ? 'Show entry' : 'Hide entry'}"
-                on:click="{toggleObfuscation}"
+                aria-label={obfuscated ? 'Show entry' : 'Hide entry'}
+                on:click={toggleObfuscation}
             >
                 {#if obfuscated}
                     <Eye size="25" />

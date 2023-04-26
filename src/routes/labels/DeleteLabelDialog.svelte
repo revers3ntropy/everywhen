@@ -102,15 +102,15 @@
             <div>
                 {#if labels}
                     <LabelSelect
-                        auth="{auth}"
-                        bind:value="{changeLabelId}"
-                        filter="{filter}"
-                        labels="{labels}"
+                        {auth}
+                        bind:value={changeLabelId}
+                        {filter}
+                        {labels}
                     />
                 {:else}
                     Loading...
                 {/if}
-                <button on:click="{reassign}">
+                <button on:click={reassign}>
                     Give Different Label to Entries/Events with this Label
                 </button>
             </div>
@@ -118,13 +118,13 @@
             <h2>OR</h2>
 
             <div>
-                <button on:click="{rmLabel}">
+                <button on:click={rmLabel}>
                     Delete Label and Remove from Entries/Events
                 </button>
             </div>
 
             <div class="cancel">
-                <button on:click|self="{cancel}"> Cancel </button>
+                <button on:click|self={cancel}> Cancel </button>
             </div>
         </div>
     {/if}

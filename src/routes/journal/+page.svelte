@@ -19,19 +19,19 @@
 
 <main>
     <EntryForm
-        auth="{data}"
-        bind:reset="{clearEntryForm}"
-        obfuscated="{$obfuscated}"
-        on:updated="{reloadEntries}"
+        auth={data}
+        bind:reset={clearEntryForm}
+        obfuscated={$obfuscated}
+        on:updated={reloadEntries}
     />
     <Entries
-        auth="{data}"
-        bind:reload="{reloadEntries}"
-        pageSize="{data.settings.entriesPerPage.value}"
-        showBin="{true}"
-        showImport="{true}"
-        showLabels="{true}"
-        showSearch="{true}"
-        showSidebar="{true}"
+        auth={data}
+        bind:reload={reloadEntries}
+        pageSize={data.settings.entriesPerPage.value}
+        showBin={true}
+        showImport={true}
+        showLabels={true}
+        showSearch={true}
+        showSidebar={true}
     />
 </main>

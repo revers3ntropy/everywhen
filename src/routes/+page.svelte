@@ -53,8 +53,8 @@
             <input
                 aria-label="Username"
                 autocomplete="username"
-                bind:value="{username}"
-                disabled="{actionPending}"
+                bind:value={username}
+                disabled={actionPending}
                 style="font-size: x-large"
             />
         </label>
@@ -63,8 +63,8 @@
             <input
                 aria-label="Password"
                 autocomplete="current-password"
-                bind:value="{password}"
-                disabled="{actionPending}"
+                bind:value={password}
+                disabled={actionPending}
                 style="font-size: x-large"
                 type="password"
             />
@@ -72,8 +72,8 @@
         <div class="flex-center" style="justify-content: space-between">
             <button
                 aria-label="Create Account"
-                disabled="{actionPending}"
-                on:click|preventDefault="{create}"
+                disabled={actionPending}
+                on:click|preventDefault={create}
                 type="button"
             >
                 Sign Up
@@ -81,8 +81,8 @@
             <button
                 aria-label="Log In"
                 class="primary with-icon"
-                disabled="{actionPending}"
-                on:click|preventDefault="{login}"
+                disabled={actionPending}
+                on:click|preventDefault={login}
                 type="button"
             >
                 <ChevronRight size="30" />

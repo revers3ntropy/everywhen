@@ -52,16 +52,16 @@
     <div class="content">
         <label>
             Name<br />
-            <input bind:value="{labelName}" type="text" />
+            <input bind:value={labelName} type="text" />
         </label>
         <label>
             Colour<br />
-            <input bind:value="{labelColour}" type="color" />
-            <input bind:value="{labelColour}" type="text" />
+            <input bind:value={labelColour} type="color" />
+            <input bind:value={labelColour} type="text" />
         </label>
     </div>
     <div class="actions">
-        <button class="primary" on:click="{closeHandler}"> Create </button>
+        <button class="primary" on:click={closeHandler}> Create </button>
     </div>
 </div>
 

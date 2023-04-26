@@ -10,20 +10,20 @@
 
 <section class="edit">
     <div>
-        <EditLocation {...data.location} auth="{data}" />
+        <EditLocation {...data.location} auth={data} />
     </div>
 </section>
 
 <section class="entries">
     <Entries
-        auth="{data}"
-        options="{{
+        auth={data}
+        options={{
             locationId: data.location.id
-        }}"
-        pageSize="{data.settings.entriesPerPage.value}"
-        showLabels="{true}"
-        showLocations="{false}"
-        showSearch="{true}"
+        }}
+        pageSize={data.settings.entriesPerPage.value}
+        showLabels={true}
+        showLocations={false}
+        showSearch={true}
     />
 </section>
 

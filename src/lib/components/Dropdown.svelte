@@ -22,7 +22,7 @@
     }
 </script>
 
-<svelte:window on:mousedown="{globalMouseDown}" />
+<svelte:window on:mousedown={globalMouseDown} />
 
 <div
     class="dropdown {cn({
@@ -34,8 +34,8 @@
     })}"
 >
     <button
-        aria-label="{ariaLabel || 'Open popup'}"
-        on:click="{() => (open = !open)}"
+        aria-label={ariaLabel || 'Open popup'}
+        on:click={() => (open = !open)}
     >
         <slot name="button" />
         <MenuDown class="menu-down" size="30" />

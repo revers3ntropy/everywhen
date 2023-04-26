@@ -78,19 +78,11 @@
     <div class="labels">
         <div class="label-list">
             {#each data.labels as label}
-                <LabelOptions
-                    {...label}
-                    auth="{data}"
-                    on:delete="{labelDeleted}"
-                />
+                <LabelOptions {...label} auth={data} on:delete={labelDeleted} />
             {/each}
 
-            {#if data.labels.length === 0}
-                <i class="flex-center text-light">No labels yet</i>
-            {/if}
-
             <div class="flex-center">
-                <button class="primary with-icon" on:click="{newLabel}">
+                <button class="primary with-icon" on:click={newLabel}>
                     <Plus size="30" />
                     Create Label
                 </button>

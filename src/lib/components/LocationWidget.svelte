@@ -43,11 +43,11 @@
 
 <span class="outer">
     {#if entryId}
-        <a use:tooltip="{coordsTooltip}" href="/journal/{entryId}">
+        <a use:tooltip={coordsTooltip} href="/journal/{entryId}">
             <MapMarker size="20" />
         </a>
     {:else}
-        <span use:tooltip="{coordsTooltip}">
+        <span use:tooltip={coordsTooltip}>
             <MapMarker size="20" />
         </span>
     {/if}
@@ -70,12 +70,12 @@
                         {/if}
                     {:else if i === MAX_LOCATIONS_SHOWN}
                         <span
-                            use:tooltip="{{
+                            use:tooltip={{
                                 content: locations
                                     .slice(MAX_LOCATIONS_SHOWN)
                                     .map(l => l.name)
                                     .join(', ')
-                            }}"
+                            }}
                         >
                             ...
                         </span>

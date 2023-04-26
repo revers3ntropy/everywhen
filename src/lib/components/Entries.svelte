@@ -103,7 +103,7 @@
         <div class="entries-menu">
             <div>
                 {#if showSidebar}
-                    <Sidebar titles="{entryTitles}" auth="{auth}" />
+                    <Sidebar titles={entryTitles} {auth} />
                 {/if}
                 {#if showBin}
                     <a class="with-circled-icon" href="/journal/deleted">
@@ -114,7 +114,7 @@
                 {#if showImport}
                     <button
                         class="with-circled-icon hide-mobile"
-                        on:click="{importPopup}"
+                        on:click={importPopup}
                     >
                         <TrayArrowUp size="30" />
                         Import
@@ -123,17 +123,17 @@
             </div>
             <div>
                 <PageCounter
-                    bind:page="{page}"
-                    pageLength="{pageSize}"
-                    pages="{pages}"
-                    total="{entryCount}"
+                    bind:page
+                    pageLength={pageSize}
+                    {pages}
+                    total={entryCount}
                 />
             </div>
 
             <div>
                 {#if showSearch}
                     <input
-                        bind:value="{search}"
+                        bind:value={search}
                         placeholder="Search..."
                         type="text"
                     />
@@ -147,13 +147,13 @@
         {:else}
             {#each Object.keys(entries).sort((a, b) => parseInt(b) - parseInt(a)) as day}
                 <EntryGroup
-                    entries="{entries[parseInt(day)]}"
-                    on:updated="{() => reloadEntries()}"
-                    obfuscated="{$obfuscated}"
-                    showLabels="{showLabels}"
-                    showLocations="{showLocations}"
-                    auth="{auth}"
-                    day="{parseInt(day)}"
+                    entries={entries[parseInt(day)]}
+                    on:updated={() => reloadEntries()}
+                    obfuscated={$obfuscated}
+                    {showLabels}
+                    {showLocations}
+                    {auth}
+                    day={parseInt(day)}
                 />
             {/each}
         {/if}

@@ -87,49 +87,47 @@
         {data.label.colour}
         <input
             type="color"
-            bind:value="{data.label.colour}"
-            on:change="{updateColour}"
+            bind:value={data.label.colour}
+            on:change={updateColour}
         />
     </div>
     <div class="title-line">
         <input
             class="name editable-text"
-            bind:value="{data.label.name}"
-            on:change="{updateName}"
+            bind:value={data.label.name}
+            on:change={updateName}
         />
-        <button class="with-circled-icon danger" on:click="{deleteLabel}">
+        <button class="with-circled-icon danger" on:click={deleteLabel}>
             <Delete size="30" />
             Delete this Label
         </button>
     </div>
 
-    {#if eventCount > 0}
-        <section>
-            <h1>
-                {eventCount}
-                Event{eventCount !== 1 ? 's' : ''}
-            </h1>
-            <div class="events">
-                {#each data.events as event}
-                    <Event
-                        auth="{data}"
-                        event="{event}"
-                        changeEventCount="{changeEventCount}"
-                        labels="{data.labels}"
-                        obfuscated="{$obfuscated}"
-                    />
-                {/each}
-            </div>
-        </section>
-    {/if}
+    <section>
+        <h1>
+            {eventCount}
+            Event{eventCount !== 1 ? 's' : ''}
+        </h1>
+        <div class="events">
+            {#each data.events as event}
+                <Event
+                    auth={data}
+                    {event}
+                    {changeEventCount}
+                    labels={data.labels}
+                    obfuscated={$obfuscated}
+                />
+            {/each}
+        </div>
+    </section>
 
     <section>
         <h1>{data.entryCount} {data.entryCount === 1 ? 'Entry' : 'Entries'}</h1>
         <Entries
-            auth="{data}"
-            options="{{ labelId: data.label.id }}"
-            showLabels="{false}"
-            pageSize="{data.settings.entriesPerPage.value}"
+            auth={data}
+            options={{ labelId: data.label.id }}
+            showLabels={false}
+            pageSize={data.settings.entriesPerPage.value}
         />
     </section>
 </main>

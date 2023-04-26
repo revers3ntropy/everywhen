@@ -59,7 +59,7 @@ export class Settings<T = unknown> {
             name: 'Passcode Timeout',
             description:
                 `Delay before passcode is required again. ` +
-                `Set to 0 to only require once.`,
+                `Set to 0 to only require once per device.`,
             unit: 'seconds'
         } satisfies ISettingsConfig<Seconds>,
         yearOfBirth: {

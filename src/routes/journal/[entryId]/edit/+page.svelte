@@ -25,17 +25,17 @@
             </a>
         </div>
         <h1>Edit Entry</h1>
-        <div></div>
+        <div />
     </div>
     <EntryForm
         action="edit"
-        auth="{data}"
-        entry="{data.entry}"
-        loadFromLS="{false}"
-        newEntryBody="{data.entry.entry}"
-        newEntryLabel="{data.entry?.label?.id || ''}"
-        newEntryTitle="{data.entry.title}"
-        obfuscated="{$obfuscated}"
+        auth={data}
+        entry={data.entry}
+        loadFromLS={false}
+        newEntryBody={data.entry.entry}
+        newEntryLabel={data.entry?.label?.id || ''}
+        newEntryTitle={data.entry.title}
+        obfuscated={$obfuscated}
     />
 </main>
 
