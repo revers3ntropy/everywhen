@@ -107,7 +107,7 @@
         <div class="flex-space-evenly">
             <span class="time">
                 <UtcTime
-                    fmt="{showFullDate ? 'ddd DD-MM-YYYY h:mm A' : 'h:mm A'}"
+                    fmt="{showFullDate ? 'ddd DD-MM-YYYY h:mma' : 'h:mma'}"
                     timestamp="{created}"
                     tooltipPosition="right"
                     tzOffset="{createdTZOffset}"

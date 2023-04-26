@@ -13,6 +13,10 @@
 
         <b class="count">{count}</b>
 
+        <div class="per-entry">
+            {(count / entryCount).toPrecision(3)} / entry
+        </div>
+
         {#if i < words.length - 1}
             <hr />
         {/if}
@@ -25,7 +29,7 @@
     .common-words {
         margin: 0.5em 0;
         display: grid;
-        grid-template-columns: 3rem 1fr 4rem;
+        grid-template-columns: 3rem 1fr 4rem 8rem;
         grid-row-gap: 0.3rem;
         max-width: 900px;
 

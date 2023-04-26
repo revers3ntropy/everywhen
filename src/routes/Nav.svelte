@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { afterNavigate, beforeNavigate } from '$app/navigation';
     import { page } from '$app/stores';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import Brain from 'svelte-material-icons/Brain.svelte';
@@ -105,6 +106,21 @@
         localStorage.removeItem(LS_KEY.newEntryLabel);
         location.assign('/journal');
     }
+
+    let navigating = false;
+    let finishedNavigation = false;
+    beforeNavigate(() => {
+        navigating = true;
+        finishedNavigation = false;
+    });
+    afterNavigate(() => {
+        navigating = false;
+        finishedNavigation = true;
+
+        setTimeout(() => {
+            finishedNavigation = false;
+        }, 100);
+    });
 </script>
 
 <svelte:window
@@ -131,7 +147,11 @@
     </linearGradient>
 </svg>
 
-<nav class="{showingNavPopup ? 'showing-dropdown' : ''}">
+<nav
+    class="{showingNavPopup ? 'showing-dropdown' : ''} {navigating
+        ? 'navigating'
+        : ''} {finishedNavigation ? 'finished-navigation' : ''}"
+>
     <div class="menu-button-mobile">
         <button aria-label="Show nav menu" on:click="{toggleNavPopup}">
             {#if showingNavPopup}
@@ -315,6 +335,29 @@
         &.showing-dropdown {
             box-shadow: 0 0 4px 4px black;
             background: @header-bg;
+        }
+
+        &::after {
+            content: '';
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            background: @accent-color-primary;
+            transition: width 2s ease-out;
+            position: absolute;
+            z-index: 10000;
+        }
+
+        &.navigating {
+            &::after {
+                width: 100%;
+            }
+        }
+
+        &.finished-navigation {
+            &::after {
+                display: none;
+            }
         }
     }
 
