@@ -340,7 +340,7 @@ export class CanvasState implements ICanvasListeners {
         x: number,
         y: number,
         {
-            c = CanvasState.colours.text,
+            colour = CanvasState.colours.text,
             maxWidth = undefined,
             align = 'left',
             backgroundColour = undefined,
@@ -350,7 +350,7 @@ export class CanvasState implements ICanvasListeners {
             backgroundRadius = 0,
             zIndex = 1
         }: {
-            c?: string;
+            colour?: string;
             maxWidth?: number;
             align?: CanvasTextAlign;
             backgroundColour?: string;
@@ -367,7 +367,7 @@ export class CanvasState implements ICanvasListeners {
                 zIndex,
                 cb: () =>
                     this.text(txt, x, y, {
-                        c,
+                        colour,
                         maxWidth,
                         align,
                         backgroundColour,
@@ -413,7 +413,7 @@ export class CanvasState implements ICanvasListeners {
         this.ctx.font = fontFmt;
         this.ctx.textBaseline = 'hanging';
         this.ctx.textAlign = align;
-        this.ctx.fillStyle = c;
+        this.ctx.fillStyle = colour;
         this.ctx.fillText(txt, x, y, maxWidth);
         this.ctx.fill();
     }

@@ -19,7 +19,7 @@
 
             if (this.hovering) {
                 state.text('now', nowLinePos + 5, state.centerLnY() - 14, {
-                    c: '#79ebe2',
+                    colour: '#79ebe2',
                     fontSize: 12
                 });
             }

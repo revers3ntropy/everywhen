@@ -130,6 +130,7 @@
         const showDayText = state.zoom >= 1.2e-3;
         const showDays = state.zoom >= 5e-4;
         const showWeekText = state.zoom >= 1.2e-4;
+        const showWeeks = state.zoom >= 1.2e-4;
 
         while (true) {
             const dayDate = new Date(day * 1000);
@@ -146,7 +147,7 @@
             const isMonday =
                 fmtUtc(dayStart, currentTzOffset(), 'ddd') === 'Mon';
 
-            const shouldShow = isMonday || showDays;
+            const shouldShow = (isMonday && showWeeks) || showDays;
 
             if (shouldShow) {
                 state.rect(renderPos, 0, 1, state.height, {

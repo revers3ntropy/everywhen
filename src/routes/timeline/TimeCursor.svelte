@@ -12,14 +12,14 @@
             centerTimeDate.toDateString(),
             state.width / 2,
             state.centerLnY() - 30,
-            { c: '#6FA' }
+            { colour: '#6FA' }
         );
         if (state.zoom > START_ZOOM) {
             state.text(
                 fmtUtc(centerTime, currentTzOffset(), 'hh:mma'),
                 state.width / 2,
                 state.centerLnY() - 40,
-                { c: '#6FA' }
+                { colour: '#6FA' }
             );
         }
 

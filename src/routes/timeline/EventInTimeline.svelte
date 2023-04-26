@@ -4,6 +4,7 @@
     import { interactable } from '../../lib/canvas/interactable';
     import type { Auth } from '../../lib/controllers/user';
     import Event from '../../lib/components/Event.svelte';
+    import type { Event as EventController } from '../../lib/controllers/event';
     import type { Label } from '../../lib/controllers/label';
     import { obfuscated } from '../../lib/stores';
     import { showPopup } from '../../lib/utils/popups';
@@ -12,7 +13,8 @@
     const LABEL_HEIGHT = 4;
     const SINGLE_EVENT_CIRCLE_RADIUS = 5;
     const Y_MARGIN = 2;
-    const TEXT_X_OFFSET = 0;
+    const DURATION_TEXT_X_OFFSET = 2;
+    const DURATION_TEXT_Y_OFFSET = 8;
 
     export let auth: Auth;
     export let labels: Label[];
@@ -21,7 +23,7 @@
     export let start: number;
     export let end: number;
     export let name: string;
-    export let label = undefined as Label | undefined;
+    export let label = null as Label | null;
     export let yLevel: number;
     export let eventTextParityHeight: boolean;
     export let created: number;
@@ -31,9 +33,9 @@
 
     if (!start || !end) throw 'Missing required props';
 
-    const duration = end - start;
-    const isSingleEvent = duration < 60;
-    const colour = label?.colour || CanvasState.colours.primary;
+    $: duration = end - start;
+    $: isSingleEvent = duration < 60;
+    $: colour = label?.colour || CanvasState.colours.primary;
 
     function yRenderPos(centerLineY: number) {
         return centerLineY - yLevel * (HEIGHT + Y_MARGIN);
@@ -69,7 +71,7 @@
                 });
             } else {
                 state.rect(x, y, width, HEIGHT, {
-                    colour: this.hovering ? '#333' : '#222',
+                    colour: this.hovering ? '#222326' : '#252A35',
                     radius: 5
                 });
                 state.rect(x, y + HEIGHT - LABEL_HEIGHT, width, LABEL_HEIGHT, {
@@ -89,10 +91,14 @@
             if (!isSingleEvent && (width > 50 || this.hovering)) {
                 state.text(
                     name,
-                    Math.max(5, x + TEXT_X_OFFSET),
-                    y + HEIGHT / 2,
+                    Math.max(
+                        DURATION_TEXT_X_OFFSET,
+                        x + DURATION_TEXT_X_OFFSET
+                    ),
+                    y + DURATION_TEXT_Y_OFFSET,
                     {
-                        c: textColour
+                        colour: textColour,
+                        fontSize: 14
                     }
                 );
             } else if (
@@ -153,14 +159,22 @@
                 },
                 labels,
                 expanded: true,
+                bordered: false,
                 changeEventCount(by: number) {
+                    // NOTE: doesn't recalculate the Y values when
+                    // event is deleted, just stops rendering it
                     if (by === -1) {
                         thisIsDeleted = true;
                     } else if (by === 1) {
                         thisIsDeleted = false;
                     }
                 },
-                bordered: false
+                onChange(newEvent: EventController) {
+                    start = newEvent.start;
+                    end = newEvent.end;
+                    name = newEvent.name;
+                    label = newEvent.label || null;
+                }
             });
         }
     });
