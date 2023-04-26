@@ -149,8 +149,6 @@
             }
         }
     }
-
-    console.log(data.settings.darkMode.value);
 </script>
 
 <svelte:window

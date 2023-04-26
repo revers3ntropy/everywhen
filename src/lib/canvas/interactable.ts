@@ -5,6 +5,7 @@ import type { TimestampSecs } from '../utils/types';
 import {
     type CanvasContext,
     canvasState,
+    type ContextMenuOptions,
     key,
     type Listener
 } from './canvasState';
@@ -16,6 +17,7 @@ export interface Interactable extends Listener {
     onMouseUp?: (time: TimestampSecs, y: number) => void;
     collider?: (props: RenderProps) => Collider | null;
     cursorOnHover?: CursorStyle;
+    contextMenu?: ContextMenuOptions;
 }
 
 export function interactable(interactable: Interactable): void {

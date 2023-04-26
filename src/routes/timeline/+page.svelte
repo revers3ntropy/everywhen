@@ -4,7 +4,7 @@
     import Background from '../../lib/canvas/Background.svelte';
     import Canvas from '../../lib/canvas/Canvas.svelte';
     import { canvasState } from '../../lib/canvas/canvasState';
-    import { Event } from '../../lib/controllers/event';
+    import type { Event } from '../../lib/controllers/event';
     import { nowUtc } from '../../lib/utils/time';
     import type { TimelineEntry } from './+page.server';
     import CenterLine from './CenterLine.svelte';
@@ -13,6 +13,7 @@
     import EventInTimeline from './EventInTimeline.svelte';
     import NowLine from './NowLine.svelte';
     import TimeCursor from './TimeCursor.svelte';
+    import ContextMenu from './ContextMenu.svelte';
     import TimeMarkers from './TimeMarkers.svelte';
     import { addYToEvents, type EventWithYLevel } from './utils';
 
@@ -23,8 +24,6 @@
     };
 
     let events: EventWithYLevel[];
-
-    const eventBaseY = 4;
 
     $: events = addYToEvents(data.events);
 
@@ -50,6 +49,10 @@
     }
 
     onMount(setInitialZoomAndPos);
+
+    function onCreateEvent(event: Event) {
+        events = addYToEvents([...events, event]);
+    }
 
     onMount(() => (document.title = 'Timeline'));
 </script>
@@ -101,6 +104,7 @@
     <Canvas>
         <Controls />
         <Background />
+        <ContextMenu auth={data} {onCreateEvent} />
 
         <TimeMarkers startYear={data.settings.yearOfBirth.value} />
 
@@ -119,9 +123,7 @@
                 auth={data}
                 labels={data.labels}
                 {...event}
-                yLevel={Event.duration(event) < 60
-                    ? eventBaseY
-                    : eventBaseY + 1 + event.yLevel}
+                yLevel={1 + event.yLevel}
                 eventTextParityHeight={i % 2 === 0}
             />
         {/each}

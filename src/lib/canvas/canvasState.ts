@@ -21,6 +21,23 @@ export type RenderCallback = (
     dt: number
 ) => void | Promise<void>;
 
+export interface ContextMenuElement {
+    label: string;
+    action?: (
+        state: RenderProps,
+        clickX: Pixels,
+        clickY: Pixels
+    ) => void | Promise<void>;
+}
+
+export type ContextMenuOptions = ContextMenuElement[];
+
+export interface ContextMenu {
+    options: ContextMenuOptions;
+    x: Pixels;
+    y: Pixels;
+}
+
 export interface Listener {
     setup?: SetupCallback;
     render?: RenderCallback;
@@ -35,7 +52,7 @@ export interface CanvasContext {
     remove(fn: Listener): void;
 }
 
-export interface ICanvasListeners {
+export interface CanvasListeners {
     mousemove: CanvasListener[];
     mouseup: CanvasListener[];
     mousedown: CanvasListener[];
@@ -43,9 +60,10 @@ export interface ICanvasListeners {
     touchmove: CanvasListener[];
     touchend: CanvasListener[];
     wheel: CanvasListener[];
+    contextmenu: CanvasListener[];
 }
 
-export interface ICanvasState extends ICanvasListeners {
+export interface ICanvasState extends CanvasListeners {
     width: number;
     height: number;
     pixelRatio: number;
@@ -54,6 +72,7 @@ export interface ICanvasState extends ICanvasListeners {
     time: number;
     cameraOffset: number;
     zoom: number;
+    cursor?: CursorStyle;
 }
 
 export interface RenderRequest {
@@ -61,7 +80,7 @@ export interface RenderRequest {
     cb: (state: CanvasState) => void;
 }
 
-export class CanvasState implements ICanvasListeners {
+export class CanvasState implements CanvasListeners {
     static colours = {
         primary: '#DDD',
         text: '#FFF'
@@ -77,13 +96,14 @@ export class CanvasState implements ICanvasListeners {
     public time: number;
     public cursor: CursorStyle = 'default';
 
-    public readonly mousemove: CanvasListener[];
-    public readonly mouseup: CanvasListener[];
-    public readonly mousedown: CanvasListener[];
-    public readonly touchstart: CanvasListener[];
-    public readonly touchmove: CanvasListener[];
-    public readonly touchend: CanvasListener[];
-    public readonly wheel: CanvasListener[];
+    public readonly mousemove: CanvasListener[] = [];
+    public readonly mouseup: CanvasListener[] = [];
+    public readonly mousedown: CanvasListener[] = [];
+    public readonly touchstart: CanvasListener[] = [];
+    public readonly touchmove: CanvasListener[] = [];
+    public readonly touchend: CanvasListener[] = [];
+    public readonly wheel: CanvasListener[] = [];
+    public readonly contextmenu: CanvasListener[] = [];
 
     public mouseTime = 0;
     public mouseY = 0;
@@ -91,7 +111,7 @@ export class CanvasState implements ICanvasListeners {
     private interactables: Interactable[] = [];
     private renderQueue: RenderRequest[] = [];
 
-    public constructor(props: Required<CanvasState>) {
+    public constructor(props: ICanvasState) {
         this.width = props.width;
         this.height = props.height;
         this.cameraOffset = props.cameraOffset;
@@ -101,27 +121,55 @@ export class CanvasState implements ICanvasListeners {
         this.pixelRatio = props.pixelRatio;
         this.time = props.time;
 
-        this.mousemove = props.mousemove;
-        this.mouseup = props.mouseup;
-        this.mousedown = props.mousedown;
-        this.touchstart = props.touchstart;
-        this.touchmove = props.touchmove;
-        this.touchend = props.touchend;
-        this.wheel = props.wheel;
-
         this.listen('mousemove', e => {
             this.mouseTime = this.getMouseTime(e);
             this.mouseY = this.getMouseYRaw(e);
 
             this.updateHoveringOnInteractables();
-
-            this.listen('mouseup', () => {
-                for (const interactable of this.interactables) {
-                    if (!interactable.hovering) continue;
-                    interactable.onMouseUp?.(this.mouseTime, this.mouseY);
-                }
-            });
         });
+
+        let waitingForCtxMenu = null as null | ContextMenuOptions;
+
+        this.listen('mouseup', event => {
+            if (waitingForCtxMenu) {
+                this.showContextMenu(waitingForCtxMenu, event);
+                waitingForCtxMenu = null;
+            } else {
+                this.hideContextMenu();
+            }
+
+            for (const interactable of this.interactables) {
+                if (!interactable.hovering) continue;
+                interactable.onMouseUp?.(this.mouseTime, this.mouseY);
+                return;
+            }
+        });
+
+        this.listen('contextmenu', evt => {
+            for (const interactable of this.interactables) {
+                if (!interactable.hovering || !interactable.contextMenu) {
+                    continue;
+                }
+                evt.preventDefault();
+                waitingForCtxMenu = interactable.contextMenu;
+                return;
+            }
+        });
+    }
+
+    private showContextMenu(options: ContextMenuOptions, event: MouseEvent) {
+        const x = this.getMouseXRaw(event);
+        const y = this.getMouseYRaw(event);
+
+        contextMenuState.set({
+            options,
+            x,
+            y
+        });
+    }
+
+    private hideContextMenu() {
+        contextMenuState.set(null);
     }
 
     private updateHoveringOnInteractables() {
@@ -156,6 +204,12 @@ export class CanvasState implements ICanvasListeners {
         }
     }
 
+    public handleResize() {
+        this.width = window.innerWidth;
+        this.height = window.innerHeight;
+        this.pixelRatio = window.devicePixelRatio;
+    }
+
     public flushRenderQueue() {
         this.renderQueue.sort((a, b) => a.zIndex - b.zIndex);
         for (const req of this.renderQueue) {
@@ -173,19 +227,11 @@ export class CanvasState implements ICanvasListeners {
             canvas: null,
             time: 0,
             cameraOffset: 0,
-            zoom: START_ZOOM,
-
-            mousemove: [],
-            mouseup: [],
-            mousedown: [],
-            touchstart: [],
-            touchmove: [],
-            touchend: [],
-            wheel: []
+            zoom: START_ZOOM
         } as unknown as CanvasState);
     }
 
-    public listen<EvtT extends keyof ICanvasListeners>(
+    public listen<EvtT extends keyof CanvasListeners>(
         event: EvtT,
         callback: CanvasListener<WindowEventMap[EvtT]>
     ) {
@@ -449,4 +495,5 @@ export class CanvasState implements ICanvasListeners {
 }
 
 export const canvasState = writable(CanvasState.empty());
+export const contextMenuState = writable<ContextMenu | null>(null);
 export const key = Symbol();

@@ -15,6 +15,7 @@
     const Y_MARGIN = 2;
     const DURATION_TEXT_X_OFFSET = 2;
     const DURATION_TEXT_Y_OFFSET = 8;
+    const EVENT_BASE_Y = 4;
 
     export let auth: Auth;
     export let labels: Label[];
@@ -34,11 +35,12 @@
     if (!start || !end) throw 'Missing required props';
 
     $: duration = end - start;
-    $: isSingleEvent = duration < 60;
+    $: isInstantEvent = duration < 60;
     $: colour = label?.colour || CanvasState.colours.primary;
 
     function yRenderPos(centerLineY: number) {
-        return centerLineY - yLevel * (HEIGHT + Y_MARGIN);
+        const y = isInstantEvent ? 0 : yLevel;
+        return centerLineY - (y + EVENT_BASE_Y) * (HEIGHT + Y_MARGIN);
     }
 
     interactable({
@@ -50,7 +52,7 @@
             const y = yRenderPos(state.centerLnY());
             const width = duration * state.zoom;
 
-            if (isSingleEvent) {
+            if (isInstantEvent) {
                 if (this.hovering) {
                     state.circle(
                         x,
@@ -74,9 +76,17 @@
                     colour: this.hovering ? '#222326' : '#252A35',
                     radius: 5
                 });
-                state.rect(x, y + HEIGHT - LABEL_HEIGHT, width, LABEL_HEIGHT, {
-                    colour
-                });
+                if (label) {
+                    state.rect(
+                        x,
+                        y + HEIGHT - LABEL_HEIGHT,
+                        width,
+                        LABEL_HEIGHT,
+                        {
+                            colour
+                        }
+                    );
+                }
             }
 
             let textColour = '#fff';
@@ -88,7 +98,7 @@
 
             if ($obfuscated) return;
 
-            if (!isSingleEvent && (width > 50 || this.hovering)) {
+            if (!isInstantEvent && (width > 50 || this.hovering)) {
                 state.text(
                     name,
                     Math.max(
@@ -102,7 +112,7 @@
                     }
                 );
             } else if (
-                isSingleEvent &&
+                isInstantEvent &&
                 (state.zoom > START_ZOOM / 2 || this.hovering)
             ) {
                 state.text(
@@ -124,7 +134,7 @@
 
         collider(state) {
             if (thisIsDeleted) return null;
-            if (isSingleEvent) {
+            if (isInstantEvent) {
                 const h =
                     state.centerLnY() -
                     (yRenderPos(state.centerLnY()) + HEIGHT);

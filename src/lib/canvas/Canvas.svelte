@@ -6,6 +6,8 @@
         type CanvasContext,
         CanvasState,
         canvasState,
+        type ContextMenuElement,
+        contextMenuState,
         type ICanvasState,
         key,
         type Listener
@@ -21,10 +23,10 @@
     let setupCanvas = false;
 
     onMount(async () => {
-        const empty = CanvasState.empty();
-        empty.canvas = canvas;
-        empty.ctx = canvas.getContext('2d', attributes);
-        canvasState.set(empty);
+        const state = CanvasState.empty();
+        state.canvas = canvas;
+        state.ctx = canvas.getContext('2d', attributes);
+        canvasState.set(state);
 
         // setup entities
         for (const entity of listeners) {
@@ -100,15 +102,6 @@
         $canvasState.ctx.restore();
     }
 
-    function handleResize() {
-        canvasState.update(s => {
-            s.width = window.innerWidth;
-            s.height = window.innerHeight;
-            s.pixelRatio = window.devicePixelRatio;
-            return s;
-        });
-    }
-
     function createLoop(fn: (elapsed: number, dt: number) => void) {
         let elapsed = 0;
         let lastTime = performance.now();
@@ -148,6 +141,17 @@
         };
     }
 
+    function ctxMenuAction(item: ContextMenuElement) {
+        return (event: MouseEvent) => {
+            void item.action?.(
+                $canvasState.asRenderProps(),
+                $canvasState.getMouseXRaw(event),
+                $canvasState.getMouseYRaw(event)
+            );
+            $contextMenuState = null;
+        };
+    }
+
     beforeNavigate(() => {
         cancelAnimationFrame(frame);
     });
@@ -156,9 +160,8 @@
 <canvas
     bind:this={canvas}
     width={$canvasState.width * $canvasState.pixelRatio}
-    height="{$canvasState.height * $canvasState.pixelRatio}}"
+    height={$canvasState.height * $canvasState.pixelRatio}
     style="width: {$canvasState.width}px; height: {$canvasState.height}px;"
-    class="fullscreen"
     on:mousedown={canvasListener('mousedown')}
     on:mouseup={canvasListener('mouseup')}
     on:mousemove={canvasListener('mousemove')}
@@ -166,7 +169,41 @@
     on:touchend={canvasListener('touchend')}
     on:touchmove={canvasListener('touchmove')}
     on:wheel={canvasListener('wheel')}
+    on:contextmenu={canvasListener('contextmenu')}
 />
 
-<svelte:window on:resize|passive={handleResize} />
+{#if $contextMenuState}
+    <div
+        class="context-menu"
+        style="top: {$contextMenuState.y}px; left: {$contextMenuState.x}px"
+    >
+        {#each $contextMenuState.options as ctxItem}
+            <button on:click={ctxMenuAction(ctxItem)}>
+                {ctxItem.label}
+            </button>
+        {/each}
+    </div>
+{/if}
+
+<svelte:window on:resize|passive={() => $canvasState.handleResize()} />
 <slot />
+
+<style lang="less">
+    @import '../../styles/variables';
+
+    .context-menu {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: fit-content;
+        min-width: 200px;
+        padding: 10px;
+        border-radius: @border-radius;
+        z-index: 10;
+        background: @light-accent;
+
+        button {
+            color: @text-color;
+        }
+    }
+</style>
