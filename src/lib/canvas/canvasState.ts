@@ -289,6 +289,16 @@ export class CanvasState implements CanvasListeners {
         );
     }
 
+    public zoomOnCenter(deltaZoom: number) {
+        const centerTime = this.renderPosToTime(this.width / 2);
+
+        this.zoom *= deltaZoom;
+        this.zoom = Math.max(Math.min(100, this.zoom), 1e-10);
+
+        const newCenterTime = this.renderPosToTime(this.width / 2);
+        this.cameraOffset -= (newCenterTime - centerTime) * this.zoom;
+    }
+
     public getMouseXRaw(event: MouseEvent | TouchEvent): number {
         if (!this.canvas) throw new Error('Canvas not set');
         const rect = this.canvas.getBoundingClientRect();

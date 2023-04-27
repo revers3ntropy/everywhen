@@ -94,7 +94,7 @@
 
     $: entryHtml = browser ? rawMdToHtml(entry, obfuscated) : '';
     // doesn't set reactively on tooltip content if in props???
-    $: restoreDeleteTooltip = deleted ? 'Restore Entry' : 'Delete Entry';
+    $: restoreDeleteTooltip = deleted ? 'Restore Entry' : 'Move Entry to Bin';
 </script>
 
 <div

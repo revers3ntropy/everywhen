@@ -1,6 +1,7 @@
 <script lang="ts">
     import { createEventDispatcher } from 'svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
+    import LabelOffOutline from 'svelte-material-icons/LabelOffOutline.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import Dropdown from '../../lib/components/Dropdown.svelte';
     import type { Label } from '../controllers/label';
@@ -60,7 +61,9 @@
                     ?.colour || 'transparent'}"
             />
             {#if labels}
-                {labels.find(l => l.id === value)?.name || '(No Label)'}
+                <span class="label-name">
+                    {labels.find(l => l.id === value)?.name || '(No Label)'}
+                </span>
             {:else}
                 loading...
             {/if}
@@ -71,10 +74,11 @@
                     closeDropDown();
                     value = '';
                 }}
-                class="label-button single"
+                class="label-button"
                 aria-label="Remove label"
             >
-                <i>No Label</i>
+                <LabelOffOutline size="25" />
+                No Label
             </button>
             {#each (labels ?? []).filter(filter) as label (label.id)}
                 <button
@@ -89,24 +93,27 @@
                         class="entry-label-colour"
                         style="background: {label.colour}"
                     />
-                    {#if value === label.id}
-                        <b>{label.name}</b>
-                    {:else}
-                        {label.name}
-                    {/if}
+                    <span class="label-name">
+                        {#if value === label.id}
+                            <b>{label.name}</b>
+                        {:else}
+                            {label.name}
+                        {/if}
+                    </span>
                 </button>
             {/each}
+            {#if showAddButton}
+                <button
+                    on:click={showNewLabelPopup}
+                    class="label-button"
+                    aria-label="Create new label"
+                >
+                    <Plus size="25" />
+                    New Label
+                </button>
+            {/if}
         </div>
     </Dropdown>
-    {#if showAddButton}
-        <button
-            on:click={showNewLabelPopup}
-            class="icon-button"
-            aria-label="Create new label"
-        >
-            <Plus size="25" />
-        </button>
-    {/if}
 </div>
 
 <style lang="less">
@@ -116,9 +123,13 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        background-color: @light-accent;
+        background: @light-accent;
         border-radius: @border-radius;
         border: none;
+
+        &:hover {
+            background: @light-v-accent;
+        }
 
         .icon-button {
             background: transparent;
@@ -138,7 +149,7 @@
             display: inline-grid;
             grid-template-columns: 20px 3fr;
             align-items: center;
-            margin: 0 1em;
+            margin: 0 0 0 0.5rem;
             justify-items: left;
         }
     }
@@ -159,14 +170,17 @@
             border-radius: @border-radius;
             border: 1px solid @border;
         }
-
-        &.single {
-            grid-template-columns: 1fr;
-        }
     }
 
     .list-container {
         max-height: 80vh;
         overflow-y: auto;
+    }
+
+    .label-name {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        max-width: 100%;
     }
 </style>

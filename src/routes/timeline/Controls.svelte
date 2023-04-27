@@ -10,17 +10,7 @@
             let dragYEnd = 0;
 
             function doZoom(deltaZ: number) {
-                canvasState.update(s => {
-                    let centerTime = s.renderPosToTime(s.width / 2);
-                    s.zoom *= deltaZ;
-
-                    s.zoom = Math.max(Math.min(100, s.zoom), 1e-10);
-
-                    let newCenterTime = s.renderPosToTime(s.width / 2);
-                    s.cameraOffset -= (newCenterTime - centerTime) * s.zoom;
-
-                    return s;
-                });
+                $canvasState.zoomOnCenter(deltaZ);
             }
 
             $canvasState.listen('wheel', evt => {
@@ -68,7 +58,7 @@
                 const dragEnd = $canvasState.getMouseXRaw(evt);
 
                 canvasState.update(s => {
-                    s.cameraOffset += (dragStart - dragEnd) * 0.25;
+                    s.cameraOffset += dragStart - dragEnd;
                     return s;
                 });
                 dragStart = dragEnd;

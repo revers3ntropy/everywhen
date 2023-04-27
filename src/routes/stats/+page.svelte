@@ -55,13 +55,18 @@
         <section class="container unbordered">
             <div class="stats">
                 <StatPill primary value={data.entryCount} label="entries" />
-                <StatPill value={data.charCount} label="characters" />
+                <StatPill
+                    primary
+                    value={(data.wordCount / data.days).toFixed(1)}
+                    label="words / day"
+                />
                 <StatPill
                     primary
                     value={data.wordCount}
                     label="words"
                     tooltip="A typical novel is 100,000 words"
                 />
+                <StatPill value={data.charCount} label="characters" />
                 <StatPill
                     value={(data.wordCount / (data.entryCount || 1)).toFixed(1)}
                     label="words / entry"
@@ -70,11 +75,6 @@
                     value={(data.charCount / (data.wordCount || 1)).toFixed(1)}
                     label="letters / word"
                     tooltip="The average English word is 4.7 letters long"
-                />
-                <StatPill
-                    primary
-                    value={(data.wordCount / data.days).toFixed(1)}
-                    label="words / day"
                 />
                 <StatPill
                     value={(
@@ -86,12 +86,16 @@
         </section>
 
         <section class="charts">
-            <div class="entry-heatmap-wrapper container">
+            <div class="entry-heatmap-wrapper">
                 <EntryHeatMap {by} entries={data.entries} />
             </div>
             {#if data.entryCount > 4}
-                <div class="entry-bar-chart-wrapper container">
-                    <EntryBarChart {by} entries={data.entries} />
+                <div class="entry-bar-chart-wrapper">
+                    <EntryBarChart
+                        {by}
+                        entries={data.entries}
+                        days={data.days}
+                    />
                 </div>
             {/if}
         </section>

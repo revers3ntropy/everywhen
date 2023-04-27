@@ -42,6 +42,10 @@
 
         .name {
             margin-left: 5px;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            max-width: 10rem;
         }
 
         .colour {

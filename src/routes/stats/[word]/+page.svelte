@@ -87,10 +87,10 @@
         </section>
 
         <section class="charts">
-            <div class="entry-heatmap-wrapper container">
+            <div class="entry-heatmap-wrapper">
                 <EntryHeatMap {by} entries={data.entries} />
             </div>
-            <div class="entry-bar-chart-wrapper container">
+            <div class="entry-bar-chart-wrapper">
                 <EntryBarChart {by} entries={data.entries} />
             </div>
         </section>

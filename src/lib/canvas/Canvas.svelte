@@ -178,9 +178,11 @@
         style="top: {$contextMenuState.y}px; left: {$contextMenuState.x}px"
     >
         {#each $contextMenuState.options as ctxItem}
-            <button on:click={ctxMenuAction(ctxItem)}>
-                {ctxItem.label}
-            </button>
+            <div class="context-menu-item">
+                <button on:click={ctxMenuAction(ctxItem)}>
+                    {ctxItem.label}
+                </button>
+            </div>
         {/each}
     </div>
 {/if}
@@ -197,13 +199,23 @@
         left: 0;
         width: fit-content;
         min-width: 200px;
-        padding: 10px;
         border-radius: @border-radius;
         z-index: 10;
         background: @light-accent;
 
-        button {
-            color: @text-color;
+        .context-menu-item {
+            padding: 0.2rem;
+            border-radius: @border-radius;
+
+            button {
+                color: @text-color;
+                width: 100%;
+                text-align: left;
+            }
+
+            &:hover {
+                background: @light-v-accent;
+            }
         }
     }
 </style>

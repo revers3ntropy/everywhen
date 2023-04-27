@@ -18,6 +18,7 @@
 
     export let entries: EntryWithWordCount[];
     export let by: By;
+    export let days = 0;
 
     interface ChartData {
         datasets: {
@@ -27,7 +28,7 @@
         labels: string[];
     }
 
-    let selectedBucket = Bucket.Week;
+    let selectedBucket = days < 15 ? Bucket.Day : Bucket.Week;
 
     let data: ChartData;
 
@@ -108,7 +109,7 @@
         <div>Group by</div>
         <Select
             bind:value={selectedBucket}
-            key="Week"
+            key={days < 15 ? 'Day' : 'Week'}
             options={{
                 Year: Bucket.Year,
                 Month: Bucket.Month,
