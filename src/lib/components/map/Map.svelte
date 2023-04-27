@@ -43,6 +43,8 @@
         olFeatureFromLocation
     } from './map';
 
+    // https://openlayers.org/
+
     const { addNotification } = getNotificationsContext();
 
     export let entries: EntryLocation[] = [];

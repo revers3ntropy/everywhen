@@ -57,14 +57,14 @@
                 <StatPill primary value={data.entryCount} label="entries" />
                 <StatPill
                     primary
-                    value={(data.wordCount / data.days).toFixed(1)}
-                    label="words / day"
-                />
-                <StatPill
-                    primary
                     value={data.wordCount}
                     label="words"
                     tooltip="A typical novel is 100,000 words"
+                />
+                <StatPill
+                    value={(data.wordCount / data.days).toFixed(1)}
+                    label="words / day"
+                    tooltip="People typically speak about {(7000).toLocaleString()} words per day"
                 />
                 <StatPill value={data.charCount} label="characters" />
                 <StatPill
@@ -81,6 +81,7 @@
                         data.entryCount / Math.max(data.days / 7, 1)
                     ).toFixed(1)}
                     label="entries / week"
+                    tooltip="7 would be one per day"
                 />
             </div>
         </section>
