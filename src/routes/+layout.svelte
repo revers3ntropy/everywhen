@@ -1,5 +1,6 @@
 <script lang="ts">
     import { browser } from '$app/environment';
+    import { goto } from '$app/navigation';
     import { page } from '$app/stores';
     import { parse } from 'cookie';
     import { onMount } from 'svelte';
@@ -67,7 +68,7 @@
         }
     }
 
-    function checkCookies() {
+    async function checkCookies() {
         if (!requireAuth) return;
 
         const cookies = parse(document.cookie);
@@ -76,7 +77,7 @@
         // https://owasp.org/www-community/HttpOnly
         if (!cookies[USERNAME_COOKIE_KEY]) {
             errorLogger.error('Cookies have expired');
-            location.assign(
+            await goto(
                 '/?redirect=' +
                     encodeURIComponent(
                         location.pathname.substring(1) + location.search
@@ -107,9 +108,8 @@
     onMount(() => {
         setInterval(() => {
             if (home) return;
-
+            void checkCookies();
             checkObfuscatedTimeout();
-            checkCookies();
             checkPasscode();
         }, 1000);
 

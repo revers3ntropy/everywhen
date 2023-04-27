@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { goto } from '$app/navigation';
     import { onMount } from 'svelte';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import Cog from 'svelte-material-icons/Cog.svelte';
@@ -31,7 +32,7 @@
             await api.delete(data, '/users')
         );
         Backup.download(backupData, data.username, true);
-        location.assign('/');
+        void goto('/');
     }
 
     onMount(() => (document.title = 'Settings'));

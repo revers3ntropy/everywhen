@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { goto } from '$app/navigation';
     import { onMount } from 'svelte';
     import { LS_KEY } from '../../lib/constants';
 
@@ -9,7 +10,7 @@
             localStorage.removeItem(LS_KEY[key as keyof typeof LS_KEY]);
         }
 
-        location.assign('/');
+        void goto('/');
     });
 </script>
 

@@ -1,6 +1,6 @@
 <script lang="ts">
     import { browser } from '$app/environment';
-    import { beforeNavigate } from '$app/navigation';
+    import { beforeNavigate, goto } from '$app/navigation';
     import { tooltip } from '@svelte-plugins/tooltips';
     import {
         filedrop,
@@ -100,17 +100,15 @@
     }
 
     function areUnsavedChanges() {
-        if (entry && !loadFromLS) {
-            // check for unsaved changes
-            if (
-                entry.title !== newEntryTitle ||
-                entry.entry !== newEntryBody ||
-                (entry.label?.id || '') !== newEntryLabel
-            ) {
-                return true;
-            }
+        if (!entry || loadFromLS) {
+            return false;
         }
-        return false;
+        // check for unsaved changes
+        return (
+            entry.title !== newEntryTitle ||
+            entry.entry !== newEntryBody ||
+            (entry.label?.id || '') !== newEntryLabel
+        );
     }
 
     /**
@@ -197,6 +195,7 @@
                     removeAfter: 1000,
                     text: `Entry created`
                 });
+                await goto(`#${res.id}`);
                 break;
             case 'edit':
                 if (!entry)
@@ -214,7 +213,7 @@
                     addNotification,
                     await api.put(auth, apiPath('/entries/?', entry.id), body)
                 );
-                location.assign(`/journal/${entry.id}?obfuscate=0`);
+                await goto(`/journal/${entry.id}?obfuscate=0`);
                 break;
             default:
                 throw new Error(`Unknown action: ${action as string}`);
@@ -387,11 +386,12 @@
 
             <button
                 aria-label="Submit Entry"
-                class="send"
+                class="primary with-icon send"
                 disabled={submitted}
                 on:click={submit}
             >
                 <Send size="30" />
+                Submit
             </button>
         </div>
     </div>
@@ -442,7 +442,7 @@
         padding: 0 0.4em;
         border-bottom: 1px solid @border-light;
         display: grid;
-        grid-template-columns: 1fr 23.5rem;
+        grid-template-columns: 1fr 28rem;
 
         @media @mobile {
             display: flex;
@@ -487,24 +487,10 @@
     }
 
     .send {
-        .flex-center();
-        border-radius: @border-radius;
-        margin: 0 0 0 0.2rem;
-        padding: 0.1rem;
-        aspect-ratio: 1/1;
-        background: @accent-gradient;
-
-        :global(svg),
-        :global(svg *) {
-            fill: @text-color-invert;
-        }
+        padding: 0 0.5rem !important; // override .primary
 
         @media @mobile {
-            display: none;
-        }
-
-        &:hover {
-            .glow();
+            display: none !important;
         }
     }
 

@@ -14,6 +14,7 @@
     import type { Auth } from '../controllers/user';
     import { popup } from '../stores';
     import { api, apiPath } from '../utils/apiRequest';
+    import { focusableId } from '../utils/focusableId';
     import {
         displayNotifOnErr,
         SUCCESS_NOTIFICATION
@@ -48,6 +49,7 @@
     export let obfuscated = true;
     export let showLabels = true;
     export let showLocations = true;
+    export let hideAgentWidget = false;
     export let isInDialog = false;
 
     export let auth: Auth;
@@ -99,6 +101,7 @@
 
 <div
     class="entry {obfuscated ? '' : 'visible'} {isInDialog ? 'in-dialog' : ''}"
+    use:focusableId={id}
 >
     <p class="mobile-title {obfuscated ? 'obfuscated' : ''}">
         {obfuscated ? obfuscate(title) : title}
@@ -114,7 +117,9 @@
                 />
             </span>
 
-            <AgentWidget data={agentData} />
+            {#if !hideAgentWidget}
+                <AgentWidget data={agentData} />
+            {/if}
 
             {#if latitude && longitude && showLocations}
                 <LocationWidget
@@ -190,11 +195,12 @@
     @import '../../styles/variables';
 
     .entry {
-        padding: 0.8em 0;
+        padding: 0;
         margin: 0;
         height: fit-content;
         white-space: pre-wrap;
         border: 1px solid transparent;
+        outline: none;
 
         &,
         * {
@@ -202,11 +208,10 @@
             font-size: 1.05rem;
         }
 
-        //&.visible:not(.in-dialog) {
-        //    border-image: linear-gradient(transparent,
-        //    @accent-color-secondary,
-        //    transparent) 1 100%;
-        //}
+        &:focus {
+            border: 1px solid @accent-secondary;
+            border-radius: @border-radius;
+        }
 
         @media @mobile {
             padding: 0;
@@ -224,7 +229,7 @@
             justify-content: space-between;
             align-items: center;
             margin: 0.5em 2em 0 0;
-            padding: 0.3em;
+            padding: 0 0.3em;
 
             @media @mobile {
                 margin: 0;

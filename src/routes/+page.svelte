@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { goto } from '$app/navigation';
     import ChevronRight from 'svelte-material-icons/ChevronRight.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import { encryptionKeyFromPassword } from '../lib/security/authUtils';
@@ -28,7 +29,7 @@
             {},
             () => (actionPending = false)
         );
-        location.assign('/' + data.redirect);
+        await goto('/' + data.redirect);
     }
 
     async function create(): Promise<void> {
@@ -42,7 +43,7 @@
             {},
             () => (actionPending = false)
         );
-        location.assign('/' + data.redirect);
+        await goto('/' + data.redirect);
     }
 </script>
 

@@ -101,6 +101,7 @@
                 options={{ search: data.theWord }}
                 pageSize={data.settings.entriesPerPage.value}
                 showSearch={false}
+                hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
             />
         </section>
     {/if}

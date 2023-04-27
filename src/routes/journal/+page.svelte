@@ -33,5 +33,6 @@
         showLabels={true}
         showSearch={true}
         showSidebar={true}
+        hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
     />
 </main>

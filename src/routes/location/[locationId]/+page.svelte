@@ -24,6 +24,7 @@
         showLabels={true}
         showLocations={false}
         showSearch={true}
+        hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
     />
 </section>
 

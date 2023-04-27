@@ -12,6 +12,7 @@
     export let entries: EntryController[];
     export let showLabels = true;
     export let showLocations = true;
+    export let hideAgentWidget = false;
     export let auth: Auth;
     export let day: number;
 
@@ -70,6 +71,7 @@
                     {obfuscated}
                     {showLabels}
                     {showLocations}
+                    {hideAgentWidget}
                     {auth}
                 />
             {/each}

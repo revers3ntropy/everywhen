@@ -27,6 +27,7 @@
     export let showSearch = true;
     export let showLabels = true;
     export let showLocations = true;
+    export let hideAgentWidget: boolean;
     export let pageSize: number;
 
     interface IOptions extends EntryFilter {
@@ -154,6 +155,7 @@
                     {showLocations}
                     {auth}
                     day={parseInt(day)}
+                    {hideAgentWidget}
                 />
             {/each}
         {/if}

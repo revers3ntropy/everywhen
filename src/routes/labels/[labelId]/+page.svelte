@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { goto } from '$app/navigation';
     import { onMount } from 'svelte';
     import Delete from 'svelte-material-icons/Delete.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
@@ -57,7 +58,7 @@
                 addNotification,
                 await api.delete(data, apiPath(`/labels/?`, data.label.id))
             );
-            location.assign('../');
+            await goto('../');
             return;
         }
 
@@ -71,7 +72,7 @@
                 reloadOnDelete: false
             },
             () => {
-                location.assign('/labels');
+                void goto('/labels');
             }
         );
     }
@@ -128,6 +129,7 @@
             options={{ labelId: data.label.id }}
             showLabels={false}
             pageSize={data.settings.entriesPerPage.value}
+            hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
         />
     </section>
 </main>

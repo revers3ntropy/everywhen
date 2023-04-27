@@ -37,6 +37,13 @@ export class Settings<T = unknown> {
             name: 'Blur Entries By Default',
             description: 'Blur entries by default, and manually show them.'
         } satisfies ISettingsConfig<boolean>,
+        showAgentWidgetOnEntries: {
+            type: 'boolean',
+            defaultValue: false,
+            name: 'Show Device',
+            description:
+                'Shows the operating system of the device the entry was submitted on by entries.'
+        } satisfies ISettingsConfig<boolean>,
         autoHideEntriesDelay: {
             type: 'number',
             defaultValue: 60 * 2,

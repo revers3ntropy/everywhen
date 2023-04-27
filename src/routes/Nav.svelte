@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { afterNavigate, beforeNavigate } from '$app/navigation';
+    import { afterNavigate, beforeNavigate, goto } from '$app/navigation';
     import { page } from '$app/stores';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import Brain from 'svelte-material-icons/Brain.svelte';
@@ -87,7 +87,7 @@
             defaultColour
         );
         localStorage.setItem(LS_KEY.newEntryLabel, labelId);
-        location.assign('/journal?obfuscate=0');
+        await goto('/journal?obfuscate=0');
     }
 
     async function makeDream() {
@@ -104,7 +104,7 @@
 
     function makeEntry() {
         localStorage.removeItem(LS_KEY.newEntryLabel);
-        location.assign('/journal');
+        void goto('/journal');
     }
 
     let navigating = false;
