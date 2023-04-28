@@ -183,40 +183,42 @@
     </linearGradient>
 </svg>
 
-<Notifications>
-    {#if data.settings.passcode.value && nowUtc() - $passcodeLastEntered > data.settings.passcodeTimeout.value && showPasscodeModal && !home && (data.settings.passcodeTimeout.value > 0 || !$passcodeLastEntered || !browser)}
-        <PasscodeModal
-            bind:show={showPasscodeModal}
-            passcode={data.settings.passcode.value}
-        />
-    {/if}
-
-    <Notifier bind:addNotification />
-
-    {#if !home}
-        {#if data.id}
-            <Nav auth={data} />
-        {:else}
-            <NoAuthNav />
+<div data-sveltekit-preload-data="hover">
+    <Notifications>
+        {#if data.settings.passcode.value && nowUtc() - $passcodeLastEntered > data.settings.passcodeTimeout.value && showPasscodeModal && !home && (data.settings.passcodeTimeout.value > 0 || !$passcodeLastEntered || !browser)}
+            <PasscodeModal
+                bind:show={showPasscodeModal}
+                passcode={data.settings.passcode.value}
+            />
         {/if}
-    {/if}
 
-    <div class="page-content">
-        <slot />
-    </div>
+        <Notifier bind:addNotification />
 
-    {#if newVersionAvailable}
-        <NewVersionAvailable {newVersion} />
-    {/if}
+        {#if !home}
+            {#if data.id}
+                <Nav auth={data} />
+            {:else}
+                <NoAuthNav />
+            {/if}
+        {/if}
 
-    <Modal
-        classContent="popup-background"
-        classWindow="popup-background"
-        show={$popup}
-    />
+        <div class="page-content">
+            <slot />
+        </div>
 
-    <Footer />
-</Notifications>
+        {#if newVersionAvailable}
+            <NewVersionAvailable {newVersion} />
+        {/if}
+
+        <Modal
+            classContent="popup-background"
+            classWindow="popup-background"
+            show={$popup}
+        />
+
+        <Footer />
+    </Notifications>
+</div>
 
 <style lang="less">
     .page-content {

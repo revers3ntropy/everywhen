@@ -7,7 +7,11 @@
     {#each words as [word, count], i}
         <div>#{i + 1}</div>
 
-        <a href="/stats/{encodeURIComponent(word)}" class="word">
+        <a
+            href="/stats/{encodeURIComponent(word)}"
+            class="word"
+            data-sveltekit-preload-data="tap"
+        >
             {word}
         </a>
 

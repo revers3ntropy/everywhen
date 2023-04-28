@@ -87,7 +87,11 @@
             defaultColour
         );
         localStorage.setItem(LS_KEY.newEntryLabel, labelId);
-        await goto('/journal?obfuscate=0');
+        if ($page.url.pathname === '/journal') {
+            location.reload();
+        } else {
+            await goto('/journal');
+        }
     }
 
     async function makeDream() {
@@ -102,9 +106,9 @@
         await goToEntryFormWithLabel('Thought', '#735820');
     }
 
-    function makeEntry() {
+    async function makeEntry() {
         localStorage.removeItem(LS_KEY.newEntryLabel);
-        void goto('/journal');
+        await goto('/journal');
     }
 
     let navigating = false;
