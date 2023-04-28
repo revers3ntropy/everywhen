@@ -11,7 +11,7 @@ die () {
 
 [ -d "./secrets/$1" ] || die "Error: Directory /secrets/$1 does not exists."
 
-bin/precommit || die "precommit failed";
+bin/precommit --reporter=line || die "precommit failed";
 
 mv .env tmp.env
 mv "./secrets/$1/remote.env" .env

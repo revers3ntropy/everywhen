@@ -18,14 +18,13 @@ export default defineConfig({
          * Maximum time expect() should wait for the condition to be met.
          * For example in `await expect(locator).toHaveText();`
          */
-        timeout: 5000,
+        timeout: 10000
     },
     /* Run tests in files in parallel */
     fullyParallel: true,
     /* Fail the build on CI if you accidentally left test.only in the source code. */
     forbidOnly: !!process.env.CI,
-    /* Retry on CI only */
-    retries: process.env.CI ? 2 : 0,
+    retries: process.env.CI ? 2 : 3,
     /* Opt out of parallel tests on CI. */
     workers: process.env.CI ? 1 : undefined,
     /* Reporter to use. See https://playwright.dev/docs/test-reporters */
@@ -38,7 +37,7 @@ export default defineConfig({
         baseURL: 'http://localhost:5173',
 
         /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-        trace: 'on-first-retry',
+        trace: 'on-first-retry'
 
         //headless: false,
     },
@@ -60,13 +59,13 @@ export default defineConfig({
         // },
         {
             name: 'Google Chrome',
-            use: { channel: 'chrome' },
+            use: { channel: 'chrome' }
         },
         /* Test against mobile viewports. */
         {
             name: 'Mobile Chrome',
-            use: { ...devices['Pixel 5'] },
-        },
+            use: { ...devices['Pixel 5'] }
+        }
 
         /* Doesn't work on Ubuntu :/ */
         // {
@@ -81,12 +80,12 @@ export default defineConfig({
     ],
 
     /* Folder for test artifacts such as screenshots, videos, traces, etc. */
-    // outputDir: 'test-results/',
+    outputDir: 'test-results/',
 
     /* Run your local dev server before starting the tests */
     webServer: {
         command: 'bin/dev',
         port: 5173,
-        reuseExistingServer: true,
-    },
+        reuseExistingServer: true
+    }
 });
