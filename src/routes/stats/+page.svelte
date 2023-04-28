@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
-    import CommonWordsList from './CommoWordsList.svelte';
+    import CommonWordsList from './CommonWordsList.svelte';
     import EntryBarChart from './EntryBarChart.svelte';
     import EntryHeatMap from './EntryHeatMap.svelte';
     import { By, type EntryWithWordCount } from './helpers';
