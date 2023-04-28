@@ -5,6 +5,7 @@
     import TimerSand from 'svelte-material-icons/TimerSand.svelte';
     import type { Streaks } from '../controllers/entry';
     import type { Auth } from '../controllers/user';
+    import { addEntryListeners } from '../stores';
     import { api } from '../utils/apiRequest';
 
     export let auth: Auth;
@@ -14,6 +15,21 @@
     let loaded = false;
     let error: string | null;
 
+    function madeEntry() {
+        // only update when streaks are loaded,
+        // and when the streak is running out or is 0
+        if (!streaks || (!streaks.runningOut && streaks.current !== 0)) {
+            return;
+        }
+
+        if (streaks.current === streaks.longest) {
+            streaks.longest++;
+        }
+
+        streaks.current++;
+        streaks.runningOut = false;
+    }
+
     onMount(async () => {
         const { err, val } = await api.get(auth, '/entries/streaks');
         if (err) {
@@ -21,6 +37,7 @@
         } else {
             streaks = val;
         }
+        $addEntryListeners.push(madeEntry);
         loaded = true;
     });
 

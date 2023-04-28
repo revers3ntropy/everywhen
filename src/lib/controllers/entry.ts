@@ -276,7 +276,13 @@ export class Entry {
                 'YYYY-MM-DD'
             );
             const dayTimeStamp =
-                new Date(localDate).setHours(12, 0, 0, 0) / 1000;
+                new Date(localDate).setHours(
+                    // I think this works?? TODO: verify
+                    currentTzOffset(),
+                    0,
+                    0,
+                    0
+                ) / 1000;
             grouped[dayTimeStamp] ??= [];
             grouped[dayTimeStamp].push(entry);
         });

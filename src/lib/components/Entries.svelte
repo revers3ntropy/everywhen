@@ -74,7 +74,14 @@
         }
 
         void api
-            .get(auth, `/entries`, entriesOptions)
+            .get(
+                auth,
+                `/entries`,
+                entriesOptions as Record<
+                    string,
+                    number | string | boolean | undefined
+                >
+            )
             .then(res => displayNotifOnErr(addNotification, res))
             .then(res => {
                 entries = Entry.groupEntriesByDay(res.entries);

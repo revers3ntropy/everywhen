@@ -23,6 +23,8 @@ export const popup = writable<typeof SvelteComponentDev | null | undefined>(
     null
 );
 
+export const addEntryListeners = writable<(() => void)[]>([]);
+
 export function localStorageWritable<T>(
     lsKey: string,
     initial: T extends (...args: infer _) => infer _ ? never : T

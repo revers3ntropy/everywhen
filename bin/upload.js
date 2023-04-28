@@ -26,7 +26,7 @@ const replacerValues = {
     '%ENV%': flags.env
 };
 
-const pathsWithEnvReplace = [`./server/remote.package.json`];
+const pathsToUseReplacer = [`./server/remote.package.json`];
 
 const uploadPaths = {
     [`./secrets/${flags.env}/cert.pem`]: '/cert.pem',
@@ -41,7 +41,7 @@ async function upload() {
     console.log(c.green('Uploading...'));
     await uploadPath(process.env.DIR, '~/', '-r');
 
-    for (const path in pathsWithEnvReplace) {
+    for (const path of pathsToUseReplacer) {
         fs.copyFileSync(path, path + '.tmp');
         fs.writeFileSync(
             path,
@@ -66,7 +66,7 @@ async function upload() {
         })
     );
 
-    for (const path in pathsWithEnvReplace) {
+    for (const path of pathsToUseReplacer) {
         fs.unlinkSync(path);
         fs.renameSync(path + '.tmp', path);
     }

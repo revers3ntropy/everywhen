@@ -16,10 +16,10 @@
     import LabelSelect from '../../lib/components/LabelSelect.svelte';
     import { LS_KEY, MAX_IMAGE_SIZE } from '../../lib/constants';
     import { Asset } from '../../lib/controllers/asset';
-    import type { Entry } from '../../lib/controllers/entry';
+    import type { Entry, RawEntry } from '../../lib/controllers/entry';
     import type { Label } from '../../lib/controllers/label';
     import type { Auth } from '../../lib/controllers/user';
-    import { enabledLocation } from '../../lib/stores.js';
+    import { addEntryListeners, enabledLocation } from '../../lib/stores.js';
     import { api, apiPath } from '../../lib/utils/apiRequest';
     import { getFileContents } from '../../lib/utils/files';
     import { getLocation } from '../../lib/utils/geolocation';
@@ -155,6 +155,51 @@
         }
     });
 
+    async function onEntryCreation(body: RawEntry) {
+        const res = displayNotifOnErr(
+            addNotification,
+            await api.post(auth, '/entries', body)
+        );
+        submitted = false;
+        if (res.id) {
+            // make really sure it's saved before resetting
+            reset();
+        } else {
+            errorLogger.error(res);
+            addNotification({
+                ...ERR_NOTIFICATION,
+                text: `Failed to create entry: ${JSON.stringify(res)}`
+            });
+        }
+        addNotification({
+            ...SUCCESS_NOTIFICATION,
+            removeAfter: 1000,
+            text: `Entry created`
+        });
+        $addEntryListeners.map(e => e());
+        await goto(`#${res.id}`);
+    }
+
+    async function onEntryEdit(body: RawEntry) {
+        if (!entry) {
+            throw new Error('entry must be set when action is edit');
+        }
+        if (!areUnsavedChanges()) {
+            if (
+                !confirm(
+                    'No changes have been made, are you sure you want to edit this entry?'
+                )
+            ) {
+                return;
+            }
+        }
+        displayNotifOnErr(
+            addNotification,
+            await api.put(auth, apiPath('/entries/?', entry.id), body)
+        );
+        await goto(`/journal/${entry.id}?obfuscate=0`);
+    }
+
     async function submit() {
         submitted = true;
 
@@ -170,50 +215,14 @@
             longitude: currentLocation[1],
             created: nowUtc(),
             agentData: serializeAgentData()
-        };
+        } as RawEntry;
 
-        let res;
         switch (action) {
             case 'create':
-                res = displayNotifOnErr(
-                    addNotification,
-                    await api.post(auth, '/entries', body)
-                );
-                submitted = false;
-                if (res.id) {
-                    // make really sure it's saved before resetting
-                    reset();
-                } else {
-                    errorLogger.error(res);
-                    addNotification({
-                        ...ERR_NOTIFICATION,
-                        text: `Failed to create entry: ${JSON.stringify(res)}`
-                    });
-                }
-                addNotification({
-                    ...SUCCESS_NOTIFICATION,
-                    removeAfter: 1000,
-                    text: `Entry created`
-                });
-                await goto(`#${res.id}`);
+                await onEntryCreation(body);
                 break;
             case 'edit':
-                if (!entry)
-                    throw new Error('entry must be set when action is edit');
-                if (!areUnsavedChanges()) {
-                    if (
-                        !confirm(
-                            'No changes have been made, are you sure you want to edit this entry?'
-                        )
-                    ) {
-                        return;
-                    }
-                }
-                res = displayNotifOnErr(
-                    addNotification,
-                    await api.put(auth, apiPath('/entries/?', entry.id), body)
-                );
-                await goto(`/journal/${entry.id}?obfuscate=0`);
+                await onEntryEdit(body);
                 break;
             default:
                 throw new Error(`Unknown action: ${action as string}`);
