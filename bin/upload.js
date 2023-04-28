@@ -9,41 +9,67 @@ import fs from 'fs';
 
 export const flags = commandLineArgs([
     { name: 'verbose', type: Boolean, alias: 'v', defaultValue: false },
-    { name: 'env', type: String, alias: 'e', defaultValue: 'prod' },
+    { name: 'env', type: String, alias: 'e', defaultValue: 'prod' }
 ]);
 
 $.verbose = flags.verbose;
 
-async function uploadPath (localPath, remotePath, args = '') {
-    return await $`sshpass -f './secrets/${flags.env}/sshpass.txt' rsync ${args.split(
-        ' ',
-    )} ${localPath} ${process.env.REMOTE_ADDRESS}:${remotePath}`;
+async function uploadPath(localPath, remotePath, args = '') {
+    return await $`sshpass -f './secrets/${
+        flags.env
+    }/sshpass.txt' rsync ${args.split(' ')} ${localPath} ${
+        process.env.REMOTE_ADDRESS
+    }:${remotePath}`;
 }
 
-async function upload () {
+const replacerValues = {
+    '%ENV%': flags.env
+};
+
+const pathsWithEnvReplace = [`./server/remote.package.json`];
+
+const uploadPaths = {
+    [`./secrets/${flags.env}/cert.pem`]: '/cert.pem',
+    [`./secrets/${flags.env}/key.pem`]: '/key.pem',
+    [`./secrets/${flags.env}/remote.env`]: '/.env',
+    ['./server/server.js']: '/server.js',
+    [`./server/remote.package.json`]: '/package.json'
+};
+
+async function upload() {
     await $`mv ./build ./${process.env.DIR}`;
     console.log(c.green('Uploading...'));
     await uploadPath(process.env.DIR, '~/', '-r');
 
-    const paths = {
-        [`./secrets/${flags.env}/remote.package.json`]: '/package.json',
-        [`./secrets/${flags.env}/cert.pem`]: '/cert.pem',
-        [`./secrets/${flags.env}/key.pem`]: '/key.pem',
-        [`./secrets/${flags.env}/remote.env`]: '/.env',
-        ['./server/server.js']: '/server.js',
-    };
+    for (const path in pathsWithEnvReplace) {
+        fs.copyFileSync(path, path + '.tmp');
+        fs.writeFileSync(
+            path,
+            fs
+                .readFileSync(path + '.tmp', 'utf8')
+                .replace(
+                    new RegExp(Object.keys(replacerValues).join('|'), 'gi'),
+                    matched => replacerValues[matched]
+                )
+        );
+    }
 
     await Promise.all(
-        Object.keys(paths).map(async (path) => {
+        Object.keys(uploadPaths).map(async path => {
             if (fs.existsSync(path)) {
                 console.log(c.yellow(path));
                 await uploadPath(
                     path,
-                    '~/' + process.env.DIR + paths[path],
+                    '~/' + process.env.DIR + uploadPaths[path]
                 );
             }
-        }),
+        })
     );
+
+    for (const path in pathsWithEnvReplace) {
+        fs.unlinkSync(path);
+        fs.renameSync(path + '.tmp', path);
+    }
 
     await $`rm -r ./${process.env.DIR}`;
 }

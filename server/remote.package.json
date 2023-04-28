@@ -1,8 +1,8 @@
 {
     "type": "module",
     "scripts": {
-        "start": "screen -S halcyon_land_screen -d -m node -r dotenv/config server",
-        "stop": "screen -S halcyon_land_screen -X quit",
+        "start": "screen -S halcyon_land_screen_%ENV% -d -m node -r dotenv/config server",
+        "stop": "screen -S halcyon_land_screen_%ENV% -X quit",
         "restart": "npm run stop; npm run start",
         "setup": "npm i",
         "clear-logs": "rm *.log"
