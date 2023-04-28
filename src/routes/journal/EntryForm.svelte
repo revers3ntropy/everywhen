@@ -83,7 +83,7 @@
             newEntryBody = localStorage.getItem(LS_KEY.newEntryBody) || '';
             newEntryLabel = localStorage.getItem(LS_KEY.newEntryLabel) || '';
 
-            if (!newEntryBody && !newEntryLabel && !newEntryTitle) {
+            if (!newEntryBody && !newEntryTitle) {
                 obfuscated = false;
             }
         }
