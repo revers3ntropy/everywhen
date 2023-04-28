@@ -9,7 +9,8 @@ import fs from 'fs';
 
 export const flags = commandLineArgs([
     { name: 'verbose', type: Boolean, alias: 'v', defaultValue: false },
-    { name: 'env', type: String, alias: 'e', defaultValue: 'prod' }
+    { name: 'env', type: String, alias: 'e', defaultValue: 'prod' },
+    { name: 'restart', type: Boolean, alias: 'r', defaultValue: false }
 ]);
 
 $.verbose = flags.verbose;
@@ -74,6 +75,11 @@ async function upload() {
     await $`rm -r ./${process.env.DIR}`;
 }
 
+async function restartRemoteServer() {
+    console.log('Restarting remote server...');
+    return await $`sshpass -f './secrets/${flags.env}/sshpass.txt' ssh ${process.env.REMOTE_ADDRESS} 'cd ${process.env.DIR} && npm run restart'`;
+}
+
 (async () => {
     const start = now();
 
@@ -82,6 +88,11 @@ async function upload() {
     console.log(`Uploading to ${process.env.REMOTE_ADDRESS} (${flags.env})`);
 
     await upload();
+
+    console.log(flags.restart);
+    if (flags.restart) {
+        await restartRemoteServer();
+    }
 
     const duration = (now() - start) / 1000;
     console.log(c.green(`Finished Uploading in ${duration.toFixed(3)}s`));
