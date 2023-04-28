@@ -98,7 +98,7 @@
                         content: fmtUtc(
                             created,
                             currentTzOffset(),
-                            'DD/MM/YYYY h:mm A'
+                            'DD/MM/YYYY h:mma'
                         )
                     }}
                 >

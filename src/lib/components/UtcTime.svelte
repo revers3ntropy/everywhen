@@ -7,7 +7,7 @@
 
     export let timestamp: Seconds;
     export let tzOffset: Hours = currentTzOffset();
-    export let fmt = 'h:mm A';
+    export let fmt = 'h:mma';
     export let relative = false;
     export let noTooltip = false;
     export let tooltipPosition = 'top';

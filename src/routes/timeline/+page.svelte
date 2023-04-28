@@ -129,6 +129,6 @@
         {/each}
 
         <CenterLine />
-        <TimeCursor />
+        <TimeCursor auth={data} {onCreateEvent} />
     </Canvas>
 </main>

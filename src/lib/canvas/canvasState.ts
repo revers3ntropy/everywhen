@@ -83,8 +83,13 @@ export interface RenderRequest {
 export class CanvasState implements CanvasListeners {
     static colours = {
         primary: '#DDD',
-        text: '#FFF'
+        text: '#FFF',
+        accentPrimary: 'rgb(121 235 226)',
+        accentSecondary: 'rgb(189 176 255)',
+        lightAccent: 'rgb(72 76 80)'
     };
+
+    public readonly colours = CanvasState.colours;
 
     public width: number;
     public height: number;
@@ -140,7 +145,11 @@ export class CanvasState implements CanvasListeners {
 
             for (const interactable of this.interactables) {
                 if (!interactable.hovering) continue;
-                interactable.onMouseUp?.(this.mouseTime, this.mouseY);
+                interactable.onMouseUp?.(
+                    this.asRenderProps(),
+                    this.mouseTime,
+                    this.mouseY
+                );
                 return;
             }
         });

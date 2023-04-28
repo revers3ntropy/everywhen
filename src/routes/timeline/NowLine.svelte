@@ -14,13 +14,13 @@
             }
 
             state.rect(nowLinePos, 0, 1, state.height, {
-                colour: '#79ebe2'
+                colour: state.colours.accentPrimary
             });
 
             if (this.hovering) {
-                state.text('now', nowLinePos + 5, state.centerLnY() - 14, {
+                state.text('now', nowLinePos - 40, state.mouseY, {
                     colour: '#79ebe2',
-                    fontSize: 12
+                    fontSize: 14
                 });
             }
         },
@@ -31,7 +31,7 @@
                 0,
                 20,
                 state.height,
-                -1
+                { zIndex: -2 }
             );
         }
     });

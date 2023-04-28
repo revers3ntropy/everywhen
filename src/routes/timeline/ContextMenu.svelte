@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { displayNotifOnErr } from '$lib/utils/notifications.js';
+    import { displayNotifOnErr } from '../../lib/utils/notifications.js';
     import { getNotificationsContext } from 'svelte-notifications';
     import { RectCollider } from '../../lib/canvas/collider';
     import { interactable } from '../../lib/canvas/interactable';
@@ -37,7 +37,9 @@
 
     interactable({
         collider(state) {
-            return new RectCollider(0, 0, state.width, state.height, -2);
+            return new RectCollider(0, 0, state.width, state.height, {
+                zIndex: -3
+            });
         },
 
         contextMenu: [

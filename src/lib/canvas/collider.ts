@@ -32,7 +32,7 @@ export class DurationRectCollider implements Collider {
             this.duration * state.zoom,
             this.height,
             {
-                colour: '#FF0000',
+                colour: '#F00',
                 wireframe: true
             }
         );
@@ -40,13 +40,16 @@ export class DurationRectCollider implements Collider {
 }
 
 export class RectCollider implements Collider {
+    public readonly zIndex: number = 0;
     constructor(
         public readonly x: number,
         public readonly y: number,
         public readonly width: number,
         public readonly height: number,
-        public readonly zIndex: number = 0
-    ) {}
+        { zIndex = 0 } = {}
+    ) {
+        this.zIndex = zIndex;
+    }
 
     colliding(state: RenderProps, time: TimestampSecs, y: Pixels): boolean {
         const x = state.timeToRenderPos(time);

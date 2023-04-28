@@ -74,7 +74,7 @@
                     <span class="entry-time">
                         <UtcTime
                             timestamp={entry.created}
-                            fmt="h:mm A"
+                            fmt="h:mma"
                             tzOffset={entry.createdTZOffset}
                             tooltipPosition="right"
                         />

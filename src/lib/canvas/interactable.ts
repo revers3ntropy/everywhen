@@ -14,8 +14,8 @@ import type { Collider } from './collider';
 
 export interface Interactable extends Listener {
     onHover?: (time: TimestampSecs, y: number) => void;
-    onMouseUp?: (time: TimestampSecs, y: number) => void;
-    collider?: (props: RenderProps) => Collider | null;
+    onMouseUp?: (state: RenderProps, time: TimestampSecs, y: number) => void;
+    collider?: (state: RenderProps) => Collider | null;
     cursorOnHover?: CursorStyle;
     contextMenu?: ContextMenuOptions;
 }

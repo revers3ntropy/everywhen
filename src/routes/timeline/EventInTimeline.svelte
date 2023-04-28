@@ -76,17 +76,9 @@
                     colour: this.hovering ? '#222326' : '#252A35',
                     radius: 5
                 });
-                if (label) {
-                    state.rect(
-                        x,
-                        y + HEIGHT - LABEL_HEIGHT,
-                        width,
-                        LABEL_HEIGHT,
-                        {
-                            colour
-                        }
-                    );
-                }
+                state.rect(x, y + HEIGHT - LABEL_HEIGHT, width, LABEL_HEIGHT, {
+                    colour
+                });
             }
 
             let textColour = '#fff';
