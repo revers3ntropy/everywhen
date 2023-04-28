@@ -11,6 +11,7 @@
 
     export let titles: Record<number, Entry[]>;
     export let auth: Auth;
+    export let hideAgentWidget: boolean;
 
     let showing = false;
     let obfuscated = false;
@@ -52,7 +53,13 @@
                 </button>
             </div>
             <div class="content">
-                <EntryTitles {auth} {obfuscated} {titles} hideBlurToggle />
+                <EntryTitles
+                    {auth}
+                    {obfuscated}
+                    {titles}
+                    hideBlurToggle
+                    {hideAgentWidget}
+                />
             </div>
         </div>
     {/if}

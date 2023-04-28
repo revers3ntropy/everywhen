@@ -1,7 +1,7 @@
 <script lang="ts">
-    import EditLocation from '../../../lib/components/EditLocation.svelte';
-    import Entries from '../../../lib/components/Entries.svelte';
-    import type { Location } from '../../../lib/controllers/location';
+    import EditLocation from '$lib/components/EditLocation.svelte';
+    import Entries from '$lib/components/Entries.svelte';
+    import type { Location } from '$lib/controllers/location';
 
     export let data: App.PageData & {
         location: Location;

@@ -3,7 +3,7 @@ import {
     KEY_COOKIE_OPTIONS,
     USERNAME_COOKIE_KEY,
     USERNAME_COOKIE_OPTIONS
-} from '../../lib/constants';
+} from '$lib/constants';
 import type { PageServerLoad } from './$types';
 
 export const load = (({ cookies }) => {

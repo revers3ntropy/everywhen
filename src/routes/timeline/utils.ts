@@ -1,5 +1,5 @@
 // src: https://awik.io/determine-color-bright-dark-using-javascript/
-import { Event } from '../../lib/controllers/event';
+import { Event } from '$lib/controllers/event';
 
 const monthNames = [
     'Jan',

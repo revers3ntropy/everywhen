@@ -61,7 +61,7 @@
                                 {obfuscate(location.name)}
                             </span>
                         {:else}
-                            <a href="/location/{location.id}">
+                            <a href="/map/{location.id}">
                                 {location.name}
                             </a>
                         {/if}
@@ -85,7 +85,7 @@
         {:else if nearby && nearby?.length}
             <span class="flex-center" style="gap: 0.2rem">
                 <span class="text-light">near</span>
-                <a href="/location/{nearby[0].id}">
+                <a href="/map/{nearby[0].id}">
                     {nearby[0].name}
                 </a>
             </span>

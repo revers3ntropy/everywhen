@@ -102,7 +102,7 @@
 
         {#if isInDialog}
             <button>
-                <a class="flex-center" href="/location/{id}"> See more </a>
+                <a class="flex-center" href="/map/{id}"> See more </a>
             </button>
         {/if}
         <button

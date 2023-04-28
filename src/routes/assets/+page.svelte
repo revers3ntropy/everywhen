@@ -1,8 +1,8 @@
 <script lang="ts">
     import ImageOutline from 'svelte-material-icons/ImageOutline.svelte';
-    import Dot from '../../lib/components/Dot.svelte';
-    import type { Asset as AssetController } from '../../lib/controllers/asset';
-    import { obfuscated } from '../../lib/stores';
+    import Dot from '$lib/components/Dot.svelte';
+    import type { Asset as AssetController } from '$lib/controllers/asset';
+    import { obfuscated } from '$lib/stores';
     import Asset from './Asset.svelte';
 
     export let data: App.PageData & {

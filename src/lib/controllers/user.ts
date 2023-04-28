@@ -57,8 +57,12 @@ export class User {
             return Result.err('Password must be at least 8 characters');
         }
 
+        if (username.length > 128) {
+            return Result.err('Username must be less than 128 characters');
+        }
+
         if (await User.userExistsWithUsername(query, username)) {
-            return Result.err('Username already exists');
+            return Result.err('Username already in use');
         }
 
         return Result.ok(null);

@@ -3,7 +3,7 @@
     import ImageArea from 'svelte-material-icons/ImageArea.svelte';
     import NoteEditOutline from 'svelte-material-icons/NoteEditOutline.svelte';
     import OpenInNew from 'svelte-material-icons/OpenInNew.svelte';
-    import { API_DOCS_LINK } from '../../lib/constants';
+    import { API_DOCS_LINK } from '$lib/constants';
 </script>
 
 <main class="flex-center">

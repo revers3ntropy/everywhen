@@ -3,7 +3,7 @@
     import Plus from 'svelte-material-icons/Plus.svelte';
     import LabelOffOutline from 'svelte-material-icons/LabelOffOutline.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
-    import Dropdown from '../../lib/components/Dropdown.svelte';
+    import Dropdown from '$lib/components/Dropdown.svelte';
     import type { Label } from '../controllers/label';
     import type { Auth } from '../controllers/user';
     import { api } from '../utils/apiRequest';

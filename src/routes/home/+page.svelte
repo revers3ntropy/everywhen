@@ -6,15 +6,15 @@
     import Notebook from 'svelte-material-icons/Notebook.svelte';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
     import type { App } from '../../app';
-    import EntryTitles from '../../lib/components/EntryTitles.svelte';
-    import type { Entry } from '../../lib/controllers/entry';
-    import { obfuscated } from '../../lib/stores.js';
+    import EntryTitles from '$lib/components/EntryTitles.svelte';
+    import type { Entry } from '$lib/controllers/entry';
+    import { obfuscated } from '$lib/stores.js';
     import {
         currentTzOffset,
         dayUtcFromTimestamp,
         fmtUtc,
         nowUtc
-    } from '../../lib/utils/time';
+    } from '$lib/utils/time';
 
     export let data: App.PageData & {
         titles: Record<number, Entry[]>;
@@ -86,6 +86,7 @@
                 auth={data}
                 titles={data.titles}
                 obfuscated={$obfuscated}
+                hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
             />
         </section>
     {:else}
@@ -113,6 +114,7 @@
                 obfuscated={$obfuscated}
                 showTimeAgo={false}
                 auth={data}
+                hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
             />
         </section>
     {/each}

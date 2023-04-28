@@ -1,13 +1,14 @@
 <script lang="ts">
-    import { START_ZOOM } from '../../lib/canvas/canvasState';
-    import { RectCollider } from '../../lib/canvas/collider';
-    import { interactable } from '../../lib/canvas/interactable';
-    import EntryDialog from '../../lib/components/dialogs/EntryDialog.svelte';
-    import type { EntryEdit } from '../../lib/controllers/entry';
-    import type { Label } from '../../lib/controllers/label';
-    import type { Auth } from '../../lib/controllers/user';
-    import { obfuscated } from '../../lib/stores';
-    import { showPopup } from '../../lib/utils/popups';
+    import { START_ZOOM } from '$lib/canvas/canvasState';
+    import { RectCollider } from '$lib/canvas/collider';
+    import { interactable } from '$lib/canvas/interactable';
+    import EntryDialog from '$lib/components/dialogs/EntryDialog.svelte';
+    import type { EntryEdit } from '$lib/controllers/entry';
+    import type { Label } from '$lib/controllers/label';
+    import type { Auth } from '$lib/controllers/user';
+    import { obfuscated } from '$lib/stores';
+    import { showPopup } from '$lib/utils/popups';
+    import { limitStrLen } from '$lib/utils/text.js';
 
     const WIDTH = 4;
 
@@ -26,6 +27,7 @@
     export let agentData = '';
     export let latitude = null as number | null;
     export let longitude = null as number | null;
+    export let hideAgentWidget: boolean;
 
     const height = 0.1 * wordCount + 20;
 
@@ -73,7 +75,7 @@
                     y += height + 12;
                 }
 
-                state.text(title, renderPos, y - 5, {
+                state.text(limitStrLen(title, 20), renderPos, y - 5, {
                     align: 'center',
                     backgroundColour: this.hovering ? '#223' : undefined,
                     fontSize: this.hovering ? 14 : 12,
@@ -96,7 +98,8 @@
             showPopup(EntryDialog, {
                 id,
                 auth,
-                obfuscated: false
+                obfuscated: false,
+                hideAgentWidget
             });
         }
     });

@@ -1,15 +1,15 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { getNotificationsContext } from 'svelte-notifications';
-    import BookSpinner from '../../lib/components/BookSpinner.svelte';
-    import LabelSelect from '../../lib/components/LabelSelect.svelte';
-    import type { Entry } from '../../lib/controllers/entry';
-    import type { Event } from '../../lib/controllers/event';
-    import type { Label } from '../../lib/controllers/label';
-    import type { Auth } from '../../lib/controllers/user';
-    import { popup } from '../../lib/stores';
-    import { api, apiPath } from '../../lib/utils/apiRequest';
-    import { displayNotifOnErr } from '../../lib/utils/notifications';
+    import BookSpinner from '$lib/components/BookSpinner.svelte';
+    import LabelSelect from '$lib/components/LabelSelect.svelte';
+    import type { Entry } from '$lib/controllers/entry';
+    import type { Event } from '$lib/controllers/event';
+    import type { Label } from '$lib/controllers/label';
+    import type { Auth } from '$lib/controllers/user';
+    import { popup } from '$lib/stores';
+    import { api, apiPath } from '$lib/utils/apiRequest';
+    import { displayNotifOnErr } from '$lib/utils/notifications';
 
     const { addNotification } = getNotificationsContext();
 

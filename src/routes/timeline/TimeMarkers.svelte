@@ -1,9 +1,9 @@
 <script lang="ts">
     import { browser } from '$app/environment';
-    import type { RenderProps } from '../../lib/canvas/canvasState';
-    import { renderable } from '../../lib/canvas/renderable';
-    import { NAVBAR_HEIGHT } from '../../lib/constants';
-    import { currentTzOffset, fmtUtc, nowUtc } from '../../lib/utils/time.js';
+    import type { RenderProps } from '$lib/canvas/canvasState';
+    import { renderable } from '$lib/canvas/renderable';
+    import { NAVBAR_HEIGHT } from '$lib/constants';
+    import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time.js';
     import { monthIdxToName } from './utils';
 
     export let startYear = 2000;

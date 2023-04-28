@@ -5,9 +5,9 @@
     import { Bar } from 'svelte-chartjs';
     import ToggleSwitch from 'svelte-material-icons/ToggleSwitch.svelte';
     import ToggleSwitchOff from 'svelte-material-icons/ToggleSwitchOff.svelte';
-    import Select from '../../lib/components/Select.svelte';
-    import { currentTzOffset, fmtUtc, nowUtc } from '../../lib/utils/time';
-    import type { Seconds } from '../../lib/utils/types';
+    import Select from '$lib/components/Select.svelte';
+    import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
+    import type { Seconds } from '$lib/utils/types';
     import {
         Bucket,
         bucketiseTime,

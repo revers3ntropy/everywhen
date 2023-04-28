@@ -2,10 +2,10 @@
     import { onMount } from 'svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import type { Entry as EntryController } from '../../controllers/entry';
-    import type { Auth } from '../../controllers/user';
-    import { popup } from '../../stores';
-    import { api, apiPath } from '../../utils/apiRequest';
-    import { displayNotifOnErr } from '../../utils/notifications';
+    import type { Auth } from '$lib/controllers/user';
+    import { popup } from '$lib/stores';
+    import { api, apiPath } from '$lib/utils/apiRequest';
+    import { displayNotifOnErr } from '$lib/utils/notifications';
     import BookSpinner from '../BookSpinner.svelte';
     import Entry from '../Entry.svelte';
 
@@ -14,6 +14,7 @@
     export let id: string;
     export let auth: Auth;
     export let obfuscated = false;
+    export let hideAgentWidget: boolean;
 
     let entry: EntryController | null = null;
 
@@ -35,6 +36,7 @@
             {auth}
             {obfuscated}
             showFullDate={true}
+            {hideAgentWidget}
         />
     {:else}
         <BookSpinner />

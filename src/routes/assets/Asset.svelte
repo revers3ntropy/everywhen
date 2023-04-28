@@ -7,15 +7,15 @@
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
-    import UtcTime from '../../lib/components/UtcTime.svelte';
-    import { Asset } from '../../lib/controllers/asset';
-    import type { Auth } from '../../lib/controllers/user';
-    import { api, apiPath } from '../../lib/utils/apiRequest';
+    import UtcTime from '$lib/components/UtcTime.svelte';
+    import { Asset } from '$lib/controllers/asset';
+    import type { Auth } from '$lib/controllers/user';
+    import { api, apiPath } from '$lib/utils/apiRequest';
     import {
         displayNotifOnErr,
         SUCCESS_NOTIFICATION
-    } from '../../lib/utils/notifications';
-    import type { TimestampSecs } from '../../lib/utils/types';
+    } from '$lib/utils/notifications';
+    import type { TimestampSecs } from '$lib/utils/types';
 
     const { addNotification } = getNotificationsContext();
     const dispatch = createEventDispatcher();

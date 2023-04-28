@@ -1,8 +1,8 @@
 import { error } from '@sveltejs/kit';
-import { Entry } from '../../../lib/controllers/entry';
-import { query } from '../../../lib/db/mysql';
-import { cachedPageRoute } from '../../../lib/utils/cache';
-import { splitText } from '../../../lib/utils/text';
+import { Entry } from '$lib/controllers/entry';
+import { query } from '$lib/db/mysql';
+import { cachedPageRoute } from '$lib/utils/cache';
+import { splitText } from '$lib/utils/text';
 import type { EntryWithWordCount } from '../helpers';
 import type { PageServerLoad } from './$types';
 

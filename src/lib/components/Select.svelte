@@ -1,7 +1,7 @@
 <script lang="ts">
     import MenuDown from 'svelte-material-icons/MenuDown.svelte';
     import MenuUp from 'svelte-material-icons/MenuUp.svelte';
-    import Dropdown from '../../lib/components/Dropdown.svelte';
+    import Dropdown from '$lib/components/Dropdown.svelte';
 
     export let options: Record<string, string | number>;
     export let key: string;

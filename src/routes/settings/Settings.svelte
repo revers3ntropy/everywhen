@@ -3,15 +3,15 @@
     import CloudCheckOutline from 'svelte-material-icons/CloudCheckOutline.svelte';
     import Sync from 'svelte-material-icons/Sync.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
-    import type { Auth } from '../../lib/controllers/user';
-    import { api } from '../../lib/utils/apiRequest';
-    import { displayNotifOnErr } from '../../lib/utils/notifications.js';
+    import type { Auth } from '$lib/controllers/user';
+    import { api } from '$lib/utils/apiRequest';
+    import { displayNotifOnErr } from '$lib/utils/notifications.js';
     import {
         currentTzOffset,
         fmtDuration,
         fmtUtc,
         nowUtc
-    } from '../../lib/utils/time.js';
+    } from '$lib/utils/time.js';
 
     const { addNotification } = getNotificationsContext();
 

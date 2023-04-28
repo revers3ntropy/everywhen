@@ -1,8 +1,8 @@
 <script lang="ts">
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
-    import Entry from '../../lib/components/Entry.svelte';
-    import type { Entry as EntryController } from '../../lib/controllers/entry';
+    import Entry from '$lib/components/Entry.svelte';
+    import type { Entry as EntryController } from '$lib/controllers/entry';
     import type { Auth } from '../controllers/user';
     import { nowUtc, utcEq } from '../utils/time';
     import Dot from './Dot.svelte';

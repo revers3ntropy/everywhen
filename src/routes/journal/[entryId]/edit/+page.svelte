@@ -1,8 +1,8 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import Close from 'svelte-material-icons/Close.svelte';
-    import type { Entry } from '../../../../lib/controllers/entry';
-    import { obfuscated } from '../../../../lib/stores';
+    import type { Entry } from '$lib/controllers/entry';
+    import { obfuscated } from '$lib/stores';
     import EntryForm from '../../EntryForm.svelte';
 
     export let data: App.PageData & {

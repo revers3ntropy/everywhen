@@ -14,8 +14,8 @@
     import { Style } from 'ol/style';
     import { getNotificationsContext } from 'svelte-notifications';
     import { writable } from 'svelte/store';
-    import { errorLogger } from '../../utils/log';
-    import { displayNotifOnErr } from '../../utils/notifications';
+    import { errorLogger } from '$lib/utils/log';
+    import { displayNotifOnErr } from '$lib/utils/notifications';
     import type { MapBrowserEvent } from 'ol';
     import Map from 'ol/Map';
     import TileLayer from 'ol/layer/Tile';
@@ -27,11 +27,11 @@
     import ContextMenu from 'ol-contextmenu';
     import { fromLonLat, toLonLat } from 'ol/proj';
     import type { EntryLocation } from '../../../routes/stats/helpers';
-    import type { Auth } from '../../controllers/user';
-    import { Location } from '../../controllers/location';
-    import { popup } from '../../stores';
-    import { api, apiPath } from '../../utils/apiRequest';
-    import { showPopup } from '../../utils/popups';
+    import type { Auth } from '$lib/controllers/user';
+    import { Location } from '$lib/controllers/location';
+    import { popup } from '$lib/stores';
+    import { api, apiPath } from '$lib/utils/apiRequest';
+    import { showPopup } from '$lib/utils/popups';
     import EditLocation from '../EditLocation.svelte';
     import EntryDialog from '../dialogs/EntryDialog.svelte';
     import EntryTooltipOnMap from './EntryTooltipOnMap.svelte';
@@ -50,6 +50,7 @@
     export let entries: EntryLocation[] = [];
     export let locations: Location[] = [];
     export let auth: Auth;
+    export let hideAgentWidget: boolean;
 
     let mapId = getId();
     let tooltip: HTMLElement;
@@ -265,7 +266,8 @@
                 showPopup(EntryDialog, {
                     id: hovering.entry.id,
                     auth,
-                    obfuscated: false
+                    obfuscated: false,
+                    hideAgentWidget
                 });
                 return;
             }

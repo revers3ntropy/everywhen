@@ -1,9 +1,9 @@
 <script lang="ts">
     import { browser } from '$app/environment';
     import { onMount } from 'svelte';
-    import { passcodeLastEntered } from '../lib/stores';
-    import { nowUtc } from '../lib/utils/time';
-    import { wheel } from '../lib/utils/toggleScrollable';
+    import { passcodeLastEntered } from '$lib/stores';
+    import { nowUtc } from '$lib/utils/time';
+    import { wheel } from '$lib/utils/toggleScrollable';
 
     export let show = true;
     export let passcode: string;

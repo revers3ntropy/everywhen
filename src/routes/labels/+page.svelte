@@ -3,11 +3,11 @@
     import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
-    import Dot from '../../lib/components/Dot.svelte';
-    import type { Label as LabelController } from '../../lib/controllers/label';
-    import { api } from '../../lib/utils/apiRequest';
-    import { displayNotifOnErr } from '../../lib/utils/notifications';
-    import { nowUtc } from '../../lib/utils/time';
+    import Dot from '$lib/components/Dot.svelte';
+    import type { Label as LabelController } from '$lib/controllers/label';
+    import { api } from '$lib/utils/apiRequest';
+    import { displayNotifOnErr } from '$lib/utils/notifications';
+    import { nowUtc } from '$lib/utils/time';
     import LabelOptions from './LabelOptions.svelte';
 
     const { addNotification } = getNotificationsContext();

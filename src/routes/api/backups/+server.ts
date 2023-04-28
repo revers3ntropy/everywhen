@@ -1,11 +1,11 @@
 import { error } from '@sveltejs/kit';
-import { Backup } from '../../../lib/controllers/backup';
-import { query } from '../../../lib/db/mysql';
-import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
-import { apiRes404, apiResponse } from '../../../lib/utils/apiResponse';
-import { cachedApiRoute, invalidateCache } from '../../../lib/utils/cache';
-import { GETParamIsTruthy } from '../../../lib/utils/GETArgs';
-import { getUnwrappedReqBody } from '../../../lib/utils/requestBody';
+import { Backup } from '$lib/controllers/backup';
+import { query } from '$lib/db/mysql';
+import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
+import { apiRes404, apiResponse } from '$lib/utils/apiResponse';
+import { cachedApiRoute, invalidateCache } from '$lib/utils/cache';
+import { GETParamIsTruthy } from '$lib/utils/GETArgs';
+import { getUnwrappedReqBody } from '$lib/utils/requestBody';
 import type { RequestHandler } from './$types';
 
 export const GET = cachedApiRoute(async (auth, { url }) => {

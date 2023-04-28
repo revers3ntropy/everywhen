@@ -1,10 +1,10 @@
 import { error } from '@sveltejs/kit';
-import { Entry } from '../../lib/controllers/entry';
-import { Event } from '../../lib/controllers/event';
-import { Label } from '../../lib/controllers/label';
-import { query } from '../../lib/db/mysql';
-import { cachedPageRoute } from '../../lib/utils/cache';
-import { wordCount } from '../../lib/utils/text';
+import { Entry } from '$lib/controllers/entry';
+import { Event } from '$lib/controllers/event';
+import { Label } from '$lib/controllers/label';
+import { query } from '$lib/db/mysql';
+import { cachedPageRoute } from '$lib/utils/cache';
+import { wordCount } from '$lib/utils/text';
 import type { PageServerLoad } from './$types';
 
 export type TimelineEntry = Omit<Entry, 'entry'> & {

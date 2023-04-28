@@ -5,10 +5,10 @@ import {
     KEY_COOKIE_OPTIONS,
     USERNAME_COOKIE_KEY,
     USERNAME_COOKIE_OPTIONS
-} from '../../../lib/constants';
-import { User } from '../../../lib/controllers/user';
-import { query } from '../../../lib/db/mysql';
-import { apiRes404, apiResponse } from '../../../lib/utils/apiResponse';
+} from '$lib/constants';
+import { User } from '$lib/controllers/user';
+import { query } from '$lib/db/mysql';
+import { apiRes404, apiResponse } from '$lib/utils/apiResponse';
 
 export const GET = (async ({ url, cookies }) => {
     let key: string | undefined | null = url.searchParams.get('key');

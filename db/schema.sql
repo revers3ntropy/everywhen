@@ -1,156 +1,141 @@
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
-START TRANSACTION;
-SET time_zone = "+00:00";
-
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT = @@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS = @@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION = @@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
 
--- --- Tables ---
-
-CREATE TABLE `users`
+CREATE TABLE users
 (
-    `id`       varchar(128) NOT NULL,
-    `username` varchar(255) NOT NULL,
-    `password` varchar(255) NOT NULL,
-    `salt`     varchar(255) NOT NULL,
-    `created`  int(64)      NOT NULL
+    id       char(128) NOT NULL,
+    username varchar(255) NOT NULL,
+    password varchar(255) NOT NULL,
+    salt     varchar(255) NOT NULL,
+    created  int(64)      NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY username (username)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
 
 -- --------------------------------------------------------
 
-CREATE TABLE `entries`
+CREATE TABLE entries
 (
-    `id`              varchar(128) NOT NULL,
-    `user`            varchar(128) NOT NULL,
-    `created`         int(64)      NOT NULL,
-    `createdTZOffset` double       NOT NULL,
-    `latitude`        double       DEFAULT NULL,
-    `longitude`       double       DEFAULT NULL,
-    `title`           text         NULL,
-    `entry`           longtext     NOT NULL,
-    `deleted`         int(1)       DEFAULT 0,
-    `label`           varchar(128) DEFAULT NULL,
-    `agentData`       longtext     NOT NULL
+    id              char(128) NOT NULL,
+    user            char(128) NOT NULL,
+    created         int(64)      NOT NULL,
+    createdTZOffset double       NOT NULL,
+    latitude        double       DEFAULT NULL,
+    longitude       double       DEFAULT NULL,
+    title           text         NULL,
+    entry           longtext     NOT NULL,
+    deleted         int(1)       DEFAULT 0,
+    label           varchar(128) DEFAULT NULL,
+    agentData       longtext     NOT NULL,
+    PRIMARY KEY (id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
 
 -- --------------------------------------------------------
 
-CREATE TABLE `entryEdits`
+CREATE TABLE entryEdits
 (
-    `id`              varchar(128) NOT NULL,
-    `entryId`         varchar(128) NOT NULL,
-    `created`         int(64)      NOT NULL,
-    `createdTZOffset` double       NOT NULL,
-    `latitude`        double       DEFAULT NULL,
-    `longitude`       double       DEFAULT NULL,
-    `title`           text         NULL,
-    `entry`           longtext     NOT NULL,
-    `label`           varchar(128) DEFAULT NULL,
-    `agentData`       longtext     NOT NULL
+    id              char(128) NOT NULL,
+    entryId         char(128) NOT NULL,
+    created         int(64)      NOT NULL,
+    createdTZOffset double       NOT NULL,
+    latitude        double       DEFAULT NULL,
+    longitude       double       DEFAULT NULL,
+    title           text         NULL,
+    entry           longtext     NOT NULL,
+    label           varchar(128) DEFAULT NULL,
+    agentData       longtext     NOT NULL,
+    PRIMARY KEY (id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
 
 -- --------------------------------------------------------
 
-CREATE TABLE `events`
+CREATE TABLE events
 (
-    `id`      varchar(128) NOT NULL,
-    `user`    varchar(128) NOT NULL,
-    `name`    varchar(256) NOT NULL,
-    `start`   int(64)      NOT NULL,
-    `end`     int(64)      NOT NULL,
-    `label`   varchar(128) DEFAULT NULL,
-    `created` int(64)      NOT NULL
+    id      char(128) NOT NULL,
+    user    char(128) NOT NULL,
+    name    varchar(256) NOT NULL,
+    start   int(64)      NOT NULL,
+    end     int(64)      NOT NULL,
+    label   varchar(128) DEFAULT NULL,
+    created int(64)      NOT NULL,
+    PRIMARY KEY (id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
 
 -- --------------------------------------------------------
 
-CREATE TABLE `labels`
+CREATE TABLE labels
 (
-    `id`      varchar(128) NOT NULL,
-    `user`    varchar(128) NOT NULL,
-    `name`    varchar(256) NOT NULL,
-    `colour`  varchar(64)  NOT NULL,
-    `created` int(64)      NOT NULL
+    id      char(128) NOT NULL,
+    user    char(128) NOT NULL,
+    name    varchar(256) NOT NULL,
+    colour  varchar(64)  NOT NULL,
+    created int(64)      NOT NULL,
+    PRIMARY KEY (id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
 
 -- --------------------------------------------------------
 
-CREATE TABLE `assets`
+CREATE TABLE assets
 (
-    `id`          varchar(128) NOT NULL,
+    id          char(128) NOT NULL,
     # publicId is unique per user and allows same
     # public id to be used for different users
     # (for instance when importing a backup into a different
     # account, which will duplicate IDs)
-    `publicId`    varchar(128) NOT NULL,
-    `user`        varchar(128) NOT NULL,
-    `created`     int(64)      NOT NULL,
-    `fileName`    varchar(256) NOT NULL,
-    `contentType` varchar(128) NOT NULL,
-    `content`     longtext     NOT NULL
+    publicId    char(128) NOT NULL,
+    user        char(128) NOT NULL,
+    created     int(64)      NOT NULL,
+    fileName    varchar(256) NOT NULL,
+    contentType varchar(128) NOT NULL,
+    content     longtext     NOT NULL,
+    PRIMARY KEY (id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
 
 -- --------------------------------------------------------
 
-CREATE TABLE `settings`
+CREATE TABLE settings
 (
-    `id`      varchar(128) NOT NULL,
-    `user`    varchar(128) NOT NULL,
-    `created` int(64)      NOT NULL,
+    id      char(128) NOT NULL,
+    user    char(128) NOT NULL,
+    created int(64)      NOT NULL,
     `key`     varchar(256) NOT NULL,
-    `value`   longtext     NOT NULL
+    value   longtext     NOT NULL,
+    PRIMARY KEY (id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
 
 -- --------------------------------------------------------
 
-CREATE TABLE `locations`
+CREATE TABLE locations
 (
-    `id`              varchar(128) NOT NULL,
-    `user`            varchar(128) NOT NULL,
-    `created`         int(64)      NOT NULL,
-    `createdTZOffset` double       NOT NULL,
-    `name`            varchar(256) NOT NULL,
-    `latitude`        double       NOT NULL,
-    `longitude`       double       NOT NULL,
-    `radius`          double       NOT NULL
+    id              char(128) NOT NULL,
+    user            char(128) NOT NULL,
+    created         int(64)      NOT NULL,
+    createdTZOffset double       NOT NULL,
+    name            varchar(256) NOT NULL,
+    latitude        double       NOT NULL,
+    longitude       double       NOT NULL,
+    radius          double       NOT NULL,
+    PRIMARY KEY (id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
 
 -- --------------------------------------------------------
 
-CREATE TABLE `ids`
+CREATE TABLE ids
 (
-    `id` varchar(128) NOT NULL
+    id varchar(128) NOT NULL,
+    PRIMARY KEY (id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
-
--- --- Indexes ---
-ALTER TABLE `users`
-    ADD PRIMARY KEY (`id`),
-    ADD UNIQUE KEY `username` (`username`);
-COMMIT;
-ALTER TABLE `assets`
-    ADD PRIMARY KEY (`id`);
-ALTER TABLE `entries`
-    ADD PRIMARY KEY (`id`);
-ALTER TABLE `events`
-    ADD PRIMARY KEY (`id`);
-ALTER TABLE `ids`
-    ADD PRIMARY KEY (`id`);
-ALTER TABLE `labels`
-    ADD PRIMARY KEY (`id`);
-
-COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT = @OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS = @OLD_CHARACTER_SET_RESULTS */;

@@ -5,14 +5,14 @@ import {
     KEY_COOKIE_OPTIONS,
     USERNAME_COOKIE_KEY,
     USERNAME_COOKIE_OPTIONS
-} from '../../../lib/constants';
-import { Backup } from '../../../lib/controllers/backup';
-import { User } from '../../../lib/controllers/user';
-import { query } from '../../../lib/db/mysql';
-import { getAuthFromCookies } from '../../../lib/security/getAuthFromCookies';
-import { apiRes404, apiResponse } from '../../../lib/utils/apiResponse';
-import { invalidateCache } from '../../../lib/utils/cache';
-import { getUnwrappedReqBody } from '../../../lib/utils/requestBody';
+} from '$lib/constants';
+import { Backup } from '$lib/controllers/backup';
+import { User } from '$lib/controllers/user';
+import { query } from '$lib/db/mysql';
+import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
+import { apiRes404, apiResponse } from '$lib/utils/apiResponse';
+import { invalidateCache } from '$lib/utils/cache';
+import { getUnwrappedReqBody } from '$lib/utils/requestBody';
 
 export const POST = (async ({ request, cookies }) => {
     const body = await getUnwrappedReqBody(request, {

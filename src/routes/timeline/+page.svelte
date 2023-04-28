@@ -1,11 +1,11 @@
 <script lang="ts">
-    import type { Label } from '../../lib/controllers/label';
+    import type { Label } from '$lib/controllers/label';
     import { onMount } from 'svelte';
-    import Background from '../../lib/canvas/Background.svelte';
-    import Canvas from '../../lib/canvas/Canvas.svelte';
-    import { canvasState } from '../../lib/canvas/canvasState';
-    import type { Event } from '../../lib/controllers/event';
-    import { nowUtc } from '../../lib/utils/time';
+    import Background from '$lib/canvas/Background.svelte';
+    import Canvas from '$lib/canvas/Canvas.svelte';
+    import { canvasState } from '$lib/canvas/canvasState';
+    import type { Event } from '$lib/controllers/event';
+    import { nowUtc } from '$lib/utils/time';
     import type { TimelineEntry } from './+page.server';
     import CenterLine from './CenterLine.svelte';
     import Controls from './Controls.svelte';
@@ -115,6 +115,7 @@
                 {...entry}
                 entryTextParityHeight={i % 2 === 0}
                 auth={data}
+                hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
             />
         {/each}
 

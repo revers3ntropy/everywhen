@@ -43,7 +43,7 @@
 {/if}
 
 <style lang="less">
-    @import '../../styles/variables.less';
+    @import '../../styles/variables';
 
     .page-counter {
         display: flex;

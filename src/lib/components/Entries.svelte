@@ -4,8 +4,8 @@
     import Bin from 'svelte-material-icons/Delete.svelte';
     import TrayArrowUp from 'svelte-material-icons/TrayArrowUp.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
-    import EntryGroup from '../../lib/components/EntryGroup.svelte';
-    import PageCounter from '../../lib/components/PageCounter.svelte';
+    import EntryGroup from '$lib/components/EntryGroup.svelte';
+    import PageCounter from '$lib/components/PageCounter.svelte';
     import { Entry, type EntryFilter } from '../controllers/entry';
     import type { Auth } from '../controllers/user';
     import { obfuscated } from '../stores';
@@ -111,7 +111,7 @@
         <div class="entries-menu">
             <div>
                 {#if showSidebar}
-                    <Sidebar titles={entryTitles} {auth} />
+                    <Sidebar titles={entryTitles} {auth} {hideAgentWidget} />
                 {/if}
                 {#if showBin}
                     <a class="with-circled-icon" href="/journal/deleted">

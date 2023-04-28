@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import Dot from '../../../lib/components/Dot.svelte';
+    import Dot from '$lib/components/Dot.svelte';
     import type { Entry } from '../../controllers/entry';
     import type { Auth } from '../../controllers/user';
     import { api, apiPath } from '../../utils/apiRequest';
@@ -41,7 +41,7 @@
             />
         </div>
         {#if entry.title}
-            <h1>{entry.title}</h1>
+            <h1 class="ellipsis">{entry.title}</h1>
         {/if}
         <p>{entry.entry}</p>
     {:else if error}

@@ -4,7 +4,7 @@
     import MapMarkerOffOutline from 'svelte-material-icons/MapMarkerOffOutline.svelte';
     import MapMarkerOutline from 'svelte-material-icons/MapMarkerOutline.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
-    import { enabledLocation } from '../../lib/stores';
+    import { enabledLocation } from '$lib/stores';
 
     const { addNotification } = getNotificationsContext();
 

@@ -17,12 +17,14 @@
     export let auth: Auth;
     export let blurToggleOnLeft = false;
     export let hideBlurToggle = false;
+    export let hideAgentWidget: boolean;
 
     function showEntryPopup(entryId: string) {
         showPopup(EntryDialog, {
             id: entryId,
             auth,
-            obfuscated
+            obfuscated,
+            hideAgentWidget
         });
     }
 </script>

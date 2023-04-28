@@ -1,4 +1,4 @@
-import { apiRes404 } from '../../../lib/utils/apiResponse';
+import { apiRes404 } from '$lib/utils/apiResponse';
 
 export const GET = apiRes404;
 export const POST = apiRes404;

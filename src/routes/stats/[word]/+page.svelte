@@ -2,7 +2,7 @@
     import { onMount } from 'svelte';
     import ArrowLeft from 'svelte-material-icons/ArrowLeft.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
-    import Entries from '../../../lib/components/Entries.svelte';
+    import Entries from '$lib/components/Entries.svelte';
     import { By, type EntryWithWordCount } from '../helpers';
     import SearchForWord from '../SearchForWord.svelte';
     import StatPill from '../StatPill.svelte';

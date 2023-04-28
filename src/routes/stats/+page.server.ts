@@ -1,9 +1,9 @@
 import { error } from '@sveltejs/kit';
-import { Entry } from '../../lib/controllers/entry';
-import { query } from '../../lib/db/mysql';
-import { cachedPageRoute } from '../../lib/utils/cache';
-import { wordCount as txtWordCount } from '../../lib/utils/text';
-import { daysSince, nowUtc } from '../../lib/utils/time';
+import { Entry } from '$lib/controllers/entry';
+import { query } from '$lib/db/mysql';
+import { cachedPageRoute } from '$lib/utils/cache';
+import { wordCount as txtWordCount } from '$lib/utils/text';
+import { daysSince, nowUtc } from '$lib/utils/time';
 import type { PageServerLoad } from './$types';
 import { commonWordsFromText, type EntryWithWordCount } from './helpers';
 

@@ -13,24 +13,24 @@
     import ImageArea from 'svelte-material-icons/ImageArea.svelte';
     import Send from 'svelte-material-icons/Send.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
-    import LabelSelect from '../../lib/components/LabelSelect.svelte';
-    import { LS_KEY, MAX_IMAGE_SIZE } from '../../lib/constants';
-    import { Asset } from '../../lib/controllers/asset';
-    import type { Entry, RawEntry } from '../../lib/controllers/entry';
-    import type { Label } from '../../lib/controllers/label';
-    import type { Auth } from '../../lib/controllers/user';
-    import { addEntryListeners, enabledLocation } from '../../lib/stores.js';
-    import { api, apiPath } from '../../lib/utils/apiRequest';
-    import { getFileContents } from '../../lib/utils/files';
-    import { getLocation } from '../../lib/utils/geolocation';
-    import { errorLogger } from '../../lib/utils/log';
+    import LabelSelect from '$lib/components/LabelSelect.svelte';
+    import { LS_KEY, MAX_IMAGE_SIZE } from '$lib/constants';
+    import { Asset } from '$lib/controllers/asset';
+    import type { Entry, RawEntry } from '$lib/controllers/entry';
+    import type { Label } from '$lib/controllers/label';
+    import type { Auth } from '$lib/controllers/user';
+    import { addEntryListeners, enabledLocation } from '$lib/stores.js';
+    import { api, apiPath } from '$lib/utils/apiRequest';
+    import { getFileContents } from '$lib/utils/files';
+    import { getLocation } from '$lib/utils/geolocation';
+    import { errorLogger } from '$lib/utils/log';
     import {
         displayNotifOnErr,
         ERR_NOTIFICATION,
         SUCCESS_NOTIFICATION
-    } from '../../lib/utils/notifications';
-    import { obfuscate } from '../../lib/utils/text';
-    import { nowUtc } from '../../lib/utils/time';
+    } from '$lib/utils/notifications';
+    import { obfuscate } from '$lib/utils/text';
+    import { nowUtc } from '$lib/utils/time';
     import LocationToggle from './LocationToggle.svelte';
 
     const { addNotification } = getNotificationsContext();

@@ -1,13 +1,14 @@
 <script lang="ts">
-    import { CanvasState, START_ZOOM } from '../../lib/canvas/canvasState';
-    import { DurationRectCollider } from '../../lib/canvas/collider';
-    import { interactable } from '../../lib/canvas/interactable';
-    import type { Auth } from '../../lib/controllers/user';
-    import Event from '../../lib/components/Event.svelte';
-    import type { Event as EventController } from '../../lib/controllers/event';
-    import type { Label } from '../../lib/controllers/label';
-    import { obfuscated } from '../../lib/stores';
-    import { showPopup } from '../../lib/utils/popups';
+    import { CanvasState, START_ZOOM } from '$lib/canvas/canvasState';
+    import { DurationRectCollider } from '$lib/canvas/collider';
+    import { interactable } from '$lib/canvas/interactable';
+    import type { Auth } from '$lib/controllers/user';
+    import Event from '$lib/components/Event.svelte';
+    import type { Event as EventController } from '$lib/controllers/event';
+    import type { Label } from '$lib/controllers/label';
+    import { obfuscated } from '$lib/stores';
+    import { showPopup } from '$lib/utils/popups';
+    import { limitStrLen } from '$lib/utils/text';
 
     const HEIGHT = 30;
     const LABEL_HEIGHT = 4;
@@ -92,7 +93,7 @@
 
             if (!isInstantEvent && (width > 50 || this.hovering)) {
                 state.text(
-                    name,
+                    limitStrLen(name, 20),
                     Math.max(
                         DURATION_TEXT_X_OFFSET,
                         x + DURATION_TEXT_X_OFFSET
@@ -108,7 +109,7 @@
                 (state.zoom > START_ZOOM / 2 || this.hovering)
             ) {
                 state.text(
-                    name,
+                    limitStrLen(name, 20),
                     x + 5,
                     y +
                         HEIGHT / 2 +

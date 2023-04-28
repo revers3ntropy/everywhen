@@ -41,6 +41,13 @@ export function rawMdToHtml(md: string, obfuscated = false): string {
     });
 }
 
+export function limitStrLen(str: string, len: number): string {
+    if (str.length <= len) {
+        return str;
+    }
+    return `${str.substring(0, len - 1)}…`;
+}
+
 export function fmtBytes(bytes: number): string {
     if (bytes < 0) {
         return `-${fmtBytes(-bytes)}`;

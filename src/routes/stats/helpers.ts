@@ -1,7 +1,7 @@
 import moment from 'moment';
-import type { Entry } from '../../lib/controllers/entry';
-import { splitText } from '../../lib/utils/text';
-import type { PickOptionalAndMutable, Seconds } from '../../lib/utils/types';
+import type { Entry } from '$lib/controllers/entry';
+import { splitText } from '$lib/utils/text';
+import type { PickOptionalAndMutable, Seconds } from '$lib/utils/types';
 
 export type EntryWithWordCount = PickOptionalAndMutable<
     Entry,

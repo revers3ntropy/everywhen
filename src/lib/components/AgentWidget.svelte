@@ -27,6 +27,7 @@
 
     export let data = '';
     export let size: Pixels = 20;
+    export let tooltipPosition = 'right';
 
     let parsed: unknown = {};
     let ua = null as ReturnType<typeof UAParser> | null;
@@ -52,7 +53,8 @@
 {#if ua}
     <span
         use:tooltip={{
-            content: `Created on ${osName}`
+            content: `Created on ${osName}`,
+            position: tooltipPosition
         }}
     >
         {#if mobileOSs.includes(osName)}
@@ -75,6 +77,6 @@
 
 <style lang="less">
     span {
-        margin: 0.5rem;
+        margin: 0.3rem;
     }
 </style>

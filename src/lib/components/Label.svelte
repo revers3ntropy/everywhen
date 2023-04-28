@@ -7,7 +7,7 @@
 </script>
 
 {#if label}
-    <a class="label has-label" href="/labels/{label.id}">
+    <a class="label" href="/labels/{label.id}">
         <span class="colour" style="background: {label.colour}" />
         <span class="name {obfuscated ? 'obfuscated' : ''}">
             {label.name}
@@ -18,29 +18,29 @@
 {/if}
 
 <style lang="less">
-    @import '../../styles/variables.less';
+    @import '../../styles/variables';
 
     .label {
-        margin: 0.5em;
+        margin: 0.1em 0.4rem;
         width: fit-content;
         padding: 5px;
         border-radius: @border-radius;
         display: inline-grid;
         align-items: center;
-        align-content: center;
-        justify-items: center;
-        justify-content: space-between;
         grid-template-columns: 25px 1fr;
         background: @border;
 
         &:hover {
-            background: @accent-primary;
+            background: @accent-secondary;
             * {
                 color: black;
             }
         }
 
+        overflow: hidden;
+
         .name {
+            text-align: left;
             margin-left: 5px;
             text-overflow: ellipsis;
             overflow: hidden;

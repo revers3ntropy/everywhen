@@ -2,13 +2,13 @@
     import { onMount } from 'svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../../../app';
-    import BookSpinner from '../../../lib/components/BookSpinner.svelte';
-    import Dot from '../../../lib/components/Dot.svelte';
-    import Entry from '../../../lib/components/Entry.svelte';
-    import type { Entry as EntryController } from '../../../lib/controllers/entry';
-    import { obfuscated } from '../../../lib/stores';
-    import { api } from '../../../lib/utils/apiRequest';
-    import { displayNotifOnErr } from '../../../lib/utils/notifications';
+    import BookSpinner from '$lib/components/BookSpinner.svelte';
+    import Dot from '$lib/components/Dot.svelte';
+    import Entry from '$lib/components/Entry.svelte';
+    import type { Entry as EntryController } from '$lib/controllers/entry';
+    import { obfuscated } from '$lib/stores';
+    import { api } from '$lib/utils/apiRequest';
+    import { displayNotifOnErr } from '$lib/utils/notifications';
 
     const { addNotification } = getNotificationsContext();
 
@@ -57,6 +57,7 @@
             obfuscated={$obfuscated}
             on:updated={reload}
             auth={data}
+            hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
         />
     {/each}
 

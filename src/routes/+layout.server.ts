@@ -4,11 +4,11 @@ import {
     KEY_COOKIE_KEY,
     NON_AUTH_ROUTES,
     USERNAME_COOKIE_KEY
-} from '../lib/constants';
-import { Settings } from '../lib/controllers/settings';
-import type { Auth } from '../lib/controllers/user';
-import { User } from '../lib/controllers/user';
-import { query } from '../lib/db/mysql';
+} from '$lib/constants';
+import { Settings } from '$lib/controllers/settings';
+import type { Auth } from '$lib/controllers/user';
+import { User } from '$lib/controllers/user';
+import { query } from '$lib/db/mysql';
 import type { LayoutServerLoad } from './$types';
 
 export const prerender = false;

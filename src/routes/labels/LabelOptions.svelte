@@ -2,10 +2,10 @@
     import { createEventDispatcher } from 'svelte';
     import Delete from 'svelte-material-icons/Delete.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
-    import type { Auth } from '../../lib/controllers/user';
-    import { api, apiPath } from '../../lib/utils/apiRequest';
-    import { displayNotifOnErr } from '../../lib/utils/notifications';
-    import { showPopup } from '../../lib/utils/popups';
+    import type { Auth } from '$lib/controllers/user';
+    import { api, apiPath } from '$lib/utils/apiRequest';
+    import { displayNotifOnErr } from '$lib/utils/notifications';
+    import { showPopup } from '$lib/utils/popups';
     import DeleteLabelDialog from './DeleteLabelDialog.svelte';
 
     const { addNotification } = getNotificationsContext();

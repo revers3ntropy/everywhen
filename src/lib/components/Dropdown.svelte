@@ -48,8 +48,8 @@
 </div>
 
 <style lang="less">
-    @import '../../styles/variables.less';
-    @import '../../styles/layout.less';
+    @import '../../styles/variables';
+    @import '../../styles/layout';
 
     .dropdown {
         position: relative;

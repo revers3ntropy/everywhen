@@ -8,18 +8,18 @@
     import Modal from 'svelte-simple-modal';
     import 'ts-polyfill';
     import '../app.less';
-    import { NON_AUTH_ROUTES, USERNAME_COOKIE_KEY } from '../lib/constants';
-    import { Backup } from '../lib/controllers/backup';
-    import { obfuscated, passcodeLastEntered, popup } from '../lib/stores';
-    import { api } from '../lib/utils/apiRequest';
-    import { GETParamIsFalsy } from '../lib/utils/GETArgs';
-    import { errorLogger } from '../lib/utils/log';
+    import { NON_AUTH_ROUTES, USERNAME_COOKIE_KEY } from '$lib/constants';
+    import { Backup } from '$lib/controllers/backup';
+    import { obfuscated, passcodeLastEntered, popup } from '$lib/stores';
+    import { api } from '$lib/utils/apiRequest';
+    import { GETParamIsFalsy } from '$lib/utils/GETArgs';
+    import { errorLogger } from '$lib/utils/log';
     import {
         displayNotifOnErr,
         INFO_NOTIFICATION
-    } from '../lib/utils/notifications';
-    import { nowUtc } from '../lib/utils/time';
-    import type { NotificationOptions } from '../lib/utils/types';
+    } from '$lib/utils/notifications';
+    import { nowUtc } from '$lib/utils/time';
+    import type { NotificationOptions } from '$lib/utils/types';
     import Footer from './Footer.svelte';
     import Nav from './Nav.svelte';
     import NewVersionAvailable from './NewVersionAvailable.svelte';

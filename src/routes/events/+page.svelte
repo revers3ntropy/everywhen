@@ -5,18 +5,18 @@
     import TrayArrowUp from 'svelte-material-icons/TrayArrowUp.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../../app';
-    import ImportDialog from '../../lib/components/dialogs/ImportDialog.svelte';
-    import Dot from '../../lib/components/Dot.svelte';
-    import Select from '../../lib/components/Select.svelte';
-    import type { Event as EventController } from '../../lib/controllers/event';
-    import type { Label } from '../../lib/controllers/label';
-    import { eventsSortKey, obfuscated } from '../../lib/stores';
-    import { api } from '../../lib/utils/apiRequest';
-    import { displayNotifOnErr } from '../../lib/utils/notifications';
-    import { showPopup } from '../../lib/utils/popups';
-    import { nowUtc } from '../../lib/utils/time';
-    import type { EventsSortKey } from '../../lib/utils/types';
-    import Event from '../../lib/components/Event.svelte';
+    import ImportDialog from '$lib/components/dialogs/ImportDialog.svelte';
+    import Dot from '$lib/components/Dot.svelte';
+    import Select from '$lib/components/Select.svelte';
+    import type { Event as EventController } from '$lib/controllers/event';
+    import type { Label } from '$lib/controllers/label';
+    import { eventsSortKey, obfuscated } from '$lib/stores';
+    import { api } from '$lib/utils/apiRequest';
+    import { displayNotifOnErr } from '$lib/utils/notifications';
+    import { showPopup } from '$lib/utils/popups';
+    import { nowUtc } from '$lib/utils/time';
+    import type { EventsSortKey } from '$lib/utils/types';
+    import Event from '$lib/components/Event.svelte';
 
     const NEW_EVENT_NAME = 'New Event';
 

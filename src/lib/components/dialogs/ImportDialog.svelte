@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import { getNotificationsContext } from 'svelte-notifications';
-    import Spinner from '../../../lib/components/BookSpinner.svelte';
+    import Spinner from '$lib/components/BookSpinner.svelte';
     import type { Label } from '../../controllers/label';
     import type { Auth } from '../../controllers/user';
     import { api } from '../../utils/apiRequest';

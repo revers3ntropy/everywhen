@@ -8,7 +8,7 @@
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import NoteEditOutline from 'svelte-material-icons/NoteEditOutline.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
-    import UtcTime from '../../lib/components/UtcTime.svelte';
+    import UtcTime from '$lib/components/UtcTime.svelte';
     import type { Entry } from '../controllers/entry';
     import type { Label as LabelController } from '../controllers/label';
     import type { Auth } from '../controllers/user';
@@ -103,19 +103,29 @@
     class="entry {obfuscated ? '' : 'visible'} {isInDialog ? 'in-dialog' : ''}"
     use:focusableId={id}
 >
+    {#if showFullDate}
+        <UtcTime
+            fmt={'ddd DD MMM YYYY, h:mma'}
+            timestamp={created}
+            tooltipPosition="right"
+            tzOffset={createdTZOffset}
+        />
+    {/if}
     <p class="mobile-title {obfuscated ? 'obfuscated' : ''}">
         {obfuscated ? obfuscate(title) : title}
     </p>
     <div class="header">
         <div class="flex-space-evenly">
-            <span class="time">
-                <UtcTime
-                    fmt={showFullDate ? 'ddd DD-MM-YYYY h:mma' : 'h:mma'}
-                    timestamp={created}
-                    tooltipPosition="right"
-                    tzOffset={createdTZOffset}
-                />
-            </span>
+            {#if !showFullDate}
+                <span class="time">
+                    <UtcTime
+                        fmt={'h:mma'}
+                        timestamp={created}
+                        tooltipPosition="right"
+                        tzOffset={createdTZOffset}
+                    />
+                </span>
+            {/if}
 
             {#if !hideAgentWidget}
                 <AgentWidget data={agentData} />
@@ -132,7 +142,9 @@
             {/if}
 
             {#if !obfuscated && !isEdit && edits.length > 0}
-                <Dot />
+                {#if (latitude && longitude && showLocations) || (hideAgentWidget && !showFullDate)}
+                    <Dot />
+                {/if}
                 <a
                     href="/journal/{id}?history=on&obfuscate=0"
                     class="edits-link link"
@@ -329,5 +341,6 @@
 
     .edits-link {
         font-size: 0.95rem;
+        white-space: nowrap;
     }
 </style>

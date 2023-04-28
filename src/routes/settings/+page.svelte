@@ -6,11 +6,11 @@
     import Logout from 'svelte-material-icons/Logout.svelte';
     import Skull from 'svelte-material-icons/Skull.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
-    import BackupOptions from '../../lib/components/BackupOptions.svelte';
-    import { Backup } from '../../lib/controllers/backup';
-    import { Settings as SettingsController } from '../../lib/controllers/settings';
-    import { api } from '../../lib/utils/apiRequest';
-    import { displayNotifOnErr } from '../../lib/utils/notifications';
+    import BackupOptions from '$lib/components/BackupOptions.svelte';
+    import { Backup } from '$lib/controllers/backup';
+    import { Settings as SettingsController } from '$lib/controllers/settings';
+    import { api } from '$lib/utils/apiRequest';
+    import { displayNotifOnErr } from '$lib/utils/notifications';
     import Settings from './Settings.svelte';
 
     const { addNotification } = getNotificationsContext();

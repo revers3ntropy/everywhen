@@ -2,9 +2,9 @@
     import { goto } from '$app/navigation';
     import ChevronRight from 'svelte-material-icons/ChevronRight.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
-    import { encryptionKeyFromPassword } from '../lib/security/authUtils';
-    import { api } from '../lib/utils/apiRequest';
-    import { displayNotifOnErr } from '../lib/utils/notifications';
+    import { encryptionKeyFromPassword } from '$lib/security/authUtils';
+    import { api } from '$lib/utils/apiRequest';
+    import { displayNotifOnErr } from '$lib/utils/notifications';
 
     const { addNotification } = getNotificationsContext();
 

@@ -1,13 +1,13 @@
 <script lang="ts">
-    import { displayNotifOnErr } from '../../lib/utils/notifications.js';
+    import { displayNotifOnErr } from '$lib/utils/notifications.js';
     import { getNotificationsContext } from 'svelte-notifications';
-    import { RectCollider } from '../../lib/canvas/collider';
-    import { interactable } from '../../lib/canvas/interactable';
-    import type { Auth } from '../../lib/controllers/user';
-    import { Event } from '../../lib/controllers/event';
-    import { api } from '../../lib/utils/apiRequest';
-    import { nowUtc } from '../../lib/utils/time';
-    import type { TimestampSecs } from '../../lib/utils/types';
+    import { RectCollider } from '$lib/canvas/collider';
+    import { interactable } from '$lib/canvas/interactable';
+    import type { Auth } from '$lib/controllers/user';
+    import { Event } from '$lib/controllers/event';
+    import { api } from '$lib/utils/apiRequest';
+    import { nowUtc } from '$lib/utils/time';
+    import type { TimestampSecs } from '$lib/utils/types';
     export let auth: Auth;
 
     export const { addNotification } = getNotificationsContext();
