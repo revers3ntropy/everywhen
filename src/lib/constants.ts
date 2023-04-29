@@ -14,7 +14,7 @@ export const LS_KEY = {
 };
 
 // possible characters to show when the text is blurred
-export const OBFUSCATE_CHARS = '0123456789abcdefghijklmnopqrstuvwxyz ';
+export const OBFUSCATE_CHARS = 'abcdefghijklmnopqrstuvwxyz ';
 
 export const KEY_COOKIE_OPTIONS = Object.freeze({
     path: '/',
@@ -32,7 +32,14 @@ export const USERNAME_COOKIE_OPTIONS = Object.freeze({
     httpOnly: false
 });
 
-export const NON_AUTH_ROUTES = Object.freeze(['/', '/about', '/about/history']);
+export const NON_AUTH_ROUTES = Object.freeze([
+    '/',
+    '/about',
+    '/about/history',
+    '/signup'
+]);
+
+export const NO_SIGNED_IN_ROUTES = Object.freeze(['/signup', '/']);
 
 export const MAX_IMAGE_SIZE: Bytes = 1024 * 1024 * 8; // 8MiB
 

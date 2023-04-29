@@ -31,20 +31,6 @@
         );
         await goto('/' + data.redirect);
     }
-
-    async function create(): Promise<void> {
-        actionPending = true;
-        displayNotifOnErr(
-            addNotification,
-            await api.post(data, `/users`, {
-                password: encryptionKeyFromPassword(password),
-                username
-            }),
-            {},
-            () => (actionPending = false)
-        );
-        await goto('/' + data.redirect);
-    }
 </script>
 
 <main class="flex-center">
@@ -71,14 +57,12 @@
             />
         </label>
         <div class="flex-center" style="justify-content: space-between">
-            <button
+            <a
                 aria-label="Create Account"
-                disabled={actionPending}
-                on:click|preventDefault={create}
-                type="button"
+                href="/signup/?redirect={encodeURIComponent(data.redirect)}"
             >
                 Sign Up
-            </button>
+            </a>
             <button
                 aria-label="Log In"
                 class="primary with-icon"

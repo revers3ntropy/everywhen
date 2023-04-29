@@ -2,6 +2,7 @@ import { redirect } from '@sveltejs/kit';
 import 'ts-polyfill';
 import {
     KEY_COOKIE_KEY,
+    NO_SIGNED_IN_ROUTES,
     NON_AUTH_ROUTES,
     USERNAME_COOKIE_KEY
 } from '$lib/constants';
@@ -14,14 +15,7 @@ import type { LayoutServerLoad } from './$types';
 export const prerender = false;
 export const ssr = true;
 
-async function isAuthenticated(
-    home: boolean,
-    auth: Auth
-): Promise<App.PageData> {
-    if (home) {
-        throw redirect(307, '/home');
-    }
-
+async function isAuthenticated(auth: Auth): Promise<App.PageData> {
     const { err, val: settings } = await Settings.allAsMap(query, auth);
     if (err) throw err;
 
@@ -53,7 +47,10 @@ export const load: LayoutServerLoad = async ({
             key
         );
         if (!err) {
-            return await isAuthenticated(home, {
+            if (NO_SIGNED_IN_ROUTES.includes(url.pathname.trim())) {
+                throw redirect(307, '/home');
+            }
+            return await isAuthenticated({
                 key,
                 username,
                 id: user.id

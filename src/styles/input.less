@@ -160,6 +160,13 @@ button {
         align-items: center;
         justify-content: space-between;
         margin: 0 0.3rem;
+
+        &.icon-right {
+            // text then icon
+            // use weird gap stuff to make the icon right aligned
+            grid-template-columns: 1fr 15px;
+            gap: 10px;
+        }
     }
 
     &.with-circled-icon {
