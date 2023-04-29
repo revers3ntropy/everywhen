@@ -5,7 +5,6 @@
     import Canvas from '$lib/components/canvas/Canvas.svelte';
     import { canvasState } from '$lib/components/canvas/canvasState';
     import type { Event } from '$lib/controllers/event';
-    import { nowUtc } from '$lib/utils/time';
     import type { TimelineEntry } from './+page.server';
     import CenterLine from './CenterLine.svelte';
     import Controls from './Controls.svelte';

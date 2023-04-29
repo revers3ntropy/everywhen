@@ -9,7 +9,7 @@
     import { api } from '$lib/utils/apiRequest';
     import { nowUtc } from '$lib/utils/time';
     import type { TimestampSecs } from '$lib/utils/types';
-    import { cameraOffsetForNow, getInitialZoomAndPos } from './utils';
+    import { cameraOffsetForNow } from './utils';
     export let auth: Auth;
 
     export const { addNotification } = getNotificationsContext();
