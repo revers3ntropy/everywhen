@@ -22,7 +22,6 @@
 
     .label {
         margin: 0.1em 0.4rem;
-        width: fit-content;
         padding: 5px;
         border-radius: @border-radius;
         display: inline-grid;

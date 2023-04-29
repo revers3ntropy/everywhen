@@ -1,3 +1,4 @@
+import { Location } from '$lib/controllers/location';
 import schemion from 'schemion';
 import { parseSemVer } from 'semver-parser';
 import type { QueryFunc } from '../db/mysql';
@@ -52,6 +53,14 @@ export class Backup {
             end: number;
             created: number;
         }[],
+        public locations: {
+            created: number;
+            createdTZOffset: number;
+            name: string;
+            latitude: number;
+            longitude: number;
+            radius: number;
+        }[],
         public created: number,
         public appVersion: string
     ) {}
@@ -70,6 +79,11 @@ export class Backup {
         if (labelsErr) return Result.err(labelsErr);
         const { err: assetsErr, val: assets } = await Asset.all(query, auth);
         if (assetsErr) return Result.err(assetsErr);
+        const { err: locationsErr, val: locations } = await Location.all(
+            query,
+            auth
+        );
+        if (locationsErr) return Result.err(locationsErr);
 
         return Result.ok(
             new Backup(
@@ -116,6 +130,14 @@ export class Backup {
                     end: event.end,
                     created: event.created
                 })),
+                locations.map(location => ({
+                    created: location.created,
+                    createdTZOffset: location.createdTZOffset,
+                    name: location.name,
+                    latitude: location.latitude,
+                    longitude: location.longitude,
+                    radius: location.radius
+                })),
                 created ?? nowUtc(),
                 __VERSION__
             )
@@ -157,6 +179,7 @@ export class Backup {
                 labels: 'object',
                 assets: 'object',
                 events: 'object',
+                locations: 'object',
                 created: 'number',
                 appVersion: 'string'
             })
@@ -164,12 +187,13 @@ export class Backup {
             return Result.err('Invalid backup format');
         }
 
-        const { entries, labels, assets, events } = migratedData;
+        const { entries, labels, assets, events, locations } = migratedData;
         if (
             !Array.isArray(entries) ||
             !Array.isArray(labels) ||
             !Array.isArray(assets) ||
-            !Array.isArray(events)
+            !Array.isArray(events) ||
+            !Array.isArray(locations)
         ) {
             return Result.err(
                 'data must be an object with entries and labels properties'
@@ -254,6 +278,26 @@ export class Backup {
                 // card coded into entries
                 asset.created,
                 asset.publicId
+            );
+            if (err) return Result.err(err);
+        }
+
+        await Location.purgeAll(query, auth);
+
+        for (const location of locations) {
+            if (!Location.jsonIsRawLocation(location)) {
+                return Result.err('Invalid location format in JSON');
+            }
+
+            const { err } = await Location.create(
+                query,
+                auth,
+                location.created,
+                location.createdTZOffset,
+                location.name,
+                location.latitude,
+                location.longitude,
+                location.radius
             );
             if (err) return Result.err(err);
         }

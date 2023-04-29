@@ -57,11 +57,11 @@
                 {#each locations as location, i}
                     {#if i < MAX_LOCATIONS_SHOWN}
                         {#if obfuscated}
-                            <span class="text-light obfuscated">
+                            <span class="text-light ellipsis obfuscated">
                                 {obfuscate(location.name)}
                             </span>
                         {:else}
-                            <a href="/map/{location.id}">
+                            <a href="/map/{location.id}" class="ellipsis">
                                 {location.name}
                             </a>
                         {/if}
@@ -83,7 +83,7 @@
                 {/each}
             </span>
         {:else if nearby && nearby?.length}
-            <span class="flex-center" style="gap: 0.2rem">
+            <span class="flex-center ellipsis" style="gap: 0.2rem">
                 <span class="text-light">near</span>
                 <a href="/map/{nearby[0].id}">
                     {nearby[0].name}

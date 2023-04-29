@@ -62,6 +62,27 @@ export class Location {
         );
     }
 
+    public static jsonIsRawLocation(
+        json: unknown
+    ): json is Omit<Location, 'id'> {
+        return (
+            typeof json === 'object' &&
+            json !== null &&
+            'created' in json &&
+            typeof json.created === 'number' &&
+            (!('createdTZOffset' in json) ||
+                typeof json.createdTZOffset === 'number') &&
+            'name' in json &&
+            typeof json.name === 'string' &&
+            'latitude' in json &&
+            typeof json.latitude === 'number' &&
+            'longitude' in json &&
+            typeof json.longitude === 'number' &&
+            'radius' in json &&
+            typeof json.radius === 'number'
+        );
+    }
+
     public static async all(
         query: QueryFunc,
         auth: Auth
@@ -226,6 +247,18 @@ export class Location {
         if (!res.affectedRows) {
             return Result.err('Location not found');
         }
+        return Result.ok(null);
+    }
+
+    public static async purgeAll(
+        query: QueryFunc,
+        auth: Auth
+    ): Promise<Result> {
+        await query`
+            DELETE
+            FROM locations
+            WHERE user = ${auth.id}
+        `;
         return Result.ok(null);
     }
 
