@@ -9,7 +9,6 @@
     import { api } from '$lib/utils/apiRequest';
     import { nowUtc } from '$lib/utils/time';
     import type { TimestampSecs } from '$lib/utils/types';
-    import { cameraOffsetForNow } from './utils';
     export let auth: Auth;
 
     export const { addNotification } = getNotificationsContext();
@@ -39,7 +38,7 @@
 
     function resetCamera() {
         $canvasState.zoom = 0.01;
-        $canvasState.cameraOffset = cameraOffsetForNow($canvasState);
+        $canvasState.cameraOffset = $canvasState.cameraOffsetForTime();
     }
 
     interactable({

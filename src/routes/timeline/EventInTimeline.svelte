@@ -182,7 +182,15 @@
                     label = newEvent.label || null;
                 }
             });
-        }
+        },
+        contextMenu: [
+            {
+                label: 'Zoom to Event',
+                action(state) {
+                    state.zoomTo(start, end);
+                }
+            }
+        ]
     });
 </script>
 

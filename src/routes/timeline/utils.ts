@@ -52,17 +52,6 @@ export function addYToEvents(
     return evts;
 }
 
-export function cameraOffsetForNow(
-    state: CanvasState,
-    acrossScreen = 3 / 4
-): number {
-    const offset = state.cameraOffset;
-    state.cameraOffset = 0;
-    const nowRenderPos = state.timeToRenderPos(nowUtc(false));
-    state.cameraOffset = offset;
-    return nowRenderPos - state.width * acrossScreen;
-}
-
 export function getInitialZoomAndPos(
     state: CanvasState,
     entries: EntryWithWordCount[],
@@ -83,6 +72,6 @@ export function getInitialZoomAndPos(
         // except if it is more than 52 days ago,
         // then show 53 days
         1 / 60 / (daysAgo + 1),
-        cameraOffsetForNow(state)
+        state.cameraOffsetForTime()
     ];
 }

@@ -133,15 +133,10 @@ export class CanvasState implements CanvasListeners {
             this.updateHoveringOnInteractables();
         });
 
-        let waitingForCtxMenu = null as null | ContextMenuOptions;
-
         this.listen('mouseup', event => {
-            if (waitingForCtxMenu) {
-                this.showContextMenu(waitingForCtxMenu, event);
-                waitingForCtxMenu = null;
-            } else {
-                this.hideContextMenu();
-            }
+            if (event.button !== 0) return;
+
+            this.hideContextMenu();
 
             for (const interactable of this.interactables) {
                 if (!interactable.hovering) continue;
@@ -160,7 +155,7 @@ export class CanvasState implements CanvasListeners {
                     continue;
                 }
                 evt.preventDefault();
-                waitingForCtxMenu = interactable.contextMenu;
+                this.showContextMenu(interactable.contextMenu, evt);
                 return;
             }
         });
@@ -364,8 +359,33 @@ export class CanvasState implements CanvasListeners {
         );
     }
 
+    public cameraOffsetForTime(
+        time: TimestampSecs | null = null,
+        acrossScreen = 3 / 4
+    ): number {
+        if (time === null) {
+            time = nowUtc(false);
+        }
+        const offset = this.cameraOffset;
+        this.cameraOffset = 0;
+        const nowRenderPos = this.timeToRenderPos(time);
+        this.cameraOffset = offset;
+        return nowRenderPos - this.width * acrossScreen;
+    }
+
     public getMouseTime(event: MouseEvent | TouchEvent): number {
         return this.renderPosToTime(this.getMouseXRaw(event));
+    }
+
+    public zoomTo(
+        start: TimestampSecs,
+        end: TimestampSecs,
+        marginPercent = 0.25
+    ) {
+        const marginedStart = start - (end - start) * marginPercent;
+        const marginedEnd = end + (end - start) * marginPercent;
+        this.zoom = this.width / (marginedEnd - marginedStart);
+        this.cameraOffset = this.cameraOffsetForTime(marginedStart, 0);
     }
 
     public rect(
