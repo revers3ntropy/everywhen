@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { canvasState } from '$lib/canvas/canvasState';
     import { displayNotifOnErr } from '$lib/utils/notifications.js';
     import { getNotificationsContext } from 'svelte-notifications';
     import { RectCollider } from '$lib/canvas/collider';
@@ -8,6 +9,7 @@
     import { api } from '$lib/utils/apiRequest';
     import { nowUtc } from '$lib/utils/time';
     import type { TimestampSecs } from '$lib/utils/types';
+    import { cameraOffsetForNow, getInitialZoomAndPos } from './utils';
     export let auth: Auth;
 
     export const { addNotification } = getNotificationsContext();
@@ -33,6 +35,11 @@
                 nowUtc() // not precise but fine
             )
         );
+    }
+
+    function resetCamera() {
+        $canvasState.zoom = 0.01;
+        $canvasState.cameraOffset = cameraOffsetForNow($canvasState);
     }
 
     interactable({
@@ -63,6 +70,10 @@
                 action(state) {
                     state.zoomOnCenter(0.5);
                 }
+            },
+            {
+                label: 'Reset Zoom',
+                action: resetCamera
             }
         ]
     });

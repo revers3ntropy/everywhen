@@ -15,7 +15,11 @@
     import TimeCursor from './TimeCursor.svelte';
     import ContextMenu from './ContextMenu.svelte';
     import TimeMarkers from './TimeMarkers.svelte';
-    import { addYToEvents, type EventWithYLevel } from './utils';
+    import {
+        addYToEvents,
+        type EventWithYLevel,
+        getInitialZoomAndPos
+    } from './utils';
 
     export let data: App.PageData & {
         entries: TimelineEntry[];
@@ -27,31 +31,23 @@
 
     $: events = addYToEvents(data.events);
 
-    function setInitialZoomAndPos() {
-        const earliestTimestamp = Math.min(
-            ...data.entries.map(e => e.created),
-            ...data.events.map(e => e.start)
+    onMount(() => {
+        const [zoom, offset] = getInitialZoomAndPos(
+            $canvasState,
+            data.entries,
+            data.events
         );
-        const earliestTimestampTimeAgo = nowUtc() - earliestTimestamp;
-        const daysAgo = Math.round(
-            Math.min(52, Math.max(earliestTimestampTimeAgo / (60 * 60 * 24), 0))
-        );
+        $canvasState.zoom = zoom;
+        $canvasState.cameraOffset = offset;
+    });
 
-        // zoom so that there is 1 day of blank space to the left
-        // of the last entry/event,
-        // except if it is more than 52 days ago,
-        // then show 53 days
-        $canvasState.zoom = 1 / 60 / (daysAgo + 1);
-
-        $canvasState.cameraOffset =
-            $canvasState.timeToRenderPos(nowUtc()) -
-            ($canvasState.width * 3) / 4;
+    function onUpdateEvents() {
+        data.events = [...data.events];
     }
 
-    onMount(setInitialZoomAndPos);
-
     function onCreateEvent(event: Event) {
-        events = addYToEvents([...events, event]);
+        data.events.push(event);
+        onUpdateEvents();
     }
 
     onMount(() => (document.title = 'Timeline'));
