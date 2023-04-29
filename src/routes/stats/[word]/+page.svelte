@@ -45,7 +45,7 @@
             </h1>
         </div>
         <div class="search-for-word">
-            <SearchForWord value={data.theWord} />
+            <SearchForWord value={data.theWord} auth={data} />
         </div>
     </div>
     {#if data.wordInstances === 0}

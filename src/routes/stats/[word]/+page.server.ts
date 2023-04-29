@@ -1,3 +1,4 @@
+import { decrypt } from '$lib/security/encryption';
 import { error } from '@sveltejs/kit';
 import { Entry } from '$lib/controllers/entry';
 import { query } from '$lib/db/mysql';
@@ -12,7 +13,11 @@ export const load = cachedPageRoute(async (auth, { params }) => {
     });
     if (err) throw error(400, err);
 
-    const theWord = params.word.toLowerCase();
+    const { err: decryptErr, val: theWord } = decrypt(
+        params.word,
+        auth.key
+    ).map(w => w.toLowerCase());
+    if (decryptErr) throw error(400, decryptErr);
 
     const filteredEntries: EntryWithWordCount[] = [];
     let wordInstances = 0;

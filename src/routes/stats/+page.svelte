@@ -48,7 +48,7 @@
                 </h1>
             </div>
             <div class="search-for-word">
-                <SearchForWord />
+                <SearchForWord auth={data} />
             </div>
         </div>
 
@@ -105,6 +105,7 @@
             <CommonWordsList
                 entryCount={data.entryCount}
                 words={data.commonWords}
+                auth={data}
             />
         </section>
     {/if}

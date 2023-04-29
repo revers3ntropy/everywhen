@@ -31,6 +31,9 @@ function fmt(
         args
             .map(arg => {
                 if (typeof arg === 'object') {
+                    if (arg instanceof Error) {
+                        return arg.stack;
+                    }
                     return JSON.stringify(arg);
                 } else {
                     return arg;

@@ -1,4 +1,11 @@
 <script lang="ts">
+    import type { Auth } from '$lib/controllers/user';
+    import { encrypt } from '$lib/security/encryption';
+    import { displayNotifOnErr } from '$lib/utils/notifications.js';
+    import { getNotificationsContext } from 'svelte-notifications';
+    export const { addNotification } = getNotificationsContext();
+
+    export let auth: Auth;
     export let words: [string, number][];
     export let entryCount: number;
 </script>
@@ -6,9 +13,11 @@
 <div class="common-words">
     {#each words as [word, count], i}
         <div>#{i + 1}</div>
-
         <a
-            href="/stats/{encodeURIComponent(word)}"
+            href="/stats/{displayNotifOnErr(
+                addNotification,
+                encrypt(word, auth.key)
+            )}"
             class="word"
             data-sveltekit-preload-data="tap"
         >
