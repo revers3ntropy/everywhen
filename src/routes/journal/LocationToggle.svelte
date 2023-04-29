@@ -73,7 +73,9 @@
     <button
         on:click={enableLocation}
         use:tooltip={{
-            content: 'Location is disabled, click to record location with entry'
+            content:
+                'Location is disabled, click to record location with entry',
+            position: tooltipPosition
         }}
         aria-label="Turn on Location"
     >

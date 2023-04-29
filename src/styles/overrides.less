@@ -3,6 +3,12 @@
 .popup-background {
     background: @bg !important;
     border-radius: @border-radius;
+
+    @media @not-mobile {
+        & > button.close {
+            display: none;
+        }
+    }
 }
 
 .notifications {

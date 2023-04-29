@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { limitStrLen } from '$lib/utils/text.js';
     import { tooltip } from '@svelte-plugins/tooltips';
     import { onMount } from 'svelte';
     import MapMarker from 'svelte-material-icons/MapMarkerOutline.svelte';
@@ -58,11 +59,11 @@
                     {#if i < MAX_LOCATIONS_SHOWN}
                         {#if obfuscated}
                             <span class="text-light ellipsis obfuscated">
-                                {obfuscate(location.name)}
+                                {obfuscate(limitStrLen(location.name, 20))}
                             </span>
                         {:else}
                             <a href="/map/{location.id}" class="ellipsis">
-                                {location.name}
+                                {limitStrLen(location.name, 20)}
                             </a>
                         {/if}
                         {#if i < locations.length - 1}
