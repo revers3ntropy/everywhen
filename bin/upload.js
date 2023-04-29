@@ -23,6 +23,10 @@ async function uploadPath(localPath, remotePath, args = '') {
     }:${remotePath}`;
 }
 
+async function runRemoteCommand(command) {
+    return await $`sshpass -f './secrets/${flags.env}/sshpass.txt' ssh ${process.env.REMOTE_ADDRESS} ${command}`;
+}
+
 const replacerValues = {
     '%ENV%': flags.env
 };
@@ -75,11 +79,6 @@ async function upload() {
     await $`rm -r ./${process.env.DIR}`;
 }
 
-async function restartRemoteServer() {
-    console.log('Restarting remote server...');
-    return await $`sshpass -f './secrets/${flags.env}/sshpass.txt' ssh ${process.env.REMOTE_ADDRESS} 'cd ${process.env.DIR} && npm run restart'`;
-}
-
 (async () => {
     const start = now();
 
@@ -89,9 +88,9 @@ async function restartRemoteServer() {
 
     await upload();
 
-    console.log(flags.restart);
     if (flags.restart) {
-        await restartRemoteServer();
+        console.log('Restarting remote server...');
+        await runRemoteCommand(`cd ${process.env.DIR} && npm run restart`);
     }
 
     const duration = (now() - start) / 1000;
