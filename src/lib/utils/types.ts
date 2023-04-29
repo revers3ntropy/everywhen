@@ -31,5 +31,8 @@ export type Hours = number;
 export type Seconds = number;
 export type TimestampSecs = number;
 export type Milliseconds = number;
+export type Degrees = number;
+export type Meters = number;
+export type Radians = number;
 
 export type EventsSortKey = keyof Omit<Event, 'id' | 'decrypted'>;

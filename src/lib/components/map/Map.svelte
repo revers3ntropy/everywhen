@@ -160,7 +160,11 @@
             view: new View({ center, zoom })
         });
 
-        const locationFeatures = locations.map(olFeatureFromLocation);
+        const viewProjection = map.getView().getProjection();
+
+        const locationFeatures = locations.map(l => {
+            return olFeatureFromLocation(l, viewProjection);
+        });
 
         map.addLayer(
             new LayerVector({
@@ -195,21 +199,28 @@
                 const target = evt.target as LocationFeature;
                 const geometry = target.getGeometry() as Circle;
                 const center = geometry.getCenter();
-                const [long, lat] = toLonLat(center);
-                const radius = Location.metersToDegrees(geometry.getRadius());
+                const [lon, lat] = toLonLat(center);
+                const resolution = map.getView().getResolution();
+                if (!resolution) return;
+
+                const radius = Location.metersToDegreesPrecise(
+                    geometry.getRadius(),
+                    resolution,
+                    viewProjection.getMetersPerUnit(),
+                    lat
+                );
+
                 const id = feature.location.id;
 
-                if (!locationChangeQueue[id]) {
-                    locationChangeQueue[id] = [];
-                }
+                locationChangeQueue[id] ??= [];
                 locationChangeQueue[id].push({
                     latitude: lat,
-                    longitude: long,
+                    longitude: lon,
                     radius
                 });
 
                 target.location.latitude = lat;
-                target.location.longitude = long;
+                target.location.longitude = lon;
                 target.location.radius = radius;
             });
         }

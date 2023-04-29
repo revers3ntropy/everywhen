@@ -1,7 +1,7 @@
 import Feature from 'ol/Feature';
 import { Circle } from 'ol/geom';
 import Point from 'ol/geom/Point';
-import { fromLonLat } from 'ol/proj';
+import { fromLonLat, Projection } from 'ol/proj';
 import { Style } from 'ol/style';
 import type { EntryLocation } from '../../../routes/stats/helpers';
 import { Location } from '$lib/controllers/location';
@@ -27,28 +27,39 @@ export function lastEntry(entries: EntryLocation[]): EntryLocation | null {
     return lastEntry;
 }
 
-export function olFeatureFromLocation(location: Location): LocationFeature {
-    const feature = new Feature({
-        geometry: new Circle(
-            fromLonLat([location.longitude, location.latitude]),
-            Location.degreesToMeters(location.radius)
-        )
-    }) as LocationFeature;
+export function olFeatureFromLocation(
+    location: Location,
+    viewProjection: Projection
+): LocationFeature {
+    const mPerUnit = viewProjection.getMetersPerUnit();
+    if (!mPerUnit) {
+        throw new Error('mPerUnit is null');
+    }
+
+    const geometry = new Circle(
+        fromLonLat([location.longitude, location.latitude]),
+        Location.degreesToMeters(location.radius)
+    );
+
+    const feature = new Feature({ geometry }) as LocationFeature;
 
     feature.setStyle(
         new Style({
             renderer(coordinates, state) {
-                const [p1, p2] = coordinates;
-                if (typeof p1 === 'number' || typeof p2 === 'number') {
-                    return;
+                const [p1] = coordinates;
+                if (typeof p1 === 'number') {
+                    throw new Error('p1 is a number');
                 }
                 const [x, y] = p1 as number[];
-                const [x1, y1] = p2 as number[];
 
                 const ctx = state.context;
-                const dx = x1 - x;
-                const dy = y1 - y;
-                const radius = Math.sqrt(dx * dx + dy * dy);
+
+                const radius = Location.degreesToMetersPrecise(
+                    location.radius,
+                    state.resolution,
+                    mPerUnit,
+                    location.latitude
+                );
 
                 const innerRadius = 0;
                 const outerRadius = radius * 1.4;
@@ -61,8 +72,8 @@ export function olFeatureFromLocation(location: Location): LocationFeature {
                     y,
                     outerRadius
                 );
-                gradient.addColorStop(0, 'rgba(255,0,0,0)');
-                gradient.addColorStop(0.6, 'rgba(67,25,254,0.1)');
+                gradient.addColorStop(0, 'rgba(9,221,237,0.1)');
+                gradient.addColorStop(0.6, 'rgba(34,157,214,0.1)');
                 gradient.addColorStop(1, 'rgba(113,37,186,0.3)');
                 ctx.beginPath();
                 ctx.arc(x, y, radius, 0, 2 * Math.PI);

@@ -119,8 +119,7 @@ export class Entry {
             if (locationResult.err) return Result.err(locationResult.err);
             location = locationResult.val;
         }
-        return Result.ok(
-            await query<RawEntry[]>`
+        const rawEntries = await query<RawEntry[]>`
             SELECT id,
                    created,
                    createdTZOffset,
@@ -133,27 +132,36 @@ export class Entry {
                    agentData
             FROM entries
             WHERE (deleted = ${filter.deleted ? 1 : 0} OR ${
-                filter.deleted === 'both'
-            })
+            filter.deleted === 'both'
+        })
               AND (label = ${filter.labelId || ''} OR ${
-                filter.labelId === undefined
-            })
+            filter.labelId === undefined
+        })
               AND (${location === undefined} OR (
                     latitude IS NOT NULL
                     AND longitude IS NOT NULL
                     AND SQRT(
-                                    POW(latitude - ${
-                                        location?.latitude || 0
-                                    }, 2)
-                                    + POW(longitude - ${
-                                        location?.longitude || 0
-                                    }, 2)
-                            ) <= ${location?.radius || 0}
+                                POW(latitude - ${location?.latitude || 0}, 2)
+                                + POW(longitude - ${
+                                    location?.longitude || 0
+                                }, 2)
+                        ) <= ${(location?.radius || 0) * 2}
                 ))
               AND user = ${auth.id}
             ORDER BY created DESC, id
-        `
-        );
+        `;
+
+        if (location) {
+            return Result.ok(
+                Location.filterByCirclePrecise(
+                    rawEntries,
+                    location.latitude,
+                    location.longitude,
+                    Location.degreesToMeters(location.radius)
+                )
+            );
+        }
+        return Result.ok(rawEntries);
     }
 
     public static async all(
