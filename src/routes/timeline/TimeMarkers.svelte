@@ -1,7 +1,7 @@
 <script lang="ts">
     import { browser } from '$app/environment';
-    import type { RenderProps } from '$lib/canvas/canvasState';
-    import { renderable } from '$lib/canvas/renderable';
+    import type { RenderProps } from '$lib/components/canvas/canvasState';
+    import { renderable } from '$lib/components/canvas/renderable';
     import { NAVBAR_HEIGHT } from '$lib/constants';
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time.js';
     import { monthIdxToName } from './utils';

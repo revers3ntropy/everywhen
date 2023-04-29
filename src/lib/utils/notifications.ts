@@ -1,11 +1,6 @@
 import type { Result } from './result';
 import type { NotificationOptions, PickOptional } from './types';
 
-export const WARN_NOTIFICATION = Object.freeze({
-    removeAfter: 6000,
-    type: 'warning',
-    position: 'top-center'
-} as const satisfies NotificationOptions);
 export const ERR_NOTIFICATION = Object.freeze({
     removeAfter: 8000,
     text: 'An error has occurred',

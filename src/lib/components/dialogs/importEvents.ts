@@ -1,11 +1,11 @@
 import { matches } from 'schemion';
-import type { Event } from '../../controllers/event';
-import type { Label } from '../../controllers/label';
-import type { Auth } from '../../controllers/user';
-import { api, type ReqBody } from '../../utils/apiRequest';
-import { errorLogger } from '../../utils/log';
-import { nowUtc } from '../../utils/time';
-import type { Mutable, NotificationOptions } from '../../utils/types';
+import type { Event } from '$lib/controllers/event';
+import type { Label } from '$lib/controllers/label';
+import type { Auth } from '$lib/controllers/user';
+import { api, type ReqBody } from '$lib/utils/apiRequest';
+import { errorLogger } from '$lib/utils/log';
+import { nowUtc } from '$lib/utils/time';
+import type { Mutable, NotificationOptions } from '$lib/utils/types';
 
 export async function importEvents(
     contents: string,

@@ -2,14 +2,14 @@
     import { onMount } from 'svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import Spinner from '$lib/components/BookSpinner.svelte';
-    import type { Label } from '../../controllers/label';
-    import type { Auth } from '../../controllers/user';
-    import { api } from '../../utils/apiRequest';
+    import type { Label } from '$lib/controllers/label';
+    import type { Auth } from '$lib/controllers/user';
+    import { api } from '$lib/utils/apiRequest';
     import {
         displayNotifOnErr,
         ERR_NOTIFICATION
-    } from '../../utils/notifications';
-    import type { Result } from '../../utils/result';
+    } from '$lib/utils/notifications';
+    import type { Result } from '$lib/utils/result';
     import FileDrop from './FileDropDialog.svelte';
     import { importEntries } from './importEntries.js';
     import { importEvents } from './importEvents';

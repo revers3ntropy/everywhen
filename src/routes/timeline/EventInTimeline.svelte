@@ -1,7 +1,10 @@
 <script lang="ts">
-    import { CanvasState, START_ZOOM } from '$lib/canvas/canvasState';
-    import { DurationRectCollider } from '$lib/canvas/collider';
-    import { interactable } from '$lib/canvas/interactable';
+    import {
+        CanvasState,
+        START_ZOOM
+    } from '$lib/components/canvas/canvasState';
+    import { DurationRectCollider } from '$lib/components/canvas/collider';
+    import { interactable } from '$lib/components/canvas/interactable';
     import type { Auth } from '$lib/controllers/user';
     import Event from '$lib/components/Event.svelte';
     import type { Event as EventController } from '$lib/controllers/event';

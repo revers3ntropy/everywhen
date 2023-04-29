@@ -1,8 +1,8 @@
 <script lang="ts">
     import { getNotificationsContext } from 'svelte-notifications';
-    import { START_ZOOM } from '$lib/canvas/canvasState';
-    import { RectCollider } from '$lib/canvas/collider';
-    import { interactable } from '$lib/canvas/interactable';
+    import { START_ZOOM } from '$lib/components/canvas/canvasState';
+    import { RectCollider } from '$lib/components/canvas/collider';
+    import { interactable } from '$lib/components/canvas/interactable';
     import { Event } from '$lib/controllers/event';
     import type { Auth } from '$lib/controllers/user';
     import { api } from '$lib/utils/apiRequest';

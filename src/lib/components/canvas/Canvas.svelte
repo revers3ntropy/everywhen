@@ -1,7 +1,7 @@
 <script lang="ts">
     import { beforeNavigate } from '$app/navigation';
     import { onMount, setContext } from 'svelte';
-    import { errorLogger } from '../utils/log';
+    import { errorLogger } from '$lib/utils/log';
     import {
         type CanvasContext,
         CanvasState,
@@ -191,7 +191,7 @@
 <slot />
 
 <style lang="less">
-    @import '../../styles/variables';
+    @import '../../../styles/variables';
 
     .context-menu {
         position: absolute;

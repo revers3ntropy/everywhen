@@ -5,10 +5,10 @@
         type Files
     } from 'filedrop-svelte';
     import { getNotificationsContext } from 'svelte-notifications';
-    import { popup } from '../../stores';
-    import { getFileContents } from '../../utils/files';
-    import { ERR_NOTIFICATION } from '../../utils/notifications';
-    import type { Result } from '../../utils/result';
+    import { popup } from '$lib/stores';
+    import { getFileContents } from '$lib/utils/files';
+    import { ERR_NOTIFICATION } from '$lib/utils/notifications';
+    import type { Result } from '$lib/utils/result';
 
     const { addNotification } = getNotificationsContext();
 

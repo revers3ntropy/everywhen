@@ -4,7 +4,7 @@ import Point from 'ol/geom/Point';
 import { fromLonLat } from 'ol/proj';
 import { Style } from 'ol/style';
 import type { EntryLocation } from '../../../routes/stats/helpers';
-import { Location } from '../../controllers/location';
+import { Location } from '$lib/controllers/location';
 
 export interface LocationFeature extends Feature<Circle> {
     location: Location;

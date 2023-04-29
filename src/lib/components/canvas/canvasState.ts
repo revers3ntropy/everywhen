@@ -1,9 +1,9 @@
 import { browser } from '$app/environment';
 import { writable } from 'svelte/store';
-import type { CursorStyle } from '../../app';
-import { errorLogger } from '../utils/log';
-import { nowUtc } from '../utils/time';
-import type { Pixels, TimestampSecs } from '../utils/types';
+import type { CursorStyle } from '../../../app';
+import { errorLogger } from '$lib/utils/log';
+import { nowUtc } from '$lib/utils/time';
+import type { Pixels, TimestampSecs } from '$lib/utils/types';
 import type { Interactable } from './interactable';
 
 export const START_ZOOM = 1 / (60 * 60);

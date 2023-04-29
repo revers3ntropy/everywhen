@@ -1,9 +1,9 @@
 <script lang="ts">
     import type { Label } from '$lib/controllers/label';
     import { onMount } from 'svelte';
-    import Background from '$lib/canvas/Background.svelte';
-    import Canvas from '$lib/canvas/Canvas.svelte';
-    import { canvasState } from '$lib/canvas/canvasState';
+    import Background from '$lib/components/canvas/Background.svelte';
+    import Canvas from '$lib/components/canvas/Canvas.svelte';
+    import { canvasState } from '$lib/components/canvas/canvasState';
     import type { Event } from '$lib/controllers/event';
     import { nowUtc } from '$lib/utils/time';
     import type { TimelineEntry } from './+page.server';
