@@ -1,11 +1,16 @@
-import { apiRes404, apiResponse } from '$lib/utils/apiResponse';
+import { apiRes404, GenericResponse } from '$lib/utils/apiResponse';
 import type { RequestHandler } from './$types';
 
-const GET_RES = {
-    version: __VERSION__
-};
+// Use 'v' over 'version' to save bytes,
+// as this is a very common request
+const GET_RES = JSON.stringify({
+    v: __VERSION__
+});
 
-export const GET = (() => apiResponse(GET_RES)) satisfies RequestHandler;
+export const GET = (() =>
+    new Response(GET_RES, {
+        status: 200
+    }) as GenericResponse<{ v: string }>) satisfies RequestHandler;
 
 export const POST = apiRes404;
 export const DELETE = apiRes404;

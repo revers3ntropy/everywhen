@@ -106,8 +106,8 @@
             await api.get(data, '/version')
         );
 
-        newVersionAvailable = versionResult.version !== currentVersion;
-        newVersion = versionResult.version;
+        newVersionAvailable = versionResult.v !== currentVersion;
+        newVersion = versionResult.v;
     }
 
     onMount(() => {

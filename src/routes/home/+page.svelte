@@ -1,13 +1,17 @@
 <script lang="ts">
+    import BookSpinner from '$lib/components/BookSpinner.svelte';
+    import { api } from '$lib/utils/apiRequest';
+    import { displayNotifOnErr } from '$lib/utils/notifications.js';
     import { onMount } from 'svelte';
     import Cog from 'svelte-material-icons/Cog.svelte';
     import ImageOutline from 'svelte-material-icons/ImageOutline.svelte';
     import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
     import Notebook from 'svelte-material-icons/Notebook.svelte';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
+    import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../../app';
     import EntryTitles from '$lib/components/EntryTitles.svelte';
-    import type { Entry } from '$lib/controllers/entry';
+    import { Entry } from '$lib/controllers/entry';
     import { obfuscated } from '$lib/stores.js';
     import {
         currentTzOffset,
@@ -16,10 +20,11 @@
         nowUtc
     } from '$lib/utils/time';
 
-    export let data: App.PageData & {
-        titles: Record<number, Entry[]>;
-        entries: Entry[];
-    };
+    export const { addNotification } = getNotificationsContext();
+
+    const NUMBER_OF_ENTRY_TITLES = 10;
+
+    export let data: App.PageData;
 
     onMount(() => (document.title = `Home`));
 
@@ -52,6 +57,33 @@
         }
         return res;
     }
+
+    let titles: Entry[];
+    let groupedTitles: Record<string, Entry[]>;
+    let titlesLoaded = false;
+
+    onMount(async () => {
+        const titlesRes = displayNotifOnErr(
+            addNotification,
+            await api.get(data, '/entries/titles')
+        );
+        titles = titlesRes.entries;
+
+        const byDay = Entry.groupEntriesByDay(titles);
+
+        let i = 0;
+        groupedTitles = Object.keys(byDay)
+            .sort((a, b) => parseInt(b) - parseInt(a))
+            .reduce((acc, key) => {
+                if (i >= NUMBER_OF_ENTRY_TITLES) return acc;
+                i += byDay[parseInt(key)].length;
+                return {
+                    ...acc,
+                    [key]: byDay[parseInt(key)]
+                } as Record<string, Entry[]>;
+            }, {} as Record<string, Entry[]>);
+        titlesLoaded = true;
+    });
 </script>
 
 <main>
@@ -79,45 +111,51 @@
             </a>
         </div>
     </section>
-    {#if Object.keys(data.titles || {}).length}
-        <section>
-            <h1>Recent Entries</h1>
-            <EntryTitles
-                auth={data}
-                titles={data.titles}
-                obfuscated={$obfuscated}
-                hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
-            />
-        </section>
+    {#if titlesLoaded}
+        {#if Object.keys(groupedTitles || {}).length}
+            <section>
+                <h1>Recent Entries</h1>
+                <EntryTitles
+                    auth={data}
+                    titles={groupedTitles}
+                    obfuscated={$obfuscated}
+                    hideAgentWidget={!data.settings.showAgentWidgetOnEntries
+                        .value}
+                />
+            </section>
+        {:else}
+            <section>
+                <h1 class="recent-entries">Recent Entries</h1>
+                <p class="recent-entries-text">
+                    Doesn't look like you have any entries yet, why not <a
+                        href="/journal?obfuscate=0">write one</a
+                    >?
+                </p>
+            </section>
+        {/if}
+        {#each Object.entries(entriesYearsAgoToday(titles)) as [yearsAgo, entries]}
+            <section>
+                <h1>
+                    {yearsAgo === '1' ? `A Year` : `${yearsAgo} Years`} Ago Today
+                </h1>
+                <EntryTitles
+                    titles={{
+                        [dayUtcFromTimestamp(
+                            entries[0].created,
+                            entries[0].createdTZOffset
+                        )]: entries
+                    }}
+                    obfuscated={$obfuscated}
+                    showTimeAgo={false}
+                    auth={data}
+                    hideAgentWidget={!data.settings.showAgentWidgetOnEntries
+                        .value}
+                />
+            </section>
+        {/each}
     {:else}
-        <section>
-            <h1 class="recent-entries">Recent Entries</h1>
-            <p class="recent-entries-text">
-                Doesn't look like you have any entries yet, why not <a
-                    href="/journal?obfuscate=0">write one</a
-                >?
-            </p>
-        </section>
+        <BookSpinner />
     {/if}
-    {#each Object.entries(entriesYearsAgoToday(data.entries)) as [yearsAgo, titles]}
-        <section>
-            <h1>
-                {yearsAgo === '1' ? `A Year` : `${yearsAgo} Years`} Ago Today
-            </h1>
-            <EntryTitles
-                titles={{
-                    [dayUtcFromTimestamp(
-                        titles[0].created,
-                        titles[0].createdTZOffset
-                    )]: titles
-                }}
-                obfuscated={$obfuscated}
-                showTimeAgo={false}
-                auth={data}
-                hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
-            />
-        </section>
-    {/each}
 </main>
 
 <style lang="less">
