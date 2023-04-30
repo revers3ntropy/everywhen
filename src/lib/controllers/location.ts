@@ -1,4 +1,4 @@
-import type { Degrees, Meters } from '$lib/utils/types';
+import type { Degrees, Meters, TimestampSecs } from '$lib/utils/types';
 import type { ResultSetHeader } from 'mysql2';
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
@@ -9,12 +9,12 @@ import { UUID } from './uuid';
 export class Location {
     public constructor(
         public id: string,
-        public created: number,
+        public created: TimestampSecs,
         public createdTZOffset: number,
         public name: string,
-        public latitude: number,
-        public longitude: number,
-        public radius: number
+        public latitude: Degrees,
+        public longitude: Degrees,
+        public radius: Degrees
     ) {}
 
     public static async create(
@@ -317,7 +317,7 @@ export class Location {
         );
     }
 
-    private static distBetweenPointsPrecise(
+    public static distBetweenPointsPrecise(
         lat1: number,
         lon1: number,
         lat2: number,

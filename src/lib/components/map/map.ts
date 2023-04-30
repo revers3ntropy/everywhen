@@ -1,8 +1,9 @@
 import Feature from 'ol/Feature';
 import { Circle } from 'ol/geom';
 import Point from 'ol/geom/Point';
-import { fromLonLat, Projection } from 'ol/proj';
+import { fromLonLat } from 'ol/proj';
 import { Style } from 'ol/style';
+import type { Map } from 'ol';
 import type { EntryLocation } from '../../../routes/stats/helpers';
 import { Location } from '$lib/controllers/location';
 
@@ -29,16 +30,24 @@ export function lastEntry(entries: EntryLocation[]): EntryLocation | null {
 
 export function olFeatureFromLocation(
     location: Location,
-    viewProjection: Projection
+    map: Map
 ): LocationFeature {
-    const mPerUnit = viewProjection.getMetersPerUnit();
+    const mPerUnit = map.getView().getProjection().getMetersPerUnit();
     if (!mPerUnit) {
         throw new Error('mPerUnit is null');
     }
-
+    const resolution = map.getView().getResolution();
+    if (!resolution) {
+        throw new Error('resolution is null');
+    }
     const geometry = new Circle(
         fromLonLat([location.longitude, location.latitude]),
-        Location.degreesToMeters(location.radius)
+        Location.degreesToMeters(
+            location.radius
+            // resolution,
+            // mPerUnit,
+            // location.latitude
+        ) / mPerUnit
     );
 
     const feature = new Feature({ geometry }) as LocationFeature;
@@ -54,9 +63,21 @@ export function olFeatureFromLocation(
 
                 const ctx = state.context;
 
+                const mPerUnit = map
+                    .getView()
+                    .getProjection()
+                    .getMetersPerUnit();
+                if (!mPerUnit) {
+                    throw new Error('mPerUnit is null');
+                }
+                const resolution = map.getView().getResolution();
+                if (!resolution) {
+                    throw new Error('resolution is null');
+                }
+
                 const radius = Location.degreesToMetersPrecise(
                     location.radius,
-                    state.resolution,
+                    resolution,
                     mPerUnit,
                     location.latitude
                 );

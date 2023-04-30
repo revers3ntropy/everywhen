@@ -154,16 +154,14 @@
             zoom = 19;
         }
 
-        let map = new Map({
+        const map = new Map({
             target: node.id,
             layers: [osmLayer],
             view: new View({ center, zoom })
         });
 
-        const viewProjection = map.getView().getProjection();
-
         const locationFeatures = locations.map(l => {
-            return olFeatureFromLocation(l, viewProjection);
+            return olFeatureFromLocation(l, map);
         });
 
         map.addLayer(
@@ -200,14 +198,23 @@
                 const geometry = target.getGeometry() as Circle;
                 const center = geometry.getCenter();
                 const [lon, lat] = toLonLat(center);
+
                 const resolution = map.getView().getResolution();
                 if (!resolution) return;
 
-                const radius = Location.metersToDegreesPrecise(
-                    geometry.getRadius(),
-                    resolution,
-                    viewProjection.getMetersPerUnit(),
-                    lat
+                const mPerUnit = map
+                    .getView()
+                    .getProjection()
+                    .getMetersPerUnit();
+                if (!mPerUnit) {
+                    throw new Error('mPerUnit is null');
+                }
+
+                const radius = Location.metersToDegrees(
+                    geometry.getRadius()
+                    // resolution,
+                    // mPerUnit,
+                    // lat
                 );
 
                 const id = feature.location.id;

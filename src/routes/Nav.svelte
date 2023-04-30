@@ -307,6 +307,7 @@
                 aria-label="log out"
                 class="account-dropdown-button with-icon"
                 href="/logout"
+                data-sveltekit-preload-data="tap"
             >
                 <Logout size="30" />
                 Log Out

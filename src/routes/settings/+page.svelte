@@ -52,7 +52,12 @@
 
         <div class="buttons">
             <BackupOptions auth={data} />
-            <a aria-label="Log Out" class="danger" href="/logout">
+            <a
+                aria-label="Log Out"
+                class="danger"
+                href="/logout"
+                data-sveltekit-preload-data="tap"
+            >
                 <Logout size="30" />
                 Log Out
             </a>
