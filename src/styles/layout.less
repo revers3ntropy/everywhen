@@ -70,6 +70,12 @@ main:extend(#svelte) {
     }
 }
 
+.only-mobile {
+    @media @not-mobile {
+        display: none !important;
+    }
+}
+
 .glow {
     box-shadow: 0 0 8px 2px rgba(121, 235, 226, 0.5);
 }

@@ -41,6 +41,7 @@ declare global {
             username: string;
             id: string;
             settings: SettingsConfig;
+            path: string;
         }
 
         // interface Error {}

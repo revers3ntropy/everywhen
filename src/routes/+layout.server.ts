@@ -15,7 +15,9 @@ import type { LayoutServerLoad } from './$types';
 export const prerender = false;
 export const ssr = true;
 
-async function isAuthenticated(auth: Auth): Promise<App.PageData> {
+async function isAuthenticated(
+    auth: Auth
+): Promise<Omit<App.PageData, 'path'>> {
     const { err, val: settings } = await Settings.allAsMap(query, auth);
     if (err) throw err;
 
@@ -50,11 +52,14 @@ export const load: LayoutServerLoad = async ({
             if (NO_SIGNED_IN_ROUTES.includes(url.pathname.trim())) {
                 throw redirect(307, '/home');
             }
-            return await isAuthenticated({
-                key,
-                username,
-                id: user.id
-            });
+            return {
+                ...(await isAuthenticated({
+                    key,
+                    username,
+                    id: user.id
+                })),
+                path: url.pathname
+            };
         }
     }
 
@@ -69,6 +74,7 @@ export const load: LayoutServerLoad = async ({
         id: '',
         settings: JSON.parse(
             JSON.stringify(Settings.fillWithDefaults({}))
-        ) as App.PageData['settings']
+        ) as App.PageData['settings'],
+        path: url.pathname
     };
 };

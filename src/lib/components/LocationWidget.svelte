@@ -1,7 +1,6 @@
 <script lang="ts">
     import { limitStrLen } from '$lib/utils/text.js';
     import { tooltip } from '@svelte-plugins/tooltips';
-    import { onMount } from 'svelte';
     import MapMarker from 'svelte-material-icons/MapMarkerOutline.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import type { Location } from '../controllers/location';
@@ -10,6 +9,7 @@
     import { displayNotifOnErr } from '../utils/notifications';
     import { obfuscate } from '../utils/text';
     import Dot from './Dot.svelte';
+    import { inview } from 'svelte-inview';
 
     const MAX_LOCATIONS_SHOWN = 2;
 
@@ -35,14 +35,21 @@
         loaded = true;
     }
 
-    onMount(load);
-
     $: coordsTooltip = {
-        content: `Created at ${latitude}, ${longitude} (lat, lng)`
+        content: `Created at ${latitude}, ${longitude} (lat, lng)`,
+        position: 'right'
     };
 </script>
 
-<span class="outer">
+<span
+    class="outer"
+    use:inview={{ rootMargin: '50px', unobserveOnEnter: true }}
+    on:inview_enter={() => {
+        if (!loaded) {
+            void load();
+        }
+    }}
+>
     {#if entryId}
         <a use:tooltip={coordsTooltip} href="/journal/{entryId}">
             <MapMarker size="20" />

@@ -96,8 +96,6 @@ export class Settings<T = unknown> {
         key: string,
         value: unknown
     ): Promise<Result<Settings>> {
-        const id = await UUID.generateUUId(query);
-
         if (!(key in Settings.config)) {
             return Result.err(`Invalid setting key`);
         }
@@ -116,6 +114,26 @@ export class Settings<T = unknown> {
             auth.key
         );
         if (err) return Result.err(err);
+
+        const alreadyInDb = await query<{ id: string }[]>`
+            SELECT id from settings
+            WHERE user = ${auth.id}
+                AND \`key\` = ${key}
+        `;
+
+        if (alreadyInDb.length > 0) {
+            const id = alreadyInDb[0].id;
+            await query`
+                UPDATE settings
+                SET 
+                    value = ${valEncrypted},
+                    created = ${now}
+                WHERE id = ${id}
+            `;
+            return Result.ok(new Settings(id, now, key, value));
+        }
+
+        const id = await UUID.generateUUId(query);
 
         await query`
             INSERT INTO settings (id, user, created, \`key\`, value)
@@ -140,10 +158,6 @@ export class Settings<T = unknown> {
             SELECT created, id, \`key\`, value
             FROM settings
             WHERE user = ${auth.id}
-              AND created = (SELECT max(created)
-                             FROM settings as S
-                             WHERE user = ${auth.id}
-                               AND S.\`key\` = settings.\`key\`)
         `;
 
         return Result.collect(

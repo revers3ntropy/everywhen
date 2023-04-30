@@ -8,7 +8,11 @@
     import Modal from 'svelte-simple-modal';
     import 'ts-polyfill';
     import '../app.less';
-    import { NON_AUTH_ROUTES, USERNAME_COOKIE_KEY } from '$lib/constants';
+    import {
+        ANIMATION_DURATION,
+        NON_AUTH_ROUTES,
+        USERNAME_COOKIE_KEY
+    } from '$lib/constants';
     import { Backup } from '$lib/controllers/backup';
     import { obfuscated, passcodeLastEntered, popup } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
@@ -26,6 +30,7 @@
     import NoAuthNav from './NoAuthNav.svelte';
     import Notifier from './Notifier.svelte';
     import PasscodeModal from './PasscodeModal.svelte';
+    import { blur } from 'svelte/transition';
 
     $: home = $page.url.pathname.trim() === '/';
     $: requireAuth = !NON_AUTH_ROUTES.includes($page.url.pathname);
@@ -202,9 +207,23 @@
             {/if}
         {/if}
 
-        <div class="page-content">
-            <slot />
-        </div>
+        {#key data.path}
+            <div
+                class="page-content"
+                in:blur={{
+                    // half as total = in + out
+                    duration: ANIMATION_DURATION * 0.5,
+                    delay: ANIMATION_DURATION * 0.5,
+                    opacity: 0
+                }}
+                out:blur={{
+                    duration: ANIMATION_DURATION * 0.5,
+                    opacity: 0
+                }}
+            >
+                <slot />
+            </div>
+        {/key}
 
         {#if newVersionAvailable}
             <NewVersionAvailable {newVersion} />
