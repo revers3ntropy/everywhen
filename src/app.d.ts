@@ -121,6 +121,18 @@ declare global {
         ): unknown;
     }
 
+    class WebpConverter {
+        static str2webpstr(
+            str: string,
+            type: string,
+            options: string
+        ): Promise<string>;
+    }
+
+    declare module 'webp-converter' {
+        export = WebpConverter;
+    }
+
     // Very annoying, but otherwise `svelte-check` complains about
     // `import '@svelte-plugins/tooltips'`
     declare module '*';

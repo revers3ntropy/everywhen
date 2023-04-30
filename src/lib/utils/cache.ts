@@ -47,9 +47,11 @@ export function cacheResponse<T>(
     userId: string,
     response: T
 ): void {
-    const userCache = cache[userId] || {};
-    userCache[url] = response;
-    cacheLastUsed[userId] = nowUtc();
+    cacheLastUsed[userId] = nowUtc(false);
+    if (!(userId in cache)) {
+        cache[userId] = {};
+    }
+    (cache[userId] as Record<string, T>)[url] = response;
 }
 
 function logReq(hit: boolean, url: URL) {

@@ -120,7 +120,7 @@
 
         setInterval(() => {
             void checkForUpdate();
-        }, 1000 * 10);
+        }, 1000 * 30);
     });
 
     function activity() {

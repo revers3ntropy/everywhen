@@ -26,6 +26,9 @@ async function uploadPath(localPath, remotePath, args = '') {
 async function runRemoteCommand(command) {
     return await $`sshpass -f './secrets/${flags.env}/sshpass.txt' ssh ${process.env.REMOTE_ADDRESS} ${command}`;
 }
+async function runRemoteCommandSudo(command) {
+    return await $`sshpass -f './secrets/${flags.env}/sshpass.txt' ssh -t ${process.env.REMOTE_ADDRESS} ${command}`;
+}
 
 const replacerValues = {
     '%ENV%': flags.env
@@ -38,7 +41,8 @@ const uploadPaths = {
     [`./secrets/${flags.env}/key.pem`]: '/key.pem',
     [`./secrets/${flags.env}/remote.env`]: '/.env',
     ['./server/server.js']: '/server.js',
-    [`./server/remote.package.json`]: '/package.json'
+    [`./server/remote.package.json`]: '/package.json',
+    [`./node_modules/webp-converter/bin/libwebp_linux/bin/cwebp`]: `/server/bin/libwebp_linux/bin/cwebp`
 };
 
 async function upload() {
@@ -86,12 +90,25 @@ async function upload() {
 
     console.log(`Uploading to ${process.env.REMOTE_ADDRESS} (${flags.env})`);
 
+    await runRemoteCommand(`cd ${process.env.DIR} && npm run stop`);
+    await runRemoteCommand(`rm -r ${process.env.DIR}`);
+
+    // Required by 'webp-converter' package TODO: Remove this requirement
+    await runRemoteCommand(
+        `mkdir -p ${process.env.DIR}/server/bin/libwebp_linux/bin`
+    );
+    await runRemoteCommand(`mkdir -p ${process.env.DIR}/server/temp`);
+
     await upload();
 
-    if (flags.restart) {
-        console.log('Restarting remote server...');
-        await runRemoteCommand(`cd ${process.env.DIR} && npm run restart`);
-    }
+    await runRemoteCommandSudo(
+        `sudo chmod +x ${process.env.DIR}/server/bin/libwebp_linux/bin/cwebp`
+    );
+
+    await runRemoteCommand(`cd ${process.env.DIR} && npm i`);
+
+    console.log('Restarting remote server...');
+    await runRemoteCommand(`cd ${process.env.DIR} && npm run start`);
 
     const duration = (now() - start) / 1000;
     console.log(c.green(`Finished Uploading in ${duration.toFixed(3)}s`));
