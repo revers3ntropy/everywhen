@@ -278,6 +278,10 @@
                     return a.location.radius - b.location.radius;
                 });
 
+            if (features.length < 1) {
+                return;
+            }
+
             const hovering = features[0] as EntryFeature | LocationFeature;
 
             if ('entry' in hovering) {

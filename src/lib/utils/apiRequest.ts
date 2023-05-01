@@ -164,6 +164,10 @@ export async function makeApiReq<
         }
         return Result.ok(res as ApiResponse[Verb][Path]);
     }
+
+    if (response.status === 503) {
+        return Result.err('Server is down for maintenance');
+    }
     errorLogger.error(
         `Error on api fetch (${browser ? 'client' : 'server'} side)`,
         method,

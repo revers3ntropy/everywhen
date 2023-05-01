@@ -158,8 +158,13 @@ button {
         // assumed one svg icon and then text
         grid-template-columns: 35px 1fr;
         align-items: center;
-        justify-content: space-between;
+        justify-content: start;
         margin: 0 0.3rem;
+
+        &.icon-small {
+            grid-template-columns: 25px 1fr;
+            margin: 0 0.1rem;
+        }
 
         &.icon-right {
             // text then icon

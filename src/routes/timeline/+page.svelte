@@ -5,7 +5,9 @@
     import Canvas from '$lib/components/canvas/Canvas.svelte';
     import { canvasState } from '$lib/components/canvas/canvasState';
     import type { Event } from '$lib/controllers/event';
+    import type { Label } from '$lib/controllers/label';
     import { getNotificationsContext } from 'svelte-notifications';
+    import type { TimelineEntry } from './+page.server';
     import CenterLine from './CenterLine.svelte';
     import Controls from './Controls.svelte';
     import EntryInTimeline from './EntryInTimeline.svelte';
@@ -19,11 +21,14 @@
         type EventWithYLevel,
         getInitialZoomAndPos
     } from './utils';
-    import type { PageData } from './$types';
 
     export const { addNotification } = getNotificationsContext();
 
-    export let data: PageData;
+    export let data: App.PageData & {
+        events: Event[];
+        entries: TimelineEntry[];
+        labels: Label[];
+    };
 
     let instantEvents: EventWithYLevel[];
     let durationEvents: EventWithYLevel[];
