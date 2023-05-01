@@ -5,7 +5,6 @@ import { Label } from '$lib/controllers/label';
 import { query } from '$lib/db/mysql';
 import { cachedPageRoute } from '$lib/utils/cache';
 import { wordCount } from '$lib/utils/text';
-import type { PageServerLoad } from './$types';
 
 export type TimelineEntry = Omit<Entry, 'entry'> & {
     wordCount: number;
@@ -30,4 +29,4 @@ export const load = cachedPageRoute(async auth => {
         events,
         labels
     };
-}) satisfies PageServerLoad;
+});

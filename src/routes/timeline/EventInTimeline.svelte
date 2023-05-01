@@ -34,6 +34,10 @@
     export let created: number;
     export let decrypted: boolean;
 
+    export let updateEvent: (event: EventController, reload?: boolean) => void;
+    export let deleteEvent: (id: string) => void;
+    export let createEvent: (event: EventController) => void;
+
     let thisIsDeleted = false;
 
     if (!start || !end) throw 'Missing required props';
@@ -171,8 +175,18 @@
                     // event is deleted, just stops rendering it
                     if (by === -1) {
                         thisIsDeleted = true;
+                        deleteEvent(id);
                     } else if (by === 1) {
                         thisIsDeleted = false;
+                        createEvent({
+                            id,
+                            name,
+                            start,
+                            end,
+                            created,
+                            label: label || undefined,
+                            decrypted: true
+                        });
                     }
                 },
                 onChange(newEvent: EventController) {
@@ -180,6 +194,13 @@
                     end = newEvent.end;
                     name = newEvent.name;
                     label = newEvent.label || null;
+
+                    updateEvent({
+                        ...newEvent,
+                        id,
+                        created,
+                        decrypted: true
+                    });
                 }
             });
         },

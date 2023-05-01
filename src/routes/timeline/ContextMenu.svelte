@@ -13,7 +13,7 @@
 
     export const { addNotification } = getNotificationsContext();
 
-    export let onCreateEvent: (event: Event) => void;
+    export let createEvent: (event: Event) => void;
 
     async function newEvent(start: TimestampSecs, end: TimestampSecs) {
         const event = {
@@ -25,7 +25,7 @@
             addNotification,
             await api.post(auth, '/events', event)
         );
-        onCreateEvent(
+        createEvent(
             new Event(
                 id,
                 event.name,

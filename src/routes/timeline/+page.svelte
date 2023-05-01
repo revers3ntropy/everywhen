@@ -1,11 +1,9 @@
 <script lang="ts">
-    import type { Label } from '$lib/controllers/label';
     import { onMount } from 'svelte';
     import Background from '$lib/components/canvas/Background.svelte';
     import Canvas from '$lib/components/canvas/Canvas.svelte';
     import { canvasState } from '$lib/components/canvas/canvasState';
     import type { Event } from '$lib/controllers/event';
-    import type { TimelineEntry } from './+page.server';
     import CenterLine from './CenterLine.svelte';
     import Controls from './Controls.svelte';
     import EntryInTimeline from './EntryInTimeline.svelte';
@@ -19,12 +17,9 @@
         type EventWithYLevel,
         getInitialZoomAndPos
     } from './utils';
+    import type { PageData } from './$types';
 
-    export let data: App.PageData & {
-        entries: TimelineEntry[];
-        events: Event[];
-        labels: Label[];
-    };
+    export let data: PageData;
 
     let events: EventWithYLevel[];
 
@@ -40,12 +35,26 @@
         $canvasState.cameraOffset = offset;
     });
 
-    function onUpdateEvents() {
+    function onUpdateEvents(): void {
         data.events = [...data.events];
     }
 
-    function onCreateEvent(event: Event) {
+    function createEvent(event: Event): void {
         data.events.push(event);
+        onUpdateEvents();
+    }
+
+    function updateEvent(event: Event, reload = false): void {
+        const index = data.events.findIndex(e => e.id === event.id);
+        data.events[index] = event;
+        if (reload) {
+            onUpdateEvents();
+        }
+    }
+
+    function deleteEvent(id: string): void {
+        const index = data.events.findIndex(e => e.id === id);
+        data.events.splice(index, 1);
         onUpdateEvents();
     }
 
@@ -99,7 +108,7 @@
     <Canvas>
         <Controls />
         <Background />
-        <ContextMenu auth={data} {onCreateEvent} />
+        <ContextMenu auth={data} {createEvent} />
 
         <TimeMarkers startYear={data.settings.yearOfBirth.value} />
 
@@ -121,10 +130,13 @@
                 {...event}
                 yLevel={1 + event.yLevel}
                 eventTextParityHeight={i % 2 === 0}
+                {updateEvent}
+                {deleteEvent}
+                {createEvent}
             />
         {/each}
 
         <CenterLine />
-        <TimeCursor auth={data} {onCreateEvent} />
+        <TimeCursor auth={data} {createEvent} />
     </Canvas>
 </main>
