@@ -218,11 +218,6 @@
                 text: `Failed to create entry: ${JSON.stringify(res)}`
             });
         }
-        addNotification({
-            ...SUCCESS_NOTIFICATION,
-            removeAfter: 1000,
-            text: `Entry created`
-        });
         $addEntryListeners.map(e => e());
         await goto(`#${res.id}`);
     }

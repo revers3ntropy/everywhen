@@ -22,11 +22,11 @@
 
     .label {
         margin: 0.1em 0.4rem;
-        padding: 5px;
+        padding: 0 0.5rem 0 0;
         border-radius: @border-radius;
         display: inline-grid;
         align-items: center;
-        grid-template-columns: 25px 1fr;
+        grid-template-columns: 20px 1fr;
         background: @border;
 
         &:hover {
@@ -50,7 +50,7 @@
         .colour {
             height: 20px;
             width: 20px;
-            border-radius: 50%;
+            border-radius: @border-radius 50% 50% @border-radius;
         }
     }
 </style>
