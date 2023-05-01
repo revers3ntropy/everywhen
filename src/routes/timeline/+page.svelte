@@ -1,9 +1,11 @@
 <script lang="ts">
+    import { ERR_NOTIFICATION } from '$lib/utils/notifications';
     import { onMount } from 'svelte';
     import Background from '$lib/components/canvas/Background.svelte';
     import Canvas from '$lib/components/canvas/Canvas.svelte';
     import { canvasState } from '$lib/components/canvas/canvasState';
     import type { Event } from '$lib/controllers/event';
+    import { getNotificationsContext } from 'svelte-notifications';
     import CenterLine from './CenterLine.svelte';
     import Controls from './Controls.svelte';
     import EntryInTimeline from './EntryInTimeline.svelte';
@@ -19,11 +21,13 @@
     } from './utils';
     import type { PageData } from './$types';
 
+    export const { addNotification } = getNotificationsContext();
+
     export let data: PageData;
 
-    let events: EventWithYLevel[];
-
-    $: events = addYToEvents(data.events);
+    let instantEvents: EventWithYLevel[];
+    let durationEvents: EventWithYLevel[];
+    $: [instantEvents, durationEvents] = addYToEvents(data.events);
 
     onMount(() => {
         const [zoom, offset] = getInitialZoomAndPos(
@@ -35,27 +39,39 @@
         $canvasState.cameraOffset = offset;
     });
 
-    function onUpdateEvents(): void {
-        data.events = [...data.events];
-    }
-
     function createEvent(event: Event): void {
-        data.events.push(event);
-        onUpdateEvents();
+        data.events = [...data.events, event];
     }
 
-    function updateEvent(event: Event, reload = false): void {
+    function updateEvent(event: Event): void {
         const index = data.events.findIndex(e => e.id === event.id);
-        data.events[index] = event;
-        if (reload) {
-            onUpdateEvents();
+        if (index === -1) {
+            addNotification({
+                ...ERR_NOTIFICATION,
+                message: 'Event not found'
+            });
+            return;
         }
+        data.events = [
+            ...data.events.slice(0, index),
+            event,
+            ...data.events.slice(index + 1)
+        ];
     }
 
     function deleteEvent(id: string): void {
         const index = data.events.findIndex(e => e.id === id);
-        data.events.splice(index, 1);
-        onUpdateEvents();
+        if (index === -1) {
+            addNotification({
+                ...ERR_NOTIFICATION,
+                message: 'Event not found'
+            });
+            return;
+        }
+        data.events = [
+            ...data.events.slice(0, index),
+            ...data.events.slice(index + 1)
+        ];
     }
 
     onMount(() => (document.title = 'Timeline'));
@@ -123,18 +139,33 @@
             />
         {/each}
 
-        {#each events as event, i}
-            <EventInTimeline
-                auth={data}
-                labels={data.labels}
-                {...event}
-                yLevel={1 + event.yLevel}
-                eventTextParityHeight={i % 2 === 0}
-                {updateEvent}
-                {deleteEvent}
-                {createEvent}
-            />
-        {/each}
+        {#key instantEvents}
+            {#key durationEvents}
+                {#each durationEvents as event (event.id)}
+                    <EventInTimeline
+                        auth={data}
+                        labels={data.labels}
+                        {...event}
+                        yLevel={1 + event.yLevel}
+                        eventTextParityHeight
+                        {updateEvent}
+                        {deleteEvent}
+                        {createEvent}
+                    />
+                {/each}
+                {#each instantEvents as event, i (event.id)}
+                    <EventInTimeline
+                        auth={data}
+                        labels={data.labels}
+                        {...event}
+                        eventTextParityHeight={i % 2 === 0}
+                        {updateEvent}
+                        {deleteEvent}
+                        {createEvent}
+                    />
+                {/each}
+            {/key}
+        {/key}
 
         <CenterLine />
         <TimeCursor auth={data} {createEvent} />

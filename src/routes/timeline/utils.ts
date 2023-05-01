@@ -27,13 +27,17 @@ export type EventWithYLevel = { yLevel: number } & Event;
 
 export function addYToEvents(
     rawEvents: Event[]
-): ({ yLevel: number } & Event)[] {
+): [({ yLevel: number } & Event)[], ({ yLevel: number } & Event)[]] {
     const evts: EventWithYLevel[] = rawEvents
         .sort((e1, e2) => (Event.compare(e1, e2) ? 1 : -1))
         .map(e => ({ ...e, yLevel: 0 }));
 
+    const instantEvents = [];
+    const durationEvents = [];
+
     for (const event of evts) {
         if (Event.isInstantEvent(event)) {
+            instantEvents.push(event);
             continue;
         }
 
@@ -47,9 +51,11 @@ export function addYToEvents(
         for (const e of overlappedLargerEvents) {
             e.yLevel = Math.max(e.yLevel, event.yLevel + 1);
         }
+
+        durationEvents.push(event);
     }
 
-    return evts;
+    return [instantEvents, durationEvents];
 }
 
 export function getInitialZoomAndPos(

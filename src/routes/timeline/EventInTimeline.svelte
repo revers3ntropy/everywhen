@@ -29,7 +29,7 @@
     export let end: number;
     export let name: string;
     export let label = null as Label | null;
-    export let yLevel: number;
+    export let yLevel = 0;
     export let eventTextParityHeight: boolean;
     export let created: number;
     export let decrypted: boolean;
@@ -190,11 +190,6 @@
                     }
                 },
                 onChange(newEvent: EventController) {
-                    start = newEvent.start;
-                    end = newEvent.end;
-                    name = newEvent.name;
-                    label = newEvent.label || null;
-
                     updateEvent({
                         ...newEvent,
                         id,

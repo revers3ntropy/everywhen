@@ -4,7 +4,7 @@ import { DEBUG_RENDER_COLLIDERS } from '$lib/constants';
 import type { TimestampSecs } from '$lib/utils/types';
 import {
     type CanvasContext,
-    canvasState,
+    CanvasState,
     type ContextMenuOptions,
     key,
     type Listener
@@ -23,7 +23,7 @@ export interface Interactable extends Listener {
 export function interactable(interactable: Interactable): void {
     let wasHovering = false;
 
-    const ctx: CanvasContext = getContext(key);
+    const ctx = getContext<CanvasContext>(key);
 
     const element = {
         ready: false,
@@ -32,10 +32,8 @@ export function interactable(interactable: Interactable): void {
         render(state, dt) {
             if (interactable.hovering) {
                 if (interactable.cursorOnHover) {
-                    canvasState.update(s => {
-                        s.cursor = interactable.cursorOnHover || 'default';
-                        return s;
-                    });
+                    (state as CanvasState).cursor =
+                        interactable.cursorOnHover || 'default';
                 }
 
                 if (!wasHovering && interactable.onHover) {
@@ -63,8 +61,10 @@ export function interactable(interactable: Interactable): void {
     void ctx.add(element);
     onMount(() => {
         element.mounted = true;
+        interactable.mounted = true;
         return () => {
             ctx.remove(element);
+            interactable.mounted = false;
             element.mounted = false;
         };
     });

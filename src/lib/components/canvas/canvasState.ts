@@ -139,7 +139,7 @@ export class CanvasState implements CanvasListeners {
             this.hideContextMenu();
 
             for (const interactable of this.interactables) {
-                if (!interactable.hovering) continue;
+                if (!interactable.hovering || !interactable.mounted) continue;
                 interactable.onMouseUp?.(
                     this.asRenderProps(),
                     this.mouseTime,
@@ -151,7 +151,11 @@ export class CanvasState implements CanvasListeners {
 
         this.listen('contextmenu', evt => {
             for (const interactable of this.interactables) {
-                if (!interactable.hovering || !interactable.contextMenu) {
+                if (
+                    !interactable.hovering ||
+                    !interactable.contextMenu ||
+                    !interactable.mounted
+                ) {
                     continue;
                 }
                 evt.preventDefault();
@@ -178,6 +182,7 @@ export class CanvasState implements CanvasListeners {
 
     private updateHoveringOnInteractables() {
         const queue = this.interactables
+            .filter(e => e.mounted)
             .map(i =>
                 i.collider
                     ? ([i.collider?.(this.asRenderProps()), i] as const)
@@ -244,6 +249,10 @@ export class CanvasState implements CanvasListeners {
 
     public registerInteractable(interactable: Interactable) {
         this.interactables.push(interactable);
+    }
+
+    public removeInteractable(interactable: Interactable) {
+        this.interactables = this.interactables.filter(i => i !== interactable);
     }
 
     public center(): number {

@@ -1,6 +1,6 @@
 {
     "name": "halcyon.land",
-    "version": "0.4.21",
+    "version": "0.4.21-b",
     "type": "module",
     "private": true,
     "devDependencies": {
