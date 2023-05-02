@@ -89,23 +89,23 @@
 <main>
     <section>
         <div class="buttons">
-            <a class="primary" href="/journal">
+            <a class="primary with-icon" href="/journal">
                 <Notebook size="25" />
                 Journal
             </a>
-            <a class="icon-gradient-on-hover" href="/labels">
+            <a class="icon-gradient-on-hover with-icon" href="/labels">
                 <LabelOutline size="25" />
                 Labels
             </a>
-            <a class="icon-gradient-on-hover" href="/events">
+            <a class="icon-gradient-on-hover with-icon" href="/events">
                 <Calendar size="25" />
                 Events
             </a>
-            <a class="icon-gradient-on-hover" href="/assets">
+            <a class="icon-gradient-on-hover with-icon" href="/assets">
                 <ImageOutline size="25" />
                 Gallery
             </a>
-            <a class="icon-gradient-on-hover" href="/settings">
+            <a class="icon-gradient-on-hover with-icon" href="/settings">
                 <Cog size="25" />
                 Settings
             </a>
@@ -173,39 +173,9 @@
 
         a,
         button {
-            display: grid;
-            align-items: center;
-            justify-content: space-between;
-            // assumed one svg icon and then text
-            grid-template-columns: 35px 1fr;
-            font-size: 1.2rem;
-            padding: 0.6em 0.8em;
-            margin: 1em;
-            text-decoration: none;
-            transition: all @transition;
-
-            &:after {
-                display: none;
-            }
-
-            &:not(.primary) {
-                border-radius: @border-radius;
-                border: 1px solid @light-accent;
-
-                &:hover {
-                    background: @light-v-accent;
-                    color: @accent-secondary;
-                    text-decoration: none;
-                }
-            }
-
-            @media @mobile {
-                .bordered();
-
-                padding: 0.5em;
-                margin: 0.2em;
-                text-align: center;
-            }
+            padding: 0.5rem;
+            margin: 0.2rem 1rem;
+            font-size: 1.1rem;
         }
     }
 

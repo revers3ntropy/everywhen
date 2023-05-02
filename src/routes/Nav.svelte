@@ -4,7 +4,6 @@
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import Brain from 'svelte-material-icons/Brain.svelte';
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
-    import Close from 'svelte-material-icons/Close.svelte';
     import Cog from 'svelte-material-icons/Cog.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
     import DownloadLock from 'svelte-material-icons/DownloadLock.svelte';
@@ -14,7 +13,6 @@
     import Lightbulb from 'svelte-material-icons/Lightbulb.svelte';
     import Logout from 'svelte-material-icons/Logout.svelte';
     import MapMarkerOutline from 'svelte-material-icons/MapMarkerOutline.svelte';
-    import Menu from 'svelte-material-icons/Menu.svelte';
     import Moon from 'svelte-material-icons/MoonWaningCrescent.svelte';
     import Notebook from 'svelte-material-icons/Notebook.svelte';
     import Pencil from 'svelte-material-icons/Pencil.svelte';
@@ -28,25 +26,12 @@
     import { obfuscated } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/utils/notifications';
-    import { wheel } from '$lib/utils/toggleScrollable';
 
     const { addNotification } = getNotificationsContext();
 
     export let auth: Auth;
 
-    let showingNavPopup = false;
     let downloadingBackup = false;
-
-    function onClick() {
-        if (showingNavPopup) {
-            showingNavPopup = false;
-        }
-    }
-
-    function toggleNavPopup(event: Event) {
-        event.stopPropagation();
-        showingNavPopup = !showingNavPopup;
-    }
 
     async function downloadBackup() {
         if (downloadingBackup) return;
@@ -127,11 +112,6 @@
     });
 </script>
 
-<svelte:window
-    on:click={onClick}
-    use:wheel={{ scrollable: !showingNavPopup }}
-/>
-
 <svg class="accent-gradient-svg" height={0} width={0}>
     <linearGradient id="dream-gradient" x1={1} x2={1} y1={0} y2={1}>
         <stop offset={0} stop-color="rgb(252,233,255)" />
@@ -152,27 +132,17 @@
 </svg>
 
 <nav
-    class="{showingNavPopup ? 'showing-dropdown' : ''} {navigating
-        ? 'navigating'
-        : ''} {finishedNavigation ? 'finished-navigation' : ''}"
+    class="{navigating ? 'navigating' : ''} {finishedNavigation
+        ? 'finished-navigation'
+        : ''}"
 >
-    <div class="menu-button-mobile">
-        <button aria-label="Show nav menu" on:click={toggleNavPopup}>
-            {#if showingNavPopup}
-                <Close size="40" />
-            {:else}
-                <Menu size="40" />
-            {/if}
-        </button>
-    </div>
-    <div class="nav-buttons {showingNavPopup ? 'showing' : ''}">
+    <div class="nav-buttons">
         <a
             aria-label="home"
             class="icon {$page.url.pathname === '/home' ? 'current' : ''}"
             href="/home"
         >
             <Home size="35" />
-            <span class="name">Home</span>
         </a>
         <a
             aria-label="journal"
@@ -180,7 +150,6 @@
             href="/journal"
         >
             <Notebook size="35" />
-            <span class="name">Journal</span>
         </a>
         <a
             aria-label="timeline"
@@ -188,7 +157,6 @@
             href="/timeline"
         >
             <ChartTimeline size="35" />
-            <span class="name">Timeline</span>
         </a>
         <a
             aria-label="map"
@@ -196,7 +164,6 @@
             href="/map"
         >
             <MapMarkerOutline size="35" />
-            <span class="name">Map</span>
         </a>
         <a
             aria-label="statistics"
@@ -204,7 +171,6 @@
             href="/stats"
         >
             <Counter size="35" />
-            <span class="name">Insights</span>
         </a>
     </div>
 
@@ -329,7 +295,13 @@
         align-items: center;
         padding: 0;
         height: var(--nav-height);
-        z-index: 4;
+        // increased to 5 so that on mobile the nav buttons are not cut off
+        // by entry group titles
+        z-index: 5;
+
+        @media @mobile {
+            justify-content: end;
+        }
 
         div {
             display: flex;
@@ -373,16 +345,6 @@
         &.current {
             &:after {
                 background: @accent-secondary;
-            }
-        }
-
-        .name {
-            display: none;
-            @media @mobile {
-                display: flex;
-                align-items: center;
-                padding: 0 1rem;
-                width: 100%;
             }
         }
     }
@@ -437,50 +399,20 @@
         }
     }
 
-    .menu-button-mobile {
-        display: none;
-        @media @mobile {
-            .flex-center();
-        }
-    }
-
-    .hide-menu-mobile {
-        padding: 0;
-        display: none;
-        @media @mobile {
-            .flex-center();
-        }
-    }
-
     .nav-buttons {
         @media @mobile {
-            position: absolute;
-            height: fit-content;
-            top: var(--nav-height);
+            position: fixed;
+            bottom: 0;
             left: 0;
+            height: fit-content;
             width: 100%;
-            z-index: -1;
-            justify-content: flex-start;
+            z-index: 2000;
+            justify-content: space-evenly;
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             background: @header-bg;
-            transform: translate(0, -30rem);
-            transition: @transition;
-
-            &.showing {
-                transform: translate(0);
-                z-index: 4;
-            }
-
-            a,
-            button {
-                margin: 0;
-                display: grid;
-                grid-template-columns: 50px 1fr;
-                place-items: center;
-                width: 100%;
-                text-align: left;
-            }
+            padding: 0.8rem 0;
+            border-top: 1px solid @border;
         }
     }
 
