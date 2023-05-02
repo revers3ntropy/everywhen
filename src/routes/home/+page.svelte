@@ -133,7 +133,7 @@
                 </p>
             </section>
         {/if}
-        {#each Object.entries(entriesYearsAgoToday(titles)) as [yearsAgo, entries]}
+        {#each Object.entries(entriesYearsAgoToday(titles)) as [yearsAgo, entries] (yearsAgo)}
             <section>
                 <h1>
                     {yearsAgo === '1' ? `A Year` : `${yearsAgo} Years`} Ago Today

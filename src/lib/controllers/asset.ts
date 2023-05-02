@@ -1,4 +1,6 @@
+import type { TimestampSecs } from '$lib/utils/types';
 import type { ResultSetHeader } from 'mysql2';
+import webp from 'webp-converter';
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { Result } from '../utils/result';
@@ -29,7 +31,7 @@ export class Asset {
         auth: Auth,
         fileNamePlainText: string,
         contentsPlainText: string,
-        created?: number,
+        created?: TimestampSecs,
         publicId?: string
     ): Promise<Result<string>> {
         publicId ??= await UUID.generateUUId(query);
@@ -245,5 +247,22 @@ export class Asset {
 
     public static markDownLink(fileName: string, publicId: string): string {
         return `![${fileName}](/api/assets/${publicId})`;
+    }
+
+    public static async base64ToWebP(
+        b64: string,
+        fileExt: string,
+        quality: number
+    ) {
+        const imgB64 = b64.replace(
+            /^data:image\/((jpeg)|(jpg)|(png));base64,/,
+            ''
+        );
+
+        return await (webp as typeof WebpConverter).str2webpstr(
+            imgB64,
+            fileExt,
+            `-q ${quality}`
+        );
     }
 }

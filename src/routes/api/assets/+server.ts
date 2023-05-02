@@ -7,6 +7,8 @@ import { apiRes404, apiResponse } from '$lib/utils/apiResponse';
 import { invalidateCache } from '$lib/utils/cache';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody';
 
+const IMG_QUALITY = 100;
+
 export const POST = (async ({ request, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
     invalidateCache(auth.id);
@@ -16,15 +18,20 @@ export const POST = (async ({ request, cookies }) => {
         fileName: 'string'
     });
 
-    const { err, val } = await Asset.create(
+    const fileExt = body.fileName.split('.').pop();
+    if (!fileExt) throw error(400, 'No file extension provided');
+
+    const img = await Asset.base64ToWebP(body.content, fileExt, IMG_QUALITY);
+
+    const { err, val: id } = await Asset.create(
         query,
         auth,
         body.fileName,
-        body.content
+        img
     );
     if (err) throw error(400, err);
 
-    return apiResponse({ id: val });
+    return apiResponse({ id });
 }) satisfies RequestHandler;
 
 export const GET = apiRes404;
