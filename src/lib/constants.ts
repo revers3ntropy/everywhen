@@ -51,3 +51,5 @@ export const API_DOCS_LINK =
     'https://docs.google.com/spreadsheets/d/1eLjbfXnzAXRz08qJPRGnM_IsezMKcuT6anuy_qwP-Uo/edit?usp=sharing';
 
 export const DEBUG_RENDER_COLLIDERS = false;
+
+export const ENABLE_CACHING = true;

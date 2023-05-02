@@ -1,4 +1,5 @@
 import type { MaybePromise } from '$app/forms';
+import { ENABLE_CACHING } from '$lib/constants';
 import type { RequestEvent, ServerLoadEvent } from '@sveltejs/kit';
 import chalk from 'chalk';
 import type { Auth } from '../controllers/user';
@@ -42,19 +43,7 @@ function roughSizeOfObject(object: unknown): number {
     return bytes;
 }
 
-export function cacheResponse<T>(
-    url: string,
-    userId: string,
-    response: T
-): void {
-    cacheLastUsed[userId] = nowUtc(false);
-    if (!(userId in cache)) {
-        cache[userId] = {};
-    }
-    (cache[userId] as Record<string, T>)[url] = response;
-}
-
-function logReq(hit: boolean, url: URL) {
+function logCacheReq(hit: boolean, url: URL) {
     const path = url.pathname.split('/');
     path.shift();
     let pathStr = `/${path.shift() || ''}`;
@@ -71,27 +60,47 @@ function logReq(hit: boolean, url: URL) {
     );
 }
 
+export function cacheResponse<T>(
+    url: string,
+    userId: string,
+    response: T
+): void {
+    if (!ENABLE_CACHING) return;
+
+    cacheLastUsed[userId] = nowUtc(false);
+    if (!(userId in cache)) {
+        cache[userId] = {};
+    }
+    (cache[userId] as Record<string, T>)[url] = response;
+}
+
 export function getCachedResponse<T>(
     url: string,
     userId: string
 ): T | undefined {
+    if (!ENABLE_CACHING) return;
+
     cacheLastUsed[userId] = nowUtc();
     const userCache = cache[userId] || {};
     if (url in userCache) {
-        logReq(true, new URL(url));
+        logCacheReq(true, new URL(url));
         return userCache[url] as T;
     } else {
-        logReq(false, new URL(url));
+        logCacheReq(false, new URL(url));
         return undefined;
     }
 }
 
 export function invalidateCache(userId: string): void {
+    if (!ENABLE_CACHING) return;
+
     delete cache[userId];
     delete cacheLastUsed[userId];
 }
 
 export function cleanupCache(): number {
+    if (!ENABLE_CACHING) return 0;
+
     const now = nowUtc();
     const cacheSize = roughSizeOfObject(cache);
     const timeout = cacheTimeout(cacheSize);
@@ -146,6 +155,7 @@ export function cachedApiRoute<
         if (cached) {
             return cached as GenericResponse<Res>;
         }
+
         const response = await handler(auth, props);
         if (typeof response !== 'object') {
             throw new Error('Body must be an object');
@@ -154,9 +164,11 @@ export function cachedApiRoute<
             throw new Error('Body must not be an array');
         }
         const responseString = JSON.stringify(response);
+
         const responseObj = new Response(responseString, {
             status: 200
         }) as GenericResponse<Res>;
+
         cacheResponse(url, auth.id, responseObj.clone());
         return responseObj;
     }) satisfies (
@@ -185,6 +197,7 @@ export function cachedPageRoute<
         const url = props.url.href;
         const auth = await getAuthFromCookies(props.cookies);
         const cached = getCachedResponse(url, auth.id);
+
         if (cached) {
             return cached as OutputData & App.PageData;
         }
@@ -192,7 +205,9 @@ export function cachedPageRoute<
         const response = JSON.parse(
             JSON.stringify(await handler(auth, props))
         ) as OutputData;
+
         cacheResponse(url, auth.id, response);
+
         return response as OutputData & App.PageData;
     }) satisfies (
         event: ServerLoadEvent<Params, ParentData, RouteId>
