@@ -2,9 +2,9 @@
     import { goto } from '$app/navigation';
     import { popup } from '$lib/stores';
     import { getNotificationsContext } from 'svelte-notifications';
-    import type { Auth } from '../../controllers/user';
-    import { api } from '../../utils/apiRequest';
-    import { displayNotifOnErr } from '../../utils/notifications';
+    import type { Auth } from '$lib/controllers/user';
+    import { api } from '$lib/utils/apiRequest';
+    import { displayNotifOnErr } from '$lib/utils/notifications';
 
     const { addNotification } = getNotificationsContext();
 
@@ -16,6 +16,8 @@
 
     let passwordsDoNotMatch = false;
 
+    let submitted = false;
+
     async function change() {
         if (newPassword !== confirmNewPassword) {
             passwordsDoNotMatch = true;
@@ -23,13 +25,15 @@
         }
         passwordsDoNotMatch = false;
 
-        console.log('req');
+        submitted = true;
         displayNotifOnErr(
             addNotification,
             await api.put(auth, '/auth', {
                 currentPassword,
                 newPassword
-            })
+            }),
+            {},
+            () => (submitted = false)
         );
 
         await goto('/logout');
@@ -51,6 +55,7 @@
                 type="password"
                 autocomplete="current-password"
                 bind:value={currentPassword}
+                disabled={submitted}
             />
         </label>
         <label>
@@ -59,6 +64,7 @@
                 type="password"
                 autocomplete="new-password"
                 bind:value={newPassword}
+                disabled={submitted}
             />
         </label>
         <label>
@@ -67,6 +73,7 @@
                 type="password"
                 autocomplete="new-password"
                 bind:value={confirmNewPassword}
+                disabled={submitted}
             />
             {#if passwordsDoNotMatch}
                 <span class="text-warning">Passwords do not match</span>
@@ -76,12 +83,18 @@
             <button
                 class="primary"
                 aria-label="change password submit"
-                on:click={change}>Change Password</button
+                disabled={submitted}
+                on:click={change}
             >
+                Change Password
+            </button>
             <button
                 on:click={() => ($popup = null)}
-                aria-label="cancel change password">Cancel</button
+                aria-label="cancel change password"
+                disabled={submitted}
             >
+                Cancel
+            </button>
         </div>
     </div>
 </div>
