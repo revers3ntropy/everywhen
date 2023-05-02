@@ -59,7 +59,13 @@
             @media @mobile {
                 grid-template-columns: 1fr;
                 grid-template-rows: 1fr 1fr 1fr;
+                gap: 1rem;
+                margin: 0 0 1rem 0;
             }
+        }
+
+        @media @mobile {
+            margin-bottom: 10rem;
         }
     }
 

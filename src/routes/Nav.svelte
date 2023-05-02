@@ -131,11 +131,15 @@
     </linearGradient>
 </svg>
 
-<nav
-    class="{navigating ? 'navigating' : ''} {finishedNavigation
-        ? 'finished-navigation'
-        : ''}"
->
+<span class="nav-loader-wrapper">
+    <span
+        class="nav-loader {navigating ? 'navigating' : ''} {finishedNavigation
+            ? 'finished-navigation'
+            : ''}"
+    />
+</span>
+
+<nav>
     <div class="nav-buttons">
         <a
             aria-label="home"
@@ -303,19 +307,22 @@
             justify-content: end;
         }
 
-        div {
-            display: flex;
-            align-items: center;
-            height: 100%;
-        }
-
         &.showing-dropdown {
             box-shadow: 0 0 4px 4px black;
             background: @header-bg;
         }
 
-        &::after {
-            content: '';
+        & > div {
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+    }
+
+    .nav-loader-wrapper {
+        width: 100%;
+
+        .nav-loader {
             width: 0;
             height: 3px;
             position: fixed;
@@ -323,16 +330,12 @@
             background: @accent-secondary;
             transition: width 12s cubic-bezier(0, 1, 0.5, 0.5);
             z-index: 10000;
-        }
 
-        &.navigating {
-            &::after {
+            &.navigating {
                 width: 100%;
             }
-        }
 
-        &.finished-navigation {
-            &::after {
+            &.finished-navigation {
                 display: none;
             }
         }
@@ -380,6 +383,10 @@
             display: grid;
             grid-template-columns: 3.2rem 1fr;
             place-items: center;
+
+            @media @mobile {
+                padding-right: 0.4rem;
+            }
 
             .streaks {
                 display: flex;
