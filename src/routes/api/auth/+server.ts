@@ -1,3 +1,6 @@
+import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
+import { invalidateCache } from '$lib/utils/cache';
+import { getUnwrappedReqBody } from '$lib/utils/requestBody';
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
 import {
@@ -37,6 +40,28 @@ export const GET = (async ({ url, cookies }) => {
     });
 }) satisfies RequestHandler;
 
+export const PUT = (async ({ request, cookies }) => {
+    const auth = await getAuthFromCookies(cookies);
+    invalidateCache(auth.id);
+
+    const { newPassword, currentPassword } = await getUnwrappedReqBody(
+        request,
+        {
+            currentPassword: 'string',
+            newPassword: 'string'
+        }
+    );
+
+    const { err } = await User.changePassword(
+        query,
+        auth,
+        currentPassword,
+        newPassword
+    );
+    if (err) throw error(400, err);
+
+    return apiResponse({});
+}) satisfies RequestHandler;
+
 export const POST = apiRes404;
 export const DELETE = apiRes404;
-export const PUT = apiRes404;

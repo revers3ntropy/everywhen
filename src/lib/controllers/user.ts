@@ -1,8 +1,10 @@
 import type { QueryFunc } from '../db/mysql';
+import { encryptionKeyFromPassword } from '../security/authUtils.server';
 import { Result } from '../utils/result';
 import { cryptoRandomStr } from '../utils/text';
 import { nowUtc } from '../utils/time';
 import { Asset } from './asset';
+import { Backup } from './backup';
 import { Entry } from './entry';
 import { Event } from './event';
 import { Label } from './label';
@@ -118,6 +120,63 @@ export class User {
         } while (existingSalts.length !== 0);
 
         return salt;
+    }
+
+    public static async changePassword(
+        query: QueryFunc,
+        auth: Auth,
+        oldPassword: string,
+        newPassword: string
+    ): Promise<Result> {
+        if (!oldPassword) return Result.err('Invalid password');
+
+        if (newPassword.length < 5) {
+            return Result.err('New password is too short');
+        }
+
+        const oldKey = encryptionKeyFromPassword(oldPassword);
+
+        if (oldKey !== auth.key) {
+            return Result.err('Current password is invalid');
+        }
+
+        if (oldPassword === newPassword) {
+            return Result.err('New password is same as current password');
+        }
+
+        const newKey = encryptionKeyFromPassword(newPassword);
+
+        const newAuth = {
+            ...auth,
+            key: newKey
+        };
+
+        const { val: backup, err: generateErr } = await Backup.generate(
+            query,
+            auth
+        );
+        if (generateErr) return Result.err(generateErr);
+
+        const { err: encryptErr, val: encryptedBackup } =
+            Backup.asEncryptedString(backup, auth);
+
+        if (encryptErr) return Result.err(encryptErr);
+
+        await query`
+            UPDATE users
+            SET password = SHA2(CONCAT(${newKey}, salt), 256)
+            WHERE id = ${auth.id}
+        `;
+
+        const { err } = await Backup.restore(
+            query,
+            newAuth,
+            encryptedBackup,
+            auth.key
+        );
+        if (err) return Result.err(err);
+
+        return await Settings.changeKey(query, auth, newKey);
     }
 }
 

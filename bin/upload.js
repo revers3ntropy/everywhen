@@ -90,7 +90,9 @@ async function upload() {
 
     console.log(`Uploading to ${process.env.REMOTE_ADDRESS} (${flags.env})`);
 
-    await runRemoteCommand(`cd ${process.env.DIR} && npm run stop`);
+    await runRemoteCommand(`cd ${process.env.DIR} && npm run stop`).catch(
+        console.error
+    );
     await runRemoteCommand(`rm -r ${process.env.DIR}`);
 
     // Required by 'webp-converter' package TODO: Remove this requirement

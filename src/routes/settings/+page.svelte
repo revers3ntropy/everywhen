@@ -1,10 +1,13 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
+    import ChangePasswordDialog from '$lib/components/dialogs/ChangePasswordDialog.svelte';
+    import { showPopup } from '$lib/utils/popups';
     import { onMount } from 'svelte';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import Cog from 'svelte-material-icons/Cog.svelte';
     import Logout from 'svelte-material-icons/Logout.svelte';
     import Skull from 'svelte-material-icons/Skull.svelte';
+    import LockOutline from 'svelte-material-icons/LockOutline.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import BackupOptions from '$lib/components/BackupOptions.svelte';
     import { Backup } from '$lib/controllers/backup';
@@ -35,6 +38,10 @@
         void goto('/');
     }
 
+    function changePassword() {
+        showPopup(ChangePasswordDialog, { auth: data });
+    }
+
     onMount(() => (document.title = 'Settings'));
 </script>
 
@@ -52,6 +59,12 @@
 
         <div class="buttons">
             <BackupOptions auth={data} />
+        </div>
+        <div class="buttons">
+            <button aria-label="Change password" on:click={changePassword}>
+                <LockOutline size="30" />
+                Change Password
+            </button>
             <a
                 aria-label="Log Out"
                 class="danger"
@@ -115,20 +128,25 @@
         margin-top: 3rem;
 
         .buttons {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+
+            @media @mobile {
+                grid-template-columns: 1fr;
+            }
 
             // global for the backup buttons,
             // which are in a child component but should have consistent style
             // with the other buttons
             a,
             :global(button) {
-                .bordered();
                 border-radius: @border-radius;
                 padding: 0.8rem;
                 margin: 0.5rem;
                 display: grid;
-                place-items: center;
+                align-items: center;
+                justify-content: start;
+                text-align: left;
                 grid-template-columns: 35px 1fr;
                 color: @accent-primary;
 

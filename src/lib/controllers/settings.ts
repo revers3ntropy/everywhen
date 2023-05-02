@@ -42,7 +42,7 @@ export class Settings<T = unknown> {
             defaultValue: false,
             name: 'Show Device',
             description:
-                'Shows the operating system of the device the entry was submitted on by entries.'
+                'Shows the operating system of the device the entry was submitted on.'
         } satisfies ISettingsConfig<boolean>,
         autoHideEntriesDelay: {
             type: 'number',
@@ -215,6 +215,32 @@ export class Settings<T = unknown> {
             FROM settings
             WHERE user = ${auth.id}
         `;
+        return Result.ok(null);
+    }
+
+    public static async changeKey(
+        query: QueryFunc,
+        auth: Auth,
+        newKey: string
+    ): Promise<Result> {
+        const { val: unencryptedSettings, err } = await Settings.all(
+            query,
+            auth
+        );
+        if (err) return Result.err(err);
+        for (const setting of unencryptedSettings) {
+            const { err, val: newValue } = encrypt(
+                JSON.stringify(setting.value),
+                newKey
+            );
+            if (err) return Result.err(err);
+
+            await query`
+                UPDATE settings
+                SET value = ${newValue}
+                WHERE id = ${setting.id}
+            `;
+        }
         return Result.ok(null);
     }
 }

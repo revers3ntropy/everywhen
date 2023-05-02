@@ -213,12 +213,10 @@
                 in:blur={{
                     // half as total = in + out
                     duration: ANIMATION_DURATION * 0.5,
-                    delay: ANIMATION_DURATION * 0.5,
-                    opacity: 0
+                    delay: ANIMATION_DURATION * 0.5
                 }}
                 out:blur={{
-                    duration: ANIMATION_DURATION * 0.5,
-                    opacity: 0
+                    duration: ANIMATION_DURATION * 0.5
                 }}
             >
                 <slot />

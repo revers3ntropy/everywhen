@@ -100,6 +100,7 @@ interface ApiResponse {
         '/locations/?': PUT<
             typeof import('../../routes/api/locations/[locationId]/+server')
         >;
+        '/auth': PUT<typeof import('../../routes/api/auth/+server')>;
     };
 }
 

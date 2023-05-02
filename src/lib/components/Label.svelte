@@ -27,7 +27,7 @@
         display: inline-grid;
         align-items: center;
         grid-template-columns: 20px 1fr;
-        background: @border;
+        background: @light-v-accent;
 
         &:hover {
             background: @accent-secondary;
@@ -48,9 +48,10 @@
         }
 
         .colour {
+            margin: 1px;
             height: 20px;
             width: 20px;
-            border-radius: @border-radius 50% 50% @border-radius;
+            border-radius: 50%;
         }
     }
 </style>

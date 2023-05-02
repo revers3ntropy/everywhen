@@ -39,8 +39,7 @@
     import { errorLogger } from '$lib/utils/log';
     import {
         displayNotifOnErr,
-        ERR_NOTIFICATION,
-        SUCCESS_NOTIFICATION
+        ERR_NOTIFICATION
     } from '$lib/utils/notifications';
     import { obfuscate } from '$lib/utils/text';
     import { nowUtc } from '$lib/utils/time';
