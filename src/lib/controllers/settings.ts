@@ -46,7 +46,7 @@ export class Settings<T = unknown> {
         } satisfies ISettingsConfig<boolean>,
         autoHideEntriesDelay: {
             type: 'number',
-            defaultValue: 60 * 2,
+            defaultValue: 0,
             name: 'Auto Blur Entries After',
             description:
                 `Blur entries after 'N' seconds without user interaction. ` +

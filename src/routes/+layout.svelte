@@ -66,7 +66,7 @@
         if (nowUtc() - lastActivity >= hideAfter) {
             addNotification({
                 ...INFO_NOTIFICATION,
-                removeAfter: 0,
+                removeAfter: 5000,
                 text: 'Hidden due to inactivity'
             });
             $obfuscated = true;
