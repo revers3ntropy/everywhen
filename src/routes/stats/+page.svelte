@@ -101,7 +101,8 @@
             {/if}
         </section>
 
-        <section class="container">
+        <section
+            ><h2>Common Words</h2>
             <CommonWordsList
                 entryCount={data.entryCount}
                 words={data.commonWords}
