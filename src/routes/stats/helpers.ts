@@ -1,3 +1,4 @@
+import { fmtUtc } from '$lib/utils/time';
 import moment from 'moment';
 import type { Entry } from '$lib/controllers/entry';
 import { splitText } from '$lib/utils/text';
@@ -23,6 +24,8 @@ export enum By {
 }
 
 export enum Bucket {
+    // hour is a little different in that it only looks at the hour, ignores day
+    Hour,
     Day,
     Week,
     Month,
@@ -32,6 +35,8 @@ export enum Bucket {
 export function bucketiseTime(time: Seconds, bucket: Bucket): Seconds {
     const date = moment(new Date(time * 1000));
     switch (bucket) {
+        case Bucket.Hour:
+            return parseInt(fmtUtc(time, 0, 'hh'));
         case Bucket.Year:
             return date.startOf('year').unix();
         case Bucket.Month:
@@ -53,6 +58,8 @@ export function bucketSize(bucket: Bucket): Seconds {
             return 60 * 60 * 24 * 7;
         case Bucket.Day:
             return 60 * 60 * 24;
+        case Bucket.Hour:
+            return 60 * 60;
     }
 }
 

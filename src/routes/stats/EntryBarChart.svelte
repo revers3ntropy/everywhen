@@ -1,7 +1,7 @@
 <script lang="ts">
     import { browser } from '$app/environment';
     import 'chart.js/auto';
-    // https://www.npmjs.com/package/svelte-chartjs
+    import moment from 'moment';
     import { Bar } from 'svelte-chartjs';
     import ToggleSwitch from 'svelte-material-icons/ToggleSwitch.svelte';
     import ToggleSwitchOff from 'svelte-material-icons/ToggleSwitchOff.svelte';
@@ -36,7 +36,19 @@
         by = by === By.Entries ? By.Words : By.Entries;
     }
 
-    function generateLabels(start: Seconds, buckets: Seconds[]) {
+    function generateHourLabels(): string[] {
+        const today = moment().startOf('day').unix();
+        return Array(24)
+            .fill(0)
+            .map((_, i) => {
+                const hour = i % 24;
+                const day = Math.floor(i / 24);
+                const date = today + day * 24 * 60 * 60;
+                return fmtUtc(date + hour * 60 * 60, currentTzOffset(), 'ha');
+            });
+    }
+
+    function generateLabels(start: Seconds, buckets: Seconds[]): string[] {
         let year = parseInt(fmtUtc(start, currentTzOffset(), 'YYYY'));
         return buckets.map(k => {
             if (selectedBucket === Bucket.Year) {
@@ -60,12 +72,39 @@
         });
     }
 
+    function graphDataHours(
+        sortedEntries: EntryWithWordCount[],
+        selectedBucket: Bucket,
+        by: By
+    ): ChartData {
+        const buckets = Array<number>(24).fill(0);
+
+        for (const entry of sortedEntries) {
+            const bucket = fmtUtc(entry.created, entry.createdTZOffset, 'H');
+            buckets[bucket] += by === By.Entries ? 1 : entry.wordCount;
+        }
+
+        return {
+            labels: generateHourLabels(),
+            datasets: [
+                {
+                    data: Object.values(buckets),
+                    label: by === By.Entries ? 'Entries' : 'Words'
+                }
+            ]
+        };
+    }
+
     function getGraphData(
         entries: EntryWithWordCount[],
         selectedBucket: Bucket,
         by: By
     ): ChartData {
         const sortedEntries = entries.sort((a, b) => a.created - b.created);
+
+        if (selectedBucket === Bucket.Hour) {
+            return graphDataHours(sortedEntries, selectedBucket, by);
+        }
 
         const buckets: Record<string, number> = {};
         const start = sortedEntries[0].created;
@@ -80,19 +119,17 @@
                 by === By.Entries ? 1 : entry.wordCount;
         }
 
-        const labels = generateLabels(
-            start,
-            Object.keys(buckets).map(k => parseInt(k))
-        );
-
-        const dataset = {
-            data: Object.values(buckets),
-            label: by === By.Entries ? 'Entries' : 'Words'
-        };
-
         return {
-            labels,
-            datasets: [dataset]
+            labels: generateLabels(
+                start,
+                Object.keys(buckets).map(k => parseInt(k))
+            ),
+            datasets: [
+                {
+                    data: Object.values(buckets),
+                    label: by === By.Entries ? 'Entries' : 'Words'
+                }
+            ]
         };
     }
 
@@ -114,7 +151,8 @@
                 Year: Bucket.Year,
                 Month: Bucket.Month,
                 Week: Bucket.Week,
-                Day: Bucket.Day
+                Day: Bucket.Day,
+                Hour: Bucket.Hour
             }}
         />
     </div>
