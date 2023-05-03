@@ -2,6 +2,7 @@
     import { createEventDispatcher } from 'svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import LabelOffOutline from 'svelte-material-icons/LabelOffOutline.svelte';
+    import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import Dropdown from '$lib/components/Dropdown.svelte';
     import type { Label } from '../controllers/label';
@@ -14,6 +15,7 @@
     } from '../utils/notifications';
     import { showPopup } from '../utils/popups';
     import NewLabelDialog from './dialogs/NewLabelDialog.svelte';
+    import MenuDown from 'svelte-material-icons/MenuDown.svelte';
 
     const dispatch = createEventDispatcher();
 
@@ -50,22 +52,39 @@
             text: `Can't find label`
         });
     }
+
+    $: selectedLabel = (labels ?? []).find(l => l.id === value);
 </script>
 
 <div class="select-label">
-    <Dropdown bind:close={closeDropDown} rounded ariaLabel="Select label">
+    <Dropdown
+        bind:close={closeDropDown}
+        rounded
+        unstyledButton
+        ariaLabel="Select label"
+        fromRight
+    >
         <span slot="button" class="select-button">
-            <span
-                class="entry-label-colour"
-                style="background: {(labels ?? []).find(l => l.id === value)
-                    ?.colour || 'transparent'}"
-            />
             {#if labels}
-                <span class="label-name">
-                    {labels.find(l => l.id === value)?.name || '(No Label)'}
-                </span>
+                {#if selectedLabel}
+                    <span
+                        class="entry-label-colour"
+                        style="background: {(labels ?? []).find(
+                            l => l.id === value
+                        )?.colour || 'transparent'}"
+                    />
+                    <span class="label-name">
+                        {selectedLabel.name}
+                    </span>
+
+                    <MenuDown />
+                {:else}
+                    <LabelOutline size="20" />
+                    Add Label
+                {/if}
             {:else}
-                loading...
+                <span />
+                <i class="text-light">loading...</i>
             {/if}
         </span>
         <div class="list-container">
@@ -77,8 +96,10 @@
                 class="label-button"
                 aria-label="Remove label"
             >
-                <LabelOffOutline size="25" />
-                No Label
+                <span class="flex-center">
+                    <LabelOffOutline size="25" />
+                </span>
+                <span class="label-name"> No Label </span>
             </button>
             {#each (labels ?? []).filter(filter) as label (label.id)}
                 <button
@@ -89,10 +110,12 @@
                     class="label-button"
                     aria-label="Select label {label.name}"
                 >
-                    <span
-                        class="entry-label-colour"
-                        style="background: {label.colour}"
-                    />
+                    <span class="flex-center">
+                        <span
+                            class="entry-label-colour"
+                            style="background: {label.colour}"
+                        />
+                    </span>
                     <span class="label-name">
                         {#if value === label.id}
                             <b>{label.name}</b>
@@ -108,8 +131,10 @@
                     class="label-button"
                     aria-label="Create new label"
                 >
-                    <Plus size="25" />
-                    New Label
+                    <span class="flex-center">
+                        <Plus size="25" />
+                    </span>
+                    <span class="label-name"> New Label </span>
                 </button>
             {/if}
         </div>
@@ -119,11 +144,16 @@
 <style lang="less">
     @import '../../styles/variables';
 
+    .entry-label-colour {
+        border: 1px solid @border-light;
+        width: 20px;
+        height: 20px;
+    }
+
     .select-label {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        background: @light-accent;
         border-radius: @border-radius;
         border: none;
 
@@ -147,34 +177,35 @@
 
         .select-button {
             display: inline-grid;
-            grid-template-columns: 20px 3fr;
+            grid-template-columns: 25px 1fr 15px;
             align-items: center;
-            margin: 0 0 0 0.5rem;
             justify-items: left;
+            background: none;
+            padding: 0.4rem 0.4rem 0.4rem 0.1rem;
         }
     }
 
     .label-button {
         height: 2em;
-        width: 100%;
-        padding: 0 1em;
+        padding: 0 0.5em;
         margin: 0;
         text-align: center;
         display: inline-grid;
         grid-template-columns: 1fr 3fr;
         justify-content: center;
         align-items: center;
+        width: 100%;
+        border-radius: @border-radius;
 
         &:hover {
-            background: @bg;
-            border-radius: @border-radius;
-            border: 1px solid @border;
+            background: @light-v-accent;
         }
     }
 
     .list-container {
         max-height: 80vh;
         overflow-y: auto;
+        width: 200px;
     }
 
     .label-name {
@@ -182,5 +213,6 @@
         overflow: hidden;
         white-space: nowrap;
         max-width: 100%;
+        text-align: left;
     }
 </style>

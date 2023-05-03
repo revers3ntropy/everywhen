@@ -1,3 +1,4 @@
+import { decrypt } from '$lib/security/encryption';
 import { error } from '@sveltejs/kit';
 import { Entry } from '$lib/controllers/entry';
 import { Label } from '$lib/controllers/label';
@@ -11,19 +12,22 @@ import { nowUtc } from '$lib/utils/time';
 import type { RequestHandler } from './$types';
 
 export const GET = cachedApiRoute(async (auth, { url }) => {
-    const pageSize = parseInt(url.searchParams.get('pageSize') || '50');
-    const page = parseInt(url.searchParams.get('page') || '0');
+    const count = parseInt(url.searchParams.get('count') || '10');
+    const offset = parseInt(url.searchParams.get('offset') || '0');
     const deleted = GETParamIsTruthy(url.searchParams.get('deleted'));
-    const search = (url.searchParams.get('search') || '').toLowerCase();
+    const search = url.searchParams.get('search') || '';
     const labelId = url.searchParams.get('labelId') || undefined;
     const locationId = url.searchParams.get('locationId') || undefined;
-    if (page < 0) throw error(400, 'Invalid page number');
-    if (!pageSize || pageSize < 0) throw error(400, 'Invalid page size');
+    if (offset < 0) throw error(400, 'Invalid page number');
+    if (!count || count < 0) throw error(400, 'Invalid page size');
 
-    const { val, err } = await Entry.getPage(query, auth, page, pageSize, {
+    const { err: searchErr, val: searchDecrypted } = decrypt(search, auth.key);
+    if (searchErr) throw error(400, 'Invalid search query');
+
+    const { val, err } = await Entry.getPage(query, auth, offset, count, {
         deleted,
         labelId,
-        search,
+        search: searchDecrypted.toLowerCase(),
         locationId
     });
     if (err) throw error(400, err);
@@ -31,9 +35,9 @@ export const GET = cachedApiRoute(async (auth, { url }) => {
 
     return {
         entries,
-        page,
-        pageSize,
-        totalPages: Math.ceil(numEntries / pageSize),
+        page: offset,
+        pageSize: count,
+        totalPages: Math.ceil(numEntries / count),
         totalEntries: numEntries
     };
 }) satisfies RequestHandler;

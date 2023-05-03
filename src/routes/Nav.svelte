@@ -93,7 +93,11 @@
 
     async function makeEntry() {
         localStorage.removeItem(LS_KEY.newEntryLabel);
-        await goto('/journal');
+        if ($page.url.pathname === '/journal') {
+            location.reload();
+        } else {
+            await goto('/journal');
+        }
     }
 
     let navigating = false;

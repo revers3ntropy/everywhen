@@ -52,15 +52,24 @@ main:extend(#svelte) {
     border-radius: @border-radius;
 }
 
+.container-shadow {
+    box-shadow: 0 0 12px 2px rgba(0, 0, 0, 0.65);
+}
+
 .container {
-    .bordered();
+    .container-shadow();
 
     margin: 1em;
     padding: 0.3em 0;
     border-radius: @border-radius;
 
+    @media @mobile {
+        margin: 0.2em;
+        padding: 0.2rem;
+    }
+
     &.unbordered {
-        border: none;
+        box-shadow: none;
     }
 }
 

@@ -72,15 +72,19 @@
         });
     }
 
+    // Treat hours differently because it is showing the distribution of entries
+    // over the day, not the total number of entries in a given -
+    // entries at 3pm on different days go in the same bucket.
     function graphDataHours(
         sortedEntries: EntryWithWordCount[],
-        selectedBucket: Bucket,
         by: By
     ): ChartData {
         const buckets = Array<number>(24).fill(0);
 
         for (const entry of sortedEntries) {
-            const bucket = fmtUtc(entry.created, entry.createdTZOffset, 'H');
+            const bucket = parseInt(
+                fmtUtc(entry.created, entry.createdTZOffset, 'H')
+            );
             buckets[bucket] += by === By.Entries ? 1 : entry.wordCount;
         }
 
@@ -103,7 +107,7 @@
         const sortedEntries = entries.sort((a, b) => a.created - b.created);
 
         if (selectedBucket === Bucket.Hour) {
-            return graphDataHours(sortedEntries, selectedBucket, by);
+            return graphDataHours(sortedEntries, by);
         }
 
         const buckets: Record<string, number> = {};

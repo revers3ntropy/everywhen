@@ -181,8 +181,8 @@ export class Entry {
     public static async getPage(
         query: QueryFunc,
         auth: Auth,
-        page: number,
-        pageSize: number,
+        offset: number,
+        count: number,
         filters: EntryFilter = {}
     ): Promise<Result<[Entry[], number]>> {
         const { val: rawEntries, err: rawErr } = await Entry.allRaw(
@@ -203,8 +203,8 @@ export class Entry {
             );
         }
 
-        const start = page * pageSize;
-        const end = start + pageSize;
+        const start = offset;
+        const end = start + count;
 
         return Result.ok([entries.slice(start, end), entries.length]);
     }
@@ -274,30 +274,20 @@ export class Entry {
             created: TimestampSecs;
             createdTZOffset: Hours;
         } = Entry
-    >(entries: T[]): T[][] {
-        const grouped: T[][] = [];
-
+    >(entries: T[], grouped: Record<string, T[]> = {}): Record<string, T[]> {
         entries.forEach(entry => {
             const localDate = fmtUtc(
                 entry.created,
                 entry.createdTZOffset,
                 'YYYY-MM-DD'
             );
-            const dayTimeStamp =
-                new Date(localDate).setHours(
-                    // I think this works?? TODO: verify
-                    currentTzOffset(),
-                    0,
-                    0,
-                    0
-                ) / 1000;
-            grouped[dayTimeStamp] ??= [];
-            grouped[dayTimeStamp].push(entry);
+            grouped[localDate] ??= [];
+            grouped[localDate].push(entry);
         });
 
         // sort each day
         for (const day of Object.keys(grouped)) {
-            grouped[parseInt(day)].sort((a, b) => {
+            grouped[day].sort((a, b) => {
                 return b.created - a.created;
             });
         }

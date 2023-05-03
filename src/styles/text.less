@@ -53,13 +53,18 @@ p {
 }
 
 a {
-    color: @text-color-accent;
+    color: @accent-primary;
+
+    &:hover {
+        color: @accent-secondary;
+    }
+
     text-decoration: none;
     cursor: pointer;
 
     &:hover {
         text-decoration: underline;
-        text-underline-color: @text-color-accent;
+        text-underline-color: @accent-secondary;
     }
 
     &.icon {
@@ -71,7 +76,7 @@ a {
         }
 
         &:hover::after {
-            background: @text-color-accent;
+            background: @accent-secondary;
         }
     }
 }

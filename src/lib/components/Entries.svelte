@@ -1,18 +1,19 @@
 <script lang="ts">
     import { browser } from '$app/environment';
+    import { encrypt } from '$lib/security/encryption.js';
+    import type { Mutable } from '$lib/utils/types.js';
     import { onMount } from 'svelte';
+    import { inview } from 'svelte-inview';
     import Bin from 'svelte-material-icons/Delete.svelte';
     import TrayArrowUp from 'svelte-material-icons/TrayArrowUp.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import EntryGroup from '$lib/components/EntryGroup.svelte';
-    import PageCounter from '$lib/components/PageCounter.svelte';
     import { Entry, type EntryFilter } from '../controllers/entry';
     import type { Auth } from '../controllers/user';
     import { obfuscated } from '../stores';
     import { api } from '../utils/apiRequest';
     import { displayNotifOnErr } from '../utils/notifications';
     import { showPopup } from '../utils/popups';
-    import type { PickOptionalAndMutable } from '../utils/types';
     import Spinner from './BookSpinner.svelte';
     import ImportDialog from './dialogs/ImportDialog.svelte';
     import Sidebar from './EntriesSidebar.svelte';
@@ -31,20 +32,20 @@
     export let pageSize: number;
 
     interface IOptions extends EntryFilter {
-        pageSize?: number;
-        page?: number;
+        readonly count?: number;
+        readonly offset?: number;
     }
 
     export let options: IOptions = {};
 
-    let entries: Record<number, Entry[]> = {};
-    let entryTitles: Record<number, Entry[]> = {};
-    let entryCount = 0;
-    let page = 0;
-    let pages = 0;
-    let search = '';
+    const batchSize = 10;
 
-    let loading = true;
+    let search = null as null | string;
+    let entryTitles: Record<number, Entry[]> = {};
+    let entries: Record<string, Entry[]> = {};
+    let currentOffset = 0;
+    let loadingAt = null as number | null;
+    let numberOfEntries = Infinity;
 
     function importPopup() {
         showPopup(
@@ -57,39 +58,33 @@
         );
     }
 
-    export async function reloadEntries(force = false) {
-        if (loading && !force) return;
-        loading = true;
-
-        const entriesOptions: PickOptionalAndMutable<IOptions, 'search'> = {
-            page,
-            ...options,
-            pageSize
+    function getEntriesOptions(): IOptions {
+        const entriesOptions = {
+            ...(options as Mutable<IOptions>),
+            offset: currentOffset,
+            count: batchSize
         };
+
         if (search) {
-            entriesOptions.search = search;
+            entriesOptions.search = displayNotifOnErr(
+                addNotification,
+                encrypt(search, auth.key)
+            );
         }
+
         if (!entriesOptions.search) {
             delete entriesOptions.search;
         }
 
-        void api
-            .get(
-                auth,
-                `/entries`,
-                entriesOptions as Record<
-                    string,
-                    number | string | boolean | undefined
-                >
-            )
-            .then(res => displayNotifOnErr(addNotification, res))
-            .then(res => {
-                entries = Entry.groupEntriesByDay(res.entries);
-                pages = res.totalPages;
-                entryCount = res.totalEntries;
+        return Object.freeze(entriesOptions);
+    }
 
-                loading = false;
-            });
+    async function reloadEntries() {
+        currentOffset = 0;
+        loadingAt = null;
+        entries = {};
+
+        void loadMoreEntries(true);
 
         const res = displayNotifOnErr(
             addNotification,
@@ -98,12 +93,47 @@
         entryTitles = Entry.groupEntriesByDay(res.entries);
     }
 
+    async function loadMoreEntries(isInitialLoad = false) {
+        let offset = currentOffset;
+        if (loadingAt === offset && !isInitialLoad) {
+            return;
+        }
+        loadingAt = offset;
+
+        if (loadingAt >= numberOfEntries) {
+            return;
+        }
+
+        const entriesOptions = getEntriesOptions();
+
+        const res = displayNotifOnErr(
+            addNotification,
+            await api.get(
+                auth,
+                `/entries`,
+                entriesOptions as Record<
+                    string,
+                    number | string | boolean | undefined
+                >
+            )
+        );
+
+        numberOfEntries = res.totalEntries;
+
+        currentOffset += res.entries.length;
+        entries = Entry.groupEntriesByDay(res.entries, entries);
+
+        // if still loading at this offset,
+        // so another req has not been sent,
+        // say we have stopped loading
+        if (loadingAt === offset) {
+            loadingAt = null;
+        }
+    }
+
     export const reload = () => reloadEntries();
 
-    onMount(async () => {
-        await reloadEntries(true);
-    });
-    $: [page, search, browser ? reloadEntries() : 0];
+    $: if (search !== null && browser) void reloadEntries();
 </script>
 
 <div>
@@ -129,14 +159,8 @@
                     </button>
                 {/if}
             </div>
-            <div>
-                <PageCounter
-                    bind:page
-                    pageLength={pageSize}
-                    {pages}
-                    total={entryCount}
-                />
-            </div>
+
+            <div />
 
             <div>
                 {#if showSearch}
@@ -150,23 +174,26 @@
         </div>
     </div>
     <div class="entries">
-        {#if loading}
+        {#each Object.keys(entries).sort() as day}
+            <EntryGroup
+                entries={entries[day]}
+                on:updated={() => reloadEntries()}
+                obfuscated={$obfuscated}
+                {showLabels}
+                {showLocations}
+                {auth}
+                day={new Date(day).getTime() / 1000}
+                {hideAgentWidget}
+            />
+        {/each}
+        {#if loadingAt !== null && loadingAt + batchSize < numberOfEntries}
             <Spinner />
-        {:else}
-            {#each Object.keys(entries).sort((a, b) => parseInt(b) - parseInt(a)) as day}
-                <EntryGroup
-                    entries={entries[parseInt(day)]}
-                    on:updated={() => reloadEntries()}
-                    obfuscated={$obfuscated}
-                    {showLabels}
-                    {showLocations}
-                    {auth}
-                    day={parseInt(day)}
-                    {hideAgentWidget}
-                />
-            {/each}
         {/if}
     </div>
+    <div
+        use:inview={{ rootMargin: '100px' }}
+        on:inview_enter={() => loadMoreEntries()}
+    />
 </div>
 
 <style lang="less">

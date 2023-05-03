@@ -76,11 +76,12 @@
         left: 0;
         min-width: @width;
         height: 100%;
-        background-color: @header-bg;
+        background-color: @light-v-accent;
         z-index: 10;
         border-right: 2px solid @border-heavy;
         overflow-y: scroll;
         padding: 0;
+        box-shadow: 0 0 8px 4px rgba(0, 0, 0, 0.5);
 
         .header {
             padding: 0.5rem;

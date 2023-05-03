@@ -73,13 +73,13 @@
 
         let i = 0;
         groupedTitles = Object.keys(byDay)
-            .sort((a, b) => parseInt(b) - parseInt(a))
+            .sort()
             .reduce((acc, key) => {
                 if (i >= NUMBER_OF_ENTRY_TITLES) return acc;
-                i += byDay[parseInt(key)].length;
+                i += byDay[key].length;
                 return {
                     ...acc,
-                    [key]: byDay[parseInt(key)]
+                    [key]: byDay[key]
                 } as Record<string, Entry[]>;
             }, {} as Record<string, Entry[]>);
         titlesLoaded = true;

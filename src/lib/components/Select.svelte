@@ -12,7 +12,7 @@
 
     $: if (!(key in options)) key = Object.keys(options)[0];
 
-    export let close: () => void = () => void 0;
+    export let close: () => void;
 </script>
 
 <Dropdown bind:close bind:open unstyledButton>

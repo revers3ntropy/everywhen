@@ -387,18 +387,134 @@
     on:filedrop={onFileDrop}
     use:filedrop={fileOptions}
 >
-    <div class="head">
-        <div class="left-options">
-            <button
-                aria-label={obfuscated ? 'Show entry form' : 'Hide entry form'}
-                on:click={() => (obfuscated = !obfuscated)}
-            >
-                {#if obfuscated}
-                    <Eye size="25" />
-                {:else}
-                    <EyeOff size="25" />
-                {/if}
-            </button>
+    <div>
+        <div class="head">
+            <div class="left-options">
+                <button
+                    aria-label={obfuscated
+                        ? 'Show entry form'
+                        : 'Hide entry form'}
+                    on:click={() => (obfuscated = !obfuscated)}
+                    class="hide-mobile"
+                >
+                    {#if obfuscated}
+                        <Eye size="25" />
+                    {:else}
+                        <EyeOff size="25" />
+                    {/if}
+                </button>
+            </div>
+            <div class="right-options {obfuscated ? 'blur' : ''}">
+                <Dropdown unstyledButton openOnHover>
+                    <span slot="button">
+                        <span class="icon-button">
+                            <FormatText size="25" />
+                        </span>
+                    </span>
+
+                    <div class="format-options">
+                        <button
+                            class="with-icon icon-small"
+                            on:click={makeWrapper('**', '**', false)}
+                        >
+                            <FormatBold /> Bold
+                        </button>
+                        <button
+                            class="with-icon icon-small"
+                            on:click={makeWrapper('*', '*', false)}
+                        >
+                            <FormatItalic /> Italic
+                        </button>
+                        <button
+                            class="with-icon icon-small"
+                            on:click={makeWrapper('~~', '~~', false)}
+                        >
+                            <FormatStrikethrough /> Strikethrough
+                        </button>
+                        <button
+                            class="with-icon icon-small"
+                            on:click={makeWrapper('# ', '', false)}
+                        >
+                            <FormatHeader1 /> Header
+                        </button>
+                        <button
+                            class="with-icon icon-small"
+                            on:click={makeWrapper('`', '`')}
+                        >
+                            <CodeTags /> Code
+                        </button>
+                        <button
+                            class="with-icon icon-small"
+                            on:click={makeWrapper('```', '```')}
+                        >
+                            <CodeBrackets /> Code Block
+                        </button>
+                        <button
+                            class="with-icon icon-small"
+                            on:click={makeWrapper('\n > ', '', false)}
+                        >
+                            <FormatQuoteClose /> Quote
+                        </button>
+                        <button
+                            class="with-icon icon-small"
+                            on:click={makeWrapper('\n - ', '', false)}
+                        >
+                            <FormatListBulleted /> Bullet List
+                        </button>
+                        <button
+                            class="with-icon icon-small"
+                            on:click={makeWrapper('\n 1. ', '', false)}
+                        >
+                            <FormatListNumbered /> Numbered List
+                        </button>
+                        <button
+                            class="with-icon icon-small"
+                            on:click={makeWrapper('[', '](url)')}
+                        >
+                            <Link /> Link
+                        </button>
+                        <button
+                            class="with-icon icon-small"
+                            on:click={makeWrapper('![', '](url)')}
+                        >
+                            <ImageArea /> Image
+                        </button>
+                        <button
+                            class="with-icon icon-small"
+                            on:click={makeWrapper('\n---\n', '', false)}
+                        >
+                            <HorizontalRule /> Break
+                        </button>
+                    </div>
+                </Dropdown>
+                <button
+                    aria-label="Insert Image"
+                    disabled={submitted}
+                    on:click={triggerFileDrop}
+                    use:tooltip={{
+                        content: 'Insert Image',
+                        position: 'bottom'
+                    }}
+                >
+                    <ImageArea size="30" />
+                </button>
+
+                <LocationToggle />
+
+                <LabelSelect {auth} bind:value={newEntryLabel} {labels} />
+
+                <button
+                    aria-label="Submit Entry"
+                    class="primary with-icon send"
+                    disabled={submitted}
+                    on:click={submit}
+                >
+                    <Send size="28" />
+                    Submit
+                </button>
+            </div>
+        </div>
+        <div class="entry-title-container">
             {#if obfuscated}
                 <input
                     aria-label="Entry Title"
@@ -417,142 +533,33 @@
                 />
             {/if}
         </div>
-        <div class="right-options {obfuscated ? 'blur' : ''}">
-            <Dropdown unstyledButton openOnHover>
-                <span slot="button">
-                    <span class="icon-button">
-                        <FormatText size="25" />
-                    </span>
-                </span>
+        <div class="entry-container">
+            {#if obfuscated}
+                <textarea placeholder="..." disabled class="obfuscated"
+                    >{obfuscate(newEntryBody)}</textarea
+                >
+            {:else}
+                <textarea
+                    bind:this={newEntryInputElement}
+                    bind:value={newEntryBody}
+                    on:keydown={handleEntryInputKeydown}
+                    placeholder="Entry"
+                    disabled={submitted}
+                />
+            {/if}
+        </div>
 
-                <div class="format-options">
-                    <button
-                        class="with-icon icon-small"
-                        on:click={makeWrapper('**', '**', false)}
-                    >
-                        <FormatBold /> Bold
-                    </button>
-                    <button
-                        class="with-icon icon-small"
-                        on:click={makeWrapper('*', '*', false)}
-                    >
-                        <FormatItalic /> Italic
-                    </button>
-                    <button
-                        class="with-icon icon-small"
-                        on:click={makeWrapper('~~', '~~', false)}
-                    >
-                        <FormatStrikethrough /> Strikethrough
-                    </button>
-                    <button
-                        class="with-icon icon-small"
-                        on:click={makeWrapper('# ', '', false)}
-                    >
-                        <FormatHeader1 /> Header
-                    </button>
-                    <button
-                        class="with-icon icon-small"
-                        on:click={makeWrapper('`', '`')}
-                    >
-                        <CodeTags /> Code
-                    </button>
-                    <button
-                        class="with-icon icon-small"
-                        on:click={makeWrapper('```', '```')}
-                    >
-                        <CodeBrackets /> Code Block
-                    </button>
-                    <button
-                        class="with-icon icon-small"
-                        on:click={makeWrapper('\n > ', '', false)}
-                    >
-                        <FormatQuoteClose /> Quote
-                    </button>
-                    <button
-                        class="with-icon icon-small"
-                        on:click={makeWrapper('\n - ', '', false)}
-                    >
-                        <FormatListBulleted /> Bullet List
-                    </button>
-                    <button
-                        class="with-icon icon-small"
-                        on:click={makeWrapper('\n 1. ', '', false)}
-                    >
-                        <FormatListNumbered /> Numbered List
-                    </button>
-                    <button
-                        class="with-icon icon-small"
-                        on:click={makeWrapper('[', '](url)')}
-                    >
-                        <Link /> Link
-                    </button>
-                    <button
-                        class="with-icon icon-small"
-                        on:click={makeWrapper('![', '](url)')}
-                    >
-                        <ImageArea /> Image
-                    </button>
-                    <button
-                        class="with-icon icon-small"
-                        on:click={makeWrapper('\n---\n', '', false)}
-                    >
-                        <HorizontalRule /> Break
-                    </button>
-                </div>
-            </Dropdown>
-            <button
-                aria-label="Insert Image"
-                disabled={submitted}
-                on:click={triggerFileDrop}
-                use:tooltip={{
-                    content: 'Insert Image',
-                    position: 'bottom'
-                }}
-            >
-                <ImageArea size="30" />
-            </button>
-
-            <LocationToggle />
-
-            <LabelSelect {auth} bind:value={newEntryLabel} {labels} />
-
+        <div class="send-mobile flex-center">
             <button
                 aria-label="Submit Entry"
-                class="primary with-icon send"
+                class="primary with-icon"
                 disabled={submitted}
                 on:click={submit}
             >
-                <Send size="28" />
-                Submit
+                <Send size="30" />
+                Submit Entry
             </button>
         </div>
-    </div>
-    <div class="entry-container">
-        {#if obfuscated}
-            <textarea placeholder="..." disabled class="obfuscated"
-                >{obfuscate(newEntryBody)}</textarea
-            >
-        {:else}
-            <textarea
-                bind:this={newEntryInputElement}
-                bind:value={newEntryBody}
-                on:keydown={handleEntryInputKeydown}
-                placeholder="Entry"
-                disabled={submitted}
-            />
-        {/if}
-    </div>
-
-    <div class="send-mobile flex-center">
-        <button
-            aria-label="Submit Entry"
-            class="primary with-icon"
-            disabled={submitted}
-            on:click={submit}
-        >
-            <Send size="30" />
-            Submit Entry
-        </button>
     </div>
 </div>
 
@@ -563,6 +570,13 @@
 
     .container {
         margin: 0;
+        .flex-center();
+
+        & > div {
+            width: min(100%, 700px);
+            max-width: 100%;
+            min-width: 200px;
+        }
 
         @media @mobile {
             border: none;
@@ -572,7 +586,6 @@
     .head {
         margin: 0;
         padding: 0 0.4em;
-        border-bottom: 1px solid @border-light;
         display: grid;
         grid-template-columns: 1fr 28rem;
 
@@ -634,17 +647,49 @@
         }
     }
 
+    .entry-title-container {
+        .flex-center();
+        padding: 0;
+
+        @media @mobile {
+            padding: 0;
+        }
+
+        input {
+            padding: 0.5rem 1rem;
+            margin: 0;
+            outline: none;
+            border: none;
+            font-size: 20px;
+            background: @light-v-accent;
+            border-radius: @border-radius @border-radius 0 0;
+            border-bottom: 2px solid @bg;
+            width: calc(100% - 1rem);
+
+            @media @mobile {
+                background: transparent;
+            }
+        }
+    }
+
     .entry-container {
         .flex-center();
-        padding: 1rem;
+        padding: 0 0 1rem 0;
+
+        @media @mobile {
+            padding: 0;
+        }
 
         textarea {
-            width: min(100%, 700px);
-            max-width: 100%;
-            min-width: 200px;
             resize: both;
             padding: 1rem;
             margin: 0;
+            width: calc(100% - 1rem);
+            outline: none;
+            border: none;
+            font-size: 20px;
+            background: @light-v-accent;
+            border-radius: 0 0 @border-radius @border-radius;
 
             // fills page
             height: calc(100vh - 12rem);
@@ -659,17 +704,8 @@
                 overflow-y: scroll;
                 margin: 0;
                 background: none;
+                padding: 0.8rem 0.5rem;
             }
-
-            outline: none;
-            border: none;
-            font-size: 20px;
-            background: @light-v-accent;
-            border-radius: 8px;
-        }
-
-        @media @mobile {
-            padding: 0;
         }
     }
 

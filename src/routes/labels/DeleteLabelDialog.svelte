@@ -3,8 +3,6 @@
     import { getNotificationsContext } from 'svelte-notifications';
     import BookSpinner from '$lib/components/BookSpinner.svelte';
     import LabelSelect from '$lib/components/LabelSelect.svelte';
-    import type { Entry } from '$lib/controllers/entry';
-    import type { Event } from '$lib/controllers/event';
     import type { Label } from '$lib/controllers/label';
     import type { Auth } from '$lib/controllers/user';
     import { popup } from '$lib/stores';
@@ -19,8 +17,8 @@
     export let name: string;
     export let reloadOnDelete = true;
 
-    let entries: Entry[] = [];
-    let events: Event[] = [];
+    let entryCount = 0;
+    let eventCount = 0;
     let labels: Label[] | null = null;
 
     let loaded = false;
@@ -28,16 +26,18 @@
 
     async function reloadEntries() {
         loaded = false;
+
         const entriesRes = displayNotifOnErr(
             addNotification,
             await api.get(auth, `/entries`, { labelId: id })
         );
-        entries = entriesRes.entries;
+        entryCount = entriesRes.totalEntries;
+
         const eventsRes = displayNotifOnErr(
             addNotification,
             await api.get(auth, `/events`, { labelId: id })
         );
-        events = eventsRes.events.filter(e => e.label?.id === id);
+        eventCount = eventsRes.events.filter(e => e.label?.id === id).length;
 
         const labelsRes = displayNotifOnErr(
             addNotification,
@@ -91,8 +91,7 @@
 <div>
     <h1>Delete Label '{name}'</h1>
     <p
-        >There are {entries.length} entries and {events.length} events with this
-        label.</p
+        >There are {entryCount} entries and {eventCount} events with this label.</p
     >
 
     {#if !loaded}

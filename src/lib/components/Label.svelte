@@ -27,31 +27,30 @@
         display: inline-grid;
         align-items: center;
         grid-template-columns: 20px 1fr;
-        background: @light-v-accent;
-
-        &:hover {
-            background: @accent-secondary;
-            * {
-                color: black;
-            }
-        }
 
         overflow: hidden;
 
         .name {
             text-align: left;
-            margin-left: 5px;
+            margin-left: 2px;
             text-overflow: ellipsis;
             overflow: hidden;
             white-space: nowrap;
             max-width: 10rem;
+            font-size: 14px;
+            color: @accent-primary;
+
+            &:hover {
+                color: @accent-secondary;
+            }
         }
 
         .colour {
             margin: 1px;
-            height: 20px;
-            width: 20px;
+            height: 18px;
+            width: 18px;
             border-radius: 50%;
+            border: 1px solid @border;
         }
     }
 </style>

@@ -141,7 +141,7 @@
                 />
             {/if}
 
-            {#if !obfuscated && !isEdit && edits.length > 0}
+            {#if !obfuscated && !isEdit && edits?.length}
                 {#if (latitude && longitude && showLocations) || (hideAgentWidget && !showFullDate)}
                     <Dot />
                 {/if}

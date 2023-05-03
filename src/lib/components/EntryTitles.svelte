@@ -11,7 +11,7 @@
     import Dot from './Dot.svelte';
     import UtcTime from './UtcTime.svelte';
 
-    export let titles: Record<number, Entry[]>;
+    export let titles: Record<string, Entry[]>;
     export let obfuscated = true;
     export let showTimeAgo = true;
     export let auth: Auth;
@@ -27,6 +27,12 @@
             hideAgentWidget
         });
     }
+
+    let sortedTitles: [number, string][];
+    $: sortedTitles = Object.keys(titles)
+        .sort()
+        .filter(Boolean)
+        .map(date => [new Date(date).getTime() / 1000, date]);
 </script>
 
 <div>
@@ -45,25 +51,21 @@
         </div>
     {/if}
 
-    {#each Object.keys(titles).sort((a, b) => parseInt(b) - parseInt(a)) as day}
+    {#each sortedTitles as [day, date]}
         <div class="day">
             <h2>
-                <UtcTime
-                    timestamp={parseInt(day)}
-                    fmt="dddd DD/MM/YY"
-                    noTooltip={true}
-                />
+                <UtcTime timestamp={day} fmt="dddd DD/MM/YY" noTooltip={true} />
                 {#if showTimeAgo}
                     <Dot />
                     <span class="text-light">
-                        {#if utcEq(nowUtc(), parseInt(day))}
+                        {#if utcEq(nowUtc(), day)}
                             <span>Today</span>
-                        {:else if utcEq(nowUtc() - 60 * 60 * 24, parseInt(day))}
+                        {:else if utcEq(nowUtc() - 60 * 60 * 24, day)}
                             <span>Yesterday</span>
                         {:else}
                             <UtcTime
                                 relative
-                                timestamp={parseInt(day)}
+                                timestamp={day}
                                 noTooltip={true}
                             />
                         {/if}
@@ -71,7 +73,7 @@
                 {/if}
             </h2>
 
-            {#each titles[parseInt(day)] as entry}
+            {#each titles[date] as entry}
                 <button class="entry" on:click={() => showEntryPopup(entry.id)}>
                     <span class="entry-time">
                         <UtcTime

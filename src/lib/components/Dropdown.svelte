@@ -12,17 +12,25 @@
 
     export let close = () => {
         open = false;
+
+        if (openOnHover) {
+            // make sure it's closed, then allow it to open on hover
+            // after a short delay
+            openOnHover = false;
+            setTimeout(() => {
+                openOnHover = true;
+            }, 100);
+        }
     };
 
-    function globalMouseDown(evt: MouseEvent) {
-        if (open && !(evt.target as Element).closest('.dropdown')) {
-            close();
-            evt.preventDefault();
+    function globalMouseUp(evt: MouseEvent) {
+        if (!(evt.target as Element).closest('.dropdown > .dropdown-button')) {
+            setTimeout(close, 10);
         }
     }
 </script>
 
-<svelte:window on:mousedown={globalMouseDown} />
+<svelte:window on:mouseup={globalMouseUp} />
 
 <div
     class="dropdown {cn({
@@ -36,6 +44,7 @@
     <button
         aria-label={ariaLabel || 'Open popup'}
         on:click={() => (open = !open)}
+        class="dropdown-button"
     >
         <slot name="button" />
         <MenuDown class="menu-down" size="30" />
@@ -92,6 +101,7 @@
 
             .popup {
                 .content {
+                    .container-shadow();
                     border: 1px solid @border-heavy;
                     background: @light-accent;
                     border-radius: @border-radius;
