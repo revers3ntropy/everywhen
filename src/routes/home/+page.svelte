@@ -73,7 +73,7 @@
 
         let i = 0;
         groupedTitles = Object.keys(byDay)
-            .sort()
+            .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
             .reduce((acc, key) => {
                 if (i >= NUMBER_OF_ENTRY_TITLES) return acc;
                 i += byDay[key].length;
@@ -140,9 +140,13 @@
                 </h1>
                 <EntryTitles
                     titles={{
-                        [dayUtcFromTimestamp(
-                            entries[0].created,
-                            entries[0].createdTZOffset
+                        [fmtUtc(
+                            dayUtcFromTimestamp(
+                                entries[0].created,
+                                entries[0].createdTZOffset
+                            ),
+                            0,
+                            'YYYY-MM-DD'
                         )]: entries
                     }}
                     obfuscated={$obfuscated}

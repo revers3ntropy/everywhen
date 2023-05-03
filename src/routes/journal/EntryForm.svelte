@@ -383,7 +383,7 @@
 </script>
 
 <div
-    class="container entry-file-drop"
+    class="wrapper entry-file-drop"
     on:filedrop={onFileDrop}
     use:filedrop={fileOptions}
 >
@@ -568,7 +568,7 @@
     @import '../../styles/layout';
     @import '../../styles/input';
 
-    .container {
+    .wrapper {
         margin: 0;
         .flex-center();
 

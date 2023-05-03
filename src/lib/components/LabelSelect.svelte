@@ -76,12 +76,11 @@
                     <span class="label-name">
                         {selectedLabel.name}
                     </span>
-
-                    <MenuDown />
                 {:else}
                     <LabelOutline size="20" />
                     Add Label
                 {/if}
+                <MenuDown />
             {:else}
                 <span />
                 <i class="text-light">loading...</i>

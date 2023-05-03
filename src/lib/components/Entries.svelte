@@ -41,7 +41,7 @@
     const batchSize = 10;
 
     let search = null as null | string;
-    let entryTitles: Record<number, Entry[]> = {};
+    let entryTitles: Record<string, Entry[]> = {};
     let entries: Record<string, Entry[]> = {};
     let currentOffset = 0;
     let loadingAt = null as number | null;
@@ -79,18 +79,20 @@
         return Object.freeze(entriesOptions);
     }
 
-    async function reloadEntries() {
-        currentOffset = 0;
-        loadingAt = null;
-        entries = {};
-
-        void loadMoreEntries(true);
-
+    async function loadTitles() {
         const res = displayNotifOnErr(
             addNotification,
             await api.get(auth, '/entries/titles')
         );
         entryTitles = Entry.groupEntriesByDay(res.entries);
+    }
+
+    async function reloadEntries() {
+        currentOffset = 0;
+        loadingAt = null;
+        entries = {};
+
+        await Promise.all([loadMoreEntries(true), loadTitles()]);
     }
 
     async function loadMoreEntries(isInitialLoad = false) {
@@ -133,6 +135,10 @@
 
     export const reload = () => reloadEntries();
 
+    onMount(async () => {
+        await loadTitles();
+    });
+
     $: if (search !== null && browser) void reloadEntries();
 </script>
 
@@ -174,7 +180,7 @@
         </div>
     </div>
     <div class="entries">
-        {#each Object.keys(entries).sort() as day}
+        {#each Object.keys(entries).sort((a, b) => new Date(b).getTime() - new Date(a).getTime()) as day}
             <EntryGroup
                 entries={entries[day]}
                 on:updated={() => reloadEntries()}

@@ -9,7 +9,7 @@
     import type { Auth } from '../controllers/user';
     import EntryTitles from './EntryTitles.svelte';
 
-    export let titles: Record<number, Entry[]>;
+    export let titles: Record<string, Entry[]>;
     export let auth: Auth;
     export let hideAgentWidget: boolean;
 

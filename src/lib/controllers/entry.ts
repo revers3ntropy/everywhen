@@ -40,7 +40,7 @@ export type DecryptedRawEntry = Omit<RawEntry, 'decrypted'> & {
 export type EntryEdit = Omit<Entry, 'edits'> & { entryId?: string };
 
 export class Entry {
-    public static TITLE_CUTOFF = 25;
+    public static TITLE_CUTOFF = 30;
 
     public label?: Label;
     public edits?: EntryEdit[];
@@ -626,7 +626,8 @@ export class Entry {
 
         entries.map((entry: Mutable<Entry>) => {
             entry.entry = entry.entry
-                .replace(/[^0-9a-z ]/gi, '')
+                .replace(/[^0-9a-z# ]/gi, ' ')
+                .replace(/ +/gi, ' ')
                 .substring(0, Entry.TITLE_CUTOFF);
         });
 

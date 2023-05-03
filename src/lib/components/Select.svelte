@@ -11,11 +11,9 @@
     $: value = options[key];
 
     $: if (!(key in options)) key = Object.keys(options)[0];
-
-    export let close: () => void;
 </script>
 
-<Dropdown bind:close bind:open unstyledButton>
+<Dropdown bind:open unstyledButton>
     <span class="selector" slot="button">
         {key}
         {#if open}

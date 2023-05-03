@@ -30,7 +30,7 @@
 
     let sortedTitles: [number, string][];
     $: sortedTitles = Object.keys(titles)
-        .sort()
+        .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
         .filter(Boolean)
         .map(date => [new Date(date).getTime() / 1000, date]);
 </script>
@@ -98,14 +98,12 @@
                         {#if entry.title}
                             {obfuscated ? obfuscate(entry.title) : entry.title}
                         {:else}
-                            <span class="entry-preview">
+                            <i class="text-light">
                                 {obfuscated
                                     ? obfuscate(entry.entry)
-                                    : entry.entry}
-                                {#if entry.entry.length >= Entry.TITLE_CUTOFF}
-                                    ...
+                                    : entry.entry}{#if entry.entry.length >= Entry.TITLE_CUTOFF}...
                                 {/if}
-                            </span>
+                            </i>
                         {/if}
                     </span>
                 </button>
@@ -122,6 +120,7 @@
 
 <style lang="less">
     @import '../../styles/variables';
+    @import '../../styles/text';
 
     .menu {
         display: flex;
@@ -170,11 +169,11 @@
                 width: 100%;
                 text-align: center;
             }
-
-            .entry-preview {
-                color: @text-color-light;
-                font-style: italic;
-            }
         }
+    }
+
+    .title {
+        .ellipsis();
+        max-width: 350px;
     }
 </style>
