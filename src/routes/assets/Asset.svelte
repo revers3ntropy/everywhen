@@ -129,14 +129,13 @@
     @import '../../styles/layout';
 
     .img-wrapper {
-        .bordered();
+        .container();
         .flex-center();
 
         position: relative;
-
         border-radius: @border-radius;
         margin: 0.5rem;
-
+        padding: 0;
         height: 50vh;
         aspect-ratio: 1/1;
         overflow: hidden;
@@ -158,7 +157,7 @@
             height: 50px;
             border-radius: 5px;
             padding: 5px;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.7);
             display: flex;
             justify-content: space-between;
             align-items: center;

@@ -37,8 +37,6 @@
             await api.get(data, `/assets`, { offset, count: batchSize })
         );
 
-        console.log(res.assets);
-
         currentOffset += res.assets.length;
         assets = [...assets, ...res.assets];
 
@@ -57,6 +55,7 @@
             <span class="text-light">{data.assetCount}</span>
         {/if}
     </h1>
+
     <div class="assets">
         {#each assets as asset}
             <Asset
@@ -67,8 +66,9 @@
             />
         {/each}
     </div>
+
     {#if data.assetCount === 0}
-        <div class="flex-center">
+        <div class="flex-center container invisible">
             <i>No images yet</i>
         </div>
     {:else}
@@ -104,5 +104,6 @@
     .assets {
         display: flex;
         flex-wrap: wrap;
+        justify-content: center;
     }
 </style>
