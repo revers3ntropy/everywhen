@@ -76,7 +76,7 @@
             <Spinner />
         {/if}
         <div
-            use:inview={{ rootMargin: '100px' }}
+            use:inview={{ rootMargin: '300px' }}
             on:inview_enter={loadMoreAssets}
         />
     {/if}
