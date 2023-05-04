@@ -29,7 +29,6 @@
     export let showLabels = true;
     export let showLocations = true;
     export let hideAgentWidget: boolean;
-    export let pageSize: number;
 
     interface IOptions extends EntryFilter {
         readonly count?: number;
@@ -45,7 +44,7 @@
     let entries: Record<string, Entry[]> = {};
     let currentOffset = 0;
     let loadingAt = null as number | null;
-    let numberOfEntries = Infinity;
+    export let numberOfEntries = Infinity;
 
     function importPopup() {
         showPopup(

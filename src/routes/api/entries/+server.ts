@@ -35,8 +35,8 @@ export const GET = cachedApiRoute(async (auth, { url }) => {
 
     return {
         entries,
-        page: offset,
-        pageSize: count,
+        offset,
+        count,
         totalPages: Math.ceil(numEntries / count),
         totalEntries: numEntries
     };

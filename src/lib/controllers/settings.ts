@@ -53,13 +53,6 @@ export class Settings<T = unknown> {
                 `Set to 0 to disable.`,
             unit: 'seconds'
         } satisfies ISettingsConfig<Seconds>,
-        entriesPerPage: {
-            type: 'number',
-            defaultValue: 100,
-            name: 'Entries per Page',
-            description: `Number of entries displayed per page.`,
-            unit: 'entries'
-        } satisfies ISettingsConfig<Seconds>,
         passcode: {
             type: 'string',
             defaultValue: '',

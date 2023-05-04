@@ -13,7 +13,7 @@
     $: if (!(key in options)) key = Object.keys(options)[0];
 </script>
 
-<Dropdown bind:open unstyledButton>
+<Dropdown bind:open>
     <span class="selector" slot="button">
         {key}
         {#if open}
@@ -26,6 +26,7 @@
     <div class="options">
         {#each Object.keys(options) as option}
             <button
+                class="option"
                 on:click={() => {
                     close();
                     key = option;
@@ -41,35 +42,23 @@
     @import '../../styles/variables';
     @import '../../styles/layout';
 
-    button {
-        display: block;
-        padding: 0.3em;
-        border-radius: @border-radius;
-        border: none;
-
-        &:hover {
-            background-color: @accent-primary;
-            color: black;
-        }
-    }
-
     .options {
         display: flex;
         flex-direction: column;
-        padding: 0;
-        border: 1px solid @border-heavy;
-        border-top-color: @border-light;
+        padding: 0.5rem 0;
         border-radius: @border-radius;
         background: @light-accent;
+        min-width: 100px;
 
-        button {
-            padding: 0.4rem 1.2rem;
+        button.option {
+            display: block;
+            padding: 0.4em 0.8rem;
+            border: none;
+            text-align: left;
+
+            &:hover {
+                background-color: @light-v-accent;
+            }
         }
-    }
-
-    .selector {
-        &:extend(button.primary);
-        cursor: pointer;
-        margin: 0.5em;
     }
 </style>

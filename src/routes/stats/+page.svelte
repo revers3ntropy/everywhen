@@ -29,7 +29,7 @@
 
 <main>
     {#if data.entries.length === 0}
-        <section class="container unbordered">
+        <section class="container invisible">
             <h1>No Entries</h1>
             <div class="flex-center">
                 <p>
@@ -52,7 +52,7 @@
             </div>
         </div>
 
-        <section class="container unbordered">
+        <section class="container invisible">
             <div class="stats">
                 <StatPill primary value={data.entryCount} label="entries" />
                 <StatPill

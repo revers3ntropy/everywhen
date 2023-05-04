@@ -183,7 +183,7 @@
     </div>
 
     <div>
-        <Dropdown openOnHover unstyledButton width="170px">
+        <Dropdown openOnHover width="170px">
             <span class="create-button" slot="button">
                 <Plus size="25" />
             </span>
@@ -239,7 +239,7 @@
             {/if}
         </button>
 
-        <Dropdown fromRight unstyledButton>
+        <Dropdown fromRight width="200px">
             <span class="account-button" slot="button">
                 <span class="username-span">
                     <span class="streaks">
@@ -254,38 +254,40 @@
                 </span>
             </span>
 
-            <button
-                aria-label="download encrypted backup"
-                class="account-dropdown-button with-icon"
-                disabled={downloadingBackup}
-                on:click={downloadBackup}
-            >
-                <DownloadLock size="30" />
-                {#if downloadingBackup}
-                    Downloading...
-                {:else}
-                    Download Backup
-                {/if}
-            </button>
+            <div class="account-dropdown-options">
+                <button
+                    aria-label="download encrypted backup"
+                    class="account-dropdown-button"
+                    disabled={downloadingBackup}
+                    on:click={downloadBackup}
+                >
+                    <DownloadLock size="30" />
+                    {#if downloadingBackup}
+                        Downloading...
+                    {:else}
+                        Download Backup
+                    {/if}
+                </button>
 
-            <a
-                aria-label="settings"
-                class="account-dropdown-button with-icon"
-                href="/settings"
-            >
-                <Cog size="30" />
-                Settings
-            </a>
+                <a
+                    aria-label="settings"
+                    class="account-dropdown-button"
+                    href="/settings"
+                >
+                    <Cog size="30" />
+                    Settings
+                </a>
 
-            <a
-                aria-label="log out"
-                class="account-dropdown-button with-icon"
-                href="/logout"
-                data-sveltekit-preload-data="tap"
-            >
-                <Logout size="30" />
-                Log Out
-            </a>
+                <a
+                    aria-label="log out"
+                    class="account-dropdown-button"
+                    href="/logout"
+                    data-sveltekit-preload-data="tap"
+                >
+                    <Logout size="30" />
+                    Log Out
+                </a>
+            </div>
         </Dropdown>
     </div>
 </nav>
@@ -427,18 +429,27 @@
         }
     }
 
-    .account-dropdown-button {
-        margin: 0;
-        padding: 0.4em 0.8em 0.4em 0.4em;
+    .account-dropdown-options {
+        padding: 0.5rem 0;
 
-        &:hover {
-            border-radius: @border-radius;
-            background-color: @light-v-accent;
+        .account-dropdown-button {
+            margin: 0;
+            padding: 0.4em 0.8em 0.4em 0.4em;
+            width: 100%;
             color: @text-color;
+            display: grid;
+            grid-template-columns: 35px 1fr;
+            align-items: center;
+            justify-content: start;
+            text-align: left;
 
-            :global(svg),
-            :global(svg *) {
-                fill: @accent-secondary;
+            &:hover {
+                background-color: @light-v-accent;
+
+                :global(svg),
+                :global(svg *) {
+                    fill: @accent-secondary;
+                }
             }
         }
     }

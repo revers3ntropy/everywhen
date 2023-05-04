@@ -93,9 +93,15 @@
         {:else if nearby && nearby?.length}
             <span class="flex-center ellipsis" style="gap: 0.2rem">
                 <span class="text-light">near</span>
-                <a href="/map/{nearby[0].id}">
-                    {nearby[0].name}
-                </a>
+                {#if obfuscated}
+                    <span class="text-light ellipsis obfuscated">
+                        {obfuscate(limitStrLen(nearby[0].name, 20))}
+                    </span>
+                {:else}
+                    <a href="/map/{nearby[0].id}" class="ellipsis">
+                        {limitStrLen(nearby[0].name, 20)}
+                    </a>
+                {/if}
             </span>
         {/if}
     {:else}

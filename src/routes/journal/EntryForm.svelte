@@ -1,7 +1,6 @@
 <script lang="ts">
     import { browser } from '$app/environment';
     import { beforeNavigate, goto } from '$app/navigation';
-    import Dropdown from '$lib/components/Dropdown.svelte';
     import { tooltip } from '@svelte-plugins/tooltips';
     import {
         filedrop,
@@ -12,18 +11,6 @@
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import ImageArea from 'svelte-material-icons/ImageArea.svelte';
-    import FormatText from 'svelte-material-icons/FormatText.svelte';
-    import CodeTags from 'svelte-material-icons/CodeTags.svelte';
-    import CodeBrackets from 'svelte-material-icons/CodeBrackets.svelte';
-    import HorizontalRule from 'svelte-material-icons/FormatPageBreak.svelte';
-    import FormatBold from 'svelte-material-icons/FormatBold.svelte';
-    import FormatHeader1 from 'svelte-material-icons/FormatHeader1.svelte';
-    import FormatStrikethrough from 'svelte-material-icons/FormatStrikethrough.svelte';
-    import FormatQuoteClose from 'svelte-material-icons/FormatQuoteClose.svelte';
-    import FormatListBulleted from 'svelte-material-icons/FormatListBulleted.svelte';
-    import Link from 'svelte-material-icons/Link.svelte';
-    import FormatItalic from 'svelte-material-icons/FormatItalic.svelte';
-    import FormatListNumbered from 'svelte-material-icons/FormatListNumbered.svelte';
     import Send from 'svelte-material-icons/Send.svelte';
     import { getNotificationsContext } from 'svelte-notifications';
     import LabelSelect from '$lib/components/LabelSelect.svelte';
@@ -43,6 +30,7 @@
     } from '$lib/utils/notifications';
     import { obfuscate } from '$lib/utils/text';
     import { nowUtc } from '$lib/utils/time';
+    import FormatOptions from './FormatOptions.svelte';
     import LocationToggle from './LocationToggle.svelte';
 
     const { addNotification } = getNotificationsContext();
@@ -403,90 +391,8 @@
                         <EyeOff size="25" />
                     {/if}
                 </button>
-            </div>
-            <div class="right-options {obfuscated ? 'blur' : ''}">
-                <Dropdown unstyledButton openOnHover>
-                    <span slot="button">
-                        <span class="icon-button">
-                            <FormatText size="25" />
-                        </span>
-                    </span>
 
-                    <div class="format-options">
-                        <button
-                            class="with-icon icon-small"
-                            on:click={makeWrapper('**', '**', false)}
-                        >
-                            <FormatBold /> Bold
-                        </button>
-                        <button
-                            class="with-icon icon-small"
-                            on:click={makeWrapper('*', '*', false)}
-                        >
-                            <FormatItalic /> Italic
-                        </button>
-                        <button
-                            class="with-icon icon-small"
-                            on:click={makeWrapper('~~', '~~', false)}
-                        >
-                            <FormatStrikethrough /> Strikethrough
-                        </button>
-                        <button
-                            class="with-icon icon-small"
-                            on:click={makeWrapper('# ', '', false)}
-                        >
-                            <FormatHeader1 /> Header
-                        </button>
-                        <button
-                            class="with-icon icon-small"
-                            on:click={makeWrapper('`', '`')}
-                        >
-                            <CodeTags /> Code
-                        </button>
-                        <button
-                            class="with-icon icon-small"
-                            on:click={makeWrapper('```', '```')}
-                        >
-                            <CodeBrackets /> Code Block
-                        </button>
-                        <button
-                            class="with-icon icon-small"
-                            on:click={makeWrapper('\n > ', '', false)}
-                        >
-                            <FormatQuoteClose /> Quote
-                        </button>
-                        <button
-                            class="with-icon icon-small"
-                            on:click={makeWrapper('\n - ', '', false)}
-                        >
-                            <FormatListBulleted /> Bullet List
-                        </button>
-                        <button
-                            class="with-icon icon-small"
-                            on:click={makeWrapper('\n 1. ', '', false)}
-                        >
-                            <FormatListNumbered /> Numbered List
-                        </button>
-                        <button
-                            class="with-icon icon-small"
-                            on:click={makeWrapper('[', '](url)')}
-                        >
-                            <Link /> Link
-                        </button>
-                        <button
-                            class="with-icon icon-small"
-                            on:click={makeWrapper('![', '](url)')}
-                        >
-                            <ImageArea /> Image
-                        </button>
-                        <button
-                            class="with-icon icon-small"
-                            on:click={makeWrapper('\n---\n', '', false)}
-                        >
-                            <HorizontalRule /> Break
-                        </button>
-                    </div>
-                </Dropdown>
+                <FormatOptions {makeWrapper} />
                 <button
                     aria-label="Insert Image"
                     disabled={submitted}
@@ -500,7 +406,8 @@
                 </button>
 
                 <LocationToggle />
-
+            </div>
+            <div class="right-options {obfuscated ? 'blur' : ''}">
                 <LabelSelect {auth} bind:value={newEntryLabel} {labels} />
 
                 <button
@@ -587,11 +494,9 @@
         margin: 0;
         padding: 0 0.4em;
         display: grid;
-        grid-template-columns: 1fr 28rem;
+        grid-template-columns: 1fr 1fr;
 
         @media @mobile {
-            display: flex;
-            flex-wrap: wrap;
             border: none;
         }
 
@@ -668,6 +573,7 @@
 
             @media @mobile {
                 background: transparent;
+                border-bottom: 1px solid @border;
             }
         }
     }
@@ -705,24 +611,6 @@
                 margin: 0;
                 background: none;
                 padding: 0.8rem 0.5rem;
-            }
-        }
-    }
-
-    .format-options {
-        padding: 0.5rem 0;
-
-        button {
-            white-space: nowrap;
-            color: @text-color;
-            padding: 0.4rem 1rem;
-            margin: 0;
-            width: 100%;
-            text-align: left;
-
-            &:hover,
-            &:focus {
-                background: @light-v-accent;
             }
         }
     }

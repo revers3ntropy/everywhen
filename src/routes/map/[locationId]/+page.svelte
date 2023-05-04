@@ -20,7 +20,6 @@
         options={{
             locationId: data.location.id
         }}
-        pageSize={data.settings.entriesPerPage.value}
         showLabels={true}
         showLocations={false}
         showSearch={true}

@@ -49,7 +49,7 @@
         </div>
     </div>
     {#if data.wordInstances === 0}
-        <section class="container unbordered">
+        <section class="container invisible">
             <div class="flex-center">
                 <p>
                     You've never used that word before!
@@ -58,7 +58,7 @@
             </div>
         </section>
     {:else}
-        <section class="container unbordered">
+        <section class="container invisible">
             <div class="stats">
                 <StatPill
                     primary
@@ -99,7 +99,6 @@
             <Entries
                 auth={data}
                 options={{ search: data.theWord }}
-                pageSize={data.settings.entriesPerPage.value}
                 showSearch={false}
                 hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
             />

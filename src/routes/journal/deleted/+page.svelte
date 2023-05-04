@@ -1,39 +1,12 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
-    import type { App } from '../../../app';
-    import BookSpinner from '$lib/components/BookSpinner.svelte';
     import Dot from '$lib/components/Dot.svelte';
-    import Entry from '$lib/components/Entry.svelte';
-    import type { Entry as EntryController } from '$lib/controllers/entry';
-    import { obfuscated } from '$lib/stores';
-    import { api } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/utils/notifications';
+    import Entries from '$lib/components/Entries.svelte';
+    import { onMount } from 'svelte';
+    import type { PageData } from './$types';
 
-    const { addNotification } = getNotificationsContext();
+    export let data: PageData;
 
-    export let data: App.PageData;
-
-    let search = '';
-    let loaded = false;
-    let entries: EntryController[] = [];
-
-    async function reload() {
-        const entriesOptions = {
-            page: 0,
-            pageSize: 10e10,
-            search,
-            deleted: 1
-        };
-        const res = await api
-            .get(data, `/entries`, entriesOptions)
-            .then(res => displayNotifOnErr(addNotification, res));
-
-        entries = res.entries;
-        loaded = true;
-    }
-
-    onMount(reload);
+    let numberOfEntries: number;
 
     onMount(() => (document.title = `Deleted`));
 </script>
@@ -44,28 +17,21 @@
 </svelte:head>
 
 <main>
-    <h1>
+    <h2>
         Bin
-        {#if entries.length > 0}
-            <Dot />
-            {entries.length}
+        {#if numberOfEntries !== null && numberOfEntries !== Infinity}
+            <Dot light />
+            <span class="text-light">{numberOfEntries}</span>
         {/if}
-    </h1>
-    {#each entries as entry}
-        <Entry
-            {...entry}
-            obfuscated={$obfuscated}
-            on:updated={reload}
-            auth={data}
-            hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
-        />
-    {/each}
-
-    {#if !loaded}
-        <BookSpinner />
-    {:else if entries.length === 0}
-        <i>No deleted entries.</i>
-    {/if}
+    </h2>
+    <Entries
+        auth={data}
+        hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
+        options={{
+            deleted: true
+        }}
+        bind:numberOfEntries
+    />
 </main>
 
 <style lang="less">

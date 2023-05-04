@@ -59,9 +59,7 @@
 <div class="select-label">
     <Dropdown
         bind:close={closeDropDown}
-        rounded
-        unstyledButton
-        ariaLabel="Select label"
+        ariaLabel={() => 'Set label'}
         fromRight
     >
         <span slot="button" class="select-button">
@@ -186,15 +184,13 @@
 
     .label-button {
         height: 2em;
-        padding: 0 0.5em;
         margin: 0;
         text-align: center;
         display: inline-grid;
-        grid-template-columns: 1fr 3fr;
+        grid-template-columns: 30px 1fr;
         justify-content: center;
         align-items: center;
         width: 100%;
-        border-radius: @border-radius;
 
         &:hover {
             background: @light-v-accent;
@@ -205,6 +201,7 @@
         max-height: 80vh;
         overflow-y: auto;
         width: 200px;
+        padding: 0.5em 0;
     }
 
     .label-name {

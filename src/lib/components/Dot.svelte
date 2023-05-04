@@ -1,4 +1,8 @@
-<span>&#x2022;</span>
+<script lang="ts">
+    export let light = false;
+</script>
+
+<span class={light ? 'text-light' : ''}>&#x2022;</span>
 
 <style lang="less">
     span {

@@ -128,7 +128,6 @@
             auth={data}
             options={{ labelId: data.label.id }}
             showLabels={false}
-            pageSize={data.settings.entriesPerPage.value}
             hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
         />
     </section>
