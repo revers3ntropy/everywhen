@@ -435,23 +435,26 @@
                     aria-label="Entry Title"
                     bind:value={newEntryTitle}
                     class="title"
-                    placeholder="Title"
+                    placeholder="Title (optional)"
                     disabled={submitted}
                 />
             {/if}
         </div>
         <div class="entry-container">
             {#if obfuscated}
-                <textarea placeholder="..." disabled class="obfuscated"
-                    >{obfuscate(newEntryBody)}</textarea
+                <textarea
+                    placeholder="..."
+                    aria-label="Entry Body"
+                    disabled
+                    class="obfuscated">{obfuscate(newEntryBody)}</textarea
                 >
             {:else}
                 <textarea
                     bind:this={newEntryInputElement}
                     bind:value={newEntryBody}
                     on:keydown={handleEntryInputKeydown}
-                    placeholder="Entry"
                     disabled={submitted}
+                    aria-label="Entry Body"
                 />
             {/if}
         </div>

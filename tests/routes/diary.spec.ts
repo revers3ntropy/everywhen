@@ -17,9 +17,9 @@ test.describe('/journal', () => {
 
         await page.waitForTimeout(1000);
 
-        await page.getByPlaceholder('Title').click();
-        await page.getByPlaceholder('Title').fill(entryTitle);
-        await page.getByPlaceholder('Entry').fill(entryBody);
+        await page.getByLabel('Entry Title').click();
+        await page.getByLabel('Entry Title').fill(entryTitle);
+        await page.getByLabel('Entry Body').fill(entryBody);
         await page.getByRole('button', { name: 'Submit Entry' }).click();
 
         await expect(await page.getByText(entryTitle)).toBeTruthy();

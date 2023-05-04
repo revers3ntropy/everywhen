@@ -191,7 +191,7 @@
                 {hideAgentWidget}
             />
         {/each}
-        {#if loadingAt !== null && loadingAt + batchSize < numberOfEntries}
+        {#if loadingAt !== null && loadingAt < numberOfEntries}
             <Spinner />
         {/if}
     </div>

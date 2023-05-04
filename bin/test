@@ -1,7 +1,9 @@
 #!/bin/bash
 
-# rm -rf .svelte-kit
+rm -rf .svelte-kit
 rm -rf playwright-report
 rm -rf test-results
+
+svelte-kit sync
 
 npx playwright test "$@"

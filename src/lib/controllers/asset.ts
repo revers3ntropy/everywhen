@@ -166,10 +166,16 @@ export class Asset {
         );
     }
 
-    public static async allMetadata(
+    public static async pageOfMetaData(
         query: QueryFunc,
-        auth: Auth
-    ): Promise<Result<Omit<Asset, 'content'>[]>> {
+        auth: Auth,
+        offset: number,
+        count: number
+    ): Promise<Result<[Omit<Asset, 'content'>[], number]>> {
+        if (count < 1) {
+            return Result.err('Count must be positive');
+        }
+
         const res = await query<Omit<Asset, 'content'>[]>`
             SELECT id,
                    publicId,
@@ -178,10 +184,13 @@ export class Asset {
                    contentType
             FROM assets
             WHERE user = ${auth.id}
+            ORDER BY created DESC
+            LIMIT ${count}
+            OFFSET ${offset}
         `;
 
-        return Result.collect(
-            res.map(row => {
+        const { err, val: metadata } = Result.collect(
+            res.map((row): Result<Asset> => {
                 const { err: fileNameErr, val: fileName } = decrypt(
                     row.fileName,
                     auth.key
@@ -200,6 +209,15 @@ export class Asset {
                 );
             })
         );
+        if (err) return Result.err(err);
+
+        const [assetCount] = await query<{ count: number }[]>`
+            SELECT COUNT(*) as count
+            FROM assets
+            WHERE user = ${auth.id}
+        `;
+
+        return Result.ok([metadata, assetCount.count]);
     }
 
     public static async purgeAll(query: QueryFunc, auth: Auth): Promise<void> {
