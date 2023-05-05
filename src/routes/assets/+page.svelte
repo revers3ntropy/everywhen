@@ -1,8 +1,7 @@
 <script lang="ts">
-    import Spinner from '$lib/components/BookSpinner.svelte';
+    import InfiniteScroller from '$lib/components/InfiniteScroller.svelte';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/utils/notifications';
-    import { inview } from 'svelte-inview';
     import ImageOutline from 'svelte-material-icons/ImageOutline.svelte';
     import Dot from '$lib/components/Dot.svelte';
     import { obfuscated } from '$lib/stores';
@@ -14,35 +13,17 @@
 
     export let data: PageData;
 
-    const batchSize = 4;
-    // initial are loaded from page.server.ts
-    let currentOffset = data.assets.length;
-    let loadingAt = null as number | null;
-
     let assets = data.assets;
 
-    async function loadMoreAssets() {
-        let offset = currentOffset;
-        if (loadingAt === offset) {
-            return;
-        }
-        loadingAt = offset;
-
-        if (loadingAt >= data.assetCount) {
-            return;
-        }
-
+    async function loadMoreAssets(
+        offset: number,
+        count: number
+    ): Promise<Asset[]> {
         const res = displayNotifOnErr(
             addNotification,
-            await api.get(data, `/assets`, { offset, count: batchSize })
+            await api.get(data, `/assets`, { offset, count })
         );
-
-        currentOffset += res.assets.length;
-        assets = [...assets, ...res.assets];
-
-        if (loadingAt === offset) {
-            loadingAt = null;
-        }
+        return res.assets;
     }
 </script>
 
@@ -56,29 +37,28 @@
         {/if}
     </h1>
 
-    <div class="assets">
-        {#each assets as asset}
-            <Asset
-                {...asset}
-                auth={data}
-                on:delete={() => data.assetCount--}
-                obfuscated={$obfuscated}
-            />
-        {/each}
-    </div>
-
     {#if data.assetCount === 0}
         <div class="flex-center container invisible">
             <i>No images yet</i>
         </div>
     {:else}
-        {#if loadingAt !== null && loadingAt < data.assetCount}
-            <Spinner />
-        {/if}
-        <div
-            use:inview={{ rootMargin: '300px' }}
-            on:inview_enter={loadMoreAssets}
-        />
+        <InfiniteScroller
+            bind:items={assets}
+            batchSize={4}
+            numItems={data.assetCount}
+            loadItems={loadMoreAssets}
+        >
+            <div class="assets">
+                {#each assets as asset}
+                    <Asset
+                        {...asset}
+                        auth={data}
+                        on:delete={() => data.assetCount--}
+                        obfuscated={$obfuscated}
+                    />
+                {/each}
+            </div>
+        </InfiniteScroller>
     {/if}
 </main>
 
