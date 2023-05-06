@@ -3,6 +3,7 @@
     import MenuUp from 'svelte-material-icons/MenuUp.svelte';
     import Dropdown from '$lib/components/Dropdown.svelte';
 
+    export let fromRight = false;
     export let options: Record<string, string | number>;
     export let key: string;
     export let open = false;
@@ -13,13 +14,13 @@
     $: if (!(key in options)) key = Object.keys(options)[0];
 </script>
 
-<Dropdown bind:open>
+<Dropdown bind:open fromRight>
     <span class="selector" slot="button">
         {key}
         {#if open}
-            <MenuUp />
+            <MenuUp size="22" />
         {:else}
-            <MenuDown />
+            <MenuDown size="22" />
         {/if}
     </span>
 
@@ -41,6 +42,12 @@
 <style lang="less">
     @import '../../styles/variables';
     @import '../../styles/layout';
+
+    .selector {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        align-items: center;
+    }
 
     .options {
         display: flex;

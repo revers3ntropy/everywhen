@@ -150,7 +150,7 @@
 
 <div class="options">
     <div class="flex-center">
-        <div>Group by</div>
+        <span class="text-light" style="margin: 0.3rem">Group by</span>
         <Select
             bind:value={selectedBucket}
             key={days < 15 ? 'Day' : 'Week'}

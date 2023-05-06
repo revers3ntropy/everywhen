@@ -15,6 +15,7 @@
 
     const dispatch = createEventDispatcher();
 
+    export let fromRight = false;
     export let labels: Label[] | null;
     export let value = '';
     export let auth: Auth;
@@ -48,7 +49,7 @@
     <Dropdown
         bind:close={closeDropDown}
         ariaLabel={() => 'Set label'}
-        fromRight
+        {fromRight}
     >
         <span slot="button" class="select-button">
             {#if labels}

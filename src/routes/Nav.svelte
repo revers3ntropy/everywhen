@@ -174,7 +174,7 @@
         </a>
     </div>
 
-    <div>
+    <div class="right-options">
         <Dropdown openOnHover width="170px">
             <span class="create-button" slot="button">
                 <Plus size="25" />
@@ -446,16 +446,20 @@
         }
     }
 
-    .create-button {
-        .flex-center();
+    .right-options {
+        gap: 0.5rem;
 
-        border-radius: 50%;
-        background: @light-accent;
-        width: 30px;
-        height: 30px;
+        .create-button {
+            .flex-center();
 
-        &:hover {
-            background: none;
+            border-radius: 50%;
+            background: @light-accent;
+            width: 30px;
+            height: 30px;
+
+            &:hover {
+                background: none;
+            }
         }
     }
 

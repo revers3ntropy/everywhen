@@ -73,6 +73,7 @@
             <button
                 aria-label={obfuscated ? 'Show asset' : 'Hide asset'}
                 on:click={() => (obfuscated = !obfuscated)}
+                style="margin: 0 0.5rem 0 0.2rem;"
             >
                 {#if obfuscated}
                     <Eye size="25" />
@@ -87,6 +88,7 @@
                     <button
                         on:click={copyToClipBoard}
                         class="icon-button"
+                        style="padding: 0.2rem"
                         use:tooltip={{
                             content: 'Copy link',
                             // `overflow: hidden` so needs to show below

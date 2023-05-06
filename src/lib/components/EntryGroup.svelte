@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { ANIMATION_DURATION } from '$lib/constants';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
     import Entry from '$lib/components/Entry.svelte';
@@ -7,6 +8,7 @@
     import { nowUtc, utcEq } from '../utils/time';
     import Dot from './Dot.svelte';
     import UtcTime from './UtcTime.svelte';
+    import { fly, slide } from 'svelte/transition';
 
     export let obfuscated = true;
     export let entries: EntryController[];
@@ -27,11 +29,11 @@
     <div class="title">
         <div>
             <h3>
-                <button class="flex-center not-link" on:click={toggleCollapse}>
+                <button class="flex-center" on:click={toggleCollapse}>
                     {#if collapsed}
-                        <ChevronDown size="30" />
+                        <ChevronDown size="25" />
                     {:else}
-                        <ChevronUp size="30" />
+                        <ChevronUp size="25" />
                     {/if}
 
                     <UtcTime
@@ -40,30 +42,45 @@
                         timestamp={day}
                     />
 
+                    <Dot light marginX={10} />
+
+                    <span class="text-light">
+                        {#if utcEq(nowUtc(), day)}
+                            <span>Today</span>
+                        {:else if utcEq(nowUtc() - 60 * 60 * 24, day)}
+                            <span>Yesterday</span>
+                        {:else}
+                            <UtcTime relative timestamp={day} />
+                        {/if}
+                    </span>
+
                     {#if collapsed}
-                        <p class="entry-count">
-                            <Dot />
-                            {entries.length}
-                            {entries.length === 1 ? 'entry' : 'entries'}
-                        </p>
+                        <div
+                            transition:fly|local={{
+                                x: -50,
+                                duration: ANIMATION_DURATION
+                            }}
+                            class="flex-center"
+                        >
+                            <Dot light marginX={10} />
+                            <p class="entry-count">
+                                {entries.length}
+                                {entries.length === 1 ? 'entry' : 'entries'}
+                            </p>
+                        </div>
                     {/if}
                 </button>
             </h3>
         </div>
-        <div>
-            <p class="text-light">
-                {#if utcEq(nowUtc(), day)}
-                    <span>Today</span>
-                {:else if utcEq(nowUtc() - 60 * 60 * 24, day)}
-                    <span>Yesterday</span>
-                {:else}
-                    <UtcTime relative timestamp={day} />
-                {/if}
-            </p>
-        </div>
     </div>
     {#if !collapsed}
-        <div class="contents">
+        <div
+            class="contents"
+            transition:slide|local={{
+                axis: 'y',
+                duration: ANIMATION_DURATION
+            }}
+        >
             {#each entries as entry}
                 <Entry
                     {...entry}
@@ -84,17 +101,29 @@
 
     .entry-group {
         margin: 1em 0;
-        padding: 0;
+        padding: 0.5rem 0;
+
+        transition: height @transition;
 
         .title {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 1rem 0 0.5rem;
+            padding: 0.4rem 0.8rem;
+
+            @media @mobile {
+                border-radius: @border-radius;
+                background: @light-v-accent;
+                border: 1px solid @border;
+                margin: 0.5rem 0;
+                padding: 0.4rem 0.8rem 0.4rem 0;
+                position: sticky;
+                top: 0.3em;
+                z-index: 4;
+            }
 
             .entry-count {
-                margin: 0 0 0 0.4em;
-                padding: 0;
+                font-size: 1rem;
 
                 &,
                 & * {
@@ -106,21 +135,8 @@
                 }
             }
 
-            @media @mobile {
-                border-radius: @border-radius;
-                background: @light-v-accent;
-                border: 1px solid @border;
-                margin: 0.5rem 0;
-                padding: 0.4rem 0.8rem 0.4rem 0;
-                position: sticky;
-                top: 0.3em;
-                z-index: 4;
-
-                p,
-                h3 {
-                    margin: 0;
-                    padding: 0;
-                }
+            h3 {
+                font-weight: normal;
             }
         }
 

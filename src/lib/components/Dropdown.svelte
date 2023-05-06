@@ -1,9 +1,19 @@
+<script context="module" lang="ts">
+    let dropDownId = 0;
+
+    export function getId(): string {
+        return (dropDownId++).toString();
+    }
+</script>
+
 <script lang="ts">
     import cn from 'classnames';
 
+    const id = `dropdown__${getId()}`;
+
     export let open = false;
     export let ariaLabel = (open: boolean) =>
-        //                                       string, not literal 'Close popup' | 'Open popup'
+        // as string, not literal 'Close popup' | 'Open popup'
         (open ? 'Close popup' : 'Open popup') as string;
     export let width = '100%';
     export let fromRight = false;
@@ -23,8 +33,9 @@
     };
 
     function globalMouseUp(evt: MouseEvent) {
+        const target = evt.target as Element;
         // don't close when clicking the button
-        if (!(evt.target as Element).closest('.dropdown > .dropdown-button')) {
+        if (!target.closest(`.dropdown#${id} > .dropdown-button`)) {
             setTimeout(close, 10);
         }
     }
@@ -40,6 +51,7 @@
         'from-right': fromRight,
         'open-on-hover': openOnHover
     })}"
+    {id}
 >
     <button
         aria-label={label}
@@ -58,6 +70,11 @@
 <style lang="less">
     @import '../../styles/variables';
     @import '../../styles/layout';
+
+    * {
+        margin: 0;
+        padding: 0;
+    }
 
     .dropdown {
         position: relative;

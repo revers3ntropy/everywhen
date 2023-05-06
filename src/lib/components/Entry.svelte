@@ -1,12 +1,13 @@
 <script lang="ts">
     import { browser } from '$app/environment';
-    import { tooltip } from '@svelte-plugins/tooltips';
+    import Dropdown from '$lib/components/Dropdown.svelte';
     import { createEventDispatcher } from 'svelte';
     import Bin from 'svelte-material-icons/Delete.svelte';
     import Restore from 'svelte-material-icons/DeleteRestore.svelte';
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import NoteEditOutline from 'svelte-material-icons/NoteEditOutline.svelte';
+    import DotsVertical from 'svelte-material-icons/DotsVertical.svelte';
     import UtcTime from '$lib/components/UtcTime.svelte';
     import type { Entry } from '../controllers/entry';
     import type { Label as LabelController } from '../controllers/label';
@@ -155,30 +156,42 @@
 
         <div class="flex-center">
             {#if !obfuscated && !isEdit}
-                <button
-                    on:click={deleteSelf}
-                    aria-label={deleted ? 'Restore' : 'Delete'}
-                    use:tooltip={{ content: restoreDeleteTooltip }}
-                >
-                    {#if deleted}
-                        <Restore size="25" />
-                    {:else}
-                        <Bin size="25" />
-                    {/if}
-                </button>
-                {#if !deleted}
-                    <a
-                        href="/journal/{id}/edit?obfuscate=0"
-                        use:tooltip={{ content: 'Edit Entry' }}
-                    >
-                        <NoteEditOutline size="25" />
-                    </a>
-                {/if}
+                <Dropdown fromRight>
+                    <div slot="button" class="options-dropdown-button">
+                        <DotsVertical size="22" />
+                    </div>
+                    <div class="options-dropdown">
+                        <button
+                            on:click={deleteSelf}
+                            class="with-icon"
+                            aria-label={restoreDeleteTooltip}
+                        >
+                            {#if deleted}
+                                <Restore size="25" />
+                                Remove from Bin
+                            {:else}
+                                <Bin size="25" />
+                                Move to Bin
+                            {/if}
+                        </button>
+                        {#if !deleted}
+                            <a
+                                href="/journal/{id}/edit?obfuscate=0"
+                                class="with-icon"
+                                aria-label="edit entry"
+                            >
+                                <NoteEditOutline size="25" />
+                                Edit
+                            </a>
+                        {/if}
+                    </div>
+                </Dropdown>
             {/if}
 
             <button
                 aria-label={obfuscated ? 'Show entry' : 'Hide entry'}
                 on:click={toggleObfuscation}
+                style="margin: 0 0.3rem 0 0"
             >
                 {#if obfuscated}
                     <Eye size="25" />
@@ -231,7 +244,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin: 0.5em 2em 0 0;
+            margin: 1rem 0 0 0;
             padding: 0 0.3em;
 
             @media @mobile {
@@ -333,5 +346,30 @@
     .edits-link {
         font-size: 0.95rem;
         white-space: nowrap;
+    }
+
+    .options-dropdown-button {
+        margin: 0;
+        padding: 0;
+    }
+
+    .options-dropdown {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 100px;
+        padding: 0.5rem 0;
+
+        button,
+        a {
+            .oneline();
+            padding: 0.4em 0.8rem;
+            width: 100%;
+            color: @text-color;
+
+            &:hover {
+                background: @light-v-accent;
+            }
+        }
     }
 </style>

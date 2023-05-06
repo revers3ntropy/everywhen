@@ -101,8 +101,8 @@
             {/if}
         </section>
 
-        <section
-            ><h2>Common Words</h2>
+        <section>
+            <h2>Common Words</h2>
             <CommonWordsList
                 entryCount={data.entryCount}
                 words={data.commonWords}
@@ -115,6 +115,10 @@
 <style lang="less">
     @import '../../styles/layout';
     @import '../../styles/variables';
+
+    h2 {
+        margin: 2rem 0 1rem 0;
+    }
 
     .title-line {
         display: grid;

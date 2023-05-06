@@ -13,53 +13,6 @@
     }
 }
 
-.notifications {
-    div {
-        z-index: 100;
-    }
-
-    .notification {
-        color: @text-color;
-
-        z-index: 100;
-
-        &.default-notification-style {
-            .notification-content {
-                color: @text-color-invert;
-
-                &.default-notification-style-content {
-                    color: @text-color;
-                }
-            }
-        }
-
-        &.default-notification-style.default-notification-info {
-            background: @bg !important;
-            border-radius: 0 10px 10px 0;
-            border: 1px solid @border-heavy;
-            border-left: 5px solid @accent-secondary;
-            color: @text-color !important;
-
-            .notification-button.default-notification-style-button {
-                color: @text-color !important;
-                border-left: 1px solid @border-heavy;
-
-                &:hover {
-                    background: @accent-primary !important;
-                }
-            }
-        }
-
-        &.default-notification-style.default-notification-error {
-            .notification-button.default-notification-style-button {
-                &:hover {
-                    background: @accent-secondary !important;
-                }
-            }
-        }
-    }
-}
-
 .dropzone {
     color: @text-color;
 }

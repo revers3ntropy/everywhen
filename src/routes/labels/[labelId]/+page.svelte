@@ -111,7 +111,7 @@
     </section>
 
     <section>
-        <h1>{data.entryCount} {data.entryCount === 1 ? 'Entry' : 'Entries'}</h1>
+        <h1>{data.entryCount} Entr{data.entryCount === 1 ? 'y' : 'ies'}</h1>
         <Entries
             auth={data}
             options={{ labelId: data.label.id }}
@@ -123,6 +123,10 @@
 
 <style lang="less">
     @import '../../../styles/layout';
+
+    h1 {
+        margin: 2rem 0 1rem 0;
+    }
 
     .title-line {
         display: flex;

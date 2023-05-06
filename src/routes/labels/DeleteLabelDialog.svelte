@@ -80,9 +80,9 @@
 
 <div>
     <h1>Delete Label '{name}'</h1>
-    <p
-        >There are {entryCount} entries and {eventCount} events with this label.</p
-    >
+    <p>
+        There are {entryCount} entries and {eventCount} events with this label.
+    </p>
 
     {#if !loaded}
         <BookSpinner />
@@ -120,7 +120,11 @@
 </div>
 
 <style lang="less">
-    @import '../../styles/variables.less';
+    @import '../../styles/variables';
+
+    h1 {
+        margin: 0 0 1rem 0;
+    }
 
     .options {
         display: flex;

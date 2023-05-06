@@ -4,28 +4,107 @@
 @import './styles/input.less';
 @import './styles/overrides.less';
 
-svg {
-    color: @text-color;
-    shape-rendering: geometricPrecision;
+// https://andy-bell.co.uk/a-modern-css-reset/
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
 }
 
-.entry-label-colour {
-    display: inline-block;
-    height: 10px;
-    width: 10px;
-    border-radius: 50%;
+ul[role='list'],
+ol[role='list'] {
+    list-style: none;
+}
 
-    &.big {
-        height: 20px;
-        width: 20px;
+html:focus-within {
+    scroll-behavior: smooth;
+}
+
+body {
+    min-height: 100vh;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+a:not([class]) {
+    text-decoration-skip-ink: auto;
+}
+
+img,
+picture {
+    max-width: 100%;
+    display: block;
+}
+
+input,
+button,
+textarea,
+select {
+    font: inherit;
+}
+
+p, h1, h2, h3, h4, h5, h6 {
+    overflow-wrap: break-word;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html:focus-within {
+        scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
     }
 }
 
-hr {
-    border: none;
-    border-top: 1px solid @border;
-    margin: 10px;
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, button, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    vertical-align: baseline;
 }
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+    display: block;
+}
+body {
+    line-height: 1;
+}
+ol, ul {
+    list-style: none;
+}
+blockquote, q {
+    quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+    content: none;
+}
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+
+// Scrollbar
 
 ::-webkit-scrollbar {
     width: 10px;
@@ -40,4 +119,27 @@ hr {
     height: 50px;
     background-color: #666;
     border-radius: 3px;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid @border;
+    margin: 10px;
+}
+
+.entry-label-colour {
+    display: inline-block;
+    height: 10px;
+    width: 10px;
+    border-radius: 50%;
+
+    &.big {
+        height: 20px;
+        width: 20px;
+    }
+}
+
+svg {
+    color: @text-color;
+    shape-rendering: geometricPrecision;
 }

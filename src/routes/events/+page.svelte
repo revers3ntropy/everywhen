@@ -133,7 +133,13 @@
 
         <div class="sort-by">
             Sort by
-            <Select bind:key={$eventsSortKey} options={sortEventsKeys} />
+            <span class="sort-by-select">
+                <Select
+                    bind:key={$eventsSortKey}
+                    options={sortEventsKeys}
+                    fromRight
+                />
+            </span>
         </div>
     </div>
     <ul>
@@ -209,5 +215,9 @@
         .flex-center();
         .bordered();
         padding: 0 0 0 1rem;
+
+        .sort-by-select {
+            margin: 0.3rem;
+        }
     }
 </style>

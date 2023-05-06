@@ -383,7 +383,12 @@
                 <LocationToggle />
             </div>
             <div class="right-options {obfuscated ? 'blur' : ''}">
-                <LabelSelect {auth} bind:value={newEntryLabel} {labels} />
+                <LabelSelect
+                    {auth}
+                    bind:value={newEntryLabel}
+                    {labels}
+                    fromRight
+                />
 
                 <button
                     aria-label="Submit Entry"
@@ -485,6 +490,7 @@
             flex-wrap: wrap;
             justify-content: start;
             align-items: center;
+            gap: 0.5rem;
 
             .title {
                 border: none;

@@ -47,11 +47,15 @@
     }}
 >
     {#if entryId}
-        <a use:tooltip={coordsTooltip} href="/journal/{entryId}">
+        <a
+            use:tooltip={coordsTooltip}
+            href="/journal/{entryId}"
+            class="flex-center"
+        >
             <MapMarker size="20" />
         </a>
     {:else}
-        <span use:tooltip={coordsTooltip}>
+        <span use:tooltip={coordsTooltip} class="flex-center">
             <MapMarker size="20" />
         </span>
     {/if}

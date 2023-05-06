@@ -259,7 +259,7 @@
         <i>
             Created
             <!-- TODO use tz from db -->
-            <UtcTime timestamp={event.created} fmt="hh:mm DD/MM/YYYY" />
+            <UtcTime timestamp={event.created} fmt="MMMM Do YYYY, h:mma" />
         </i>
         <div class="middle-row">
             {#if obfuscated}
