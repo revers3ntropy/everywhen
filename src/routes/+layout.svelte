@@ -2,6 +2,7 @@
     import { browser } from '$app/environment';
     import { goto } from '$app/navigation';
     import { page } from '$app/stores';
+    import Notifications from '$lib/notifications/Notifications.svelte';
     import { parse } from 'cookie';
     import { onMount } from 'svelte';
     import Modal from 'svelte-simple-modal';
@@ -70,7 +71,7 @@
         if (hideAfter < 1) return;
 
         if (nowUtc() - lastActivity >= hideAfter) {
-            notify.info('Hidden due to inactivity');
+            notify.info('Blurred due to inactivity', 10_000);
             $obfuscated = true;
         }
     }
@@ -173,11 +174,7 @@
 </svg>
 
 <div data-sveltekit-preload-data="hover">
-    <button on:click={() => notify.info('info notification')}> info </button>
-    <button on:click={() => notify.error('error notification')}> error </button>
-    <button on:click={() => notify.success('success notification')}>
-        success
-    </button>
+    <Notifications />
 
     {#if data.settings.passcode.value && nowUtc() - $passcodeLastEntered > data.settings.passcodeTimeout.value && showPasscodeModal && !home && (data.settings.passcodeTimeout.value > 0 || !$passcodeLastEntered || !browser)}
         <PasscodeModal

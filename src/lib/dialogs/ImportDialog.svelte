@@ -48,6 +48,7 @@
                     type: NotificationType.ERROR,
                     text: '',
                     timeout: 3000,
+                    created: Date.now(),
                     ...notification
                 });
             }
@@ -56,6 +57,7 @@
                 type: NotificationType.ERROR,
                 text: '',
                 timeout: 3000,
+                created: Date.now(),
                 ...res
             });
         }

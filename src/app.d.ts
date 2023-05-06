@@ -24,6 +24,7 @@ export type Pixels = number;
 export type Hours = number;
 export type Seconds = number;
 export type TimestampSecs = number;
+export type TimestampMilliseconds = number;
 export type Milliseconds = number;
 export type Degrees = number;
 export type Meters = number;

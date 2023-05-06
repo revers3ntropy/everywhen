@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import type { Milliseconds } from '../../app';
+import type { Milliseconds, TimestampMilliseconds } from '../../app';
 import type { Result } from '../utils/result';
 
 export enum NotificationType {
@@ -12,6 +12,7 @@ export interface Notification {
     text: string;
     type: NotificationType;
     timeout: Milliseconds;
+    created: TimestampMilliseconds;
 }
 
 export const notifications = writable<Notification[]>([]);
@@ -23,12 +24,15 @@ export interface Notify {
     error(text: string, timeout?: Milliseconds): void;
 }
 
+export function removeNotification(notification: Notification) {
+    notifications.update(notifs => {
+        return notifs.filter(n => n !== notification);
+    });
+}
+
 export function addNotification(notification: Notification) {
     notifications.update(n => [...n, notification]);
-
-    setTimeout(() => {
-        notifications.update(n => n.filter(n => n !== notification));
-    });
+    setTimeout(() => removeNotification(notification), notification.timeout);
 }
 
 export const notify: Notify = (
@@ -39,7 +43,8 @@ export const notify: Notify = (
     addNotification({
         text,
         type,
-        timeout
+        timeout,
+        created: Date.now()
     });
 };
 
