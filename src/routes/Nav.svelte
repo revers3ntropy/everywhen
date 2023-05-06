@@ -17,7 +17,6 @@
     import Notebook from 'svelte-material-icons/Notebook.svelte';
     import Pencil from 'svelte-material-icons/Pencil.svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
     import Dropdown from '$lib/components/Dropdown.svelte';
     import Streaks from '$lib/components/Streaks.svelte';
     import { LS_KEY } from '$lib/constants';
@@ -25,9 +24,7 @@
     import type { Auth } from '$lib/controllers/user';
     import { obfuscated } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/utils/notifications';
-
-    const { addNotification } = getNotificationsContext();
+    import { displayNotifOnErr } from '$lib/notifications/notifications';
 
     export let auth: Auth;
 
@@ -37,7 +34,6 @@
         if (downloadingBackup) return;
         downloadingBackup = true;
         const { data: backupData } = displayNotifOnErr(
-            addNotification,
             await api.get(auth, '/backups', { encrypted: 1 })
         );
         Backup.download(backupData, auth.username, true);
@@ -48,16 +44,12 @@
         name: string,
         defaultColour: string
     ): Promise<string> {
-        const { labels } = displayNotifOnErr(
-            addNotification,
-            await api.get(auth, '/labels')
-        );
+        const { labels } = displayNotifOnErr(await api.get(auth, '/labels'));
         const label = labels.find(label => label.name === name);
         if (label) {
             return label.id;
         }
         const res = displayNotifOnErr(
-            addNotification,
             await api.post(auth, '/labels', {
                 name,
                 colour: defaultColour

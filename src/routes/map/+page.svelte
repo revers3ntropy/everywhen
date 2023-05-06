@@ -1,12 +1,8 @@
 <script lang="ts">
-    import Map from '$lib/components/map/Map.svelte';
-    import type { Entry } from '$lib/controllers/entry';
-    import type { Location } from '$lib/controllers/location';
+    import Map from '$lib/map/Map.svelte';
+    import type { PageData } from './$types';
 
-    export let data: App.PageData & {
-        locations: Location[];
-        entries: Entry[];
-    };
+    export let data: PageData;
 </script>
 
 <main>

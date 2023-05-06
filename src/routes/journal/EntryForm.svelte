@@ -12,7 +12,6 @@
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import ImageArea from 'svelte-material-icons/ImageArea.svelte';
     import Send from 'svelte-material-icons/Send.svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
     import LabelSelect from '$lib/components/LabelSelect.svelte';
     import { LS_KEY, MAX_IMAGE_SIZE } from '$lib/constants';
     import { Asset } from '$lib/controllers/asset';
@@ -26,14 +25,13 @@
     import { errorLogger } from '$lib/utils/log';
     import {
         displayNotifOnErr,
-        ERR_NOTIFICATION
-    } from '$lib/utils/notifications';
+        notify
+    } from '$lib/notifications/notifications';
     import { obfuscate } from '$lib/utils/text';
     import { nowUtc } from '$lib/utils/time';
     import FormatOptions from './FormatOptions.svelte';
     import LocationToggle from './LocationToggle.svelte';
 
-    const { addNotification } = getNotificationsContext();
     const dispatch = createEventDispatcher();
 
     let mounted = false;
@@ -190,20 +188,14 @@
     });
 
     async function onEntryCreation(body: RawEntry) {
-        const res = displayNotifOnErr(
-            addNotification,
-            await api.post(auth, '/entries', body)
-        );
+        const res = displayNotifOnErr(await api.post(auth, '/entries', body));
         submitted = false;
         if (res.id) {
             // make really sure it's saved before resetting
             reset();
         } else {
             errorLogger.error(res);
-            addNotification({
-                ...ERR_NOTIFICATION,
-                text: `Failed to create entry: ${JSON.stringify(res)}`
-            });
+            notify.error(`Failed to create entry: ${JSON.stringify(res)}`);
         }
         $addEntryListeners.map(e => e());
         await goto(`#${res.id}`);
@@ -223,7 +215,6 @@
             }
         }
         displayNotifOnErr(
-            addNotification,
             await api.put(auth, apiPath('/entries/?', entry.id), body)
         );
         await goto(`/journal/${entry.id}?obfuscate=0`);
@@ -233,7 +224,7 @@
         submitted = true;
 
         const currentLocation = $enabledLocation
-            ? await getLocation(addNotification)
+            ? await getLocation()
             : [null, null];
 
         const body = {
@@ -274,37 +265,24 @@
     async function onFileDrop(e: CustomEvent<{ files: Files }>) {
         const files = e.detail.files;
         if (files.rejected.length > 0) {
-            addNotification({
-                ...ERR_NOTIFICATION,
-                text: 'File could not be read, please try again'
-            });
+            notify.error('File could not be read, please try again');
             return;
         }
         if (files.accepted.length < 1) return;
         if (files.accepted.length !== 1) {
-            addNotification({
-                ...ERR_NOTIFICATION,
-                text: 'Please select exactly one file'
-            });
+            notify.error('Please select exactly one file');
             return;
         }
         const file = files.accepted[0];
-        const content = displayNotifOnErr(
-            addNotification,
-            await getFileContents(file, 'b64')
-        );
+        const content = displayNotifOnErr(await getFileContents(file, 'b64'));
 
         if (!content) return;
         if (content.length > MAX_IMAGE_SIZE) {
-            addNotification({
-                ...ERR_NOTIFICATION,
-                text: 'File too large'
-            });
+            notify.error('Image is too large');
             return;
         }
 
         const { id } = displayNotifOnErr(
-            addNotification,
             await api.post(auth, '/assets', {
                 fileName: file.name,
                 content
@@ -349,10 +327,7 @@
     let labels: Label[] | null = null;
 
     async function loadLabels() {
-        const labelsRes = displayNotifOnErr(
-            addNotification,
-            await api.get(auth, '/labels')
-        );
+        const labelsRes = displayNotifOnErr(await api.get(auth, '/labels'));
         labels = labelsRes.labels;
     }
 

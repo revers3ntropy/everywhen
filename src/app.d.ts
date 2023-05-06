@@ -1,6 +1,36 @@
 import '@total-typescript/ts-reset';
-import type { SettingsConfig } from './lib/controllers/settings';
-import type { Auth } from './lib/controllers/user';
+import type { Event } from '$lib/controllers/event';
+import type { SettingsConfig } from '$lib/controllers/settings';
+import type { Auth } from '$lib/controllers/user';
+
+export type Mutable<T> = {
+    -readonly [P in keyof T]: T[P];
+};
+type NonFunctionPropertyNames<T> = {
+    [K in keyof T]: T[K] extends (...args: infer _) => infer _ ? never : K;
+}[keyof T];
+export type NonFunctionProperties<T> = Pick<T, NonFunctionPropertyNames<T>>;
+export type PickOptionalAndMutable<
+    A,
+    B extends keyof A
+> = NonFunctionProperties<Omit<Readonly<A>, B> & Partial<Mutable<Pick<A, B>>>>;
+export type PickOptional<
+    A,
+    B extends keyof A = keyof A
+> = NonFunctionProperties<Omit<A, B> & Partial<Pick<A, B>>>;
+
+export type Bytes = number;
+export type Pixels = number;
+export type Hours = number;
+export type Seconds = number;
+export type TimestampSecs = number;
+export type Milliseconds = number;
+export type Degrees = number;
+export type Meters = number;
+
+export type EventsSortKey = keyof Omit<Event, 'id' | 'decrypted'>;
+
+export type TooltipPosition = 'top' | 'bottom' | 'left' | 'right';
 
 declare module '$env/static/private' {
     export const DB_HOST: string;
@@ -27,7 +57,7 @@ declare namespace App {
 }
 
 declare global {
-    interface String {
+    declare interface String {
         toLowerCase(): Lowercase<string>;
     }
 
@@ -109,33 +139,6 @@ declare global {
             ) => void;
         }
     }
-
-    declare module '@svelte-plugins/tooltips' {
-        export function tooltip(
-            el: HTMLElement,
-            props: {
-                content: string;
-                placement?: 'top' | 'bottom' | 'left' | 'right';
-                offset?: number;
-            }
-        ): unknown;
-    }
-
-    class WebpConverter {
-        static str2webpstr(
-            str: string,
-            type: string,
-            options: string
-        ): Promise<string>;
-    }
-
-    declare module 'webp-converter' {
-        export = WebpConverter;
-    }
-
-    // Very annoying, but otherwise `svelte-check` complains about
-    // `import '@svelte-plugins/tooltips'`
-    declare module '*';
 }
 
 export type CursorStyle =

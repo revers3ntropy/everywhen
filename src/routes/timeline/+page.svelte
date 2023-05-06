@@ -1,13 +1,10 @@
 <script lang="ts">
-    import { ERR_NOTIFICATION } from '$lib/utils/notifications';
+    import { notify } from '$lib/notifications/notifications';
     import { onMount } from 'svelte';
-    import Background from '$lib/components/canvas/Background.svelte';
-    import Canvas from '$lib/components/canvas/Canvas.svelte';
-    import { canvasState } from '$lib/components/canvas/canvasState';
+    import Background from '$lib/canvas/Background.svelte';
+    import Canvas from '$lib/canvas/Canvas.svelte';
+    import { canvasState } from '$lib/canvas/canvasState';
     import type { Event } from '$lib/controllers/event';
-    import type { Label } from '$lib/controllers/label';
-    import { getNotificationsContext } from 'svelte-notifications';
-    import type { TimelineEntry } from './+page.server';
     import CenterLine from './CenterLine.svelte';
     import Controls from './Controls.svelte';
     import EntryInTimeline from './EntryInTimeline.svelte';
@@ -21,14 +18,9 @@
         type EventWithYLevel,
         getInitialZoomAndPos
     } from './utils';
+    import type { PageData } from './$types';
 
-    export const { addNotification } = getNotificationsContext();
-
-    export let data: App.PageData & {
-        events: Event[];
-        entries: TimelineEntry[];
-        labels: Label[];
-    };
+    export let data: PageData;
 
     let instantEvents: EventWithYLevel[];
     let durationEvents: EventWithYLevel[];
@@ -51,10 +43,7 @@
     function updateEvent(event: Event): void {
         const index = data.events.findIndex(e => e.id === event.id);
         if (index === -1) {
-            addNotification({
-                ...ERR_NOTIFICATION,
-                message: 'Event not found'
-            });
+            notify.error('Event not found');
             return;
         }
         data.events = [
@@ -67,10 +56,7 @@
     function deleteEvent(id: string): void {
         const index = data.events.findIndex(e => e.id === id);
         if (index === -1) {
-            addNotification({
-                ...ERR_NOTIFICATION,
-                message: 'Event not found'
-            });
+            notify.error('Event not found');
             return;
         }
         data.events = [

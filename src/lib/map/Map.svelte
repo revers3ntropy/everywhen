@@ -12,10 +12,9 @@
     import type { Circle } from 'ol/geom';
     import { Modify } from 'ol/interaction';
     import { Style } from 'ol/style';
-    import { getNotificationsContext } from 'svelte-notifications';
     import { writable } from 'svelte/store';
     import { errorLogger } from '$lib/utils/log';
-    import { displayNotifOnErr } from '$lib/utils/notifications';
+    import { displayNotifOnErr } from '$lib/notifications/notifications';
     import type { MapBrowserEvent } from 'ol';
     import Map from 'ol/Map';
     import TileLayer from 'ol/layer/Tile';
@@ -26,14 +25,14 @@
     import Overlay from 'ol/Overlay';
     import ContextMenu from 'ol-contextmenu';
     import { fromLonLat, toLonLat } from 'ol/proj';
-    import type { EntryLocation } from '../../../routes/stats/helpers';
+    import type { EntryLocation } from '../../routes/stats/helpers';
     import type { Auth } from '$lib/controllers/user';
     import { Location } from '$lib/controllers/location';
     import { popup } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { showPopup } from '$lib/utils/popups';
-    import EditLocation from '../EditLocation.svelte';
-    import EntryDialog from '../dialogs/EntryDialog.svelte';
+    import EditLocation from '../components/EditLocation.svelte';
+    import EntryDialog from '$lib/dialogs/EntryDialog.svelte';
     import EntryTooltipOnMap from './EntryTooltipOnMap.svelte';
     import {
         type EntryFeature,
@@ -44,8 +43,6 @@
     } from './map';
 
     // https://openlayers.org/
-
-    const { addNotification } = getNotificationsContext();
 
     export let entries: EntryLocation[] = [];
     export let locations: Location[] = [];
@@ -70,10 +67,7 @@
     > = {};
 
     async function reloadLocations() {
-        const res = displayNotifOnErr(
-            addNotification,
-            await api.get(auth, '/locations')
-        );
+        const res = displayNotifOnErr(await api.get(auth, '/locations'));
         locations = res.locations;
     }
 
@@ -84,7 +78,6 @@
         radius: number
     ): Promise<void> {
         displayNotifOnErr(
-            addNotification,
             await api.put(auth, apiPath('/locations/?', id), {
                 latitude,
                 longitude,
@@ -111,7 +104,6 @@
         const [long, lat] = toLonLat(coordinate);
 
         displayNotifOnErr(
-            addNotification,
             await api.post(auth, '/locations', {
                 latitude: lat,
                 longitude: long,
@@ -395,8 +387,8 @@
 
 <style lang="less">
     @import 'ol-contextmenu/ol-contextmenu.css';
-    @import '../../../styles/variables';
-    @import '../../../styles/layout';
+    @import '../../styles/variables';
+    @import '../../styles/layout';
 
     .map {
         .container();

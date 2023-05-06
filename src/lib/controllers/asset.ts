@@ -1,6 +1,6 @@
-import type { TimestampSecs } from '$lib/utils/types';
 import type { ResultSetHeader } from 'mysql2';
 import webp from 'webp-converter';
+import type { TimestampSecs } from '../../app';
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { Result } from '../utils/result';
@@ -277,7 +277,7 @@ export class Asset {
             ''
         );
 
-        return await (webp as typeof WebpConverter).str2webpstr(
+        return await (webp ).str2webpstr(
             imgB64,
             fileExt,
             `-q ${quality}`

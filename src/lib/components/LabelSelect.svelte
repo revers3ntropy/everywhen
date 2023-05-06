@@ -3,23 +3,17 @@
     import Plus from 'svelte-material-icons/Plus.svelte';
     import LabelOffOutline from 'svelte-material-icons/LabelOffOutline.svelte';
     import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
     import Dropdown from '$lib/components/Dropdown.svelte';
     import type { Label } from '../controllers/label';
     import type { Auth } from '../controllers/user';
     import { api } from '../utils/apiRequest';
     import { errorLogger } from '../utils/log';
-    import {
-        displayNotifOnErr,
-        ERR_NOTIFICATION
-    } from '../utils/notifications';
+    import { displayNotifOnErr, notify } from '../notifications/notifications';
     import { showPopup } from '../utils/popups';
-    import NewLabelDialog from './dialogs/NewLabelDialog.svelte';
+    import NewLabelDialog from '$lib/dialogs/NewLabelDialog.svelte';
     import MenuDown from 'svelte-material-icons/MenuDown.svelte';
 
     const dispatch = createEventDispatcher();
-
-    const { addNotification } = getNotificationsContext();
 
     export let labels: Label[] | null;
     export let value = '';
@@ -34,10 +28,7 @@
 
     function showNewLabelPopup() {
         showPopup(NewLabelDialog, { auth }, async () => {
-            const res = displayNotifOnErr(
-                addNotification,
-                await api.get(auth, '/labels')
-            );
+            const res = displayNotifOnErr(await api.get(auth, '/labels'));
             labels = res.labels;
             // set to last created label
             value = labels.sort((a, b) => b.created - a.created)[0].id;
@@ -47,10 +38,7 @@
     $: if (labels && value !== '' && !labels.find(l => l.id === value)) {
         errorLogger.error(`Label ${value} not found`);
         value = '';
-        addNotification({
-            ...ERR_NOTIFICATION,
-            text: `Can't find label`
-        });
+        notify.error(`Can't find label`);
     }
 
     $: selectedLabel = (labels ?? []).find(l => l.id === value);

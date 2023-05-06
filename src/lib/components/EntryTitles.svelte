@@ -7,7 +7,7 @@
     import { showPopup } from '../utils/popups';
     import { obfuscate } from '../utils/text';
     import { nowUtc, utcEq } from '../utils/time';
-    import EntryDialog from './dialogs/EntryDialog.svelte';
+    import EntryDialog from '$lib/dialogs/EntryDialog.svelte';
     import Dot from './Dot.svelte';
     import UtcTime from './UtcTime.svelte';
 

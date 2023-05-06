@@ -1,14 +1,10 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import type { App } from '../../../app';
     import Entry from '$lib/components/Entry.svelte';
-    import type { Entry as EntryController } from '$lib/controllers/entry';
     import { obfuscated } from '$lib/stores';
+    import type { PageData } from './$types';
 
-    export let data: App.PageData & {
-        entry: EntryController;
-        history: boolean;
-    };
+    export let data: PageData;
 
     onMount(() => (document.title = `View Entry`));
 </script>

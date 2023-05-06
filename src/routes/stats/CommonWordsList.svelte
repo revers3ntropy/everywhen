@@ -1,9 +1,7 @@
 <script lang="ts">
     import type { Auth } from '$lib/controllers/user';
     import { encrypt } from '$lib/security/encryption';
-    import { displayNotifOnErr } from '$lib/utils/notifications.js';
-    import { getNotificationsContext } from 'svelte-notifications';
-    export const { addNotification } = getNotificationsContext();
+    import { displayNotifOnErr } from '$lib/notifications/notifications.js';
 
     export let auth: Auth;
     export let words: [string, number][];
@@ -14,10 +12,7 @@
     {#each words as [word, count], i}
         <div>#{i + 1}</div>
         <a
-            href="/stats/{displayNotifOnErr(
-                addNotification,
-                encrypt(word, auth.key)
-            )}"
+            href="/stats/{displayNotifOnErr(encrypt(word, auth.key))}"
             class="word"
             data-sveltekit-preload-data="tap"
         >

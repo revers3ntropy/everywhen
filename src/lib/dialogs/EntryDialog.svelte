@@ -1,15 +1,12 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
-    import type { Entry as EntryController } from '../../controllers/entry';
+    import type { Entry as EntryController } from '../controllers/entry';
     import type { Auth } from '$lib/controllers/user';
     import { popup } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/utils/notifications';
-    import BookSpinner from '../BookSpinner.svelte';
-    import Entry from '../Entry.svelte';
-
-    const { addNotification } = getNotificationsContext();
+    import { displayNotifOnErr } from '$lib/notifications/notifications';
+    import BookSpinner from '../components/BookSpinner.svelte';
+    import Entry from '../components/Entry.svelte';
 
     export let id: string;
     export let auth: Auth;
@@ -20,9 +17,7 @@
 
     onMount(async () => {
         entry = displayNotifOnErr(
-            addNotification,
             await api.get(auth, apiPath('/entries/?', id)),
-            {},
             () => popup.set(null)
         );
     });

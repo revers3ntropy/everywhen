@@ -1,8 +1,8 @@
+import type { Seconds } from '../../app';
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { Result } from '../utils/result';
 import { nowUtc } from '../utils/time';
-import type { Seconds } from '../utils/types';
 import type { Auth } from './user';
 import { UUID } from './uuid';
 

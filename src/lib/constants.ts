@@ -1,4 +1,4 @@
-import type { Bytes, Milliseconds, Pixels, Seconds } from './utils/types';
+import type { Bytes, Milliseconds, Pixels, Seconds } from '../app';
 
 export const COOKIE_TIMEOUT: Seconds = 60 * 60;
 export const KEY_COOKIE_KEY = '__misc_3_key_v2';

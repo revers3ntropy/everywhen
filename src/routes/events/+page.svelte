@@ -3,24 +3,20 @@
     import Calendar from 'svelte-material-icons/Calendar.svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import TrayArrowUp from 'svelte-material-icons/TrayArrowUp.svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
-    import type { App } from '../../app';
-    import ImportDialog from '$lib/components/dialogs/ImportDialog.svelte';
+    import type { App, EventsSortKey } from '../../app';
+    import ImportDialog from '$lib/dialogs/ImportDialog.svelte';
     import Dot from '$lib/components/Dot.svelte';
     import Select from '$lib/components/Select.svelte';
     import type { Event as EventController } from '$lib/controllers/event';
     import type { Label } from '$lib/controllers/label';
     import { eventsSortKey, obfuscated } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/utils/notifications';
+    import { displayNotifOnErr } from '$lib/notifications/notifications';
     import { showPopup } from '$lib/utils/popups';
     import { nowUtc } from '$lib/utils/time';
-    import type { EventsSortKey } from '$lib/utils/types';
     import Event from '$lib/components/Event.svelte';
 
     const NEW_EVENT_NAME = 'New Event';
-
-    const { addNotification } = getNotificationsContext();
 
     export let data: App.PageData & {
         events: EventController[];
@@ -50,8 +46,7 @@
 
     async function reloadEvents() {
         events = sortEvents(
-            displayNotifOnErr(addNotification, await api.get(data, '/events'))
-                .events,
+            displayNotifOnErr(await api.get(data, '/events')).events,
             $eventsSortKey
         );
     }
@@ -61,7 +56,6 @@
     async function newEvent() {
         const now = nowUtc();
         displayNotifOnErr(
-            addNotification,
             await api.post(data, '/events', {
                 name: NEW_EVENT_NAME,
                 start: now,

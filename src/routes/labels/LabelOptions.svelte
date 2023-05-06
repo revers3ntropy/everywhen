@@ -1,14 +1,11 @@
 <script lang="ts">
     import { createEventDispatcher } from 'svelte';
     import Delete from 'svelte-material-icons/Delete.svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
     import type { Auth } from '$lib/controllers/user';
     import { api, apiPath } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/utils/notifications';
+    import { displayNotifOnErr } from '$lib/notifications/notifications';
     import { showPopup } from '$lib/utils/popups';
     import DeleteLabelDialog from './DeleteLabelDialog.svelte';
-
-    const { addNotification } = getNotificationsContext();
 
     const dispatch = createEventDispatcher();
 
@@ -25,7 +22,6 @@
 
     async function updateLabel(changes: { name?: string; colour?: string }) {
         displayNotifOnErr(
-            addNotification,
             await api.put(auth, apiPath(`/labels/?`, id), changes)
         );
     }
@@ -36,10 +32,7 @@
         // a more complex approach is required to clear the
         // label from the entries and events
         if (entryCount + eventCount < 1) {
-            displayNotifOnErr(
-                addNotification,
-                await api.delete(auth, apiPath(`/labels/?`, id))
-            );
+            displayNotifOnErr(await api.delete(auth, apiPath(`/labels/?`, id)));
             dispatch('delete', { id });
             return;
         }
@@ -64,7 +57,6 @@
             <input
                 bind:value={name}
                 class="editable-text"
-                autocomplete="none"
                 type="text"
                 on:change={() => updateLabel({ name })}
             />

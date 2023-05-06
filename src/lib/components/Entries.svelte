@@ -1,24 +1,21 @@
 <script lang="ts">
     import { browser } from '$app/environment';
     import { encrypt } from '$lib/security/encryption.js';
-    import type { Mutable } from '$lib/utils/types.js';
     import { onMount } from 'svelte';
     import { inview } from 'svelte-inview';
     import Bin from 'svelte-material-icons/Delete.svelte';
     import TrayArrowUp from 'svelte-material-icons/TrayArrowUp.svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
     import EntryGroup from '$lib/components/EntryGroup.svelte';
+    import type { Mutable } from '../../app';
     import { Entry, type EntryFilter } from '../controllers/entry';
     import type { Auth } from '../controllers/user';
     import { obfuscated } from '../stores';
     import { api } from '../utils/apiRequest';
-    import { displayNotifOnErr } from '../utils/notifications';
+    import { displayNotifOnErr } from '../notifications/notifications';
     import { showPopup } from '../utils/popups';
     import Spinner from './BookSpinner.svelte';
-    import ImportDialog from './dialogs/ImportDialog.svelte';
+    import ImportDialog from '$lib/dialogs/ImportDialog.svelte';
     import Sidebar from './EntriesSidebar.svelte';
-
-    const { addNotification } = getNotificationsContext();
 
     export let auth: Auth;
 
@@ -66,7 +63,6 @@
 
         if (search) {
             entriesOptions.search = displayNotifOnErr(
-                addNotification,
                 encrypt(search, auth.key)
             );
         }
@@ -79,10 +75,7 @@
     }
 
     async function loadTitles() {
-        const res = displayNotifOnErr(
-            addNotification,
-            await api.get(auth, '/entries/titles')
-        );
+        const res = displayNotifOnErr(await api.get(auth, '/entries/titles'));
         entryTitles = Entry.groupEntriesByDay(res.entries);
     }
 
@@ -108,7 +101,6 @@
         const entriesOptions = getEntriesOptions();
 
         const res = displayNotifOnErr(
-            addNotification,
             await api.get(
                 auth,
                 `/entries`,

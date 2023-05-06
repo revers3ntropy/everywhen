@@ -4,7 +4,7 @@
     import type { Entry } from '$lib/controllers/entry';
     import type { Auth } from '$lib/controllers/user';
     import { api, apiPath } from '$lib/utils/apiRequest';
-    import UtcTime from '../UtcTime.svelte';
+    import UtcTime from '../components/UtcTime.svelte';
 
     export let id: string;
     export let auth: Auth;

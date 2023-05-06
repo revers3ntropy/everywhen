@@ -1,9 +1,9 @@
 <script lang="ts">
     import { tooltip } from '@svelte-plugins/tooltips';
     import * as timeago from 'timeago.js';
+    import type { Hours, Seconds } from '../../app';
     import { numberAsSignedStr } from '../utils/text';
     import { currentTzOffset, fmtUtc } from '../utils/time';
-    import type { Hours, Seconds } from '../utils/types';
 
     export let timestamp: Seconds;
     export let tzOffset: Hours = currentTzOffset();

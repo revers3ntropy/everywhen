@@ -1,14 +1,13 @@
 <script lang="ts">
     import BookSpinner from '$lib/components/BookSpinner.svelte';
     import { api } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/utils/notifications.js';
+    import { displayNotifOnErr } from '$lib/notifications/notifications.js';
     import { onMount } from 'svelte';
     import Cog from 'svelte-material-icons/Cog.svelte';
     import ImageOutline from 'svelte-material-icons/ImageOutline.svelte';
     import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
     import Notebook from 'svelte-material-icons/Notebook.svelte';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
     import type { App } from '../../app';
     import EntryTitles from '$lib/components/EntryTitles.svelte';
     import { Entry } from '$lib/controllers/entry';
@@ -19,8 +18,6 @@
         fmtUtc,
         nowUtc
     } from '$lib/utils/time';
-
-    export const { addNotification } = getNotificationsContext();
 
     const NUMBER_OF_ENTRY_TITLES = 10;
 
@@ -64,7 +61,6 @@
 
     onMount(async () => {
         const titlesRes = displayNotifOnErr(
-            addNotification,
             await api.get(data, '/entries/titles')
         );
         titles = titlesRes.entries;

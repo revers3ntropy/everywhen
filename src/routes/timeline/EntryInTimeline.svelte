@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { START_ZOOM } from '$lib/components/canvas/canvasState';
-    import { RectCollider } from '$lib/components/canvas/collider';
-    import { interactable } from '$lib/components/canvas/interactable';
-    import EntryDialog from '$lib/components/dialogs/EntryDialog.svelte';
+    import { START_ZOOM } from '$lib/canvas/canvasState';
+    import { RectCollider } from '$lib/canvas/collider';
+    import { interactable } from '$lib/canvas/interactable';
+    import EntryDialog from '$lib/dialogs/EntryDialog.svelte';
     import type { EntryEdit } from '$lib/controllers/entry';
     import type { Label } from '$lib/controllers/label';
     import type { Auth } from '$lib/controllers/user';

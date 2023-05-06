@@ -7,7 +7,6 @@
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import NoteEditOutline from 'svelte-material-icons/NoteEditOutline.svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
     import UtcTime from '$lib/components/UtcTime.svelte';
     import type { Entry } from '../controllers/entry';
     import type { Label as LabelController } from '../controllers/label';
@@ -15,10 +14,7 @@
     import { popup } from '../stores';
     import { api, apiPath } from '../utils/apiRequest';
     import { focusableId } from '../utils/focusableId';
-    import {
-        displayNotifOnErr,
-        SUCCESS_NOTIFICATION
-    } from '../utils/notifications';
+    import { displayNotifOnErr, notify } from '../notifications/notifications';
     import { obfuscate, rawMdToHtml } from '../utils/text';
     import AgentWidget from './AgentWidget.svelte';
     import Dot from './Dot.svelte';
@@ -26,7 +22,6 @@
     import LocationWidget from './LocationWidget.svelte';
 
     const dispatch = createEventDispatcher();
-    const { addNotification } = getNotificationsContext();
 
     export let id = '';
     export let title = '';
@@ -75,7 +70,6 @@
         }
 
         displayNotifOnErr(
-            addNotification,
             await api.delete(auth, apiPath('/entries/?', id), {
                 restore: !!deleted
             })
@@ -83,10 +77,7 @@
 
         if (isInDialog) popup.set(null);
 
-        addNotification({
-            ...SUCCESS_NOTIFICATION,
-            text: `Entry ${deleted ? 'restored' : 'deleted'}`
-        });
+        notify.success(`Entry ${deleted ? 'restored' : 'deleted'}`);
         dispatch('updated');
     }
 

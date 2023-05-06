@@ -2,22 +2,14 @@
     import { onMount } from 'svelte';
     import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
     import Dot from '$lib/components/Dot.svelte';
-    import type { Label as LabelController } from '$lib/controllers/label';
     import { api } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/utils/notifications';
+    import { displayNotifOnErr } from '$lib/notifications/notifications';
     import { nowUtc } from '$lib/utils/time';
     import LabelOptions from './LabelOptions.svelte';
+    import type { PageData } from './$types';
 
-    const { addNotification } = getNotificationsContext();
-
-    export let data: App.PageData & {
-        labels: (LabelController & {
-            entryCount: number;
-            eventCount: number;
-        })[];
-    };
+    export let data: PageData;
 
     async function newLabel() {
         let name = 'New Label';
@@ -32,7 +24,6 @@
         };
 
         const { id } = displayNotifOnErr(
-            addNotification,
             await api.post(data, '/labels', newLabel)
         );
 

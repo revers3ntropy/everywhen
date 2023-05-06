@@ -6,18 +6,16 @@
     import Delete from 'svelte-material-icons/Delete.svelte';
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
     import UtcTime from '$lib/components/UtcTime.svelte';
     import { Asset } from '$lib/controllers/asset';
     import type { Auth } from '$lib/controllers/user';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import {
         displayNotifOnErr,
-        SUCCESS_NOTIFICATION
-    } from '$lib/utils/notifications';
-    import type { TimestampSecs } from '$lib/utils/types';
+        notify
+    } from '$lib/notifications/notifications';
+    import type { TimestampSecs } from '../../app';
 
-    const { addNotification } = getNotificationsContext();
     const dispatch = createEventDispatcher();
 
     export let id: string;
@@ -41,26 +39,22 @@
         )
             return;
         displayNotifOnErr(
-            addNotification,
             await api.delete(auth, apiPath(`/assets/?`, publicId))
         );
-        addNotification({
-            ...SUCCESS_NOTIFICATION,
-            text: 'Deleted asset'
-        });
+        notify.success('Deleted asset');
         deleted = true;
         dispatch('delete');
     }
 
     async function copyToClipBoard() {
         recentlyCopied = true;
+
         await navigator.clipboard.writeText(
             Asset.markDownLink(fileName, publicId)
         );
-        addNotification({
-            ...SUCCESS_NOTIFICATION,
-            text: 'Copied to clipboard'
-        });
+
+        notify.success('Copied to clipboard');
+
         setTimeout(() => (recentlyCopied = false), 3000);
     }
 

@@ -7,7 +7,7 @@
     import ToggleSwitchOff from 'svelte-material-icons/ToggleSwitchOff.svelte';
     import Select from '$lib/components/Select.svelte';
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
-    import type { Seconds } from '$lib/utils/types';
+    import type { Seconds, TimestampSecs } from '../../app';
     import {
         Bucket,
         bucketiseTime,
@@ -48,7 +48,10 @@
             });
     }
 
-    function generateLabels(start: Seconds, buckets: Seconds[]): string[] {
+    function generateLabels(
+        start: TimestampSecs,
+        buckets: Seconds[]
+    ): string[] {
         let year = parseInt(fmtUtc(start, currentTzOffset(), 'YYYY'));
         return buckets.map(k => {
             if (selectedBucket === Bucket.Year) {

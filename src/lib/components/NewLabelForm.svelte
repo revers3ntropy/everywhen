@@ -1,16 +1,10 @@
 <script lang="ts">
     import { createEventDispatcher } from 'svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
     import type { Auth } from '../controllers/user';
     import { api } from '../utils/apiRequest';
-    import {
-        displayNotifOnErr,
-        ERR_NOTIFICATION,
-        SUCCESS_NOTIFICATION
-    } from '../utils/notifications';
+    import { displayNotifOnErr, notify } from '../notifications/notifications';
 
     const dispatch = createEventDispatcher();
-    const { addNotification } = getNotificationsContext();
 
     let labelName = '';
     let labelColour = '#000000';
@@ -19,25 +13,18 @@
 
     async function closeHandler() {
         if (!labelName) {
-            addNotification({
-                ...ERR_NOTIFICATION,
-                text: 'Invalid Name'
-            });
+            notify.error('Invalid Name');
             return;
         }
 
         displayNotifOnErr(
-            addNotification,
             await api.post(auth, '/labels', {
                 name: labelName,
                 colour: labelColour
             })
         );
 
-        addNotification({
-            ...SUCCESS_NOTIFICATION,
-            text: 'Label created'
-        });
+        notify.success('Label created');
 
         labelName = '';
 

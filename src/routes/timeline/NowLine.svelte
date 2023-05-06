@@ -1,7 +1,7 @@
 <script lang="ts">
-    import type { RenderProps } from '$lib/components/canvas/canvasState';
-    import { RectCollider } from '$lib/components/canvas/collider';
-    import { interactable } from '$lib/components/canvas/interactable';
+    import type { RenderProps } from '$lib/canvas/canvasState';
+    import { RectCollider } from '$lib/canvas/collider';
+    import { interactable } from '$lib/canvas/interactable';
     import { nowUtc } from '$lib/utils/time';
 
     interactable({

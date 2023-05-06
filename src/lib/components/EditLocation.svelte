@@ -3,16 +3,13 @@
     import Syncing from 'svelte-material-icons/CloudArrowUpOutline.svelte';
     import Synced from 'svelte-material-icons/CloudCheckOutline.svelte';
     import Bin from 'svelte-material-icons/Delete.svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
     import type { ChangeEventHandler } from 'svelte/elements';
     import { Location } from '../controllers/location';
     import type { Auth } from '../controllers/user';
     import { popup } from '../stores';
     import { api, apiPath } from '../utils/apiRequest';
-    import { displayNotifOnErr } from '../utils/notifications';
+    import { displayNotifOnErr } from '../notifications/notifications';
     import { round1DP } from '../utils/text';
-
-    const { addNotification } = getNotificationsContext();
 
     export let isInDialog = false;
     export let auth: Auth;
@@ -32,7 +29,6 @@
     async function syncWithServer() {
         synced = false;
         displayNotifOnErr(
-            addNotification,
             await api.put(auth, apiPath('/locations/?', id), {
                 name,
                 radius
@@ -67,10 +63,7 @@
     }) satisfies ChangeEventHandler<HTMLInputElement>;
 
     async function bin() {
-        displayNotifOnErr(
-            addNotification,
-            await api.delete(auth, apiPath('/locations/?', id))
-        );
+        displayNotifOnErr(await api.delete(auth, apiPath('/locations/?', id)));
         popup.set(null);
         if (onChange !== null) {
             await onChange(null);

@@ -1,8 +1,8 @@
+import type { PickOptional } from '../../app';
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { Result } from '../utils/result';
 import { nowUtc } from '../utils/time';
-import type { PickOptional } from '../utils/types';
 import type { Auth } from './user';
 import { UUID } from './uuid';
 

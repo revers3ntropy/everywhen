@@ -191,7 +191,7 @@
 <slot />
 
 <style lang="less">
-    @import '../../../styles/variables';
+    @import '../../styles/variables';
 
     .context-menu {
         position: absolute;

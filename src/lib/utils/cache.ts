@@ -2,13 +2,13 @@ import type { MaybePromise } from '$app/forms';
 import { ENABLE_CACHING } from '$lib/constants';
 import type { RequestEvent, ServerLoadEvent } from '@sveltejs/kit';
 import chalk from 'chalk';
+import type { Bytes, Seconds } from '../../app';
 import type { Auth } from '../controllers/user';
 import { getAuthFromCookies } from '../security/getAuthFromCookies';
 import type { GenericResponse } from './apiResponse';
 import { makeLogger } from './log';
 import { fmtBytes } from './text';
 import { nowUtc } from './time';
-import type { Bytes, Seconds } from './types';
 
 const cacheLogger = makeLogger('CACHE', chalk.magentaBright, 'general.log');
 

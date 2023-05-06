@@ -1,14 +1,13 @@
 <script lang="ts">
+    import { notify } from '$lib/notifications/notifications';
     import { tooltip } from '@svelte-plugins/tooltips';
     import { onMount } from 'svelte';
     import MapMarkerOffOutline from 'svelte-material-icons/MapMarkerOffOutline.svelte';
     import MapMarkerOutline from 'svelte-material-icons/MapMarkerOutline.svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
     import { enabledLocation } from '$lib/stores';
+    import type { TooltipPosition } from '../../app';
 
-    const { addNotification } = getNotificationsContext();
-
-    export let tooltipPosition = 'bottom';
+    export let tooltipPosition: TooltipPosition = 'bottom';
 
     async function watchLocationPermissions() {
         const permissionStatus = await navigator.permissions.query({
@@ -36,14 +35,10 @@
                 () => {
                     enabledLocation.set(false);
                     resolve(false);
-                    addNotification({
-                        text:
-                            'Something went wrong enabling location' +
-                            ' - please check your browser settings',
-                        removeAfter: 8000,
-                        type: 'error',
-                        position: 'top-center'
-                    });
+                    notify.error(
+                        'Something went wrong enabling location' +
+                            ' - please check your browser settings'
+                    );
                 }
             );
         });

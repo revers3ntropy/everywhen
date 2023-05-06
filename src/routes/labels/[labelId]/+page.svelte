@@ -2,29 +2,19 @@
     import { goto } from '$app/navigation';
     import { onMount } from 'svelte';
     import Delete from 'svelte-material-icons/Delete.svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
     import Entries from '$lib/components/Entries.svelte';
-    import type { Event as EventController } from '$lib/controllers/event';
-    import type { Label } from '$lib/controllers/label';
     import { obfuscated } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/utils/notifications';
+    import { displayNotifOnErr } from '$lib/notifications/notifications';
     import { showPopup } from '$lib/utils/popups';
     import Event from '$lib/components/Event.svelte';
     import DeleteLabelDialog from '../DeleteLabelDialog.svelte';
+    import type { PageData } from './$types';
 
-    const { addNotification } = getNotificationsContext();
-
-    export let data: App.PageData & {
-        label: Label;
-        entryCount: number;
-        events: EventController[];
-        labels: Label[];
-    };
+    export let data: PageData;
 
     async function updateName() {
         displayNotifOnErr(
-            addNotification,
             await api.put(data, apiPath('/labels/?', data.label.id), {
                 name: data.label.name
             })
@@ -33,7 +23,6 @@
 
     async function updateColour() {
         displayNotifOnErr(
-            addNotification,
             await api.put(data, apiPath('/labels/?', data.label.id), {
                 colour: data.label.colour
             })
@@ -55,7 +44,6 @@
         // label from the entries and events
         if (data.entryCount + eventCount < 1) {
             displayNotifOnErr(
-                addNotification,
                 await api.delete(data, apiPath(`/labels/?`, data.label.id))
             );
             await goto('../');

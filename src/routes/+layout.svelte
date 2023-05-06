@@ -4,7 +4,6 @@
     import { page } from '$app/stores';
     import { parse } from 'cookie';
     import { onMount } from 'svelte';
-    import Notifications from 'svelte-notifications';
     import Modal from 'svelte-simple-modal';
     import 'ts-polyfill';
     import '../app.less';
@@ -20,15 +19,13 @@
     import { errorLogger } from '$lib/utils/log';
     import {
         displayNotifOnErr,
-        INFO_NOTIFICATION
-    } from '$lib/utils/notifications';
+        notify
+    } from '$lib/notifications/notifications';
     import { nowUtc } from '$lib/utils/time';
-    import type { NotificationOptions } from '$lib/utils/types';
     import Footer from './Footer.svelte';
     import Nav from './Nav.svelte';
     import NewVersionAvailable from './NewVersionAvailable.svelte';
     import NoAuthNav from './NoAuthNav.svelte';
-    import Notifier from './Notifier.svelte';
     import PasscodeModal from './PasscodeModal.svelte';
     import { blur } from 'svelte/transition';
 
@@ -38,10 +35,6 @@
     export let data: App.PageData;
 
     let lastActivity = nowUtc();
-
-    let addNotification: <T>(
-        props: Record<string, T> | NotificationOptions
-    ) => void;
 
     $: obfuscated.set(data.settings.hideEntriesByDefault.value);
 
@@ -56,6 +49,19 @@
     let newVersion = '<error>';
     let downloadingBackup = false;
 
+    onMount(() => {
+        setInterval(() => {
+            if (home) return;
+            void checkCookies();
+            checkObfuscatedTimeout();
+            checkPasscode();
+        }, 1000);
+
+        setInterval(() => {
+            void checkForUpdate();
+        }, 1000 * 30);
+    });
+
     function checkObfuscatedTimeout() {
         if (!requireAuth) return;
         if ($obfuscated) return;
@@ -64,11 +70,7 @@
         if (hideAfter < 1) return;
 
         if (nowUtc() - lastActivity >= hideAfter) {
-            addNotification({
-                ...INFO_NOTIFICATION,
-                removeAfter: 5000,
-                text: 'Hidden due to inactivity'
-            });
+            notify.info('Hidden due to inactivity');
             $obfuscated = true;
         }
     }
@@ -102,26 +104,12 @@
     async function checkForUpdate() {
         const currentVersion = __VERSION__;
         const versionResult = displayNotifOnErr(
-            addNotification,
             await api.get(data, '/version')
         );
 
         newVersionAvailable = versionResult.v !== currentVersion;
         newVersion = versionResult.v;
     }
-
-    onMount(() => {
-        setInterval(() => {
-            if (home) return;
-            void checkCookies();
-            checkObfuscatedTimeout();
-            checkPasscode();
-        }, 1000);
-
-        setInterval(() => {
-            void checkForUpdate();
-        }, 1000 * 30);
-    });
 
     function activity() {
         lastActivity = nowUtc();
@@ -131,7 +119,6 @@
         if (downloadingBackup) return;
         downloadingBackup = true;
         const { data: backupData } = displayNotifOnErr(
-            addNotification,
             await api.get(data, '/backups', { encrypted: 1 })
         );
         Backup.download(backupData, data.username, true);
@@ -164,10 +151,7 @@
 
 <svelte:head>
     <title>Halcyon.Land</title>
-    <meta
-        content="Halcyon.Land - Journal and Life Logging"
-        name="description"
-    />
+    <meta content="Halcyon.Land - Journal and Life Logger" name="description" />
 
     <link href="https://fonts.googleapis.com" rel="preconnect" />
     <link
@@ -189,52 +173,54 @@
 </svg>
 
 <div data-sveltekit-preload-data="hover">
-    <Notifications>
-        {#if data.settings.passcode.value && nowUtc() - $passcodeLastEntered > data.settings.passcodeTimeout.value && showPasscodeModal && !home && (data.settings.passcodeTimeout.value > 0 || !$passcodeLastEntered || !browser)}
-            <PasscodeModal
-                bind:show={showPasscodeModal}
-                passcode={data.settings.passcode.value}
-            />
-        {/if}
+    <button on:click={() => notify.info('info notification')}> info </button>
+    <button on:click={() => notify.error('error notification')}> error </button>
+    <button on:click={() => notify.success('success notification')}>
+        success
+    </button>
 
-        <Notifier bind:addNotification />
-
-        {#if !home}
-            {#if data.id}
-                <Nav auth={data} />
-            {:else}
-                <NoAuthNav />
-            {/if}
-        {/if}
-
-        {#key data.path}
-            <div
-                class="page-content"
-                in:blur={{
-                    // half as total = in + out
-                    duration: ANIMATION_DURATION * 0.5,
-                    delay: ANIMATION_DURATION * 0.5
-                }}
-                out:blur={{
-                    duration: ANIMATION_DURATION * 0.5
-                }}
-            >
-                <slot />
-            </div>
-        {/key}
-
-        {#if newVersionAvailable}
-            <NewVersionAvailable {newVersion} />
-        {/if}
-
-        <Modal
-            classContent="popup-background"
-            classWindow="popup-background"
-            show={$popup}
+    {#if data.settings.passcode.value && nowUtc() - $passcodeLastEntered > data.settings.passcodeTimeout.value && showPasscodeModal && !home && (data.settings.passcodeTimeout.value > 0 || !$passcodeLastEntered || !browser)}
+        <PasscodeModal
+            bind:show={showPasscodeModal}
+            passcode={data.settings.passcode.value}
         />
+    {/if}
 
-        <Footer />
-    </Notifications>
+    {#if !home}
+        {#if data.id}
+            <Nav auth={data} />
+        {:else}
+            <NoAuthNav />
+        {/if}
+    {/if}
+
+    {#key data.path}
+        <div
+            class="page-content"
+            in:blur={{
+                // half as total = in + out
+                duration: ANIMATION_DURATION * 0.5,
+                delay: ANIMATION_DURATION * 0.5
+            }}
+            out:blur={{
+                duration: ANIMATION_DURATION * 0.5
+            }}
+        >
+            <slot />
+        </div>
+    {/key}
+
+    {#if newVersionAvailable}
+        <NewVersionAvailable {newVersion} />
+    {/if}
+
+    <Modal
+        classContent="popup-background"
+        classWindow="popup-background"
+        show={$popup}
+    />
+
+    <Footer />
 </div>
 
 <style lang="less">

@@ -1,15 +1,13 @@
 <script lang="ts">
     import InfiniteScroller from '$lib/components/InfiniteScroller.svelte';
     import { api } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/utils/notifications';
+    import { displayNotifOnErr } from '$lib/notifications/notifications';
     import ImageOutline from 'svelte-material-icons/ImageOutline.svelte';
     import Dot from '$lib/components/Dot.svelte';
     import { obfuscated } from '$lib/stores';
-    import { getNotificationsContext } from 'svelte-notifications';
     import Asset from './Asset.svelte';
+    import type { Asset as AssetController } from '$lib/controllers/asset';
     import type { PageData } from './$types';
-
-    const { addNotification } = getNotificationsContext();
 
     export let data: PageData;
 
@@ -18,9 +16,8 @@
     async function loadMoreAssets(
         offset: number,
         count: number
-    ): Promise<Asset[]> {
+    ): Promise<Omit<AssetController, 'content'>[]> {
         const res = displayNotifOnErr(
-            addNotification,
             await api.get(data, `/assets`, { offset, count })
         );
         return res.assets;

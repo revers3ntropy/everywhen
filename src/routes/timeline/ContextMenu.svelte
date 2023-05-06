@@ -1,17 +1,14 @@
 <script lang="ts">
-    import { canvasState } from '$lib/components/canvas/canvasState';
-    import { displayNotifOnErr } from '$lib/utils/notifications.js';
-    import { getNotificationsContext } from 'svelte-notifications';
-    import { RectCollider } from '$lib/components/canvas/collider';
-    import { interactable } from '$lib/components/canvas/interactable';
+    import { canvasState } from '$lib/canvas/canvasState';
+    import { displayNotifOnErr } from '$lib/notifications/notifications.js';
+    import { RectCollider } from '$lib/canvas/collider';
+    import { interactable } from '$lib/canvas/interactable';
     import type { Auth } from '$lib/controllers/user';
     import { Event } from '$lib/controllers/event';
     import { api } from '$lib/utils/apiRequest';
     import { nowUtc } from '$lib/utils/time';
-    import type { TimestampSecs } from '$lib/utils/types';
+    import type { TimestampSecs } from '../../app';
     export let auth: Auth;
-
-    export const { addNotification } = getNotificationsContext();
 
     export let createEvent: (event: Event) => void;
 
@@ -22,7 +19,6 @@
             end
         };
         const { id } = displayNotifOnErr(
-            addNotification,
             await api.post(auth, '/events', event)
         );
         createEvent(

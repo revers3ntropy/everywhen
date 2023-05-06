@@ -3,8 +3,9 @@
     import Entries from '$lib/components/Entries.svelte';
     import { obfuscated } from '$lib/stores';
     import EntryForm from './EntryForm.svelte';
+    import type { PageData } from './$types';
 
-    export let data: App.PageData;
+    export let data: PageData;
 
     let clearEntryForm: () => void;
     let reloadEntries: () => Promise<void>;

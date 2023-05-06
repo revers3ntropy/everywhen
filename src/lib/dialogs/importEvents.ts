@@ -1,19 +1,19 @@
-import { matches } from 'schemion';
 import type { Event } from '$lib/controllers/event';
 import type { Label } from '$lib/controllers/label';
 import type { Auth } from '$lib/controllers/user';
 import { api, type ReqBody } from '$lib/utils/apiRequest';
 import { errorLogger } from '$lib/utils/log';
+import type { Notification } from '$lib/notifications/notifications';
+import { NotificationType } from '$lib/notifications/notifications';
 import { nowUtc } from '$lib/utils/time';
-import type { Mutable, NotificationOptions } from '$lib/utils/types';
+import { matches } from 'schemion';
+import type { Mutable } from '../../app';
 
 export async function importEvents(
     contents: string,
     labels: Label[],
     auth: Auth
-): Promise<
-    undefined | Partial<NotificationOptions> | Partial<NotificationOptions>[]
-> {
+): Promise<undefined | Partial<Notification> | Partial<Notification>[]> {
     const labelHashMap = new Map<string, string>();
     labels.forEach(label => {
         labelHashMap.set(label.name, label.id);
@@ -36,7 +36,7 @@ export async function importEvents(
     }
 
     const errors: [number, string][] = [];
-    const notifications: Partial<NotificationOptions>[] = [];
+    const notifications: Partial<Notification>[] = [];
 
     let i = -1;
     for (const eventJson of json) {
@@ -76,9 +76,9 @@ export async function importEvents(
             if (!labelId) {
                 notifications.push({
                     text: `Creating label ${eventJson.label}`,
-                    type: 'info',
-                    removeAfter: 10000
-                });
+                    type: NotificationType.INFO,
+                    timeout: 10000
+                } as const);
                 const { err, val: createLabelRes } = await api.post(
                     auth,
                     `/labels`,
@@ -116,7 +116,7 @@ export async function importEvents(
     if (errors.length < 0) {
         return {
             text: `Successfully uploaded entries`,
-            type: 'success'
+            type: NotificationType.SUCCESS
         };
     }
 

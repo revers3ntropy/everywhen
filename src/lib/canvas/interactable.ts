@@ -1,7 +1,6 @@
 import { getContext, onMount } from 'svelte';
-import type { CursorStyle } from '../../../app';
+import type { CursorStyle, TimestampSecs } from '../../app';
 import { DEBUG_RENDER_COLLIDERS } from '$lib/constants';
-import type { TimestampSecs } from '$lib/utils/types';
 import {
     type CanvasContext,
     CanvasState,

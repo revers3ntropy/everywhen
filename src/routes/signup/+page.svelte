@@ -1,15 +1,12 @@
 <script lang="ts">
     import Dot from '$lib/components/Dot.svelte';
-    import { displayNotifOnErr } from '$lib/utils/notifications.js';
+    import { displayNotifOnErr } from '$lib/notifications/notifications.js';
     import { api } from '$lib/utils/apiRequest.js';
     import { encryptionKeyFromPassword } from '$lib/security/authUtils.js';
     import { goto } from '$app/navigation';
     import { tooltip } from '@svelte-plugins/tooltips';
     import ArrowRightThinCircleOutline from 'svelte-material-icons/ArrowRightThinCircleOutline.svelte';
     import InformationOutline from 'svelte-material-icons/InformationOutline.svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
-
-    const { addNotification } = getNotificationsContext();
 
     export let data: App.PageData & {
         redirect: string;
@@ -25,22 +22,18 @@
     async function create(): Promise<void> {
         actionPending = true;
         displayNotifOnErr(
-            addNotification,
             await api.post(data, `/users`, {
                 password: encryptionKeyFromPassword(password),
                 username
             }),
-            {},
             () => (actionPending = false)
         );
         if (passcode) {
             displayNotifOnErr(
-                addNotification,
                 await api.put(data, `/settings`, {
                     key: 'passcode',
                     value: passcode
                 }),
-                {},
                 () => (actionPending = false)
             );
         }

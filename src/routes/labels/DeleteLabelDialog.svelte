@@ -1,15 +1,12 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
     import BookSpinner from '$lib/components/BookSpinner.svelte';
     import LabelSelect from '$lib/components/LabelSelect.svelte';
     import type { Label } from '$lib/controllers/label';
     import type { Auth } from '$lib/controllers/user';
     import { popup } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/utils/notifications';
-
-    const { addNotification } = getNotificationsContext();
+    import { displayNotifOnErr } from '$lib/notifications/notifications';
 
     export let auth: Auth;
     export let id: string;
@@ -28,21 +25,16 @@
         loaded = false;
 
         const entriesRes = displayNotifOnErr(
-            addNotification,
             await api.get(auth, `/entries`, { labelId: id })
         );
         entryCount = entriesRes.totalEntries;
 
         const eventsRes = displayNotifOnErr(
-            addNotification,
             await api.get(auth, `/events`, { labelId: id })
         );
         eventCount = eventsRes.events.filter(e => e.label?.id === id).length;
 
-        const labelsRes = displayNotifOnErr(
-            addNotification,
-            await api.get(auth, '/labels')
-        );
+        const labelsRes = displayNotifOnErr(await api.get(auth, '/labels'));
         labels = labelsRes.labels;
 
         loaded = true;
@@ -50,7 +42,6 @@
 
     async function rmLabel() {
         displayNotifOnErr(
-            addNotification,
             await api.delete(auth, apiPath(`/labels/?`, id), {
                 strategy: 'remove'
             })
@@ -64,7 +55,6 @@
 
     async function reassign() {
         displayNotifOnErr(
-            addNotification,
             await api.delete(auth, apiPath(`/labels/?`, id), {
                 strategy: 'reassign',
                 newLabelId: changeLabelId

@@ -1,16 +1,13 @@
 <script lang="ts">
+    import { notify } from '$lib/notifications/notifications';
     import {
         filedrop,
         type FileDropOptions,
         type Files
     } from 'filedrop-svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
     import { popup } from '$lib/stores';
     import { getFileContents } from '$lib/utils/files';
-    import { ERR_NOTIFICATION } from '$lib/utils/notifications';
     import type { Result } from '$lib/utils/result';
-
-    const { addNotification } = getNotificationsContext();
 
     export const fileOptions: FileDropOptions = {
         fileLimit: 1,
@@ -34,18 +31,12 @@
         const files = e.detail.files;
         if (files.rejected.length > 0) {
             popup.set(null);
-            addNotification({
-                ...ERR_NOTIFICATION,
-                text: 'File could not be read, please try again'
-            });
+            notify.error('File could not be read, please try again');
             return;
         }
         if (files.accepted.length !== 1) {
             popup.set(null);
-            addNotification({
-                ...ERR_NOTIFICATION,
-                text: 'Please select exactly one file'
-            });
+            notify.error('Please select exactly one file');
             return;
         }
         const file = files.accepted[0];

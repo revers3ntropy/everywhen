@@ -1,8 +1,8 @@
 import type { Handle, RequestEvent } from '@sveltejs/kit';
 import chalk from 'chalk';
-import { connect, dbConnection } from './lib/db/mysql';
-import { cleanupCache } from './lib/utils/cache';
-import { errorLogger, makeLogger } from './lib/utils/log';
+import { connect, dbConnection } from '$lib/db/mysql';
+import { cleanupCache } from '$lib/utils/cache';
+import { errorLogger, makeLogger } from '$lib/utils/log';
 
 const reqLogger = makeLogger('REQ', chalk.grey, 'general.log');
 

@@ -1,20 +1,19 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
     import Spinner from '$lib/components/BookSpinner.svelte';
     import type { Label } from '$lib/controllers/label';
     import type { Auth } from '$lib/controllers/user';
     import { api } from '$lib/utils/apiRequest';
     import {
+        addNotification,
         displayNotifOnErr,
-        ERR_NOTIFICATION
-    } from '$lib/utils/notifications';
+        notify,
+        NotificationType
+    } from '$lib/notifications/notifications';
     import type { Result } from '$lib/utils/result';
     import FileDrop from './FileDropDialog.svelte';
     import { importEntries } from './importEntries.js';
     import { importEvents } from './importEvents';
-
-    const { addNotification } = getNotificationsContext();
 
     export let auth: Auth;
     export let type: 'events' | 'entries';
@@ -24,13 +23,10 @@
     let loading = false;
 
     async function withContents(result: Result<string>): Promise<void> {
-        const contents = displayNotifOnErr(addNotification, result);
+        const contents = displayNotifOnErr(result);
 
         if (!labels) {
-            addNotification({
-                ...ERR_NOTIFICATION,
-                text: `Failed to load labels`
-            });
+            notify.error('Failed to load labels');
             return;
         }
 
@@ -49,13 +45,17 @@
         if (Array.isArray(res)) {
             for (const notification of res) {
                 addNotification({
-                    ...ERR_NOTIFICATION,
+                    type: NotificationType.ERROR,
+                    text: '',
+                    timeout: 3000,
                     ...notification
                 });
             }
         } else if (res) {
             addNotification({
-                ...ERR_NOTIFICATION,
+                type: NotificationType.ERROR,
+                text: '',
+                timeout: 3000,
                 ...res
             });
         }
@@ -64,10 +64,7 @@
     }
 
     onMount(async () => {
-        const labelRes = displayNotifOnErr(
-            addNotification,
-            await api.get(auth, '/labels')
-        );
+        const labelRes = displayNotifOnErr(await api.get(auth, '/labels'));
         labels = labelRes.labels;
     });
 </script>

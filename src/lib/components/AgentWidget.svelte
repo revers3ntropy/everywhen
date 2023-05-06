@@ -8,7 +8,7 @@
     import Television from 'svelte-material-icons/Television.svelte';
     import Watch from 'svelte-material-icons/Watch.svelte';
     import UAParser from 'ua-parser-js';
-    import type { Pixels } from '../utils/types';
+    import type { Pixels } from '../../app';
 
     const mobileOSs = [
         'Android',

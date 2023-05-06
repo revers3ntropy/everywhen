@@ -12,8 +12,8 @@
     import Restore from 'svelte-material-icons/Restore.svelte';
     import TimelineClockOutline from 'svelte-material-icons/TimelineClockOutline.svelte';
     import TimelineOutline from 'svelte-material-icons/TimelineOutline.svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
     import type { ChangeEventHandler } from 'svelte/elements';
+    import type { TimestampSecs } from '../../app';
     import Label from './Label.svelte';
     import LabelSelect from './LabelSelect.svelte';
     import UtcTime from './UtcTime.svelte';
@@ -22,16 +22,13 @@
     import type { Label as LabelController } from '../controllers/label';
     import type { Auth } from '../controllers/user';
     import { api, apiPath } from '../utils/apiRequest';
-    import { displayNotifOnErr } from '../utils/notifications';
+    import { displayNotifOnErr } from '../notifications/notifications';
     import { obfuscate } from '../utils/text';
     import {
         fmtDuration,
         fmtTimestampForInput,
         parseTimestampFromInputUtc
     } from '../utils/time';
-    import type { Seconds } from '../utils/types';
-
-    const { addNotification } = getNotificationsContext();
 
     export let auth: Auth;
     export let labels: LabelController[];
@@ -53,12 +50,11 @@
 
     async function updateEvent(changes: {
         name?: string;
-        start?: Seconds;
-        end?: Seconds;
+        start?: TimestampSecs;
+        end?: TimestampSecs;
         label?: LabelController['id'];
     }) {
         displayNotifOnErr(
-            addNotification,
             await api.put(auth, apiPath('/events/?', event.id), changes)
         );
 
@@ -136,7 +132,6 @@
         changeEventCount(-1);
         event.deleted = true;
         displayNotifOnErr(
-            addNotification,
             await api.delete(auth, apiPath('/events/?', event.id))
         );
         await onDelete();
@@ -145,7 +140,6 @@
     async function restoreEvent() {
         changeEventCount(1);
         const { id } = displayNotifOnErr(
-            addNotification,
             await api.post(auth, `/events`, {
                 name: event.name,
                 start: event.start,

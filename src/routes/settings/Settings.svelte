@@ -2,18 +2,15 @@
     import { tooltip } from '@svelte-plugins/tooltips';
     import CloudCheckOutline from 'svelte-material-icons/CloudCheckOutline.svelte';
     import Sync from 'svelte-material-icons/Sync.svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
     import type { Auth } from '$lib/controllers/user';
     import { api } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/utils/notifications.js';
+    import { displayNotifOnErr } from '$lib/notifications/notifications.js';
     import {
         currentTzOffset,
         fmtDuration,
         fmtUtc,
         nowUtc
     } from '$lib/utils/time.js';
-
-    const { addNotification } = getNotificationsContext();
 
     export let id: string;
     export let auth: Auth;
@@ -53,7 +50,6 @@
         created = nowUtc();
 
         displayNotifOnErr(
-            addNotification,
             await api.put(auth, '/settings', {
                 key,
                 value: newValue

@@ -1,13 +1,11 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import Close from 'svelte-material-icons/Close.svelte';
-    import type { Entry } from '$lib/controllers/entry';
     import { obfuscated } from '$lib/stores';
     import EntryForm from '../../EntryForm.svelte';
+    import type { PageData } from './$types';
 
-    export let data: App.PageData & {
-        entry: Entry;
-    };
+    export let data: PageData;
 
     onMount(() => (document.title = `Edit Entry`));
 </script>

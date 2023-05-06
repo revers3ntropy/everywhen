@@ -1,12 +1,9 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import ChevronRight from 'svelte-material-icons/ChevronRight.svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
     import { encryptionKeyFromPassword } from '$lib/security/authUtils';
     import { api } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/utils/notifications';
-
-    const { addNotification } = getNotificationsContext();
+    import { displayNotifOnErr } from '$lib/notifications/notifications';
 
     export let data: App.PageData & {
         redirect: string;
@@ -21,12 +18,10 @@
     async function login(): Promise<void> {
         actionPending = true;
         displayNotifOnErr(
-            addNotification,
             await api.get(data, `/auth`, {
                 key: encryptionKeyFromPassword(password),
                 username
             }),
-            {},
             () => (actionPending = false)
         );
         await goto('/' + data.redirect);

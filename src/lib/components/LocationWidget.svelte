@@ -2,18 +2,15 @@
     import { limitStrLen } from '$lib/utils/text.js';
     import { tooltip } from '@svelte-plugins/tooltips';
     import MapMarker from 'svelte-material-icons/MapMarkerOutline.svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
     import type { Location } from '../controllers/location';
     import type { Auth } from '../controllers/user';
     import { api } from '../utils/apiRequest';
-    import { displayNotifOnErr } from '../utils/notifications';
+    import { displayNotifOnErr } from '../notifications/notifications';
     import { obfuscate } from '../utils/text';
     import Dot from './Dot.svelte';
     import { inview } from 'svelte-inview';
 
     const MAX_LOCATIONS_SHOWN = 2;
-
-    export const { addNotification } = getNotificationsContext();
 
     export let auth: Auth;
     export let obfuscated = false;
@@ -27,7 +24,6 @@
 
     async function load() {
         const res = displayNotifOnErr(
-            addNotification,
             await api.get(auth, '/locations', { lat: latitude, lon: longitude })
         );
         locations = res.locations;

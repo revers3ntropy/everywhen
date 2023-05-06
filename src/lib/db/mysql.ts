@@ -3,8 +3,8 @@ import { DB, DB_HOST, DB_PASS, DB_PORT, DB_USER } from '$env/static/private';
 import chalk from 'chalk';
 import mysql from 'mysql2/promise';
 import '../require';
+import type { Milliseconds, NonFunctionProperties } from '../../app';
 import { makeLogger } from '../utils/log';
-import type { Milliseconds, NonFunctionProperties } from '../utils/types';
 
 export type QueryResult =
     | mysql.RowDataPacket[][]

@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { canvasState } from '$lib/components/canvas/canvasState';
-    import { renderable } from '$lib/components/canvas/renderable';
+    import { canvasState } from '$lib/canvas/canvasState';
+    import { renderable } from '$lib/canvas/renderable';
 
     renderable({
         setup(state) {

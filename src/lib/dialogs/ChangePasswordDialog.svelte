@@ -1,12 +1,9 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import { popup } from '$lib/stores';
-    import { getNotificationsContext } from 'svelte-notifications';
     import type { Auth } from '$lib/controllers/user';
     import { api } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/utils/notifications';
-
-    const { addNotification } = getNotificationsContext();
+    import { displayNotifOnErr } from '$lib/notifications/notifications';
 
     export let auth: Auth;
 
@@ -27,12 +24,10 @@
 
         submitted = true;
         displayNotifOnErr(
-            addNotification,
             await api.put(auth, '/auth', {
                 currentPassword,
                 newPassword
             }),
-            {},
             () => (submitted = false)
         );
 

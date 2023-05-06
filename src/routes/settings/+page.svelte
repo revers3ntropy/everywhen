@@ -1,6 +1,6 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
-    import ChangePasswordDialog from '$lib/components/dialogs/ChangePasswordDialog.svelte';
+    import ChangePasswordDialog from '$lib/dialogs/ChangePasswordDialog.svelte';
     import { showPopup } from '$lib/utils/popups';
     import { onMount } from 'svelte';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
@@ -8,15 +8,12 @@
     import Logout from 'svelte-material-icons/Logout.svelte';
     import Skull from 'svelte-material-icons/Skull.svelte';
     import LockOutline from 'svelte-material-icons/LockOutline.svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
     import BackupOptions from '$lib/components/BackupOptions.svelte';
     import { Backup } from '$lib/controllers/backup';
     import { Settings as SettingsController } from '$lib/controllers/settings';
     import { api } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/utils/notifications';
+    import { displayNotifOnErr } from '$lib/notifications/notifications';
     import Settings from './Settings.svelte';
-
-    const { addNotification } = getNotificationsContext();
 
     export let data: App.PageData;
 
@@ -31,7 +28,6 @@
         }
 
         const { backup: backupData } = displayNotifOnErr(
-            addNotification,
             await api.delete(data, '/users')
         );
         Backup.download(backupData, data.username, true);
@@ -39,7 +35,9 @@
     }
 
     function changePassword() {
-        showPopup(ChangePasswordDialog, { auth: data });
+        showPopup(ChangePasswordDialog, {
+            auth: data
+        });
     }
 
     onMount(() => (document.title = 'Settings'));

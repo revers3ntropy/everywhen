@@ -1,11 +1,9 @@
 <script lang="ts">
     import EditLocation from '$lib/components/EditLocation.svelte';
     import Entries from '$lib/components/Entries.svelte';
-    import type { Location } from '$lib/controllers/location';
+    import type { PageData } from './$types';
 
-    export let data: App.PageData & {
-        location: Location;
-    };
+    export let data: PageData;
 </script>
 
 <section class="edit">

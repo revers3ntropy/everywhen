@@ -2,20 +2,14 @@
     import Download from 'svelte-material-icons/Download.svelte';
     import DownloadLock from 'svelte-material-icons/DownloadLock.svelte';
     import Upload from 'svelte-material-icons/Upload.svelte';
-    import { getNotificationsContext } from 'svelte-notifications';
     import { Backup } from '../controllers/backup';
     import type { Auth } from '../controllers/user';
     import { encryptionKeyFromPassword } from '../security/authUtils';
     import { api } from '../utils/apiRequest';
-    import {
-        displayNotifOnErr,
-        SUCCESS_NOTIFICATION
-    } from '../utils/notifications';
+    import { displayNotifOnErr, notify } from '../notifications/notifications';
     import { showPopup } from '../utils/popups';
     import type { Result } from '../utils/result';
-    import FileDropDialog from './dialogs/FileDropDialog.svelte';
-
-    const { addNotification } = getNotificationsContext();
+    import FileDropDialog from '$lib/dialogs/FileDropDialog.svelte';
 
     export let auth: Auth;
 
@@ -25,7 +19,6 @@
         if (downloading) return;
         downloading = true;
         const { data: backupData } = displayNotifOnErr(
-            addNotification,
             await api.get(auth, '/backups', { encrypted })
         );
         Backup.download(backupData, auth.username, encrypted);
@@ -42,7 +35,7 @@
                 'Password of account the backup came from ' +
                 '(leave blank if same account)',
             withContents: async (res: Result<string>, password?: string) => {
-                let contents = displayNotifOnErr(addNotification, res);
+                let contents = displayNotifOnErr(res);
 
                 if (
                     !confirm(
@@ -60,17 +53,12 @@
                 }
 
                 displayNotifOnErr(
-                    addNotification,
                     await api.post(auth, '/backups', {
                         data: contents,
                         key: password
                     })
                 );
-
-                addNotification({
-                    ...SUCCESS_NOTIFICATION,
-                    text: 'File uploaded successfully'
-                });
+                notify.success('File uploaded successfully');
             }
         });
     }
