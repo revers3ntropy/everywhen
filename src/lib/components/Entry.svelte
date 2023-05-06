@@ -258,9 +258,9 @@
         }
 
         .title {
-            font-size: 1.2em;
-            white-space: nowrap;
-            overflow-x: scroll;
+            .ellipsis();
+            font-size: 1.1em;
+            font-weight: 500;
 
             @media @mobile {
                 display: none;

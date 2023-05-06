@@ -55,6 +55,10 @@
 <style lang="less">
     @import '../styles/layout';
 
+    h1 {
+        margin: 1rem;
+    }
+
     .modal-container {
         .flex-center();
 

@@ -295,11 +295,12 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 0;
         height: var(--nav-height);
         // increased to 5 so that on mobile the nav buttons are not cut off
         // by entry group titles
         z-index: 5;
+
+        padding: 0 5px;
 
         @media @mobile {
             justify-content: end;
