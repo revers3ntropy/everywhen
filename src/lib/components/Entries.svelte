@@ -36,7 +36,6 @@
 
     const batchSize = 10;
 
-    let search = null as null | string;
     let entryTitles: Record<string, Entry[]> = {};
     let entries: Record<string, Entry[]> = {};
     let currentOffset = 0;
@@ -61,12 +60,6 @@
             count: batchSize
         };
 
-        if (search) {
-            entriesOptions.search = displayNotifOnErr(
-                encrypt(search, auth.key)
-            );
-        }
-
         if (!entriesOptions.search) {
             delete entriesOptions.search;
         }
@@ -83,6 +76,7 @@
         currentOffset = 0;
         loadingAt = null;
         entries = {};
+        numberOfEntries = Infinity;
 
         await Promise.all([loadMoreEntries(true), loadTitles()]);
     }
@@ -124,13 +118,28 @@
         }
     }
 
+    function updateSearch(e: Event & { target: EventTarget | null }) {
+        if (!e.target) {
+            return;
+        }
+
+        const searchEncrypted = displayNotifOnErr(
+            encrypt((e.target as HTMLInputElement).value, auth.key)
+        );
+
+        options = {
+            ...options,
+            search: searchEncrypted
+        };
+    }
+
     export const reload = () => reloadEntries();
 
     onMount(async () => {
         await loadTitles();
     });
 
-    $: if (search !== null && browser) void reloadEntries();
+    $: if (options.search !== undefined && browser) void reloadEntries();
 </script>
 
 <div>
@@ -162,7 +171,7 @@
             <div>
                 {#if showSearch}
                     <input
-                        bind:value={search}
+                        on:input={updateSearch}
                         placeholder="Search..."
                         type="text"
                     />

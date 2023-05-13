@@ -144,7 +144,9 @@ pre {
 }
 
 .ellipsis {
-    text-overflow: ellipsis;
     overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
+    // stop hanging letters being clipped
+    min-height: 1.2em;
 }

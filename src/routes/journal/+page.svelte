@@ -21,7 +21,7 @@
 <main>
     <EntryForm
         auth={data}
-        bind:reset={clearEntryForm}
+        bind:resetEntryForm={clearEntryForm}
         obfuscated={$obfuscated}
         on:updated={reloadEntries}
     />

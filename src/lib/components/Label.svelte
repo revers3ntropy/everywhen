@@ -19,6 +19,7 @@
 
 <style lang="less">
     @import '../../styles/variables';
+    @import '../../styles/text';
 
     .label {
         margin: 0.1em 0.4rem;
@@ -31,11 +32,9 @@
         overflow: hidden;
 
         .name {
+            .ellipsis();
             text-align: left;
             margin-left: 2px;
-            text-overflow: ellipsis;
-            overflow: hidden;
-            white-space: nowrap;
             max-width: 10rem;
             font-size: 14px;
             color: @accent-primary;

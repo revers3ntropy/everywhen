@@ -11,10 +11,10 @@ export default {
             values: {
                 ENV: JSON.stringify({
                     env,
-                    ...process.env,
-                }),
+                    ...process.env
+                })
             },
-            preventAssignment: true,
-        }),
-    ],
+            preventAssignment: true
+        })
+    ]
 };

@@ -129,9 +129,16 @@
     }
 
     .title-line {
-        display: flex;
+        display: grid;
+        grid-template-columns: 1fr auto;
         justify-content: space-between;
         align-items: center;
+
+        @media @mobile {
+            display: block;
+            justify-content: left;
+            overflow-x: hidden;
+        }
     }
 
     .name {

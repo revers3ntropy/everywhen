@@ -12,6 +12,7 @@
         scale: {scale};
         --color: {colour};
         --duration: {duration}s;
+        display: none;
     "
 >
     <div class="book">
@@ -30,8 +31,10 @@
 
 <style lang="less">
     .spinner-container {
+        // use inline style to hide until this style sheet is loaded
+        display: flex !important;
+
         min-height: 300px;
-        display: flex;
         justify-content: center;
         align-items: center;
         width: 100%;

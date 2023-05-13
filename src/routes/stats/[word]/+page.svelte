@@ -1,23 +1,20 @@
 <script lang="ts">
+    import { displayNotifOnErr } from '$lib/notifications/notifications.js';
     import { onMount } from 'svelte';
     import ArrowLeft from 'svelte-material-icons/ArrowLeft.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
     import Entries from '$lib/components/Entries.svelte';
-    import { By, type EntryWithWordCount } from '../helpers';
+    import { By } from '../helpers';
     import SearchForWord from '../SearchForWord.svelte';
     import StatPill from '../StatPill.svelte';
     import EntryBarChart from './../EntryBarChart.svelte';
     import EntryHeatMap from './../EntryHeatMap.svelte';
+    import type { PageData } from './$types';
+    import { encrypt } from '$lib/security/encryption';
 
     let by: By = By.Words;
 
-    export let data: App.PageData & {
-        entries: EntryWithWordCount[];
-        wordCount: number;
-        wordInstances: number;
-        theWord: string;
-        totalEntries: number;
-    };
+    export let data: PageData;
 
     onMount(() => (document.title = 'Insights'));
 </script>
@@ -98,7 +95,9 @@
         <section class="entries">
             <Entries
                 auth={data}
-                options={{ search: data.theWord }}
+                options={{
+                    search: displayNotifOnErr(encrypt(data.theWord, data.key))
+                }}
                 showSearch={false}
                 hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
             />

@@ -29,6 +29,7 @@
     } from '$lib/notifications/notifications';
     import { obfuscate } from '$lib/utils/text';
     import { nowUtc } from '$lib/utils/time';
+    import type { Mutable } from '../../app';
     import FormatOptions from './FormatOptions.svelte';
     import LocationToggle from './LocationToggle.svelte';
 
@@ -55,7 +56,7 @@
 
     let newEntryInputElement: HTMLTextAreaElement;
 
-    export function reset() {
+    export function resetEntryForm() {
         newEntryTitle = '';
         newEntryBody = '';
         newEntryLabel = '';
@@ -192,12 +193,34 @@
         submitted = false;
         if (res.id) {
             // make really sure it's saved before resetting
-            reset();
+            resetEntryForm();
         } else {
             errorLogger.error(res);
             notify.error(`Failed to create entry: ${JSON.stringify(res)}`);
         }
-        $addEntryListeners.map(e => e());
+
+        const entry = {
+            id: res.id,
+            title: body.title,
+            entry: body.entry,
+            created: body.created,
+            createdTZOffset: body.createdTZOffset,
+            deleted: false,
+            latitude: body.latitude,
+            longitude: body.longitude,
+            agentData: body.agentData
+        } as Mutable<Entry>;
+
+        if (body.label && labels) {
+            const label = labels.find(l => (l.id || '') === (body.label || ''));
+            if (label) {
+                entry.label = label;
+            } else {
+                notify.error('Label not found');
+            }
+        }
+
+        $addEntryListeners.map(e => e(entry));
         await goto(`#${res.id}`);
     }
 
@@ -324,7 +347,7 @@
         ).click();
     }
 
-    let labels: Label[] | null = null;
+    let labels = null as Label[] | null;
 
     async function loadLabels() {
         const labelsRes = displayNotifOnErr(await api.get(auth, '/labels'));
@@ -383,12 +406,14 @@
                 <LocationToggle />
             </div>
             <div class="right-options {obfuscated ? 'blur' : ''}">
-                <LabelSelect
-                    {auth}
-                    bind:value={newEntryLabel}
-                    {labels}
-                    fromRight
-                />
+                <div class="label-select-container">
+                    <LabelSelect
+                        {auth}
+                        bind:value={newEntryLabel}
+                        {labels}
+                        fromRight
+                    />
+                </div>
 
                 <button
                     aria-label="Submit Entry"
@@ -508,14 +533,19 @@
 
         .right-options {
             height: 100%;
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: 1fr auto;
             justify-content: end;
             align-items: center;
 
             &.blur {
                 filter: blur(4px);
+            }
+
+            .label-select-container {
+                display: grid;
+                justify-content: end;
+                align-items: center;
             }
         }
     }

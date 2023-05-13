@@ -67,10 +67,10 @@
                     <LabelOutline size="20" />
                     Add Label
                 {/if}
-                <MenuDown />
+                <MenuDown size="20" />
             {:else}
                 <span />
-                <i class="text-light">loading...</i>
+                <i class="text-light">Loading...</i>
             {/if}
         </span>
         <div class="list-container">
@@ -129,6 +129,7 @@
 
 <style lang="less">
     @import '../../styles/variables';
+    @import '../../styles/text';
 
     .entry-label-colour {
         border: 1px solid @border-light;
@@ -194,9 +195,7 @@
     }
 
     .label-name {
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
+        .ellipsis();
         max-width: 100%;
         text-align: left;
     }

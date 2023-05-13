@@ -25,7 +25,7 @@
     }
 </script>
 
-<div class="entry-group container">
+<div class="entry-group">
     <div class="title">
         <div>
             <h3>
@@ -98,12 +98,17 @@
 
 <style lang="less">
     @import '../../styles/variables';
+    @import '../../styles/layout';
 
     .entry-group {
         margin: 1em 0;
         padding: 0.5rem 0;
 
         transition: height @transition;
+
+        @media @not-mobile {
+            .container();
+        }
 
         .title {
             display: flex;
