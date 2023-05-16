@@ -714,6 +714,7 @@ export class Entry {
 
         let current = 0;
 
+        // group entries by day
         const entriesOnDay: Record<string, true | undefined> = {};
         for (const entry of entries) {
             entriesOnDay[
@@ -721,12 +722,15 @@ export class Entry {
             ] = true;
         }
 
+        // streaks are running out when we made an entry yesterday but not today
         const runningOut = !entriesOnDay[today] && !!entriesOnDay[yesterday];
 
         let currentDay = today;
         if (!entriesOnDay[currentDay]) {
             currentDay = yesterday;
         }
+        // find the current streak by counting backwards from today until
+        // we find a day without an entry
         while (entriesOnDay[currentDay]) {
             current++;
             currentDay = fmtUtc(
@@ -747,6 +751,8 @@ export class Entry {
         );
 
         currentDay = today;
+        // find the longest streak by counting forwards from first entry
+        // until we find a day without an entry
         while (currentDay !== firstDay) {
             currentDay = fmtUtc(
                 new Date(currentDay).getTime() / 1000 - 86400,
