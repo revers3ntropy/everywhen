@@ -35,6 +35,10 @@ export function round1DP(num: number): number {
     return Math.round(num * 10) / 10;
 }
 
+export function roundNDP(num: number, n: number): number {
+    return Math.round(num * 10 ** n) / 10 ** n;
+}
+
 export function rawMdToHtml(md: string, obfuscated = false): string {
     return DomPurify.sanitize(marked(obfuscated ? obfuscate(md) : md), {
         USE_PROFILES: { html: true }

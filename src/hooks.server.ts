@@ -1,8 +1,11 @@
+import { PageLoadLog } from '$lib/controllers/log';
+import { nowUtc } from '$lib/utils/time';
 import type { Handle, RequestEvent } from '@sveltejs/kit';
 import chalk from 'chalk';
-import { connect, dbConnection } from '$lib/db/mysql';
+import { connect, dbConnection, query } from '$lib/db/mysql';
 import { cleanupCache } from '$lib/utils/cache';
 import { errorLogger, makeLogger } from '$lib/utils/log';
+import type { Milliseconds, TimestampSecs } from './app';
 
 const reqLogger = makeLogger('REQ', chalk.grey, 'general.log');
 
@@ -18,8 +21,8 @@ setInterval(() => {
 
 setInterval(cleanupCache, 1000 * 60);
 
-function exitHandler(code: number) {
-    void errorLogger.logToFile(`Exited with code ${code}`).then(() => {
+function exitHandler(...args: unknown[]) {
+    void errorLogger.logToFile(`Exited!`, ...args).then(() => {
         process.exit();
     });
 }
@@ -31,26 +34,33 @@ process.on('SIGUSR1', exitHandler);
 process.on('SIGUSR2', exitHandler);
 process.on('uncaughtException', exitHandler);
 
-function logReq(time: number, event: RequestEvent) {
-    const path = new URL(event.request.url).pathname.split('/');
-    path.shift();
-    let pathStr = `/${path.shift() || ''}`;
-    if (pathStr === '/api') {
-        pathStr += `/${path.shift() || ''}`;
-    }
-    if (path.length) {
-        pathStr += `/[...${path.join('/').length}]`;
-    }
+function logReq(
+    startPerf: Milliseconds,
+    now: TimestampSecs,
+    status: number,
+    event: RequestEvent
+) {
+    const time = performance.now() - startPerf;
+    const path = event.route.id || '[unknown]';
 
-    void reqLogger.logToFile(
+    void reqLogger.logToFile(event.request.method, path);
+
+    void PageLoadLog.createLog(
+        query,
+        now,
         event.request.method,
-        `(${time.toPrecision(3)}ms)`,
-        pathStr
+        event.url.href,
+        (event.route.id as string) || '[unknown]',
+        time,
+        status,
+        '',
+        event.request.headers.get('user-agent') || ''
     );
 }
 
 export const handle = (async ({ event, resolve }) => {
     const start = performance.now();
+    const now = nowUtc();
     let result: Response;
     try {
         result = await resolve(event);
@@ -60,8 +70,7 @@ export const handle = (async ({ event, resolve }) => {
             status: 500
         });
     }
-    const end = performance.now();
-    logReq(end - start, event);
+    logReq(start, now, result.status, event);
 
     return result;
 }) satisfies Handle;
