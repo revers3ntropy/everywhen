@@ -132,14 +132,16 @@ CREATE TABLE locations
 
 CREATE TABLE pageLoads
 (
-    user         char(128) DEFAULT NULL,
+    user         char(128)    DEFAULT NULL,
     created      int(64)      NOT NULL,
-    method       varchar(64) NOT NULL,
+    method       varchar(64)  NOT NULL,
     url          varchar(512) NOT NULL,
     route        varchar(256) NOT NULL,
-    loadTimeMs   real      NOT NULL,
+    loadTimeMs   real         NOT NULL,
     responseCode int(64)      NOT NULL,
-    userAgent    varchar(512) NOT NULL
+    userAgent    varchar(512) NOT NULL,
+    requestSize  int(64)      NOT NULL,
+    responseSize int(64)      NOT NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
 

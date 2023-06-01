@@ -11,12 +11,16 @@ export class PageLoadLog {
         route: string,
         responseTimeMs: Milliseconds,
         responseCode: number,
-        userId = '',
-        userAgent = ''
+        userId: string,
+        userAgent: string,
+        requestSize: number,
+        resultSize: number
     ) {
         await query`
             INSERT INTO pageLoads (
-                user, created, method, url, route, loadTimeMs, responseCode, userAgent
+                user, created, method, url, 
+                route, loadTimeMs, responseCode,
+                userAgent, requestSize, responseSize
             ) VALUES (
                       ${userId},
                       ${created},
@@ -25,6 +29,10 @@ export class PageLoadLog {
                       ${route},
                       ${roundNDP(responseTimeMs, 3)},
                       ${responseCode},
-                      ${userAgent})`;
+                      ${userAgent},
+                      ${requestSize},
+                      ${resultSize}
+          )
+        `;
     }
 }

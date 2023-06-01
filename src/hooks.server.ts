@@ -1,4 +1,5 @@
 import { PageLoadLog } from '$lib/controllers/log';
+import { tryGetAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import { nowUtc } from '$lib/utils/time';
 import type { Handle, RequestEvent } from '@sveltejs/kit';
 import chalk from 'chalk';
@@ -34,33 +35,47 @@ process.on('SIGUSR1', exitHandler);
 process.on('SIGUSR2', exitHandler);
 process.on('uncaughtException', exitHandler);
 
-function logReq(
-    startPerf: Milliseconds,
+async function logReq(
+    duration: Milliseconds,
     now: TimestampSecs,
-    status: number,
-    event: RequestEvent
-) {
-    const time = performance.now() - startPerf;
-    const path = event.route.id || '[unknown]';
+    req: RequestEvent,
+    res: Response
+): Promise<void> {
+    const path = req.route.id || '[unknown]';
 
-    void reqLogger.logToFile(event.request.method, path);
+    void reqLogger.logToFile(req.request.method, path);
 
-    void PageLoadLog.createLog(
+    const auth = await tryGetAuthFromCookies(req.cookies);
+    const userId = (auth?.id || 0).toString();
+
+    await PageLoadLog.createLog(
         query,
         now,
-        event.request.method,
-        event.url.href,
-        (event.route.id as string) || '[unknown]',
-        time,
-        status,
-        '',
-        event.request.headers.get('user-agent') || ''
+        req.request.method,
+        req.url.href,
+        (req.route.id as string) || '[unknown]',
+        duration,
+        res.status,
+        userId,
+        req.request.headers.get('user-agent') || '',
+        (
+            await req.request.text()
+        ).length,
+        (
+            await res.text()
+        ).length
     );
 }
 
 export const handle = (async ({ event, resolve }) => {
     const start = performance.now();
     const now = nowUtc();
+
+    const eventClone: RequestEvent = {
+        ...event,
+        request: event.request.clone()
+    };
+
     let result: Response;
     try {
         result = await resolve(event);
@@ -70,7 +85,8 @@ export const handle = (async ({ event, resolve }) => {
             status: 500
         });
     }
-    logReq(start, now, result.status, event);
+
+    void logReq(performance.now() - start, now, eventClone, result.clone());
 
     return result;
 }) satisfies Handle;
