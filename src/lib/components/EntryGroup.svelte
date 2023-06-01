@@ -60,7 +60,7 @@
                                 x: -50,
                                 duration: ANIMATION_DURATION
                             }}
-                            class="flex-center"
+                            class="flex-center hide-mobile"
                         >
                             <Dot light marginX={10} />
                             <p class="entry-count">
@@ -133,10 +133,6 @@
                 &,
                 & * {
                     color: @text-color-light;
-                }
-
-                @media @mobile {
-                    display: none;
                 }
             }
 

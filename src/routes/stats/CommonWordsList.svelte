@@ -33,6 +33,7 @@
 
 <style lang="less">
     @import '../../styles/variables';
+    @import '../../styles/text';
 
     .common-words {
         margin: 0.5em 0;
@@ -57,9 +58,7 @@
         }
 
         .word {
-            text-overflow: ellipsis;
-            overflow: hidden;
-            white-space: nowrap;
+            .ellipsis();
         }
 
         hr {

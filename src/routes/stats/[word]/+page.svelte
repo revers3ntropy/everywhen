@@ -108,6 +108,7 @@
 <style lang="less">
     @import '../../../styles/layout';
     @import '../../../styles/variables';
+    @import '../../../styles/text';
 
     .title-line {
         display: grid;
@@ -174,10 +175,8 @@
     }
 
     .the-word-with-quotes {
+        .ellipsis();
         max-width: calc(100vw - 400px);
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
     }
 
     .entries {

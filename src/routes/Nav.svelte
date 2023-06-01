@@ -288,6 +288,7 @@
     @import '../styles/variables';
     @import '../styles/layout';
     @import '../styles/input';
+    @import '../styles/text';
 
     nav {
         position: relative;
@@ -396,10 +397,8 @@
             }
 
             .username {
+                .ellipsis();
                 text-align: right;
-                text-overflow: ellipsis;
-                overflow: hidden;
-                white-space: nowrap;
                 width: 100%;
             }
         }
