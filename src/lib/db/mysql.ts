@@ -59,10 +59,12 @@ function logQuery(
 
     const resultStr = Array.isArray(result)
         ? `Array(${result.length})`
-        : typeof result;
+        : JSON.stringify(result);
+
+    const queryStr = query.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
 
     void dbLogger.logToFile(
-        `\`${query.trim()}\`` +
+        `\`${queryStr}\`` +
             `\n     [${params.join(', ')}]` +
             `\n     (${time.toPrecision(3)}ms) => ${resultStr}`
     );

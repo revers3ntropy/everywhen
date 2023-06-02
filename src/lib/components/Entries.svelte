@@ -5,6 +5,7 @@
     import { inview } from 'svelte-inview';
     import Bin from 'svelte-material-icons/Delete.svelte';
     import TrayArrowUp from 'svelte-material-icons/TrayArrowUp.svelte';
+    import Search from 'svelte-material-icons/Magnify.svelte';
     import EntryGroup from '$lib/components/EntryGroup.svelte';
     import type { Mutable } from '../../app';
     import { Entry, type EntryFilter } from '../controllers/entry';
@@ -110,8 +111,15 @@
         currentOffset += res.entries.length;
         entries = Entry.groupEntriesByDay(res.entries, entries);
 
-        // if still loading at this offset,
-        // so another req has not been sent,
+        // Very occasionally, the same entries are loaded twice by accident,
+        // so filter out duplicates. TODO make it so they are never loaded twice
+        for (const day in entries) {
+            entries[day] = entries[day].filter(
+                (entry, i, arr) => arr.findIndex(e => e.id === entry.id) === i
+            );
+        }
+
+        // if still loading at this offset, so another req has not been sent,
         // say we have stopped loading
         if (loadingAt === offset) {
             loadingAt = null;
@@ -171,10 +179,11 @@
             <div>
                 {#if showSearch}
                     <input
-                        on:input={updateSearch}
+                        on:change={updateSearch}
                         placeholder="Search..."
                         type="text"
                     />
+                    <button><Search /></button>
                 {/if}
             </div>
         </div>
@@ -210,6 +219,10 @@
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
         margin: 3rem 0 0 0;
+
+        @media @not-mobile {
+            margin: 2rem 1rem;
+        }
 
         & > div {
             width: 100%;
