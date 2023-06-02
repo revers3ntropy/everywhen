@@ -152,7 +152,7 @@
 
 <svelte:head>
     <title>Halcyon.Land</title>
-    <meta content="Halcyon.Land - Journal and Life Logger" name="description" />
+    <meta content="Journal and Life Logging app" name="description" />
 
     <link href="https://fonts.googleapis.com" rel="preconnect" />
     <link
