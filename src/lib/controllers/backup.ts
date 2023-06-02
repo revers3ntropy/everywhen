@@ -23,6 +23,7 @@ export class Backup {
             created: number;
             createdTZOffset: number;
             agentData?: string;
+            deleted?: boolean;
             edits: {
                 title: string;
                 label?: string; // label's name
@@ -70,8 +71,9 @@ export class Backup {
         auth: Auth,
         created?: number
     ): Promise<Result<Backup>> {
-        // use allRaw to keep the label as a string (it's Id)
-        const { err: entryErr, val: entries } = await Entry.all(query, auth);
+        const { err: entryErr, val: entries } = await Entry.all(query, auth, {
+            deleted: 'both'
+        });
         if (entryErr) return Result.err(entryErr);
         const { err: eventsErr, val: events } = await Event.all(query, auth);
         if (eventsErr) return Result.err(eventsErr);
@@ -99,6 +101,7 @@ export class Backup {
                     longitude: entry.longitude ?? undefined,
                     title: entry.title,
                     agentData: entry.agentData,
+                    deleted: entry.deleted,
                     edits:
                         entry.edits?.map(edit => ({
                             entry: edit.entry,

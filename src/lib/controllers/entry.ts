@@ -355,6 +355,10 @@ export class Entry {
             (!('agentData' in json) ||
                 typeof json.agentData === 'string' ||
                 !json.agentData) &&
+            (!('deleted' in json) ||
+                typeof json.deleted === 'boolean' ||
+                json.deleted === 1 ||
+                !json.deleted) &&
             'created' in json &&
             typeof json.created === 'number' &&
             (isEdit ||
