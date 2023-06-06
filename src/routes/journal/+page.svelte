@@ -8,7 +8,6 @@
     export let data: PageData;
 
     let clearEntryForm: () => void;
-    let reloadEntries: () => Promise<void>;
 
     onMount(() => (document.title = `Journal`));
 </script>
@@ -23,11 +22,9 @@
         auth={data}
         bind:resetEntryForm={clearEntryForm}
         obfuscated={$obfuscated}
-        on:updated={reloadEntries}
     />
     <Entries
         auth={data}
-        bind:reload={reloadEntries}
         showBin={true}
         showImport={true}
         showLabels={true}

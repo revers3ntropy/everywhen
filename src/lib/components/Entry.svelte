@@ -94,6 +94,7 @@
 <div
     class="entry {obfuscated ? '' : 'visible'} {isInDialog ? 'in-dialog' : ''}"
     use:focusableId={{ id }}
+    {id}
 >
     {#if showFullDate}
         <UtcTime

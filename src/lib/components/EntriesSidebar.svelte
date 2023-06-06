@@ -3,66 +3,55 @@
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import Menu from 'svelte-material-icons/Menu.svelte';
-    import { fly } from 'svelte/transition';
-    import { ANIMATION_DURATION } from '../constants';
     import type { Entry } from '../controllers/entry';
     import type { Auth } from '../controllers/user';
     import EntryTitles from './EntryTitles.svelte';
 
-    export let titles: Record<string, Entry[]>;
+    export let titles: Record<string, Entry[]> | null;
     export let auth: Auth;
+    export let obfuscated = false;
     export let hideAgentWidget: boolean;
 
     let showing = false;
-    let obfuscated = false;
 </script>
 
-<div>
-    <div class="floating-button">
+<div class="floating-button only-mobile">
+    <button
+        aria-label="Show sidebar menu"
+        on:click={() => (showing = !showing)}
+    >
+        <Menu size="40" />
+    </button>
+</div>
+<div class="sidebar {showing ? 'showing' : ''}">
+    <div class="header">
         <button
-            aria-label="Show sidebar menu"
+            aria-label={obfuscated ? 'Show entries' : 'Hide entries'}
+            on:click={() => (obfuscated = !obfuscated)}
+        >
+            {#if obfuscated}
+                <Eye size="25" />
+            {:else}
+                <EyeOff size="25" />
+            {/if}
+        </button>
+        <button
+            class="only-mobile"
+            aria-label="Close sidebar menu"
             on:click={() => (showing = !showing)}
         >
-            <Menu size="40" />
+            <Close size="30" />
         </button>
     </div>
-    {#if showing}
-        <div
-            class="sidebar"
-            transition:fly={{
-                duration: ANIMATION_DURATION,
-                x: -200
-            }}
-        >
-            <div class="header">
-                <button
-                    aria-label={obfuscated ? 'Show entries' : 'Hide entries'}
-                    on:click={() => (obfuscated = !obfuscated)}
-                >
-                    {#if obfuscated}
-                        <Eye size="25" />
-                    {:else}
-                        <EyeOff size="25" />
-                    {/if}
-                </button>
-                <button
-                    aria-label="Close sidebar menu"
-                    on:click={() => (showing = !showing)}
-                >
-                    <Close size="30" />
-                </button>
-            </div>
-            <div class="content">
-                <EntryTitles
-                    {auth}
-                    {obfuscated}
-                    {titles}
-                    hideBlurToggle
-                    {hideAgentWidget}
-                />
-            </div>
-        </div>
-    {/if}
+    <div class="content">
+        <EntryTitles
+            {auth}
+            {obfuscated}
+            {titles}
+            hideBlurToggle
+            {hideAgentWidget}
+        />
+    </div>
 </div>
 
 <style lang="less">
@@ -71,17 +60,41 @@
     @width: 300px;
 
     .sidebar {
-        position: fixed;
+        position: sticky;
         top: 0;
-        left: 0;
-        min-width: @width;
-        height: 100%;
+        height: 100vh;
+        width: min(@width, fit-content);
         background-color: @light-v-accent;
         z-index: 10;
-        border-right: 2px solid @border-heavy;
         overflow-y: scroll;
         padding: 0;
-        box-shadow: 0 0 8px 4px rgba(0, 0, 0, 0.5);
+
+        @media @not-mobile {
+            // in line with bottom of entries
+            margin: 0 0 1rem 0;
+
+            // snug to the right of the entries
+            border-radius: @border-radius 0 0 @border-radius;
+
+            // not on right
+            box-shadow: -2px 0 8px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        @media @mobile {
+            width: 100%;
+            transition: @transition;
+            transform: translateX(-100%);
+            &.showing {
+                transform: translateX(0);
+                border-right: 2px solid @border-heavy;
+                box-shadow: 0 0 8px 4px rgba(0, 0, 0, 0.5);
+            }
+
+            position: fixed;
+            top: 0;
+            left: 0;
+            margin: 0;
+        }
 
         .header {
             padding: 0.5rem;

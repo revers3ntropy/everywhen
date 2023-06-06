@@ -1,3 +1,10 @@
+<script lang="ts" context="module">
+    import { writable } from 'svelte/store';
+    import type { Writable } from 'svelte/store';
+
+    let collapsed: Writable<Record<number, boolean>> = writable({});
+</script>
+
 <script lang="ts">
     import { ANIMATION_DURATION } from '$lib/constants';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
@@ -17,15 +24,14 @@
     export let hideAgentWidget = false;
     export let auth: Auth;
     export let day: number;
-
-    let collapsed = false;
+    export let showSidebar = false;
 
     function toggleCollapse() {
-        collapsed = !collapsed;
+        $collapsed[day] = !$collapsed[day];
     }
 </script>
 
-<div class="entry-group">
+<div class="entry-group {showSidebar ? 'with-sidebar' : ''}">
     <div class="title">
         <div>
             <h3>
@@ -54,9 +60,10 @@
                         {/if}
                     </span>
 
-                    {#if collapsed}
+                    {#if $collapsed[day]}
                         <div
                             transition:fly|local={{
+                                // local transition to avoid affecting other groups
                                 x: -50,
                                 duration: ANIMATION_DURATION
                             }}
@@ -73,7 +80,7 @@
             </h3>
         </div>
     </div>
-    {#if !collapsed}
+    {#if !$collapsed[day]}
         <div
             class="contents"
             transition:slide|local={{
@@ -108,6 +115,11 @@
 
         @media @not-mobile {
             .container();
+
+            &.with-sidebar {
+                margin-left: 0;
+                border-radius: 0 @border-radius @border-radius 0;
+            }
         }
 
         .title {

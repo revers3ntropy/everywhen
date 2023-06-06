@@ -1,6 +1,7 @@
 <script lang="ts">
     import { browser } from '$app/environment';
     import { encrypt } from '$lib/security/encryption.js';
+    import { fmtUtc } from '$lib/utils/time';
     import { onMount } from 'svelte';
     import { inview } from 'svelte-inview';
     import Bin from 'svelte-material-icons/Delete.svelte';
@@ -17,6 +18,7 @@
     import Spinner from './BookSpinner.svelte';
     import ImportDialog from '$lib/dialogs/ImportDialog.svelte';
     import Sidebar from './EntriesSidebar.svelte';
+    import { addEntryListeners } from '../stores';
 
     export let auth: Auth;
 
@@ -28,6 +30,8 @@
     export let showLocations = true;
     export let hideAgentWidget: boolean;
 
+    export let numberOfEntries = Infinity;
+
     interface IOptions extends EntryFilter {
         readonly count?: number;
         readonly offset?: number;
@@ -36,12 +40,11 @@
     export let options: IOptions = {};
 
     const batchSize = 10;
-
-    let entryTitles: Record<string, Entry[]> = {};
+    let pageEndInView = false;
+    let entryTitles: Record<string, Entry[]> | null = null;
     let entries: Record<string, Entry[]> = {};
     let currentOffset = 0;
     let loadingAt = null as number | null;
-    export let numberOfEntries = Infinity;
 
     function importPopup() {
         showPopup(
@@ -83,6 +86,7 @@
     }
 
     async function loadMoreEntries(isInitialLoad = false) {
+        pageEndInView = true;
         let offset = currentOffset;
         if (loadingAt === offset && !isInitialLoad) {
             return;
@@ -109,8 +113,24 @@
         numberOfEntries = res.totalEntries;
 
         currentOffset += res.entries.length;
-        entries = Entry.groupEntriesByDay(res.entries, entries);
+        entries = ensureNoDuplicateEntries(
+            Entry.groupEntriesByDay(res.entries, entries)
+        );
 
+        // if still loading at this offset, so another req has not been sent,
+        // say we have stopped loading
+        if (loadingAt === offset) {
+            loadingAt = null;
+        }
+
+        if (pageEndInView) {
+            void loadMoreEntries();
+        }
+    }
+
+    function ensureNoDuplicateEntries(
+        entries: Record<string, Entry[]>
+    ): Record<string, Entry[]> {
         // Very occasionally, the same entries are loaded twice by accident,
         // so filter out duplicates. TODO make it so they are never loaded twice
         for (const day in entries) {
@@ -118,12 +138,7 @@
                 (entry, i, arr) => arr.findIndex(e => e.id === entry.id) === i
             );
         }
-
-        // if still loading at this offset, so another req has not been sent,
-        // say we have stopped loading
-        if (loadingAt === offset) {
-            loadingAt = null;
-        }
+        return entries;
     }
 
     function updateSearch(e: Event & { target: EventTarget | null }) {
@@ -141,10 +156,30 @@
         };
     }
 
-    export const reload = () => reloadEntries();
+    function onNewEntry(entry: Entry) {
+        const localDate = fmtUtc(
+            entry.created,
+            entry.createdTZOffset,
+            'YYYY-MM-DD'
+        );
+        entries[localDate] = [entry, ...(entries?.[localDate] || [])];
+        entries = { ...entries };
+
+        setTimeout(() => {
+            const el = document.getElementById(entry.id);
+            if (!el) {
+                console.error('Could not find new entry element');
+                return;
+            }
+            el.tabIndex = -1;
+            el.focus({ preventScroll: false });
+        }, 10);
+    }
 
     onMount(async () => {
         await loadTitles();
+
+        $addEntryListeners.push(onNewEntry);
     });
 
     $: if (options.search !== undefined && browser) void reloadEntries();
@@ -154,23 +189,19 @@
     <div>
         <div class="entries-menu">
             <div>
-                {#if showSidebar}
-                    <Sidebar titles={entryTitles} {auth} {hideAgentWidget} />
-                {/if}
-                {#if showBin}
-                    <a class="with-circled-icon" href="/journal/deleted">
-                        <Bin size="30" />
-                        Bin
-                    </a>
-                {/if}
                 {#if showImport}
                     <button
                         class="with-circled-icon hide-mobile"
                         on:click={importPopup}
                     >
                         <TrayArrowUp size="30" />
-                        Import
                     </button>
+                {/if}
+                {#if showBin}
+                    <a class="with-circled-icon" href="/journal/deleted">
+                        <Bin size="30" />
+                        Bin
+                    </a>
                 {/if}
             </div>
 
@@ -188,32 +219,57 @@
             </div>
         </div>
     </div>
-    <div class="entries">
-        {#each Object.keys(entries).sort((a, b) => new Date(b).getTime() - new Date(a).getTime()) as day}
-            <EntryGroup
-                entries={entries[day]}
-                on:updated={() => reloadEntries()}
-                obfuscated={$obfuscated}
-                {showLabels}
-                {showLocations}
-                {auth}
-                day={new Date(day).getTime() / 1000}
-                {hideAgentWidget}
-            />
-        {/each}
-        {#if loadingAt !== null && loadingAt < numberOfEntries}
-            <Spinner />
+    <div class="sidebar-and-entries">
+        {#if showSidebar}
+            <div style="height:100%">
+                <Sidebar
+                    titles={entryTitles}
+                    {auth}
+                    {hideAgentWidget}
+                    obfuscated={$obfuscated}
+                />
+            </div>
         {/if}
+
+        <div>
+            <div class="entries">
+                {#each Object.keys(entries).sort((a, b) => new Date(b).getTime() - new Date(a).getTime()) as day (entries[day])}
+                    <EntryGroup
+                        entries={entries[day]}
+                        on:updated={() => reloadEntries()}
+                        obfuscated={$obfuscated}
+                        {showLabels}
+                        {showLocations}
+                        {auth}
+                        day={new Date(day).getTime() / 1000}
+                        {hideAgentWidget}
+                        {showSidebar}
+                    />
+                {/each}
+                {#if loadingAt !== null && loadingAt < numberOfEntries}
+                    <Spinner />
+                {/if}
+            </div>
+            <div
+                use:inview={{ rootMargin: '100px' }}
+                on:inview_enter={() => loadMoreEntries()}
+                on:inview_leave={() => (pageEndInView = false)}
+            />
+        </div>
     </div>
-    <div
-        use:inview={{ rootMargin: '100px' }}
-        on:inview_enter={() => loadMoreEntries()}
-    />
 </div>
 
 <style lang="less">
     @import '../../styles/variables';
     @import '../../styles/layout';
+
+    .sidebar-and-entries {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        @media @mobile {
+            display: block;
+        }
+    }
 
     .entries-menu {
         display: grid;
@@ -259,5 +315,10 @@
                 }
             }
         }
+    }
+
+    .entries {
+        // put in line with sidebar
+        margin: -1rem 0 0 0;
     }
 </style>

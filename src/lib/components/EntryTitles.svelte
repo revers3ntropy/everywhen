@@ -11,7 +11,7 @@
     import Dot from './Dot.svelte';
     import UtcTime from './UtcTime.svelte';
 
-    export let titles: Record<string, Entry[]>;
+    export let titles: Record<string, Entry[]> | null = null;
     export let obfuscated = true;
     export let showTimeAgo = true;
     export let auth: Auth;
@@ -28,11 +28,13 @@
         });
     }
 
-    let sortedTitles: [number, string][];
-    $: sortedTitles = Object.keys(titles)
-        .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
-        .filter(Boolean)
-        .map(date => [new Date(date).getTime() / 1000, date]);
+    let sortedTitles: [number, string][] | null;
+    $: sortedTitles = titles
+        ? Object.keys(titles)
+              .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
+              .filter(Boolean)
+              .map(date => [new Date(date).getTime() / 1000, date])
+        : null;
 </script>
 
 <div>
@@ -51,70 +53,81 @@
         </div>
     {/if}
 
-    {#each sortedTitles as [day, date]}
-        <div class="day">
-            <h2>
-                <UtcTime timestamp={day} fmt="dddd DD/MM/YY" noTooltip={true} />
-                {#if showTimeAgo}
-                    <Dot />
-                    <span class="text-light">
-                        {#if utcEq(nowUtc(), day)}
-                            <span>Today</span>
-                        {:else if utcEq(nowUtc() - 60 * 60 * 24, day)}
-                            <span>Yesterday</span>
-                        {:else}
-                            <UtcTime
-                                relative
-                                timestamp={day}
-                                noTooltip={true}
-                            />
-                        {/if}
-                    </span>
-                {/if}
-            </h2>
-
-            {#each titles[date] as entry}
-                <button class="entry" on:click={() => showEntryPopup(entry.id)}>
-                    <span class="entry-time">
-                        <UtcTime
-                            timestamp={entry.created}
-                            fmt="h:mma"
-                            tzOffset={entry.createdTZOffset}
-                            tooltipPosition="right"
-                        />
-                    </span>
-                    {#if entry.label}
-                        <span
-                            class="entry-label-colour"
-                            style="background: {entry.label?.colour ||
-                                'transparent'}"
-                            use:tooltip={{ content: entry.label?.name }}
-                        />
-                    {:else}
-                        <span class="entry-label-colour" />
+    {#if sortedTitles}
+        {#each sortedTitles as [day, date]}
+            <div class="day">
+                <h2>
+                    <UtcTime
+                        timestamp={day}
+                        fmt="dddd DD/MM/YY"
+                        noTooltip={true}
+                    />
+                    {#if showTimeAgo}
+                        <Dot />
+                        <span class="text-light">
+                            {#if utcEq(nowUtc(), day)}
+                                <span>Today</span>
+                            {:else if utcEq(nowUtc() - 60 * 60 * 24, day)}
+                                <span>Yesterday</span>
+                            {:else}
+                                <UtcTime
+                                    relative
+                                    timestamp={day}
+                                    noTooltip={true}
+                                />
+                            {/if}
+                        </span>
                     {/if}
+                </h2>
 
-                    <span class="title {obfuscated ? 'obfuscated' : ''}">
-                        {#if entry.title}
-                            {obfuscated ? obfuscate(entry.title) : entry.title}
+                {#each titles[date] as entry}
+                    <button
+                        class="entry"
+                        on:click={() => showEntryPopup(entry.id)}
+                    >
+                        <span class="entry-time">
+                            <UtcTime
+                                timestamp={entry.created}
+                                fmt="h:mma"
+                                tzOffset={entry.createdTZOffset}
+                                tooltipPosition="right"
+                            />
+                        </span>
+                        {#if entry.label}
+                            <span
+                                class="entry-label-colour"
+                                style="background: {entry.label?.colour ||
+                                    'transparent'}"
+                                use:tooltip={{ content: entry.label?.name }}
+                            />
                         {:else}
-                            <i class="text-light">
-                                {obfuscated
-                                    ? obfuscate(entry.entry)
-                                    : entry.entry}{#if entry.entry.length >= Entry.TITLE_CUTOFF}...
-                                {/if}
-                            </i>
+                            <span class="entry-label-colour" />
                         {/if}
-                    </span>
-                </button>
-            {/each}
-        </div>
-    {/each}
 
-    {#if Object.keys(titles).length === 0}
-        <div class="day">
-            <h2> No entries yet </h2>
-        </div>
+                        <span class="title {obfuscated ? 'obfuscated' : ''}">
+                            {#if entry.title}
+                                {obfuscated
+                                    ? obfuscate(entry.title)
+                                    : entry.title}
+                            {:else}
+                                <i class="text-light">
+                                    {obfuscated
+                                        ? obfuscate(entry.entry)
+                                        : entry.entry}{#if entry.entry.length >= Entry.TITLE_CUTOFF}...
+                                    {/if}
+                                </i>
+                            {/if}
+                        </span>
+                    </button>
+                {/each}
+            </div>
+        {/each}
+
+        {#if Object.keys(titles).length === 0}
+            <div class="day">
+                <h2> No entries yet </h2>
+            </div>
+        {/if}
     {/if}
 </div>
 

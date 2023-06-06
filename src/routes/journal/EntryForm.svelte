@@ -28,7 +28,7 @@
         notify
     } from '$lib/notifications/notifications';
     import { obfuscate } from '$lib/utils/text';
-    import { nowUtc } from '$lib/utils/time';
+    import { currentTzOffset, nowUtc } from '$lib/utils/time';
     import type { Mutable } from '../../app';
     import FormatOptions from './FormatOptions.svelte';
     import LocationToggle from './LocationToggle.svelte';
@@ -221,7 +221,6 @@
         }
 
         $addEntryListeners.map(e => e(entry));
-        await goto(`#${res.id}`);
     }
 
     async function onEntryEdit(body: RawEntry) {
@@ -257,7 +256,8 @@
             latitude: currentLocation[0],
             longitude: currentLocation[1],
             created: nowUtc(),
-            agentData: serializeAgentData()
+            agentData: serializeAgentData(),
+            createdTZOffset: currentTzOffset()
         } as RawEntry;
 
         switch (action) {
