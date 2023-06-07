@@ -219,9 +219,9 @@
             </div>
         </div>
     </div>
-    <div class="sidebar-and-entries">
+    <div class={showSidebar ? 'sidebar-and-entries' : ''}>
         {#if showSidebar}
-            <div style="height:100%">
+            <div style="height: 100%">
                 <Sidebar
                     titles={entryTitles}
                     {auth}
@@ -243,7 +243,6 @@
                         {auth}
                         day={new Date(day).getTime() / 1000}
                         {hideAgentWidget}
-                        {showSidebar}
                     />
                 {/each}
                 {#if loadingAt !== null && loadingAt < numberOfEntries}
@@ -251,7 +250,7 @@
                 {/if}
             </div>
             <div
-                use:inview={{ rootMargin: '100px' }}
+                use:inview={{ rootMargin: '200px' }}
                 on:inview_enter={() => loadMoreEntries()}
                 on:inview_leave={() => (pageEndInView = false)}
             />
@@ -264,8 +263,20 @@
     @import '../../styles/layout';
 
     .sidebar-and-entries {
+        width: 100%;
         display: grid;
-        grid-template-columns: auto 1fr;
+
+        // bit hacky but I couldn't get it to not overflow otherwise
+        grid-template-columns: minmax(0, 3fr) 1fr;
+        grid-gap: 1rem;
+
+        & > :first-child {
+            order: 1;
+        }
+        & > :last-child {
+            order: -1;
+        }
+
         @media @mobile {
             display: block;
         }
@@ -274,10 +285,10 @@
     .entries-menu {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
-        margin: 3rem 0 0 0;
+        margin: 2rem 0 0 0;
 
         @media @not-mobile {
-            margin: 2rem 1rem;
+            margin: 2rem 0;
         }
 
         & > div {
@@ -315,10 +326,5 @@
                 }
             }
         }
-    }
-
-    .entries {
-        // put in line with sidebar
-        margin: -1rem 0 0 0;
     }
 </style>

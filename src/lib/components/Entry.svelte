@@ -214,6 +214,7 @@
     .entry {
         padding: 0;
         margin: 0;
+        width: 100%;
         height: fit-content;
         white-space: pre-wrap;
         border: 1px solid transparent;
@@ -247,6 +248,7 @@
             align-items: center;
             margin: 1rem 0 0 0;
             padding: 0 0.3em;
+            width: 100%;
 
             @media @mobile {
                 margin: 0;
@@ -262,6 +264,7 @@
             .ellipsis();
             font-size: 1.1em;
             font-weight: 500;
+            width: 100%;
 
             @media @mobile {
                 display: none;

@@ -80,7 +80,7 @@
                     {/if}
                 </h2>
 
-                {#each titles[date] as entry}
+                {#each (titles || {})[date] as entry}
                     <button
                         class="entry"
                         on:click={() => showEntryPopup(entry.id)}
@@ -123,7 +123,7 @@
             </div>
         {/each}
 
-        {#if Object.keys(titles).length === 0}
+        {#if Object.keys(titles || {}).length === 0}
             <div class="day">
                 <h2> No entries yet </h2>
             </div>
@@ -147,6 +147,7 @@
 
     .day {
         margin: 0.6rem 0 0.9em 0;
+        width: 100%;
 
         &:last-child {
             border-bottom: none;

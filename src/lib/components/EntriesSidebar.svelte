@@ -26,13 +26,14 @@
 <div class="sidebar {showing ? 'showing' : ''}">
     <div class="header">
         <button
+            class="with-circled-icon"
             aria-label={obfuscated ? 'Show entries' : 'Hide entries'}
             on:click={() => (obfuscated = !obfuscated)}
         >
             {#if obfuscated}
-                <Eye size="25" />
+                <Eye size="32" />
             {:else}
-                <EyeOff size="25" />
+                <EyeOff size="32" />
             {/if}
         </button>
         <button
@@ -57,27 +58,19 @@
 <style lang="less">
     @import '../../styles/variables';
 
-    @width: 300px;
-
     .sidebar {
         position: sticky;
         top: 0;
         height: 100vh;
-        width: min(@width, fit-content);
+        width: 100%;
         background-color: @light-v-accent;
         z-index: 10;
         overflow-y: scroll;
         padding: 0;
 
         @media @not-mobile {
-            // in line with bottom of entries
-            margin: 0 0 1rem 0;
-
-            // snug to the right of the entries
-            border-radius: @border-radius 0 0 @border-radius;
-
-            // not on right
-            box-shadow: -2px 0 8px 4px rgba(0, 0, 0, 0.5);
+            border-radius: @border-radius;
+            box-shadow: 0 0 8px 4px rgba(0, 0, 0, 0.5);
         }
 
         @media @mobile {

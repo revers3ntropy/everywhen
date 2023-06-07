@@ -24,14 +24,13 @@
     export let hideAgentWidget = false;
     export let auth: Auth;
     export let day: number;
-    export let showSidebar = false;
 
     function toggleCollapse() {
         $collapsed[day] = !$collapsed[day];
     }
 </script>
 
-<div class="entry-group {showSidebar ? 'with-sidebar' : ''}">
+<div class="entry-group">
     <div class="title">
         <div>
             <h3>
@@ -108,17 +107,22 @@
     @import '../../styles/layout';
 
     .entry-group {
-        margin: 1em 0;
+        width: 100%;
+        margin: 0;
         padding: 0.5rem 0;
 
         transition: height @transition;
 
         @media @not-mobile {
             .container();
+            margin: 1rem 0;
+            padding: 7px 0;
 
-            &.with-sidebar {
-                margin-left: 0;
-                border-radius: 0 @border-radius @border-radius 0;
+            &:first-child {
+                margin-top: 0;
+            }
+            &:last-child {
+                margin-bottom: 0;
             }
         }
 
