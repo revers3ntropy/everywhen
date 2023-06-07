@@ -1,8 +1,6 @@
-import { fmtUtc } from '$lib/utils/time';
-import moment from 'moment';
 import type { Entry } from '$lib/controllers/entry';
 import { splitText } from '$lib/utils/text';
-import type { PickOptionalAndMutable, Seconds } from '../../app';
+import type { PickOptionalAndMutable } from '../../app';
 
 export type EntryWithWordCount = PickOptionalAndMutable<
     Entry,
@@ -29,7 +27,8 @@ export enum Bucket {
     Day,
     Week,
     Month,
-    Year
+    Year,
+    OperatingSystem
 }
 
 export const bucketNames: Record<string, Bucket> = {
@@ -37,7 +36,8 @@ export const bucketNames: Record<string, Bucket> = {
     Month: Bucket.Month,
     Week: Bucket.Week,
     Day: Bucket.Day,
-    Hour: Bucket.Hour
+    Hour: Bucket.Hour,
+    'Operating System': Bucket.OperatingSystem
 };
 
 const bucketToNameMap: Record<Bucket, string> = {
@@ -45,38 +45,19 @@ const bucketToNameMap: Record<Bucket, string> = {
     [Bucket.Day]: 'Day',
     [Bucket.Week]: 'Week',
     [Bucket.Month]: 'Month',
-    [Bucket.Year]: 'Year'
+    [Bucket.Year]: 'Year',
+    [Bucket.OperatingSystem]: 'Operating System'
 };
 
-export function bucketiseTime(time: Seconds, bucket: Bucket): Seconds {
-    const date = moment(new Date(time * 1000));
-    switch (bucket) {
-        case Bucket.Hour:
-            return parseInt(fmtUtc(time, 0, 'hh'));
-        case Bucket.Year:
-            return date.startOf('year').unix();
-        case Bucket.Month:
-            return date.startOf('month').unix();
-        case Bucket.Week:
-            return date.startOf('week').unix();
-        case Bucket.Day:
-            return date.startOf('day').unix();
-    }
+export function initialBucket(days: number): Bucket {
+    if (days < 10) return Bucket.Day;
+    if (days < 100) return Bucket.Week;
+    if (days < 5000) return Bucket.Month;
+    return Bucket.Year;
 }
 
-export function bucketSize(bucket: Bucket): Seconds {
-    switch (bucket) {
-        case Bucket.Year:
-            return 60 * 60 * 24 * 365;
-        case Bucket.Month:
-            return 60 * 60 * 24 * 30;
-        case Bucket.Week:
-            return 60 * 60 * 24 * 7;
-        case Bucket.Day:
-            return 60 * 60 * 24;
-        case Bucket.Hour:
-            return 60 * 60;
-    }
+export function initialBucketName(days: number): string {
+    return bucketToNameMap[initialBucket(days)];
 }
 
 export function commonWordsFromText(
@@ -89,15 +70,4 @@ export function commonWordsFromText(
         words[word]++;
     }
     return words;
-}
-
-export function initialBucket(days: number): Bucket {
-    if (days < 10) return Bucket.Day;
-    if (days < 100) return Bucket.Week;
-    if (days < 5000) return Bucket.Month;
-    return Bucket.Year;
-}
-
-export function initialBucketName(days: number): string {
-    return bucketToNameMap[initialBucket(days)];
 }

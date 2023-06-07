@@ -29,7 +29,7 @@
             <button
                 class="option"
                 on:click={() => {
-                    close();
+                    open = false;
                     key = option;
                 }}
             >

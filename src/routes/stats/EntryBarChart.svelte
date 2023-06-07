@@ -21,7 +21,6 @@
     export let by: By;
     export let days = 0;
 
-    console.log(initialBucket(days));
     let selectedBucket = initialBucket(days);
 
     let data: ChartData;

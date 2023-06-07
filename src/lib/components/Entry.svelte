@@ -264,7 +264,7 @@
             .ellipsis();
             font-size: 1.1em;
             font-weight: 500;
-            width: 100%;
+            padding: 0 0 0 0.2rem;
 
             @media @mobile {
                 display: none;

@@ -1,4 +1,13 @@
 <script lang="ts">
+    import {
+        consoleOSs,
+        macOSs,
+        mobileOSs,
+        tvOSs,
+        userAgentFromEntry,
+        watchOSs,
+        windowsOSs
+    } from '$lib/utils/userAgent';
     import { tooltip } from '@svelte-plugins/tooltips';
     import { onMount } from 'svelte';
     import Apple from 'svelte-material-icons/Apple.svelte';
@@ -10,41 +19,15 @@
     import UAParser from 'ua-parser-js';
     import type { Pixels } from '../../app';
 
-    const mobileOSs = [
-        'Android',
-        'Android-x86',
-        'BlackBerry',
-        'iOS',
-        'Windows Phone',
-        'Windows Mobile',
-        'Palm'
-    ];
-    const watchOSs = ['watchOS'];
-    const tvOSs = ['tvOS', 'NetTV'];
-    const consoleOSs = ['PlayStation', 'Xbox'];
-    const macOSs = ['Mac OS'];
-    const windowsOSs = ['Windows'];
-
     export let data = '';
     export let size: Pixels = 20;
     export let tooltipPosition = 'right';
 
-    let parsed: unknown = {};
     let ua = null as ReturnType<typeof UAParser> | null;
 
     onMount(() => {
-        if (!data) return;
-
-        try {
-            parsed = JSON.parse(data);
-        } catch (e) {
-            /* empty */
-        }
-
-        if (typeof parsed !== 'object' || parsed === null) return;
-        if (!('userAgent' in parsed)) return;
-        if (typeof parsed.userAgent !== 'string') return;
-        ua = new UAParser(parsed.userAgent).getResult();
+        const userAgentString = userAgentFromEntry({ agentData: data });
+        ua = new UAParser(userAgentString).getResult();
     });
 
     $: osName = ua !== null ? ua?.os?.name || 'Unknown OS' : '';
