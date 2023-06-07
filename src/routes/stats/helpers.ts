@@ -32,6 +32,22 @@ export enum Bucket {
     Year
 }
 
+export const bucketNames: Record<string, Bucket> = {
+    Year: Bucket.Year,
+    Month: Bucket.Month,
+    Week: Bucket.Week,
+    Day: Bucket.Day,
+    Hour: Bucket.Hour
+};
+
+const bucketToNameMap: Record<Bucket, string> = {
+    [Bucket.Hour]: 'Hour',
+    [Bucket.Day]: 'Day',
+    [Bucket.Week]: 'Week',
+    [Bucket.Month]: 'Month',
+    [Bucket.Year]: 'Year'
+};
+
 export function bucketiseTime(time: Seconds, bucket: Bucket): Seconds {
     const date = moment(new Date(time * 1000));
     switch (bucket) {
@@ -73,4 +89,15 @@ export function commonWordsFromText(
         words[word]++;
     }
     return words;
+}
+
+export function initialBucket(days: number): Bucket {
+    if (days < 10) return Bucket.Day;
+    if (days < 100) return Bucket.Week;
+    if (days < 5000) return Bucket.Month;
+    return Bucket.Year;
+}
+
+export function initialBucketName(days: number): string {
+    return bucketToNameMap[initialBucket(days)];
 }

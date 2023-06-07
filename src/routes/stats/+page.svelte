@@ -55,6 +55,7 @@
         <section class="container invisible">
             <div class="stats">
                 <StatPill primary value={data.entryCount} label="entries" />
+                <StatPill primary value={data.days} label="days" />
                 <StatPill
                     primary
                     value={data.wordCount}

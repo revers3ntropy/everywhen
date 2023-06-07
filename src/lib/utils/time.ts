@@ -55,12 +55,22 @@ export function dayUtcFromTimestamp(
 export function utcEq(
     a: TimestampSecs,
     b: TimestampSecs,
-    fmt = 'YYYY-MM-DD',
-    tzOffset: Hours = currentTzOffset()
+    aTzOffset: Hours = currentTzOffset(),
+    bTzOffset: Hours = currentTzOffset(),
+    fmt = 'YYYY-MM-DD'
 ): boolean {
-    return fmtUtc(a, tzOffset, fmt) === fmtUtc(b, tzOffset, fmt);
+    return fmtUtc(a, aTzOffset, fmt) === fmtUtc(b, bTzOffset, fmt);
 }
 
+/**
+ * Get the number of days since the given timestamp
+ * Always returns at least 1
+ */
 export function daysSince(timestamp: TimestampSecs): number {
-    return Math.floor((nowUtc() - timestamp) / 60 / 60 / 24);
+    const today = dayUtcFromTimestamp(nowUtc());
+    const then = dayUtcFromTimestamp(timestamp);
+    if (then > today) {
+        return 1;
+    }
+    return Math.floor((today - then) / (60 * 60 * 24)) + 1;
 }

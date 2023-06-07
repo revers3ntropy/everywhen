@@ -44,7 +44,7 @@ export const load = cachedPageRoute(async auth => {
         commonWords: Object.entries(commonWords)
             .sort(([, a], [, b]) => b - a)
             .slice(0, 100),
-        days: daysSince(earliestEntryTimeStamp) || 1,
+        days: daysSince(earliestEntryTimeStamp),
         wordCount,
         charCount
     };
