@@ -69,8 +69,10 @@
         padding: 0;
 
         @media @not-mobile {
-            border-radius: @border-radius;
-            box-shadow: 0 0 8px 4px rgba(0, 0, 0, 0.5);
+            // for the scroll bar
+            border-radius: @border-radius 0 0 @border-radius;
+            background: none;
+            border: 1px solid @border;
         }
 
         @media @mobile {
@@ -80,7 +82,6 @@
             &.showing {
                 transform: translateX(0);
                 border-right: 2px solid @border-heavy;
-                box-shadow: 0 0 8px 4px rgba(0, 0, 0, 0.5);
             }
 
             position: fixed;
