@@ -26,7 +26,9 @@
     let ua = null as ReturnType<typeof UAParser> | null;
 
     onMount(() => {
+        if (!data) return;
         const userAgentString = userAgentFromEntry({ agentData: data });
+        if (!userAgentString) return;
         ua = new UAParser(userAgentString).getResult();
     });
 
