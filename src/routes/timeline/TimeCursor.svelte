@@ -11,10 +11,6 @@
 
     const COLLIDER_ABOVE = 60;
     const COLLIDER_BELOW = 40;
-    const PLUS_ICON_WIDTH = 15;
-    const PLUS_ICON_OFFSET = [-15, 35] as const;
-    const PLUS_ICON_PADDING = 4;
-    const PLUS_ICON_WEIGHT = 2;
 
     export let auth: Auth;
     export let createEvent: (event: Event) => void;
@@ -40,7 +36,7 @@
     }
 
     interactable({
-        cursorOnHover: 'pointer',
+        cursorOnHover: 'crosshair',
         render(state) {
             if (!this.hovering) return;
 
@@ -70,67 +66,6 @@
                 40,
                 {
                     colour: state.colours.accentPrimary
-                }
-            );
-
-            // plus icon
-            state.rect(
-                state.timeToRenderPos(time) +
-                    PLUS_ICON_OFFSET[0] -
-                    PLUS_ICON_WIDTH * 0.5 -
-                    PLUS_ICON_WEIGHT * 0.5 -
-                    PLUS_ICON_PADDING,
-                state.centerLnY() +
-                    PLUS_ICON_OFFSET[1] -
-                    PLUS_ICON_WIDTH * 0.5 -
-                    PLUS_ICON_WEIGHT * 0.5 -
-                    PLUS_ICON_PADDING,
-                PLUS_ICON_WIDTH + PLUS_ICON_WEIGHT + PLUS_ICON_PADDING * 2 + 80,
-                PLUS_ICON_WIDTH + PLUS_ICON_WEIGHT + PLUS_ICON_PADDING * 2,
-                {
-                    colour: state.colours.lightAccent,
-                    radius: 4,
-                    zIndex: 2
-                }
-            );
-            state.rect(
-                state.timeToRenderPos(time) +
-                    PLUS_ICON_OFFSET[0] -
-                    PLUS_ICON_WEIGHT * 0.5,
-                state.centerLnY() +
-                    PLUS_ICON_OFFSET[1] -
-                    PLUS_ICON_WIDTH * 0.5 -
-                    PLUS_ICON_WEIGHT * 0.5,
-                PLUS_ICON_WEIGHT,
-                PLUS_ICON_WIDTH + PLUS_ICON_WEIGHT,
-                {
-                    colour: state.colours.accentPrimary,
-                    zIndex: 3
-                }
-            );
-            state.rect(
-                state.timeToRenderPos(time) +
-                    PLUS_ICON_OFFSET[0] -
-                    PLUS_ICON_WIDTH * 0.5 -
-                    PLUS_ICON_WEIGHT * 0.5,
-                state.centerLnY() +
-                    PLUS_ICON_OFFSET[1] -
-                    PLUS_ICON_WEIGHT * 0.5,
-                PLUS_ICON_WIDTH + PLUS_ICON_WEIGHT,
-                PLUS_ICON_WEIGHT,
-                {
-                    colour: state.colours.accentPrimary,
-                    zIndex: 3
-                }
-            );
-            state.text(
-                'New Event',
-                state.timeToRenderPos(time) + PLUS_ICON_OFFSET[0] + 16,
-                state.centerLnY() + PLUS_ICON_OFFSET[1] - 7,
-                {
-                    colour: state.colours.accentPrimary,
-                    zIndex: 3,
-                    fontSize: 14
                 }
             );
         },
