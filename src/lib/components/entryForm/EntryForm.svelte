@@ -1,13 +1,11 @@
 <script lang="ts">
     import { browser } from '$app/environment';
     import { beforeNavigate, goto } from '$app/navigation';
+    import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
+    import { serializedAgentData } from '$lib/utils/userAgent';
     import { tooltip } from '@svelte-plugins/tooltips';
-    import {
-        filedrop,
-        type FileDropOptions,
-        type Files
-    } from 'filedrop-svelte';
-    import { createEventDispatcher, onMount } from 'svelte';
+    import { filedrop, type Files } from 'filedrop-svelte';
+    import { onMount } from 'svelte';
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import ImageArea from 'svelte-material-icons/ImageArea.svelte';
@@ -29,11 +27,9 @@
     } from '$lib/notifications/notifications';
     import { obfuscate } from '$lib/utils/text';
     import { currentTzOffset, nowUtc } from '$lib/utils/time';
-    import type { Mutable } from '../../app';
+    import type { Mutable } from '../../../app';
     import FormatOptions from './FormatOptions.svelte';
     import LocationToggle from './LocationToggle.svelte';
-
-    const dispatch = createEventDispatcher();
 
     let mounted = false;
 
@@ -56,16 +52,20 @@
 
     let newEntryInputElement: HTMLTextAreaElement;
 
-    export function resetEntryForm() {
-        newEntryTitle = '';
-        newEntryBody = '';
-        newEntryLabel = '';
-    }
+    let labels = null as Label[] | null;
+
+    let submitted = false;
 
     $: if (mounted && browser && loadFromLS) {
         // be reactive on these
         [newEntryTitle, newEntryBody, newEntryLabel];
         saveToLS();
+    }
+
+    export function resetEntryForm() {
+        newEntryTitle = '';
+        newEntryBody = '';
+        newEntryLabel = '';
     }
 
     function saveToLS() {
@@ -74,28 +74,6 @@
             localStorage.setItem(LS_KEY.newEntryBody, newEntryBody);
             localStorage.setItem(LS_KEY.newEntryLabel, newEntryLabel);
         }
-    }
-
-    onMount(() => {
-        if (loadFromLS) {
-            newEntryTitle = localStorage.getItem(LS_KEY.newEntryTitle) || '';
-            newEntryBody = localStorage.getItem(LS_KEY.newEntryBody) || '';
-            newEntryLabel = localStorage.getItem(LS_KEY.newEntryLabel) || '';
-
-            if (!newEntryBody && !newEntryTitle) {
-                obfuscated = false;
-            }
-        }
-        mounted = true;
-    });
-
-    function serializeAgentData(): string {
-        return JSON.stringify({
-            userAgent: navigator.userAgent,
-            language: navigator.language,
-            appVersion: navigator.appVersion,
-            platform: navigator.platform
-        });
     }
 
     function areUnsavedChanges() {
@@ -168,28 +146,10 @@
         };
     }
 
-    let submitted = false;
-
-    beforeNavigate(({ cancel }) => {
-        // would save to LS here, except sometimes we want to navigate away
-        // after editing something in LS, for example making 'Dream' entry from navbar
-        // in which case saving would override anything we set there.
-        // Should be fine, as we always save whenever the local variables which store the form
-        // contents are changed.
-
-        if (!submitted && areUnsavedChanges()) {
-            if (
-                !confirm(
-                    'You have unsaved changes, are you sure you want to leave?'
-                )
-            ) {
-                cancel();
-            }
-        }
-    });
-
     async function onEntryCreation(body: RawEntry) {
-        const res = displayNotifOnErr(await api.post(auth, '/entries', body));
+        const res = displayNotifOnErr(
+            await api.post(auth, '/entries', { ...body })
+        );
         submitted = false;
         if (res.id) {
             // make really sure it's saved before resetting
@@ -200,15 +160,10 @@
         }
 
         const entry = {
+            ...body,
             id: res.id,
-            title: body.title,
-            entry: body.entry,
-            created: body.created,
-            createdTZOffset: body.createdTZOffset,
             deleted: false,
-            latitude: body.latitude,
-            longitude: body.longitude,
-            agentData: body.agentData
+            decrypted: true
         } as Mutable<Entry>;
 
         if (body.label && labels) {
@@ -220,7 +175,7 @@
             }
         }
 
-        $addEntryListeners.map(e => e(entry));
+        $addEntryListeners.map(e => e(entry, EntryFormMode.Standard));
     }
 
     async function onEntryEdit(body: RawEntry) {
@@ -256,7 +211,7 @@
             latitude: currentLocation[0],
             longitude: currentLocation[1],
             created: nowUtc(),
-            agentData: serializeAgentData(),
+            agentData: serializedAgentData(),
             createdTZOffset: currentTzOffset()
         } as RawEntry;
 
@@ -270,20 +225,7 @@
             default:
                 throw new Error(`Unknown action: ${action as string}`);
         }
-
-        dispatch('updated');
     }
-
-    const fileOptions: FileDropOptions = {
-        fileLimit: 1,
-        windowDrop: false,
-        hideInput: true,
-        clickToUpload: false,
-        tabIndex: -1,
-        multiple: false,
-        accept: 'image/*',
-        id: 'entry-file-drop'
-    };
 
     async function onFileDrop(e: CustomEvent<{ files: Files }>) {
         const files = e.detail.files;
@@ -347,11 +289,8 @@
         ).click();
     }
 
-    let labels = null as Label[] | null;
-
     async function loadLabels() {
-        const labelsRes = displayNotifOnErr(await api.get(auth, '/labels'));
-        labels = labelsRes.labels;
+        labels = displayNotifOnErr(await api.get(auth, '/labels')).labels;
     }
 
     function handleEntryInputKeydown(event: KeyboardEvent) {
@@ -360,18 +299,55 @@
         insertAtCursor(newEntryInputElement, '\t');
     }
 
-    onMount(async () => {
-        await Promise.all([
-            loadLabels(),
-            stopSpaceAndEnterBeingInterceptedByFileDrop()
-        ]);
+    beforeNavigate(({ cancel }) => {
+        // would save to LS here, except sometimes we want to navigate away
+        // after editing something in LS, for example making 'Dream' entry from navbar
+        // in which case saving would override anything we set there.
+        // Should be fine, as we always save whenever the local variables which store the form
+        // contents are changed.
+
+        if (!submitted && areUnsavedChanges()) {
+            if (
+                !confirm(
+                    'You have unsaved changes, are you sure you want to leave?'
+                )
+            ) {
+                cancel();
+            }
+        }
+    });
+
+    onMount(() => {
+        void loadLabels();
+
+        if (loadFromLS) {
+            newEntryTitle = localStorage.getItem(LS_KEY.newEntryTitle) || '';
+            newEntryBody = localStorage.getItem(LS_KEY.newEntryBody) || '';
+            newEntryLabel = localStorage.getItem(LS_KEY.newEntryLabel) || '';
+
+            if (!newEntryBody && !newEntryTitle) {
+                obfuscated = false;
+            }
+        }
+        mounted = true;
+
+        void stopSpaceAndEnterBeingInterceptedByFileDrop();
     });
 </script>
 
 <div
     class="wrapper entry-file-drop"
     on:filedrop={onFileDrop}
-    use:filedrop={fileOptions}
+    use:filedrop={{
+        fileLimit: 1,
+        windowDrop: false,
+        hideInput: true,
+        clickToUpload: false,
+        tabIndex: -1,
+        multiple: false,
+        accept: 'image/*',
+        id: 'entry-file-drop'
+    }}
 >
     <div>
         <div class="head">
@@ -417,12 +393,13 @@
 
                 <button
                     aria-label="Submit Entry"
-                    class="primary with-icon send"
+                    class="primary with-icon hide-mobile"
                     disabled={submitted}
                     on:click={submit}
+                    style="padding: 2px 5px !important;"
                 >
-                    <Send size="28" />
                     Submit
+                    <Send size="26" />
                 </button>
             </div>
         </div>
@@ -479,9 +456,9 @@
 </div>
 
 <style lang="less">
-    @import '../../styles/variables';
-    @import '../../styles/layout';
-    @import '../../styles/input';
+    @import '../../../styles/variables';
+    @import '../../../styles/layout';
+    @import '../../../styles/input';
 
     .wrapper {
         margin: 0;
@@ -547,14 +524,6 @@
                 justify-content: end;
                 align-items: center;
             }
-        }
-    }
-
-    .send {
-        padding: 0 0.5rem !important; // override .primary
-
-        @media @mobile {
-            display: none !important;
         }
     }
 

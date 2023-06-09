@@ -2,7 +2,7 @@
     import { onMount } from 'svelte';
     import Close from 'svelte-material-icons/Close.svelte';
     import { obfuscated } from '$lib/stores';
-    import EntryForm from '../../EntryForm.svelte';
+    import EntryForm from '$lib/components/entryForm/EntryForm.svelte';
     import type { PageData } from './$types';
 
     export let data: PageData;

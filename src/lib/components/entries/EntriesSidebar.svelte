@@ -3,8 +3,8 @@
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import Menu from 'svelte-material-icons/Menu.svelte';
-    import type { Entry } from '../controllers/entry';
-    import type { Auth } from '../controllers/user';
+    import type { Entry } from '$lib/controllers/entry';
+    import type { Auth } from '$lib/controllers/user';
     import EntryTitles from './EntryTitles.svelte';
 
     export let titles: Record<string, Entry[]> | null;
@@ -56,7 +56,7 @@
 </div>
 
 <style lang="less">
-    @import '../../styles/variables';
+    @import '../../../styles/variables';
 
     .sidebar {
         position: sticky;

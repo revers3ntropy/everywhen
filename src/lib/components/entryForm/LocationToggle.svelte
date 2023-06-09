@@ -5,9 +5,10 @@
     import MapMarkerOffOutline from 'svelte-material-icons/MapMarkerOffOutline.svelte';
     import MapMarkerOutline from 'svelte-material-icons/MapMarkerOutline.svelte';
     import { enabledLocation } from '$lib/stores';
-    import type { TooltipPosition } from '../../app';
+    import type { Pixels, TooltipPosition } from '../../../app';
 
     export let tooltipPosition: TooltipPosition = 'bottom';
+    export let size: Pixels = 25;
 
     async function watchLocationPermissions() {
         const permissionStatus = await navigator.permissions.query({
@@ -62,7 +63,7 @@
         }}
         aria-label="Turn off Location"
     >
-        <MapMarkerOutline size="25" />
+        <MapMarkerOutline {size} />
     </button>
 {:else}
     <button
@@ -74,6 +75,6 @@
         }}
         aria-label="Turn on Location"
     >
-        <MapMarkerOffOutline size="25" />
+        <MapMarkerOffOutline {size} />
     </button>
 {/if}

@@ -9,18 +9,21 @@
     import NoteEditOutline from 'svelte-material-icons/NoteEditOutline.svelte';
     import DotsVertical from 'svelte-material-icons/DotsVertical.svelte';
     import UtcTime from '$lib/components/UtcTime.svelte';
-    import type { Entry } from '../controllers/entry';
-    import type { Label as LabelController } from '../controllers/label';
-    import type { Auth } from '../controllers/user';
-    import { popup } from '../stores';
-    import { api, apiPath } from '../utils/apiRequest';
-    import { focusableId } from '../utils/focusableId';
-    import { displayNotifOnErr, notify } from '../notifications/notifications';
-    import { obfuscate, rawMdToHtml } from '../utils/text';
-    import AgentWidget from './AgentWidget.svelte';
-    import Dot from './Dot.svelte';
-    import Label from './Label.svelte';
-    import LocationWidget from './LocationWidget.svelte';
+    import type { Entry } from '$lib/controllers/entry';
+    import type { Label as LabelController } from '../../controllers/label';
+    import type { Auth } from '$lib/controllers/user';
+    import { popup } from '$lib/stores';
+    import { api, apiPath } from '$lib/utils/apiRequest';
+    import { focusableId } from '$lib/utils/focusableId';
+    import {
+        displayNotifOnErr,
+        notify
+    } from '$lib/notifications/notifications';
+    import { obfuscate, rawMdToHtml } from '$lib/utils/text';
+    import AgentWidget from '../AgentWidget.svelte';
+    import Dot from '../Dot.svelte';
+    import Label from '../Label.svelte';
+    import LocationWidget from '../LocationWidget.svelte';
 
     const dispatch = createEventDispatcher();
 
@@ -208,8 +211,8 @@
 </div>
 
 <style lang="less">
-    @import '../../styles/text';
-    @import '../../styles/variables';
+    @import '../../../styles/text';
+    @import '../../../styles/variables';
 
     .entry {
         padding: 0;
@@ -246,7 +249,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin: 1rem 0 0 0;
+            margin: 0;
             padding: 0 0.3em;
             width: 100%;
 

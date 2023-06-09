@@ -7,9 +7,10 @@
     import ImageOutline from 'svelte-material-icons/ImageOutline.svelte';
     import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
     import Notebook from 'svelte-material-icons/Notebook.svelte';
+    import Bin from 'svelte-material-icons/Delete.svelte';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
     import type { App } from '../../app';
-    import EntryTitles from '$lib/components/EntryTitles.svelte';
+    import EntryTitles from '$lib/components/entries/EntryTitles.svelte';
     import { Entry } from '$lib/controllers/entry';
     import { obfuscated } from '$lib/stores.js';
     import {
@@ -88,6 +89,10 @@
             <a class="primary with-icon" href="/journal">
                 <Notebook size="25" />
                 Journal
+            </a>
+            <a class="icon-gradient-on-hover with-icon" href="/journal/deleted">
+                <Bin size="25" />
+                Deleted Entries
             </a>
             <a class="icon-gradient-on-hover with-icon" href="/labels">
                 <LabelOutline size="25" />

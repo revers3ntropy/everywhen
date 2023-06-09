@@ -1,8 +1,8 @@
 <script lang="ts">
+    import BulletOrStandardEntryForm from '$lib/components/entryForm/ModedEntryForm.svelte';
     import { onMount } from 'svelte';
-    import Entries from '$lib/components/Entries.svelte';
+    import Entries from '$lib/components/entries/Entries.svelte';
     import { obfuscated } from '$lib/stores';
-    import EntryForm from './EntryForm.svelte';
     import type { PageData } from './$types';
 
     export let data: PageData;
@@ -18,10 +18,10 @@
 </svelte:head>
 
 <main>
-    <EntryForm
+    <BulletOrStandardEntryForm
         auth={data}
-        bind:resetEntryForm={clearEntryForm}
         obfuscated={$obfuscated}
+        bind:resetEntryForm={clearEntryForm}
     />
     <Entries
         auth={data}

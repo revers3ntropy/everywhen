@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import Entry from '$lib/components/Entry.svelte';
+    import Entry from '$lib/components/entries/Entry.svelte';
     import { obfuscated } from '$lib/stores';
     import type { PageData } from './$types';
 

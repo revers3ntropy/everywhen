@@ -4,13 +4,15 @@ export const COOKIE_TIMEOUT: Seconds = 60 * 60;
 export const KEY_COOKIE_KEY = '__misc_3_key_v2';
 export const USERNAME_COOKIE_KEY = '__misc_3_username_v2';
 
+const LS_PREFIX = '__misc_3_';
 export const LS_KEY = {
-    newEntryBody: '__misc_3_newEntryBody',
-    newEntryTitle: '__misc_3_newEntryTitle',
-    newEntryLabel: '__misc_3_newEntryLabel',
-    passcodeLastEntered: '__misc_3_passcode_last_entered',
-    enabledLocation: '__misc_3_enabled_location',
-    sortEventsKey: '__misc_3_events_sort_key'
+    newEntryBody: `${LS_PREFIX}new_entry_body`,
+    newEntryTitle: `${LS_PREFIX}new_entry_title`,
+    newEntryLabel: `${LS_PREFIX}new_entry_label`,
+    passcodeLastEntered: `${LS_PREFIX}passcode_last_entered`,
+    enabledLocation: `${LS_PREFIX}enabled_location`,
+    sortEventsKey: `${LS_PREFIX}events_sort_key`,
+    journalingMode: `${LS_PREFIX}journaling_mode`
 };
 
 // possible characters to show when the text is blurred

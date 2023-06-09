@@ -22,6 +22,7 @@
     export let showAddButton = true;
     export let filter: (l: Label, i: number, arr: Label[]) => boolean = () =>
         true;
+    export let condensed = false;
 
     let closeDropDown: () => void;
 
@@ -45,7 +46,7 @@
     $: selectedLabel = (labels ?? []).find(l => l.id === value);
 </script>
 
-<div class="select-label">
+<div class="select-label {condensed ? 'condensed' : ''}">
     <Dropdown
         bind:close={closeDropDown}
         ariaLabel={() => 'Set label'}
@@ -60,17 +61,25 @@
                             l => l.id === value
                         )?.colour || 'transparent'}"
                     />
-                    <span class="label-name">
-                        {selectedLabel.name}
-                    </span>
+                    {#if !condensed}
+                        <span class="label-name">
+                            {selectedLabel.name}
+                        </span>
+                    {/if}
                 {:else}
                     <LabelOutline size="20" />
-                    Add Label
+                    {#if !condensed}
+                        Add Label
+                    {/if}
                 {/if}
-                <MenuDown size="20" />
+                {#if !condensed}
+                    <MenuDown size="20" />
+                {/if}
             {:else}
                 <span />
-                <i class="text-light">Loading...</i>
+                <i class="text-light">
+                    {#if !condensed}Loading{/if}...
+                </i>
             {/if}
         </span>
         <div class="list-container">
@@ -169,6 +178,13 @@
             justify-items: left;
             background: none;
             padding: 0.4rem 0.4rem 0.4rem 0.1rem;
+        }
+
+        &.condensed {
+            .select-button {
+                padding: 0.3rem;
+                grid-template-columns: 1fr;
+            }
         }
     }
 

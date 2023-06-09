@@ -2,7 +2,7 @@
     import { goto } from '$app/navigation';
     import { onMount } from 'svelte';
     import Delete from 'svelte-material-icons/Delete.svelte';
-    import Entries from '$lib/components/Entries.svelte';
+    import Entries from '$lib/components/entries/Entries.svelte';
     import { obfuscated } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/notifications/notifications';

@@ -2,14 +2,14 @@
     import { tooltip } from '@svelte-plugins/tooltips';
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
-    import { Entry } from '../controllers/entry';
-    import type { Auth } from '../controllers/user';
-    import { showPopup } from '../utils/popups';
-    import { obfuscate } from '../utils/text';
-    import { nowUtc, utcEq } from '../utils/time';
+    import { Entry } from '$lib/controllers/entry';
+    import type { Auth } from '$lib/controllers/user';
+    import { showPopup } from '$lib/utils/popups';
+    import { obfuscate } from '$lib/utils/text';
+    import { nowUtc, utcEq } from '$lib/utils/time';
     import EntryDialog from '$lib/dialogs/EntryDialog.svelte';
-    import Dot from './Dot.svelte';
-    import UtcTime from './UtcTime.svelte';
+    import Dot from '../Dot.svelte';
+    import UtcTime from '../UtcTime.svelte';
 
     export let titles: Record<string, Entry[]> | null = null;
     export let obfuscated = true;
@@ -132,8 +132,8 @@
 </div>
 
 <style lang="less">
-    @import '../../styles/variables';
-    @import '../../styles/text';
+    @import '../../../styles/variables';
+    @import '../../../styles/text';
 
     .menu {
         display: flex;

@@ -81,3 +81,19 @@ export function userAgentFromEntry(entry: { agentData?: string }): string {
 export function osGroupFromEntry(entry: { agentData?: string }): OsGroup {
     return osGroupFromUserAgentString(userAgentFromEntry(entry));
 }
+
+export interface AgentData {
+    userAgent: string;
+    language: string;
+    appVersion: string;
+    platform: string;
+}
+
+export function serializedAgentData(): string {
+    return JSON.stringify({
+        userAgent: navigator.userAgent,
+        language: navigator.language,
+        appVersion: navigator.appVersion,
+        platform: navigator.platform
+    } as AgentData);
+}

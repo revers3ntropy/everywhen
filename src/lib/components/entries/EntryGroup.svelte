@@ -9,12 +9,12 @@
     import { ANIMATION_DURATION } from '$lib/constants';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
-    import Entry from '$lib/components/Entry.svelte';
+    import Entry from '$lib/components/entries/Entry.svelte';
     import type { Entry as EntryController } from '$lib/controllers/entry';
-    import type { Auth } from '../controllers/user';
-    import { nowUtc, utcEq } from '../utils/time';
-    import Dot from './Dot.svelte';
-    import UtcTime from './UtcTime.svelte';
+    import type { Auth } from '$lib/controllers/user';
+    import { nowUtc, utcEq } from '$lib/utils/time';
+    import Dot from '../Dot.svelte';
+    import UtcTime from '../UtcTime.svelte';
     import { fly, slide } from 'svelte/transition';
 
     export let obfuscated = true;
@@ -103,8 +103,8 @@
 </div>
 
 <style lang="less">
-    @import '../../styles/variables';
-    @import '../../styles/layout';
+    @import '../../../styles/variables';
+    @import '../../../styles/layout';
 
     .entry-group {
         width: 100%;

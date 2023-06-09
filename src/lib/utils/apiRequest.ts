@@ -123,6 +123,9 @@ export async function makeApiReq<
 
     if (method !== 'GET') {
         body ??= {} as Body;
+
+        body = { ...body };
+
         // supply default timezone to all requests
         if (browser) {
             body.timezoneUtcOffset ??= -(new Date().getTimezoneOffset() / 60);

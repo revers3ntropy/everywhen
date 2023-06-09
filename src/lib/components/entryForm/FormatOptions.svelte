@@ -102,7 +102,7 @@
 </Dropdown>
 
 <style lang="less">
-    @import '../../styles/variables';
+    @import '../../../styles/variables';
 
     .format-options {
         padding: 0.5rem 0;

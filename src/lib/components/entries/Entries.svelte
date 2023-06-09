@@ -1,5 +1,6 @@
 <script lang="ts">
     import { browser } from '$app/environment';
+    import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
     import { encrypt } from '$lib/security/encryption.js';
     import { fmtUtc } from '$lib/utils/time';
     import { onMount } from 'svelte';
@@ -7,18 +8,18 @@
     import Bin from 'svelte-material-icons/Delete.svelte';
     import TrayArrowUp from 'svelte-material-icons/TrayArrowUp.svelte';
     import Search from 'svelte-material-icons/Magnify.svelte';
-    import EntryGroup from '$lib/components/EntryGroup.svelte';
-    import type { Mutable } from '../../app';
-    import { Entry, type EntryFilter } from '../controllers/entry';
-    import type { Auth } from '../controllers/user';
-    import { obfuscated } from '../stores';
-    import { api } from '../utils/apiRequest';
-    import { displayNotifOnErr } from '../notifications/notifications';
-    import { showPopup } from '../utils/popups';
-    import Spinner from './BookSpinner.svelte';
+    import EntryGroup from '$lib/components/entries/EntryGroup.svelte';
+    import type { Mutable } from '../../../app';
+    import { Entry, type EntryFilter } from '$lib/controllers/entry';
+    import type { Auth } from '$lib/controllers/user';
+    import { obfuscated } from '$lib/stores';
+    import { api } from '$lib/utils/apiRequest';
+    import { displayNotifOnErr } from '$lib/notifications/notifications';
+    import { showPopup } from '$lib/utils/popups';
+    import Spinner from '../BookSpinner.svelte';
     import ImportDialog from '$lib/dialogs/ImportDialog.svelte';
     import Sidebar from './EntriesSidebar.svelte';
-    import { addEntryListeners } from '../stores';
+    import { addEntryListeners } from '$lib/stores';
 
     export let auth: Auth;
 
@@ -38,6 +39,8 @@
     }
 
     export let options: IOptions = {};
+
+    let searchInput: HTMLInputElement;
 
     const batchSize = 10;
     let pageEndInView = false;
@@ -141,13 +144,9 @@
         return entries;
     }
 
-    function updateSearch(e: Event & { target: EventTarget | null }) {
-        if (!e.target) {
-            return;
-        }
-
+    function updateSearch() {
         const searchEncrypted = displayNotifOnErr(
-            encrypt((e.target as HTMLInputElement).value, auth.key)
+            encrypt(searchInput.value, auth.key)
         );
 
         options = {
@@ -156,7 +155,8 @@
         };
     }
 
-    function onNewEntry(entry: Entry) {
+    function onNewEntry(entry: Entry, mode: EntryFormMode) {
+        // TODO check against search and stuff before inserting
         const localDate = fmtUtc(
             entry.created,
             entry.createdTZOffset,
@@ -164,6 +164,10 @@
         );
         entries[localDate] = [entry, ...(entries?.[localDate] || [])];
         entries = { ...entries };
+
+        if (mode === EntryFormMode.Bullet) {
+            return;
+        }
 
         setTimeout(() => {
             const el = document.getElementById(entry.id);
@@ -187,13 +191,10 @@
 
 <div>
     <div>
-        <div class="entries-menu">
+        <div class="entries-menu hide-mobile">
             <div>
                 {#if showImport}
-                    <button
-                        class="with-circled-icon hide-mobile"
-                        on:click={importPopup}
-                    >
+                    <button class="with-circled-icon" on:click={importPopup}>
                         <TrayArrowUp size="30" />
                     </button>
                 {/if}
@@ -210,11 +211,14 @@
             <div>
                 {#if showSearch}
                     <input
+                        bind:this={searchInput}
                         on:change={updateSearch}
                         placeholder="Search..."
                         type="text"
                     />
-                    <button><Search /></button>
+                    <button on:click={updateSearch}>
+                        <Search />
+                    </button>
                 {/if}
             </div>
         </div>
@@ -259,8 +263,8 @@
 </div>
 
 <style lang="less">
-    @import '../../styles/variables';
-    @import '../../styles/layout';
+    @import '../../../styles/variables';
+    @import '../../../styles/layout';
 
     .sidebar-and-entries {
         width: 100%;

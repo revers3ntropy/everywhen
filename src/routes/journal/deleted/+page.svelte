@@ -1,6 +1,6 @@
 <script lang="ts">
     import Dot from '$lib/components/Dot.svelte';
-    import Entries from '$lib/components/Entries.svelte';
+    import Entries from '$lib/components/entries/Entries.svelte';
     import { onMount } from 'svelte';
     import type { PageData } from './$types';
 
