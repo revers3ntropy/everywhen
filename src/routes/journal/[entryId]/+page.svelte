@@ -1,4 +1,7 @@
 <script lang="ts">
+    import type { Location } from '$lib/controllers/location';
+    import { displayNotifOnErr } from '$lib/notifications/notifications';
+    import { api } from '$lib/utils/apiRequest';
     import { onMount } from 'svelte';
     import Entry from '$lib/components/entries/Entry.svelte';
     import { obfuscated } from '$lib/stores';
@@ -6,7 +9,18 @@
 
     export let data: PageData;
 
-    onMount(() => (document.title = `View Entry`));
+    let locations = null as Location[] | null;
+
+    async function loadLocations() {
+        locations = displayNotifOnErr(
+            await api.get(data, '/locations')
+        ).locations;
+    }
+
+    onMount(() => {
+        void loadLocations();
+        document.title = `View Entry`;
+    });
 </script>
 
 <svelte:head>
@@ -28,6 +42,7 @@
         on:updated={() => location.reload()}
         showFullDate={true}
         hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
+        {locations}
     />
 
     {#if !data.history}
@@ -59,6 +74,7 @@
                     showFullDate={true}
                     hideAgentWidget={!data.settings.showAgentWidgetOnEntries
                         .value}
+                    {locations}
                 />
             {/each}
         {/if}

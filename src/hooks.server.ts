@@ -8,7 +8,7 @@ import { cleanupCache } from '$lib/utils/cache';
 import { errorLogger, makeLogger } from '$lib/utils/log';
 import type { Milliseconds, TimestampSecs } from './app';
 
-const reqLogger = makeLogger('REQ', chalk.grey, 'general.log');
+const reqLogger = makeLogger('REQ', chalk.bgWhite.black, 'general.log');
 
 // keep connection to database alive
 // so it's not re-connected on API request
@@ -49,7 +49,7 @@ async function logReq(
     const userId = (auth?.id || 0).toString();
 
     await PageLoadLog.createLog(
-        query,
+        query.unlogged,
         now,
         req.request.method,
         req.url.href,

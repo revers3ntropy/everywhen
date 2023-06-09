@@ -150,15 +150,18 @@ export class Location {
         auth: Auth,
         id: string
     ): Promise<Result<Location>> {
-        return Location.fromRaw(
+        const { val, err } = Location.fromRaw(
             auth,
             await query<Location[]>`
-            SELECT id, created, createdTZOffset, name, latitude, longitude, radius
-            FROM locations
-            WHERE user = ${auth.id}
-              AND id = ${id}
-        `
-        ).map(labels => labels[0]);
+                SELECT id, created, createdTZOffset, name, latitude, longitude, radius
+                FROM locations
+                WHERE user = ${auth.id}
+                  AND id = ${id}
+            `
+        );
+        if (err) return Result.err(err);
+        if (val.length === 0) return Result.err('Location not found');
+        return Result.ok(val[0]);
     }
 
     public static async updateName(
@@ -257,17 +260,6 @@ export class Location {
         );
     }
 
-    public static metersToDegreesPrecise(
-        m: Meters,
-        resolution: number,
-        mPerUnit: number,
-        latitude: Degrees
-    ): Degrees {
-        return Location.metersToDegrees(
-            m * ((resolution / mPerUnit) * Math.cos(latitude * (Math.PI / 180)))
-        );
-    }
-
     public static async purge(
         query: QueryFunc,
         auth: Auth,
@@ -318,10 +310,10 @@ export class Location {
     }
 
     public static distBetweenPointsPrecise(
-        lat1: number,
-        lon1: number,
-        lat2: number,
-        lon2: number
+        lat1: Degrees,
+        lon1: Degrees,
+        lat2: Degrees,
+        lon2: Degrees
     ): Meters {
         // https://stackoverflow.com/questions/639695/
         const R = 6378.137; // Radius of earth in KM
@@ -379,5 +371,32 @@ export class Location {
                     longitude
                 ) <= mapRadius(radius)
         );
+    }
+
+    public static filterLocationsByPoint<
+        T extends { latitude: Degrees; longitude: Degrees }
+    >(
+        locations: Location[],
+        point: T
+    ): { touching: Location[]; near: Location[] } {
+        const touching: Location[] = [];
+        const near: Location[] = [];
+
+        for (const location of locations) {
+            const radius = Location.degreesToMeters(location.radius);
+            const dist = Location.distBetweenPointsPrecise(
+                location.latitude,
+                location.longitude,
+                point.latitude,
+                point.longitude
+            );
+            if (dist <= radius) {
+                touching.push(location);
+            } else if (dist <= radius * 2) {
+                near.push(location);
+            }
+        }
+
+        return { touching, near };
     }
 }

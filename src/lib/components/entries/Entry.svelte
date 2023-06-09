@@ -9,6 +9,7 @@
     import NoteEditOutline from 'svelte-material-icons/NoteEditOutline.svelte';
     import DotsVertical from 'svelte-material-icons/DotsVertical.svelte';
     import UtcTime from '$lib/components/UtcTime.svelte';
+    import type { Location } from '$lib/controllers/location';
     import type { Entry } from '$lib/controllers/entry';
     import type { Label as LabelController } from '../../controllers/label';
     import type { Auth } from '$lib/controllers/user';
@@ -20,10 +21,10 @@
         notify
     } from '$lib/notifications/notifications';
     import { obfuscate, rawMdToHtml } from '$lib/utils/text';
-    import AgentWidget from '../AgentWidget.svelte';
+    import AgentWidget from './AgentWidget.svelte';
     import Dot from '../Dot.svelte';
     import Label from '../Label.svelte';
-    import LocationWidget from '../LocationWidget.svelte';
+    import LocationWidget from './LocationWidget.svelte';
 
     const dispatch = createEventDispatcher();
 
@@ -52,6 +53,7 @@
     export let isInDialog = false;
 
     export let auth: Auth;
+    export let locations: Location[] | null;
 
     // show random string instead of text content if obfuscated
     export let showLabel: LabelController | null | undefined = label;
@@ -100,12 +102,14 @@
     {id}
 >
     {#if showFullDate}
-        <UtcTime
-            fmt={'ddd DD MMM YYYY, h:mma'}
-            timestamp={created}
-            tooltipPosition="right"
-            tzOffset={createdTZOffset}
-        />
+        <div class="text-light">
+            <UtcTime
+                fmt={'ddd DD MMM YYYY, h:mma'}
+                timestamp={created}
+                tooltipPosition="right"
+                tzOffset={createdTZOffset}
+            />
+        </div>
     {/if}
     <p class="mobile-title {obfuscated ? 'obfuscated' : ''}">
         {obfuscated ? obfuscate(title) : title}
@@ -129,6 +133,7 @@
 
             {#if latitude && longitude && showLocations}
                 <LocationWidget
+                    {locations}
                     {auth}
                     entryId={id}
                     {latitude}

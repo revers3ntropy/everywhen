@@ -17,7 +17,7 @@
     import Television from 'svelte-material-icons/Television.svelte';
     import Watch from 'svelte-material-icons/Watch.svelte';
     import UAParser from 'ua-parser-js';
-    import type { Pixels } from '../../app';
+    import type { Pixels } from '../../../app';
 
     export let data = '';
     export let size: Pixels = 20;

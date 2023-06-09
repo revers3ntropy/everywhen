@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type { Location } from '$lib/controllers/location';
     import { onMount } from 'svelte';
     import type { Entry as EntryController } from '../controllers/entry';
     import type { Auth } from '$lib/controllers/user';
@@ -14,12 +15,24 @@
     export let hideAgentWidget: boolean;
 
     let entry: EntryController | null = null;
+    let locations = null as Location[] | null;
 
-    onMount(async () => {
+    async function loadEntry() {
         entry = displayNotifOnErr(
             await api.get(auth, apiPath('/entries/?', id)),
             () => popup.set(null)
         );
+    }
+
+    async function loadLocations() {
+        locations = displayNotifOnErr(
+            await api.get(auth, '/locations')
+        ).locations;
+    }
+
+    onMount(() => {
+        void loadEntry();
+        void loadLocations();
     });
 </script>
 
@@ -32,6 +45,7 @@
             {obfuscated}
             showFullDate={true}
             {hideAgentWidget}
+            {locations}
         />
     {:else}
         <BookSpinner />

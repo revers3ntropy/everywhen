@@ -52,8 +52,10 @@ notify.info = (text: string, timeout: Milliseconds = 4000) =>
     notify(text, NotificationType.INFO, timeout);
 notify.success = (text: string, timeout: Milliseconds = 2000) =>
     notify(text, NotificationType.SUCCESS, timeout);
-notify.error = (text: string, timeout: Milliseconds = 5000) =>
+notify.error = (text: string, timeout: Milliseconds = 5000) => {
+    console.error(text);
     notify(text, NotificationType.ERROR, timeout);
+};
 
 export function displayNotifOnErr<T extends NonNullable<unknown>>(
     { err, val }: Result<T>,

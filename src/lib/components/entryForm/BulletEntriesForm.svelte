@@ -24,22 +24,24 @@
 
     let entry: HTMLInputElement;
     let label: string;
-    let labels = undefined as Label[] | undefined;
+    let labels = null as Label[] | null;
 
     export function resetEntryForm() {
         entry.value = '';
     }
 
     async function submit() {
+        const entryVal = entry.value;
+
+        resetEntryForm();
+
         const currentLocation = $enabledLocation
             ? await getLocation()
             : [null, null];
 
-        console.log(label);
-
         const body = {
             title: '',
-            entry: entry.value,
+            entry: entryVal,
             label,
             latitude: currentLocation[0],
             longitude: currentLocation[1],
@@ -52,12 +54,10 @@
             await api.post(auth, '/entries', { ...body })
         );
 
-        if (res.id) {
-            // make really sure it's saved before resetting
-            resetEntryForm();
-        } else {
+        if (!res.id) {
             errorLogger.error(res);
-            notify.error(`Failed to create entry: ${JSON.stringify(res)}`);
+            notify.error(`Failed to create entry`);
+            return;
         }
 
         const newEntry = {
@@ -77,8 +77,6 @@
         }
 
         $addEntryListeners.map(e => e(newEntry, EntryFormMode.Bullet));
-
-        entry.focus();
     }
 
     function onInput(e: KeyboardEvent) {
@@ -104,7 +102,7 @@
             />
         </div>
         <div class="hide-mobile">
-            <LocationToggle size="20" tooltipPosition="left" />
+            <LocationToggle size={20} tooltipPosition="left" />
         </div>
         <button
             class="primary with-icon"

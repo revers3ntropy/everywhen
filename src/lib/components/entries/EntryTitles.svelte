@@ -1,12 +1,14 @@
 <script lang="ts">
+    import { addEntryListeners } from '$lib/stores';
     import { tooltip } from '@svelte-plugins/tooltips';
+    import { onMount } from 'svelte';
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import { Entry } from '$lib/controllers/entry';
     import type { Auth } from '$lib/controllers/user';
     import { showPopup } from '$lib/utils/popups';
     import { obfuscate } from '$lib/utils/text';
-    import { nowUtc, utcEq } from '$lib/utils/time';
+    import { fmtUtc, nowUtc, utcEq } from '$lib/utils/time';
     import EntryDialog from '$lib/dialogs/EntryDialog.svelte';
     import Dot from '../Dot.svelte';
     import UtcTime from '../UtcTime.svelte';
@@ -28,6 +30,19 @@
         });
     }
 
+    function onNewEntry(entry: Entry) {
+        if (!titles) titles = {};
+
+        const localDate = fmtUtc(
+            entry.created,
+            entry.createdTZOffset,
+            'YYYY-MM-DD'
+        );
+        titles[localDate] = [entry, ...(titles?.[localDate] || [])];
+        // force reactivity
+        titles = { ...titles };
+    }
+
     let sortedTitles: [number, string][] | null;
     $: sortedTitles = titles
         ? Object.keys(titles)
@@ -35,6 +50,10 @@
               .filter(Boolean)
               .map(date => [new Date(date).getTime() / 1000, date])
         : null;
+
+    onMount(() => {
+        $addEntryListeners.push(onNewEntry);
+    });
 </script>
 
 <div>

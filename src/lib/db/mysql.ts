@@ -2,8 +2,8 @@ import { browser } from '$app/environment';
 import { DB, DB_HOST, DB_PASS, DB_PORT, DB_USER } from '$env/static/private';
 import chalk from 'chalk';
 import mysql from 'mysql2/promise';
-import '../require';
 import type { Milliseconds, NonFunctionProperties } from '../../app';
+import '../require';
 import { makeLogger } from '../utils/log';
 
 export type QueryResult =
@@ -70,26 +70,11 @@ function logQuery(
     );
 }
 
-export type QueryParam = string | number | null | boolean | undefined;
-export type QueryFunc = <Res extends QueryResult = never>(
+function buildQuery(
     queryParts: TemplateStringsArray,
-    ...params: QueryParam[]
-) => Promise<Res extends (infer A)[] ? NonFunctionProperties<A>[] : Res>;
-
-export const query = (async <Res extends QueryResult = never>(
-    queryParts: TemplateStringsArray,
-    ...params: QueryParam[]
-): Promise<Res extends (infer A)[] ? NonFunctionProperties<A>[] : Res> => {
-    if (browser) {
-        throw new Error('Cannot query database from browser');
-    }
-
-    const start = performance.now();
-
-    if (!dbConnection) {
-        await connect();
-    }
-
+    params: QueryParam[]
+): [string, unknown[]] {
+    params = [...params];
     const query = queryParts.reduce((acc, cur, i) => {
         const str = acc + cur;
         const p = params[i];
@@ -113,11 +98,36 @@ export const query = (async <Res extends QueryResult = never>(
         }
     }
 
+    return [query, params];
+}
+
+export type QueryParam = string | number | null | boolean | undefined;
+type QueryExecutor = <Res extends QueryResult = never>(
+    queryParts: TemplateStringsArray,
+    ...params: QueryParam[]
+) => Promise<Res extends (infer A)[] ? NonFunctionProperties<A>[] : Res>;
+
+export interface QueryFunc extends QueryExecutor {
+    unlogged: QueryFunc;
+}
+
+export const query = (async <Res extends QueryResult = never>(
+    queryParts: TemplateStringsArray,
+    ...params: QueryParam[]
+): Promise<Res extends (infer A)[] ? NonFunctionProperties<A>[] : Res> => {
+    if (browser) throw new Error('Cannot query database from browser');
+
+    const start = performance.now();
+
+    if (!dbConnection) await connect();
+
+    const [query, queryParams] = buildQuery(queryParts, params);
+
     const result = ((await dbConnection
-        ?.query(query, params)
+        ?.query(query, queryParams)
         .catch((e: unknown) => {
             const end = performance.now();
-            logQuery(query, params, null, end - start);
+            logQuery(query, queryParams, null, end - start);
             void dbLogger.logToFile(`Error querying mysql db '${DB}'`);
             void dbLogger.logToFile(e);
         })) || [])[0] as Res extends (infer A)[]
@@ -129,4 +139,25 @@ export const query = (async <Res extends QueryResult = never>(
     logQuery(query, params, result, end - start);
 
     return result;
-}) satisfies QueryFunc;
+}) as QueryFunc;
+
+query.unlogged = (async <Res extends QueryResult = never>(
+    queryParts: TemplateStringsArray,
+    ...params: QueryParam[]
+): Promise<Res extends (infer A)[] ? NonFunctionProperties<A>[] : Res> => {
+    if (browser) throw new Error('Cannot query database from browser');
+    if (!dbConnection) await connect();
+
+    const [query, queryParams] = buildQuery(queryParts, params);
+
+    return ((await dbConnection
+        ?.query(query, queryParams)
+        .catch((e: unknown) => {
+            void dbLogger.logToFile(`Error querying mysql db '${DB}'`);
+            void dbLogger.logToFile(e);
+        })) || [])[0] as Res extends (infer A)[]
+        ? NonFunctionProperties<A>[]
+        : Res;
+}) as QueryFunc;
+
+query.unlogged.unlogged = query.unlogged;

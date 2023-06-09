@@ -44,19 +44,9 @@ function roughSizeOfObject(object: unknown): number {
 }
 
 function logCacheReq(hit: boolean, url: URL) {
-    const path = url.pathname.split('/');
-    path.shift();
-    let pathStr = `/${path.shift() || ''}`;
-    if (pathStr === '/api') {
-        pathStr += `/${path.shift() || ''}`;
-    }
-    if (path.length) {
-        pathStr += `/[...${path.join('/').length}]`;
-    }
-
     void cacheLogger.logToFile(
         hit ? chalk.green('HIT ') : chalk.red('MISS'),
-        pathStr
+        url.pathname
     );
 }
 
@@ -201,10 +191,11 @@ export function cachedPageRoute<
         if (cached) {
             return cached as OutputData & App.PageData;
         }
+
+        const res = await handler(auth, props);
+
         // stringify and parse to turn into a plain object
-        const response = JSON.parse(
-            JSON.stringify(await handler(auth, props))
-        ) as OutputData;
+        const response = JSON.parse(JSON.stringify(res)) as OutputData;
 
         cacheResponse(url, auth.id, response);
 

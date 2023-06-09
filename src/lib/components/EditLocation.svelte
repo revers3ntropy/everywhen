@@ -63,6 +63,11 @@
     }) satisfies ChangeEventHandler<HTMLInputElement>;
 
     async function bin() {
+        if (
+            !confirm(`Are you sure you want to delete the location '${name}'?`)
+        ) {
+            return;
+        }
         displayNotifOnErr(await api.delete(auth, apiPath('/locations/?', id)));
         popup.set(null);
         if (onChange !== null) {
@@ -108,19 +113,20 @@
             <Bin size="25" />
         </button>
     </div>
-    <h2>
+    <h2 style="margin: 1rem 0;">
         <label>
             <input bind:value={name} on:change={syncWithServer} />
         </label>
     </h2>
     <label>
-        <span class="text-light">Radius</span><br />
+        <span class="text-light">Radius</span>
         <input
             min="0"
             on:change={onRadiusChange}
             step="0.1"
             type="number"
             value={round1DP(Location.degreesToMeters(radius))}
+            style="width: 50px"
         />
         m
     </label>
@@ -132,5 +138,9 @@
         display: flex;
         justify-content: flex-start;
         align-items: center;
+    }
+
+    input {
+        max-width: 100%;
     }
 </style>

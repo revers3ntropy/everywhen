@@ -20,6 +20,7 @@
     import ImportDialog from '$lib/dialogs/ImportDialog.svelte';
     import Sidebar from './EntriesSidebar.svelte';
     import { addEntryListeners } from '$lib/stores';
+    import type { Location } from '$lib/controllers/location';
 
     export let auth: Auth;
 
@@ -48,6 +49,8 @@
     let entries: Record<string, Entry[]> = {};
     let currentOffset = 0;
     let loadingAt = null as number | null;
+
+    let locations = null as Location[] | null;
 
     function importPopup() {
         showPopup(
@@ -180,8 +183,15 @@
         }, 10);
     }
 
-    onMount(async () => {
-        await loadTitles();
+    async function loadLocations() {
+        locations = displayNotifOnErr(
+            await api.get(auth, '/locations')
+        ).locations;
+    }
+
+    onMount(() => {
+        void loadTitles();
+        void loadLocations();
 
         $addEntryListeners.push(onNewEntry);
     });
@@ -247,6 +257,7 @@
                         {auth}
                         day={new Date(day).getTime() / 1000}
                         {hideAgentWidget}
+                        {locations}
                     />
                 {/each}
                 {#if loadingAt !== null && loadingAt < numberOfEntries}

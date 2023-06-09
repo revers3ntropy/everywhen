@@ -11,12 +11,14 @@
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
     import Entry from '$lib/components/entries/Entry.svelte';
     import type { Entry as EntryController } from '$lib/controllers/entry';
+    import type { Location } from '$lib/controllers/location';
     import type { Auth } from '$lib/controllers/user';
     import { nowUtc, utcEq } from '$lib/utils/time';
     import Dot from '../Dot.svelte';
     import UtcTime from '../UtcTime.svelte';
     import { fly, slide } from 'svelte/transition';
 
+    export let locations: Location[] | null;
     export let obfuscated = true;
     export let entries: EntryController[];
     export let showLabels = true;
@@ -96,6 +98,7 @@
                     {showLocations}
                     {hideAgentWidget}
                     {auth}
+                    {locations}
                 />
             {/each}
         </div>

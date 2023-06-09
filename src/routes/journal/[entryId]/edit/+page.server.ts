@@ -11,7 +11,7 @@ export const load = cachedPageRoute(async (auth, { params }) => {
         params.entryId,
         true
     );
-    if (err) throw error(400, err);
+    if (err) throw error(404, err);
 
     return { entry };
 }) satisfies PageServerLoad;
