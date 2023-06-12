@@ -14,7 +14,7 @@
     import { LS_KEY, MAX_IMAGE_SIZE } from '$lib/constants';
     import { Asset } from '$lib/controllers/asset';
     import type { Entry, RawEntry } from '$lib/controllers/entry';
-    import type { Label } from '$lib/controllers/label';
+    import { Label } from '$lib/controllers/label';
     import type { Auth } from '$lib/controllers/user';
     import { addEntryListeners, enabledLocation } from '$lib/stores.js';
     import { api, apiPath } from '$lib/utils/apiRequest';
@@ -167,12 +167,17 @@
         } as Mutable<Entry>;
 
         if (body.label && labels) {
-            const label = labels.find(l => (l.id || '') === (body.label || ''));
-            if (label) {
-                entry.label = label;
-            } else {
+            const { val: label, err } = await Label.withIdFromListOrFetch(
+                api,
+                auth,
+                body.label,
+                labels
+            );
+            if (err) {
+                errorLogger.error(err);
                 notify.error('Label not found');
             }
+            entry.label = label;
         }
 
         $addEntryListeners.map(e => e(entry, EntryFormMode.Standard));

@@ -1,10 +1,7 @@
 import adapter from '@sveltejs/adapter-node';
 import preprocess from 'svelte-preprocess';
 
-const ignoreWarningCodes = [
-    'css-unused-selector',
-    'unused-export-let',
-];
+const ignoreWarningCodes = ['css-unused-selector', 'unused-export-let'];
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -13,17 +10,20 @@ const config = {
     preprocess: preprocess(),
 
     kit: {
-        adapter: adapter(),
+        adapter: adapter()
     },
 
+    /**
+     * @param {{ code: string }} warning
+     * @param {(c: { code: string }) => *} handler
+     */
     onwarn: (warning, handler) => {
         const { code } = warning;
 
-        if (ignoreWarningCodes.includes(code))
-            return;
+        if (ignoreWarningCodes.includes(code)) return;
 
         handler(warning);
-    },
+    }
 };
 
 export default config;

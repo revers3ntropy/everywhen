@@ -3,7 +3,7 @@
     import LocationToggle from '$lib/components/entryForm/LocationToggle.svelte';
     import LabelSelect from '$lib/components/LabelSelect.svelte';
     import type { Entry, RawEntry } from '$lib/controllers/entry';
-    import type { Label } from '$lib/controllers/label';
+    import { Label } from '$lib/controllers/label';
     import type { Auth } from '$lib/controllers/user';
     import {
         displayNotifOnErr,
@@ -68,12 +68,17 @@
         } as Mutable<Entry>;
 
         if (body.label && labels) {
-            const label = labels.find(l => (l.id || '') === (body.label || ''));
-            if (label) {
-                newEntry.label = label;
-            } else {
+            const { val: label, err } = await Label.withIdFromListOrFetch(
+                api,
+                auth,
+                body.label,
+                labels
+            );
+            if (err) {
+                errorLogger.error(err);
                 notify.error('Label not found');
             }
+            newEntry.label = label;
         }
 
         $addEntryListeners.map(e => e(newEntry, EntryFormMode.Bullet));

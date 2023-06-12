@@ -5,6 +5,7 @@
     import { encryptionKeyFromPassword } from '$lib/security/authUtils.js';
     import { goto } from '$app/navigation';
     import { tooltip } from '@svelte-plugins/tooltips';
+    import { onMount } from 'svelte';
     import ArrowRightThinCircleOutline from 'svelte-material-icons/ArrowRightThinCircleOutline.svelte';
     import InformationOutline from 'svelte-material-icons/InformationOutline.svelte';
 
@@ -39,7 +40,14 @@
         }
         await goto('/' + data.redirect);
     }
+
+    onMount(() => (document.title = 'Sign Up'));
 </script>
+
+<svelte:head>
+    <title>Sign Up</title>
+    <meta content="Sign up to halcyon.land" name="description" />
+</svelte:head>
 
 <main class="flex-center">
     <div class="content">

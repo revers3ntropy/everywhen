@@ -1,3 +1,5 @@
+import { apiPath } from '$lib/utils/apiRequest';
+import type { Api } from '$lib/utils/apiRequest';
 import type { PickOptional } from '../../app';
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
@@ -286,5 +288,20 @@ export class Label {
                 })
             )
         );
+    }
+
+    public static async withIdFromListOrFetch(
+        api: Api,
+        auth: Auth,
+        id: string,
+        labels: Label[]
+    ): Promise<Result<Label>> {
+        for (const label of labels) {
+            if (label.id === id) {
+                return Result.ok(label);
+            }
+        }
+
+        return await api.get(auth, apiPath('/labels/?', id));
     }
 }

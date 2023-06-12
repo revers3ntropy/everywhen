@@ -1,9 +1,4 @@
-import type {
-    Hours,
-    Mutable,
-    PickOptionalAndMutable,
-    TimestampSecs
-} from '../../app';
+import type { Hours, PickOptionalAndMutable, TimestampSecs } from '../../app';
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt, encryptMulti } from '../security/encryption';
 import { Result } from '../utils/result';
@@ -621,6 +616,16 @@ export class Entry {
         return Result.ok(null);
     }
 
+    public static entryToTitleEntry(this: void, entry: Entry): Entry {
+        return {
+            ...entry,
+            entry: entry.entry
+                .replace(/[^0-9a-z# ]/gi, ' ')
+                .replace(/ +/gi, ' ')
+                .substring(0, Entry.TITLE_CUTOFF)
+        };
+    }
+
     public static async getTitles(
         query: QueryFunc,
         auth: Auth
@@ -628,12 +633,7 @@ export class Entry {
         const { val: entries, err } = await Entry.all(query, auth);
         if (err) return Result.err(err);
 
-        entries.map((entry: Mutable<Entry>) => {
-            entry.entry = entry.entry
-                .replace(/[^0-9a-z# ]/gi, ' ')
-                .replace(/ +/gi, ' ')
-                .substring(0, Entry.TITLE_CUTOFF);
-        });
+        entries.map(Entry.entryToTitleEntry);
 
         return Result.ok(entries);
     }

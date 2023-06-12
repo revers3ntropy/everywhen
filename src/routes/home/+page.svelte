@@ -92,7 +92,7 @@
             </a>
             <a class="icon-gradient-on-hover with-icon" href="/journal/deleted">
                 <Bin size="25" />
-                Deleted Entries
+                Bin
             </a>
             <a class="icon-gradient-on-hover with-icon" href="/labels">
                 <LabelOutline size="25" />

@@ -38,7 +38,12 @@
             entry.createdTZOffset,
             'YYYY-MM-DD'
         );
-        titles[localDate] = [entry, ...(titles?.[localDate] || [])];
+
+        titles[localDate] = [
+            Entry.entryToTitleEntry(entry),
+            ...(titles?.[localDate] || [])
+        ];
+
         // force reactivity
         titles = { ...titles };
     }

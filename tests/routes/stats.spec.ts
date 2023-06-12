@@ -8,11 +8,10 @@ test.describe('/stats', () => {
     });
 
     test('Can view page', async ({ page }) => {
-        await page.goto('/', { waitUntil: 'networkidle' });
         const { api } = await generateUserAndSignIn(page);
         await page.goto('/stats', { waitUntil: 'networkidle' });
         await expect(page).toHaveURL('/stats');
-        await expect(await page.getByText('No Entries')).toBeTruthy();
+        expect(page.getByText('No Entries')).toBeTruthy();
         await expectDeleteUser(api, expect);
     });
 });

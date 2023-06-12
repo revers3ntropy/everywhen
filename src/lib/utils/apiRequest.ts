@@ -248,3 +248,5 @@ export const api = {
 export function apiPath<T extends string>(path: T, ...params: string[]): T {
     return path.replace(/\?/g, () => params.shift() || '') as T;
 }
+
+export type Api = typeof api;

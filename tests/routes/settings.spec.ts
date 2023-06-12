@@ -8,7 +8,6 @@ test.describe('/settings', () => {
     });
 
     test('Can view page', async ({ page }) => {
-        await page.goto('/', { waitUntil: 'networkidle' });
         const { api } = await generateUserAndSignIn(page);
         await page.goto('/settings', { waitUntil: 'networkidle' });
         await expect(page).toHaveURL('/settings');
