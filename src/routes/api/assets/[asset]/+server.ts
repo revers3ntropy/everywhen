@@ -31,14 +31,14 @@ export const GET = (async ({ params, url, cookies }) => {
     let img;
     // backwards compatibility with old image formats
     if (/^data:image\/((jpeg)|(jpg)|(png));base64,/i.test(asset.content)) {
-        img = Buffer.from(
-            await Asset.base64ToWebP(
-                asset.content,
-                asset.contentType.split('/')[1],
-                100
-            ),
-            'base64'
+        console.log('\n\n   !! Converting image to webp\n\n');
+        const webP = await Asset.base64ToWebP(
+            asset.content,
+            asset.contentType.split('/')[1],
+            100
         );
+        img = Buffer.from(webP, 'base64');
+        void Asset.updateAssetContentToWebP(query, auth, asset.publicId, webP);
     } else {
         img = Buffer.from(asset.content, 'base64');
     }

@@ -277,10 +277,27 @@ export class Asset {
             ''
         );
 
-        return await (webp ).str2webpstr(
-            imgB64,
-            fileExt,
-            `-q ${quality}`
+        return await webp.str2webpstr(imgB64, fileExt, `-q ${quality}`);
+    }
+
+    public static async updateAssetContentToWebP(
+        query: QueryFunc,
+        auth: Auth,
+        publicId: string,
+        webp: string
+    ): Promise<Result> {
+        const { err: contentsErr, val: encryptedContents } = encrypt(
+            webp,
+            auth.key
         );
+        if (contentsErr) return Result.err(contentsErr);
+
+        await query`
+            UPDATE assets
+            SET content = ${encryptedContents}
+            WHERE publicId = ${publicId}
+              AND user = ${auth.id}
+        `;
+        return Result.ok(null);
     }
 }
