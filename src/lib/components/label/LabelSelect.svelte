@@ -40,7 +40,7 @@
         });
     }
 
-    $: if (labels && value !== '' && !labels.find(l => l.id === value)) {
+    $: if (labels && value && !labels.find(l => l.id === value)) {
         errorLogger.error(`Label ${value} not found`);
         value = '';
         notify.error(`Can't find label`);
@@ -49,7 +49,7 @@
     $: selectedLabel = (labels ?? []).find(l => l.id === value);
 </script>
 
-<div class="select-label {condensed ? 'condensed' : ''}">
+<div class="select-label" class:condensed>
     <Dropdown
         bind:close={closeDropDown}
         ariaLabel={() => 'Set label'}

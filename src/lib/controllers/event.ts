@@ -15,6 +15,8 @@ export type RawEvent = Omit<Event, 'label' | 'decrypted'> & {
 };
 
 export class Event {
+    static NEW_EVENT_NAME = 'New Event';
+
     public label?: Label;
     public readonly decrypted = true;
 

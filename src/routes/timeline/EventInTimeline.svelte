@@ -166,6 +166,7 @@
                 },
                 labels,
                 expanded: true,
+                allowCollapseChange: false,
                 bordered: false,
                 changeEventCount(by: number) {
                     // NOTE: doesn't recalculate the Y values when

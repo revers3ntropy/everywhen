@@ -1,20 +1,16 @@
 <script lang="ts">
     import { browser } from '$app/environment';
+    import { ANIMATION_DURATION } from '$lib/constants';
     import { tooltip } from '@svelte-plugins/tooltips';
     import { onMount } from 'svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
     import Bin from 'svelte-material-icons/Delete.svelte';
-    import Eye from 'svelte-material-icons/Eye.svelte';
-    import EyeOff from 'svelte-material-icons/EyeOff.svelte';
-    import Pencil from 'svelte-material-icons/Pencil.svelte';
-    import PencilOff from 'svelte-material-icons/PencilOff.svelte';
     import Restore from 'svelte-material-icons/Restore.svelte';
     import TimelineClockOutline from 'svelte-material-icons/TimelineClockOutline.svelte';
     import TimelineOutline from 'svelte-material-icons/TimelineOutline.svelte';
     import type { ChangeEventHandler } from 'svelte/elements';
     import type { TimestampSecs } from '../../../app';
-    import Label from '$lib/components/label/Label.svelte';
     import LabelSelect from '$lib/components/label/LabelSelect.svelte';
     import UtcTime from '../UtcTime.svelte';
     import { Event as EventController } from '../../controllers/event';
@@ -29,6 +25,7 @@
         fmtTimestampForInput,
         parseTimestampFromInputUtc
     } from '$lib/utils/time';
+    import { slide, fly } from 'svelte/transition';
 
     export let auth: Auth;
     export let labels: LabelController[];
@@ -37,8 +34,8 @@
     export let bordered = true;
     export let event: EventController & { deleted?: boolean };
     export let selectNameId = '';
-    export let editingLabel = false;
     export let expanded = false;
+    export let allowCollapseChange = true;
 
     export let changeEventCount: (by: number) => void;
     export let onChange: (
@@ -150,9 +147,9 @@
         );
         event = {
             ...event,
-            id,
-            deleted: undefined
+            id
         };
+        delete event.deleted;
         await onChange(event);
     }
 
@@ -198,7 +195,7 @@
 </script>
 
 {#if event.deleted}
-    <div class="restore-event {bordered ? 'bordered' : ''}">
+    <div class="restore-event" class:invisible={!bordered}>
         <button class="with-icon" on:click={restoreEvent}>
             <Restore />
             Undo Deletion
@@ -207,88 +204,91 @@
             <i>'{event.name}' has been deleted</i>
         </div>
     </div>
-{:else if expanded}
-    <div class="event open {bordered ? 'bordered' : ''}">
+{:else}
+    <div class="event" class:invisible={!bordered}>
         <div class="header">
-            <button
-                aria-label={obfuscated ? 'Show entry' : 'Hide entry'}
-                on:click={() => (obfuscated = !obfuscated)}
-            >
-                {#if obfuscated}
-                    <Eye size="25" />
-                {:else}
-                    <EyeOff size="25" />
+            <div>
+                {#if !expanded}
+                    <div
+                        transition:slide={{
+                            axis: 'x',
+                            duration: ANIMATION_DURATION,
+                            delay: 100
+                        }}
+                    >
+                        <LabelSelect
+                            on:change={updateLabel}
+                            value={event.label?.id || ''}
+                            {labels}
+                            {auth}
+                            condensed
+                        />
+                    </div>
                 {/if}
-            </button>
-            {#if !obfuscated}
-                <button class="danger" on:click={deleteEvent}>
-                    <Bin size="25" />
-                </button>
-                {#if editingLabel}
-                    <div class="flex-center">
+            </div>
+            <div>
+                {#if obfuscated}
+                    <p class="event-name-inp obfuscated">
+                        {obfuscate(event.name)}
+                    </p>
+                {:else}
+                    <input
+                        bind:this={nameInput}
+                        class="editable-text event-name-inp"
+                        on:change={updateName}
+                        placeholder="Event Name"
+                        value={event.name}
+                    />
+                {/if}
+            </div>
+            <div class="flex-center">
+                {#key expanded}
+                    {#if allowCollapseChange}
+                        <button
+                            on:click={() => (expanded = !expanded)}
+                            class="icon-button"
+                            use:tooltip={{
+                                content: expanded ? 'Collapse' : 'Expand'
+                            }}
+                        >
+                            {#if expanded}
+                                <ChevronUp size="30" />
+                            {:else}
+                                <ChevronDown size="30" />
+                            {/if}
+                        </button>
+                    {/if}
+                {/key}
+            </div>
+        </div>
+
+        {#if expanded}
+            <div
+                class="expanded-content"
+                transition:slide|local={{
+                    axis: 'y',
+                    duration: ANIMATION_DURATION
+                }}
+            >
+                <div class="top-row">
+                    <div
+                        class="flex-center"
+                        transition:fly={{
+                            y: -50,
+                            duration: ANIMATION_DURATION,
+                            delay: ANIMATION_DURATION / 2
+                        }}
+                    >
                         <LabelSelect
                             on:change={updateLabel}
                             value={event.label?.id || ''}
                             {labels}
                             {auth}
                         />
-                        <button
-                            on:click={() => (editingLabel = false)}
-                            class="icon-button"
-                        >
-                            <PencilOff size="20" />
-                        </button>
                     </div>
-                {:else if event.label}
-                    <span>
-                        <Label {obfuscated} label={event.label} />
-                        <button on:click={() => (editingLabel = true)}>
-                            <Pencil size="15" />
-                        </button>
-                    </span>
-                {:else}
-                    <button class="link" on:click={() => (editingLabel = true)}>
-                        Add Label
-                    </button>
-                {/if}
-            {/if}
-            <button on:click={() => (expanded = false)} class="icon-button">
-                <ChevronUp size="25" />
-            </button>
-        </div>
-        <i>
-            Created
-            <!-- TODO use tz from db -->
-            <UtcTime timestamp={event.created} fmt="MMMM Do YYYY, h:mma" />
-        </i>
-        <div class="middle-row">
-            {#if obfuscated}
-                <p class="event-name-inp obfuscated">
-                    {obfuscate(event.name)}
-                </p>
-            {:else}
-                <input
-                    bind:this={nameInput}
-                    class="editable-text event-name-inp"
-                    on:change={updateName}
-                    placeholder="Event Name"
-                    value={event.name}
-                />
-            {/if}
-        </div>
-        <div class="from-to-menu">
-            {#if Event.isInstantEvent(event)}
-                {#if obfuscated}
-                    <div>
-                        <span>
-                            <UtcTime
-                                timestamp={event.start}
-                                fmt="DD/MM/YYYY HH:mm"
-                            />
-                        </span>
-                    </div>
-                {:else}
-                    <div>
+                </div>
+                <div class="from-to-menu">
+                    {#if Event.isInstantEvent(event)}
                         <input
                             class="editable-text"
                             on:change={updateStartAndEnd}
@@ -296,163 +296,73 @@
                             type="datetime-local"
                             value={fmtTimestampForInput(event.start)}
                         />
-                    </div>
-                    <button
-                        class="instant-duration-toggle"
-                        on:click={makeDurationEvent}
-                        use:tooltip={{
-                            content: 'Give this event a duration'
-                        }}
-                    >
-                        <TimelineOutline size="30" />
-                        <span class="instant-duration-toggle-text">
-                            Make Duration Event
-                        </span>
-                    </button>
-                {/if}
-            {:else if obfuscated}
-                <div>
-                    from
-                    <span>
-                        <UtcTime
-                            timestamp={event.start}
-                            fmt="DD/MM/YYYY HH:mm"
+                    {:else}
+                        <input
+                            class="editable-text"
+                            on:change={updateStart}
+                            placeholder="Start"
+                            type="datetime-local"
+                            value={fmtTimestampForInput(event.start)}
                         />
-                    </span>
+                        to
+                        <input
+                            class="editable-text"
+                            on:change={updateEnd}
+                            placeholder="End"
+                            type="datetime-local"
+                            value={fmtTimestampForInput(event.end)}
+                        />
+                        <i>
+                            ({fmtDuration(event.end - event.start)})
+                        </i>
+                    {/if}
                 </div>
-                <div>
-                    to
-                    <span>
-                        <UtcTime timestamp={event.end} fmt="DD/MM/YYYY HH:mm" />
-                    </span>
-                </div>
-            {:else}
-                <div>
-                    from
-                    <input
-                        class="editable-text"
-                        on:change={updateStart}
-                        placeholder="Start"
-                        type="datetime-local"
-                        value={fmtTimestampForInput(event.start)}
-                    />
-                </div>
-                <div>
-                    to
-                    <input
-                        class="editable-text"
-                        on:change={updateEnd}
-                        placeholder="End"
-                        type="datetime-local"
-                        value={fmtTimestampForInput(event.end)}
-                    />
-                </div>
-                <p>
-                    <i>
-                        ({fmtDuration(event.end - event.start)})
-                    </i>
-                </p>
                 <div>
                     <button
-                        class="instant-duration-toggle"
-                        on:click={makeInstantEvent}
-                        use:tooltip={{
-                            content: 'Make this event instantaneous'
-                        }}
+                        class="with-icon bordered danger"
+                        on:click={deleteEvent}
                     >
-                        <TimelineClockOutline size="30" />
-                        <span class="instant-duration-toggle-text">
-                            Make Instant Event
-                        </span>
+                        <Bin size="25" />
+                        Delete
                     </button>
+
+                    {#if Event.isInstantEvent(event)}
+                        <button
+                            class="with-icon bordered icon-gradient-on-hover"
+                            on:click={makeDurationEvent}
+                        >
+                            <TimelineOutline size="25" />
+                            Make Duration Event
+                        </button>
+                    {:else}
+                        <button
+                            class="with-icon bordered icon-gradient-on-hover"
+                            on:click={makeInstantEvent}
+                        >
+                            <TimelineClockOutline size="25" />
+                            Make Instant Event
+                        </button>
+                    {/if}
                 </div>
-            {/if}
-        </div>
-    </div>
-{:else}
-    <div class="event {bordered ? 'bordered' : ''}">
-        <button
-            aria-label={obfuscated ? 'Show entry' : 'Hide entry'}
-            on:click={() => (obfuscated = !obfuscated)}
-        >
-            {#if obfuscated}
-                <Eye size="25" />
-            {:else}
-                <EyeOff size="25" />
-            {/if}
-        </button>
-
-        {#if obfuscated}
-            <p class="event-name-inp obfuscated">
-                {obfuscate(event.name)}
-            </p>
-        {:else}
-            <input
-                bind:this={nameInput}
-                class="editable-text event-name-inp"
-                on:change={updateName}
-                placeholder="Event Name"
-                value={event.name}
-            />
-        {/if}
-        <div class="label-and-open-container">
-            {#if obfuscated}
-                <span
-                    class="entry-label-colour big"
-                    style="background: {event.label?.colour || 'transparent'}"
-                />
-            {:else if event.label}
-                <a href="/labels/{event.label?.id}">
-                    <span
-                        class="entry-label-colour big"
-                        style="background: {event.label.colour ||
-                            'transparent'}"
-                        use:tooltip={{ content: event.label.name }}
-                    />
-                </a>
-            {:else}
-                <span class="entry-label-colour big" />
-            {/if}
-
-            <div>
-                <button on:click={() => (expanded = true)} class="icon-button">
-                    <ChevronDown size="25" />
-                </button>
+                <div class="created-datetime">
+                    <i>
+                        Created
+                        <!-- TODO use tz from db -->
+                        <UtcTime
+                            timestamp={event.created}
+                            fmt="MMMM Do YYYY, h:mma"
+                        />
+                        (<UtcTime timestamp={event.created} relative />)
+                    </i>
+                </div>
             </div>
-        </div>
+        {/if}
     </div>
 {/if}
 
 <style lang="less">
     @import '../../../styles/variables';
     @import '../../../styles/layout';
-
-    .event {
-        margin: 0.3rem 0.3em;
-        padding: 0.4em;
-        border-radius: @border-radius;
-
-        @media @mobile {
-            margin: 0.3rem 0;
-            padding: 0.5rem 0 1rem 0;
-            border-radius: 0;
-            border: none;
-            border-top: 1px solid @border;
-        }
-
-        display: grid;
-        grid-template-columns: 50px 1fr 70px;
-
-        &.open {
-            display: block;
-            .header {
-                display: flex;
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-            }
-        }
-    }
 
     .restore-event {
         border-radius: @border-radius;
@@ -464,72 +374,62 @@
         padding: 1.3rem 0.4rem;
     }
 
-    i {
-        font-size: 0.8em;
-        color: @text-color-light;
-    }
+    .event {
+        .container();
 
-    .event-name-inp {
-        font-size: 1.4rem;
-        display: block;
-        margin: 0.4em;
-        width: 100%;
-    }
+        .created-datetime {
+            padding: 0 1rem 1rem 1rem;
+        }
 
-    .from-to-menu {
-        display: flex;
-        flex-direction: row;
-        justify-content: start;
-        align-items: center;
-        flex-wrap: wrap;
+        .header {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            margin: 0.5rem 1rem;
+
+            .event-name-inp {
+                font-size: 1.4rem;
+                display: block;
+                width: 100%;
+            }
+        }
 
         @media @mobile {
+            margin: 1rem 0;
+            border-radius: 0;
+            background: none;
+            border-bottom: 1px solid @border;
+        }
+
+        .expanded-content {
+            .top-row {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
+                margin: 0.5rem 0.8rem;
+
+                @media @mobile {
+                    margin: 0.5rem 0;
+                }
+            }
+        }
+
+        .from-to-menu {
             display: block;
+            margin: 0 0.5rem;
 
             input[type='datetime-local'] {
                 margin: 0.5rem;
             }
-        }
 
-        * {
-            margin: 0 0.3em;
-        }
-    }
-
-    .middle-row {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0 1em 0 0;
-
-        @media @mobile {
-            display: block;
-        }
-    }
-
-    .label-and-open-container {
-        .flex-center();
-        justify-content: space-between;
-    }
-
-    .instant-duration-toggle {
-        @media @mobile {
-            .bordered();
-            border-radius: @border-radius;
-            display: grid;
-            grid-template-columns: 2rem 1fr;
-            padding: 0.5rem;
-            align-items: center;
-            margin: 0.5rem;
-        }
-
-        .instant-duration-toggle-text {
-            display: none;
-
-            @media @mobile {
-                display: inline;
+            * {
+                margin: 0 0.3em;
             }
         }
+    }
+
+    i {
+        font-size: 0.9em;
+        color: @text-color-light;
     }
 </style>

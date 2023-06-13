@@ -21,6 +21,7 @@
     import Sidebar from './EntriesSidebar.svelte';
     import { addEntryListeners } from '$lib/stores';
     import type { Location } from '$lib/controllers/location';
+    import { tooltip } from '@svelte-plugins/tooltips';
 
     export let auth: Auth;
 
@@ -204,7 +205,15 @@
         <div class="entries-menu hide-mobile">
             <div>
                 {#if showImport}
-                    <button class="with-circled-icon" on:click={importPopup}>
+                    <button
+                        class="with-circled-icon"
+                        on:click={importPopup}
+                        aria-label="Import Entries"
+                        use:tooltip={{
+                            content: 'Import Entries',
+                            position: 'right'
+                        }}
+                    >
                         <TrayArrowUp size="30" />
                     </button>
                 {/if}
@@ -233,7 +242,7 @@
             </div>
         </div>
     </div>
-    <div class={showSidebar ? 'sidebar-and-entries' : ''}>
+    <div class:sidebar-and-entries={showSidebar}>
         {#if showSidebar}
             <div style="height: 100%">
                 <Sidebar

@@ -7,7 +7,7 @@
     import ImportDialog from '$lib/dialogs/ImportDialog.svelte';
     import Dot from '$lib/components/Dot.svelte';
     import Select from '$lib/components/Select.svelte';
-    import type { Event as EventController } from '$lib/controllers/event';
+    import { Event as EventController } from '$lib/controllers/event';
     import type { Label } from '$lib/controllers/label';
     import { eventsSortKey, obfuscated } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
@@ -15,8 +15,6 @@
     import { showPopup } from '$lib/utils/popups';
     import { nowUtc } from '$lib/utils/time';
     import Event from '$lib/components/event/Event.svelte';
-
-    const NEW_EVENT_NAME = 'New Event';
 
     export let data: App.PageData & {
         events: EventController[];
@@ -57,7 +55,7 @@
         const now = nowUtc();
         displayNotifOnErr(
             await api.post(data, '/events', {
-                name: NEW_EVENT_NAME,
+                name: EventController.NEW_EVENT_NAME,
                 start: now,
                 end: now
             })
@@ -86,8 +84,11 @@
 
     let selectNameId: string;
     $: selectNameId =
-        events[events.findIndex(e => e.name === NEW_EVENT_NAME && !e.deleted)]
-            ?.id || '';
+        events[
+            events.findIndex(
+                e => e.name === EventController.NEW_EVENT_NAME && !e.deleted
+            )
+        ]?.id || '';
 
     const sortEventsKeys = {
         created: 'created',
@@ -106,7 +107,7 @@
 
 <main>
     <div class="menu">
-        <div class="flex-center">
+        <div>
             <button class="primary with-icon" on:click={newEvent}>
                 <Plus size="30" />
                 New Event
@@ -191,20 +192,23 @@
             grid-template-columns: 100%;
             margin: 0;
         }
+
+        @media @large {
+            grid-template-columns: 33% 33% 33%;
+        }
     }
 
     .menu {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
         margin-bottom: 1em;
 
         @media @mobile {
-            flex-direction: column;
-            align-items: flex-start;
+            display: block;
         }
 
         button {
+            margin: 0 1rem 0 0;
             @media @mobile {
                 margin-bottom: 1em;
             }
@@ -213,8 +217,8 @@
 
     .sort-by {
         .flex-center();
-        .bordered();
         padding: 0 0 0 1rem;
+        justify-content: end;
 
         .sort-by-select {
             margin: 0.3rem;
