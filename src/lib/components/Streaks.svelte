@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { errorLogger } from '$lib/utils/log';
+    import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
     import { tooltip } from '@svelte-plugins/tooltips';
     import { onMount } from 'svelte';
     import Fire from 'svelte-material-icons/Fire.svelte';
@@ -10,8 +12,9 @@
 
     export let auth: Auth;
     export let tooltipPosition: 'top' | 'bottom' | 'left' | 'right' = 'bottom';
+    export let condensed = false;
 
-    let streaks: Streaks | null = null;
+    let streaks = null as Streaks | null;
     let loaded = false;
     let error: string | null;
 
@@ -26,13 +29,22 @@
             streaks.longest++;
         }
 
-        streaks.current++;
-        streaks.runningOut = false;
+        streaks = {
+            current: streaks.current + 1,
+            runningOut: false,
+            longest: Math.max(streaks.longest, streaks.current + 1)
+        };
+
+        console.log('made: ', streaks);
     }
 
     onMount(async () => {
-        const { err, val } = await api.get(auth, '/entries/streaks');
+        const { err, val } = await api.get(auth, '/entries/streaks', {
+            // cache busting - otherwise streaks are static through day changes
+            x: fmtUtc(nowUtc(), currentTzOffset(), 'yyyy-MM-dd')
+        });
         if (err) {
+            errorLogger.error('Failed to get streaks', err);
             error = err;
         } else {
             streaks = val;
@@ -41,49 +53,70 @@
         loaded = true;
     });
 
-    function makeTooltip(longest: number, runningOut: boolean): string {
-        return (
-            `Current Streak` +
-            (longest > 0 ? ` &#x2022; <br> Longest: ${longest} days` : '') +
-            (runningOut
+    let tooltipContent = 'Loading...';
+    $: if (streaks) {
+        tooltipContent =
+            (streaks.longest > 0 ? `Longest: ${streaks.longest} days` : '') +
+            (streaks.runningOut
                 ? '<br> Make an entry today to continue the Streak!'
-                : '')
-        );
+                : '') +
+            (streaks.current < 1 ? 'Make an entry to start a Streak!' : '');
     }
 </script>
 
-{#if loaded}
-    {#if error}
-        <p>{error}</p>
-    {:else if streaks}
+{#key streaks}
+    {#if loaded}
+        {#if error}
+            ???
+        {:else if streaks}
+            <span
+                class="flex-center"
+                class:full={!condensed}
+                use:tooltip={condensed
+                    ? { content: '' }
+                    : {
+                          content: tooltipContent,
+                          position: tooltipPosition
+                      }}
+            >
+                {#if streaks.runningOut}
+                    <TimerSand size="25" />
+                {:else if streaks.current > 0}
+                    <Fire size="25" class="gradient-icon" />
+                {:else}
+                    <Fire size="25" />
+                {/if}
+                <span>
+                    {#if !condensed}
+                        Streak:
+                    {/if}
+                    <b>
+                        {streaks.current}
+                    </b>
+                    {#if !condensed}
+                        days
+                    {/if}
+                </span>
+            </span>
+        {/if}
+    {:else}
         <span
             class="flex-center"
             use:tooltip={{
-                content: makeTooltip(streaks.longest, streaks.runningOut),
+                content: '...',
                 position: tooltipPosition
             }}
         >
-            {#if streaks.runningOut}
-                <TimerSand size="25" />
-            {:else if streaks.current > 0}
-                <span>
-                    <Fire size="25" class="gradient-icon" />
-                </span>
-            {:else}
-                <Fire size="25" />
-            {/if}
-            <b>{streaks.current}</b>
+            <Fire size="25" />
+            <b>...</b>
         </span>
     {/if}
-{:else}
-    <span
-        class="flex-center"
-        use:tooltip={{
-            content: '...',
-            position: tooltipPosition
-        }}
-    >
-        <Fire size="25" />
-        <b>...</b>
-    </span>
-{/if}
+{/key}
+
+<style lang="less">
+    .full {
+        display: grid;
+        grid-template-columns: 35px 1fr;
+        margin: 0 0.5rem;
+    }
+</style>

@@ -9,7 +9,7 @@
     import { showPopup } from '$lib/utils/popups';
     import { obfuscate } from '$lib/utils/text';
     import { fmtUtc, nowUtc, utcEq } from '$lib/utils/time';
-    import EntryDialog from '$lib/dialogs/EntryDialog.svelte';
+    import EntryDialog from '$lib/components/dialogs/EntryDialog.svelte';
     import Dot from '../Dot.svelte';
     import UtcTime from '../UtcTime.svelte';
 

@@ -235,7 +235,7 @@
             <span class="account-button" slot="button">
                 <span class="username-span">
                     <span class="streaks">
-                        <Streaks {auth} />
+                        <Streaks {auth} condensed />
                     </span>
                     <span class="username">
                         {auth.username}
@@ -247,6 +247,10 @@
             </span>
 
             <div class="account-dropdown-options">
+                <Streaks {auth} tooltipPosition="left" />
+
+                <hr />
+
                 <button
                     aria-label="download encrypted backup"
                     class="account-dropdown-button"
@@ -272,7 +276,7 @@
 
                 <a
                     aria-label="log out"
-                    class="account-dropdown-button"
+                    class="account-dropdown-button danger"
                     href="/logout"
                     data-sveltekit-preload-data="tap"
                 >
@@ -443,6 +447,12 @@
                     fill: @accent-secondary;
                 }
             }
+        }
+
+        hr {
+            margin: 10px 0;
+            border: none;
+            border-bottom: 1px solid @bg;
         }
     }
 

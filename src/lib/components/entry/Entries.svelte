@@ -17,7 +17,7 @@
     import { displayNotifOnErr } from '$lib/notifications/notifications';
     import { showPopup } from '$lib/utils/popups';
     import Spinner from '../BookSpinner.svelte';
-    import ImportDialog from '$lib/dialogs/ImportDialog.svelte';
+    import ImportDialog from '$lib/components/dialogs/ImportDialog.svelte';
     import Sidebar from './EntriesSidebar.svelte';
     import { addEntryListeners } from '$lib/stores';
     import type { Location } from '$lib/controllers/location';

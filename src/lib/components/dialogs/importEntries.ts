@@ -6,7 +6,7 @@ import { errorLogger } from '$lib/utils/log';
 import type { Notification } from '$lib/notifications/notifications';
 import { NotificationType } from '$lib/notifications/notifications';
 import { matches } from 'schemion';
-import type { Mutable } from '../../app';
+import type { Mutable } from '../../../app';
 
 export async function importEntries(
     contents: string,

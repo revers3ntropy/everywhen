@@ -4,7 +4,7 @@
     import Plus from 'svelte-material-icons/Plus.svelte';
     import TrayArrowUp from 'svelte-material-icons/TrayArrowUp.svelte';
     import type { App, EventsSortKey } from '../../app';
-    import ImportDialog from '$lib/dialogs/ImportDialog.svelte';
+    import ImportDialog from '$lib/components/dialogs/ImportDialog.svelte';
     import Dot from '$lib/components/Dot.svelte';
     import Select from '$lib/components/Select.svelte';
     import { Event as EventController } from '$lib/controllers/event';

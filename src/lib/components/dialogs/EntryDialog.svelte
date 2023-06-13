@@ -1,12 +1,12 @@
 <script lang="ts">
     import type { Location } from '$lib/controllers/location';
     import { onMount } from 'svelte';
-    import type { Entry as EntryController } from '../controllers/entry';
+    import type { Entry as EntryController } from '../../controllers/entry';
     import type { Auth } from '$lib/controllers/user';
     import { popup } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/notifications/notifications';
-    import BookSpinner from '../components/BookSpinner.svelte';
+    import BookSpinner from '../BookSpinner.svelte';
     import Entry from '$lib/components/entry/Entry.svelte';
 
     export let id: string;

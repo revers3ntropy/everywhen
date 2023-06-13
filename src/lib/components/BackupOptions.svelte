@@ -9,7 +9,7 @@
     import { displayNotifOnErr, notify } from '../notifications/notifications';
     import { showPopup } from '../utils/popups';
     import type { Result } from '../utils/result';
-    import FileDropDialog from '$lib/dialogs/FileDropDialog.svelte';
+    import FileDropDialog from '$lib/components/dialogs/FileDropDialog.svelte';
 
     export let auth: Auth;
 

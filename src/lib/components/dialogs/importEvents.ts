@@ -7,7 +7,7 @@ import type { Notification } from '$lib/notifications/notifications';
 import { NotificationType } from '$lib/notifications/notifications';
 import { nowUtc } from '$lib/utils/time';
 import { matches } from 'schemion';
-import type { Mutable } from '../../app';
+import type { Mutable } from '../../../app';
 
 export async function importEvents(
     contents: string,

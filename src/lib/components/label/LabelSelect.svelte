@@ -13,7 +13,7 @@
         notify
     } from '$lib/notifications/notifications';
     import { showPopup } from '$lib/utils/popups';
-    import NewLabelDialog from '$lib/dialogs/NewLabelDialog.svelte';
+    import NewLabelDialog from '$lib/components/dialogs/NewLabelDialog.svelte';
     import MenuDown from 'svelte-material-icons/MenuDown.svelte';
 
     const dispatch = createEventDispatcher();

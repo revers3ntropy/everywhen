@@ -1,6 +1,6 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
-    import ChangePasswordDialog from '$lib/dialogs/ChangePasswordDialog.svelte';
+    import ChangePasswordDialog from '$lib/components/dialogs/ChangePasswordDialog.svelte';
     import { showPopup } from '$lib/utils/popups';
     import { onMount } from 'svelte';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
