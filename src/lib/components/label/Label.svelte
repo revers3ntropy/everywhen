@@ -1,7 +1,7 @@
 <script lang="ts">
-    import type { Label } from '../controllers/label';
+    import type { Label } from '$lib/controllers/label';
 
-    export let label: Label | null = null;
+    export let label = null as Label | null;
 
     export let obfuscated = true;
 </script>
@@ -18,8 +18,8 @@
 {/if}
 
 <style lang="less">
-    @import '../../styles/variables';
-    @import '../../styles/text';
+    @import '../../../styles/variables';
+    @import '../../../styles/text';
 
     .label {
         margin: 0.1em 0.4rem;

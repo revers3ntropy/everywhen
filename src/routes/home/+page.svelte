@@ -10,7 +10,7 @@
     import Bin from 'svelte-material-icons/Delete.svelte';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
     import type { App } from '../../app';
-    import EntryTitles from '$lib/components/entries/EntryTitles.svelte';
+    import EntryTitles from '$lib/components/entry/EntryTitles.svelte';
     import { Entry } from '$lib/controllers/entry';
     import { obfuscated } from '$lib/stores.js';
     import {

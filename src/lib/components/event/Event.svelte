@@ -13,22 +13,22 @@
     import TimelineClockOutline from 'svelte-material-icons/TimelineClockOutline.svelte';
     import TimelineOutline from 'svelte-material-icons/TimelineOutline.svelte';
     import type { ChangeEventHandler } from 'svelte/elements';
-    import type { TimestampSecs } from '../../app';
-    import Label from './Label.svelte';
-    import LabelSelect from './LabelSelect.svelte';
-    import UtcTime from './UtcTime.svelte';
-    import { Event as EventController } from '../controllers/event';
-    import { Event } from '../controllers/event';
-    import type { Label as LabelController } from '../controllers/label';
-    import type { Auth } from '../controllers/user';
-    import { api, apiPath } from '../utils/apiRequest';
-    import { displayNotifOnErr } from '../notifications/notifications';
-    import { obfuscate } from '../utils/text';
+    import type { TimestampSecs } from '../../../app';
+    import Label from '$lib/components/label/Label.svelte';
+    import LabelSelect from '$lib/components/label/LabelSelect.svelte';
+    import UtcTime from '../UtcTime.svelte';
+    import { Event as EventController } from '../../controllers/event';
+    import { Event } from '$lib/controllers/event';
+    import type { Label as LabelController } from '../../controllers/label';
+    import type { Auth } from '$lib/controllers/user';
+    import { api, apiPath } from '$lib/utils/apiRequest';
+    import { displayNotifOnErr } from '$lib/notifications/notifications';
+    import { obfuscate } from '$lib/utils/text';
     import {
         fmtDuration,
         fmtTimestampForInput,
         parseTimestampFromInputUtc
-    } from '../utils/time';
+    } from '$lib/utils/time';
 
     export let auth: Auth;
     export let labels: LabelController[];
@@ -424,8 +424,8 @@
 {/if}
 
 <style lang="less">
-    @import '../../styles/variables';
-    @import '../../styles/layout';
+    @import '../../../styles/variables';
+    @import '../../../styles/layout';
 
     .event {
         margin: 0.3rem 0.3em;

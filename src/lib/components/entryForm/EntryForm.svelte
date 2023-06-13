@@ -10,7 +10,7 @@
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import ImageArea from 'svelte-material-icons/ImageArea.svelte';
     import Send from 'svelte-material-icons/Send.svelte';
-    import LabelSelect from '$lib/components/LabelSelect.svelte';
+    import LabelSelect from '$lib/components/label/LabelSelect.svelte';
     import { LS_KEY, MAX_IMAGE_SIZE } from '$lib/constants';
     import { Asset } from '$lib/controllers/asset';
     import type { Entry, RawEntry } from '$lib/controllers/entry';

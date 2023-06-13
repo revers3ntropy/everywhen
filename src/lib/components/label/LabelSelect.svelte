@@ -4,12 +4,15 @@
     import LabelOffOutline from 'svelte-material-icons/LabelOffOutline.svelte';
     import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
     import Dropdown from '$lib/components/Dropdown.svelte';
-    import type { Label } from '../controllers/label';
-    import type { Auth } from '../controllers/user';
-    import { api } from '../utils/apiRequest';
-    import { errorLogger } from '../utils/log';
-    import { displayNotifOnErr, notify } from '../notifications/notifications';
-    import { showPopup } from '../utils/popups';
+    import type { Label } from '$lib/controllers/label';
+    import type { Auth } from '$lib/controllers/user';
+    import { api } from '$lib/utils/apiRequest';
+    import { errorLogger } from '$lib/utils/log';
+    import {
+        displayNotifOnErr,
+        notify
+    } from '$lib/notifications/notifications';
+    import { showPopup } from '$lib/utils/popups';
     import NewLabelDialog from '$lib/dialogs/NewLabelDialog.svelte';
     import MenuDown from 'svelte-material-icons/MenuDown.svelte';
 
@@ -137,8 +140,8 @@
 </div>
 
 <style lang="less">
-    @import '../../styles/variables';
-    @import '../../styles/text';
+    @import '../../../styles/variables';
+    @import '../../../styles/text';
 
     .entry-label-colour {
         border: 1px solid @border-light;

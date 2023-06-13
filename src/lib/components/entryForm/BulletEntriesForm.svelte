@@ -1,7 +1,7 @@
 <script lang="ts">
     import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
     import LocationToggle from '$lib/components/entryForm/LocationToggle.svelte';
-    import LabelSelect from '$lib/components/LabelSelect.svelte';
+    import LabelSelect from '$lib/components/label/LabelSelect.svelte';
     import type { Entry, RawEntry } from '$lib/controllers/entry';
     import { Label } from '$lib/controllers/label';
     import type { Auth } from '$lib/controllers/user';

@@ -3,7 +3,7 @@
     import { DurationRectCollider } from '$lib/canvas/collider';
     import { interactable } from '$lib/canvas/interactable';
     import type { Auth } from '$lib/controllers/user';
-    import Event from '$lib/components/Event.svelte';
+    import Event from '$lib/components/event/Event.svelte';
     import type { Event as EventController } from '$lib/controllers/event';
     import type { Label } from '$lib/controllers/label';
     import { obfuscated } from '$lib/stores';

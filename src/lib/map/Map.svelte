@@ -31,7 +31,7 @@
     import { popup } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { showPopup } from '$lib/utils/popups';
-    import EditLocation from '../components/EditLocation.svelte';
+    import EditLocation from '../components/location/EditLocation.svelte';
     import EntryDialog from '$lib/dialogs/EntryDialog.svelte';
     import EntryTooltipOnMap from './EntryTooltipOnMap.svelte';
     import {

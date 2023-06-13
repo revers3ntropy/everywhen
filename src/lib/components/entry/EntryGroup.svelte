@@ -9,7 +9,7 @@
     import { ANIMATION_DURATION } from '$lib/constants';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
-    import Entry from '$lib/components/entries/Entry.svelte';
+    import Entry from '$lib/components/entry/Entry.svelte';
     import type { Entry as EntryController } from '$lib/controllers/entry';
     import type { Location } from '$lib/controllers/location';
     import type { Auth } from '$lib/controllers/user';

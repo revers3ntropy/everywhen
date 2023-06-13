@@ -1,8 +1,11 @@
 <script lang="ts">
     import { createEventDispatcher } from 'svelte';
-    import type { Auth } from '../controllers/user';
-    import { api } from '../utils/apiRequest';
-    import { displayNotifOnErr, notify } from '../notifications/notifications';
+    import type { Auth } from '$lib/controllers/user';
+    import { api } from '$lib/utils/apiRequest';
+    import {
+        displayNotifOnErr,
+        notify
+    } from '$lib/notifications/notifications';
 
     const dispatch = createEventDispatcher();
 
@@ -53,8 +56,8 @@
 </div>
 
 <style lang="less">
-    @import '../../styles/variables';
-    @import '../../styles/text';
+    @import '../../../styles/variables';
+    @import '../../../styles/text';
 
     .content {
         margin-left: 10vw;

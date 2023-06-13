@@ -7,7 +7,7 @@
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/notifications/notifications';
     import BookSpinner from '../components/BookSpinner.svelte';
-    import Entry from '../components/entries/Entry.svelte';
+    import Entry from '$lib/components/entry/Entry.svelte';
 
     export let id: string;
     export let auth: Auth;

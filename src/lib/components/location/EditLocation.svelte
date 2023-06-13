@@ -4,12 +4,12 @@
     import Synced from 'svelte-material-icons/CloudCheckOutline.svelte';
     import Bin from 'svelte-material-icons/Delete.svelte';
     import type { ChangeEventHandler } from 'svelte/elements';
-    import { Location } from '../controllers/location';
-    import type { Auth } from '../controllers/user';
-    import { popup } from '../stores';
-    import { api, apiPath } from '../utils/apiRequest';
-    import { displayNotifOnErr } from '../notifications/notifications';
-    import { round1DP } from '../utils/text';
+    import { Location } from '$lib/controllers/location';
+    import type { Auth } from '$lib/controllers/user';
+    import { popup } from '$lib/stores';
+    import { api, apiPath } from '$lib/utils/apiRequest';
+    import { displayNotifOnErr } from '$lib/notifications/notifications';
+    import { round1DP } from '$lib/utils/text';
 
     export let isInDialog = false;
     export let auth: Auth;

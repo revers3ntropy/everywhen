@@ -1,7 +1,7 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
-    import EditLocation from '$lib/components/EditLocation.svelte';
-    import Entries from '$lib/components/entries/Entries.svelte';
+    import EditLocation from '$lib/components/location/EditLocation.svelte';
+    import Entries from '$lib/components/entry/Entries.svelte';
     import type { Location } from '$lib/controllers/location';
     import type { PageData } from './$types';
 

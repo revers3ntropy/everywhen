@@ -23,7 +23,7 @@
     import { obfuscate, rawMdToHtml } from '$lib/utils/text';
     import AgentWidget from './AgentWidget.svelte';
     import Dot from '../Dot.svelte';
-    import Label from '../Label.svelte';
+    import Label from '$lib/components/label/Label.svelte';
     import LocationWidget from './LocationWidget.svelte';
 
     const dispatch = createEventDispatcher();

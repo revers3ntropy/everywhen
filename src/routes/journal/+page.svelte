@@ -1,7 +1,7 @@
 <script lang="ts">
     import BulletOrStandardEntryForm from '$lib/components/entryForm/ModedEntryForm.svelte';
     import { onMount } from 'svelte';
-    import Entries from '$lib/components/entries/Entries.svelte';
+    import Entries from '$lib/components/entry/Entries.svelte';
     import { obfuscated } from '$lib/stores';
     import type { PageData } from './$types';
 

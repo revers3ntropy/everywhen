@@ -1,5 +1,5 @@
 <script lang="ts">
-    import NewLabelForm from '$lib/components/NewLabelForm.svelte';
+    import NewLabelForm from '$lib/components/label/NewLabelForm.svelte';
     import type { Auth } from '$lib/controllers/user';
     import { popup } from '$lib/stores';
 

@@ -14,7 +14,7 @@
     import { displayNotifOnErr } from '$lib/notifications/notifications';
     import { showPopup } from '$lib/utils/popups';
     import { nowUtc } from '$lib/utils/time';
-    import Event from '$lib/components/Event.svelte';
+    import Event from '$lib/components/event/Event.svelte';
 
     const NEW_EVENT_NAME = 'New Event';
 

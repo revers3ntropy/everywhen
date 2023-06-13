@@ -2,12 +2,12 @@
     import { goto } from '$app/navigation';
     import { onMount } from 'svelte';
     import Delete from 'svelte-material-icons/Delete.svelte';
-    import Entries from '$lib/components/entries/Entries.svelte';
+    import Entries from '$lib/components/entry/Entries.svelte';
     import { obfuscated } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/notifications/notifications';
     import { showPopup } from '$lib/utils/popups';
-    import Event from '$lib/components/Event.svelte';
+    import Event from '$lib/components/event/Event.svelte';
     import DeleteLabelDialog from '../DeleteLabelDialog.svelte';
     import type { PageData } from './$types';
 

@@ -8,7 +8,7 @@
     import Bin from 'svelte-material-icons/Delete.svelte';
     import TrayArrowUp from 'svelte-material-icons/TrayArrowUp.svelte';
     import Search from 'svelte-material-icons/Magnify.svelte';
-    import EntryGroup from '$lib/components/entries/EntryGroup.svelte';
+    import EntryGroup from '$lib/components/entry/EntryGroup.svelte';
     import type { Mutable } from '../../../app';
     import { Entry, type EntryFilter } from '$lib/controllers/entry';
     import type { Auth } from '$lib/controllers/user';
