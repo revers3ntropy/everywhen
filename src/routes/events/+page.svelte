@@ -113,7 +113,7 @@
                 New Event
             </button>
             <button
-                class="with-icon icon-gradient-on-hover"
+                class="with-icon icon-gradient-on-hover hide-mobile"
                 on:click={importPopup}
             >
                 <TrayArrowUp size="30" />
@@ -133,7 +133,7 @@
         </h1>
 
         <div class="sort-by">
-            Sort by
+            <span class="text-light">Sort by</span>
             <span class="sort-by-select">
                 <Select
                     bind:key={$eventsSortKey}
@@ -219,6 +219,11 @@
         .flex-center();
         padding: 0 0 0 1rem;
         justify-content: end;
+
+        @media @mobile {
+            padding: 1rem 0 0 1rem;
+            justify-content: start;
+        }
 
         .sort-by-select {
             margin: 0.3rem;

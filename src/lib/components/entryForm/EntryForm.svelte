@@ -377,7 +377,7 @@
                     disabled={submitted}
                     on:click={triggerFileDrop}
                     use:tooltip={{
-                        content: 'Insert Image',
+                        content: 'Upload Image',
                         position: 'bottom'
                     }}
                 >
@@ -442,6 +442,7 @@
                     on:keydown={handleEntryInputKeydown}
                     disabled={submitted}
                     aria-label="Entry Body"
+                    autofocus
                 />
             {/if}
         </div>

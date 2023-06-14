@@ -1,8 +1,6 @@
 <script lang="ts">
-    import { browser } from '$app/environment';
     import { ANIMATION_DURATION } from '$lib/constants';
     import { tooltip } from '@svelte-plugins/tooltips';
-    import { onMount } from 'svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
     import Bin from 'svelte-material-icons/Delete.svelte';
@@ -180,32 +178,37 @@
         });
     }
 
-    onMount(() => {
-        // nameInput should be defined by this point,
-        // but just in case...
-        if (selectNameId === event.id && nameInput) {
+    function selectIfSelected(selectNameId: string, eventId: string) {
+        if (selectNameId !== eventId) return;
+        obfuscated = false;
+        if (nameInput) {
             nameInput.focus();
             nameInput.select();
+            if (!expanded && allowCollapseChange) {
+                expanded = true;
+            }
         }
-    });
-
-    $: if (browser && selectNameId === event.id && nameInput) {
-        nameInput.focus();
     }
+
+    $: selectIfSelected(selectNameId, event.id), obfuscated || nameInput;
 </script>
 
 {#if event.deleted}
     <div class="restore-event" class:invisible={!bordered}>
-        <button class="with-icon" on:click={restoreEvent}>
-            <Restore />
-            Undo Deletion
-        </button>
         <div>
             <i>'{event.name}' has been deleted</i>
         </div>
+        <button class="with-icon bordered" on:click={restoreEvent}>
+            <Restore />
+            Undo Deletion
+        </button>
     </div>
 {:else}
-    <div class="event" class:invisible={!bordered}>
+    <div
+        class="event"
+        class:invisible={!bordered}
+        transition:slide={{ axis: 'y', duration: 0 }}
+    >
         <div class="header">
             <div>
                 {#if !expanded}
@@ -248,7 +251,8 @@
                             on:click={() => (expanded = !expanded)}
                             class="icon-button"
                             use:tooltip={{
-                                content: expanded ? 'Collapse' : 'Expand'
+                                content: expanded ? 'Collapse' : 'Expand',
+                                position: 'left'
                             }}
                         >
                             {#if expanded}
@@ -318,14 +322,6 @@
                     {/if}
                 </div>
                 <div>
-                    <button
-                        class="with-icon bordered danger"
-                        on:click={deleteEvent}
-                    >
-                        <Bin size="25" />
-                        Delete
-                    </button>
-
                     {#if Event.isInstantEvent(event)}
                         <button
                             class="with-icon bordered icon-gradient-on-hover"
@@ -343,6 +339,13 @@
                             Make Instant Event
                         </button>
                     {/if}
+                    <button
+                        class="with-icon bordered danger"
+                        on:click={deleteEvent}
+                    >
+                        <Bin size="25" />
+                        Delete
+                    </button>
                 </div>
                 <div class="created-datetime">
                     <i>
@@ -365,17 +368,19 @@
     @import '../../../styles/layout';
 
     .restore-event {
+        .container();
         border-radius: @border-radius;
         display: flex;
         flex-direction: row;
         justify-content: space-around;
         align-items: center;
-        margin: 0.3rem 0.3rem;
+        margin: 8px;
         padding: 1.3rem 0.4rem;
     }
 
     .event {
         .container();
+        margin: 8px;
 
         .created-datetime {
             padding: 0 1rem 1rem 1rem;

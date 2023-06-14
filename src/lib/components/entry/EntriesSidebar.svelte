@@ -64,7 +64,6 @@
         height: 100vh;
         width: 100%;
         background-color: @light-v-accent;
-        z-index: 10;
         overflow-y: scroll;
         padding: 0;
 
@@ -76,6 +75,7 @@
         }
 
         @media @mobile {
+            z-index: 10;
             width: 100%;
             transition: @transition;
             transform: translateX(-100%);

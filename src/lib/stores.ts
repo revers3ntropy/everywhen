@@ -1,4 +1,4 @@
-import type { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
+import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
 import { localStorageWritable } from '$lib/lsWritable';
 import type { SvelteComponentDev } from 'svelte/internal';
 import { writable } from 'svelte/store';
@@ -27,3 +27,8 @@ export const popup = writable<typeof SvelteComponentDev | null | undefined>(
 export const addEntryListeners = writable<
     ((e: Entry, mode: EntryFormMode) => void)[]
 >([]);
+
+export const entryFormMode = localStorageWritable<EntryFormMode>(
+    LS_KEY.journalingMode,
+    EntryFormMode.Standard
+);

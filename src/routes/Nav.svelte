@@ -1,6 +1,9 @@
 <script lang="ts">
     import { afterNavigate, beforeNavigate, goto } from '$app/navigation';
     import { page } from '$app/stores';
+    import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
+    import { Event as EventController } from '$lib/controllers/event';
+    import { nowUtc } from '$lib/utils/time';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import Brain from 'svelte-material-icons/Brain.svelte';
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
@@ -10,19 +13,21 @@
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import Home from 'svelte-material-icons/Home.svelte';
+    import Calendar from 'svelte-material-icons/Calendar.svelte';
     import Lightbulb from 'svelte-material-icons/Lightbulb.svelte';
     import Logout from 'svelte-material-icons/Logout.svelte';
     import MapMarkerOutline from 'svelte-material-icons/MapMarkerOutline.svelte';
     import Moon from 'svelte-material-icons/MoonWaningCrescent.svelte';
     import Notebook from 'svelte-material-icons/Notebook.svelte';
     import Pencil from 'svelte-material-icons/Pencil.svelte';
+    import BulletPoints from 'svelte-material-icons/FormatListBulleted.svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import Dropdown from '$lib/components/Dropdown.svelte';
     import Streaks from '$lib/components/Streaks.svelte';
     import { LS_KEY } from '$lib/constants';
     import { Backup } from '$lib/controllers/backup';
     import type { Auth } from '$lib/controllers/user';
-    import { obfuscated } from '$lib/stores';
+    import { entryFormMode, eventsSortKey, obfuscated } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/notifications/notifications';
 
@@ -58,17 +63,22 @@
         return res.id;
     }
 
+    async function gotoIfNotAt(path: string) {
+        if ($page.url.pathname === path) {
+            location.reload();
+        } else {
+            await goto(path);
+        }
+    }
+
     async function goToEntryFormWithLabel(name: string, defaultColour: string) {
+        entryFormMode.set(EntryFormMode.Standard);
         const labelId = await makeLabelFromNameIfDoesntExist(
             name,
             defaultColour
         );
         localStorage.setItem(LS_KEY.newEntryLabel, labelId);
-        if ($page.url.pathname === '/journal') {
-            location.reload();
-        } else {
-            await goto('/journal');
-        }
+        await gotoIfNotAt('/journal');
     }
 
     async function makeDream() {
@@ -84,12 +94,32 @@
     }
 
     async function makeEntry() {
+        entryFormMode.set(EntryFormMode.Standard);
         localStorage.removeItem(LS_KEY.newEntryLabel);
-        if ($page.url.pathname === '/journal') {
-            location.reload();
-        } else {
+        await gotoIfNotAt('/journal');
+    }
+
+    async function makeBullet() {
+        entryFormMode.set(EntryFormMode.Bullet);
+        if ($page.url.pathname !== '/journal') {
             await goto('/journal');
         }
+    }
+
+    async function makeEvent() {
+        // put the new event at the top of the list
+        eventsSortKey.set('created');
+
+        const now = nowUtc();
+        displayNotifOnErr(
+            await api.post(auth, '/events', {
+                name: EventController.NEW_EVENT_NAME,
+                start: now,
+                end: now
+            })
+        );
+
+        await gotoIfNotAt('/events');
     }
 
     let navigating = false;
@@ -181,42 +211,52 @@
             </span>
 
             <div class="record-something-buttons">
-                <div>
-                    <button
-                        class="with-icon oneline record-entry"
-                        on:click={makeEntry}
-                    >
-                        <Pencil size="30" />
-                        Record Entry
-                    </button>
-                </div>
-                <div>
-                    <button
-                        class="with-icon oneline record-dream"
-                        on:click={makeDream}
-                    >
-                        <Moon size="30" />
-                        Record Dream
-                    </button>
-                </div>
-                <div>
-                    <button
-                        class="with-icon oneline record-idea"
-                        on:click={makeIdea}
-                    >
-                        <Lightbulb size="30" />
-                        Record Idea
-                    </button>
-                </div>
-                <div>
-                    <button
-                        class="with-icon oneline record-thought"
-                        on:click={makeThought}
-                    >
-                        <Brain size="30" />
-                        Record Thought
-                    </button>
-                </div>
+                <button
+                    class="with-icon oneline record-entry"
+                    on:click={makeEntry}
+                >
+                    <Pencil size="30" />
+                    Record Entry
+                </button>
+                <button
+                    class="with-icon oneline record-bullet"
+                    on:click={makeBullet}
+                >
+                    <BulletPoints size="30" />
+                    Record Bullet
+                </button>
+
+                <button
+                    class="with-icon oneline record-dream"
+                    on:click={makeDream}
+                >
+                    <Moon size="30" />
+                    Record Dream
+                </button>
+
+                <button
+                    class="with-icon oneline record-idea"
+                    on:click={makeIdea}
+                >
+                    <Lightbulb size="30" />
+                    Record Idea
+                </button>
+
+                <button
+                    class="with-icon oneline record-thought"
+                    on:click={makeThought}
+                >
+                    <Brain size="30" />
+                    Record Thought
+                </button>
+
+                <button
+                    class="with-icon oneline new-event"
+                    on:click={makeEvent}
+                >
+                    <Calendar size="30" />
+                    New Event
+                </button>
             </div>
         </Dropdown>
 
@@ -488,6 +528,15 @@
         }
 
         .record-entry:hover {
+            background: @light-v-accent;
+
+            :global(svg),
+            :global(svg *) {
+                fill: url(#accent-gradient);
+            }
+        }
+
+        .record-bullet:hover {
             background: @light-v-accent;
 
             :global(svg),

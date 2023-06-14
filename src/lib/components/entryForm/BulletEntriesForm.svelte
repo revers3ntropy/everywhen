@@ -103,7 +103,8 @@
             <input
                 on:keyup={onInput}
                 bind:this={entry}
-                placeholder="New bullet..."
+                placeholder="New bullet... (Enter to submit)"
+                autofocus
             />
         </div>
         <div class="hide-mobile">
