@@ -207,13 +207,13 @@
     <div
         class="event"
         class:invisible={!bordered}
-        transition:slide={{ axis: 'y', duration: 0 }}
+        transition:slide|local={{ axis: 'y', duration: 0 }}
     >
         <div class="header">
             <div>
                 {#if !expanded}
                     <div
-                        transition:slide={{
+                        transition:slide|local={{
                             axis: 'x',
                             duration: ANIMATION_DURATION,
                             delay: 100
@@ -277,7 +277,7 @@
                 <div class="top-row">
                     <div
                         class="flex-center"
-                        transition:fly={{
+                        transition:fly|local={{
                             y: -50,
                             duration: ANIMATION_DURATION,
                             delay: ANIMATION_DURATION / 2
