@@ -1,4 +1,9 @@
-import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
+import {
+    currentTzOffset,
+    dayUtcFromTimestamp,
+    fmtUtc,
+    nowUtc
+} from '$lib/utils/time';
 import { type OsGroup, osGroupFromEntry, osGroups } from '$lib/utils/userAgent';
 import moment from 'moment/moment';
 import type { Seconds, TimestampSecs } from '../../app';
@@ -98,7 +103,7 @@ function datasetFactoryForStandardBuckets(
             case Bucket.Week:
                 return date.startOf('week').unix();
             case Bucket.Day:
-                return date.startOf('day').unix();
+                return dayUtcFromTimestamp(time, 0);
         }
         throw new Error(`Invalid bucket ${time} ${bucket}`);
     }
@@ -107,18 +112,38 @@ function datasetFactoryForStandardBuckets(
         sortedEntries: EntryWithWordCount[],
         by: By
     ): Record<string | number, number> => {
-        const start = sortedEntries[0].created;
+        const start =
+            sortedEntries[0].created +
+            sortedEntries[0].createdTZOffset * 60 * 60;
 
         const buckets: Record<string, number> = {};
-        const end = nowUtc();
-        for (let i = start; i < end; i += bucketSize(selectedBucket)) {
-            buckets[bucketiseTime(i, selectedBucket).toString()] = 0;
+        const end = nowUtc() + bucketSize(selectedBucket);
+
+        let bucket = bucketiseTime(start, selectedBucket);
+        while (bucket < end) {
+            buckets[bucketiseTime(bucket, selectedBucket).toString()] = 0;
+            bucket += bucketSize(selectedBucket);
         }
 
         for (const entry of sortedEntries) {
-            const bucket = bucketiseTime(entry.created, selectedBucket);
-            buckets[bucket.toString()] +=
-                by === By.Entries ? 1 : entry.wordCount;
+            const bucket = bucketiseTime(
+                entry.created,
+                selectedBucket
+            ).toString();
+            buckets[bucket] += by === By.Entries ? 1 : entry.wordCount;
+        }
+
+        if (isNaN(Object.values(buckets).reduce((a, b) => a + b, 0))) {
+            console.log(buckets);
+            throw new Error('NaN in buckets');
+        }
+
+        const lastBucket = Object.keys(buckets)
+            .map(a => parseInt(a))
+            .sort((a, b) => a - b)
+            .pop();
+        if (lastBucket && buckets[lastBucket.toString()] === 0) {
+            delete buckets[lastBucket.toString()];
         }
 
         return buckets;

@@ -23,12 +23,12 @@ export enum By {
 
 export enum Bucket {
     // hour is a little different in that it only looks at the hour, ignores day
-    Hour,
-    Day,
-    Week,
-    Month,
-    Year,
-    OperatingSystem
+    Hour = 'Hour',
+    Day = 'Day',
+    Week = 'Week',
+    Month = 'Month',
+    Year = 'Year',
+    OperatingSystem = 'Operating System'
 }
 
 export const bucketNames: Record<string, Bucket> = {
@@ -40,15 +40,6 @@ export const bucketNames: Record<string, Bucket> = {
     'Operating System': Bucket.OperatingSystem
 };
 
-const bucketToNameMap: Record<Bucket, string> = {
-    [Bucket.Hour]: 'Hour',
-    [Bucket.Day]: 'Day',
-    [Bucket.Week]: 'Week',
-    [Bucket.Month]: 'Month',
-    [Bucket.Year]: 'Year',
-    [Bucket.OperatingSystem]: 'Operating System'
-};
-
 export function initialBucket(days: number): Bucket {
     if (days < 10) return Bucket.Day;
     if (days < 100) return Bucket.Week;
@@ -57,7 +48,7 @@ export function initialBucket(days: number): Bucket {
 }
 
 export function initialBucketName(days: number): string {
-    return bucketToNameMap[initialBucket(days)];
+    return initialBucket(days);
 }
 
 export function commonWordsFromText(
