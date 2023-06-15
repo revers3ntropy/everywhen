@@ -13,7 +13,7 @@ export const enabledLocation = localStorageWritable(
 
 export const passcodeLastEntered = localStorageWritable(
     LS_KEY.passcodeLastEntered,
-    0
+    0 as number
 );
 export const eventsSortKey = localStorageWritable<EventsSortKey>(
     LS_KEY.sortEventsKey,
@@ -24,11 +24,11 @@ export const popup = writable<typeof SvelteComponentDev | null | undefined>(
     null
 );
 
-export const addEntryListeners = writable<
-    ((e: Entry, mode: EntryFormMode) => void)[]
->([]);
-
 export const entryFormMode = localStorageWritable<EntryFormMode>(
     LS_KEY.journalingMode,
     EntryFormMode.Standard
 );
+
+export const addEntryListeners = writable<
+    ((e: Entry, mode: EntryFormMode) => void)[]
+>([]);

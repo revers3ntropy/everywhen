@@ -96,6 +96,7 @@
 
     function checkPasscode() {
         if (!requireAuth) return;
+        if ($passcodeLastEntered === null) return;
 
         const secondsSinceLastEntered = nowUtc() - $passcodeLastEntered;
         showPasscodeModal =
@@ -176,7 +177,7 @@
 <div data-sveltekit-preload-data="hover">
     <Notifications />
 
-    {#if data.settings.passcode.value && nowUtc() - $passcodeLastEntered > data.settings.passcodeTimeout.value && showPasscodeModal && !home && (data.settings.passcodeTimeout.value > 0 || !$passcodeLastEntered || !browser)}
+    {#if data.settings.passcode.value && nowUtc() - ($passcodeLastEntered || 0) > data.settings.passcodeTimeout.value && showPasscodeModal && !home && (data.settings.passcodeTimeout.value > 0 || !$passcodeLastEntered || !browser)}
         <PasscodeModal
             bind:show={showPasscodeModal}
             passcode={data.settings.passcode.value}

@@ -202,8 +202,8 @@
 
 <div>
     <div>
-        <div class="entries-menu hide-mobile">
-            <div>
+        <div class="entries-menu">
+            <div class="hide-mobile">
                 {#if showImport}
                     <button
                         class="with-circled-icon"

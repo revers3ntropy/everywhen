@@ -1,4 +1,5 @@
 <script lang="ts">
+    import BookSpinner from '$lib/components/BookSpinner.svelte';
     import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
     import { tooltip } from '@svelte-plugins/tooltips';
     import FormatListBulleted from 'svelte-material-icons/FormatListBulleted.svelte';
@@ -34,7 +35,9 @@
             }}
             class="with-circled-icon"
         >
-            {#if $entryFormMode === EntryFormMode.Standard}
+            {#if $entryFormMode === null}
+                ...
+            {:else if $entryFormMode === EntryFormMode.Standard}
                 <FormatListBulleted size="30" />
             {:else}
                 <TextBoxOutline size="30" />
@@ -43,7 +46,9 @@
     {/key}
 </div>
 
-{#if $entryFormMode === EntryFormMode.Standard}
+{#if $entryFormMode === null}
+    <BookSpinner />
+{:else if $entryFormMode === EntryFormMode.Standard}
     <EntryForm {auth} {obfuscated} bind:resetEntryForm />
 {:else}
     <BulletEntriesForm {auth} {obfuscated} bind:resetEntryForm />

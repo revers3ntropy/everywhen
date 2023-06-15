@@ -16,15 +16,6 @@
     import { nowUtc } from '$lib/utils/time';
     import Event from '$lib/components/event/Event.svelte';
 
-    export let data: App.PageData & {
-        events: EventController[];
-        labels: Label[];
-    };
-
-    type EventData = EventController & { deleted?: true };
-
-    let events: EventData[] = data.events;
-
     function sortEvents<T extends EventController | EventData>(
         events: T[],
         key: EventsSortKey & keyof T
@@ -43,13 +34,12 @@
     }
 
     async function reloadEvents() {
+        // FIXME: handle the unset $eventsSortKey case
         events = sortEvents(
             displayNotifOnErr(await api.get(data, '/events')).events,
-            $eventsSortKey
+            $eventsSortKey || 'created'
         );
     }
-
-    $: events = sortEvents(events, $eventsSortKey);
 
     async function newEvent() {
         const now = nowUtc();
@@ -74,6 +64,16 @@
             reloadEvents
         );
     }
+
+    export let data: App.PageData & {
+        events: EventController[];
+        labels: Label[];
+    };
+
+    type EventData = EventController & { deleted?: true };
+
+    let events: EventData[] = data.events;
+    $: if ($eventsSortKey) events = sortEvents(events, $eventsSortKey);
 
     function changeEventCount(by: number) {
         eventCount += by;
@@ -134,13 +134,17 @@
 
         <div class="sort-by">
             <span class="text-light">Sort by</span>
-            <span class="sort-by-select">
-                <Select
-                    bind:key={$eventsSortKey}
-                    options={sortEventsKeys}
-                    fromRight
-                />
-            </span>
+            {#if $eventsSortKey !== null}
+                <span class="sort-by-select">
+                    <Select
+                        bind:key={$eventsSortKey}
+                        options={sortEventsKeys}
+                        fromRight
+                    />
+                </span>
+            {:else}
+                ...
+            {/if}
         </div>
     </div>
     <ul>
