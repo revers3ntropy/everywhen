@@ -1,9 +1,7 @@
 <script lang="ts">
     import { afterNavigate, beforeNavigate, goto } from '$app/navigation';
     import { page } from '$app/stores';
-    import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
-    import { Event as EventController } from '$lib/controllers/event';
-    import { nowUtc } from '$lib/utils/time';
+    import { tooltip } from '@svelte-plugins/tooltips';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import Brain from 'svelte-material-icons/Brain.svelte';
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
@@ -12,6 +10,7 @@
     import DownloadLock from 'svelte-material-icons/DownloadLock.svelte';
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
+    import Lock from 'svelte-material-icons/Lock.svelte';
     import Home from 'svelte-material-icons/Home.svelte';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
     import Lightbulb from 'svelte-material-icons/Lightbulb.svelte';
@@ -27,22 +26,30 @@
     import { LS_KEY } from '$lib/constants';
     import { Backup } from '$lib/controllers/backup';
     import type { Auth } from '$lib/controllers/user';
-    import { entryFormMode, eventsSortKey, obfuscated } from '$lib/stores';
+    import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
+    import { Event as EventController } from '$lib/controllers/event';
+    import type { SettingsConfig } from '$lib/controllers/settings';
+    import { nowUtc } from '$lib/utils/time';
+    import {
+        entryFormMode,
+        eventsSortKey,
+        obfuscated,
+        passcodeLastEntered
+    } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/notifications/notifications';
 
     export let auth: Auth;
-
-    let downloadingBackup = false;
+    export let settings: SettingsConfig;
 
     async function downloadBackup() {
-        if (downloadingBackup) return;
-        downloadingBackup = true;
+        if (isDownloadingBackup) return;
+        isDownloadingBackup = true;
         const { data: backupData } = displayNotifOnErr(
             await api.get(auth, '/backups', { encrypted: 1 })
         );
         Backup.download(backupData, auth.username, true);
-        downloadingBackup = false;
+        isDownloadingBackup = false;
     }
 
     async function makeLabelFromNameIfDoesntExist(
@@ -121,6 +128,12 @@
 
         await gotoIfNotAt('/events');
     }
+
+    function lock() {
+        passcodeLastEntered.set(null);
+    }
+
+    let isDownloadingBackup = false;
 
     let navigating = false;
     let finishedNavigation = false;
@@ -205,6 +218,18 @@
     </div>
 
     <div class="right-options">
+        {#if settings.passcode.value}
+            <button
+                on:click={lock}
+                class="danger"
+                use:tooltip={{
+                    content: '<span class="oneline">Require Passcode</span>',
+                    position: 'bottom'
+                }}
+            >
+                <Lock size="25" />
+            </button>
+        {/if}
         <Dropdown openOnHover width="170px">
             <span class="create-button" slot="button">
                 <Plus size="25" />
@@ -294,11 +319,11 @@
                 <button
                     aria-label="download encrypted backup"
                     class="account-dropdown-button"
-                    disabled={downloadingBackup}
+                    disabled={isDownloadingBackup}
                     on:click={downloadBackup}
                 >
                     <DownloadLock size="30" />
-                    {#if downloadingBackup}
+                    {#if isDownloadingBackup}
                         Downloading...
                     {:else}
                         Download Backup

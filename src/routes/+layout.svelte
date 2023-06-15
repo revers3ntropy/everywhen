@@ -29,11 +29,12 @@
     import NoAuthNav from './NoAuthNav.svelte';
     import PasscodeModal from './PasscodeModal.svelte';
     import { blur } from 'svelte/transition';
+    import type { PageData } from './$types';
 
     $: home = $page.url.pathname.trim() === '/';
     $: requireAuth = !NON_AUTH_ROUTES.includes($page.url.pathname);
 
-    export let data: App.PageData;
+    export let data: PageData;
 
     let lastActivity = nowUtc();
 
@@ -55,13 +56,15 @@
             if (home) return;
             void checkCookies();
             checkObfuscatedTimeout();
-            checkPasscode();
+            checkPasscode($passcodeLastEntered);
         }, 1000);
 
         setInterval(() => {
             void checkForUpdate();
         }, 1000 * 30);
     });
+
+    $: checkPasscode($passcodeLastEntered);
 
     function checkObfuscatedTimeout() {
         if (!requireAuth) return;
@@ -94,11 +97,11 @@
         }
     }
 
-    function checkPasscode() {
+    function checkPasscode(lastEntered: number | null) {
         if (!requireAuth) return;
-        if ($passcodeLastEntered === null) return;
+        if (lastEntered === null) return;
 
-        const secondsSinceLastEntered = nowUtc() - $passcodeLastEntered;
+        const secondsSinceLastEntered = nowUtc() - lastEntered;
         showPasscodeModal =
             secondsSinceLastEntered > data.settings.passcodeTimeout.value;
     }
@@ -181,12 +184,13 @@
         <PasscodeModal
             bind:show={showPasscodeModal}
             passcode={data.settings.passcode.value}
+            auth={data}
         />
     {/if}
 
     {#if !home}
         {#if data.id}
-            <Nav auth={data} />
+            <Nav auth={data} settings={data.settings} />
         {:else}
             <NoAuthNav />
         {/if}

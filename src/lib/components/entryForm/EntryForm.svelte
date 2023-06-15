@@ -436,6 +436,7 @@
                     class="obfuscated">{obfuscate(newEntryBody)}</textarea
                 >
             {:else}
+                <!-- svelte-ignore a11y-autofocus -->
                 <textarea
                     bind:this={newEntryInputElement}
                     bind:value={newEntryBody}

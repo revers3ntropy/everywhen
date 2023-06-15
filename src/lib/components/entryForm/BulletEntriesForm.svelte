@@ -100,6 +100,7 @@
     <div class="line">
         <div class="entry-input">
             <LabelSelect {labels} {auth} condensed bind:value={label} />
+            <!-- svelte-ignore a11y-autofocus -->
             <input
                 on:keyup={onInput}
                 bind:this={entry}

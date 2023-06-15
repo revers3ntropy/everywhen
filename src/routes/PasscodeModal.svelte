@@ -1,14 +1,23 @@
 <script lang="ts">
+    import { ANIMATION_DURATION } from '$lib/constants';
+    import { slide } from 'svelte/transition';
     import { browser } from '$app/environment';
+    import type { Auth } from '$lib/controllers/user';
+    import { encryptionKeyFromPassword } from '$lib/security/authUtils';
     import { onMount } from 'svelte';
+    import Close from 'svelte-material-icons/Close.svelte';
     import { passcodeLastEntered } from '$lib/stores';
     import { nowUtc } from '$lib/utils/time';
     import { wheel } from '$lib/utils/toggleScrollable';
 
+    export let auth: Auth;
     export let show = true;
     export let passcode: string;
 
+    export let showingForgotPassword = false;
+
     let input: string;
+    let passwordInput: string;
 
     let loaded = false;
     onMount(() => {
@@ -17,14 +26,21 @@
 
     let lastYScroll = 0;
 
-    $: if (input === passcode && browser) {
-        input = '';
-        passcodeLastEntered.set(nowUtc());
-        show = false;
-        setTimeout(() => {
-            window.scrollTo(0, lastYScroll);
-            lastYScroll = 0;
-        }, 0);
+    $: if (browser) {
+        let valid = (input || '') === passcode;
+        if (showingForgotPassword) {
+            valid ||=
+                encryptionKeyFromPassword(passwordInput || '') === auth.key;
+        }
+        if (valid) {
+            input = '';
+            passcodeLastEntered.set(nowUtc());
+            show = false;
+            setTimeout(() => {
+                window.scrollTo(0, lastYScroll);
+                lastYScroll = 0;
+            }, 0);
+        }
     }
 
     $: if (show && !lastYScroll && browser) {
@@ -37,7 +53,7 @@
 <div class="modal-container {show ? 'show' : ''}">
     {#if loaded}
         <div class="content">
-            <h1>Please enter your passcode</h1>
+            <h1>Enter your passcode</h1>
             <!-- svelte-ignore a11y-autofocus -->
             <input
                 type="text"
@@ -48,6 +64,34 @@
                 data-lpignore="true"
                 class="password-input"
             />
+            <button on:click={() => (input = '')}>
+                <Close />
+            </button>
+
+            <div class="forgot-passcode">
+                <button
+                    class="text-light"
+                    on:click={() => (showingForgotPassword = true)}
+                >
+                    Forgot Passcode?
+                </button>
+                <div>
+                    {#if showingForgotPassword}
+                        <input
+                            type="text"
+                            bind:value={passwordInput}
+                            placeholder="Enter Password"
+                            autocomplete="off"
+                            data-lpignore="true"
+                            class="password-input"
+                            transition:slide={{
+                                axis: 'y',
+                                duration: ANIMATION_DURATION
+                            }}
+                        />
+                    {/if}
+                </div>
+            </div>
         </div>
     {/if}
 </div>
@@ -56,7 +100,7 @@
     @import '../styles/layout';
 
     h1 {
-        margin: 1rem;
+        text-align: left;
     }
 
     .modal-container {
@@ -67,13 +111,13 @@
         left: 0;
         width: 100vw;
         height: 100vh;
-        background-color: rgba(0, 0, 0, 0.2);
+        background-color: rgba(0, 0, 0, 0.3);
         z-index: 1500;
         margin: 0;
         padding: 0;
         border-radius: 0;
         border: none;
-        backdrop-filter: blur(15px);
+        backdrop-filter: blur(18px);
         overflow: auto;
         display: none;
 
@@ -82,15 +126,28 @@
         }
 
         .content {
-            text-align: center;
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(20, 20, 20, 0.5);
             backdrop-filter: blur(30px);
-            padding: 1rem 2rem 2rem 2rem;
+            padding: 2rem 3rem 3rem 3rem;
             border-radius: @border-radius;
 
+            @media @mobile {
+                padding: 2rem 4px 3rem 4px;
+                width: 100%;
+                border-radius: 0;
+            }
+
             .password-input {
+                margin-top: 2rem;
+                font-size: 20px;
                 -webkit-text-security: disc;
                 -moz-text-security: disc;
+                max-width: 90vw;
+            }
+
+            .forgot-passcode {
+                margin-top: 4rem;
+                text-align: left;
             }
         }
     }
