@@ -130,7 +130,7 @@
     }
 
     function lock() {
-        passcodeLastEntered.set(null);
+        passcodeLastEntered.set(0);
     }
 
     let isDownloadingBackup = false;

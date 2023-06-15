@@ -64,7 +64,7 @@
         }, 1000 * 30);
     });
 
-    $: checkPasscode($passcodeLastEntered);
+    passcodeLastEntered.subscribe(v => void checkPasscode(v));
 
     function checkObfuscatedTimeout() {
         if (!requireAuth) return;
