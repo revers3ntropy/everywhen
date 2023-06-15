@@ -346,8 +346,8 @@
         // save the map view
         map.on('postrender', () => {
             const view = map.getView();
-            $mapZoom = view.getZoom();
-            $mapCenter = view.getCenter();
+            mapZoom.set(view.getZoom());
+            mapCenter.set(view.getCenter());
         });
 
         return map;

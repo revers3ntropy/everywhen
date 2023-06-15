@@ -287,7 +287,7 @@
 
         <button
             aria-label={$obfuscated ? 'Show all' : 'Hide all'}
-            on:click={() => ($obfuscated = !$obfuscated)}
+            on:click={() => obfuscated.set(!$obfuscated)}
         >
             {#if $obfuscated}
                 <Eye size="25" />

@@ -15,10 +15,11 @@
     export let resetEntryForm: () => void;
 
     function switchMode() {
-        $entryFormMode =
+        entryFormMode.set(
             $entryFormMode === EntryFormMode.Standard
                 ? EntryFormMode.Bullet
-                : EntryFormMode.Standard;
+                : EntryFormMode.Standard
+        );
     }
 </script>
 

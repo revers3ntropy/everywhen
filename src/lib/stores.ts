@@ -6,14 +6,14 @@ import type { EventsSortKey } from '../app';
 import { LS_KEY } from './constants';
 import type { Entry } from '$lib/controllers/entry';
 
-export const enabledLocation = localStorageWritable(
+export const enabledLocation = localStorageWritable<boolean>(
     LS_KEY.enabledLocation,
     false
 );
 
-export const passcodeLastEntered = localStorageWritable(
+export const passcodeLastEntered = localStorageWritable<number>(
     LS_KEY.passcodeLastEntered,
-    0 as number
+    0
 );
 export const eventsSortKey = localStorageWritable<EventsSortKey>(
     LS_KEY.sortEventsKey,

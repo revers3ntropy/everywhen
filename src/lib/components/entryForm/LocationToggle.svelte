@@ -54,7 +54,9 @@
     });
 </script>
 
-{#if $enabledLocation}
+{#if $enabledLocation === null}
+    ...
+{:else if $enabledLocation === true}
     <button
         on:click={disableLocation}
         use:tooltip={{

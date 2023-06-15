@@ -148,7 +148,7 @@
                 $canvasState.getMouseXRaw(event),
                 $canvasState.getMouseYRaw(event)
             );
-            $contextMenuState = null;
+            contextMenuState.set(null);
         };
     }
 

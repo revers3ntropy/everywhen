@@ -68,14 +68,15 @@
 
     function checkObfuscatedTimeout() {
         if (!requireAuth) return;
-        if ($obfuscated) return;
+        // === true to get around a weird TS + Svelte bug
+        if ($obfuscated === true) return;
 
         const hideAfter = data.settings.autoHideEntriesDelay.value;
         if (hideAfter < 1) return;
 
         if (nowUtc() - lastActivity >= hideAfter) {
             notify.info('Blurred due to inactivity', 10_000);
-            $obfuscated = true;
+            obfuscated.set(true);
         }
     }
 

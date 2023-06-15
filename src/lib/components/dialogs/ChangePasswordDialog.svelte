@@ -84,7 +84,7 @@
                 Change Password
             </button>
             <button
-                on:click={() => ($popup = null)}
+                on:click={() => popup.set(null)}
                 aria-label="cancel change password"
                 disabled={submitted}
             >
