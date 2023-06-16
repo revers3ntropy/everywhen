@@ -16,7 +16,7 @@ export type LabelWithCount = Label & {
 export class Label {
     private constructor(
         public id: string,
-        public colour: string,
+        public color: string,
         public name: string,
         public created: number
     ) {}
@@ -28,7 +28,7 @@ export class Label {
     ): Promise<Result<Label>> {
         console.trace();
         const res = await query<Required<Label>[]>`
-            SELECT id, colour, name, created
+            SELECT id, color, name, created
             FROM labels
             WHERE id = ${id}
               AND user = ${auth.id}
@@ -42,7 +42,7 @@ export class Label {
         if (err) return Result.err(err);
 
         return Result.ok(
-            new Label(res[0].id, res[0].colour, nameDecrypted, res[0].created)
+            new Label(res[0].id, res[0].color, nameDecrypted, res[0].created)
         );
     }
 
@@ -77,7 +77,7 @@ export class Label {
         if (err) return Result.err(err);
 
         const res = await query<Required<Label>[]>`
-            SELECT id, colour, name, created
+            SELECT id, color, name, created
             FROM labels
             WHERE name = ${encryptedName}
               AND user = ${auth.id}
@@ -88,7 +88,7 @@ export class Label {
         }
 
         return Result.ok(
-            new Label(res[0].id, res[0].colour, nameDecrypted, res[0].created)
+            new Label(res[0].id, res[0].color, nameDecrypted, res[0].created)
         );
     }
 
@@ -97,7 +97,7 @@ export class Label {
         auth: Auth
     ): Promise<Result<Label[]>> {
         const res = await query<Required<Label>[]>`
-            SELECT id, colour, name, created
+            SELECT id, color, name, created
             FROM labels
             WHERE user = ${auth.id}
             ORDER BY name
@@ -113,7 +113,7 @@ export class Label {
                 return Result.ok(
                     new Label(
                         label.id,
-                        label.colour,
+                        label.color,
                         nameDecrypted,
                         label.created
                     )
@@ -142,8 +142,8 @@ export class Label {
         return (
             typeof label === 'object' &&
             label !== null &&
-            'colour' in label &&
-            typeof label.colour === 'string' &&
+            'color' in label &&
+            typeof label.color === 'string' &&
             'name' in label &&
             typeof label.name === 'string' &&
             'created' in label &&
@@ -193,16 +193,16 @@ export class Label {
         }
 
         await query`
-            INSERT INTO labels (id, user, name, colour, created)
+            INSERT INTO labels (id, user, name, color, created)
             VALUES (${json.id},
                     ${auth.id},
                     ${encryptedName},
-                    ${json.colour},
+                    ${json.color},
                     ${json.created})
         `;
 
         return Result.ok(
-            new Label(json.id, json.colour, json.name, json.created)
+            new Label(json.id, json.color, json.name, json.created)
         );
     }
 
@@ -234,18 +234,18 @@ export class Label {
         return Result.ok(label);
     }
 
-    public static async updateColour(
+    public static async updateColor(
         query: QueryFunc,
         label: Label,
-        colour: string
+        color: string
     ): Promise<Result<Label>> {
         await query`
             UPDATE labels
-            SET colour = ${colour}
+            SET color = ${color}
             WHERE id = ${label.id}
         `;
 
-        label.colour = colour;
+        label.color = color;
 
         return Result.ok(label);
     }

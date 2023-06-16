@@ -21,10 +21,10 @@
         );
     }
 
-    async function updateColour() {
+    async function updateColor() {
         displayNotifOnErr(
             await api.put(data, apiPath('/labels/?', data.label.id), {
-                colour: data.label.colour
+                color: data.label.color
             })
         );
     }
@@ -55,7 +55,7 @@
             {
                 auth: data,
                 id: data.label.id,
-                colour: data.label.colour,
+                color: data.label.color,
                 name: data.label.name,
                 reloadOnDelete: false
             },
@@ -72,12 +72,12 @@
 </svelte:head>
 
 <main>
-    <div class="colour-select" style="border-color: {data.label.colour}">
-        {data.label.colour}
+    <div class="color-select" style="border-color: {data.label.color}">
+        {data.label.color}
         <input
             type="color"
-            bind:value={data.label.colour}
-            on:change={updateColour}
+            bind:value={data.label.color}
+            on:change={updateColor}
         />
     </div>
     <div class="title-line">
@@ -146,7 +146,7 @@
         font-weight: bold;
     }
 
-    .colour-select {
+    .color-select {
         width: calc(100% - 1em);
         border: none;
         border-bottom: 3px solid black;

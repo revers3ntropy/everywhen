@@ -190,7 +190,7 @@
         // to the visibility toggle being inline
         margin: 1em 1em -22px 1em;
         padding: 0.5em;
-        border-bottom: 1px solid @light-accent;
+        border-bottom: 1px solid var(--light-accent);
         text-align: start;
 
         @media @mobile {

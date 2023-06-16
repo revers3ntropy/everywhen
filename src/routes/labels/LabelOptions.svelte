@@ -11,7 +11,7 @@
 
     export let auth: Auth;
     export let name: string;
-    export let colour: string;
+    export let color: string;
     export let id: string;
     export let editable = true;
     export let created: number;
@@ -20,7 +20,7 @@
 
     let deleted = false;
 
-    async function updateLabel(changes: { name?: string; colour?: string }) {
+    async function updateLabel(changes: { name?: string; color?: string }) {
         displayNotifOnErr(
             await api.put(auth, apiPath(`/labels/?`, id), changes)
         );
@@ -40,7 +40,7 @@
         showPopup(DeleteLabelDialog, {
             auth,
             id,
-            colour,
+            color,
             name
         });
     }
@@ -51,8 +51,8 @@
         {#if editable}
             <input
                 type="color"
-                bind:value={colour}
-                on:change={() => updateLabel({ colour })}
+                bind:value={color}
+                on:change={() => updateLabel({ color })}
             />
             <input
                 bind:value={name}
@@ -61,7 +61,7 @@
                 on:change={() => updateLabel({ name })}
             />
         {:else}
-            <div class="entry-label-colour" style="background: {colour}" />
+            <div class="entry-label-color" style="background: {color}" />
             <div>{name}</div>
         {/if}
         <a href="/labels/{id}">

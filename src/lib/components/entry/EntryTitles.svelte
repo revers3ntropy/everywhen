@@ -119,13 +119,13 @@
                         </span>
                         {#if entry.label}
                             <span
-                                class="entry-label-colour"
-                                style="background: {entry.label?.colour ||
+                                class="entry-label-color"
+                                style="background: {entry.label?.color ||
                                     'transparent'}"
                                 use:tooltip={{ content: entry.label?.name }}
                             />
                         {:else}
-                            <span class="entry-label-colour" />
+                            <span class="entry-label-color" />
                         {/if}
 
                         <span class="title {obfuscated ? 'obfuscated' : ''}">
@@ -188,7 +188,7 @@
             grid-template-columns: 65px 18px 1fr;
             padding: 2px 2px;
             align-items: center;
-            color: @text-color;
+            color: var(--text-color);
             border-radius: 2px;
             width: 100%;
             text-align: left;
@@ -198,12 +198,12 @@
             }
 
             &:hover {
-                background-color: @light-accent;
+                background-color: var(--light-accent);
             }
 
             .entry-time {
                 font-size: 0.7rem;
-                color: @text-color-light;
+                color: var(--text-color-light);
                 width: 100%;
                 text-align: center;
             }

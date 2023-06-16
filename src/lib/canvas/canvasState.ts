@@ -7,6 +7,22 @@ import type { Interactable } from './interactable';
 
 export const START_ZOOM = 1 / (60 * 60);
 
+interface Colors {
+    primary: string;
+    text: string;
+    accentPrimary: string;
+    accentSecondary: string;
+    lightAccent: string;
+}
+
+const EMPTY_COLORS: Colors = {
+    primary: '',
+    text: '',
+    accentPrimary: '',
+    accentSecondary: '',
+    lightAccent: ''
+};
+
 type CanvasListener<T = MouseEvent & TouchEvent & WheelEvent> = (
     event: T
 ) => void;
@@ -79,26 +95,21 @@ export interface RenderRequest {
     cb: (state: CanvasState) => void;
 }
 
+function cssVar(canvas: HTMLCanvasElement, v: string): string {
+    return getComputedStyle(canvas).getPropertyValue(v);
+}
+
 export class CanvasState implements CanvasListeners {
-    static colours = {
-        primary: '#DDD',
-        text: '#FFF',
-        accentPrimary: 'rgb(121 235 226)',
-        accentSecondary: 'rgb(189 176 255)',
-        lightAccent: 'rgb(72 76 80)'
-    };
-
-    public readonly colours = CanvasState.colours;
-
     public width: number;
     public height: number;
     public cameraOffset: number;
     public zoom: number;
     public ctx: CanvasRenderingContext2D | null;
-    public canvas: HTMLCanvasElement | null;
     public pixelRatio: number;
     public time: number;
     public cursor: CursorStyle = 'default';
+
+    private __canvas: HTMLCanvasElement | null;
 
     public readonly mousemove: CanvasListener[] = [];
     public readonly mouseup: CanvasListener[] = [];
@@ -115,15 +126,20 @@ export class CanvasState implements CanvasListeners {
     private interactables: Interactable[] = [];
     private renderQueue: RenderRequest[] = [];
 
+    public colors: Colors;
+
     public constructor(props: ICanvasState) {
         this.width = props.width;
         this.height = props.height;
         this.cameraOffset = props.cameraOffset;
         this.zoom = props.zoom;
-        this.ctx = props.ctx;
-        this.canvas = props.canvas;
         this.pixelRatio = props.pixelRatio;
         this.time = props.time;
+        this.colors = EMPTY_COLORS;
+
+        this.ctx = props.ctx;
+        this.__canvas = props.canvas;
+        this.canvas = props.canvas;
 
         this.listen('mousemove', e => {
             this.mouseTime = this.getMouseTime(e);
@@ -162,6 +178,32 @@ export class CanvasState implements CanvasListeners {
                 return;
             }
         });
+    }
+
+    public get canvas(): HTMLCanvasElement | null {
+        return this.__canvas;
+    }
+
+    public set canvas(canvas: HTMLCanvasElement | null) {
+        this.__canvas = canvas;
+        this.updateColors();
+        if (canvas) {
+            this.ctx = canvas.getContext('2d');
+        }
+    }
+
+    private updateColors() {
+        if (this.canvas && browser) {
+            this.colors = {
+                primary: cssVar(this.canvas, '--light-accent'),
+                text: cssVar(this.canvas, '--text-color'),
+                accentPrimary: cssVar(this.canvas, '--secondary'),
+                accentSecondary: cssVar(this.canvas, '--primary'),
+                lightAccent: cssVar(this.canvas, '--light-accent')
+            };
+        } else {
+            this.colors = EMPTY_COLORS;
+        }
     }
 
     private showContextMenu(options: ContextMenuOptions, event: MouseEvent) {
@@ -403,7 +445,7 @@ export class CanvasState implements CanvasListeners {
         h: number,
         {
             radius = 0,
-            colour = CanvasState.colours.primary,
+            color = this.colors.primary,
             wireframe = false,
             zIndex = 0
         } = {}
@@ -412,14 +454,14 @@ export class CanvasState implements CanvasListeners {
         if (zIndex !== 0) {
             this.renderQueue.push({
                 zIndex,
-                cb: () => this.rect(x, y, w, h, { radius, colour, wireframe })
+                cb: () => this.rect(x, y, w, h, { radius, color, wireframe })
             });
             return;
         }
 
         this.ctx.beginPath();
-        this.ctx.fillStyle = colour;
-        this.ctx.strokeStyle = colour;
+        this.ctx.fillStyle = color;
+        this.ctx.strokeStyle = color;
         this.ctx.roundRect(x, y, w, h, radius);
         if (wireframe) {
             this.ctx.stroke();
@@ -433,20 +475,20 @@ export class CanvasState implements CanvasListeners {
         x: number,
         y: number,
         {
-            colour = CanvasState.colours.text,
+            color = this.colors.text,
             maxWidth = undefined,
             align = 'left',
-            backgroundColour = undefined,
+            backgroundColor = undefined,
             backgroundPadding = 2,
             fontSize = 10,
             font = 'sans-serif',
             backgroundRadius = 0,
             zIndex = 1
         }: {
-            colour?: string;
+            color?: string;
             maxWidth?: number;
             align?: CanvasTextAlign;
-            backgroundColour?: string;
+            backgroundColor?: string;
             backgroundPadding?: Pixels;
             fontSize?: Pixels;
             font?: string;
@@ -460,10 +502,10 @@ export class CanvasState implements CanvasListeners {
                 zIndex,
                 cb: () =>
                     this.text(txt, x, y, {
-                        colour,
+                        color,
                         maxWidth,
                         align,
-                        backgroundColour,
+                        backgroundColor,
                         backgroundPadding,
                         fontSize,
                         font,
@@ -476,7 +518,7 @@ export class CanvasState implements CanvasListeners {
 
         const fontFmt = `${fontSize}px ${font}`;
 
-        if (backgroundColour) {
+        if (backgroundColor) {
             this.ctx.font = fontFmt;
             const { width } = this.ctx.measureText(txt);
 
@@ -496,7 +538,7 @@ export class CanvasState implements CanvasListeners {
                 width + backgroundPadding * 2,
                 fontSize + backgroundPadding,
                 {
-                    colour: backgroundColour,
+                    color: backgroundColor,
                     radius: backgroundRadius
                 }
             );
@@ -506,7 +548,7 @@ export class CanvasState implements CanvasListeners {
         this.ctx.font = fontFmt;
         this.ctx.textBaseline = 'hanging';
         this.ctx.textAlign = align;
-        this.ctx.fillStyle = colour;
+        this.ctx.fillStyle = color;
         this.ctx.fillText(txt, x, y, maxWidth);
         this.ctx.fill();
     }
@@ -515,19 +557,19 @@ export class CanvasState implements CanvasListeners {
         x: number,
         y: number,
         r: number,
-        { colour = CanvasState.colours.primary, zIndex = 0 } = {}
+        { color = this.colors.primary, zIndex = 0 } = {}
     ) {
         if (!this.ctx) throw new Error('Canvas not set');
         if (zIndex !== 0) {
             this.renderQueue.push({
                 zIndex,
-                cb: () => this.circle(x, y, r, { colour })
+                cb: () => this.circle(x, y, r, { color })
             });
             return;
         }
 
         this.ctx.beginPath();
-        this.ctx.fillStyle = colour;
+        this.ctx.fillStyle = color;
         this.ctx.arc(x, y, r, 0, 2 * Math.PI);
         this.ctx.fill();
     }

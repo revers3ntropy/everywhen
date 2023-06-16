@@ -105,7 +105,7 @@
             transition: background-color @transition;
 
             &:hover {
-                background-color: @light-v-accent;
+                background-color: var(--v-light-accent);
             }
         }
     </style>

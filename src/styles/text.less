@@ -4,7 +4,7 @@
     font-family: Roboto, Oxygen, Ubuntu, 'Segoe UI', Arial, -apple-system,
     BlinkMacSystemFont, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 
-    color: @text-color;
+    color: var(--text-color);
 }
 
 body {
@@ -53,10 +53,10 @@ p {
 }
 
 a {
-    color: @accent-primary;
+    color: var(--text-color-accent);
 
     &:hover {
-        color: @accent-secondary;
+        color: var(--primary);
     }
 
     text-decoration: none;
@@ -64,7 +64,7 @@ a {
 
     &:hover {
         text-decoration: underline;
-        text-underline-color: @accent-secondary;
+        text-underline-color: var(--primary);
     }
 
     &.icon {
@@ -76,7 +76,7 @@ a {
         }
 
         &:hover::after {
-            background: @accent-secondary;
+            background: var(--primary);
         }
     }
 }
@@ -92,17 +92,17 @@ h2 {
 }
 
 code {
-    background-color: @light-accent;
+    background-color: var(--light-accent);
     border-radius: 5px;
     padding: 0.3em;
     overflow-x: auto;
-    color: @text-color;
+    color: var(--text-color);
     font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
     font-size: 0.95rem;
 }
 
 pre {
-    background-color: @light-accent;
+    background-color: var(--light-accent);
     border-radius: 6px;
     padding: 16px;
     overflow: auto;
@@ -117,25 +117,25 @@ pre {
 .obfuscated {
     &, * {
         color: transparent !important;
-        text-shadow: 0 0 3px @text-color !important;
+        text-shadow: 0 0 3px var(--text-color) !important;
     }
 }
 
 .text-light {
     &, * {
-        color: @text-color-light;
+        color: var(--text-color-light);
     }
 }
 
 .text-invert {
     &, & * {
-        color: @text-color-invert !important;
+        color: var(--text-color-invert) !important;
     }
 }
 
 .text-warning {
     &, & * {
-        color: @accent-danger !important;
+        color: var(--accent-danger) !important;
     }
 }
 

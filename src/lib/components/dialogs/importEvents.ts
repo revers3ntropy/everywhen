@@ -84,7 +84,7 @@ export async function importEvents(
                     `/labels`,
                     {
                         name: eventJson.label,
-                        colour: '#000000'
+                        color: '#000000'
                     }
                 );
                 if (err) {

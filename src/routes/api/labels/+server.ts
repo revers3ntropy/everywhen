@@ -21,10 +21,10 @@ export const POST = (async ({ request, cookies }) => {
         request,
         {
             name: 'string',
-            colour: 'string'
+            color: 'string'
         },
         {
-            colour: 'black'
+            color: 'black'
         }
     );
 

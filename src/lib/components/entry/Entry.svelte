@@ -235,7 +235,7 @@
         }
 
         &:focus {
-            border: 1px solid @accent-secondary;
+            border: 1px solid var(--primary);
             border-radius: @border-radius;
         }
 
@@ -250,7 +250,7 @@
         }
 
         .header {
-            border-bottom: 1px solid @border;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -264,7 +264,7 @@
             }
 
             :global(svg) {
-                color: @text-color-light;
+                color: var(--text-color-light);
             }
         }
 
@@ -282,7 +282,7 @@
         .time {
             margin: 0 0 0 0.5rem;
             font-size: 0.8em;
-            color: @text-color-light;
+            color: var(--text-color-light);
         }
 
         .body {
@@ -323,7 +323,7 @@
                 :global(tr) {
                     :global(td),
                     :global(th) {
-                        border: 1px solid @border;
+                        border: 1px solid var(--border-color);
 
                         margin: 0;
                         padding: 0.3rem;
@@ -337,7 +337,7 @@
             }
 
             :global(blockquote) {
-                border-left: 3px solid @accent-secondary;
+                border-left: 3px solid var(--primary);
                 margin: 0 0 0 0.5em;
                 padding: 0 0 0 1em;
             }
@@ -377,10 +377,9 @@
             .oneline();
             padding: 0.4em 0.8rem;
             width: 100%;
-            color: @text-color;
-
+            color: var(--text-color);
             &:hover {
-                background: @light-v-accent;
+                background: var(--v-light-accent);
             }
         }
     }

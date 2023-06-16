@@ -20,7 +20,7 @@
 
         const newLabel = {
             name,
-            colour: '#000'
+            color: '#000'
         };
 
         const { id } = displayNotifOnErr(

@@ -110,6 +110,6 @@
     .content {
         margin: 0;
         padding: 0;
-        background: @light-accent;
+        background: var(--light-accent);
     }
 </style>

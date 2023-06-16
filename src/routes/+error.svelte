@@ -27,7 +27,7 @@
             place-items: center;
 
             & > :first-child {
-                border-right: 2px solid @border-heavy;
+                border-right: 2px solid var(--border-heavy);
                 text-align: right;
             }
 

@@ -155,7 +155,7 @@
                 width: 0.5em;
                 height: 0.5em;
                 border-radius: 50%;
-                background-color: @light-accent;
+                background-color: var(--light-accent);
                 margin-right: 0.5em;
             }
 

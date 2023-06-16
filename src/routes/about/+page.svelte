@@ -114,7 +114,7 @@
         <p>
             Both your entries and events are displayed on the timeline. Instant
             events appear as 'pins', while duration events appear as 'bars'. The
-            colour of the event represents its label.
+            color of the event represents its label.
         </p>
         <p>
             Entries appear in the timeline as grey bars hanging down from the

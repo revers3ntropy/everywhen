@@ -1,6 +1,5 @@
 <script lang="ts">
     import { browser } from '$app/environment';
-    import { ANIMATION_DURATION } from '$lib/constants';
     import { Bar } from 'svelte-chartjs';
 
     import ToggleSwitch from 'svelte-material-icons/ToggleSwitch.svelte';
@@ -52,8 +51,6 @@
     $: if (entries || by || selectedBucket) {
         data = getGraphData(entries, selectedBucket, by);
     }
-
-    data;
 </script>
 
 <Bar

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { CanvasState, START_ZOOM } from '$lib/canvas/canvasState';
+    import { canvasState, START_ZOOM } from '$lib/canvas/canvasState';
     import { DurationRectCollider } from '$lib/canvas/collider';
     import { interactable } from '$lib/canvas/interactable';
     import type { Auth } from '$lib/controllers/user';
@@ -41,7 +41,7 @@
 
     $: duration = end - start;
     $: isInstantEvent = duration < 60;
-    $: colour = label?.colour || CanvasState.colours.primary;
+    $: color = label?.color || $canvasState.colors.primary;
 
     function yRenderPos(centerLineY: number) {
         const y = isInstantEvent ? 0 : yLevel;
@@ -64,29 +64,29 @@
                         y + HEIGHT,
                         SINGLE_EVENT_CIRCLE_RADIUS + 1,
                         {
-                            colour: 'white'
+                            color: 'white'
                         }
                     );
                 }
                 state.circle(x, y + HEIGHT, SINGLE_EVENT_CIRCLE_RADIUS, {
-                    colour
+                    color
                 });
                 const h = state.centerLnY() - (y + HEIGHT);
                 state.rect(x, y + HEIGHT, 1, h, {
                     radius: 0,
-                    colour
+                    color
                 });
             } else {
                 state.rect(x, y, width, HEIGHT, {
-                    colour: this.hovering ? '#222326' : '#252A35',
+                    color: this.hovering ? '#222326' : '#252A35',
                     radius: 5
                 });
                 state.rect(x, y + HEIGHT - LABEL_HEIGHT, width, LABEL_HEIGHT, {
-                    colour
+                    color
                 });
             }
 
-            let textColour = '#fff';
+            let textColor = '#fff';
 
             if (x + width <= 0) {
                 // not on screen
@@ -104,7 +104,7 @@
                     ),
                     y + DURATION_TEXT_Y_OFFSET,
                     {
-                        colour: textColour,
+                        color: textColor,
                         fontSize: 14
                     }
                 );
@@ -120,7 +120,7 @@
                         (eventTextParityHeight ? HEIGHT / 2 + 15 : -5),
                     {
                         align: 'center',
-                        backgroundColour: this.hovering ? '#223' : undefined,
+                        backgroundColor: this.hovering ? '#223' : undefined,
                         fontSize: this.hovering ? 14 : 12,
                         backgroundPadding: 4,
                         backgroundRadius: 2

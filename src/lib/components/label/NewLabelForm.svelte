@@ -10,7 +10,7 @@
     const dispatch = createEventDispatcher();
 
     let labelName = '';
-    let labelColour = '#000000';
+    let labelColor = '#000000';
 
     export let auth: Auth;
 
@@ -23,7 +23,7 @@
         displayNotifOnErr(
             await api.post(auth, '/labels', {
                 name: labelName,
-                colour: labelColour
+                color: labelColor
             })
         );
 
@@ -45,9 +45,9 @@
             <input bind:value={labelName} type="text" />
         </label>
         <label>
-            Colour<br />
-            <input bind:value={labelColour} type="color" />
-            <input bind:value={labelColour} type="text" />
+            Color<br />
+            <input bind:value={labelColor} type="color" />
+            <input bind:value={labelColor} type="text" />
         </label>
     </div>
     <div class="actions">
@@ -79,13 +79,13 @@
         justify-content: center;
 
         button {
-            border: 1px solid @border;
+            border: 1px solid var(--border-color);
             border-radius: @border-radius;
             padding: 1em;
             margin: 1em;
 
             &:hover {
-                background-color: @light-accent;
+                background-color: var(--light-accent);
             }
         }
     }

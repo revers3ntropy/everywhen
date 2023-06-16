@@ -129,7 +129,7 @@ export async function importEntries(
                     `/labels`,
                     {
                         name,
-                        colour: '#000000'
+                        color: '#000000'
                     }
                 );
                 if (err) {

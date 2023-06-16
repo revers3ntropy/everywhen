@@ -146,12 +146,12 @@
                 justify-content: start;
                 text-align: left;
                 grid-template-columns: 35px 1fr;
-                color: @accent-primary;
+                color: var(--text-color-accent);
 
                 &:hover {
                     text-decoration: none;
-                    color: @accent-secondary;
-                    background: @light-v-accent;
+                    color: var(--primary);
+                    background: var(--v-light-accent);
                 }
             }
         }

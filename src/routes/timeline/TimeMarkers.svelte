@@ -10,7 +10,7 @@
 
     const showYears = 200;
 
-    const colours = {
+    const colors = {
         year: 'rgba(255, 255, 255, 0.5)',
         month: '#fff',
         week: '#aaa',
@@ -46,7 +46,7 @@
             // -1 to center, as has width 3
             state.rect(renderPos - 1, 0, 3, state.height, {
                 radius: 0,
-                colour: colours.year
+                color: colors.year
             });
 
             if (showYearText) {
@@ -83,7 +83,7 @@
             if (renderPos > state.width) break;
 
             state.rect(renderPos, 0, 1, state.height, {
-                colour: colours.month
+                color: colors.month
             });
 
             if (showMonthText) {
@@ -151,7 +151,7 @@
 
             if (shouldShow) {
                 state.rect(renderPos, 0, 1, state.height, {
-                    colour: isMonday ? colours.week : colours.day
+                    color: isMonday ? colors.week : colors.day
                 });
             }
 
@@ -230,7 +230,7 @@
             if (renderPos > state.width) break;
 
             state.rect(renderPos, 0, 1, state.height, {
-                colour: colours.hour
+                color: colors.hour
             });
 
             if (showHourText) {

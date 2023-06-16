@@ -201,20 +201,20 @@
         min-width: 200px;
         border-radius: @border-radius;
         z-index: 10;
-        background: @light-accent;
+        background: var(--light-accent);
 
         .context-menu-item {
             padding: 0.2rem;
             border-radius: @border-radius;
 
             button {
-                color: @text-color;
+                color: var(--text-color);
                 width: 100%;
                 text-align: left;
             }
 
             &:hover {
-                background: @light-v-accent;
+                background: var(--v-light-accent);
             }
         }
     }

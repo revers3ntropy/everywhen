@@ -59,10 +59,10 @@
             {#if labels}
                 {#if selectedLabel}
                     <span
-                        class="entry-label-colour"
+                        class="entry-label-color"
                         style="background: {(labels ?? []).find(
                             l => l.id === value
-                        )?.colour || 'transparent'}"
+                        )?.color || 'transparent'}"
                     />
                     {#if !condensed}
                         <span class="label-name">
@@ -110,8 +110,8 @@
                 >
                     <span class="flex-center">
                         <span
-                            class="entry-label-colour"
-                            style="background: {label.colour}"
+                            class="entry-label-color"
+                            style="background: {label.color}"
                         />
                     </span>
                     <span class="label-name">
@@ -143,8 +143,8 @@
     @import '../../../styles/variables';
     @import '../../../styles/text';
 
-    .entry-label-colour {
-        border: 1px solid @border-light;
+    .entry-label-color {
+        border: 1px solid var(--border-light);
         width: 20px;
         height: 20px;
     }
@@ -157,7 +157,7 @@
         border: none;
 
         &:hover {
-            background: @light-v-accent;
+            background: var(--v-light-accent);
         }
 
         .icon-button {
@@ -167,10 +167,10 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid @light-accent;
+            border: 1px solid var(--light-accent);
 
             &:hover {
-                background: @bg;
+                background: var(--bg);
             }
         }
 
@@ -202,7 +202,7 @@
         width: 100%;
 
         &:hover {
-            background: @light-v-accent;
+            background: var(--v-light-accent);
         }
     }
 

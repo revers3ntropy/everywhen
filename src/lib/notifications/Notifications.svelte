@@ -63,7 +63,7 @@
         .notification {
             .container-shadow();
 
-            background: @light-accent;
+            background: var(--light-accent);
 
             display: grid;
             grid-template-columns: auto 1fr auto;
@@ -79,7 +79,7 @@
             pointer-events: all;
 
             .icon {
-                background: @light-v-accent;
+                background: var(--v-light-accent);
                 border-radius: 50%;
                 aspect-ratio: 1/1;
                 width: fit-content;
@@ -90,13 +90,13 @@
 
             &.type-error {
                 .icon {
-                    background: @accent-danger;
+                    background: var(--accent-danger);
                 }
             }
 
             &.type-info {
                 .icon {
-                    background: @accent-secondary;
+                    background: var(--primary);
                 }
             }
 

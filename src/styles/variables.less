@@ -1,40 +1,11 @@
-:root {
-    --bg: rgb(25 32 35);
-}
-
-//[data-theme='light'] {
-//    --bg: rgb(205, 240, 255);
-//}
-
-@bg: var(--bg);
-@accent-primary: rgb(121 235 226);
-@accent-secondary: rgb(189 176 255);
-@accent-danger: rgb(255, 120, 120);
-@accent-gradient: linear-gradient(140deg, @accent-primary, @accent-secondary);
-@light-accent: rgb(72 76 80);
-@light-v-accent: rgb(41 46 48);
-@border-light: rgb(55 55 60);
-@border: rgb(78 78 83);
-@border-heavy: rgb(110 110 115);
-
 @font-mono: 'Fira Mono', monospace;
-@text-color: rgb(255 255 255);
-@text-color-light: rgb(200 200 210);
-@text-color-invert: black;
-@text-color-danger: rgb(255 56 56);
 
-@heading-color: rgba(0, 0, 0, 0.7);
-@header-bg: @bg;
-
+@nav-height: 60px;
 
 @border-radius: 8px;
 
-@transition: 0.2s ease;
+@transition: 200ms ease;
 
 @mobile: ~"only screen and (max-width: 550px)";
 @not-mobile: ~"only screen and (min-width: 550px)";
 @large: ~"only screen and (min-width: 1650px)";
-
-:global(:root) {
-    --nav-height: 60px;
-}

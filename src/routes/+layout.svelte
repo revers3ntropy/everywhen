@@ -178,7 +178,11 @@
     </linearGradient>
 </svg>
 
-<div data-sveltekit-preload-data="hover">
+<div
+    data-sveltekit-preload-data="hover"
+    data-theme={data.settings.darkMode.value === true ? 'dark' : 'light'}
+    class="root"
+>
     <Notifications />
 
     {#if data.settings.passcode.value && nowUtc() - ($passcodeLastEntered || 0) > data.settings.passcodeTimeout.value && showPasscodeModal && !home && (data.settings.passcodeTimeout.value > 0 || !$passcodeLastEntered || !browser)}
@@ -227,7 +231,29 @@
 </div>
 
 <style lang="less">
+    @import '../styles/variables';
+
+    :global(html),
+    :global(body) {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    .root {
+        height: fit-content;
+        min-height: 100vh;
+        background: var(--bg);
+        overflow-x: hidden;
+        padding: 0;
+
+        @media @mobile {
+            padding: 4px;
+        }
+    }
+
     .page-content {
         min-height: calc(100vh - var(--nav-height));
+        padding: 0 1rem 4rem 1rem;
     }
 </style>

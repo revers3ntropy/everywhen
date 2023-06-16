@@ -137,8 +137,8 @@
 
             @media @mobile {
                 border-radius: @border-radius;
-                background: @light-v-accent;
-                border: 1px solid @border;
+                background: var(--v-light-accent);
+                border: 1px solid var(--border-color);
                 margin: 0.5rem 0;
                 padding: 0.4rem 0.8rem 0.4rem 0;
                 position: sticky;
@@ -151,7 +151,7 @@
 
                 &,
                 & * {
-                    color: @text-color-light;
+                    color: var(--text-color-light);
                 }
             }
 

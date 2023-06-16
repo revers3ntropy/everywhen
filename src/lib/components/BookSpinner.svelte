@@ -1,6 +1,6 @@
 <script lang="ts">
     export let scale = 1;
-    export let colour = '#fff';
+    export let color = 'var(--text-color)';
     export let duration = 5.1;
 
     // https://codepen.io/aaroniker/pen/zYOewEP
@@ -10,7 +10,7 @@
     class="spinner-container"
     style="
         scale: {scale};
-        --color: {colour};
+        --color: {color};
         --duration: {duration}s;
         display: none;
     "

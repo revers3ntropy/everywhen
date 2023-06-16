@@ -37,7 +37,7 @@ export class Backup {
         }[],
         public labels: {
             name: string;
-            colour: string;
+            color: string;
             created: number;
         }[],
         public assets: {
@@ -116,7 +116,7 @@ export class Backup {
                 })),
                 labels.map(label => ({
                     name: label.name,
-                    colour: label.colour,
+                    color: label.color,
                     created: label.created
                 })),
                 assets.map(asset => ({

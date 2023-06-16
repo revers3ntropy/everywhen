@@ -167,7 +167,7 @@
             left: 0;
             height: 25px;
             width: 25px;
-            background-color: @light-accent;
+            background-color: var(--light-accent);
             border-radius: @border-radius;
         }
 
@@ -184,15 +184,15 @@
         }
 
         &:hover input ~ .checkmark {
-            background-color: @border-heavy;
+            background-color: var(--border-heavy);
         }
 
         &:hover input:checked ~ .checkmark {
-            background: @accent-secondary;
+            background: var(--primary);
         }
 
         input:checked ~ .checkmark {
-            background: @accent-gradient;
+            background: var(--accent-gradient);
         }
 
         & .checkmark:after {
@@ -247,7 +247,7 @@
         & > * {
             padding: 0 1em;
             margin: 0.3em 0;
-            border-right: 1px solid @border;
+            border-right: 1px solid var(--border-color);
             text-align: center;
             display: grid;
             place-items: center;
@@ -276,10 +276,10 @@
         }
 
         .restore button {
-            color: @accent-primary;
+            color: var(--text-color-accent);
 
             &:hover {
-                color: @accent-secondary;
+                color: var(--primary);
             }
         }
     }

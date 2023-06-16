@@ -54,7 +54,7 @@
 
     async function makeLabelFromNameIfDoesntExist(
         name: string,
-        defaultColour: string
+        defaultColor: string
     ): Promise<string> {
         const { labels } = displayNotifOnErr(await api.get(auth, '/labels'));
         const label = labels.find(label => label.name === name);
@@ -64,7 +64,7 @@
         const res = displayNotifOnErr(
             await api.post(auth, '/labels', {
                 name,
-                colour: defaultColour
+                color: defaultColor
             })
         );
         return res.id;
@@ -78,11 +78,11 @@
         }
     }
 
-    async function goToEntryFormWithLabel(name: string, defaultColour: string) {
+    async function goToEntryFormWithLabel(name: string, defaultColor: string) {
         entryFormMode.set(EntryFormMode.Standard);
         const labelId = await makeLabelFromNameIfDoesntExist(
             name,
-            defaultColour
+            defaultColor
         );
         localStorage.setItem(LS_KEY.newEntryLabel, labelId);
         await gotoIfNotAt('/journal');
@@ -377,11 +377,6 @@
             justify-content: end;
         }
 
-        &.showing-dropdown {
-            box-shadow: 0 0 4px 4px black;
-            background: @header-bg;
-        }
-
         & > div {
             display: flex;
             align-items: center;
@@ -397,7 +392,7 @@
             height: 3px;
             position: fixed;
             top: 0;
-            background: @accent-secondary;
+            background: var(--primary);
             transition: width 12s cubic-bezier(0, 1, 0.5, 0.5);
             z-index: 10000;
 
@@ -417,13 +412,13 @@
 
         &.current {
             &:after {
-                background: @accent-secondary;
+                background: var(--primary);
             }
         }
     }
 
     .account-dropdown {
-        background: @light-accent;
+        background: var(--light-accent);
     }
 
     .account-button {
@@ -437,10 +432,10 @@
         border-radius: @border-radius;
         padding: 0.1rem 0.3rem;
         width: fit-content;
-        background: @header-bg;
+        background: var(--nav-bg);
 
         &:hover {
-            background-color: @light-accent;
+            background-color: var(--light-accent);
         }
 
         @media @mobile {
@@ -485,9 +480,9 @@
             justify-content: space-evenly;
             display: flex;
             flex-direction: row;
-            background: @header-bg;
+            background: var(--nav-bg);
             padding: 0.8rem 0;
-            border-top: 1px solid @border;
+            border-top: 1px solid var(--border-color);
         }
     }
 
@@ -498,7 +493,7 @@
             margin: 0;
             padding: 0.4em 0.8em 0.4em 0.4em;
             width: 100%;
-            color: @text-color;
+            color: var(--text-color);
             display: grid;
             grid-template-columns: 35px 1fr;
             align-items: center;
@@ -506,11 +501,11 @@
             text-align: left;
 
             &:hover {
-                background-color: @light-v-accent;
+                background-color: var(--v-light-accent);
 
                 :global(svg),
                 :global(svg *) {
-                    fill: @accent-secondary;
+                    fill: var(--primary);
                 }
             }
         }
@@ -518,7 +513,7 @@
         hr {
             margin: 10px 0;
             border: none;
-            border-bottom: 1px solid @bg;
+            border-bottom: 1px solid var(--bg);
         }
     }
 
@@ -531,7 +526,7 @@
             padding: 0;
             margin: 0 5px 0 2px;
             border-radius: 50%;
-            background: @light-accent;
+            background: var(--light-accent);
             width: 30px;
             height: 30px;
 
@@ -551,12 +546,12 @@
             margin: 0;
             border-radius: 0;
             text-align: left;
-            color: @text-color;
+            color: var(--text-color);
             transition: @transition;
         }
 
         .record-entry:hover {
-            background: @light-v-accent;
+            background: var(--v-light-accent);
 
             :global(svg),
             :global(svg *) {
@@ -565,7 +560,7 @@
         }
 
         .record-bullet:hover {
-            background: @light-v-accent;
+            background: var(--v-light-accent);
 
             :global(svg),
             :global(svg *) {
@@ -598,6 +593,10 @@
             :global(svg *) {
                 fill: url(#thought-gradient);
             }
+        }
+
+        .new-event:hover {
+            background: var(--v-light-accent);
         }
     }
 </style>

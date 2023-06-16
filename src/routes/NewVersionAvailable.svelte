@@ -27,8 +27,8 @@
 
         .inner {
             .flex-center();
-            background: @light-accent;
-            border: 1px solid @accent-secondary;
+            background: var(--light-accent);
+            border: 1px solid var(--primary);
             padding: 1rem;
             font-size: 1.05rem;
             border-radius: @border-radius;

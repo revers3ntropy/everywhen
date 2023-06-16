@@ -63,7 +63,7 @@
         top: 0;
         height: 100vh;
         width: 100%;
-        background-color: @light-v-accent;
+        background-color: var(--v-light-accent);
         overflow-y: scroll;
         padding: 0;
 
@@ -71,7 +71,7 @@
             // for the scroll bar
             border-radius: @border-radius 0 0 @border-radius;
             background: none;
-            border: 1px solid @border;
+            border: 1px solid var(--border-color);
         }
 
         @media @mobile {
@@ -81,7 +81,7 @@
             transform: translateX(-100%);
             &.showing {
                 transform: translateX(0);
-                border-right: 2px solid @border-heavy;
+                border-right: 2px solid var(--border-heavy);
             }
 
             position: fixed;

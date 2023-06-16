@@ -510,7 +510,7 @@
                 @media @mobile {
                     width: calc(100vw - 70px);
                     margin: 0.3em;
-                    border-bottom: 1px solid @border-light;
+                    border-bottom: 1px solid var(--border-light);
                 }
             }
         }
@@ -556,14 +556,14 @@
             outline: none;
             border: none;
             font-size: 20px;
-            background: @light-v-accent;
+            background: var(--v-light-accent);
             border-radius: @border-radius @border-radius 0 0;
-            border-bottom: 2px solid @bg;
+            border-bottom: 2px solid var(--bg);
             width: calc(100% - 1rem);
 
             @media @mobile {
                 background: transparent;
-                border-bottom: 1px solid @border;
+                border-bottom: 1px solid var(--border-color);
             }
         }
     }
@@ -584,7 +584,7 @@
             outline: none;
             border: none;
             font-size: 20px;
-            background: @light-v-accent;
+            background: var(--v-light-accent);
             border-radius: 0 0 @border-radius @border-radius;
 
             // fills page

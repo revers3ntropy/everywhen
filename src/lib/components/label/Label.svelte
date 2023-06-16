@@ -8,7 +8,7 @@
 
 {#if label}
     <a class="label" href="/labels/{label.id}">
-        <span class="colour" style="background: {label.colour}" />
+        <span class="color" style="background: {label.color}" />
         <span class="name {obfuscated ? 'obfuscated' : ''}">
             {label.name}
         </span>
@@ -37,19 +37,19 @@
             margin-left: 2px;
             max-width: 10rem;
             font-size: 14px;
-            color: @accent-primary;
+            color: var(--text-color-accent);
 
             &:hover {
-                color: @accent-secondary;
+                color: var(--primary);
             }
         }
 
-        .colour {
+        .color {
             margin: 1px;
             height: 18px;
             width: 18px;
             border-radius: 50%;
-            border: 1px solid @border;
+            border: 1px solid var(--border-color);
         }
     }
 </style>

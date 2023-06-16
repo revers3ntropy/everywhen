@@ -36,16 +36,16 @@
 
 <style lang="less">
     @import '../styles/variables';
-    @import '../styles/layout.less';
+    @import '../styles/layout';
 
     footer {
-        background-color: @header-bg;
+        background-color: var(--nav-bg);
         height: 200px;
         display: grid;
         grid-template-columns: 100%;
 
         padding: 5rem 0 0 0;
-        border-top: 1px solid @border;
+        border-top: 1px solid var(--border-color);
 
         div {
             .flex-center();
@@ -82,7 +82,7 @@
             &:hover {
                 :global(svg),
                 :global(svg *) {
-                    fill: @accent-secondary;
+                    fill: var(--primary);
                 }
             }
         }

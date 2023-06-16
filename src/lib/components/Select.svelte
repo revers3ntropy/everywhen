@@ -54,7 +54,7 @@
         flex-direction: column;
         padding: 0.5rem 0;
         border-radius: @border-radius;
-        background: @light-accent;
+        background: var(--light-accent);
         min-width: 100px;
 
         button.option {
@@ -64,7 +64,7 @@
             text-align: left;
 
             &:hover {
-                background-color: @light-v-accent;
+                background-color: var(--v-light-accent);
             }
         }
     }

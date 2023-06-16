@@ -27,7 +27,7 @@
     @import '../../styles/layout';
 
     div {
-        background: @light-accent;
+        background: var(--light-accent);
         padding: 0.3rem;
         border-radius: 0.5rem;
         margin: 0.5rem;
@@ -39,13 +39,13 @@
         }
 
         &.primary {
-            background: @accent-gradient;
-            color: @text-color-invert;
-            border: 1px solid @border-light;
+            background: var(--accent-gradient);
+            color: var(--text-color-invert);
+            border: 1px solid var(--border-light);
             .glow();
 
             span {
-                color: @text-color-invert;
+                color: var(--text-color-invert);
             }
         }
     }

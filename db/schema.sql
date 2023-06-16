@@ -74,7 +74,7 @@ CREATE TABLE labels
     id      char(128)    NOT NULL,
     user    char(128)    NOT NULL,
     name    varchar(256) NOT NULL,
-    colour  varchar(64)  NOT NULL,
+    color   varchar(64)  NOT NULL,
     created int(64)      NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB

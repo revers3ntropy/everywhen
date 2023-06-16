@@ -44,7 +44,7 @@
                 height,
                 {
                     radius: 2,
-                    colour: this.hovering
+                    color: this.hovering
                         ? 'rgb(100, 100, 100)'
                         : 'rgb(200, 200, 200)',
                     zIndex: this.hovering ? 1 : 0
@@ -58,7 +58,7 @@
                     WIDTH,
                     2,
                     {
-                        colour: label.colour
+                        color: label.color
                     }
                 );
             }
@@ -77,7 +77,7 @@
 
                 state.text(limitStrLen(title, 20), renderPos, y - 5, {
                     align: 'center',
-                    backgroundColour: this.hovering ? '#223' : undefined,
+                    backgroundColor: this.hovering ? '#223' : undefined,
                     fontSize: this.hovering ? 14 : 12,
                     backgroundPadding: 4,
                     backgroundRadius: 2

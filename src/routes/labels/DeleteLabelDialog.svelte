@@ -10,7 +10,7 @@
 
     export let auth: Auth;
     export let id: string;
-    export let colour: string;
+    export let color: string;
     export let name: string;
     export let reloadOnDelete = true;
 
@@ -136,7 +136,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid @border;
+            border: 1px solid var(--border-color);
             border-radius: @border-radius;
             padding: 0.6em;
             margin: 0.5em;
@@ -147,7 +147,7 @@
                 padding: 0.3rem;
 
                 &:hover {
-                    background: @accent-danger;
+                    background: var(--accent-danger);
                 }
             }
 
@@ -158,7 +158,7 @@
                     padding: 0.5rem;
 
                     &:hover {
-                        background: @light-accent;
+                        background: var(--light-accent);
                     }
                 }
             }

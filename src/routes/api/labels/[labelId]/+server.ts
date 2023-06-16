@@ -23,11 +23,11 @@ export const PUT = (async ({ cookies, request, params }) => {
         request,
         {
             name: 'string',
-            colour: 'string'
+            color: 'string'
         },
         {
             name: '',
-            colour: ''
+            color: ''
         }
     );
 
@@ -46,8 +46,8 @@ export const PUT = (async ({ cookies, request, params }) => {
         label = val;
     }
 
-    if (body.colour) {
-        const { err } = await Label.updateColour(query, label, body.colour);
+    if (body.color) {
+        const { err } = await Label.updateColor(query, label, body.color);
         if (err) throw error(400, err);
     }
 

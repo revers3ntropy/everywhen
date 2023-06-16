@@ -1,28 +1,7 @@
-@import 'variables.less';
+@import 'variables';
 
 * {
     box-sizing: border-box !important;
-}
-
-html, body {
-    width: 100%;
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    height: fit-content;
-    min-height: 100vh;
-    background: @bg;
-    overflow-x: hidden;
-}
-
-main:extend(#svelte) {
-    padding: 1.2rem;
-
-    @media @mobile {
-        padding: .2rem;
-    }
 }
 
 .flex-center {
@@ -48,7 +27,7 @@ main:extend(#svelte) {
 }
 
 .bordered {
-    border: 1px solid @border;
+    border: 1px solid var(--border-color);
     border-radius: @border-radius;
 }
 
@@ -60,7 +39,7 @@ main:extend(#svelte) {
     margin: 1em;
     padding: 0.3em 0;
     border-radius: @border-radius;
-    background: @light-v-accent;
+    background: var(--v-light-accent);
 
     @media @mobile {
         margin: 0.2em;
@@ -75,7 +54,7 @@ main:extend(#svelte) {
     &.flat {
         box-shadow: none;
         background: none;
-        border: 1px solid @border;
+        border: 1px solid var(--border-color);
     }
 
     &.shadowed {

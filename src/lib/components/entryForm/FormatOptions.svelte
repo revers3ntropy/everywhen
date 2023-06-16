@@ -109,7 +109,7 @@
 
         button {
             white-space: nowrap;
-            color: @text-color;
+            color: var(--text-color);
             padding: 0.4rem 1rem;
             margin: 0;
             width: 100%;
@@ -117,7 +117,7 @@
 
             &:hover,
             &:focus {
-                background: @light-v-accent;
+                background: var(--v-light-accent);
             }
         }
     }

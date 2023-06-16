@@ -3,7 +3,7 @@
 
 .popup-background.window {
     .container();
-    background: @bg !important;
+    background: var(--bg) !important;
     border-radius: @border-radius;
 
     @media @not-mobile {
@@ -14,11 +14,11 @@
 }
 
 .dropzone {
-    color: @text-color;
+    color: var(--text-color);
 }
 
 :root {
-    --tooltip-background-color: @light-accent !important;
+    --tooltip-background-color: var(--light-accent) !important;
     --tooltip-border-radius: 10px !important;
     --tooltip-box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5) !important;
     --tooltip-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell,
@@ -26,7 +26,7 @@
     --tooltip-font-size: 14px !important;
     --tooltip-font-weight: 500 !important;
     --tooltip-line-height: 1.25rem !important;
-    --tooltip-color: @text-color !important;
+    --tooltip-color: var(--text-color) !important;
     --tooltip-arrow-size: 10px !important;
 }
 

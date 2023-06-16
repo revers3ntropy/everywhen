@@ -1,0 +1,48 @@
+@import 'variables';
+
+:root {
+    --nav-height: @nav-height;
+
+    --primary: rgb(189 176 255);
+    --secondary: rgb(121 235 226);
+
+    --bg: rgb(25 32 35);
+    --nav-bg: var(--bg);
+
+    --accent-danger: rgb(255 120 120);
+    --accent-gradient: linear-gradient(140deg, var(--secondary), var(--primary));
+    --light-accent: rgb(72 76 80);
+    --v-light-accent: rgb(41 46 48);
+
+    --border-light: rgb(55 55 60);
+    --border-color: rgb(78 78 83);
+    --border-heavy: rgb(110 110 115);
+
+    --text-color: white;
+    --text-color-accent: var(--secondary);
+    --text-color-light: rgb(200 200 210);
+    --text-color-invert: black;
+    --text-color-danger: rgb(255 56 56);
+}
+
+[data-theme='light'] {
+    --bg: rgb(237 237 237);
+    --nav-bg: var(--bg);
+
+    --secondary: rgb(0 235 255);
+
+    --accent-danger: rgb(255 31 31);
+    --accent-gradient: linear-gradient(140deg, var(--secondary), var(--primary));
+    --light-accent: rgb(205 205 205);
+    --v-light-accent: rgb(225 225 225);
+
+    --border-light: rgb(223 223 223);
+    --border-color: rgb(198 198 198);
+    --border-heavy: rgb(143 143 143);
+
+    --text-color: rgba(10 10 10);
+    --text-color-accent: rgb(0, 149, 214);
+    --text-color-light: rgb(53 53 53);
+    --text-color-invert: white;
+    --text-color-danger: rgb(255 56 56);
+}

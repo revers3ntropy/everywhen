@@ -103,7 +103,7 @@
         align-items: center;
 
         font-size: 0.9rem;
-        color: @text-color-light;
+        color: var(--text-color-light);
 
         .multi-locations-container {
             display: flex;

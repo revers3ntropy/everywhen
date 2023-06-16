@@ -25,8 +25,8 @@ svg.gradient-icon * {
 
 .invert-icon {
     svg, svg * {
-        color: @text-color-invert;
-        fill: @text-color-invert;
+        color: var(--text-color-invert);
+        fill: var(--text-color-invert);
     }
 }
 
@@ -44,12 +44,12 @@ textarea {
     font-size: inherit;
     font-family: inherit;
     background: transparent;
-    border: 1px solid @border;
+    border: 1px solid var(--border-color);
     outline: none;
 }
 
 input {
-    border-bottom: 1px solid @border;
+    border-bottom: 1px solid var(--border-color);
     position: relative;
     display: inline-block;
     line-height: 1.2;
@@ -58,12 +58,11 @@ input {
     cursor: text;
 
     &:hover {
-        border-bottom-color: @accent-primary;
+        border-bottom-color: var(--secondary);
     }
 
     &:focus {
-        color: @text-color;
-        border-bottom-color: @accent-secondary;
+        color: var(--text-color);        border-bottom-color: var(--primary);
     }
 
     &[type='color'] {
@@ -81,24 +80,22 @@ input {
         text-decoration: none;
 
         &:focus {
-            color: @text-color;
-            border-bottom: 1px solid @accent-secondary;
+            color: var(--text-color);            border-bottom: 1px solid var(--primary);
         }
 
         &:hover {
-            border-bottom: 1px solid @accent-primary;
+            border-bottom: 1px solid var(--secondary);
         }
     }
 
     &.text-box {
-        border: 1px solid @border-heavy;
+        border: 1px solid var(--border-heavy);
         border-radius: 3px;
         padding: 0.5em;
         margin: 0.2em;
         outline: none;
         cursor: text;
-        color: @text-color;
-        background: @light-v-accent;
+        color: var(--text-color);        background: var(--v-light-accent);
     }
 }
 
@@ -108,13 +105,12 @@ input {
 }
 
 select {
-    border: 1px solid @border;
+    border: 1px solid var(--border-color);
     border-radius: 3px;
     padding: 0.5em;
     outline: none;
     cursor: pointer;
-    color: @text-color;
-    background: @light-accent;
+    color: var(--text-color);    background: var(--light-accent);
 
     * {
         color: black;
@@ -127,10 +123,10 @@ button {
         border-radius: @border-radius;
         padding: 0.4em 0.8em 0.4em 0.4em;
         margin: 0.5em;
-        background: @accent-gradient;
+        background: var(--accent-gradient);
 
         &, svg, * {
-            color: @text-color-invert !important;
+            color: var(--text-color-invert) !important;
         }
 
         &:hover {
@@ -173,18 +169,16 @@ button {
         svg {
             border-radius: 50%;
             padding: 0.3em;
-            background: @light-accent;
+            background: var(--light-accent);
             margin: 0 0.4em 0 0.2rem;
             width: fit-content;
         }
     }
 
     &.not-link {
-        color: @text-color;
-
+        color: var(--text-color);
         &:hover {
-            color: @text-color;
-            text-decoration: none;
+            color: var(--text-color);            text-decoration: none;
         }
     }
 
@@ -205,7 +199,7 @@ button {
         place-items: center;
 
         &:hover {
-            background: @light-accent;
+            background: var(--light-accent);
             .gradient-icon();
         }
     }
@@ -229,13 +223,13 @@ button {
 
     &:hover {
         border-style: double;
-        color: @text-color-light;
+        color: var(--text-color-light);
     }
 }
 
 .danger:hover {
     svg, svg * {
-        color: @accent-danger;
-        fill: @accent-danger !important;
+        color: var(--accent-danger);
+        fill: var(--accent-danger) !important;
     }
 }

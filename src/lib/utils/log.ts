@@ -45,13 +45,13 @@ function fmt(
 
 export function makeLogger<File extends string | null>(
     name: string,
-    colour: ChalkInstance = chalk.bold,
+    color: ChalkInstance = chalk.bold,
     file: File
 ): Logger<File> {
     if (name.length > maxLogNameLen) {
         maxLogNameLen = name.length;
     }
-    const colouredName = colour(name);
+    const coloredName = color(name);
 
     let fileHandle: FileHandle | null = null;
     const waitForFileHandle = file
@@ -73,13 +73,13 @@ export function makeLogger<File extends string | null>(
     }
     const self = {
         log: (...args: unknown[]) => {
-            console.log(fmt(false, name.length, colouredName, ...args));
+            console.log(fmt(false, name.length, coloredName, ...args));
         },
         warn: (...args: unknown[]) => {
-            console.warn(fmt(false, name.length, colouredName, ...args));
+            console.warn(fmt(false, name.length, coloredName, ...args));
         },
         error: (...args: unknown[]) => {
-            console.error(fmt(false, name.length, colouredName, ...args));
+            console.error(fmt(false, name.length, coloredName, ...args));
         },
         logToFile: (async (...args) => {
             self.log(...args);
