@@ -46,7 +46,7 @@ async function logReq(
     void reqLogger.logToFile(req.request.method, path);
 
     const auth = await tryGetAuthFromCookies(req.cookies);
-    const userId = (auth?.id || 0).toString();
+    const userId = (auth?.id || '').toString();
 
     await PageLoadLog.createLog(
         query.unlogged,
