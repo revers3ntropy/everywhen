@@ -169,6 +169,22 @@
             width: 25px;
             background-color: var(--light-accent);
             border-radius: @border-radius;
+
+            &:after {
+                margin: 1px;
+                content: '';
+                position: absolute;
+                display: none;
+                left: 9px;
+                top: 5px;
+                width: 5px;
+                height: 10px;
+                border: solid #000;
+                border-width: 0 3px 3px 0;
+                -webkit-transform: rotate(45deg);
+                -ms-transform: rotate(45deg);
+                transform: rotate(45deg);
+            }
         }
 
         input {
@@ -193,21 +209,6 @@
 
         input:checked ~ .checkmark {
             background: var(--accent-gradient);
-        }
-
-        & .checkmark:after {
-            content: '';
-            position: absolute;
-            display: none;
-            left: 9px;
-            top: 5px;
-            width: 5px;
-            height: 10px;
-            border: solid black;
-            border-width: 0 3px 3px 0;
-            -webkit-transform: rotate(45deg);
-            -ms-transform: rotate(45deg);
-            transform: rotate(45deg);
         }
 
         input:checked ~ .checkmark:after {
@@ -272,14 +273,18 @@
         }
 
         .last-updated {
-            font-size: 0.8rem;
+            font-size: 0.85rem;
         }
 
-        .restore button {
-            color: var(--text-color-accent);
+        .restore {
+            font-size: 0.85rem;
 
-            &:hover {
-                color: var(--primary);
+            button {
+                color: var(--text-color-accent);
+
+                &:hover {
+                    color: var(--primary);
+                }
             }
         }
     }
