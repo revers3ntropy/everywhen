@@ -5,7 +5,7 @@
 
 CREATE TABLE users
 (
-    id       char(128) NOT NULL,
+    id       char(128)    NOT NULL,
     username varchar(255) NOT NULL,
     password varchar(255) NOT NULL,
     salt     varchar(255) NOT NULL,
@@ -19,8 +19,8 @@ CREATE TABLE users
 
 CREATE TABLE entries
 (
-    id              char(128) NOT NULL,
-    user            char(128) NOT NULL,
+    id              char(128)    NOT NULL,
+    user            char(128)    NOT NULL,
     created         int(64)      NOT NULL,
     createdTZOffset double       NOT NULL,
     latitude        double       DEFAULT NULL,
@@ -38,8 +38,8 @@ CREATE TABLE entries
 
 CREATE TABLE entryEdits
 (
-    id              char(128) NOT NULL,
-    entryId         char(128) NOT NULL,
+    id              char(128)    NOT NULL,
+    entryId         char(128)    NOT NULL,
     created         int(64)      NOT NULL,
     createdTZOffset double       NOT NULL,
     latitude        double       DEFAULT NULL,
@@ -71,8 +71,8 @@ CREATE TABLE events
 
 CREATE TABLE labels
 (
-    id      char(128) NOT NULL,
-    user    char(128) NOT NULL,
+    id      char(128)    NOT NULL,
+    user    char(128)    NOT NULL,
     name    varchar(256) NOT NULL,
     colour  varchar(64)  NOT NULL,
     created int(64)      NOT NULL,
@@ -84,13 +84,13 @@ CREATE TABLE labels
 
 CREATE TABLE assets
 (
-    id          char(128) NOT NULL,
+    id          char(128)    NOT NULL,
     # publicId is unique per user and allows same
     # public id to be used for different users
     # (for instance when importing a backup into a different
     # account, which will duplicate IDs)
-    publicId    char(128) NOT NULL,
-    user        char(128) NOT NULL,
+    publicId    char(128)    NOT NULL,
+    user        char(128)    NOT NULL,
     created     int(64)      NOT NULL,
     fileName    varchar(256) NOT NULL,
     contentType varchar(128) NOT NULL,
@@ -103,10 +103,10 @@ CREATE TABLE assets
 
 CREATE TABLE settings
 (
-    id      char(128) NOT NULL,
-    user    char(128) NOT NULL,
+    id      char(128)    NOT NULL,
+    user    char(128)    NOT NULL,
     created int(64)      NOT NULL,
-    `key`     varchar(256) NOT NULL,
+    `key`   varchar(256) NOT NULL,
     value   longtext     NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
