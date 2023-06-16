@@ -41,6 +41,7 @@ export const bucketNames: Record<string, Bucket> = {
 };
 
 export function initialBucket(days: number): Bucket {
+    if (days < 2) return Bucket.Hour;
     if (days < 10) return Bucket.Day;
     if (days < 100) return Bucket.Week;
     if (days < 5000) return Bucket.Month;

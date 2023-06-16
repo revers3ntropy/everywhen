@@ -221,7 +221,7 @@
         {#if settings.passcode.value}
             <button
                 on:click={lock}
-                class="danger"
+                class="danger lock-button"
                 use:tooltip={{
                     content: '<span class="oneline">Require Passcode</span>',
                     position: 'bottom'
@@ -230,6 +230,18 @@
                 <Lock size="25" />
             </button>
         {/if}
+
+        <button
+            aria-label={$obfuscated ? 'Show all' : 'Hide all'}
+            on:click={() => obfuscated.set(!$obfuscated)}
+        >
+            {#if $obfuscated}
+                <Eye size="25" />
+            {:else}
+                <EyeOff size="25" />
+            {/if}
+        </button>
+
         <Dropdown openOnHover width="170px">
             <span class="create-button" slot="button">
                 <Plus size="25" />
@@ -284,17 +296,6 @@
                 </button>
             </div>
         </Dropdown>
-
-        <button
-            aria-label={$obfuscated ? 'Show all' : 'Hide all'}
-            on:click={() => obfuscated.set(!$obfuscated)}
-        >
-            {#if $obfuscated}
-                <Eye size="25" />
-            {:else}
-                <EyeOff size="25" />
-            {/if}
-        </button>
 
         <Dropdown fromRight width="200px">
             <span class="account-button" slot="button">
@@ -525,8 +526,10 @@
         gap: 0.5rem;
 
         .create-button {
-            .flex-center();
-
+            display: grid;
+            place-items: center;
+            padding: 0;
+            margin: 0 5px 0 2px;
             border-radius: 50%;
             background: @light-accent;
             width: 30px;

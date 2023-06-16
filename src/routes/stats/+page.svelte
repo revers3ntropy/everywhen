@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { ANIMATION_DURATION } from '$lib/constants';
     import { onMount } from 'svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
     import CommonWordsList from './CommonWordsList.svelte';
@@ -7,6 +8,7 @@
     import { By, type EntryWithWordCount } from './helpers';
     import SearchForWord from './SearchForWord.svelte';
     import StatPill from './StatPill.svelte';
+    import { fade } from 'svelte/transition';
 
     let by: By = By.Entries;
 
@@ -92,7 +94,14 @@
                 <EntryHeatMap {by} entries={data.entries} />
             </div>
             {#if data.entryCount > 4}
-                <div class="entry-bar-chart-wrapper">
+                <div
+                    class="entry-bar-chart-wrapper"
+                    in:fade={{
+                        // stop weird animation when changing buckets
+                        duration: ANIMATION_DURATION,
+                        delay: ANIMATION_DURATION
+                    }}
+                >
                     <EntryBarChart
                         {by}
                         entries={data.entries}

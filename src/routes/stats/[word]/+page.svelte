@@ -27,8 +27,9 @@
 <main>
     <div class="title-line">
         <div>
-            <a class="icon-button" href="/stats">
+            <a class="with-icon" href="/stats">
                 <ArrowLeft size="40" />
+                Analytics
             </a>
         </div>
         <div>
@@ -159,7 +160,7 @@
         }
 
         .entry-bar-chart-wrapper {
-            padding-bottom: 0;
+            padding: 5rem 0 0 0;
         }
     }
 

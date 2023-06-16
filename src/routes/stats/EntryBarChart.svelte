@@ -26,7 +26,6 @@
         CategoryScale,
         LinearScale
     } from 'chart.js';
-    import { fade } from 'svelte/transition';
 
     Chart.register(
         Title,
@@ -57,53 +56,45 @@
     data;
 </script>
 
-<div
-    in:fade={{
-        duration: ANIMATION_DURATION,
-        // stop weird animation when changing buckets
-        delay: 300
-    }}
->
-    <Bar
-        {data}
-        height="400"
-        width={browser ? document.body.clientWidth : 1000}
-        options={{
-            scales: {
-                y: {
-                    border: { display: false },
-                    ticks: { color: 'rgb(200 200 210)' },
-                    grid: { display: false }
-                },
-                x: {
-                    border: { color: 'rgb(78 78 83)' },
-                    ticks: { color: 'rgb(200 200 210)' },
-                    grid: { display: false }
-                }
+<Bar
+    {data}
+    height="400"
+    width={browser ? document.body.clientWidth : 1000}
+    options={{
+        scales: {
+            y: {
+                border: { display: false },
+                ticks: { color: 'rgb(200 200 210)' },
+                grid: { display: false }
+            },
+            x: {
+                border: { color: 'rgb(78 78 83)' },
+                ticks: { color: 'rgb(200 200 210)' },
+                grid: { display: false }
             }
-        }}
-    />
+        }
+    }}
+/>
 
-    <div class="options">
-        <div class="flex-center">
-            <span class="text-light" style="margin: 0.3rem">Group by</span>
-            <Select
-                bind:value={selectedBucket}
-                key={initialBucketName(days)}
-                options={bucketNames}
-            />
-        </div>
-        <div>
-            <button class="toggle-by-button" on:click={toggleBy}>
-                By Words
-                {#if by === By.Entries}
-                    <ToggleSwitch size="30" />
-                {:else}
-                    <ToggleSwitchOff size="30" />
-                {/if}
-                By Entries
-            </button>
-        </div>
+<div class="options">
+    <div class="flex-center">
+        <span class="text-light" style="margin: 0.3rem">Group by</span>
+        <Select
+            bind:value={selectedBucket}
+            key={initialBucketName(days)}
+            options={bucketNames}
+        />
+    </div>
+    <div>
+        <button class="toggle-by-button" on:click={toggleBy}>
+            By Words
+            {#if by === By.Entries}
+                <ToggleSwitch size="30" />
+            {:else}
+                <ToggleSwitchOff size="30" />
+            {/if}
+            By Entries
+        </button>
     </div>
 </div>
 

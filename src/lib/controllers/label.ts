@@ -26,6 +26,7 @@ export class Label {
         auth: Auth,
         id: string
     ): Promise<Result<Label>> {
+        console.trace();
         const res = await query<Required<Label>[]>`
             SELECT id, colour, name, created
             FROM labels

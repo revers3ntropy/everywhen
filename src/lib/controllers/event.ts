@@ -49,12 +49,20 @@ export class Event {
         query: QueryFunc,
         auth: Auth
     ): Promise<Result<Event[]>> {
+        const { err, val: labels } = await Label.all(query, auth);
+        if (err) return Result.err(err);
+
         const rawEvents = await Event.allRaw(query, auth);
 
         const events = [];
 
         for (const rawEvent of rawEvents) {
-            const { err, val } = await Event.fromRaw(query, auth, rawEvent);
+            const { err, val } = await Event.fromRaw(
+                query,
+                auth,
+                rawEvent,
+                labels
+            );
             if (err) return Result.err(err);
             events.push(val);
         }
@@ -88,7 +96,8 @@ export class Event {
     public static async fromRaw(
         query: QueryFunc,
         auth: Auth,
-        rawEvent: RawEvent
+        rawEvent: RawEvent,
+        labels?: Label[]
     ): Promise<Result<Event>> {
         const { err, val: nameDecrypted } = decrypt(rawEvent.name, auth.key);
         if (err) return Result.err(err);
@@ -102,13 +111,21 @@ export class Event {
         );
 
         if (rawEvent.label) {
-            const { err } = await Event.addLabel(
-                query,
-                auth,
-                event,
-                rawEvent.label
-            );
-            if (err) return Result.err(err);
+            if (labels) {
+                event.label = labels.find(l => l.id === rawEvent.label);
+            }
+            if (!event.label) {
+                const { err } = await Event.addLabel(
+                    query,
+                    auth,
+                    event,
+                    rawEvent.label
+                );
+                if (err) return Result.err(err);
+            }
+            if (!event.label) {
+                return Result.err('Label not found');
+            }
         }
 
         return Result.ok(event);
