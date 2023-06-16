@@ -1,3 +1,4 @@
+import { capitalise } from '$lib/utils/text';
 import {
     currentTzOffset,
     dayUtcFromTimestamp,
@@ -13,6 +14,9 @@ export interface ChartData {
     datasets: {
         data: number[];
         label: string;
+        backgroundColor?: string | string[];
+        borderWidth?: number;
+        borderColor?: string | string[];
     }[];
     labels: string[];
 }
@@ -57,15 +61,15 @@ const generateLabels: Record<
     [Bucket.Day]: generateLabelsDayAndWeek,
     [Bucket.Week]: generateLabelsDayAndWeek,
     [Bucket.Month]: (start: TimestampSecs, buckets: string[]): string[] => {
-        let year = parseInt(fmtUtc(start, currentTzOffset(), 'YYYY'));
-        return buckets.map(bucket => {
+        let year = parseInt(fmtUtc(start, currentTzOffset(), 'YY'));
+        return buckets.map((bucket, i) => {
             const bucketTime = parseInt(bucket);
             const thisYear = parseInt(
-                fmtUtc(bucketTime, currentTzOffset(), 'YYYY')
+                fmtUtc(bucketTime, currentTzOffset(), 'YY')
             );
-            if (thisYear !== year) {
+            if (thisYear !== year || i === 0) {
                 year = thisYear;
-                return fmtUtc(bucketTime, currentTzOffset(), 'MMM YYYY');
+                return fmtUtc(bucketTime, currentTzOffset(), `MMM 'YY`);
             }
             return fmtUtc(bucketTime, currentTzOffset(), 'MMM');
         });
@@ -73,7 +77,7 @@ const generateLabels: Record<
     [Bucket.Year]: (_start: TimestampSecs, buckets: string[]): string[] => {
         return buckets.map(k => fmtUtc(parseInt(k), currentTzOffset(), 'YYYY'));
     },
-    [Bucket.OperatingSystem]: () => osGroups as unknown as string[]
+    [Bucket.OperatingSystem]: () => osGroups.map(capitalise)
 };
 
 function datasetFactoryForStandardBuckets(
@@ -135,7 +139,7 @@ function datasetFactoryForStandardBuckets(
 
         if (isNaN(Object.values(buckets).reduce((a, b) => a + b, 0))) {
             console.log(buckets);
-            throw new Error('NaN in buckets');
+            console.error('NaN in buckets');
         }
 
         const lastBucket = Object.keys(buckets)
@@ -214,7 +218,8 @@ export function getGraphData(
         datasets: [
             {
                 data: Object.values(bucketsMap),
-                label: by === By.Entries ? 'Entries' : 'Words'
+                label: by === By.Entries ? 'Entries' : 'Words',
+                backgroundColor: 'rgba(189, 176, 255, 0.7)'
             }
         ]
     };

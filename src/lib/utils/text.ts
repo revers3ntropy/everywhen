@@ -75,3 +75,7 @@ export function removeAnsi(str: string): string {
         ''
     );
 }
+
+export function capitalise(str: string): string {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}

@@ -1,7 +1,8 @@
 <script lang="ts">
     import { browser } from '$app/environment';
-    import 'chart.js/auto';
+    import { ANIMATION_DURATION } from '$lib/constants';
     import { Bar } from 'svelte-chartjs';
+
     import ToggleSwitch from 'svelte-material-icons/ToggleSwitch.svelte';
     import ToggleSwitchOff from 'svelte-material-icons/ToggleSwitchOff.svelte';
     import Select from '$lib/components/Select.svelte';
@@ -16,6 +17,25 @@
         initialBucket,
         initialBucketName
     } from './helpers';
+    import {
+        Chart,
+        Title,
+        Tooltip,
+        Legend,
+        BarElement,
+        CategoryScale,
+        LinearScale
+    } from 'chart.js';
+    import { fade } from 'svelte/transition';
+
+    Chart.register(
+        Title,
+        Tooltip,
+        Legend,
+        BarElement,
+        CategoryScale,
+        LinearScale
+    );
 
     export let entries: EntryWithWordCount[];
     export let by: By;
@@ -33,29 +53,57 @@
     $: if (entries || by || selectedBucket) {
         data = getGraphData(entries, selectedBucket, by);
     }
+
+    data;
 </script>
 
-<Bar {data} height="400" width={browser ? document.body.clientWidth : 1000} />
+<div
+    in:fade={{
+        duration: ANIMATION_DURATION,
+        // stop weird animation when changing buckets
+        delay: 300
+    }}
+>
+    <Bar
+        {data}
+        height="400"
+        width={browser ? document.body.clientWidth : 1000}
+        options={{
+            scales: {
+                y: {
+                    border: { display: false },
+                    ticks: { color: 'rgb(200 200 210)' },
+                    grid: { display: false }
+                },
+                x: {
+                    border: { color: 'rgb(78 78 83)' },
+                    ticks: { color: 'rgb(200 200 210)' },
+                    grid: { display: false }
+                }
+            }
+        }}
+    />
 
-<div class="options">
-    <div class="flex-center">
-        <span class="text-light" style="margin: 0.3rem">Group by</span>
-        <Select
-            bind:value={selectedBucket}
-            key={initialBucketName(days)}
-            options={bucketNames}
-        />
-    </div>
-    <div>
-        <button class="toggle-by-button" on:click={toggleBy}>
-            By Words
-            {#if by === By.Entries}
-                <ToggleSwitch size="30" />
-            {:else}
-                <ToggleSwitchOff size="30" />
-            {/if}
-            By Entries
-        </button>
+    <div class="options">
+        <div class="flex-center">
+            <span class="text-light" style="margin: 0.3rem">Group by</span>
+            <Select
+                bind:value={selectedBucket}
+                key={initialBucketName(days)}
+                options={bucketNames}
+            />
+        </div>
+        <div>
+            <button class="toggle-by-button" on:click={toggleBy}>
+                By Words
+                {#if by === By.Entries}
+                    <ToggleSwitch size="30" />
+                {:else}
+                    <ToggleSwitchOff size="30" />
+                {/if}
+                By Entries
+            </button>
+        </div>
     </div>
 </div>
 

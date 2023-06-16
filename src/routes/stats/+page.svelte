@@ -167,7 +167,7 @@
         }
 
         .entry-bar-chart-wrapper {
-            padding-bottom: 0;
+            padding: 5rem 0;
         }
     }
 
