@@ -1,8 +1,7 @@
-import type { MaybePromise } from '$app/forms';
 import { ENABLE_CACHING } from '$lib/constants';
 import type { RequestEvent, ServerLoadEvent } from '@sveltejs/kit';
 import chalk from 'chalk';
-import type { Bytes, Seconds } from '../../app';
+import type { Bytes, MaybePromise, Seconds } from '../../app';
 import type { Auth } from '../controllers/user';
 import { getAuthFromCookies } from '../security/getAuthFromCookies';
 import type { GenericResponse } from './apiResponse';

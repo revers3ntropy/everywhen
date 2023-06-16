@@ -473,7 +473,6 @@
 
         & > div {
             width: min(100%, 700px);
-            max-width: 100%;
             min-width: 200px;
         }
 
@@ -484,7 +483,7 @@
 
     .head {
         margin: 0;
-        padding: 0 0.4em;
+        padding: 0;
         display: grid;
         grid-template-columns: 1fr 1fr;
 
@@ -559,7 +558,7 @@
             background: var(--v-light-accent);
             border-radius: @border-radius @border-radius 0 0;
             border-bottom: 2px solid var(--bg);
-            width: calc(100% - 1rem);
+            width: 100%;
 
             @media @mobile {
                 background: transparent;
@@ -571,6 +570,7 @@
     .entry-container {
         .flex-center();
         padding: 0 0 1rem 0;
+        width: 100%;
 
         @media @mobile {
             padding: 0;
@@ -580,7 +580,7 @@
             resize: both;
             padding: 1rem;
             margin: 0;
-            width: calc(100% - 1rem);
+            width: 100%;
             outline: none;
             border: none;
             font-size: 20px;
@@ -588,7 +588,7 @@
             border-radius: 0 0 @border-radius @border-radius;
 
             // fills page
-            height: calc(100vh - 12rem);
+            height: min(calc(100vh - 12rem), 600px);
 
             @media @mobile {
                 // annoying on mobile to resize horizontally

@@ -19,6 +19,8 @@ export type PickOptional<
     B extends keyof A = keyof A
 > = NonFunctionProperties<Omit<A, B> & Partial<Pick<A, B>>>;
 
+export type MaybePromise<T> = T | Promise<T>;
+
 export type Bytes = number;
 export type Pixels = number;
 export type Hours = number;

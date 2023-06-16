@@ -60,7 +60,9 @@
     <button
         on:click={disableLocation}
         use:tooltip={{
-            content: 'Location will be recorded. Click to turn off location',
+            content:
+                'Location will be recorded with entry. ' +
+                'Click to turn off location',
             position: tooltipPosition
         }}
         aria-label="Turn off Location"

@@ -37,7 +37,7 @@
         <div>
             <h3>
                 <button class="flex-center" on:click={toggleCollapse}>
-                    {#if collapsed}
+                    {#if $collapsed[day]}
                         <ChevronDown size="25" />
                     {:else}
                         <ChevronUp size="25" />
