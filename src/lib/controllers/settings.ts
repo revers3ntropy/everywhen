@@ -27,26 +27,26 @@ export class Settings<T = unknown> {
     public static config = {
         darkMode: {
             type: 'boolean',
-            defaultValue: true,
+            defaultValue: false as boolean,
             name: 'Dark Mode',
             description: 'Warning: Light mode is still under development'
         } satisfies ISettingsConfig<boolean>,
         hideEntriesByDefault: {
             type: 'boolean',
-            defaultValue: false,
+            defaultValue: false as boolean,
             name: 'Blur Entries By Default',
             description: 'Blur entries by default, and manually show them.'
         } satisfies ISettingsConfig<boolean>,
         showAgentWidgetOnEntries: {
             type: 'boolean',
-            defaultValue: false,
+            defaultValue: false as boolean,
             name: 'Show Device',
             description:
                 'Shows the operating system of the device the entry was submitted on.'
         } satisfies ISettingsConfig<boolean>,
         autoHideEntriesDelay: {
             type: 'number',
-            defaultValue: 0,
+            defaultValue: 0 as number,
             name: 'Auto Blur Entries After',
             description:
                 `Blur entries after 'N' seconds without user interaction. ` +
@@ -55,13 +55,13 @@ export class Settings<T = unknown> {
         } satisfies ISettingsConfig<Seconds>,
         passcode: {
             type: 'string',
-            defaultValue: '',
+            defaultValue: '' as string,
             name: 'Passcode',
             description: `Passcode to access the app. Leave blank to disable.`
         } satisfies ISettingsConfig<string>,
         passcodeTimeout: {
             type: 'number',
-            defaultValue: 0,
+            defaultValue: 0 as number,
             name: 'Passcode Timeout',
             description:
                 `Delay before passcode is required again. ` +
@@ -70,7 +70,7 @@ export class Settings<T = unknown> {
         } satisfies ISettingsConfig<Seconds>,
         yearOfBirth: {
             type: 'number',
-            defaultValue: 2000,
+            defaultValue: 2000 as number,
             name: 'Year of Birth',
             description: `The first year in which you lived. Used by the timeline.`
         } satisfies ISettingsConfig<number>

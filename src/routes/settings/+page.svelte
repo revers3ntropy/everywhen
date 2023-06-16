@@ -83,14 +83,14 @@
         </div>
     </section>
     <section>
-        <i
-            >Please note you will have to reload the page for changes to take
-            effect</i
-        >
         <h1>
             <Cog size="40" />
             <span>General Settings</span>
         </h1>
+        <i>
+            Please note you will have to reload the page for changes to take
+            effect
+        </i>
         {#each Object.entries(SettingsController.config) as [key, config] (key)}
             <Settings {...config} {...data.settings[key]} auth={data} />
         {/each}

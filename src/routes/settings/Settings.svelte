@@ -111,7 +111,9 @@
                 </p>
             {/if}
         </div>
-        {description}
+        <p class="description">
+            {description}
+        </p>
     </div>
     <div class="right">
         <label class="label-for-{inputType}">
@@ -287,5 +289,10 @@
                 }
             }
         }
+    }
+
+    .description {
+        color: var(--text-color-light);
+        margin: 10px 0;
     }
 </style>

@@ -111,7 +111,7 @@
         left: 0;
         width: 100vw;
         height: 100vh;
-        background-color: rgba(0, 0, 0, 0.3);
+        background-color: var(--blur-bg-color);
         z-index: 1500;
         margin: 0;
         padding: 0;
@@ -126,7 +126,8 @@
         }
 
         .content {
-            background: rgba(20, 20, 20, 0.5);
+            .container-shadow();
+            background: var(--transluscent-bg);
             backdrop-filter: blur(30px);
             padding: 2rem 3rem 3rem 3rem;
             border-radius: @border-radius;

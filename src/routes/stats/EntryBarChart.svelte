@@ -1,7 +1,15 @@
 <script lang="ts">
     import { browser } from '$app/environment';
+    import {
+        Chart,
+        Title,
+        Tooltip,
+        Legend,
+        BarElement,
+        CategoryScale,
+        LinearScale
+    } from 'chart.js';
     import { Bar } from 'svelte-chartjs';
-
     import ToggleSwitch from 'svelte-material-icons/ToggleSwitch.svelte';
     import ToggleSwitchOff from 'svelte-material-icons/ToggleSwitchOff.svelte';
     import Select from '$lib/components/Select.svelte';
@@ -16,15 +24,6 @@
         initialBucket,
         initialBucketName
     } from './helpers';
-    import {
-        Chart,
-        Title,
-        Tooltip,
-        Legend,
-        BarElement,
-        CategoryScale,
-        LinearScale
-    } from 'chart.js';
 
     Chart.register(
         Title,
@@ -51,6 +50,12 @@
     $: if (entries || by || selectedBucket) {
         data = getGraphData(entries, selectedBucket, by);
     }
+
+    $: axisLabelTextColor = browser
+        ? getComputedStyle(
+              document.querySelector('.root') as Element
+          ).getPropertyValue('--text-color-light')
+        : '';
 </script>
 
 <Bar
@@ -61,12 +66,12 @@
         scales: {
             y: {
                 border: { display: false },
-                ticks: { color: 'rgb(200 200 210)' },
+                ticks: { color: axisLabelTextColor },
                 grid: { display: false }
             },
             x: {
                 border: { color: 'rgb(78 78 83)' },
-                ticks: { color: 'rgb(200 200 210)' },
+                ticks: { color: axisLabelTextColor },
                 grid: { display: false }
             }
         }

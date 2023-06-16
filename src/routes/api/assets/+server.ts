@@ -34,7 +34,15 @@ export const POST = (async ({ request, cookies }) => {
     const fileExt = body.fileName.split('.').pop();
     if (!fileExt) throw error(400, 'No file extension provided');
 
-    const img = await Asset.base64ToWebP(body.content, fileExt, IMG_QUALITY);
+    let img;
+    if (fileExt.toLowerCase() === 'webp') {
+        img = body.content.replace(
+            /^data:image\/((jpeg)|(jpg)|(png)|(webp));base64,/,
+            ''
+        );
+    } else {
+        img = await Asset.base64ToWebP(body.content, fileExt, IMG_QUALITY);
+    }
 
     const { err, val: id } = await Asset.create(
         query,

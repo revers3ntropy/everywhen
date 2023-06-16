@@ -2,12 +2,42 @@
 
 :root {
     --nav-height: @nav-height;
+}
 
-    --primary: rgb(189 176 255);
+[data-theme='light'], :root {
+    --primary: rgb(153, 131, 255);
+    --secondary: rgb(0 235 255);
+
+    --bg: rgb(237, 237, 237);
+    --nav-bg: var(--bg);
+    --blur-bg-color: rgba(255, 255, 255, 0.2);
+    --transluscent-bg: rgba(200, 200, 200, 0.85);
+
+    --accent-danger: rgb(255 31 31);
+    --accent-gradient: linear-gradient(140deg, var(--secondary), var(--primary));
+    --light-accent: rgb(205 205 205);
+    --v-light-accent: rgb(225 225 225);
+
+    --border-light: rgb(223 223 223);
+    --border-color: rgb(198 198 198);
+    --border-heavy: rgb(143 143 143);
+
+    --text-color: rgba(10 10 10);
+    --text-color-accent: rgb(79, 40, 161);
+    --text-color-light: rgb(65 65 65);
+    --text-colour-on-primary-buttons: black;
+    --text-color-invert: white;
+    --text-color-danger: rgb(255 56 56);
+}
+
+[data-theme='dark'] {
+    --primary: rgb(187, 173, 255);
     --secondary: rgb(121 235 226);
 
     --bg: rgb(25 32 35);
     --nav-bg: var(--bg);
+    --blur-bg-color: rgba(0, 0, 0, 0.3);
+    --transluscent-bg: rgba(20, 20, 20, 0.5);
 
     --accent-danger: rgb(255 120 120);
     --accent-gradient: linear-gradient(140deg, var(--secondary), var(--primary));
@@ -21,28 +51,7 @@
     --text-color: white;
     --text-color-accent: var(--secondary);
     --text-color-light: rgb(200 200 210);
+    --text-colour-on-primary-buttons: black;
     --text-color-invert: black;
-    --text-color-danger: rgb(255 56 56);
-}
-
-[data-theme='light'] {
-    --bg: rgb(237 237 237);
-    --nav-bg: var(--bg);
-
-    --secondary: rgb(0 235 255);
-
-    --accent-danger: rgb(255 31 31);
-    --accent-gradient: linear-gradient(140deg, var(--secondary), var(--primary));
-    --light-accent: rgb(205 205 205);
-    --v-light-accent: rgb(225 225 225);
-
-    --border-light: rgb(223 223 223);
-    --border-color: rgb(198 198 198);
-    --border-heavy: rgb(143 143 143);
-
-    --text-color: rgba(10 10 10);
-    --text-color-accent: rgb(0, 149, 214);
-    --text-color-light: rgb(53 53 53);
-    --text-color-invert: white;
     --text-color-danger: rgb(255 56 56);
 }

@@ -14,7 +14,8 @@ export class Asset {
     > = Object.freeze({
         png: 'image/png',
         jpg: 'image/jpeg',
-        jpeg: 'image/jpeg'
+        jpeg: 'image/jpeg',
+        webp: 'image/webp'
     });
 
     public constructor(

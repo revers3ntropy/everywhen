@@ -153,7 +153,7 @@
             height: 50px;
             border-radius: 5px;
             padding: 5px;
-            background: rgba(0, 0, 0, 0.7);
+            background: var(--transluscent-bg);
             display: flex;
             justify-content: space-between;
             align-items: center;
