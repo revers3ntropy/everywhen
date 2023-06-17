@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Dot from '$lib/components/Dot.svelte';
     import { tooltip } from '@svelte-plugins/tooltips';
     import CloudCheckOutline from 'svelte-material-icons/CloudCheckOutline.svelte';
     import Sync from 'svelte-material-icons/Sync.svelte';
@@ -98,16 +99,22 @@
                         )
                     }}
                 >
-                    Last updated
-                    {fmtDuration(nowUtc() - created)}
-                    ago
+                    <span>
+                        <Dot light />
+                        Last updated
+                        {fmtDuration(nowUtc() - created)}
+                        ago
+                    </span>
                 </p>
             {/if}
             {#if value !== defaultValue}
                 <p class="restore hide-mobile">
-                    <button on:click={() => updateValue(defaultValue)}>
-                        Restore default ({JSON.stringify(defaultValue)})
-                    </button>
+                    <span>
+                        <Dot light />
+                        <button on:click={() => updateValue(defaultValue)}>
+                            Restore default ({JSON.stringify(defaultValue)})
+                        </button>
+                    </span>
                 </p>
             {/if}
         </div>
@@ -248,9 +255,8 @@
         }
 
         & > * {
-            padding: 0 1em;
+            padding: 0 0.2rem;
             margin: 0.3em 0;
-            border-right: 1px solid var(--border-color);
             text-align: center;
             display: grid;
             place-items: center;

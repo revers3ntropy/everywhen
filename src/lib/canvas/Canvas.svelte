@@ -192,8 +192,10 @@
 
 <style lang="less">
     @import '../../styles/variables';
+    @import '../../styles/layout';
 
     .context-menu {
+        .container-shadow();
         position: absolute;
         top: 0;
         left: 0;
@@ -202,10 +204,10 @@
         border-radius: @border-radius;
         z-index: 10;
         background: var(--light-accent);
+        padding: 1rem 0;
 
         .context-menu-item {
-            padding: 0.2rem;
-            border-radius: @border-radius;
+            padding: 6px;
 
             button {
                 color: var(--text-color);

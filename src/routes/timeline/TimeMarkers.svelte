@@ -10,14 +10,6 @@
 
     const showYears = 200;
 
-    const colors = {
-        year: 'rgba(255, 255, 255, 0.5)',
-        month: '#fff',
-        week: '#aaa',
-        day: '#666',
-        hour: '#444'
-    };
-
     $: if (startYear + showYears < new Date().getFullYear()) {
         if (browser) alert(`Born in ${startYear}?? You are old!`);
         startYear = new Date().getFullYear() - showYears;
@@ -46,7 +38,7 @@
             // -1 to center, as has width 3
             state.rect(renderPos - 1, 0, 3, state.height, {
                 radius: 0,
-                color: colors.year
+                color: state.colors.text
             });
 
             if (showYearText) {
@@ -83,7 +75,7 @@
             if (renderPos > state.width) break;
 
             state.rect(renderPos, 0, 1, state.height, {
-                color: colors.month
+                color: state.colors.text
             });
 
             if (showMonthText) {
@@ -151,7 +143,9 @@
 
             if (shouldShow) {
                 state.rect(renderPos, 0, 1, state.height, {
-                    color: isMonday ? colors.week : colors.day
+                    color: isMonday
+                        ? state.colors.primary
+                        : state.colors.lightAccent
                 });
             }
 
@@ -230,7 +224,7 @@
             if (renderPos > state.width) break;
 
             state.rect(renderPos, 0, 1, state.height, {
-                color: colors.hour
+                color: state.colors.vLightAccent
             });
 
             if (showHourText) {

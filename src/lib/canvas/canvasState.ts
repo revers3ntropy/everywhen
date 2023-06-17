@@ -10,17 +10,17 @@ export const START_ZOOM = 1 / (60 * 60);
 interface Colors {
     primary: string;
     text: string;
-    accentPrimary: string;
-    accentSecondary: string;
+    accent: string;
     lightAccent: string;
+    vLightAccent: string;
 }
 
 const EMPTY_COLORS: Colors = {
     primary: '',
     text: '',
-    accentPrimary: '',
-    accentSecondary: '',
-    lightAccent: ''
+    accent: '',
+    lightAccent: '',
+    vLightAccent: ''
 };
 
 type CanvasListener<T = MouseEvent & TouchEvent & WheelEvent> = (
@@ -193,13 +193,16 @@ export class CanvasState implements CanvasListeners {
     }
 
     private updateColors() {
+        // because the instance is initialised on the server,
+        // we need to update the color pallet once the canvas is mounted
+
         if (this.canvas && browser) {
             this.colors = {
                 primary: cssVar(this.canvas, '--light-accent'),
                 text: cssVar(this.canvas, '--text-color'),
-                accentPrimary: cssVar(this.canvas, '--secondary'),
-                accentSecondary: cssVar(this.canvas, '--primary'),
-                lightAccent: cssVar(this.canvas, '--light-accent')
+                accent: cssVar(this.canvas, '--timeline-accent'),
+                lightAccent: cssVar(this.canvas, '--border-light'),
+                vLightAccent: cssVar(this.canvas, '--v-light-accent')
             };
         } else {
             this.colors = EMPTY_COLORS;

@@ -47,14 +47,14 @@
                 fmtUtc(time, currentTzOffset(), 'ddd DD MMM YYYY'),
                 state.timeToRenderPos(time),
                 state.centerLnY() - 32,
-                { color: state.colors.accentPrimary }
+                { color: state.colors.accent }
             );
             if (state.zoom > START_ZOOM) {
                 state.text(
                     fmtUtc(time, currentTzOffset(), 'hh:mma'),
                     state.timeToRenderPos(time),
                     state.centerLnY() - 44,
-                    { color: state.colors.accentPrimary }
+                    { color: state.colors.accent }
                 );
             }
 
@@ -65,7 +65,7 @@
                 1,
                 40,
                 {
-                    color: state.colors.accentPrimary
+                    color: state.colors.accent
                 }
             );
         },

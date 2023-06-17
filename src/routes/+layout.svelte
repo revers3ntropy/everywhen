@@ -255,5 +255,9 @@
     .page-content {
         min-height: calc(100vh - var(--nav-height));
         padding: 0 1rem 4rem 1rem;
+
+        @media @mobile {
+            padding: 0 5px 200px 5px;
+        }
     }
 </style>

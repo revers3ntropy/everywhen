@@ -1,18 +1,20 @@
 import type { Bytes, Milliseconds, Pixels, Seconds } from '../app';
 
 export const COOKIE_TIMEOUT: Seconds = 60 * 60;
-export const KEY_COOKIE_KEY = '__misc_3_key_v2';
-export const USERNAME_COOKIE_KEY = '__misc_3_username_v2';
 
-const LS_PREFIX = '__misc_3_';
+export const KEY_PREFIX = '__misc_3_';
+
+export const KEY_COOKIE_KEY = `${KEY_PREFIX}key_v2`;
+export const USERNAME_COOKIE_KEY = `${KEY_PREFIX}username_v2`;
+
 export const LS_KEY = {
-    newEntryBody: `${LS_PREFIX}new_entry_body`,
-    newEntryTitle: `${LS_PREFIX}new_entry_title`,
-    newEntryLabel: `${LS_PREFIX}new_entry_label`,
-    passcodeLastEntered: `${LS_PREFIX}passcode_last_entered`,
-    enabledLocation: `${LS_PREFIX}enabled_location`,
-    sortEventsKey: `${LS_PREFIX}events_sort_key`,
-    journalingMode: `${LS_PREFIX}journaling_mode`
+    newEntryBody: `${KEY_PREFIX}new_entry_body`,
+    newEntryTitle: `${KEY_PREFIX}new_entry_title`,
+    newEntryLabel: `${KEY_PREFIX}new_entry_label`,
+    passcodeLastEntered: `${KEY_PREFIX}passcode_last_entered`,
+    enabledLocation: `${KEY_PREFIX}enabled_location`,
+    sortEventsKey: `${KEY_PREFIX}events_sort_key`,
+    journalingMode: `${KEY_PREFIX}journaling_mode`
 };
 
 // possible characters to show when the text is blurred

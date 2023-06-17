@@ -41,7 +41,7 @@
 
     $: duration = end - start;
     $: isInstantEvent = duration < 60;
-    $: color = label?.color || $canvasState.colors.primary;
+    $: labelColor = label?.color || $canvasState.colors.primary;
 
     function yRenderPos(centerLineY: number) {
         const y = isInstantEvent ? 0 : yLevel;
@@ -64,29 +64,37 @@
                         y + HEIGHT,
                         SINGLE_EVENT_CIRCLE_RADIUS + 1,
                         {
-                            color: 'white'
+                            color: state.colors.text
                         }
                     );
                 }
                 state.circle(x, y + HEIGHT, SINGLE_EVENT_CIRCLE_RADIUS, {
-                    color
+                    color: labelColor
                 });
                 const h = state.centerLnY() - (y + HEIGHT);
                 state.rect(x, y + HEIGHT, 1, h, {
                     radius: 0,
-                    color
+                    color: labelColor
                 });
             } else {
                 state.rect(x, y, width, HEIGHT, {
-                    color: this.hovering ? '#222326' : '#252A35',
+                    color: this.hovering
+                        ? state.colors.lightAccent
+                        : state.colors.primary,
                     radius: 5
                 });
-                state.rect(x, y + HEIGHT - LABEL_HEIGHT, width, LABEL_HEIGHT, {
-                    color
-                });
+                if (label) {
+                    state.rect(
+                        x,
+                        y + HEIGHT - LABEL_HEIGHT,
+                        width,
+                        LABEL_HEIGHT,
+                        {
+                            color: labelColor
+                        }
+                    );
+                }
             }
-
-            let textColor = '#fff';
 
             if (x + width <= 0) {
                 // not on screen
@@ -104,7 +112,6 @@
                     ),
                     y + DURATION_TEXT_Y_OFFSET,
                     {
-                        color: textColor,
                         fontSize: 14
                     }
                 );
@@ -120,7 +127,9 @@
                         (eventTextParityHeight ? HEIGHT / 2 + 15 : -5),
                     {
                         align: 'center',
-                        backgroundColor: this.hovering ? '#223' : undefined,
+                        backgroundColor: this.hovering
+                            ? state.colors.primary
+                            : undefined,
                         fontSize: this.hovering ? 14 : 12,
                         backgroundPadding: 4,
                         backgroundRadius: 2

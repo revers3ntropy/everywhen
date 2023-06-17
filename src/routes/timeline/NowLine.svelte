@@ -14,12 +14,12 @@
             }
 
             state.rect(nowLinePos, 0, 1, state.height, {
-                color: state.colors.accentPrimary
+                color: state.colors.accent
             });
 
             if (this.hovering) {
-                state.text('now', nowLinePos - 40, state.mouseY, {
-                    color: '#79ebe2',
+                state.text('now', nowLinePos - 35, state.mouseY, {
+                    color: state.colors.accent,
                     fontSize: 14
                 });
             }

@@ -78,13 +78,18 @@ input {
         display: inline-block;
         line-height: 1.2;
         text-decoration: none;
-
-        &:focus {
-            color: var(--text-color);            border-bottom: 1px solid var(--primary);
-        }
+        padding: 0.25rem;
+        margin: 0 0.25rem 0 0;
 
         &:hover {
-            border-bottom: 1px solid var(--secondary);
+            border-bottom: 1px solid var(--primary);
+        }
+
+        &:focus {
+            color: var(--text-color);
+            border-bottom: 1px solid transparent;
+            background: var(--v-light-accent);
+            border-radius: @border-radius;
         }
     }
 
@@ -95,7 +100,8 @@ input {
         margin: 0.2em;
         outline: none;
         cursor: text;
-        color: var(--text-color);        background: var(--v-light-accent);
+        color: var(--text-color);
+        background: var(--v-light-accent);
     }
 }
 

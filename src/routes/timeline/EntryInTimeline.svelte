@@ -29,7 +29,7 @@
     export let longitude = null as number | null;
     export let hideAgentWidget: boolean;
 
-    const height = 0.1 * wordCount + 20;
+    const height = 0.2 * wordCount + 20;
 
     interactable({
         cursorOnHover: 'pointer',
@@ -65,7 +65,8 @@
 
             if (
                 (this.hovering || state.zoom > START_ZOOM * 2) &&
-                !$obfuscated
+                !$obfuscated &&
+                title
             ) {
                 let y = state.centerLnY();
 
@@ -77,7 +78,9 @@
 
                 state.text(limitStrLen(title, 20), renderPos, y - 5, {
                     align: 'center',
-                    backgroundColor: this.hovering ? '#223' : undefined,
+                    backgroundColor: this.hovering
+                        ? state.colors.primary
+                        : undefined,
                     fontSize: this.hovering ? 14 : 12,
                     backgroundPadding: 4,
                     backgroundRadius: 2

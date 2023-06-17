@@ -87,13 +87,18 @@
             <Cog size="40" />
             <span>General Settings</span>
         </h1>
-        <i>
-            Please note you will have to reload the page for changes to take
-            effect
-        </i>
-        {#each Object.entries(SettingsController.config) as [key, config] (key)}
-            <Settings {...config} {...data.settings[key]} auth={data} />
-        {/each}
+        <div style="padding: 1rem 0 2rem 0">
+            <i>
+                Please note you will have to reload the page for changes to take
+                effect
+            </i>
+        </div>
+
+        <div class="settings">
+            {#each Object.entries(SettingsController.config) as [key, config] (key)}
+                <Settings {...config} {...data.settings[key]} auth={data} />
+            {/each}
+        </div>
     </section>
 </main>
 
@@ -154,6 +159,20 @@
                     background: var(--v-light-accent);
                 }
             }
+        }
+    }
+
+    .settings {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+
+        @media @large {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        @media @mobile {
+            gap: 3rem;
         }
     }
 </style>
