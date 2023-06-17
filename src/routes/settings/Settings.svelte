@@ -78,7 +78,7 @@
     <div class="left">
         <div class="header">
             <div>
-                <h3>
+                <h3 class="oneline">
                     {#if saving}
                         <Sync size={20} class="gradient-icon" />
                     {:else}
@@ -99,7 +99,7 @@
                         )
                     }}
                 >
-                    <span>
+                    <span class="oneline">
                         <Dot light />
                         Last updated
                         {fmtDuration(nowUtc() - created)}
@@ -109,7 +109,7 @@
             {/if}
             {#if value !== defaultValue}
                 <p class="restore hide-mobile">
-                    <span>
+                    <span class="oneline">
                         <Dot light />
                         <button on:click={() => updateValue(defaultValue)}>
                             Restore default ({JSON.stringify(defaultValue)})

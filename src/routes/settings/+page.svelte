@@ -166,10 +166,7 @@
         display: grid;
         grid-template-columns: 1fr;
         gap: 1rem;
-
-        @media @large {
-            grid-template-columns: 1fr 1fr;
-        }
+        max-width: 1200px;
 
         @media @mobile {
             gap: 3rem;

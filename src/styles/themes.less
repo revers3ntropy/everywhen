@@ -32,27 +32,27 @@
     --timeline-accent: rgb(79, 40, 161);
 }
 
-[data-theme='dark'] {
+[data-theme='dark'], :has(.root[data-theme='dark']) {
     --primary: rgb(187, 173, 255);
     --secondary: rgb(121 235 226);
 
-    --bg: rgb(25 32 35);
+    --bg: rgb(30, 30, 30);
     --nav-bg: var(--bg);
     --blur-bg-color: rgba(0, 0, 0, 0.3);
     --transluscent-bg: rgba(20, 20, 20, 0.5);
 
     --accent-danger: rgb(255 120 120);
     --accent-gradient: linear-gradient(140deg, var(--secondary), var(--primary));
-    --light-accent: rgb(72 76 80);
-    --v-light-accent: rgb(41 46 48);
+    --light-accent: rgb(76 76 76);
+    --v-light-accent: rgb(46 46 46);
 
-    --border-light: rgb(55 55 60);
-    --border-color: rgb(78 78 83);
-    --border-heavy: rgb(110 110 115);
+    --border-light: rgb(55 55 55);
+    --border-color: rgb(78 78 78);
+    --border-heavy: rgb(110 110 110);
 
     --text-color: white;
     --text-color-accent: var(--secondary);
-    --text-color-light: rgb(200 200 210);
+    --text-color-light: rgb(200 200 200);
     --text-colour-on-primary-buttons: black;
     --text-color-invert: black;
     --text-color-danger: rgb(255 56 56);

@@ -56,13 +56,17 @@ input {
     text-decoration: none;
     outline: none;
     cursor: text;
+    padding: 0.25rem;
 
     &:hover {
-        border-bottom-color: var(--secondary);
+        border-bottom-color: var(--primary);
     }
 
     &:focus {
-        color: var(--text-color);        border-bottom-color: var(--primary);
+        border-radius: @border-radius;
+        color: var(--text-color);
+        background: var(--v-light-accent);
+        border-bottom-color: transparent;
     }
 
     &[type='color'] {
