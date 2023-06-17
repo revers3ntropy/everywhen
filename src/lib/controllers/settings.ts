@@ -29,7 +29,7 @@ export class Settings<T = unknown> {
             type: 'boolean',
             defaultValue: false as boolean,
             name: 'Dark Mode',
-            description: 'Warning: Light mode is still under development'
+            description: 'Use a darker theme.'
         } satisfies ISettingsConfig<boolean>,
         hideEntriesByDefault: {
             type: 'boolean',
