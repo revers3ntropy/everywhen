@@ -1,7 +1,7 @@
 <script lang="ts">
     import { browser } from '$app/environment';
     import Dropdown from '$lib/components/Dropdown.svelte';
-    import { createEventDispatcher } from 'svelte';
+    import { dispatch } from '$lib/dataChangeEvents';
     import Bin from 'svelte-material-icons/Delete.svelte';
     import Restore from 'svelte-material-icons/DeleteRestore.svelte';
     import Eye from 'svelte-material-icons/Eye.svelte';
@@ -25,8 +25,6 @@
     import Dot from '../Dot.svelte';
     import Label from '$lib/components/label/Label.svelte';
     import LocationWidget from './LocationWidget.svelte';
-
-    const dispatch = createEventDispatcher();
 
     export let id = '';
     export let title = '';
@@ -84,7 +82,7 @@
         if (isInDialog) popup.set(null);
 
         notify.success(`Entry ${deleted ? 'restored' : 'deleted'}`);
-        dispatch('updated');
+        await dispatch.delete('entry', id);
     }
 
     function toggleObfuscation() {

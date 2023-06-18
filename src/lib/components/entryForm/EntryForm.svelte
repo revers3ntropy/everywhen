@@ -2,6 +2,7 @@
     import { browser } from '$app/environment';
     import { beforeNavigate, goto } from '$app/navigation';
     import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
+    import { dispatch } from '$lib/dataChangeEvents.js';
     import { serializedAgentData } from '$lib/utils/userAgent';
     import { tooltip } from '@svelte-plugins/tooltips';
     import { filedrop, type Files } from 'filedrop-svelte';
@@ -16,7 +17,7 @@
     import type { Entry, RawEntry } from '$lib/controllers/entry';
     import { Label } from '$lib/controllers/label';
     import type { Auth } from '$lib/controllers/user';
-    import { addEntryListeners, enabledLocation } from '$lib/stores.js';
+    import { enabledLocation } from '$lib/stores.js';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { getFileContents } from '$lib/utils/files';
     import { getLocation } from '$lib/utils/geolocation';
@@ -180,7 +181,10 @@
             entry.label = label;
         }
 
-        $addEntryListeners.map(e => e(entry, EntryFormMode.Standard));
+        await dispatch.create('entry', {
+            entry,
+            entryMode: EntryFormMode.Standard
+        });
     }
 
     async function onEntryEdit(body: RawEntry) {

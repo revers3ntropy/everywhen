@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { listen } from '$lib/dataChangeEvents';
     import { errorLogger } from '$lib/utils/log';
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
     import { tooltip } from '@svelte-plugins/tooltips';
@@ -7,7 +8,6 @@
     import TimerSand from 'svelte-material-icons/TimerSand.svelte';
     import type { Streaks } from '../controllers/entry';
     import type { Auth } from '../controllers/user';
-    import { addEntryListeners } from '../stores';
     import { api } from '../utils/apiRequest';
 
     export let auth: Auth;
@@ -34,11 +34,11 @@
             runningOut: false,
             longest: Math.max(streaks.longest, streaks.current + 1)
         };
-
-        console.log('made: ', streaks);
     }
 
-    onMount(async () => {
+    async function loadStreaks() {
+        loaded = false;
+
         const { err, val } = await api.get(auth, '/entries/streaks', {
             // cache busting - otherwise streaks are static through day changes
             x: fmtUtc(nowUtc(), currentTzOffset(), 'yyyy-MM-dd')
@@ -49,8 +49,16 @@
         } else {
             streaks = val;
         }
-        $addEntryListeners.push(madeEntry);
         loaded = true;
+    }
+
+    onMount(loadStreaks);
+
+    listen.entry.onCreate(madeEntry);
+    listen.entry.onDelete(async () => {
+        // just get the new streaks, very hard to calculate
+        // if we should change the streaks when one entry is deleted
+        await loadStreaks();
     });
 
     let tooltipContent = 'Loading...';

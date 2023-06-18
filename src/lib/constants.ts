@@ -56,4 +56,4 @@ export const API_DOCS_LINK =
 
 export const DEBUG_RENDER_COLLIDERS = false;
 
-export const ENABLE_CACHING = false;
+export const ENABLE_CACHING = true;

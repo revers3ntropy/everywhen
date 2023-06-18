@@ -1,7 +1,6 @@
 <script lang="ts">
-    import { addEntryListeners } from '$lib/stores';
+    import { listen } from '$lib/dataChangeEvents';
     import { tooltip } from '@svelte-plugins/tooltips';
-    import { onMount } from 'svelte';
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import { Entry } from '$lib/controllers/entry';
@@ -30,7 +29,7 @@
         });
     }
 
-    function onNewEntry(entry: Entry) {
+    function onNewEntry({ entry }: { entry: Entry }) {
         if (!titles) titles = {};
 
         const localDate = fmtUtc(
@@ -48,6 +47,17 @@
         titles = { ...titles };
     }
 
+    function onEntryDelete(id: string) {
+        if (!titles) return;
+
+        for (const date in titles) {
+            titles[date] = titles[date].filter(entry => entry.id !== id);
+        }
+
+        // force reactivity
+        titles = { ...titles };
+    }
+
     let sortedTitles: [number, string][] | null;
     $: sortedTitles = titles
         ? Object.keys(titles)
@@ -56,9 +66,8 @@
               .map(date => [new Date(date).getTime() / 1000, date])
         : null;
 
-    onMount(() => {
-        $addEntryListeners.push(onNewEntry);
-    });
+    listen.entry.onCreate(onNewEntry);
+    listen.entry.onDelete(onEntryDelete);
 </script>
 
 <div>
@@ -103,6 +112,12 @@
                         </span>
                     {/if}
                 </h2>
+
+                {#if (titles || {})[date].length < 1}
+                    <i class="text-light flex-center">
+                        No entries on this day
+                    </i>
+                {/if}
 
                 {#each (titles || {})[date] as entry}
                     <button

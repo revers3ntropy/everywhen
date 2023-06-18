@@ -7,6 +7,7 @@
 
 <script lang="ts">
     import { ANIMATION_DURATION } from '$lib/constants';
+    import { listen } from '$lib/dataChangeEvents';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
     import Entry from '$lib/components/entry/Entry.svelte';
@@ -30,6 +31,10 @@
     function toggleCollapse() {
         $collapsed[day] = !$collapsed[day];
     }
+
+    listen.entry.onDelete(id => {
+        entries = entries.filter(e => e.id !== id);
+    });
 </script>
 
 <div class="entry-group">
@@ -92,7 +97,6 @@
             {#each entries as entry}
                 <Entry
                     {...entry}
-                    on:updated
                     {obfuscated}
                     {showLabels}
                     {showLocations}

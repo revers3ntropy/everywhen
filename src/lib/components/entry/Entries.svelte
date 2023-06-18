@@ -1,6 +1,7 @@
 <script lang="ts">
     import { browser } from '$app/environment';
     import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
+    import { listen } from '$lib/dataChangeEvents';
     import { encrypt } from '$lib/security/encryption.js';
     import { fmtUtc } from '$lib/utils/time';
     import { onMount } from 'svelte';
@@ -19,7 +20,6 @@
     import Spinner from '../BookSpinner.svelte';
     import ImportDialog from '$lib/components/dialogs/ImportDialog.svelte';
     import Sidebar from './EntriesSidebar.svelte';
-    import { addEntryListeners } from '$lib/stores';
     import type { Location } from '$lib/controllers/location';
     import { tooltip } from '@svelte-plugins/tooltips';
 
@@ -60,7 +60,7 @@
                 auth,
                 type: 'entries'
             },
-            reloadEntries
+            () => reloadEntries(true)
         );
     }
 
@@ -83,13 +83,16 @@
         entryTitles = Entry.groupEntriesByDay(res.entries);
     }
 
-    async function reloadEntries() {
+    async function reloadEntries(reloadTitles = false) {
         currentOffset = 0;
         loadingAt = null;
         entries = {};
         numberOfEntries = Infinity;
 
-        await Promise.all([loadMoreEntries(true), loadTitles()]);
+        await Promise.all([
+            loadMoreEntries(true),
+            reloadTitles ? loadTitles() : Promise.resolve()
+        ]);
     }
 
     async function loadMoreEntries(isInitialLoad = false) {
@@ -159,7 +162,13 @@
         };
     }
 
-    function onNewEntry(entry: Entry, mode: EntryFormMode) {
+    function onNewEntry({
+        entry,
+        entryMode
+    }: {
+        entry: Entry;
+        entryMode: EntryFormMode;
+    }) {
         // TODO check against search and stuff before inserting
         const localDate = fmtUtc(
             entry.created,
@@ -169,19 +178,25 @@
         entries[localDate] = [entry, ...(entries?.[localDate] || [])];
         entries = { ...entries };
 
-        if (mode === EntryFormMode.Bullet) {
-            return;
+        if (entryMode === EntryFormMode.Standard) {
+            // if a normal entry, scroll to it
+            setTimeout(() => {
+                const el = document.getElementById(entry.id);
+                if (!el) {
+                    console.error('Could not find new entry element');
+                    return;
+                }
+                el.tabIndex = -1;
+                el.focus({ preventScroll: false });
+            }, 10);
         }
+    }
 
-        setTimeout(() => {
-            const el = document.getElementById(entry.id);
-            if (!el) {
-                console.error('Could not find new entry element');
-                return;
-            }
-            el.tabIndex = -1;
-            el.focus({ preventScroll: false });
-        }, 10);
+    function onDeleteEntry(id: string) {
+        for (const day in entries) {
+            entries[day] = entries[day].filter(entry => entry.id !== id);
+        }
+        entries = { ...entries };
     }
 
     async function loadLocations() {
@@ -193,11 +208,15 @@
     onMount(() => {
         void loadTitles();
         void loadLocations();
-
-        $addEntryListeners.push(onNewEntry);
     });
 
+    listen.entry.onCreate(onNewEntry);
+    listen.entry.onDelete(onDeleteEntry);
+
     $: if (options.search !== undefined && browser) void reloadEntries();
+    $: sortedEntryKeys = Object.keys(entries).sort(
+        (a, b) => new Date(b).getTime() - new Date(a).getTime()
+    );
 </script>
 
 <div>
@@ -256,10 +275,9 @@
 
         <div>
             <div class="entries">
-                {#each Object.keys(entries).sort((a, b) => new Date(b).getTime() - new Date(a).getTime()) as day (entries[day])}
+                {#each sortedEntryKeys as day (entries[day])}
                     <EntryGroup
                         entries={entries[day]}
-                        on:updated={() => reloadEntries()}
                         obfuscated={$obfuscated}
                         {showLabels}
                         {showLocations}

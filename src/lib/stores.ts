@@ -4,7 +4,6 @@ import type { SvelteComponentDev } from 'svelte/internal';
 import { writable } from 'svelte/store';
 import type { EventsSortKey } from '../app';
 import { LS_KEY } from './constants';
-import type { Entry } from '$lib/controllers/entry';
 
 export const enabledLocation = localStorageWritable<boolean>(
     LS_KEY.enabledLocation,
@@ -28,7 +27,3 @@ export const entryFormMode = localStorageWritable<EntryFormMode>(
     LS_KEY.journalingMode,
     EntryFormMode.Standard
 );
-
-export const addEntryListeners = writable<
-    ((e: Entry, mode: EntryFormMode) => void)[]
->([]);

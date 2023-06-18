@@ -5,11 +5,12 @@
     import type { Entry, RawEntry } from '$lib/controllers/entry';
     import { Label } from '$lib/controllers/label';
     import type { Auth } from '$lib/controllers/user';
+    import { dispatch } from '$lib/dataChangeEvents';
     import {
         displayNotifOnErr,
         notify
     } from '$lib/notifications/notifications';
-    import { addEntryListeners, enabledLocation } from '$lib/stores';
+    import { enabledLocation } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { getLocation } from '$lib/utils/geolocation';
     import { errorLogger } from '$lib/utils/log';
@@ -80,8 +81,10 @@
             }
             newEntry.label = label;
         }
-
-        $addEntryListeners.map(e => e(newEntry, EntryFormMode.Bullet));
+        await dispatch.create('entry', {
+            entry: newEntry,
+            entryMode: EntryFormMode.Bullet
+        });
     }
 
     function onInput(e: KeyboardEvent) {
