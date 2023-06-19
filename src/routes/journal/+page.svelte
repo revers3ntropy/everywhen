@@ -1,11 +1,23 @@
 <script lang="ts">
-    import BulletOrStandardEntryForm from '$lib/components/entryForm/ModedEntryForm.svelte';
+    import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
+    import { listen } from '$lib/dataChangeEvents';
     import { onMount } from 'svelte';
     import Entries from '$lib/components/entry/Entries.svelte';
-    import { obfuscated } from '$lib/stores';
     import type { PageData } from './$types';
 
     export let data: PageData;
+
+    let entryFormMode = data.settings.entryFormMode.value
+        ? EntryFormMode.Bullet
+        : EntryFormMode.Standard;
+
+    listen.setting.onUpdate(({ key, value }) => {
+        if (key === 'entryFormMode') {
+            entryFormMode = value
+                ? EntryFormMode.Bullet
+                : EntryFormMode.Standard;
+        }
+    });
 
     onMount(() => (document.title = `Journal`));
 </script>
@@ -16,13 +28,14 @@
 </svelte:head>
 
 <main>
-    <BulletOrStandardEntryForm auth={data} obfuscated={$obfuscated} />
     <Entries
         auth={data}
         showBin
         showLabels
         showSearch
         showSidebar
+        showEntryForm
         hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
+        {entryFormMode}
     />
 </main>

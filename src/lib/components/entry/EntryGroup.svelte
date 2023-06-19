@@ -6,6 +6,8 @@
 </script>
 
 <script lang="ts">
+    import type { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
+    import ModedEntryForm from '$lib/components/entryForm/ModedEntryForm.svelte';
     import { ANIMATION_DURATION } from '$lib/constants';
     import { listen } from '$lib/dataChangeEvents';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
@@ -14,7 +16,7 @@
     import type { Entry as EntryController } from '$lib/controllers/entry';
     import type { Location } from '$lib/controllers/location';
     import type { Auth } from '$lib/controllers/user';
-    import { nowUtc, utcEq } from '$lib/utils/time';
+    import { currentTzOffset, nowUtc, utcEq } from '$lib/utils/time';
     import Dot from '../Dot.svelte';
     import UtcTime from '../UtcTime.svelte';
     import { fly, slide } from 'svelte/transition';
@@ -24,12 +26,23 @@
     export let entries: EntryController[];
     export let showLabels = true;
     export let showLocations = true;
+    export let showEntryForm = false;
+    export let entryFormMode = null as null | EntryFormMode;
     export let hideAgentWidget = false;
     export let auth: Auth;
     export let day: number;
 
     function toggleCollapse() {
         $collapsed[day] = !$collapsed[day];
+    }
+
+    if (entryFormMode === null && showEntryForm) {
+        throw new Error('entryFormMode must be set if showEntryForm is true');
+    }
+
+    let formMode: EntryFormMode;
+    $: if (showEntryForm) {
+        formMode = entryFormMode as EntryFormMode;
     }
 
     listen.entry.onDelete(id => {
@@ -57,9 +70,9 @@
                     <Dot light marginX={10} />
 
                     <span class="text-light">
-                        {#if utcEq(nowUtc(), day)}
+                        {#if utcEq(nowUtc(), day, currentTzOffset(), 0, 'YYYY-MM-DD')}
                             <span>Today</span>
-                        {:else if utcEq(nowUtc() - 60 * 60 * 24, day)}
+                        {:else if utcEq(nowUtc() - 60 * 60 * 24, day, currentTzOffset(), 0, 'YYYY-MM-DD')}
                             <span>Yesterday</span>
                         {:else}
                             <UtcTime relative timestamp={day} />
@@ -87,6 +100,9 @@
         </div>
     </div>
     {#if !$collapsed[day]}
+        {#if showEntryForm && utcEq(nowUtc(), day, currentTzOffset(), 0, 'YYYY-MM-DD')}
+            <ModedEntryForm {auth} {obfuscated} entryFormMode={formMode} />
+        {/if}
         <div
             class="contents"
             transition:slide|local={{

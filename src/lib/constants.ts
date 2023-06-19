@@ -14,7 +14,8 @@ export const LS_KEY = {
     passcodeLastEntered: `${KEY_PREFIX}passcode_last_entered`,
     enabledLocation: `${KEY_PREFIX}enabled_location`,
     sortEventsKey: `${KEY_PREFIX}events_sort_key`,
-    journalingMode: `${KEY_PREFIX}journaling_mode`
+    journalingMode: `${KEY_PREFIX}journaling_mode`,
+    obfuscated: `${KEY_PREFIX}obfuscated`
 };
 
 // possible characters to show when the text is blurred

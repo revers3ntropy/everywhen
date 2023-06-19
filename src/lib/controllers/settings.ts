@@ -6,7 +6,7 @@ import { nowUtc } from '../utils/time';
 import type { Auth } from './user';
 import { UUID } from './uuid';
 
-export interface ISettingsConfig<T> {
+export interface SettingConfig<T> {
     type: 'string' | 'boolean' | 'number';
     name: string;
     description: string;
@@ -27,54 +27,60 @@ export class Settings<T = unknown> {
     public static config = {
         darkMode: {
             type: 'boolean',
-            defaultValue: false as boolean,
+            defaultValue: false,
             name: 'Dark Mode',
             description: 'Use a darker theme.'
-        } satisfies ISettingsConfig<boolean>,
+        } as SettingConfig<boolean>,
         hideEntriesByDefault: {
             type: 'boolean',
-            defaultValue: false as boolean,
+            defaultValue: false,
             name: 'Blur Entries By Default',
             description: 'Blur entries by default, and manually show them.'
-        } satisfies ISettingsConfig<boolean>,
+        } as SettingConfig<boolean>,
+        entryFormMode: {
+            type: 'boolean',
+            defaultValue: false,
+            name: 'Use Bullet Mode',
+            description: 'Write entries in Bullet Journaling mode.'
+        } as SettingConfig<boolean>,
         showAgentWidgetOnEntries: {
             type: 'boolean',
-            defaultValue: false as boolean,
+            defaultValue: false,
             name: 'Show Device',
             description:
                 'Shows the operating system of the device the entry was submitted on.'
-        } satisfies ISettingsConfig<boolean>,
+        } as SettingConfig<boolean>,
         autoHideEntriesDelay: {
             type: 'number',
-            defaultValue: 0 as number,
+            defaultValue: 0,
             name: 'Auto Blur Entries After',
             description:
                 `Blur entries after 'N' seconds without user interaction. ` +
                 `Set to 0 to disable.`,
             unit: 'seconds'
-        } satisfies ISettingsConfig<Seconds>,
+        } as SettingConfig<Seconds>,
         passcode: {
             type: 'string',
-            defaultValue: '' as string,
+            defaultValue: '',
             name: 'Passcode',
             description: `Passcode to access the app. Leave blank to disable.`
-        } satisfies ISettingsConfig<string>,
+        } as SettingConfig<string>,
         passcodeTimeout: {
             type: 'number',
-            defaultValue: 0 as number,
+            defaultValue: 0,
             name: 'Passcode Timeout',
             description:
                 `Delay before passcode is required again. ` +
                 `Set to 0 to only require once per device.`,
             unit: 'seconds'
-        } satisfies ISettingsConfig<Seconds>,
+        } as SettingConfig<Seconds>,
         yearOfBirth: {
             type: 'number',
-            defaultValue: 2000 as number,
+            defaultValue: 2000,
             name: 'Year of Birth',
             description: `The first year in which you lived. Used by the timeline.`
-        } satisfies ISettingsConfig<number>
-    } satisfies Record<string, ISettingsConfig<unknown>>;
+        } as SettingConfig<number>
+    } satisfies Record<string, SettingConfig<unknown>>;
 
     constructor(
         public readonly id: string,

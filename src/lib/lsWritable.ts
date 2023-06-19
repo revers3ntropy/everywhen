@@ -6,37 +6,36 @@ import { type Writable, writable } from 'svelte/store';
  * Automatically persists a writable store in localStorage.
  * Uses null as loading value for before the initial value is set.
  */
-export function localStorageWritable<T extends NonNullable<unknown>>(
+export function localStorageWritable<T, S = T>(
     lsKey: string,
-    initial: null | (T extends (...args: infer _) => infer _ ? never : T)
-): Writable<T | null> {
+    initial: T,
+    serverSideInitial: S
+): Writable<T | S> {
     if (typeof initial === 'function') {
         throw new Error(
             'localStorageWritable does not support setting a function'
         );
     }
 
+    let initialValue: T | S = initial;
+
     if (browser) {
         const lsVal = localStorage.getItem(lsKey);
         if (lsVal !== null) {
             try {
-                initial = JSON.parse(lsVal) as T extends (
-                    ...args: infer _
-                ) => infer _
-                    ? never
-                    : T;
+                initialValue = JSON.parse(lsVal) as T;
             } catch (e) {
                 errorLogger.error('Error parsing localStorage value', e);
             }
         }
 
-        localStorage.setItem(lsKey, JSON.stringify(initial));
+        localStorage.setItem(lsKey, JSON.stringify(initialValue));
     } else {
         // null for when on server, e.g. the loading state
-        initial = null;
+        initialValue = serverSideInitial;
     }
 
-    const store = writable<T | null>(initial);
+    const store = writable<T | S>(initialValue);
 
     const { subscribe, set, update } = store;
 

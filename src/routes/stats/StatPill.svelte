@@ -40,12 +40,12 @@
 
         &.primary {
             background: var(--accent-gradient);
-            color: var(--text-colour-on-primary-buttons);
+            color: var(--text-colour-on-gradient);
             border: 1px solid var(--border-light);
             .glow();
 
             span {
-                color: var(--text-colour-on-primary-buttons);
+                color: var(--text-colour-on-gradient);
             }
         }
     }

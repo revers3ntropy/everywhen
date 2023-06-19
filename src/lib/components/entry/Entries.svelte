@@ -3,7 +3,7 @@
     import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
     import { listen } from '$lib/dataChangeEvents';
     import { encrypt } from '$lib/security/encryption.js';
-    import { fmtUtc } from '$lib/utils/time';
+    import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
     import { onMount } from 'svelte';
     import { inview } from 'svelte-inview';
     import Bin from 'svelte-material-icons/Delete.svelte';
@@ -19,34 +19,26 @@
     import Sidebar from './EntriesSidebar.svelte';
     import type { Location } from '$lib/controllers/location';
 
+    interface IOptions extends EntryFilter {
+        readonly count?: number;
+        readonly offset?: number;
+    }
+
     export let auth: Auth;
+
+    export let entryFormMode = null as null | EntryFormMode;
 
     export let showSidebar = false;
     export let showBin = false;
     export let showSearch = true;
     export let showLabels = true;
     export let showLocations = true;
+    export let showEntryForm = false;
     export let hideAgentWidget: boolean;
 
     export let numberOfEntries = Infinity;
 
-    interface IOptions extends EntryFilter {
-        readonly count?: number;
-        readonly offset?: number;
-    }
-
     export let options: IOptions = {};
-
-    let searchInput: HTMLInputElement;
-
-    const batchSize = 10;
-    let pageEndInView = false;
-    let entryTitles: Record<string, Entry[]> | null = null;
-    let entries: Record<string, Entry[]> = {};
-    let currentOffset = 0;
-    let loadingAt = null as number | null;
-
-    let locations = null as Location[] | null;
 
     function getEntriesOptions(): IOptions {
         const entriesOptions = {
@@ -70,7 +62,7 @@
     async function reloadEntries(reloadTitles = false) {
         currentOffset = 0;
         loadingAt = null;
-        entries = {};
+        entries = emptyEntries();
         numberOfEntries = Infinity;
 
         await Promise.all([
@@ -187,6 +179,23 @@
         ).locations;
     }
 
+    function emptyEntries(): Record<string, Entry[]> {
+        return {
+            [fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD')]: []
+        };
+    }
+
+    let searchInput: HTMLInputElement;
+
+    const batchSize = 10;
+    let pageEndInView = false;
+    let entryTitles = null as Record<string, Entry[]> | null;
+    let entries = emptyEntries();
+    let currentOffset = 0;
+    let loadingAt = null as number | null;
+
+    let locations = null as Location[] | null;
+
     onMount(() => {
         void loadTitles();
         void loadLocations();
@@ -199,6 +208,9 @@
     $: sortedEntryKeys = Object.keys(entries).sort(
         (a, b) => new Date(b).getTime() - new Date(a).getTime()
     );
+
+    // make sure that there is always 'today' for the entry form
+    $: entries[fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD')] ??= [];
 </script>
 
 <div>
@@ -232,7 +244,7 @@
     </div>
     <div class:sidebar-and-entries={showSidebar}>
         {#if showSidebar}
-            <div style="">
+            <div>
                 <Sidebar
                     titles={entryTitles}
                     {auth}
@@ -254,6 +266,8 @@
                         day={new Date(day).getTime() / 1000}
                         {hideAgentWidget}
                         {locations}
+                        {showEntryForm}
+                        {entryFormMode}
                     />
                 {/each}
                 {#if loadingAt !== null && loadingAt < numberOfEntries}

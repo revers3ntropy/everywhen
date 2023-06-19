@@ -15,7 +15,6 @@
     import type { Auth } from '$lib/controllers/user';
     import { popup } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
-    import { focusableId } from '$lib/utils/focusableId';
     import {
         displayNotifOnErr,
         notify
@@ -93,7 +92,6 @@
 
 <div
     class="entry {obfuscated ? '' : 'visible'} {isInDialog ? 'in-dialog' : ''}"
-    use:focusableId={{ id }}
     {id}
 >
     {#if showFullDate}

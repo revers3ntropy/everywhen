@@ -26,12 +26,10 @@
     import { LS_KEY } from '$lib/constants';
     import { Backup } from '$lib/controllers/backup';
     import type { Auth } from '$lib/controllers/user';
-    import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
     import { Event as EventController } from '$lib/controllers/event';
     import type { SettingsConfig } from '$lib/controllers/settings';
     import { nowUtc } from '$lib/utils/time';
     import {
-        entryFormMode,
         eventsSortKey,
         obfuscated,
         passcodeLastEntered
@@ -79,7 +77,10 @@
     }
 
     async function goToEntryFormWithLabel(name: string, defaultColor: string) {
-        entryFormMode.set(EntryFormMode.Standard);
+        await api.put(auth, '/settings', {
+            key: 'entryFormMode',
+            value: false
+        });
         const labelId = await makeLabelFromNameIfDoesntExist(
             name,
             defaultColor
@@ -101,15 +102,23 @@
     }
 
     async function makeEntry() {
-        entryFormMode.set(EntryFormMode.Standard);
+        await api.put(auth, '/settings', {
+            key: 'entryFormMode',
+            value: false
+        });
         localStorage.removeItem(LS_KEY.newEntryLabel);
         await gotoIfNotAt('/journal');
     }
 
     async function makeBullet() {
-        entryFormMode.set(EntryFormMode.Bullet);
+        await api.put(auth, '/settings', {
+            key: 'entryFormMode',
+            value: true
+        });
         if ($page.url.pathname !== '/journal') {
             await goto('/journal');
+        } else {
+            location.reload();
         }
     }
 

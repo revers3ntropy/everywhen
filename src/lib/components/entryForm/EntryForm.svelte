@@ -2,20 +2,19 @@
     import { browser } from '$app/environment';
     import { beforeNavigate, goto } from '$app/navigation';
     import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
-    import { dispatch } from '$lib/dataChangeEvents.js';
+    import { dispatch, listen } from '$lib/dataChangeEvents.js';
     import { serializedAgentData } from '$lib/utils/userAgent';
     import { tooltip } from '@svelte-plugins/tooltips';
     import { filedrop, type Files } from 'filedrop-svelte';
     import { onMount } from 'svelte';
-    import Eye from 'svelte-material-icons/Eye.svelte';
-    import EyeOff from 'svelte-material-icons/EyeOff.svelte';
+    import FormatListBulleted from 'svelte-material-icons/FormatListBulleted.svelte';
     import ImageArea from 'svelte-material-icons/ImageArea.svelte';
     import Send from 'svelte-material-icons/Send.svelte';
     import LabelSelect from '$lib/components/label/LabelSelect.svelte';
     import { LS_KEY, MAX_IMAGE_SIZE } from '$lib/constants';
     import { Asset } from '$lib/controllers/asset';
     import type { Entry, RawEntry } from '$lib/controllers/entry';
-    import { Label } from '$lib/controllers/label';
+    import type { Label } from '$lib/controllers/label';
     import type { Auth } from '$lib/controllers/user';
     import { enabledLocation } from '$lib/stores.js';
     import { api, apiPath } from '$lib/utils/apiRequest';
@@ -31,8 +30,6 @@
     import type { Mutable } from '../../../app';
     import FormatOptions from './FormatOptions.svelte';
     import LocationToggle from './LocationToggle.svelte';
-
-    let mounted = false;
 
     // as this form is used in entry editing and creating
     export let action: 'create' | 'edit' = 'create';
@@ -50,6 +47,9 @@
 
     export let auth: Auth;
     export let obfuscated = true;
+    export let setEntryFormMode = null as
+        | null
+        | ((mode: EntryFormMode) => Promise<void>);
 
     function resetEntryForm() {
         newEntryTitle = '';
@@ -156,17 +156,11 @@
         } as Mutable<Entry>;
 
         if (body.label && labels) {
-            const { val: label, err } = await Label.withIdFromListOrFetch(
-                api,
-                auth,
-                body.label,
-                labels
-            );
-            if (err) {
-                errorLogger.error(err);
-                notify.error('Label not found');
+            entry.label = labels.find(l => l.id === body.label);
+            if (!entry.label) {
+                notify.error('label not found');
+                errorLogger.log('label not found');
             }
-            entry.label = label;
         }
 
         await dispatch.create('entry', {
@@ -177,7 +171,8 @@
 
     async function onEntryEdit(body: RawEntry) {
         if (!entry) {
-            throw new Error('entry must be set when action is edit');
+            errorLogger.error('entry must be set when action is edit');
+            return;
         }
         if (!areUnsavedChanges()) {
             if (
@@ -264,17 +259,19 @@
             await new Promise(r => setTimeout(r, 50));
         }
         // https://stackoverflow.com/questions/19469881
-        document.getElementsByClassName('entry-file-drop')[0].addEventListener(
-            'keydown',
-            (event: Event) => {
-                const e = event as KeyboardEvent;
-                // same check as lib uses
-                if (e.key === ' ' || e.key === 'Enter') {
-                    e.stopImmediatePropagation();
-                }
-            },
-            true
-        );
+        for (const el of document.getElementsByClassName('entry-file-drop')) {
+            el.addEventListener(
+                'keydown',
+                (event: Event) => {
+                    const e = event as KeyboardEvent;
+                    // same check as lib uses
+                    if (e.key === ' ' || e.key === 'Enter') {
+                        e.stopImmediatePropagation();
+                    }
+                },
+                true
+            );
+        }
     }
 
     function triggerFileDrop() {
@@ -329,10 +326,28 @@
         void stopSpaceAndEnterBeingInterceptedByFileDrop();
     });
 
-    let newEntryInputElement: HTMLTextAreaElement;
+    let mounted = false;
 
-    // only used by LabelSelect which handles changes itself
+    let newEntryInputElement: HTMLTextAreaElement;
     let labels = null as Label[] | null;
+
+    listen.label.onCreate(label => {
+        labels = [...(labels || []), label];
+    });
+    listen.label.onUpdate(label => {
+        if (labels === null) {
+            errorLogger.error('labels should not be null');
+            return;
+        }
+        labels = labels.map(l => (l.id === label.id ? label : l));
+    });
+    listen.label.onDelete(id => {
+        if (labels === null) {
+            errorLogger.error('labels should not be null');
+            return;
+        }
+        labels = labels.filter(l => l.id !== id);
+    });
 
     let submitted = false;
 
@@ -360,34 +375,37 @@
     <div>
         <div class="head">
             <div class="left-options">
-                <button
-                    aria-label={obfuscated
-                        ? 'Show entry form'
-                        : 'Hide entry form'}
-                    on:click={() => (obfuscated = !obfuscated)}
-                    class="hide-mobile"
-                >
-                    {#if obfuscated}
-                        <Eye size="25" />
-                    {:else}
-                        <EyeOff size="25" />
-                    {/if}
-                </button>
+                {#if setEntryFormMode}
+                    <button
+                        aria-label="Switch to bullet journaling"
+                        class="with-circled-icon"
+                        on:click={() =>
+                            setEntryFormMode?.(EntryFormMode.Bullet)}
+                        style="margin: 0"
+                        use:tooltip={{
+                            content: 'Switch to Bullet Journaling',
+                            position: 'right'
+                        }}
+                    >
+                        <FormatListBulleted size="30" />
+                    </button>
+                {/if}
+
+                <LocationToggle />
 
                 <FormatOptions {makeWrapper} />
+
                 <button
                     aria-label="Insert Image"
                     disabled={submitted}
                     on:click={triggerFileDrop}
                     use:tooltip={{
-                        content: 'Upload Image',
+                        content: '<span class="oneline">Upload Image</span>',
                         position: 'bottom'
                     }}
                 >
                     <ImageArea size="30" />
                 </button>
-
-                <LocationToggle />
             </div>
             <div class="right-options {obfuscated ? 'blur' : ''}">
                 <div class="label-select-container">
@@ -404,7 +422,7 @@
                     class="primary with-icon hide-mobile"
                     disabled={submitted}
                     on:click={submit}
-                    style="padding: 2px 5px !important;"
+                    style="padding: 2px 5px; margin: 0 0 3px 0;"
                 >
                     Submit
                     <Send size="26" />
@@ -439,14 +457,12 @@
                     class="obfuscated">{obfuscate(newEntryBody)}</textarea
                 >
             {:else}
-                <!-- svelte-ignore a11y-autofocus -->
                 <textarea
                     bind:this={newEntryInputElement}
                     bind:value={newEntryBody}
                     on:keydown={handleEntryInputKeydown}
                     disabled={submitted}
                     aria-label="Entry Body"
-                    autofocus
                 />
             {/if}
         </div>
@@ -471,11 +487,16 @@
     @import '../../../styles/input';
 
     .wrapper {
-        margin: 0;
-        .flex-center();
+        margin: 1rem;
+        width: calc(100% - 2rem);
+
+        @media @mobile {
+            margin: 1rem 0;
+            width: 100%;
+        }
 
         & > div {
-            width: min(100%, 700px);
+            width: 100%;
             min-width: 200px;
         }
 
@@ -495,13 +516,10 @@
         }
 
         .left-options {
+            .flex-center();
             height: 100%;
-            display: flex;
-            flex-direction: row;
-            flex-wrap: wrap;
             justify-content: start;
-            align-items: center;
-            gap: 0.5rem;
+            gap: 3px;
 
             .title {
                 border: none;
@@ -558,7 +576,7 @@
             outline: none;
             border: none;
             font-size: 20px;
-            background: var(--v-light-accent);
+            background: var(--light-accent);
             border-radius: @border-radius @border-radius 0 0;
             border-bottom: 2px solid var(--bg);
             width: 100%;
@@ -587,11 +605,11 @@
             outline: none;
             border: none;
             font-size: 20px;
-            background: var(--v-light-accent);
+            background: var(--light-accent);
             border-radius: 0 0 @border-radius @border-radius;
 
             // fills page
-            height: min(calc(100vh - 12rem), 600px);
+            height: min(calc(100vh - 12rem), 300px);
 
             @media @mobile {
                 // annoying on mobile to resize horizontally

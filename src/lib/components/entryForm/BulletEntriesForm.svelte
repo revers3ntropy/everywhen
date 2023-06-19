@@ -1,9 +1,11 @@
 <script lang="ts">
     import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
+    import { tooltip } from '@svelte-plugins/tooltips';
     import LocationToggle from '$lib/components/entryForm/LocationToggle.svelte';
     import LabelSelect from '$lib/components/label/LabelSelect.svelte';
+    import TextBoxOutline from 'svelte-material-icons/TextBoxOutline.svelte';
     import type { Entry, RawEntry } from '$lib/controllers/entry';
-    import { Label } from '$lib/controllers/label';
+    import type { Label } from '$lib/controllers/label';
     import type { Auth } from '$lib/controllers/user';
     import { dispatch } from '$lib/dataChangeEvents';
     import {
@@ -23,11 +25,11 @@
     export let auth: Auth;
     export let obfuscated = true;
 
-    let entry: HTMLInputElement;
-    let label: string;
-    let labels = null as Label[] | null;
+    export let setEntryFormMode = null as
+        | null
+        | ((mode: EntryFormMode) => Promise<void>);
 
-    export function resetEntryForm() {
+    function resetEntryForm() {
         entry.value = '';
     }
 
@@ -69,17 +71,15 @@
         } as Mutable<Entry>;
 
         if (body.label && labels) {
-            const { val: label, err } = await Label.withIdFromListOrFetch(
-                api,
-                auth,
-                body.label,
-                labels
-            );
-            if (err) {
-                errorLogger.error(err);
-                notify.error('Label not found');
+            newEntry.label = labels.find(l => l.id === body.label);
+            if (!newEntry.label) {
+                notify.error(`Failed to find label`);
+                errorLogger.error(
+                    `Failed to find label ${body.label} in ${JSON.stringify(
+                        labels
+                    )}`
+                );
             }
-            newEntry.label = label;
         }
         await dispatch.create('entry', {
             entry: newEntry,
@@ -94,51 +94,71 @@
         }
     }
 
+    let entry: HTMLInputElement;
+    let label: string;
+    let labels = null as Label[] | null;
+
     onMount(async () => {
         labels = displayNotifOnErr(await api.get(auth, '/labels')).labels;
     });
 </script>
 
 <div class="wrapper">
+    <div
+        class="flex-center"
+        style="justify-content: start; width: 100%; gap: 3px;"
+    >
+        <button
+            aria-label="Switch to bullet journaling"
+            class="with-circled-icon"
+            on:click={() => setEntryFormMode?.(EntryFormMode.Standard)}
+            style="margin: 0"
+            use:tooltip={{
+                position: 'right',
+                content: 'Switch to normal journaling'
+            }}
+        >
+            <TextBoxOutline size="30" />
+        </button>
+        <LocationToggle tooltipPosition="right" />
+    </div>
     <div class="line">
         <div class="entry-input">
             <LabelSelect {labels} {auth} condensed bind:value={label} />
-            <!-- svelte-ignore a11y-autofocus -->
             <input
                 on:keyup={onInput}
                 bind:this={entry}
-                placeholder="New bullet... (Enter to submit)"
-                autofocus
+                placeholder="New bullet entry... (Enter to submit)"
             />
         </div>
-        <div class="hide-mobile">
-            <LocationToggle size={20} tooltipPosition="left" />
+        <div class="flex-center" style="justify-content: end">
+            <button
+                class="primary with-icon"
+                on:click={submit}
+                style="padding: 2px 5px; margin: 0"
+            >
+                Submit
+                <Send size="26" />
+            </button>
         </div>
-        <button
-            class="primary with-icon"
-            on:click={submit}
-            style="padding: 2px 5px !important;"
-        >
-            Submit
-            <Send size="26" />
-        </button>
     </div>
 </div>
 
 <style lang="less">
     @import '../../../styles/variables';
     .wrapper {
-        width: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        margin: 1rem 1rem;
+        width: calc(100% - 2rem);
+
+        @media @mobile {
+            margin: 1rem 0;
+            width: 100%;
+        }
 
         .line {
             width: 100%;
-            max-width: 800px;
             display: grid;
-            grid-template-columns: 1fr auto auto;
-            place-items: center;
+            grid-template-columns: 1fr auto;
             margin: 1rem 0;
 
             @media @mobile {
@@ -147,10 +167,20 @@
             }
 
             .entry-input {
-                width: 100%;
-                display: grid;
-                place-items: center;
-                grid-template-columns: auto 1fr;
+                display: flex;
+
+                input {
+                    border-radius: @border-radius;
+                    border: 1px solid transparent;
+                    margin-right: 4px;
+                    &:hover {
+                        border: 1px solid var(--border-color);
+                    }
+                    &:focus {
+                        background: var(--light-accent);
+                        border: 1px solid transparent;
+                    }
+                }
             }
 
             .bullet {

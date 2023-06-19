@@ -66,11 +66,13 @@
             return;
         }
 
+        if (value === id) value = '';
+
         labels = labels.filter(l => l.id !== id);
     });
 </script>
 
-<div class="select-label" class:condensed>
+<span class="select-label" class:condensed>
     <Dropdown
         bind:close={closeDropDown}
         ariaLabel={() => 'Set label'}
@@ -158,7 +160,7 @@
             {/if}
         </div>
     </Dropdown>
-</div>
+</span>
 
 <style lang="less">
     @import '../../../styles/variables';

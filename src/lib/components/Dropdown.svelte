@@ -45,7 +45,7 @@
 
 <svelte:window on:mouseup={globalMouseUp} />
 
-<div
+<span
     class="dropdown {cn({
         open,
         'from-right': fromRight,
@@ -65,7 +65,7 @@
             <slot />
         </div>
     </div>
-</div>
+</span>
 
 <style lang="less">
     @import '../../styles/variables';
