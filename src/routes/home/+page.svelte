@@ -9,7 +9,6 @@
     import Notebook from 'svelte-material-icons/Notebook.svelte';
     import Bin from 'svelte-material-icons/Delete.svelte';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
-    import type { App } from '../../app';
     import EntryTitles from '$lib/components/entry/EntryTitles.svelte';
     import { Entry } from '$lib/controllers/entry';
     import { obfuscated } from '$lib/stores.js';
@@ -19,12 +18,11 @@
         fmtUtc,
         nowUtc
     } from '$lib/utils/time';
+    import type { PageData } from './$types';
 
     const NUMBER_OF_ENTRY_TITLES = 10;
 
-    export let data: App.PageData;
-
-    onMount(() => (document.title = `Home`));
+    export let data: PageData;
 
     function entriesYearsAgoToday(entries: Entry[]): Record<string, Entry[]> {
         const res: Record<string, Entry[]> = {};
@@ -61,6 +59,8 @@
     let titlesLoaded = false;
 
     onMount(async () => {
+        document.title = `Home`;
+
         const titlesRes = displayNotifOnErr(
             await api.get(data, '/entries/titles')
         );
@@ -74,10 +74,8 @@
             .reduce((acc, key) => {
                 if (i >= NUMBER_OF_ENTRY_TITLES) return acc;
                 i += byDay[key].length;
-                return {
-                    ...acc,
-                    [key]: byDay[key]
-                } as Record<string, Entry[]>;
+                acc[key] = byDay[key];
+                return acc;
             }, {} as Record<string, Entry[]>);
         titlesLoaded = true;
     });

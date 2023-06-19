@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { dispatch } from '$lib/dataChangeEvents';
     import { onMount } from 'svelte';
     import BookSpinner from '$lib/components/BookSpinner.svelte';
     import LabelSelect from '$lib/components/label/LabelSelect.svelte';
@@ -16,7 +17,7 @@
 
     let entryCount = 0;
     let eventCount = 0;
-    let labels: Label[] | null = null;
+    let labels = null as Label[] | null;
 
     let loaded = false;
     let changeLabelId: string;
@@ -48,9 +49,10 @@
         );
         if (reloadOnDelete) {
             location.reload();
-        } else {
-            popup.set(null);
+            return;
         }
+        popup.set(null);
+        await dispatch.delete('label', id);
     }
 
     async function reassign() {
@@ -62,9 +64,10 @@
         );
         if (reloadOnDelete) {
             location.reload();
-        } else {
-            popup.set(null);
+            return;
         }
+        popup.set(null);
+        await dispatch.delete('label', id);
     }
 
     function cancel() {

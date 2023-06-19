@@ -1,5 +1,6 @@
 <script lang="ts">
     import { canvasState } from '$lib/canvas/canvasState';
+    import { dispatch } from '$lib/dataChangeEvents';
     import { displayNotifOnErr } from '$lib/notifications/notifications.js';
     import { RectCollider } from '$lib/canvas/collider';
     import { interactable } from '$lib/canvas/interactable';
@@ -10,8 +11,6 @@
     import type { TimestampSecs } from '../../app';
     export let auth: Auth;
 
-    export let createEvent: (event: Event) => void;
-
     async function newEvent(start: TimestampSecs, end: TimestampSecs) {
         const event = {
             name: 'New Event',
@@ -21,7 +20,8 @@
         const { id } = displayNotifOnErr(
             await api.post(auth, '/events', event)
         );
-        createEvent(
+        await dispatch.create(
+            'event',
             new Event(
                 id,
                 event.name,

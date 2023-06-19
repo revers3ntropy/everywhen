@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { listen } from '$lib/dataChangeEvents';
     import { onMount } from 'svelte';
     import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
@@ -42,14 +43,14 @@
         };
     }
 
-    function labelDeleted({ detail: { id } }: { detail: { id: string } }) {
+    onMount(() => (document.title = 'Labels'));
+
+    listen.label.onDelete(id => {
         data = {
             ...data,
             labels: data.labels.filter(l => l.id !== id)
         };
-    }
-
-    onMount(() => (document.title = 'Labels'));
+    });
 </script>
 
 <svelte:head>
@@ -69,7 +70,7 @@
     <div class="labels">
         <div class="label-list">
             {#each data.labels as label}
-                <LabelOptions {...label} auth={data} on:delete={labelDeleted} />
+                <LabelOptions {...label} auth={data} />
             {/each}
 
             <div class="flex-center">

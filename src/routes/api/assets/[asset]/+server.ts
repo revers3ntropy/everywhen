@@ -18,8 +18,8 @@ import {
 export const GET = (async ({ params, url, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
 
-    const cached = getCachedResponse<Response>(url.href, auth.id)?.clone();
-    if (cached) return cached as GenericResponse<Buffer>;
+    const cached = getCachedResponse<Response>(url.href, auth.id);
+    if (cached) return cached.clone() as GenericResponse<Buffer>;
 
     const { err, val: asset } = await Asset.fromPublicId(
         query,
@@ -38,6 +38,7 @@ export const GET = (async ({ params, url, cookies }) => {
             100
         );
         img = Buffer.from(webP, 'base64');
+        // update the asset in the database to use webp
         void Asset.updateAssetContentToWebP(query, auth, asset.publicId, webP);
     } else {
         img = Buffer.from(asset.content, 'base64');

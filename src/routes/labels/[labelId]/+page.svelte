@@ -1,5 +1,6 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
+    import { listen } from '$lib/dataChangeEvents';
     import { onMount } from 'svelte';
     import Delete from 'svelte-material-icons/Delete.svelte';
     import Entries from '$lib/components/entry/Entries.svelte';
@@ -29,14 +30,6 @@
         );
     }
 
-    onMount(() => (document.title = `${data.label.name} - Label`));
-
-    let eventCount = data.events.length;
-
-    function changeEventCount(by: number) {
-        eventCount += by;
-    }
-
     async function deleteLabel() {
         // if there are no entries or events tied to this
         // label, deleting it easy, but if there are then
@@ -64,6 +57,28 @@
             }
         );
     }
+
+    onMount(() => (document.title = `${data.label.name} - Label`));
+    let eventCount = data.events.length;
+
+    listen.event.onDelete(id => {
+        if (data.events.find(e => e.id === id)) {
+            eventCount -= 1;
+        }
+    });
+    listen.event.onCreate(({ label }) => {
+        if (label?.id === data.label.id) {
+            eventCount += 1;
+        }
+    });
+    listen.event.onUpdate(({ label }) => {
+        // As all events on this page have this label already,
+        // they could only be removed from this label, not added
+        // TODO: but what about changed twice...
+        if (label?.id !== data.label.id) {
+            eventCount -= 1;
+        }
+    });
 </script>
 
 <svelte:head>
@@ -102,7 +117,6 @@
                 <Event
                     auth={data}
                     {event}
-                    {changeEventCount}
                     labels={data.labels}
                     obfuscated={$obfuscated}
                 />

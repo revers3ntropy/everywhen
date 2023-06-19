@@ -4,10 +4,9 @@
     import { encryptionKeyFromPassword } from '$lib/security/authUtils';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/notifications/notifications';
+    import type { PageData } from './$types';
 
-    export let data: App.PageData & {
-        redirect: string;
-    };
+    export let data: PageData;
 
     // user log in / create account form values
     let password = '';

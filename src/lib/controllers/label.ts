@@ -14,7 +14,7 @@ export type LabelWithCount = Label & {
 };
 
 export class Label {
-    private constructor(
+    public constructor(
         public id: string,
         public color: string,
         public name: string,

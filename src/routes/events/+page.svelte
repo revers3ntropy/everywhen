@@ -1,20 +1,20 @@
 <script lang="ts">
+    import { dispatch } from '$lib/dataChangeEvents';
     import { onMount } from 'svelte';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
-    import TrayArrowUp from 'svelte-material-icons/TrayArrowUp.svelte';
-    import type { App, EventsSortKey } from '../../app';
-    import ImportDialog from '$lib/components/dialogs/ImportDialog.svelte';
+    import type { EventsSortKey } from '../../app';
     import Dot from '$lib/components/Dot.svelte';
     import Select from '$lib/components/Select.svelte';
     import { Event as EventController } from '$lib/controllers/event';
-    import type { Label } from '$lib/controllers/label';
     import { eventsSortKey, obfuscated } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/notifications/notifications';
-    import { showPopup } from '$lib/utils/popups';
     import { nowUtc } from '$lib/utils/time';
     import Event from '$lib/components/event/Event.svelte';
+    import type { PageData } from './$types';
+
+    export let data: PageData;
 
     function sortEvents<T extends EventController | EventData>(
         events: T[],
@@ -33,17 +33,10 @@
         throw new Error('Invalid sort key');
     }
 
-    async function reloadEvents() {
-        // FIXME: handle the unset $eventsSortKey case
-        events = sortEvents(
-            displayNotifOnErr(await api.get(data, '/events')).events,
-            $eventsSortKey || 'created'
-        );
-    }
-
     async function newEvent() {
         const now = nowUtc();
-        displayNotifOnErr(
+
+        const { id } = displayNotifOnErr(
             await api.post(data, '/events', {
                 name: EventController.NEW_EVENT_NAME,
                 start: now,
@@ -51,33 +44,22 @@
             })
         );
 
-        await reloadEvents();
-    }
-
-    function importPopup() {
-        showPopup(
-            ImportDialog,
-            {
-                auth: data,
-                type: 'events'
-            },
-            reloadEvents
+        const event = new EventController(
+            id,
+            EventController.NEW_EVENT_NAME,
+            now,
+            now,
+            now
         );
-    }
 
-    export let data: App.PageData & {
-        events: EventController[];
-        labels: Label[];
-    };
+        await dispatch.create('event', event);
+        events = sortEvents([...events, event], $eventsSortKey || 'created');
+    }
 
     type EventData = EventController & { deleted?: true };
 
     let events: EventData[] = data.events;
     $: if ($eventsSortKey) events = sortEvents(events, $eventsSortKey);
-
-    function changeEventCount(by: number) {
-        eventCount += by;
-    }
 
     let eventCount: number;
     $: eventCount = events.filter(e => !e.deleted).length;
@@ -111,13 +93,6 @@
             <button class="primary with-icon" on:click={newEvent}>
                 <Plus size="30" />
                 New Event
-            </button>
-            <button
-                class="with-icon icon-gradient-on-hover hide-mobile"
-                on:click={importPopup}
-            >
-                <TrayArrowUp size="30" />
-                Import
             </button>
         </div>
 
@@ -154,7 +129,6 @@
                     {event}
                     auth={data}
                     {selectNameId}
-                    {changeEventCount}
                     labels={data.labels}
                     obfuscated={$obfuscated}
                 />

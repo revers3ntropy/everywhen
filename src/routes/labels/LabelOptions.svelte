@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { createEventDispatcher } from 'svelte';
+    import { dispatch } from '$lib/dataChangeEvents';
     import Delete from 'svelte-material-icons/Delete.svelte';
     import type { Auth } from '$lib/controllers/user';
     import { api, apiPath } from '$lib/utils/apiRequest';
@@ -7,23 +7,28 @@
     import { showPopup } from '$lib/utils/popups';
     import DeleteLabelDialog from './DeleteLabelDialog.svelte';
 
-    const dispatch = createEventDispatcher();
-
     export let auth: Auth;
-    export let name: string;
-    export let color: string;
+
     export let id: string;
-    export let editable = true;
+    export let color: string;
+    export let name: string;
     export let created: number;
+
+    export let editable = true;
     export let entryCount: number;
     export let eventCount: number;
-
-    let deleted = false;
 
     async function updateLabel(changes: { name?: string; color?: string }) {
         displayNotifOnErr(
             await api.put(auth, apiPath(`/labels/?`, id), changes)
         );
+        await dispatch.update('label', {
+            id,
+            created,
+            color,
+            name,
+            ...changes
+        });
     }
 
     async function deleteLabel() {
@@ -33,7 +38,7 @@
         // label from the entries and events
         if (entryCount + eventCount < 1) {
             displayNotifOnErr(await api.delete(auth, apiPath(`/labels/?`, id)));
-            dispatch('delete', { id });
+            await dispatch.delete('label', id);
             return;
         }
 
@@ -46,39 +51,37 @@
     }
 </script>
 
-{#if !deleted}
-    <div class="label {editable ? 'editable' : ''}">
-        {#if editable}
-            <input
-                type="color"
-                bind:value={color}
-                on:change={() => updateLabel({ color })}
-            />
-            <input
-                bind:value={name}
-                class="editable-text"
-                type="text"
-                on:change={() => updateLabel({ name })}
-            />
-        {:else}
-            <div class="entry-label-color" style="background: {color}" />
-            <div>{name}</div>
+<div class="label {editable ? 'editable' : ''}">
+    {#if editable}
+        <input
+            type="color"
+            bind:value={color}
+            on:change={() => updateLabel({ color })}
+        />
+        <input
+            bind:value={name}
+            class="editable-text"
+            type="text"
+            on:change={() => updateLabel({ name })}
+        />
+    {:else}
+        <div class="entry-label-color" style="background: {color}" />
+        <div>{name}</div>
+    {/if}
+    <a href="/labels/{id}">
+        {entryCount}
+        {entryCount === 1 ? 'entry' : 'entries'}
+        {#if eventCount > 0},
+            {eventCount}
+            {eventCount === 1 ? 'event' : 'events'}
         {/if}
-        <a href="/labels/{id}">
-            {entryCount}
-            {entryCount === 1 ? 'entry' : 'entries'}
-            {#if eventCount > 0},
-                {eventCount}
-                {eventCount === 1 ? 'event' : 'events'}
-            {/if}
-        </a>
-        <div>
-            <button on:click={deleteLabel} class="icon-button">
-                <Delete size="30" />
-            </button>
-        </div>
+    </a>
+    <div>
+        <button on:click={deleteLabel} class="icon-button">
+            <Delete size="30" />
+        </button>
     </div>
-{/if}
+</div>
 
 <style lang="less">
     @import '../../styles/variables';

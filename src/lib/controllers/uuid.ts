@@ -9,7 +9,7 @@ export class UUID {
             id = UUIdv4();
         }
 
-        await query`
+        await query.unlogged`
             INSERT INTO ids
             VALUES (${id})
         `;
@@ -18,7 +18,7 @@ export class UUID {
     }
 
     private static async uuidExists(query: QueryFunc, id: string) {
-        const res = await query<{ id: string }[]>`
+        const res = await query.unlogged<{ id: string }[]>`
             SELECT id
             FROM ids
             WHERE id = ${id}

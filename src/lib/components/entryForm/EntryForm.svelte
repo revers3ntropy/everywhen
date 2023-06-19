@@ -51,19 +51,7 @@
     export let auth: Auth;
     export let obfuscated = true;
 
-    let newEntryInputElement: HTMLTextAreaElement;
-
-    let labels = null as Label[] | null;
-
-    let submitted = false;
-
-    $: if (mounted && browser && loadFromLS) {
-        // be reactive on these
-        [newEntryTitle, newEntryBody, newEntryLabel];
-        saveToLS();
-    }
-
-    export function resetEntryForm() {
+    function resetEntryForm() {
         newEntryTitle = '';
         newEntryBody = '';
         newEntryLabel = '';
@@ -272,7 +260,7 @@
 
     async function stopSpaceAndEnterBeingInterceptedByFileDrop() {
         // TODO do this properly
-        while (!document.getElementsByClassName('entry-file-drop')) {
+        while (!document.getElementsByClassName('entry-file-drop').length) {
             await new Promise(r => setTimeout(r, 50));
         }
         // https://stackoverflow.com/questions/19469881
@@ -312,17 +300,15 @@
         // would save to LS here, except sometimes we want to navigate away
         // after editing something in LS, for example making 'Dream' entry from navbar
         // in which case saving would override anything we set there.
-        // Should be fine, as we always save whenever the local variables which store the form
-        // contents are changed.
 
-        if (!submitted && areUnsavedChanges()) {
-            if (
-                !confirm(
-                    'You have unsaved changes, are you sure you want to leave?'
-                )
-            ) {
-                cancel();
-            }
+        if (submitted || !areUnsavedChanges()) {
+            return;
+        }
+        const shouldProceed = confirm(
+            'You have unsaved changes, are you sure you want to leave?'
+        );
+        if (!shouldProceed) {
+            cancel();
         }
     });
 
@@ -342,6 +328,19 @@
 
         void stopSpaceAndEnterBeingInterceptedByFileDrop();
     });
+
+    let newEntryInputElement: HTMLTextAreaElement;
+
+    // only used by LabelSelect which handles changes itself
+    let labels = null as Label[] | null;
+
+    let submitted = false;
+
+    $: if (mounted && browser && loadFromLS) {
+        // be reactive on these
+        [newEntryTitle, newEntryBody, newEntryLabel];
+        saveToLS();
+    }
 </script>
 
 <div

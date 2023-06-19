@@ -7,7 +7,6 @@
     import { onMount } from 'svelte';
     import { inview } from 'svelte-inview';
     import Bin from 'svelte-material-icons/Delete.svelte';
-    import TrayArrowUp from 'svelte-material-icons/TrayArrowUp.svelte';
     import Search from 'svelte-material-icons/Magnify.svelte';
     import EntryGroup from '$lib/components/entry/EntryGroup.svelte';
     import type { Mutable } from '../../../app';
@@ -16,18 +15,14 @@
     import { obfuscated } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/notifications/notifications';
-    import { showPopup } from '$lib/utils/popups';
     import Spinner from '../BookSpinner.svelte';
-    import ImportDialog from '$lib/components/dialogs/ImportDialog.svelte';
     import Sidebar from './EntriesSidebar.svelte';
     import type { Location } from '$lib/controllers/location';
-    import { tooltip } from '@svelte-plugins/tooltips';
 
     export let auth: Auth;
 
     export let showSidebar = false;
     export let showBin = false;
-    export let showImport = false;
     export let showSearch = true;
     export let showLabels = true;
     export let showLocations = true;
@@ -52,17 +47,6 @@
     let loadingAt = null as number | null;
 
     let locations = null as Location[] | null;
-
-    function importPopup() {
-        showPopup(
-            ImportDialog,
-            {
-                auth,
-                type: 'entries'
-            },
-            () => reloadEntries(true)
-        );
-    }
 
     function getEntriesOptions(): IOptions {
         const entriesOptions = {
@@ -169,7 +153,6 @@
         entry: Entry;
         entryMode: EntryFormMode;
     }) {
-        // TODO check against search and stuff before inserting
         const localDate = fmtUtc(
             entry.created,
             entry.createdTZOffset,
@@ -196,7 +179,6 @@
         for (const day in entries) {
             entries[day] = entries[day].filter(entry => entry.id !== id);
         }
-        entries = { ...entries };
     }
 
     async function loadLocations() {
@@ -223,19 +205,6 @@
     <div>
         <div class="entries-menu">
             <div class="hide-mobile">
-                {#if showImport}
-                    <button
-                        class="with-circled-icon"
-                        on:click={importPopup}
-                        aria-label="Import Entries"
-                        use:tooltip={{
-                            content: 'Import Entries',
-                            position: 'right'
-                        }}
-                    >
-                        <TrayArrowUp size="30" />
-                    </button>
-                {/if}
                 {#if showBin}
                     <a class="with-circled-icon" href="/journal/deleted">
                         <Bin size="30" />
@@ -263,7 +232,7 @@
     </div>
     <div class:sidebar-and-entries={showSidebar}>
         {#if showSidebar}
-            <div style="height: 100%">
+            <div style="">
                 <Sidebar
                     titles={entryTitles}
                     {auth}

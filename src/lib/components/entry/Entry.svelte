@@ -26,21 +26,18 @@
     import Label from '$lib/components/label/Label.svelte';
     import LocationWidget from './LocationWidget.svelte';
 
-    export let id = '';
-    export let title = '';
-    export let entry = '';
+    export let id: string;
+    export let title: string;
+    export let entry: string;
     export let created: number;
     export let createdTZOffset = 0;
-    export let label: LabelController | null | undefined = undefined as
-        | LabelController
-        | null
-        | undefined;
-    export let latitude: number | null = null;
-    export let longitude: number | null = null;
+    export let label = undefined as LabelController | null | undefined;
+    export let latitude = null as number | null;
+    export let longitude = null as number | null;
     export let deleted = false;
     export let decrypted = true;
     export let agentData = '';
-    export let edits: Entry[] = [];
+    export let edits = [] as Entry[];
     export let isEdit = false;
     export let showFullDate = false;
 
@@ -54,8 +51,8 @@
     export let locations: Location[] | null;
 
     // show random string instead of text content if obfuscated
-    export let showLabel: LabelController | null | undefined = label;
-    $: if (showLabels && ((l): l is LabelController => !!l)(label)) {
+    export let showLabel = label;
+    $: if (showLabels && label) {
         showLabel = {
             ...label,
             name: obfuscated ? obfuscate(label.name) : label.name

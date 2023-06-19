@@ -7,8 +7,6 @@
 
     export let data: PageData;
 
-    let clearEntryForm: () => void;
-
     onMount(() => (document.title = `Journal`));
 </script>
 
@@ -18,18 +16,13 @@
 </svelte:head>
 
 <main>
-    <BulletOrStandardEntryForm
-        auth={data}
-        obfuscated={$obfuscated}
-        bind:resetEntryForm={clearEntryForm}
-    />
+    <BulletOrStandardEntryForm auth={data} obfuscated={$obfuscated} />
     <Entries
         auth={data}
-        showBin={true}
-        showImport={true}
-        showLabels={true}
-        showSearch={true}
-        showSidebar={true}
+        showBin
+        showLabels
+        showSearch
+        showSidebar
         hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
     />
 </main>

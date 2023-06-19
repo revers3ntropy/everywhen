@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { listen } from '$lib/dataChangeEvents';
     import { createEventDispatcher } from 'svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import LabelOffOutline from 'svelte-material-icons/LabelOffOutline.svelte';
@@ -16,20 +17,14 @@
     import NewLabelDialog from '$lib/components/dialogs/NewLabelDialog.svelte';
     import MenuDown from 'svelte-material-icons/MenuDown.svelte';
 
-    const dispatch = createEventDispatcher();
-
     export let fromRight = false;
-    export let labels: Label[] | null;
+    export let labels = null as Label[] | null;
     export let value = '';
     export let auth: Auth;
     export let showAddButton = true;
     export let filter: (l: Label, i: number, arr: Label[]) => boolean = () =>
         true;
     export let condensed = false;
-
-    let closeDropDown: () => void;
-
-    $: dispatch('change', { id: value });
 
     function showNewLabelPopup() {
         showPopup(NewLabelDialog, { auth }, async () => {
@@ -40,13 +35,39 @@
         });
     }
 
+    const dispatchEvent = createEventDispatcher();
+
+    let closeDropDown: () => void;
+
     $: if (labels && value && !labels.find(l => l.id === value)) {
         errorLogger.error(`Label ${value} not found`);
         value = '';
         notify.error(`Can't find label`);
     }
 
+    $: dispatchEvent('change', { id: value });
     $: selectedLabel = (labels ?? []).find(l => l.id === value);
+    $: labels = labels?.sort((a, b) => a.name.localeCompare(b.name)) || null;
+
+    listen.label.onCreate(label => {
+        labels = [...(labels || []), label];
+    });
+    listen.label.onUpdate(label => {
+        if (!labels) {
+            console.error('Labels not loaded but being updated');
+            return;
+        }
+
+        labels = labels.map(l => (l.id === label.id ? label : l));
+    });
+    listen.label.onDelete(id => {
+        if (!labels) {
+            console.error('Labels not loaded but being deleted');
+            return;
+        }
+
+        labels = labels.filter(l => l.id !== id);
+    });
 </script>
 
 <div class="select-label" class:condensed>

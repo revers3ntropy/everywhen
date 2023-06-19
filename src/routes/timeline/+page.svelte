@@ -1,10 +1,9 @@
 <script lang="ts">
-    import { notify } from '$lib/notifications/notifications';
+    import { listen } from '$lib/dataChangeEvents';
     import { onMount } from 'svelte';
     import Background from '$lib/canvas/Background.svelte';
     import Canvas from '$lib/canvas/Canvas.svelte';
     import { canvasState } from '$lib/canvas/canvasState';
-    import type { Event } from '$lib/controllers/event';
     import CenterLine from './CenterLine.svelte';
     import Controls from './Controls.svelte';
     import EntryInTimeline from './EntryInTimeline.svelte';
@@ -27,6 +26,7 @@
     $: [instantEvents, durationEvents] = addYToEvents(data.events);
 
     onMount(() => {
+        document.title = 'Timeline';
         const [zoom, offset] = getInitialZoomAndPos(
             $canvasState,
             data.entries,
@@ -36,36 +36,30 @@
         $canvasState.cameraOffset = offset;
     });
 
-    function createEvent(event: Event): void {
+    listen.event.onCreate(event => {
         data.events = [...data.events, event];
-    }
-
-    function updateEvent(event: Event): void {
-        const index = data.events.findIndex(e => e.id === event.id);
-        if (index === -1) {
-            notify.error('Event not found');
-            return;
-        }
-        data.events = [
-            ...data.events.slice(0, index),
-            event,
-            ...data.events.slice(index + 1)
-        ];
-    }
-
-    function deleteEvent(id: string): void {
-        const index = data.events.findIndex(e => e.id === id);
-        if (index === -1) {
-            notify.error('Event not found');
-            return;
-        }
-        data.events = [
-            ...data.events.slice(0, index),
-            ...data.events.slice(index + 1)
-        ];
-    }
-
-    onMount(() => (document.title = 'Timeline'));
+    });
+    listen.event.onDelete(id => {
+        data = {
+            ...data,
+            events: [...data.events.filter(event => event.id !== id)]
+        };
+    });
+    listen.event.onUpdate(changedEvent => {
+        data = {
+            ...data,
+            events: [
+                ...data.events.filter(event => event.id !== changedEvent.id),
+                changedEvent
+            ]
+        };
+    });
+    listen.entry.onDelete(id => {
+        data = {
+            ...data,
+            entries: [...data.entries.filter(e => e.id !== id)]
+        };
+    });
 </script>
 
 <svelte:head>
@@ -115,7 +109,7 @@
     <Canvas>
         <Controls />
         <Background />
-        <ContextMenu auth={data} {createEvent} />
+        <ContextMenu auth={data} />
 
         <TimeMarkers startYear={data.settings.yearOfBirth.value} />
 
@@ -139,9 +133,6 @@
                         {...event}
                         yLevel={1 + event.yLevel}
                         eventTextParityHeight
-                        {updateEvent}
-                        {deleteEvent}
-                        {createEvent}
                     />
                 {/each}
                 {#each instantEvents as event, i (event.id)}
@@ -150,15 +141,12 @@
                         labels={data.labels}
                         {...event}
                         eventTextParityHeight={i % 2 === 0}
-                        {updateEvent}
-                        {deleteEvent}
-                        {createEvent}
                     />
                 {/each}
             {/key}
         {/key}
 
         <CenterLine />
-        <TimeCursor auth={data} {createEvent} />
+        <TimeCursor auth={data} />
     </Canvas>
 </main>

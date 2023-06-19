@@ -4,8 +4,8 @@
     import { interactable } from '$lib/canvas/interactable';
     import type { Auth } from '$lib/controllers/user';
     import Event from '$lib/components/event/Event.svelte';
-    import type { Event as EventController } from '$lib/controllers/event';
     import type { Label } from '$lib/controllers/label';
+    import { listen } from '$lib/dataChangeEvents';
     import { obfuscated } from '$lib/stores';
     import { showPopup } from '$lib/utils/popups';
     import { limitStrLen } from '$lib/utils/text';
@@ -30,10 +30,6 @@
     export let eventTextParityHeight: boolean;
     export let created: number;
     export let decrypted: boolean;
-
-    export let updateEvent: (event: EventController, reload?: boolean) => void;
-    export let deleteEvent: (id: string) => void;
-    export let createEvent: (event: EventController) => void;
 
     let thisIsDeleted = false;
 
@@ -176,34 +172,7 @@
                 labels,
                 expanded: true,
                 allowCollapseChange: false,
-                bordered: false,
-                changeEventCount(by: number) {
-                    // NOTE: doesn't recalculate the Y values when
-                    // event is deleted, just stops rendering it
-                    if (by === -1) {
-                        thisIsDeleted = true;
-                        deleteEvent(id);
-                    } else if (by === 1) {
-                        thisIsDeleted = false;
-                        createEvent({
-                            id,
-                            name,
-                            start,
-                            end,
-                            created,
-                            label: label || undefined,
-                            decrypted: true
-                        });
-                    }
-                },
-                onChange(newEvent: EventController) {
-                    updateEvent({
-                        ...newEvent,
-                        id,
-                        created,
-                        decrypted: true
-                    });
-                }
+                bordered: false
             });
         },
         contextMenu: [
@@ -214,6 +183,30 @@
                 }
             }
         ]
+    });
+
+    listen.label.onCreate(label => {
+        labels = [...labels, label];
+    });
+    listen.label.onUpdate(label => {
+        labels = labels.map(l => (l.id === label.id ? label : l));
+    });
+    listen.label.onDelete(id => {
+        labels = labels.filter(l => l.id !== id);
+    });
+
+    listen.event.onUpdate(e => {
+        if (e.id !== id) return;
+        start = e.start;
+        end = e.end;
+        name = e.name;
+        label = e.label || null;
+        created = e.created;
+        decrypted = e.decrypted;
+    });
+    listen.event.onDelete(id => {
+        if (id !== id) return;
+        thisIsDeleted = true;
     });
 </script>
 

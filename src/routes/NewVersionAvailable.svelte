@@ -6,9 +6,8 @@
 
 <div class="outer">
     <button class="inner" on:click={() => location.reload()}>
-        <span
-            >A new version ({newVersion}) is available! Click to apply the
-            update
+        <span>
+            A new version ({newVersion}) is available! Click to apply the update
         </span>
         <Reload size="40" />
     </button>
@@ -26,6 +25,7 @@
         padding: 1rem;
 
         .inner {
+            .container-shadow();
             .flex-center();
             background: var(--light-accent);
             border: 1px solid var(--primary);

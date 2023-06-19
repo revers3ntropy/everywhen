@@ -16,8 +16,6 @@
 
     let collapsed = false;
 
-    export let resetEntryForm: () => void;
-
     function switchMode() {
         entryFormMode.set(
             $entryFormMode === EntryFormMode.Standard
@@ -78,9 +76,9 @@
         {#if $entryFormMode === null}
             <BookSpinner />
         {:else if $entryFormMode === EntryFormMode.Standard}
-            <EntryForm {auth} {obfuscated} bind:resetEntryForm />
+            <EntryForm {auth} {obfuscated} />
         {:else}
-            <BulletEntriesForm {auth} {obfuscated} bind:resetEntryForm />
+            <BulletEntriesForm {auth} {obfuscated} />
         {/if}
     </div>
 {/if}

@@ -1,16 +1,20 @@
 <script lang="ts">
+    import { Label } from '$lib/controllers/label';
+    import { dispatch } from '$lib/dataChangeEvents';
+    import { nowUtc } from '$lib/utils/time';
     import { createEventDispatcher } from 'svelte';
     import type { Auth } from '$lib/controllers/user';
+    import { Event } from '$lib/controllers/event';
     import { api } from '$lib/utils/apiRequest';
     import {
         displayNotifOnErr,
         notify
     } from '$lib/notifications/notifications';
 
-    const dispatch = createEventDispatcher();
+    const dispatchEvent = createEventDispatcher();
 
     let labelName = '';
-    let labelColor = '#000000';
+    let labelColor = Event.DEFAULT_COLOR;
 
     export let auth: Auth;
 
@@ -20,7 +24,7 @@
             return;
         }
 
-        displayNotifOnErr(
+        const { id } = displayNotifOnErr(
             await api.post(auth, '/labels', {
                 name: labelName,
                 color: labelColor
@@ -28,10 +32,13 @@
         );
 
         notify.success('Label created');
-
+        await dispatch.create(
+            'label',
+            new Label(id, labelColor, labelName, nowUtc())
+        );
         labelName = '';
 
-        dispatch('submit');
+        dispatchEvent('submit');
     }
 </script>
 

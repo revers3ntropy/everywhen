@@ -1,21 +1,29 @@
 import type { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
 import type { Entry } from '$lib/controllers/entry';
+import type { Label } from '$lib/controllers/label';
+import type { Event } from '$lib/controllers/event';
 import { onDestroy } from 'svelte';
 import type { MaybePromise } from '../app';
 
-type Entities = 'entry';
+type Entities = 'entry' | 'label' | 'event';
 
 type Create = {
     entry: {
         entry: Entry;
         entryMode: EntryFormMode;
     };
+    label: Label;
+    event: Event;
 };
 type Delete = {
     entry: string;
+    label: string;
+    event: string;
 };
 type Update = {
     entry: Entry;
+    label: Label;
+    event: Event;
 };
 
 type UpdateListener<T> = (newValue: T) => MaybePromise<void>;
@@ -27,14 +35,24 @@ type SetupListener<Update, Delete, Create> = {
     onCreate: (l: CreateListener<Create>) => () => void;
 };
 
-const listeners: {
+function emptyListeners(): Readonly<{
+    onUpdate: never[];
+    onDelete: never[];
+    onCreate: never[];
+}> {
+    return Object.freeze({ onUpdate: [], onDelete: [], onCreate: [] });
+}
+
+const listeners = {
+    entry: emptyListeners(),
+    label: emptyListeners(),
+    event: emptyListeners()
+} as {
     [K in Entities]: Readonly<{
         onUpdate: UpdateListener<Update[K]>[];
         onDelete: DelListener<Delete[K]>[];
         onCreate: CreateListener<Create[K]>[];
     }>;
-} = {
-    entry: Object.freeze({ onUpdate: [], onDelete: [], onCreate: [] })
 };
 
 export const listen = (Object.keys(listeners) as Entities[]).reduce(
@@ -43,7 +61,9 @@ export const listen = (Object.keys(listeners) as Entities[]).reduce(
             onUpdate(listener: UpdateListener<Update[typeof key]>) {
                 listeners[key].onUpdate.push(listener);
                 const remove = () => {
-                    const idx = listeners[key].onUpdate.indexOf(listener);
+                    const idx = (listeners[key].onUpdate as unknown[]).indexOf(
+                        listener
+                    );
                     if (idx !== -1) {
                         listeners[key].onUpdate.splice(idx, 1);
                     }
@@ -54,7 +74,9 @@ export const listen = (Object.keys(listeners) as Entities[]).reduce(
             onDelete(listener: DelListener<Delete[typeof key]>) {
                 listeners[key].onDelete.push(listener);
                 const remove = () => {
-                    const idx = listeners[key].onDelete.indexOf(listener);
+                    const idx = (listeners[key].onDelete as unknown[]).indexOf(
+                        listener
+                    );
                     if (idx !== -1) {
                         listeners[key].onDelete.splice(idx, 1);
                     }
@@ -65,7 +87,9 @@ export const listen = (Object.keys(listeners) as Entities[]).reduce(
             onCreate(listener: CreateListener<Create[typeof key]>) {
                 listeners[key].onCreate.push(listener);
                 const remove = () => {
-                    const idx = listeners[key].onCreate.indexOf(listener);
+                    const idx = (listeners[key].onCreate as unknown[]).indexOf(
+                        listener
+                    );
                     if (idx !== -1) {
                         listeners[key].onCreate.splice(idx, 1);
                     }
@@ -76,10 +100,13 @@ export const listen = (Object.keys(listeners) as Entities[]).reduce(
         };
         return acc;
     },
-    {} as {
-        [K in Entities]: SetupListener<Update[K], Delete[K], Create[K]>;
-    }
-);
+    {} as Record<
+        Entities,
+        SetupListener<Update[Entities], Delete[Entities], Create[Entities]>
+    >
+) as {
+    [K in Entities]: SetupListener<Update[K], Delete[K], Create[K]>;
+};
 
 export const dispatch = Object.freeze({
     async update<T extends Entities>(key: T, value: Update[T]) {

@@ -21,8 +21,8 @@
     export let entryTextParityHeight: boolean;
     export let decrypted: boolean;
     export let deleted: boolean;
-    export let label: Label | null = null;
-    export let edits: EntryEdit[] = [];
+    export let label = null as Label | null;
+    export let edits = [] as EntryEdit[];
     export let createdTZOffset = 0;
     export let agentData = '';
     export let latitude = null as number | null;

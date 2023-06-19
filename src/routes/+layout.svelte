@@ -244,7 +244,6 @@
         height: fit-content;
         min-height: 100vh;
         background: var(--bg);
-        overflow-x: hidden;
         padding: 0;
 
         @media @mobile {

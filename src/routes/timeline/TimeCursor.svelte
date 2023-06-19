@@ -4,6 +4,7 @@
     import { interactable } from '$lib/canvas/interactable';
     import { Event } from '$lib/controllers/event';
     import type { Auth } from '$lib/controllers/user';
+    import { dispatch } from '$lib/dataChangeEvents';
     import { api } from '$lib/utils/apiRequest';
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
     import { displayNotifOnErr } from '$lib/notifications/notifications.js';
@@ -13,7 +14,6 @@
     const COLLIDER_BELOW = 40;
 
     export let auth: Auth;
-    export let createEvent: (event: Event) => void;
 
     async function newEvent(start: TimestampSecs, end: TimestampSecs) {
         const event = {
@@ -24,7 +24,8 @@
         const { id } = displayNotifOnErr(
             await api.post(auth, '/events', event)
         );
-        createEvent(
+        await dispatch.create(
+            'event',
             new Event(
                 id,
                 event.name,
@@ -83,8 +84,10 @@
         onMouseUp(state, time) {
             if (!confirm('Create new event?')) return;
             void newEvent(
-                time,
-                state.renderPosToTime(state.timeToRenderPos(time) + 200)
+                Math.floor(time),
+                state.renderPosToTime(
+                    state.timeToRenderPos(Math.floor(time)) + 200
+                )
             );
         }
     });

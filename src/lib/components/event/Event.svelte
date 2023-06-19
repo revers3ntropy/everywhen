@@ -1,5 +1,6 @@
 <script lang="ts">
     import { ANIMATION_DURATION } from '$lib/constants';
+    import { dispatch, listen } from '$lib/dataChangeEvents';
     import { tooltip } from '@svelte-plugins/tooltips';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
@@ -35,12 +36,6 @@
     export let expanded = false;
     export let allowCollapseChange = true;
 
-    export let changeEventCount: (by: number) => void;
-    export let onChange: (
-        newEvent: EventController
-    ) => void | Promise<void> = () => void 0;
-    export let onDelete: () => void | Promise<void> = () => void 0;
-
     let nameInput: HTMLInputElement;
 
     async function updateEvent(changes: {
@@ -67,7 +62,7 @@
             ),
             label
         };
-        await onChange(event);
+        await dispatch.update('event', event);
     }
 
     const updateName = (async ({ target }) => {
@@ -124,16 +119,14 @@
     }) satisfies ChangeEventHandler<HTMLInputElement>;
 
     async function deleteEvent() {
-        changeEventCount(-1);
         event.deleted = true;
         displayNotifOnErr(
             await api.delete(auth, apiPath('/events/?', event.id))
         );
-        await onDelete();
+        await dispatch.delete('event', event.id);
     }
 
     async function restoreEvent() {
-        changeEventCount(1);
         const { id } = displayNotifOnErr(
             await api.post(auth, `/events`, {
                 name: event.name,
@@ -148,7 +141,7 @@
             id
         };
         delete event.deleted;
-        await onChange(event);
+        await dispatch.create('event', event);
     }
 
     async function makeDurationEvent() {
@@ -190,6 +183,25 @@
         }
     }
 
+    listen.label.onCreate(label => {
+        labels = [...labels, label];
+    });
+    listen.label.onUpdate(label => {
+        labels = labels.map(l => (l.id === label.id ? label : l));
+    });
+    listen.label.onDelete(id => {
+        labels = labels.filter(l => l.id !== id);
+    });
+
+    listen.event.onUpdate(e => {
+        if (e.id !== event.id) return;
+        event = e;
+    });
+    listen.event.onDelete(id => {
+        if (id !== event.id) return;
+        event.deleted = true;
+    });
+
     $: selectIfSelected(selectNameId, event.id), obfuscated || nameInput;
 </script>
 
@@ -210,7 +222,7 @@
         transition:slide|local={{ axis: 'y', duration: 0 }}
     >
         <div class="header">
-            <div>
+            <div class="flex-center">
                 {#if !expanded}
                     <div
                         transition:slide|local={{
@@ -389,7 +401,7 @@
         .header {
             display: grid;
             grid-template-columns: auto 1fr auto;
-            margin: 0.5rem 1rem;
+            margin: 0 5px;
 
             .event-name-inp {
                 font-size: 1.4rem;

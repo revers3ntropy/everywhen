@@ -59,15 +59,15 @@
     @import '../../../styles/variables';
 
     .sidebar {
-        position: sticky;
-        top: 0;
-        height: 100vh;
         width: 100%;
         background-color: var(--v-light-accent);
         overflow-y: scroll;
         padding: 0;
 
         @media @not-mobile {
+            position: sticky;
+            top: 1rem;
+            height: calc(100vh - 2rem);
             // for the scroll bar
             border-radius: @border-radius 0 0 @border-radius;
             background: none;
@@ -75,19 +75,19 @@
         }
 
         @media @mobile {
+            height: 100vh;
             z-index: 10;
-            width: 100%;
             transition: @transition;
             transform: translateX(-100%);
-            &.showing {
-                transform: translateX(0);
-                border-right: 2px solid var(--border-heavy);
-            }
-
             position: fixed;
             top: 0;
             left: 0;
             margin: 0;
+
+            &.showing {
+                transform: translateX(0);
+                border-right: 2px solid var(--border-heavy);
+            }
         }
 
         .header {
