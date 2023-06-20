@@ -34,6 +34,7 @@
         "./tests/**/*.svelte",
         "./playwright.config.ts",
         "./rollup.config.ts",
-        "svelte.config.js"
+        "svelte.config.js",
+        "bin/upload.js"
     ]
 }
