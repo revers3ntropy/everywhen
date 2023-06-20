@@ -136,7 +136,8 @@ CREATE TABLE pageLoads
     responseCode int(64)      NOT NULL,
     userAgent    varchar(512) NOT NULL,
     requestSize  int(64)      NOT NULL,
-    responseSize int(64)      NOT NULL
+    responseSize int(64)      NOT NULL,
+    ipAddress    varchar(64)  DEFAULT NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
 

@@ -14,13 +14,15 @@ export class PageLoadLog {
         userId: string,
         userAgent: string,
         requestSize: number,
-        resultSize: number
+        resultSize: number,
+        ipAddress: string
     ) {
         await query`
             INSERT INTO pageLoads (
                 user, created, method, url, 
                 route, loadTimeMs, responseCode,
-                userAgent, requestSize, responseSize
+                userAgent, requestSize, responseSize,
+                ipAddress
             ) VALUES (
                       ${userId},
                       ${created},
@@ -31,7 +33,8 @@ export class PageLoadLog {
                       ${responseCode},
                       ${userAgent},
                       ${requestSize},
-                      ${resultSize}
+                      ${resultSize},
+                      ${ipAddress}
           )
         `;
     }

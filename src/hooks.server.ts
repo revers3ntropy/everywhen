@@ -48,6 +48,24 @@ async function logReq(
     const auth = await tryGetAuthFromCookies(req.cookies);
     const userId = (auth?.id || '').toString();
 
+    let ip = '';
+
+    // might be set by the apache reverse proxy
+    const xForwardHeader = req.request.headers.get('x-forwarded-for');
+    if (xForwardHeader) ip = xForwardHeader;
+
+    const cfConnectingIpHeader = req.request.headers.get('cf-connecting-ip');
+    if (!ip && cfConnectingIpHeader) ip = cfConnectingIpHeader;
+
+    if (!ip) {
+        try {
+            ip = req.getClientAddress();
+        } catch (e) {
+            ip = '[unknown]';
+        }
+    }
+    if (!ip) ip = '[unknown]';
+
     await PageLoadLog.createLog(
         query.unlogged,
         now,
@@ -63,7 +81,8 @@ async function logReq(
         ).length,
         (
             await res.text()
-        ).length
+        ).length,
+        ip
     );
 }
 
@@ -86,7 +105,12 @@ export const handle = (async ({ event, resolve }) => {
         });
     }
 
-    void logReq(performance.now() - start, now, eventClone, result.clone());
+    void logReq(
+        performance.now() - start,
+        now,
+        eventClone,
+        result.clone()
+    ).catch(errorLogger.error);
 
     return result;
 }) satisfies Handle;

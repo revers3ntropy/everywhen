@@ -84,8 +84,8 @@ export default defineConfig({
 
     /* Run your local dev server before starting the tests */
     webServer: {
-        command: 'bin/dev',
+        command: 'vite preview --port 5173',
         port: 5173,
-        reuseExistingServer: true
+        reuseExistingServer: false
     }
 });
