@@ -100,18 +100,11 @@
 
         {#if isInDialog}
             <button>
-                <a class="flex-center" href="/map/{id}"> See more </a>
+                <a class="flex-center" href="/map/{id}" style="padding: 4px">
+                    See more
+                </a>
             </button>
         {/if}
-        <button
-            on:click={bin}
-            use:tooltip={{
-                content: 'Delete',
-                position: 'bottom'
-            }}
-        >
-            <Bin size="25" />
-        </button>
     </div>
     <h2 style="margin: 1rem 0;">
         <label>
@@ -130,6 +123,12 @@
         />
         m
     </label>
+    <div>
+        <button class="with-icon bordered danger" on:click={bin}>
+            <Bin size="25" />
+            Delete
+        </button>
+    </div>
 </div>
 
 <style lang="less">

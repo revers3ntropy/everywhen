@@ -108,7 +108,9 @@
         {obfuscated ? obfuscate(title) : title}
     </p>
     <div class="header">
-        <div class="flex-space-evenly">
+        <div
+            style="display: flex; align-items: center; max-width: calc(100% - 60px)"
+        >
             {#if !showFullDate}
                 <span class="time">
                     <UtcTime
@@ -150,10 +152,10 @@
             {#if showLabels}
                 <Label label={showLabel} {obfuscated} />
             {/if}
-        </div>
 
-        <div class="title {obfuscated ? 'obfuscated' : ''}">
-            {obfuscated ? obfuscate(title) : title}
+            <div class="title {obfuscated ? 'obfuscated' : ''}">
+                {obfuscated ? obfuscate(title) : title}
+            </div>
         </div>
 
         <div class="flex-center">
@@ -248,8 +250,9 @@
             justify-content: space-between;
             align-items: center;
             margin: 0;
-            padding: 0 0.3em;
+            padding: 0;
             width: 100%;
+            max-width: 100%;
 
             @media @mobile {
                 margin: 0;

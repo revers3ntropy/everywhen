@@ -213,72 +213,74 @@
     $: entries[fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD')] ??= [];
 </script>
 
-<div>
-    <div>
-        <div class="entries-menu">
-            <div class="hide-mobile">
-                {#if showBin}
-                    <a class="with-circled-icon" href="/journal/deleted">
-                        <Bin size="30" />
-                        Bin
-                    </a>
-                {/if}
-            </div>
+<div class="flex-center">
+    <div style="width: 100%; max-width: {showSidebar ? 1400 : 800}px">
+        <div>
+            <div class="entries-menu">
+                <div class="hide-mobile">
+                    {#if showBin}
+                        <a class="with-circled-icon" href="/journal/deleted">
+                            <Bin size="30" />
+                            Bin
+                        </a>
+                    {/if}
+                </div>
 
-            <div />
+                <div />
 
-            <div>
-                {#if showSearch}
-                    <input
-                        bind:this={searchInput}
-                        on:change={updateSearch}
-                        placeholder="Search..."
-                        type="text"
-                    />
-                    <button on:click={updateSearch}>
-                        <Search />
-                    </button>
-                {/if}
+                <div>
+                    {#if showSearch}
+                        <input
+                            bind:this={searchInput}
+                            on:change={updateSearch}
+                            placeholder="Search..."
+                            type="text"
+                        />
+                        <button on:click={updateSearch}>
+                            <Search />
+                        </button>
+                    {/if}
+                </div>
             </div>
         </div>
-    </div>
-    <div class:sidebar-and-entries={showSidebar}>
-        {#if showSidebar}
+        <div class:sidebar-and-entries={showSidebar}>
+            {#if showSidebar}
+                <div>
+                    <Sidebar
+                        titles={entryTitles}
+                        {auth}
+                        {hideAgentWidget}
+                        obfuscated={$obfuscated}
+                    />
+                </div>
+            {/if}
+
             <div>
-                <Sidebar
-                    titles={entryTitles}
-                    {auth}
-                    {hideAgentWidget}
-                    obfuscated={$obfuscated}
+                <div class="entries">
+                    {#each sortedEntryKeys as day (entries[day])}
+                        <EntryGroup
+                            entries={entries[day]}
+                            obfuscated={$obfuscated}
+                            {showLabels}
+                            {showLocations}
+                            {auth}
+                            day={new Date(day).getTime() / 1000}
+                            {hideAgentWidget}
+                            {locations}
+                            {showEntryForm}
+                            {entryFormMode}
+                        />
+                    {/each}
+                    {#if loadingAt !== null && loadingAt < numberOfEntries}
+                        <Spinner />
+                    {/if}
+                </div>
+                <div
+                    use:inview={{ rootMargin: '200px' }}
+                    on:inview_enter={() => loadMoreEntries()}
+                    on:inview_leave={() => (pageEndInView = false)}
                 />
             </div>
-        {/if}
-
-        <div>
-            <div class="entries">
-                {#each sortedEntryKeys as day (entries[day])}
-                    <EntryGroup
-                        entries={entries[day]}
-                        obfuscated={$obfuscated}
-                        {showLabels}
-                        {showLocations}
-                        {auth}
-                        day={new Date(day).getTime() / 1000}
-                        {hideAgentWidget}
-                        {locations}
-                        {showEntryForm}
-                        {entryFormMode}
-                    />
-                {/each}
-                {#if loadingAt !== null && loadingAt < numberOfEntries}
-                    <Spinner />
-                {/if}
-            </div>
-            <div
-                use:inview={{ rootMargin: '200px' }}
-                on:inview_enter={() => loadMoreEntries()}
-                on:inview_leave={() => (pageEndInView = false)}
-            />
         </div>
     </div>
 </div>

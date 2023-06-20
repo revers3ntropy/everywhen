@@ -60,7 +60,6 @@
 
     .sidebar {
         width: 100%;
-        background-color: var(--v-light-accent);
         overflow-y: scroll;
         padding: 0;
 
@@ -71,10 +70,11 @@
             // for the scroll bar
             border-radius: @border-radius 0 0 @border-radius;
             background: none;
-            border: 1px solid var(--border-color);
+            //border: 1px solid var(--border-color);
         }
 
         @media @mobile {
+            background: var(--v-light-accent);
             height: 100vh;
             z-index: 10;
             transition: @transition;

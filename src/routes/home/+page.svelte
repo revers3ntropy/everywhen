@@ -110,55 +110,58 @@
             </a>
         </div>
     </section>
-    {#if titlesLoaded}
-        {#if Object.keys(groupedTitles || {}).length}
-            <section>
-                <h1>Recent Entries</h1>
-                <EntryTitles
-                    auth={data}
-                    titles={groupedTitles}
-                    obfuscated={$obfuscated}
-                    hideAgentWidget={!data.settings.showAgentWidgetOnEntries
-                        .value}
-                />
-            </section>
+
+    <div style="width: 100%; max-width: 800px;">
+        {#if titlesLoaded}
+            {#if Object.keys(groupedTitles || {}).length}
+                <section>
+                    <h1>Recent Entries</h1>
+                    <EntryTitles
+                        auth={data}
+                        titles={groupedTitles}
+                        obfuscated={$obfuscated}
+                        hideAgentWidget={!data.settings.showAgentWidgetOnEntries
+                            .value}
+                    />
+                </section>
+            {:else}
+                <section>
+                    <h1 class="recent-entries">Recent Entries</h1>
+                    <p class="recent-entries-text">
+                        Doesn't look like you have any entries yet, why not <a
+                            href="/journal?obfuscate=0">write one</a
+                        >?
+                    </p>
+                </section>
+            {/if}
+            {#each Object.entries(entriesYearsAgoToday(titles)) as [yearsAgo, entries] (yearsAgo)}
+                <section>
+                    <h1>
+                        {yearsAgo === '1' ? `A Year` : `${yearsAgo} Years`} Ago Today
+                    </h1>
+                    <EntryTitles
+                        titles={{
+                            [fmtUtc(
+                                dayUtcFromTimestamp(
+                                    entries[0].created,
+                                    entries[0].createdTZOffset
+                                ),
+                                0,
+                                'YYYY-MM-DD'
+                            )]: entries
+                        }}
+                        obfuscated={$obfuscated}
+                        showTimeAgo={false}
+                        auth={data}
+                        hideAgentWidget={!data.settings.showAgentWidgetOnEntries
+                            .value}
+                    />
+                </section>
+            {/each}
         {:else}
-            <section>
-                <h1 class="recent-entries">Recent Entries</h1>
-                <p class="recent-entries-text">
-                    Doesn't look like you have any entries yet, why not <a
-                        href="/journal?obfuscate=0">write one</a
-                    >?
-                </p>
-            </section>
+            <BookSpinner />
         {/if}
-        {#each Object.entries(entriesYearsAgoToday(titles)) as [yearsAgo, entries] (yearsAgo)}
-            <section>
-                <h1>
-                    {yearsAgo === '1' ? `A Year` : `${yearsAgo} Years`} Ago Today
-                </h1>
-                <EntryTitles
-                    titles={{
-                        [fmtUtc(
-                            dayUtcFromTimestamp(
-                                entries[0].created,
-                                entries[0].createdTZOffset
-                            ),
-                            0,
-                            'YYYY-MM-DD'
-                        )]: entries
-                    }}
-                    obfuscated={$obfuscated}
-                    showTimeAgo={false}
-                    auth={data}
-                    hideAgentWidget={!data.settings.showAgentWidgetOnEntries
-                        .value}
-                />
-            </section>
-        {/each}
-    {:else}
-        <BookSpinner />
-    {/if}
+    </div>
 </main>
 
 <style lang="less">
@@ -169,6 +172,7 @@
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
+        margin: 1rem;
 
         @media @mobile {
             flex-direction: column;

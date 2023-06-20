@@ -1,9 +1,9 @@
 <div>
-    <a href="/">Log In</a>
+    <a href="/"> Log In </a>
 </div>
 
 <style lang="less">
     div {
-        margin: 1rem;
+        padding: 1rem;
     }
 </style>

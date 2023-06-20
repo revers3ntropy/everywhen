@@ -506,7 +506,7 @@
     }
 
     .head {
-        margin: 0;
+        margin: 0 0 4px 0;
         padding: 0;
         display: grid;
         grid-template-columns: 1fr 1fr;

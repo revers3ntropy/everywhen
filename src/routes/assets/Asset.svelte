@@ -146,6 +146,7 @@
         }
 
         .menu {
+            display: flex;
             position: absolute;
             top: 0;
             right: 0;
@@ -154,12 +155,20 @@
             border-radius: 5px;
             padding: 5px;
             background: var(--transluscent-bg);
-            display: flex;
             justify-content: space-between;
             align-items: center;
 
+            transition: opacity @transition;
+            opacity: 0;
+
             & > * {
                 .flex-center();
+            }
+        }
+
+        &:hover {
+            .menu {
+                opacity: 1;
             }
         }
 

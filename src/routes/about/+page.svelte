@@ -8,7 +8,7 @@
 
 <main class="flex-center">
     <section>
-        <h1>Halcyon.Land</h1>
+        <h1> Halcyon.Land </h1>
 
         <p>
             Halcyon.Land is an
@@ -222,5 +222,11 @@
 
     p {
         max-width: 600px;
+        padding: 3px;
+    }
+
+    h1,
+    h2 {
+        padding: 1rem;
     }
 </style>

@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { limitStrLen } from '$lib/utils/text.js';
     import { tooltip } from '@svelte-plugins/tooltips';
     import MapMarker from 'svelte-material-icons/MapMarkerOutline.svelte';
     import { Location } from '$lib/controllers/location';
@@ -54,11 +53,11 @@
                 {#if i < MAX_LOCATIONS_SHOWN}
                     {#if obfuscated}
                         <span class="text-light ellipsis obfuscated">
-                            {obfuscate(limitStrLen(location.name, 20))}
+                            {obfuscate(location.name)}
                         </span>
                     {:else}
                         <a href="/map/{location.id}" class="ellipsis">
-                            {limitStrLen(location.name, 20)}
+                            {location.name}
                         </a>
                     {/if}
                     {#if i < touching.length - 1}
@@ -72,8 +71,10 @@
                                 .map(l => l.name)
                                 .join(', ')
                         }}
+                        class="flex-center"
+                        style="width: 10px"
                     >
-                        ...
+                        <span> ... </span>
                     </span>
                 {/if}
             {/each}
@@ -83,11 +84,11 @@
             <span class="text-light">near</span>
             {#if obfuscated}
                 <span class="text-light ellipsis obfuscated">
-                    {obfuscate(limitStrLen(nearby[0].name, 20))}
+                    {obfuscate(nearby[0].name)}
                 </span>
             {:else}
                 <a href="/map/{nearby[0].id}" class="ellipsis">
-                    {limitStrLen(nearby[0].name, 20)}
+                    {nearby[0].name}
                 </a>
             {/if}
         </span>
@@ -99,15 +100,15 @@
 
     .outer {
         display: flex;
-        justify-content: center;
         align-items: center;
 
         font-size: 0.9rem;
         color: var(--text-color-light);
+        max-width: 100%;
 
         .multi-locations-container {
+            max-width: 100%;
             display: flex;
-            justify-content: center;
             align-items: center;
         }
     }
