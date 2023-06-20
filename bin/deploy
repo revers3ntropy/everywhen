@@ -23,7 +23,7 @@ mv tmp.env .env
 
 [ -d "build" ] || die "output dir not found"
 
-node bin/upload --restart -v --env "$1" || die "upload failed";
+node bin/upload -v --env "$1" || die "upload failed";
 
 end=`date +%s`
 
