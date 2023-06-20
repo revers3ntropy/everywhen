@@ -156,7 +156,7 @@ async function main() {
         `sudo chmod +x ${remoteDir()}/server/bin/libwebp_linux/bin/cwebp`
     );
 
-    await runRemoteCommand(`cd ${remoteDir()} && npm i`);
+    await runRemoteCommand(`cd ${remoteDir()} && pnpm i`);
 
     console.log('Restarting remote server...');
     await runRemoteCommand(`cd ${remoteDir()} && npm run start`);
