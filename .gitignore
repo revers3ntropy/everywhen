@@ -5,6 +5,7 @@
 # Packages
 node_modules
 **/package-lock.json
+**/pnpm-lock.yaml
 
 # Generated
 /.svelte-kit
@@ -22,9 +23,7 @@ node_modules
 # Build files
 .output
 /build
-/misc_3-server/
 
 # Testing
 /test-results/
 /playwright-report/
-/playwright/.cache/
