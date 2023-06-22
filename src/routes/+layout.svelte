@@ -204,12 +204,12 @@
     {#key data.path}
         <div
             class="page-content"
-            in:blur={{
+            in:blur|global={{
                 // half as total = in + out
                 duration: ANIMATION_DURATION * 0.5,
                 delay: ANIMATION_DURATION * 0.5
             }}
-            out:blur={{
+            out:blur|global={{
                 duration: ANIMATION_DURATION * 0.5
             }}
         >
