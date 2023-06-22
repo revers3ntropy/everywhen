@@ -58,7 +58,12 @@
         ) {
             throw target;
         }
-        radius = Location.metersToDegrees(parseFloat(target.value));
+        radius = Location.metersToDegreesPrecise(
+            parseFloat(target.value),
+            1,
+            1,
+            latitude
+        );
         await syncWithServer();
     }) satisfies ChangeEventHandler<HTMLInputElement>;
 
@@ -118,8 +123,10 @@
             on:change={onRadiusChange}
             step="0.1"
             type="number"
-            value={round1DP(Location.degreesToMeters(radius))}
-            style="width: 50px"
+            value={round1DP(
+                Location.degreesToMetersPrecise(radius, 1, 1, latitude)
+            )}
+            style="width: 100px"
         />
         m
     </label>

@@ -260,6 +260,18 @@ export class Location {
         );
     }
 
+    public static metersToDegreesPrecise(
+        m: Meters,
+        resolution: number,
+        mPerUnit: number,
+        latitude: Degrees
+    ): Degrees {
+        return (
+            Location.metersToDegrees(m) *
+            ((resolution / mPerUnit) * Math.cos(latitude * (Math.PI / 180)))
+        );
+    }
+
     public static async purge(
         query: QueryFunc,
         auth: Auth,
