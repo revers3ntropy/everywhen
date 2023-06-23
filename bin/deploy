@@ -26,7 +26,5 @@ mv tmp.env .env
 node bin/upload -v --env "$1" || die "upload failed";
 
 end=`date +%s`
-
 runtime=$( echo "$end - $start" | bc -l )
-
 echo "Deployment total time: $runtime s"

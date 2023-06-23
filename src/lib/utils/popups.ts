@@ -1,13 +1,17 @@
+import type { SvelteComponent } from 'svelte';
 import { bind } from 'svelte-simple-modal';
-import type { SvelteComponentDev } from 'svelte/internal';
 import { popup } from '../stores';
 
 export function showPopup(
-    el: typeof SvelteComponentDev,
+    el: typeof SvelteComponent<
+        Record<string, unknown>,
+        Record<string, unknown>,
+        Record<string, unknown>
+    >,
     props: Record<string, unknown>,
     onClose: () => Promise<boolean | void> | boolean | void = () => void 0
 ) {
-    const boundEl = bind(el, props);
+    const boundEl = bind(el as typeof SvelteComponent, props);
     popup.set(boundEl);
 
     // not a very nice solution but I can't think of any other way

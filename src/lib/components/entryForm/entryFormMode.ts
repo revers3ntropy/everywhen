@@ -1,4 +1,4 @@
 export enum EntryFormMode {
-    Bullet,
-    Standard
+    Bullet = 'Bullet',
+    Standard = 'Standard'
 }

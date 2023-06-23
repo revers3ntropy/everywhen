@@ -1,7 +1,7 @@
 <script lang="ts">
     import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
     import { tooltip } from '@svelte-plugins/tooltips';
-    import LocationToggle from '$lib/components/entryForm/LocationToggle.svelte';
+    import LocationToggle from '$lib/components/location/LocationToggle.svelte';
     import LabelSelect from '$lib/components/label/LabelSelect.svelte';
     import TextBoxOutline from 'svelte-material-icons/TextBoxOutline.svelte';
     import type { Entry, RawEntry } from '$lib/controllers/entry';

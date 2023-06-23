@@ -22,7 +22,7 @@
 
     let setupCanvas = false;
 
-    onMount(async () => {
+    onMount(() => {
         const state = CanvasState.empty();
         state.canvas = canvas;
         state.ctx = canvas.getContext('2d', attributes);
@@ -31,8 +31,13 @@
         // setup entities
         for (const entity of listeners) {
             if (entity.setup) {
-                let p = entity.setup($canvasState.asRenderProps());
-                if (p && 'then' in p) await p;
+                const p = entity.setup($canvasState.asRenderProps());
+                if (p && 'then' in p) {
+                    void p.then(() => {
+                        entity.ready = true;
+                    });
+                    continue;
+                }
             }
             entity.ready = true;
         }
@@ -40,13 +45,14 @@
         setupCanvas = true;
 
         // start game loop
-        return createLoop((elapsed, dt) => {
+        const stop = createLoop((elapsed, dt) => {
             canvasState.update(s => {
                 s.time = elapsed;
                 return s;
             });
             render(dt);
         });
+        return () => stop();
     });
 
     setContext<CanvasContext>(key, {

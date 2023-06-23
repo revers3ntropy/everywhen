@@ -138,7 +138,7 @@ function datasetFactoryForStandardBuckets(
         }
 
         if (isNaN(Object.values(buckets).reduce((a, b) => a + b, 0))) {
-            console.log(buckets);
+            console.error(buckets);
             console.error('NaN in buckets');
         }
 

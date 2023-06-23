@@ -13,6 +13,8 @@
 		"zx": "^7.0.7"
 	},
 	"dependencies": {
-		"prompts": "^2.4.2"
+		"node-fetch": "^3.3.1",
+		"prompts": "^2.4.2",
+		"ssl-root-cas": "^1.3.1"
 	}
 }

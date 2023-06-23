@@ -19,6 +19,7 @@ declare class WebpConverter {
         type: string,
         options: string
     ): Promise<string>;
+    static grant_permission(): Promise<void>;
 }
 
 declare module 'webp-converter' {

@@ -1,5 +1,5 @@
 import { localStorageWritable } from '$lib/lsWritable';
-import type { SvelteComponentDev } from 'svelte/internal';
+import type { SvelteComponent } from 'svelte';
 import { writable } from 'svelte/store';
 import type { EventsSortKey } from '../app';
 import { LS_KEY } from './constants';
@@ -25,6 +25,4 @@ export const obfuscated = localStorageWritable<boolean>(
     true
 );
 
-export const popup = writable<typeof SvelteComponentDev | null | undefined>(
-    null
-);
+export const popup = writable<typeof SvelteComponent | null | undefined>(null);

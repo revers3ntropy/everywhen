@@ -7,16 +7,18 @@ import commandLineArgs from 'command-line-args';
 import * as dotenv from 'dotenv';
 import prompts from 'prompts';
 import fs from 'fs';
+import fetch from 'node-fetch';
+import https from 'https';
 
-/**
- * @type {(options: *[]) => *}
- */
+const noSslAgent = new https.Agent({
+    rejectUnauthorized: false
+});
+
+/** @type {(options: *[]) => *} */
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const cliArgs = commandLineArgs;
 
-/**
- * @type {{ verbose: boolean, env: string }}
- */
+/** @type {{ verbose: boolean, env: string }} */
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 export const { verbose, env } = cliArgs([
     { name: 'verbose', type: Boolean, alias: 'v', defaultValue: false },
@@ -56,7 +58,32 @@ const uploadPaths = {
     [`./node_modules/webp-converter/bin/libwebp_linux/bin/cwebp`]: `/server/bin/libwebp_linux/bin/cwebp`
 };
 
+const LOG_PREFIX = c.blueBright('[upload.js]');
+
+const consoleLog = console.log;
+const consoleError = console.error;
+const consoleWarn = console.warn;
+console.log = (...args) => {
+    if (verbose) {
+        consoleLog(LOG_PREFIX, ...args);
+    }
+};
+console.warn = (...args) => {
+    consoleWarn(LOG_PREFIX, ...args);
+};
+console.error = (...args) => {
+    consoleError(LOG_PREFIX, ...args);
+};
+
 $.verbose = verbose;
+
+/**
+ * @param {number} ms
+ * @returns {Promise<unknown>}
+ */
+async function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 class Version {
     major = 0;
@@ -197,14 +224,6 @@ async function runRemoteCommand(command, failOnError = true) {
     );
 }
 
-/**
- * @param {string} command
- * @returns {Promise<*>}
- */
-async function runRemoteCommandSudo(command) {
-    return await $`sshpass -f './secrets/${env}/sshpass.txt' ssh -t ${remoteSshAddress()} ${command}`;
-}
-
 async function upload() {
     await $`mv ./build ./${process.env.DIR}`;
     console.log(c.green('Uploading...'));
@@ -226,8 +245,9 @@ async function upload() {
     await Promise.all(
         Object.keys(uploadPaths).map(async path => {
             if (fs.existsSync(path)) {
-                console.log(c.yellow(path));
                 await uploadPath(path, '~/' + remoteDir() + uploadPaths[path]);
+            } else {
+                console.warn(c.yellow(`File not found: ${path}`));
             }
         })
     );
@@ -294,6 +314,7 @@ async function doMigrations(remoteVersion, localVersion) {
     }
 
     console.log('\n\n');
+    console.log('Migrations to run:');
     for (const migration of confirmedMigrations) {
         console.log(`    ${c.green(migration.str())}`);
     }
@@ -316,7 +337,7 @@ async function doMigrations(remoteVersion, localVersion) {
             `./db/migrations/${migration.str()}.sql`,
             `~/${remoteDir()}/migration-to-run.sql`
         );
-        await runRemoteCommandSudo(
+        await runRemoteCommand(
             `cd ${remoteDir()} && mysql -u ${remoteEnv.DB_USER} -p"${
                 remoteEnv.DB_PASS
             }" ${remoteEnv.DB} < migration-to-run.sql`
@@ -333,13 +354,12 @@ async function doMigrations(remoteVersion, localVersion) {
  */
 async function getRemoteVersion() {
     console.log(
-        c.cyan(
-            `Getting remote version from 'https://${remoteAddress()}/api/version'`
-        )
+        `Getting remote version from '${remoteAddress()}/api/version'...`
     );
     const rawVersion = await fetch(`https://${remoteAddress()}/api/version`, {
-        method: 'GET'
+        agent: noSslAgent
     });
+
     const apiVersion = await rawVersion.json();
     if (typeof apiVersion !== 'object' || apiVersion === null) {
         console.error(apiVersion);
@@ -356,16 +376,57 @@ async function getRemoteVersion() {
     return Version.fromString(apiVersion.v);
 }
 
+/**
+ * @param {Version} localVersion
+ */
+async function restartServer(localVersion) {
+    while (true) {
+        console.log('Restarting remote server...');
+        await runRemoteCommand(`cd ${remoteDir()} && npm run start`);
+
+        await sleep(500);
+
+        try {
+            const remoteVersion = await getRemoteVersion().catch(console.error);
+            if (remoteVersion && remoteVersion.isEqual(localVersion)) {
+                console.log(c.green('Server restart complete!'));
+                return;
+            }
+        } catch (e) {
+            console.error(e);
+        }
+        console.log(c.red('Server restart seemed to fail...'));
+
+        /**@type {{ value: boolean }} */
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment
+        const response = await prompts({
+            type: 'confirm',
+            name: 'value',
+            message: `Retry?`
+        });
+
+        if (response.value !== true) {
+            return;
+        }
+    }
+}
+
 async function main() {
     dotenv.config({ path: `./secrets/${env}/.env` });
-    console.log(c.cyan(`Uploading to ${remoteSshAddress()} (${env})`));
+    console.log(c.cyan(`Deploying to ${remoteSshAddress()} (${env})`));
 
     const remoteVersion = await getRemoteVersion();
     const localVersion = Version.fromPackageJson('./package.json');
 
-    if (remoteVersion.isEqual(localVersion)) {
-        console.log(c.red(`Remote version is equal to local version`));
-        console.log(c.red(`${localVersion.str()} == ${remoteVersion.str()}`));
+    console.log(`Found remote version: ${remoteVersion.str()}`);
+    console.log(`Found local version: ${localVersion.str()}`);
+
+    if (
+        remoteVersion.isEqual(localVersion) ||
+        remoteVersion.isGreaterThan(localVersion)
+    ) {
+        console.log(c.red(`Remote version is equal to (or gt) local version`));
+        console.log(c.red(`${localVersion.str()} <= ${remoteVersion.str()}`));
         throw new Error();
     }
 
@@ -386,18 +447,12 @@ async function main() {
 
     await upload();
 
-    await runRemoteCommandSudo(
-        `sudo chmod +x ${remoteDir()}/server/bin/libwebp_linux/bin/cwebp`
-    );
-
     await runRemoteCommand(`cd ${remoteDir()} && pnpm i`);
 
-    console.log('Restarting remote server...');
-    await runRemoteCommand(`cd ${remoteDir()} && npm run start`);
+    await restartServer(localVersion);
 
     const duration = (now() - start) / 1000;
-    console.log(c.green(`Finished Uploading`));
-    console.log(`Downtime: ${c.red(duration.toPrecision(3))}s`);
+    console.log(`Estimated downtime: ${c.red(duration.toPrecision(3))}s`);
 }
 
 void main();

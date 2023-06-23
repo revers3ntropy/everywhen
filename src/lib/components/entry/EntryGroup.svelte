@@ -39,7 +39,6 @@
     if (entryFormMode === null && showEntryForm) {
         throw new Error('entryFormMode must be set if showEntryForm is true');
     }
-
     let formMode: EntryFormMode;
     $: if (showEntryForm) {
         formMode = entryFormMode as EntryFormMode;

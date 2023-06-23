@@ -49,9 +49,7 @@
     async function copyToClipBoard() {
         recentlyCopied = true;
 
-        await navigator.clipboard.writeText(
-            Asset.markDownLink(fileName, publicId)
-        );
+        await navigator.clipboard.writeText(Asset.mdLink(fileName, publicId));
 
         notify.success('Copied to clipboard');
 

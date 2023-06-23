@@ -29,7 +29,7 @@
     import { currentTzOffset, nowUtc } from '$lib/utils/time';
     import type { Mutable } from '../../../app';
     import FormatOptions from './FormatOptions.svelte';
-    import LocationToggle from './LocationToggle.svelte';
+    import LocationToggle from '../location/LocationToggle.svelte';
 
     // as this form is used in entry editing and creating
     export let action: 'create' | 'edit' = 'create';
@@ -249,7 +249,7 @@
         // insert markdown to link to image
         insertAtCursor(
             newEntryInputElement,
-            `\n${Asset.markDownLink(file.name, id)}\n`
+            `\n${Asset.mdLink(file.name, id)}\n`
         );
     }
 

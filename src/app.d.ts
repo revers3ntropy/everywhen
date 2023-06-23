@@ -88,54 +88,54 @@ declare global {
         import('filedrop-svelte/event').FileDropSelectEvent;
     declare type FileDropDragEvent =
         import('filedrop-svelte/event').FileDropDragEvent;
-    declare namespace svelte.JSX {
+    declare namespace svelteHTML {
         interface HTMLAttributes<T> {
-            onfiledrop?: (
+            'on:filedrop'?: (
                 event: CustomEvent<FileDropSelectEvent> & {
                     target: EventTarget & T;
                 }
             ) => void;
-            onfiledragenter?: (
+            'on:filedragenter'?: (
                 event: CustomEvent<FileDropDragEvent> & {
                     target: EventTarget & T;
                 }
             ) => void;
-            onfiledragleave?: (
+            'on:filedragleave'?: (
                 event: CustomEvent<FileDropDragEvent> & {
                     target: EventTarget & T;
                 }
             ) => void;
-            onfiledragover?: (
+            'on:filedragover'?: (
                 event: CustomEvent<FileDropDragEvent> & {
                     target: EventTarget & T;
                 }
             ) => void;
-            onfiledialogcancel?: (
+            'on:filedialogcancel'?: (
                 event: CustomEvent<FileDropEvent> & {
                     target: EventTarget & T;
                 }
             ) => void;
-            onfiledialogclose?: (
+            'on:filedialogclose'?: (
                 event: CustomEvent<FileDropEvent> & {
                     target: EventTarget & T;
                 }
             ) => void;
-            onfiledialogopen?: (
+            'on:filedialogopen'?: (
                 event: CustomEvent<FileDropEvent> & {
                     target: EventTarget & T;
                 }
             ) => void;
-            onwindowfiledragenter?: (
+            'on:windowfiledragenter'?: (
                 event: CustomEvent<FileDropDragEvent> & {
                     target: EventTarget & T;
                 }
             ) => void;
-            onwindowfiledragleave?: (
+            'on:windowfiledragleave'?: (
                 event: CustomEvent<FileDropDragEvent> & {
                     target: EventTarget & T;
                 }
             ) => void;
-            onwindowfiledragover?: (
+            'on:windowfiledragover'?: (
                 event: CustomEvent<FileDropDragEvent> & {
                     target: EventTarget & T;
                 }

@@ -1,6 +1,6 @@
 {
     "name": "halcyon.land",
-    "version": "0.4.64",
+    "version": "0.4.70",
     "type": "module",
     "private": true,
     "devDependencies": {
@@ -11,7 +11,6 @@
         "@sveltejs/kit": "^1.20.4",
         "@sveltejs/pancake": "^0.0.18",
         "@sveltejs/vite-plugin-svelte": "^2.4.1",
-        "@testing-library/svelte": "^3.2.2",
         "@total-typescript/ts-reset": "^0.4.2",
         "@types/cookie": "^0.5.1",
         "@types/crypto-js": "^4.1.1",

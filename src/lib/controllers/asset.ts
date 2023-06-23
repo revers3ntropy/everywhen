@@ -1,3 +1,4 @@
+import fs from 'fs';
 import type { ResultSetHeader } from 'mysql2';
 import webp from 'webp-converter';
 import type { TimestampSecs } from '../../app';
@@ -264,7 +265,7 @@ export class Asset {
         );
     }
 
-    public static markDownLink(fileName: string, publicId: string): string {
+    public static mdLink(fileName: string, publicId: string): string {
         return `![${fileName}](/api/assets/${publicId})`;
     }
 
@@ -273,8 +274,12 @@ export class Asset {
         fileExt: string,
         quality: number
     ) {
+        // it's either do it here or when deploying,
+        // and doing it here is somehow less painful...
+        fs.chmodSync('./server/bin/libwebp_linux/bin/cwebp', 0o755);
+
         const imgB64 = b64.replace(
-            /^data:image\/((jpeg)|(jpg)|(png));base64,/,
+            /^data:image\/((jpeg)|(jpg)|(png)|(webp));base64,/,
             ''
         );
 

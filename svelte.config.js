@@ -13,6 +13,10 @@ const config = {
         adapter: adapter()
     },
 
+    compilerOptions: {
+        discloseVersion: true
+    },
+
     /**
      * @param {{ code: string }} warning
      * @param {(c: { code: string }) => *} handler

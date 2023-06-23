@@ -7,7 +7,7 @@
 
     export let data: PageData;
 
-    let entryFormMode = data.settings.entryFormMode.value
+    let entryFormMode = data?.settings.entryFormMode.value
         ? EntryFormMode.Bullet
         : EntryFormMode.Standard;
 
