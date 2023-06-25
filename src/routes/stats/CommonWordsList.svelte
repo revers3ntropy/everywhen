@@ -31,6 +31,10 @@
     {/each}
 </div>
 
+{#if words.length === 0}
+    <p class="text-light">No words yet</p>
+{/if}
+
 <style lang="less">
     @import '../../styles/variables';
     @import '../../styles/text';
