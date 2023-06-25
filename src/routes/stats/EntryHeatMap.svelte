@@ -37,7 +37,7 @@
             dayLabelWidth={20}
             emptyColor={'var(--light-accent)'}
             endDate={moment().toDate()}
-            fontColor={'var(--text-light)'}
+            fontColor={'var(--text-color-light)'}
             fontSize="12"
             monthGap={20}
             monthLabelHeight={20}
