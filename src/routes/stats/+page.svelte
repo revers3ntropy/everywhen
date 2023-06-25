@@ -5,21 +5,15 @@
     import CommonWordsList from './CommonWordsList.svelte';
     import EntryBarChart from './EntryBarChart.svelte';
     import EntryHeatMap from './EntryHeatMap.svelte';
-    import { By, type EntryWithWordCount } from './helpers';
+    import { By } from './helpers';
     import SearchForWord from './SearchForWord.svelte';
     import StatPill from './StatPill.svelte';
     import { fade } from 'svelte/transition';
+    import type { PageData } from './$types';
 
     let by: By = By.Entries;
 
-    export let data: App.PageData & {
-        entries: EntryWithWordCount[];
-        entryCount: number;
-        wordCount: number;
-        charCount: number;
-        commonWords: [string, number][];
-        days: number;
-    };
+    export let data: PageData;
 
     onMount(() => (document.title = 'Insights'));
 </script>
@@ -32,11 +26,11 @@
 <main>
     {#if data.entries.length === 0}
         <section class="container invisible">
-            <h1>No Entries</h1>
+            <h1> No Entries </h1>
             <div class="flex-center">
                 <p>
                     You need to create some entries before you can see insights,
-                    <a href="/journal">why not create one?</a>
+                    <a href="/journal"> why not create one? </a>
                 </p>
             </div>
         </section>
@@ -46,7 +40,7 @@
             <div>
                 <h1>
                     <Counter size="40" />
-                    <span>Insights</span>
+                    <span> Insights </span>
                 </h1>
             </div>
             <div class="search-for-word">
@@ -112,7 +106,7 @@
         </section>
 
         <section>
-            <h2>Common Words</h2>
+            <h2> Common Words </h2>
             <CommonWordsList
                 entryCount={data.entryCount}
                 words={data.commonWords}

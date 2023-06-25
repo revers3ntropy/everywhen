@@ -7,9 +7,7 @@
 </script>
 
 <script lang="ts">
-    import cn from 'classnames';
-
-    const id = `dropdown__${getId()}`;
+    const id = `__dropdown__${getId()}`;
 
     export let open = false;
     export let ariaLabel = (open: boolean) =>
@@ -17,7 +15,9 @@
         (open ? 'Close popup' : 'Open popup') as string;
     export let width = '100%';
     export let fromRight = false;
+    export let fromTop = false;
     export let openOnHover = false;
+    export let stayOpenWhenClicked = false;
 
     export let close = () => {
         open = false;
@@ -34,10 +34,18 @@
 
     function globalMouseUp(evt: MouseEvent) {
         const target = evt.target as Element;
+
         // don't close when clicking the button
-        if (!target.closest(`.dropdown#${id} > .dropdown-button`)) {
-            setTimeout(close, 10);
+        if (target.closest(`.dropdown#${id} > .dropdown-button`)) {
+            return;
         }
+
+        // don't close when clicking inside the popup and stayOpenWhenClicked is true
+        if (stayOpenWhenClicked && target.closest(`.dropdown#${id} > .popup`)) {
+            return;
+        }
+
+        setTimeout(close, 10);
     }
 
     $: label = ariaLabel(open);
@@ -46,11 +54,11 @@
 <svelte:window on:mouseup={globalMouseUp} />
 
 <span
-    class="dropdown {cn({
-        open,
-        'from-right': fromRight,
-        'open-on-hover': openOnHover
-    })}"
+    class="dropdown"
+    class:open
+    class:from-right={fromRight}
+    class:from-top={fromTop}
+    class:open-on-hover={openOnHover}
     {id}
 >
     <button
@@ -60,11 +68,11 @@
     >
         <slot name="button" />
     </button>
-    <div class="popup">
-        <div class="content container shadowed" style="width: {width}">
+    <span class="popup">
+        <span class="content container shadowed" style="width: {width}">
             <slot />
-        </div>
-    </div>
+        </span>
+    </span>
 </span>
 
 <style lang="less">
@@ -79,24 +87,25 @@
     .dropdown {
         position: relative;
 
-        &.popup {
-            .popup {
-                left: 0;
-            }
-        }
-
-        &.from-right {
-            .popup {
-                right: 0;
-            }
-        }
-
         .popup {
             .flex-center();
             position: absolute;
-            top: 100%;
             z-index: 15;
             display: none;
+            top: 100%;
+            left: 0;
+        }
+        &.from-right {
+            .popup {
+                right: 0;
+                left: unset;
+            }
+        }
+        &.from-top {
+            .popup {
+                bottom: 100%;
+                top: unset;
+            }
         }
 
         &.open,
@@ -108,6 +117,7 @@
     }
 
     .content {
+        display: block;
         margin: 0;
         padding: 0;
         background: var(--light-accent);

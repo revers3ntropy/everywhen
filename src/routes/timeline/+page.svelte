@@ -8,6 +8,7 @@
     import Controls from './Controls.svelte';
     import EntryInTimeline from './EntryInTimeline.svelte';
     import EventInTimeline from './EventInTimeline.svelte';
+    import Filters from './Filters.svelte';
     import NowLine from './NowLine.svelte';
     import TimeCursor from './TimeCursor.svelte';
     import ContextMenu from './ContextMenu.svelte';
@@ -21,12 +22,19 @@
 
     export let data: PageData;
 
+    let selectedLabels = [...(data.labels.map(l => l.id) || []), ''];
+
     let instantEvents: EventWithYLevel[];
     let durationEvents: EventWithYLevel[];
-    $: [instantEvents, durationEvents] = addYToEvents(data.events);
+    $: [instantEvents, durationEvents] = addYToEvents(
+        data.events.filter(event =>
+            selectedLabels.includes(event.label?.id || '')
+        )
+    );
 
     onMount(() => {
         document.title = 'Timeline';
+
         const [zoom, offset] = getInitialZoomAndPos(
             $canvasState,
             data.entries,
@@ -116,12 +124,15 @@
         <NowLine />
 
         {#each data.entries as entry, i}
-            <EntryInTimeline
-                {...entry}
-                entryTextParityHeight={i % 2 === 0}
-                auth={data}
-                hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
-            />
+            {#if selectedLabels.includes(entry.label?.id || '')}
+                <EntryInTimeline
+                    {...entry}
+                    entryTextParityHeight={i % 2 === 0}
+                    auth={data}
+                    hideAgentWidget={!data.settings.showAgentWidgetOnEntries
+                        .value}
+                />
+            {/if}
         {/each}
 
         {#key instantEvents}
@@ -149,4 +160,6 @@
         <CenterLine />
         <TimeCursor auth={data} />
     </Canvas>
+
+    <Filters auth={data} labels={data.labels} bind:selectedLabels />
 </main>

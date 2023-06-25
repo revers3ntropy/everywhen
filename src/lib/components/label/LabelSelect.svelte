@@ -7,12 +7,7 @@
     import Dropdown from '$lib/components/Dropdown.svelte';
     import type { Label } from '$lib/controllers/label';
     import type { Auth } from '$lib/controllers/user';
-    import { api } from '$lib/utils/apiRequest';
     import { errorLogger } from '$lib/utils/log';
-    import {
-        displayNotifOnErr,
-        notify
-    } from '$lib/notifications/notifications';
     import { showPopup } from '$lib/utils/popups';
     import NewLabelDialog from '$lib/components/dialogs/NewLabelDialog.svelte';
     import MenuDown from 'svelte-material-icons/MenuDown.svelte';
@@ -27,12 +22,7 @@
     export let condensed = false;
 
     function showNewLabelPopup() {
-        showPopup(NewLabelDialog, { auth }, async () => {
-            const res = displayNotifOnErr(await api.get(auth, '/labels'));
-            labels = res.labels;
-            // set to last created label
-            value = labels.sort((a, b) => b.created - a.created)[0].id;
-        });
+        showPopup(NewLabelDialog, { auth });
     }
 
     const dispatchEvent = createEventDispatcher();
@@ -42,7 +32,6 @@
     $: if (labels && value && !labels.find(l => l.id === value)) {
         errorLogger.error(`Label ${value} not found`);
         value = '';
-        notify.error(`Can't find label`);
     }
 
     $: dispatchEvent('change', { id: value });
@@ -51,6 +40,7 @@
 
     listen.label.onCreate(label => {
         labels = [...(labels || []), label];
+        value = label.id;
     });
     listen.label.onUpdate(label => {
         if (!labels) {
@@ -111,7 +101,6 @@
         <div class="list-container">
             <button
                 on:click={() => {
-                    closeDropDown();
                     value = '';
                 }}
                 class="label-button"
@@ -125,7 +114,6 @@
             {#each (labels ?? []).filter(filter) as label (label.id)}
                 <button
                     on:click={() => {
-                        closeDropDown();
                         value = label.id;
                     }}
                     class="label-button"
@@ -134,7 +122,8 @@
                     <span class="flex-center">
                         <span
                             class="entry-label-color"
-                            style="background: {label.color}"
+                            class:selected={value === label.id}
+                            style="--label-color: {label.color}"
                         />
                     </span>
                     <span class="label-name">
@@ -165,11 +154,16 @@
 <style lang="less">
     @import '../../../styles/variables';
     @import '../../../styles/text';
+    @import '../../../styles/layout';
 
     .entry-label-color {
-        border: 1px solid var(--border-light);
         width: 20px;
         height: 20px;
+        border: 4px solid var(--label-color);
+
+        &.selected {
+            background: var(--label-color);
+        }
     }
 
     .select-label {
@@ -238,7 +232,9 @@
 
     .label-name {
         .ellipsis();
+        .flex-center();
         max-width: 100%;
         text-align: left;
+        justify-content: start;
     }
 </style>
