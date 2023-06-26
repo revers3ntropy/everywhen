@@ -1,4 +1,5 @@
 import { Entry } from '$lib/controllers/entry';
+import { Settings } from '$lib/controllers/settings';
 import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
 import { error } from '@sveltejs/kit';
 import { query } from '$lib/db/mysql';
@@ -43,7 +44,16 @@ export const load = cachedPageRoute(async auth => {
             .slice(0, NUMBER_OF_RECENT_TITLES)
     );
 
-    const nYearsAgo = entriesYearsAgoToday(titles);
+    let nYearsAgo = {} as Record<string, Entry[]>;
+    const { err: showSettingErr, val: shouldShow } = await Settings.getValue(
+        query,
+        auth,
+        'showNYearsAgoEntryTitles'
+    );
+    if (showSettingErr) throw error(400, showSettingErr);
+    if (shouldShow) {
+        nYearsAgo = entriesYearsAgoToday(titles);
+    }
 
     const pinned = titles.filter(Entry.isPinned);
 

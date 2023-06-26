@@ -188,7 +188,7 @@
                 top: 5px;
                 width: 5px;
                 height: 10px;
-                border: solid #000;
+                border: solid var(--text-colour-on-gradient);
                 border-width: 0 3px 3px 0;
                 -webkit-transform: rotate(45deg);
                 -ms-transform: rotate(45deg);

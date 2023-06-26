@@ -79,7 +79,13 @@ export class Settings<T = unknown> {
             defaultValue: 2000,
             name: 'Year of Birth',
             description: `The first year in which you lived. Used by the timeline.`
-        } as SettingConfig<number>
+        } as SettingConfig<number>,
+        showNYearsAgoEntryTitles: {
+            type: 'boolean',
+            defaultValue: true,
+            name: 'Show "On this Day" Entries',
+            description: `Show entries which happened on this day some number of years ago on the home page.`
+        } as SettingConfig<boolean>
     } satisfies Record<string, SettingConfig<unknown>>;
 
     constructor(
@@ -175,6 +181,35 @@ export class Settings<T = unknown> {
                     )
                 );
             })
+        );
+    }
+
+    public static async getValue<T extends keyof typeof Settings.config>(
+        query: QueryFunc,
+        auth: Auth,
+        key: T
+    ): Promise<Result<(typeof Settings.config)[T]['defaultValue']>> {
+        const settings = await query<
+            {
+                id: string;
+                created: number;
+                key: string;
+                value: string;
+            }[]
+        >`
+            SELECT created, id, \`key\`, value
+            FROM settings
+            WHERE user = ${auth.id}
+                AND \`key\` = ${key}
+        `;
+
+        if (settings.length < 1) {
+            return Result.ok(Settings.config[key].defaultValue);
+        }
+        const { err, val } = decrypt(settings[0].value, auth.key);
+        if (err) return Result.err(err);
+        return Result.ok(
+            JSON.parse(val) as (typeof Settings.config)[T]['defaultValue']
         );
     }
 

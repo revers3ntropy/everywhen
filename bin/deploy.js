@@ -281,7 +281,7 @@ async function doMigrations(migrations) {
 
     const time = (now() - start).toPrecision(3);
     console.log(
-        c.green(`All migrations (${migrations.length}) complete in ${time}ms`)
+        c.green(`${migrations.length} migrations complete in ${time}ms`)
     );
 }
 
@@ -391,7 +391,11 @@ async function restartServer(localVersion) {
         try {
             const remoteVersion = await getRemoteVersion().catch(console.error);
             if (remoteVersion && remoteVersion.isEqual(localVersion)) {
-                console.log(c.green('Server restart complete!'));
+                console.log(
+                    c.green(
+                        `Complete: v${localVersion.str()} is live on ${env}`
+                    )
+                );
                 return;
             }
         } catch (e) {
