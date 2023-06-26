@@ -1,9 +1,12 @@
 <script lang="ts">
     import { browser } from '$app/environment';
     import Dropdown from '$lib/components/Dropdown.svelte';
+    import Map from '$lib/components/map/Map.svelte';
+    import { ANIMATION_DURATION } from '$lib/constants';
     import { dispatch } from '$lib/dataChangeEvents';
     import Bin from 'svelte-material-icons/Delete.svelte';
     import { tooltip } from '@svelte-plugins/tooltips';
+    import { slide } from 'svelte/transition';
     import Restore from 'svelte-material-icons/DeleteRestore.svelte';
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
@@ -114,6 +117,8 @@
         obfuscated = !obfuscated;
     }
 
+    let showingMap = false;
+
     $: deleted = EntryFlags.isDeleted(flags);
     $: pinned = EntryFlags.isPinned(flags);
     $: entryHtml = browser ? rawMdToHtml(entry, obfuscated) : '';
@@ -122,10 +127,7 @@
     $: pinTooltip = pinned ? 'Unpin Entry' : 'Pin Entry';
 </script>
 
-<div
-    class="entry {obfuscated ? '' : 'visible'} {isInDialog ? 'in-dialog' : ''}"
-    {id}
->
+<div class="entry" class:obfuscated class:in-dialog={isInDialog} {id}>
     {#if showFullDate}
         <div class="text-light">
             <UtcTime
@@ -136,7 +138,7 @@
             />
         </div>
     {/if}
-    <p class="mobile-title {obfuscated ? 'obfuscated' : ''}">
+    <p class="mobile-title" class:obfuscated>
         {obfuscated ? obfuscate(title) : title}
     </p>
     <div class="header">
@@ -168,14 +170,16 @@
             {/if}
 
             {#if latitude && longitude && showLocations}
-                <LocationWidget
-                    {locations}
-                    {auth}
-                    entryId={id}
-                    {latitude}
-                    {longitude}
-                    {obfuscated}
-                />
+                <span on:click={() => (showingMap = !showingMap)}>
+                    <LocationWidget
+                        {locations}
+                        {auth}
+                        entryId={id}
+                        {latitude}
+                        {longitude}
+                        {obfuscated}
+                    />
+                </span>
             {/if}
 
             {#if !obfuscated && !isEdit && edits?.length}
@@ -259,7 +263,33 @@
             </button>
         </div>
     </div>
-    <p class="body {obfuscated ? 'obfuscated' : ''}">
+
+    {#if showingMap}
+        <div
+            transition:slide={{ duration: ANIMATION_DURATION, axis: 'y' }}
+            style="margin-bottom: 1rem"
+        >
+            <Map
+                entriesInteractable={false}
+                {auth}
+                width="calc(100% - 2rem)"
+                height="300px"
+                entries={[
+                    {
+                        id,
+                        created,
+                        latitude,
+                        longitude
+                    }
+                ]}
+                {hideAgentWidget}
+            />
+        </div>
+    {/if}
+
+    <hr />
+
+    <p class="body" class:obfuscated>
         {@html entryHtml}
     </p>
 </div>
@@ -267,6 +297,11 @@
 <style lang="less">
     @import '../../../styles/text';
     @import '../../../styles/variables';
+
+    hr {
+        margin: -16px 0 -10px 0;
+        border-top-color: var(--border-light);
+    }
 
     .entry {
         padding: 0;
@@ -299,7 +334,6 @@
         }
 
         .header {
-            border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;

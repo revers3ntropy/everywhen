@@ -25,13 +25,13 @@
     import Overlay from 'ol/Overlay';
     import ContextMenu from 'ol-contextmenu';
     import { fromLonLat, toLonLat } from 'ol/proj';
-    import type { EntryLocation } from '../../routes/stats/helpers';
+    import type { EntryLocation } from '../../../routes/stats/helpers';
     import type { Auth } from '$lib/controllers/user';
     import { Location } from '$lib/controllers/location';
     import { popup } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { showPopup } from '$lib/utils/popups';
-    import EditLocation from '../components/location/EditLocation.svelte';
+    import EditLocation from '../location/EditLocation.svelte';
     import EntryDialog from '$lib/components/dialogs/EntryDialog.svelte';
     import EntryTooltipOnMap from './EntryTooltipOnMap.svelte';
     import {
@@ -48,23 +48,9 @@
     export let locations: Location[] = [];
     export let auth: Auth;
     export let hideAgentWidget: boolean;
-
-    let mapId = getId();
-    let tooltip: HTMLElement;
-    let hoveringEntryId: string | null = null;
-    let popupOnRight = false;
-    let hoveringSomething = false;
-    let mapZoom = writable<number | undefined>(undefined);
-    let mapCenter = writable<number[] | undefined>(undefined);
-
-    let locationChangeQueue: Record<
-        string,
-        {
-            radius: number;
-            latitude: number;
-            longitude: number;
-        }[]
-    > = {};
+    export let width = 'calc(100vw - 5rem)';
+    export let height = '89vh';
+    export let entriesInteractable = true;
 
     async function reloadLocations() {
         const res = displayNotifOnErr(await api.get(auth, '/locations'));
@@ -85,19 +71,6 @@
             })
         );
     }
-
-    setInterval(() => {
-        for (const [id, changes] of Object.entries(locationChangeQueue)) {
-            const last = changes[changes.length - 1];
-            void syncLocationInBackground(
-                id,
-                last.latitude,
-                last.longitude,
-                last.radius
-            );
-        }
-        locationChangeQueue = {};
-    }, 500);
 
     async function addNamedLocation(object: CallbackObject) {
         const coordinate = object.coordinate;
@@ -247,7 +220,7 @@
                     (feature): feature is LocationFeature | EntryFeature => {
                         // only locations and entries are clickable
                         if ('entry' in feature) {
-                            return true;
+                            return entriesInteractable;
                         }
                         return 'location' in feature;
                     }
@@ -328,9 +301,13 @@
                 return;
             }
 
-            hoveringSomething = true;
-
             const hovering = features[0] as EntryFeature | LocationFeature;
+
+            if (!entriesInteractable && 'entry' in hovering) {
+                return;
+            }
+
+            hoveringSomething = true;
 
             if (!('entry' in hovering)) {
                 hoveringEntryId = null;
@@ -371,10 +348,42 @@
             }
         };
     }
+
+    let mapId = getId();
+    let tooltip: HTMLElement;
+    let hoveringEntryId: string | null = null;
+    let popupOnRight = false;
+    let hoveringSomething = false;
+    let mapZoom = writable<number | undefined>(undefined);
+    let mapCenter = writable<number[] | undefined>(undefined);
+
+    let locationChangeQueue: Record<
+        string,
+        {
+            radius: number;
+            latitude: number;
+            longitude: number;
+        }[]
+    > = {};
+
+    setInterval(() => {
+        for (const [id, changes] of Object.entries(locationChangeQueue)) {
+            const last = changes[changes.length - 1];
+            void syncLocationInBackground(
+                id,
+                last.latitude,
+                last.longitude,
+                last.radius
+            );
+        }
+        locationChangeQueue = {};
+    }, 500);
 </script>
 
 <div
-    class="map {hoveringSomething ? 'hovering' : ''}"
+    class="map"
+    class:hovering={hoveringSomething}
+    style="width: {width}; height: {height};"
     id="ol-map-{mapId}"
     use:map={{ locations, entries }}
 >
@@ -387,15 +396,13 @@
 
 <style lang="less">
     @import 'ol-contextmenu/ol-contextmenu.css';
-    @import '../../styles/variables';
-    @import '../../styles/layout';
+    @import '../../../styles/variables';
+    @import '../../../styles/layout';
 
     .map {
         .container();
         padding: 0;
-        height: 89vh;
         margin: 0 0 0 1rem;
-        width: calc(100vw - 5rem);
         border: none;
         position: relative;
         overflow: hidden;

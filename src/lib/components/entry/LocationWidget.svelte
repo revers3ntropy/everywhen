@@ -35,13 +35,9 @@
 
 <span class="outer">
     {#if entryId}
-        <a
-            use:tooltip={coordsTooltip}
-            href="/journal/{entryId}"
-            class="flex-center"
-        >
+        <span use:tooltip={coordsTooltip} class="flex-center">
             <MapMarker size="20" />
-        </a>
+        </span>
     {:else}
         <span use:tooltip={coordsTooltip} class="flex-center">
             <MapMarker size="20" />

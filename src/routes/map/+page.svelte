@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Map from '$lib/map/Map.svelte';
+    import Map from '$lib/components/map/Map.svelte';
     import type { PageData } from './$types';
 
     export let data: PageData;
