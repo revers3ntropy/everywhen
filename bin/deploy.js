@@ -9,6 +9,7 @@ import prompts from 'prompts';
 import fs from 'fs';
 import fetch from 'node-fetch';
 import https from 'https';
+import prompt from 'prompt-sync';
 
 const noSslAgent = new https.Agent({
     rejectUnauthorized: false
@@ -58,7 +59,7 @@ const uploadPaths = {
     [`./node_modules/webp-converter/bin/libwebp_linux/bin/cwebp`]: `/server/bin/libwebp_linux/bin/cwebp`
 };
 
-const LOG_PREFIX = c.blueBright('[upload.js]');
+const LOG_PREFIX = c.blueBright('[deploy.js]');
 
 const consoleLog = console.log;
 const consoleError = console.error;
@@ -261,15 +262,36 @@ async function upload() {
 }
 
 /**
- * @param {Version} remoteVersion
- * @param {Version} localVersion
+ * @param {Version[]} migrations
  * @returns {Promise<void>}
  */
-async function doMigrations(remoteVersion, localVersion) {
-    const start = performance.now();
+async function doMigrations(migrations) {
+    const start = now();
 
-    console.log('Checking for DB migrations...');
+    for (const migration of migrations.map(m => m.str())) {
+        console.log(c.green(`Running migration '${migration}'...`));
+        const migrationFile = `~/migration-${migration}.sql`;
+        await uploadPath(`./db/migrations/${migration}.sql`, migrationFile);
+        await runRemoteCommand(
+            `mysql -u ${remoteEnv.DB_USER} -p"${remoteEnv.DB_PASS}" ${remoteEnv.DB} < ${migrationFile}`
+        );
+        await runRemoteCommand(`rm ${migrationFile}`);
+        console.log(c.green(`Migration '${migration}' complete!`));
+    }
 
+    console.log(
+        c.green(
+            `All migrations complete in ${(now() - start).toPrecision(3)}ms`
+        )
+    );
+}
+
+/**
+ * @param {Version} remoteVersion
+ * @param {Version} localVersion
+ * @returns {Promise<Version[]>}
+ */
+async function getMigrations(remoteVersion, localVersion) {
     const migrations = fs
         .readdirSync('./db/migrations')
         .map(file => Version.fromString(file.replace('.sql', '')));
@@ -287,35 +309,19 @@ async function doMigrations(remoteVersion, localVersion) {
     );
 
     if (migrationsToRun.length === 0) {
-        console.log(c.green('No migrations to run'));
-        return;
+        console.log(c.green('No migrations found'));
+        return [];
     }
 
-    const confirmedMigrations = [];
+    console.log(c.cyan('Pending database migrations found!'));
 
-    console.log(c.cyan('Pending Database Migrations Found!'));
+    if (migrationsToRun.length === 0) {
+        console.log(c.green('No confirmed migrations found'));
+        return [];
+    }
+
+    console.log('Confirm migrations to run:');
     for (const migration of migrationsToRun) {
-        /**@type {{ value: boolean }} */
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment
-        const response = await prompts({
-            type: 'confirm',
-            name: 'value',
-            message: `Run migration ${c.green(migration.str())}?`
-        });
-
-        if (response.value === true) {
-            confirmedMigrations.push(migration);
-        }
-    }
-
-    if (confirmedMigrations.length === 0) {
-        console.log(c.green('No migrations to run'));
-        return;
-    }
-
-    console.log('\n\n');
-    console.log('Migrations to run:');
-    for (const migration of confirmedMigrations) {
         console.log(`    ${c.green(migration.str())}`);
     }
 
@@ -328,25 +334,11 @@ async function doMigrations(remoteVersion, localVersion) {
     });
 
     if (response.value !== true) {
-        return;
+        console.log(c.red('Aborting...'));
+        throw new Error();
     }
 
-    for (const migration of confirmedMigrations) {
-        console.log(c.green(`Running migration '${migration.str()}'...`));
-        await uploadPath(
-            `./db/migrations/${migration.str()}.sql`,
-            `~/${remoteDir()}/migration-to-run.sql`
-        );
-        await runRemoteCommand(
-            `cd ${remoteDir()} && mysql -u ${remoteEnv.DB_USER} -p"${
-                remoteEnv.DB_PASS
-            }" ${remoteEnv.DB} < migration-to-run.sql`
-        );
-        await runRemoteCommand(`rm ~/${remoteDir()}/migration-to-run.sql`);
-        console.log(c.green(`Migration '${migration.str()}' complete!`));
-    }
-
-    console.log(c.green(`All migrations complete in ${now() - start}ms`));
+    return migrationsToRun;
 }
 
 /**
@@ -360,7 +352,16 @@ async function getRemoteVersion() {
         agent: noSslAgent
     });
 
-    const apiVersion = await rawVersion.json();
+    let apiVersion;
+    try {
+        apiVersion = await rawVersion.json();
+    } catch (e) {
+        console.log(c.red('Failed to get remote version'));
+        return Version.fromString(
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-call
+            prompt({ sigint: true })('Enter remote version: ')
+        );
+    }
     if (typeof apiVersion !== 'object' || apiVersion === null) {
         console.error(apiVersion);
         throw new Error('Invalid version response');
@@ -380,9 +381,11 @@ async function getRemoteVersion() {
  * @param {Version} localVersion
  */
 async function restartServer(localVersion) {
+    await runRemoteCommand(`cd ~/${remoteDir()} && pnpm i`);
+
     while (true) {
         console.log('Restarting remote server...');
-        await runRemoteCommand(`cd ${remoteDir()} && npm run start`);
+        await runRemoteCommand(`cd ~/${remoteDir()} && npm run start`);
 
         await sleep(500);
 
@@ -411,15 +414,18 @@ async function restartServer(localVersion) {
     }
 }
 
-async function main() {
+/**
+ * @returns {Promise<{localVersion: Version, remoteVersion: Version}>}
+ */
+async function getAndCheckVersions() {
     dotenv.config({ path: `./secrets/${env}/.env` });
     console.log(c.cyan(`Deploying to ${remoteSshAddress()} (${env})`));
 
     const remoteVersion = await getRemoteVersion();
     const localVersion = Version.fromPackageJson('./package.json');
 
-    console.log(`Found remote version: ${remoteVersion.str()}`);
-    console.log(`Found local version: ${localVersion.str()}`);
+    console.log(`Found remote version: ${c.yellow(remoteVersion.str())}`);
+    console.log(`Found local version: ${c.yellow(localVersion.str())}`);
 
     if (
         remoteVersion.isEqual(localVersion) ||
@@ -430,29 +436,71 @@ async function main() {
         throw new Error();
     }
 
-    const start = now();
+    return { remoteVersion, localVersion };
+}
 
-    await runRemoteCommand(`cd ${remoteDir()} && npm run stop`, false);
+async function preCommit() {
+    await $`bin/precommit --reporter=line`;
+}
 
-    // must do between stopping the server and deleting remote dir
-    await doMigrations(remoteVersion, localVersion);
+/**
+ * @returns {Promise<void>}
+ */
+async function build() {
+    await $`mv .env tmp.env`;
+    await $`mv ./secrets/${env}/remote.env .env`;
 
-    await runRemoteCommand(`rm -r ${remoteDir()}`, false);
+    await $`bin/build`;
 
+    await $`mv .env ./secrets/${env}/remote.env`;
+    await $`mv tmp.env .env`;
+
+    if (!fs.existsSync('./build')) {
+        console.error('Build failed: no build directory');
+        throw new Error();
+    }
+}
+
+async function stopRemoteServer() {
+    await runRemoteCommand(
+        `cd ~/${remoteDir()} && npm run stop && cd .. && rm -rf ~/${remoteDir()}`,
+        false
+    );
+}
+
+async function setupLibWebP() {
     // Required by 'webp-converter' package TODO: Remove this requirement
     await runRemoteCommand(
-        `mkdir -p ${remoteDir()}/server/bin/libwebp_linux/bin`
+        `mkdir -p ~/${remoteDir()}/server/bin/libwebp_linux/bin`
     );
-    await runRemoteCommand(`mkdir -p ${remoteDir()}/server/temp`);
+    await runRemoteCommand(`mkdir -p ~/${remoteDir()}/server/temp`);
+}
+
+async function main() {
+    const start = now();
+
+    const { remoteVersion, localVersion } = await getAndCheckVersions();
+
+    const migrations = await getMigrations(remoteVersion, localVersion);
+
+    await preCommit();
+    await build();
+
+    const serverDownStart = now();
+    await stopRemoteServer();
+    // must do between stopping the server and deleting remote dir
+    await doMigrations(migrations);
+
+    await setupLibWebP();
 
     await upload();
 
-    await runRemoteCommand(`cd ${remoteDir()} && pnpm i`);
-
     await restartServer(localVersion);
 
-    const duration = (now() - start) / 1000;
-    console.log(`Estimated downtime: ${c.red(duration.toPrecision(3))}s`);
+    const downtime = (now() - serverDownStart) / 1000;
+    console.log(`Estimated downtime: ${c.red(downtime.toPrecision(3))}s`);
+    const totalTime = (now() - start) / 1000;
+    console.log(`Total time: ${c.cyan(totalTime.toPrecision(3))}s`);
 }
 
 void main();

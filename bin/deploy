@@ -1,7 +1,5 @@
 #!/bin/bash
 
-start=`date +%s`
-
 die () {
     echo >&2 "$@"
     exit 1
@@ -9,22 +7,6 @@ die () {
 
 [ "$#" -eq 1 ] || die "1 argument required, $# provided"
 
-[ -d "./secrets/$1" ] || die "Error: Directory /secrets/$1 does not exists."
+[ -d "./secrets/$1" ] || die "Error: /secrets/$1 does not exists."
 
-bin/precommit --reporter=line || die "precommit failed";
-
-mv .env tmp.env
-mv "./secrets/$1/remote.env" .env
-
-bin/build || die "build failed";
-
-mv .env "./secrets/$1/remote.env"
-mv tmp.env .env
-
-[ -d "build" ] || die "output dir not found"
-
-node bin/upload -v --env "$1" || die "upload failed";
-
-end=`date +%s`
-runtime=$( echo "$end - $start" | bc -l )
-echo "Deployment total time: $runtime s"
+node bin/deploy.js -v --env "$1" || die "upload failed";
