@@ -1,5 +1,6 @@
 <script lang="ts">
     import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
+    import { EntryFlags } from '$lib/controllers/entry';
     import { tooltip } from '@svelte-plugins/tooltips';
     import LocationToggle from '$lib/components/location/LocationToggle.svelte';
     import LabelSelect from '$lib/components/label/LabelSelect.svelte';
@@ -66,8 +67,8 @@
         const newEntry = {
             ...body,
             id: res.id,
-            deleted: false,
-            decrypted: true
+            decrypted: true,
+            flags: EntryFlags.NONE
         } as Mutable<Entry>;
 
         if (body.label && labels) {

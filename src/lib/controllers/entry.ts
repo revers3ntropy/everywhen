@@ -95,7 +95,7 @@ export class Entry {
     public static isDeleted(self: { flags: number }): boolean {
         return EntryFlags.isDeleted(self.flags);
     }
-    public static isPinned(self: { flags: number }): boolean {
+    public static isPinned(this: void, self: { flags: number }): boolean {
         return EntryFlags.isPinned(self.flags);
     }
 

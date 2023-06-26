@@ -198,12 +198,13 @@
         .entry {
             display: grid;
             grid-template-columns: 65px 18px 1fr;
-            padding: 2px 2px;
             align-items: center;
             color: var(--text-color);
-            border-radius: 2px;
+            padding: 2px 2px;
+            border-radius: 4px;
             width: 100%;
             text-align: left;
+            height: calc(1rem + 4px);
 
             &:after {
                 display: none;

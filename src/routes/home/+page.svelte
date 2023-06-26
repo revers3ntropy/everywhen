@@ -1,84 +1,39 @@
 <script lang="ts">
-    import BookSpinner from '$lib/components/BookSpinner.svelte';
-    import { api } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/notifications/notifications.js';
+    import { Entry } from '$lib/controllers/entry';
     import { onMount } from 'svelte';
     import Cog from 'svelte-material-icons/Cog.svelte';
     import ImageOutline from 'svelte-material-icons/ImageOutline.svelte';
     import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
     import Notebook from 'svelte-material-icons/Notebook.svelte';
     import Bin from 'svelte-material-icons/Delete.svelte';
+    import Heart from 'svelte-material-icons/Heart.svelte';
+    import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
+    import History from 'svelte-material-icons/History.svelte';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
     import EntryTitles from '$lib/components/entry/EntryTitles.svelte';
-    import { Entry } from '$lib/controllers/entry';
     import { obfuscated } from '$lib/stores.js';
-    import {
-        currentTzOffset,
-        dayUtcFromTimestamp,
-        fmtUtc,
-        nowUtc
-    } from '$lib/utils/time';
+    import { dayUtcFromTimestamp, fmtUtc } from '$lib/utils/time';
     import type { PageData } from './$types';
-
-    const NUMBER_OF_ENTRY_TITLES = 10;
 
     export let data: PageData;
 
-    function entriesYearsAgoToday(entries: Entry[]): Record<string, Entry[]> {
-        const res: Record<string, Entry[]> = {};
-        const nowDate = fmtUtc(nowUtc(), currentTzOffset(), 'MM-DD');
-        const nowYear = fmtUtc(nowUtc(), currentTzOffset(), 'YYYY');
+    const showLimitPinnedEntries = 10;
+    let showingAllPinned = false;
 
-        for (const entry of entries) {
-            const entryDate = fmtUtc(
-                entry.created,
-                entry.createdTZOffset,
-                'MM-DD'
-            );
-            // entries on the same day and month, but not this year
-            if (entryDate === nowDate) {
-                const entryYear = fmtUtc(
-                    entry.created,
-                    entry.createdTZOffset,
-                    'YYYY'
-                );
-                if (entryYear !== nowYear) {
-                    const yearsAgo = parseInt(nowYear) - parseInt(entryYear);
-                    if (!res[yearsAgo]) {
-                        res[yearsAgo] = [];
-                    }
-                    res[yearsAgo].push(entry);
-                }
-            }
-        }
-        return res;
-    }
-
-    let titles: Entry[];
-    let groupedTitles: Record<string, Entry[]>;
-    let titlesLoaded = false;
-
-    onMount(async () => {
+    onMount(() => {
         document.title = `Home`;
-
-        const titlesRes = displayNotifOnErr(
-            await api.get(data, '/entries/titles')
-        );
-        titles = titlesRes.entries;
-
-        const byDay = Entry.groupEntriesByDay(titles);
-
-        let i = 0;
-        groupedTitles = Object.keys(byDay)
-            .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
-            .reduce((acc, key) => {
-                if (i >= NUMBER_OF_ENTRY_TITLES) return acc;
-                i += byDay[key].length;
-                acc[key] = byDay[key];
-                return acc;
-            }, {} as Record<string, Entry[]>);
-        titlesLoaded = true;
     });
+
+    $: pinnedEntries = Entry.groupEntriesByDay(
+        showingAllPinned
+            ? data.pinnedEntriesList
+            : data.pinnedEntriesList
+                  .sort((a, b) => b.created - a.created)
+                  .slice(0, showLimitPinnedEntries)
+    );
+    $: areHiddenPinnedEntries =
+        data.pinnedEntriesList.length > showLimitPinnedEntries &&
+        !showingAllPinned;
 </script>
 
 <main>
@@ -112,55 +67,91 @@
     </section>
 
     <div style="width: 100%; max-width: 800px;">
-        {#if titlesLoaded}
-            {#if Object.keys(groupedTitles || {}).length}
+        {#if Object.keys(data.recentTitles).length}
+            <section>
+                <h1
+                    class="flex-center"
+                    style="justify-content: start; gap: 8px;"
+                >
+                    <History size="25" />
+                    Recent Entries
+                </h1>
+                <EntryTitles
+                    auth={data}
+                    titles={data.recentTitles}
+                    obfuscated={$obfuscated}
+                    hideAgentWidget={!data.settings.showAgentWidgetOnEntries
+                        .value}
+                />
+            </section>
+        {:else}
+            <section>
+                <h1 class="recent-entries"> Recent Entries </h1>
+                <p class="recent-entries-text">
+                    Doesn't look like you have any entries yet, why not <a
+                        href="/journal?obfuscate=0"
+                    >
+                        write one</a
+                    >?
+                </p>
+            </section>
+        {/if}
+        {#key [data.pinnedEntriesList, showingAllPinned]}
+            {#if Object.keys(pinnedEntries).length}
                 <section>
-                    <h1>Recent Entries</h1>
-                    <EntryTitles
-                        auth={data}
-                        titles={groupedTitles}
-                        obfuscated={$obfuscated}
-                        hideAgentWidget={!data.settings.showAgentWidgetOnEntries
-                            .value}
-                    />
-                </section>
-            {:else}
-                <section>
-                    <h1 class="recent-entries">Recent Entries</h1>
-                    <p class="recent-entries-text">
-                        Doesn't look like you have any entries yet, why not <a
-                            href="/journal?obfuscate=0">write one</a
-                        >?
-                    </p>
-                </section>
-            {/if}
-            {#each Object.entries(entriesYearsAgoToday(titles)) as [yearsAgo, entries] (yearsAgo)}
-                <section>
-                    <h1>
-                        {yearsAgo === '1' ? `A Year` : `${yearsAgo} Years`} Ago Today
+                    <h1
+                        class="gradient-icon flex-center"
+                        style="justify-content: start; gap: 8px;"
+                    >
+                        <Heart size="25" />
+                        Favourited Entries
                     </h1>
                     <EntryTitles
-                        titles={{
-                            [fmtUtc(
-                                dayUtcFromTimestamp(
-                                    entries[0].created,
-                                    entries[0].createdTZOffset
-                                ),
-                                0,
-                                'YYYY-MM-DD'
-                            )]: entries
-                        }}
-                        obfuscated={$obfuscated}
-                        showTimeAgo={false}
                         auth={data}
+                        titles={pinnedEntries}
+                        obfuscated={$obfuscated}
                         hideAgentWidget={!data.settings.showAgentWidgetOnEntries
                             .value}
                     />
+                    {#if areHiddenPinnedEntries}
+                        <button
+                            class="text-light"
+                            on:click={() => {
+                                showingAllPinned = !showingAllPinned;
+                            }}
+                        >
+                            <ChevronDown />
+                            Show all favourited entries ({data.pinnedEntriesList
+                                .length - showLimitPinnedEntries})
+                        </button>
+                    {/if}
                 </section>
-            {/each}
-        {:else}
-            <BookSpinner />
-        {/if}
+            {/if}
+        {/key}
+        {#each Object.entries(data.nYearsAgo) as [yearsAgo, entries] (yearsAgo)}
+            <section>
+                <h1>
+                    {yearsAgo === '1' ? `A Year` : `${yearsAgo} Years`} Ago Today
+                </h1>
+                <EntryTitles
+                    titles={{
+                        [fmtUtc(
+                            dayUtcFromTimestamp(
+                                entries[0].created,
+                                entries[0].createdTZOffset
+                            ),
+                            0,
+                            'YYYY-MM-DD'
+                        )]: entries
+                    }}
+                    obfuscated={$obfuscated}
+                    showTimeAgo={false}
+                    auth={data}
+                    hideAgentWidget={!data.settings.showAgentWidgetOnEntries
+                        .value}
+                />
+            </section>
+        {/each}
     </div>
 </main>
 

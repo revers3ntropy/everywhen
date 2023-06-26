@@ -93,6 +93,7 @@
         );
 
         notify.success(`Entry ${!pinned ? 'favorited' : 'unfavorited'}`);
+        flags = EntryFlags.setPinned(flags, !pinned);
         await dispatch.update(
             'entry',
             new Entry(
