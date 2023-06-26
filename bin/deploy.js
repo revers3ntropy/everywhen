@@ -279,10 +279,9 @@ async function doMigrations(migrations) {
         console.log(c.green(`Migration '${migration}' complete!`));
     }
 
+    const time = (now() - start).toPrecision(3);
     console.log(
-        c.green(
-            `All migrations complete in ${(now() - start).toPrecision(3)}ms`
-        )
+        c.green(`All migrations (${migrations.length}) complete in ${time}ms`)
     );
 }
 
