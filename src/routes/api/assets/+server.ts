@@ -36,23 +36,15 @@ export const POST = (async ({ request, cookies }) => {
 
     let img;
     if (fileExt.toLowerCase() === 'webp') {
-        img = body.content.replace(
-            /^data:image\/((jpeg)|(jpg)|(png)|(webp));base64,/,
-            ''
-        );
+        img = body.content.replace(/^data:image\/webp;base64,/, '');
     } else {
         img = await Asset.base64ToWebP(body.content, fileExt, IMG_QUALITY);
     }
 
-    const { err, val: id } = await Asset.create(
-        query,
-        auth,
-        body.fileName,
-        img
-    );
+    const { err, val } = await Asset.create(query, auth, body.fileName, img);
     if (err) throw error(400, err);
 
-    return apiResponse({ id });
+    return apiResponse(val);
 }) satisfies RequestHandler;
 
 export const DELETE = apiRes404;

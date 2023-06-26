@@ -35,7 +35,7 @@ export class Asset {
         contentsPlainText: string,
         created?: TimestampSecs,
         publicId?: string
-    ): Promise<Result<string>> {
+    ): Promise<Result<{ publicId: string; id: string }>> {
         publicId ??= await UUID.generateUUId(query);
         const id = await UUID.generateUUId(query);
         const fileExt = fileNamePlainText.split('.').pop();
@@ -75,7 +75,7 @@ export class Asset {
                     ${encryptedContents})
         `;
 
-        return Result.ok(publicId);
+        return Result.ok({ publicId, id });
     }
 
     public static async fromPublicId(
@@ -276,7 +276,10 @@ export class Asset {
     ) {
         // it's either do it here or when deploying,
         // and doing it here is somehow less painful...
-        fs.chmodSync('./server/bin/libwebp_linux/bin/cwebp', 0o755);
+        const exePath = './server/bin/libwebp_linux/bin/cwebp';
+        if (fs.existsSync(exePath)) {
+            fs.chmodSync(exePath, 0o755);
+        }
 
         const imgB64 = b64.replace(
             /^data:image\/((jpeg)|(jpg)|(png)|(webp));base64,/,

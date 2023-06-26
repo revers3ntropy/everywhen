@@ -1,17 +1,23 @@
 <script lang="ts">
     import InfiniteScroller from '$lib/components/InfiniteScroller.svelte';
+    import { MAX_IMAGE_SIZE } from '$lib/constants';
     import { api } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/notifications/notifications';
+    import {
+        displayNotifOnErr,
+        notify
+    } from '$lib/notifications/notifications';
+    import { getFileContents } from '$lib/utils/files';
+    import { nowUtc } from '$lib/utils/time';
     import ImageOutline from 'svelte-material-icons/ImageOutline.svelte';
+    import Upload from 'svelte-material-icons/Upload.svelte';
     import Dot from '$lib/components/Dot.svelte';
     import { obfuscated } from '$lib/stores';
+    import type { ChangeEventHandler } from 'svelte/elements';
     import Asset from './Asset.svelte';
-    import type { Asset as AssetController } from '$lib/controllers/asset';
+    import { Asset as AssetController } from '$lib/controllers/asset';
     import type { PageData } from './$types';
 
     export let data: PageData;
-
-    let assets = data.assets;
 
     async function loadMoreAssets(
         offset: number,
@@ -22,17 +28,81 @@
         );
         return res.assets;
     }
+
+    const upload = (async e => {
+        if (e.target === null || !('files' in e.target)) {
+            return;
+        }
+        const files = e.target.files as FileList;
+        if (files.length < 1) return;
+        if (files.length !== 1) {
+            notify.error('Please select exactly one file');
+            return;
+        }
+        const file = files[0];
+        const content = displayNotifOnErr(await getFileContents(file, 'b64'));
+
+        if (!content) return;
+        if (content.length > MAX_IMAGE_SIZE) {
+            notify.error('Image is too large');
+            return;
+        }
+
+        const { id, publicId } = displayNotifOnErr(
+            await api.post(data, '/assets', {
+                fileName: file.name,
+                content
+            })
+        );
+
+        data = {
+            ...data,
+            assets: [
+                new AssetController(
+                    id,
+                    publicId,
+                    undefined as unknown as string,
+                    file.name,
+                    '',
+                    nowUtc()
+                ),
+                ...data.assets
+            ],
+            assetCount: data.assetCount + 1
+        };
+    }) as ChangeEventHandler<HTMLInputElement>;
+
+    let fileDropInput: HTMLInputElement;
 </script>
 
 <main>
-    <h1>
-        <ImageOutline size="40" />
-        <span>Gallery</span>
-        {#if data.assetCount > 0}
-            <Dot light />
-            <span class="text-light">{data.assetCount}</span>
-        {/if}
-    </h1>
+    <div class="head">
+        <div class="flex-center" style="justify-content: start">
+            <button
+                on:click={() => fileDropInput.click()}
+                class="primary with-icon"
+            >
+                <Upload size="30" />
+                Upload
+            </button>
+            <input
+                type="file"
+                on:change={upload}
+                bind:this={fileDropInput}
+                style="display: none"
+                accept="image/png, image/jpeg, image/jpg, image/webp"
+            />
+        </div>
+        <div class="flex-center" style="font-size: 40px;">
+            <ImageOutline size="40" />
+            <span> Gallery </span>
+            {#if data.assetCount > 0}
+                <Dot light />
+                <span class="text-light">{data.assetCount}</span>
+            {/if}
+        </div>
+        <div />
+    </div>
 
     {#if data.assetCount === 0}
         <div class="flex-center container invisible">
@@ -40,14 +110,14 @@
         </div>
     {:else}
         <InfiniteScroller
-            bind:items={assets}
+            bind:items={data.assets}
             batchSize={4}
             numItems={data.assetCount}
             loadItems={loadMoreAssets}
             margin={500}
         >
             <div class="assets">
-                {#each assets as asset}
+                {#each data.assets as asset}
                     <Asset
                         {...asset}
                         auth={data}
@@ -64,10 +134,10 @@
     @import '../../styles/variables';
     @import '../../styles/layout';
 
-    h1 {
-        .flex-center();
+    .head {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
         margin: 0;
-        font-size: 40px;
 
         i {
             font-size: 0.5em;

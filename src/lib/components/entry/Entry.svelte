@@ -170,7 +170,10 @@
             {/if}
 
             {#if latitude && longitude && showLocations}
-                <span on:click={() => (showingMap = !showingMap)}>
+                <button
+                    on:click={() => (showingMap = !showingMap)}
+                    aria-label="Expand map"
+                >
                     <LocationWidget
                         {locations}
                         {auth}
@@ -179,7 +182,7 @@
                         {longitude}
                         {obfuscated}
                     />
-                </span>
+                </button>
             {/if}
 
             {#if !obfuscated && !isEdit && edits?.length}
