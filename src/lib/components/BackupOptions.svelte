@@ -28,7 +28,7 @@
     function upload() {
         showPopup(FileDropDialog, {
             auth,
-            message: 'Drop encrypted .json file here',
+            message: 'Drop .json file here',
             showTextBox: true,
             textBoxType: 'password',
             textBoxLabel:

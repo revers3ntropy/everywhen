@@ -1,4 +1,5 @@
 <script lang="ts">
+    import BookSpinner from '$lib/components/BookSpinner.svelte';
     import { notify } from '$lib/notifications/notifications';
     import {
         filedrop,
@@ -25,9 +26,9 @@
         textBoxContent?: string
     ) => Promise<void> | void;
 
-    let textBoxContent = '';
-
     async function onFileDrop(e: CustomEvent<{ files: Files }>) {
+        loading = true;
+
         const files = e.detail.files;
         if (files.rejected.length > 0) {
             popup.set(null);
@@ -50,24 +51,37 @@
     function handleTextBoxInput(e: Event) {
         textBoxContent = (e.target as HTMLInputElement).value;
     }
+
+    let loading = false;
+    let textBoxContent = '';
 </script>
 
 <div>
-    <div class="flex-center">
-        {#if showTextBox}
-            <label>
-                {textBoxLabel}
-                <input
-                    class="text-box"
-                    on:input={handleTextBoxInput}
-                    placeholder={textBoxPlaceholder}
-                    type={textBoxType}
-                />
-            </label>
-        {/if}
-    </div>
+    {#if loading}
+        <div class="flex-center">
+            <BookSpinner />
+        </div>
+    {:else}
+        <div class="flex-center">
+            {#if showTextBox}
+                <label>
+                    {textBoxLabel}
+                    <input
+                        class="text-box"
+                        on:input={handleTextBoxInput}
+                        placeholder={textBoxPlaceholder}
+                        type={textBoxType}
+                    />
+                </label>
+            {/if}
+        </div>
 
-    <div class="dropzone" on:filedrop={onFileDrop} use:filedrop={fileOptions}>
-        {message}
-    </div>
+        <div
+            class="dropzone"
+            on:filedrop={onFileDrop}
+            use:filedrop={fileOptions}
+        >
+            {message}
+        </div>
+    {/if}
 </div>
