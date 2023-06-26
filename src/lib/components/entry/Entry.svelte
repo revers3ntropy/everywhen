@@ -3,14 +3,17 @@
     import Dropdown from '$lib/components/Dropdown.svelte';
     import { dispatch } from '$lib/dataChangeEvents';
     import Bin from 'svelte-material-icons/Delete.svelte';
+    import { tooltip } from '@svelte-plugins/tooltips';
     import Restore from 'svelte-material-icons/DeleteRestore.svelte';
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import NoteEditOutline from 'svelte-material-icons/NoteEditOutline.svelte';
     import DotsVertical from 'svelte-material-icons/DotsVertical.svelte';
+    import Heart from 'svelte-material-icons/Heart.svelte';
+    import HeartOffOutline from 'svelte-material-icons/HeartOffOutline.svelte';
     import UtcTime from '$lib/components/UtcTime.svelte';
     import type { Location } from '$lib/controllers/location';
-    import type { Entry } from '$lib/controllers/entry';
+    import { Entry, EntryFlags } from '$lib/controllers/entry';
     import type { Label as LabelController } from '../../controllers/label';
     import type { Auth } from '$lib/controllers/user';
     import { popup } from '$lib/stores';
@@ -33,7 +36,7 @@
     export let label = undefined as LabelController | null | undefined;
     export let latitude = null as number | null;
     export let longitude = null as number | null;
-    export let deleted = false;
+    export let flags: number;
     export let decrypted = true;
     export let agentData = '';
     export let edits = [] as Entry[];
@@ -59,6 +62,7 @@
     }
 
     async function deleteSelf() {
+        const deleted = EntryFlags.isDeleted(flags);
         if (
             !confirm(
                 `Are you sure you want to ${
@@ -81,13 +85,40 @@
         await dispatch.delete('entry', id);
     }
 
+    async function pinSelf() {
+        displayNotifOnErr(
+            await api.put(auth, apiPath('/entries/?/pinned', id), {
+                pinned: !pinned
+            })
+        );
+
+        notify.success(`Entry ${!pinned ? 'favorited' : 'unfavorited'}`);
+        await dispatch.update(
+            'entry',
+            new Entry(
+                id,
+                title,
+                entry,
+                created,
+                createdTZOffset,
+                EntryFlags.setPinned(flags, !pinned),
+                latitude,
+                longitude,
+                agentData
+            )
+        );
+    }
+
     function toggleObfuscation() {
         obfuscated = !obfuscated;
     }
 
+    $: deleted = EntryFlags.isDeleted(flags);
+    $: pinned = EntryFlags.isPinned(flags);
     $: entryHtml = browser ? rawMdToHtml(entry, obfuscated) : '';
     // doesn't set reactively on tooltip content if in props???
     $: restoreDeleteTooltip = deleted ? 'Restore Entry' : 'Move Entry to Bin';
+    $: pinTooltip = pinned ? 'Unpin Entry' : 'Pin Entry';
 </script>
 
 <div
@@ -119,6 +150,15 @@
                         tooltipPosition="right"
                         tzOffset={createdTZOffset}
                     />
+                </span>
+            {/if}
+
+            {#if pinned}
+                <span
+                    class="gradient-icon"
+                    use:tooltip={{ content: 'Favourited' }}
+                >
+                    <Heart size="20" />
                 </span>
             {/if}
 
@@ -166,16 +206,16 @@
                     </div>
                     <div class="options-dropdown">
                         <button
-                            on:click={deleteSelf}
-                            class="with-icon"
-                            aria-label={restoreDeleteTooltip}
+                            on:click={pinSelf}
+                            class="with-icon icon-gradient-on-hover"
+                            aria-label={pinTooltip}
                         >
-                            {#if deleted}
-                                <Restore size="25" />
-                                Remove from Bin
+                            {#if pinned}
+                                <HeartOffOutline size="25" />
+                                Un-favourite
                             {:else}
-                                <Bin size="25" />
-                                Move to Bin
+                                <Heart size="25" />
+                                Favourite
                             {/if}
                         </button>
                         {#if !deleted}
@@ -188,6 +228,19 @@
                                 Edit
                             </a>
                         {/if}
+                        <button
+                            on:click={deleteSelf}
+                            class="with-icon danger"
+                            aria-label={restoreDeleteTooltip}
+                        >
+                            {#if deleted}
+                                <Restore size="25" />
+                                Remove from Bin
+                            {:else}
+                                <Bin size="25" />
+                                Move to Bin
+                            {/if}
+                        </button>
                     </div>
                 </Dropdown>
             {/if}
@@ -276,7 +329,7 @@
         }
 
         .time {
-            margin: 0 0 0 0.5rem;
+            margin: 0 2px 0 0.5rem;
             font-size: 0.8em;
             color: var(--text-color-light);
         }
@@ -371,6 +424,9 @@
         button,
         a {
             .oneline();
+            display: grid;
+            grid-template-columns: auto 1fr;
+            text-align: left;
             padding: 0.4em 0.8rem;
             width: 100%;
             color: var(--text-color);

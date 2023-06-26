@@ -50,6 +50,9 @@ interface ApiResponse {
         '/entries/?': GET<
             typeof import('../../routes/api/entries/[entryId]/+server')
         >;
+        '/entries/?/pinned': GET<
+            typeof import('../../routes/api/entries/[entryId]/pinned/+server')
+        >;
         '/backups': GET<typeof import('../../routes/api/backups/+server')>;
         '/auth': GET<typeof import('../../routes/api/auth/+server')>;
         '/assets/?': GET<
@@ -97,6 +100,9 @@ interface ApiResponse {
         '/settings': PUT<typeof import('../../routes/api/settings/+server')>;
         '/entries/?': PUT<
             typeof import('../../routes/api/entries/[entryId]/+server')
+        >;
+        '/entries/?/pinned': PUT<
+            typeof import('../../routes/api/entries/[entryId]/pinned/+server')
         >;
         '/locations/?': PUT<
             typeof import('../../routes/api/locations/[locationId]/+server')

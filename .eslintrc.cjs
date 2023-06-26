@@ -38,5 +38,8 @@ module.exports = {
         'no-inner-declarations': 'off',
         // caught by other stuff and is too sensitive (e.g. `App`)
         'no-undef': 'off',
+        // doesn't like namespaces for some reason
+        // (see this: https://stackoverflow.com/questions/58270901)
+        "@typescript-eslint/no-namespace": "off"
     },
 };

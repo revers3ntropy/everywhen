@@ -29,7 +29,7 @@
         });
     }
 
-    function onNewEntry({ entry }: { entry: Entry }) {
+    listen.entry.onCreate(({ entry }) => {
         if (!titles) titles = {};
 
         const localDate = fmtUtc(
@@ -45,9 +45,9 @@
 
         // force reactivity
         titles = { ...titles };
-    }
+    });
 
-    function onEntryDelete(id: string) {
+    listen.entry.onDelete(id => {
         if (!titles) return;
 
         for (const date in titles) {
@@ -56,7 +56,7 @@
 
         // force reactivity
         titles = { ...titles };
-    }
+    });
 
     let sortedTitles: [number, string][] | null;
     $: sortedTitles = titles
@@ -65,9 +65,6 @@
               .filter(Boolean)
               .map(date => [new Date(date).getTime() / 1000, date])
         : null;
-
-    listen.entry.onCreate(onNewEntry);
-    listen.entry.onDelete(onEntryDelete);
 </script>
 
 <div>

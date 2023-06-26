@@ -27,7 +27,7 @@
     import Nav from './Nav.svelte';
     import NewVersionAvailable from './NewVersionAvailable.svelte';
     import NoAuthNav from './NoAuthNav.svelte';
-    import PasscodeModal from './PasscodeModal.svelte';
+    import PasscodeModal from '$lib/components/dialogs/PasscodeModal.svelte';
     import { blur } from 'svelte/transition';
     import type { PageData } from './$types';
 
@@ -173,8 +173,8 @@
 
 <svg class="accent-gradient-svg" height={0} width={0}>
     <linearGradient id="accent-gradient" x1={1} x2={1} y1={0} y2={1}>
-        <stop offset={0} stop-color="rgb(121, 235, 226)" />
-        <stop offset={1} stop-color="rgb(189, 176, 255)" />
+        <stop offset={0} stop-color="var(--secondary)" />
+        <stop offset={1} stop-color="var(--primary)" />
     </linearGradient>
 </svg>
 

@@ -498,11 +498,11 @@
     .account-dropdown-options {
         padding: 0.5rem 0;
 
-        .account-dropdown-button {
+        button,
+        a {
             margin: 0;
             padding: 0.4em 0.8em 0.4em 0.4em;
             width: 100%;
-            color: var(--text-color);
             display: grid;
             grid-template-columns: 35px 1fr;
             align-items: center;
@@ -511,11 +511,6 @@
 
             &:hover {
                 background-color: var(--v-light-accent);
-
-                :global(svg),
-                :global(svg *) {
-                    fill: var(--primary);
-                }
             }
         }
 

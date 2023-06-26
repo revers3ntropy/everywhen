@@ -138,39 +138,16 @@
         };
     }
 
-    function onNewEntry({
-        entry,
-        entryMode
-    }: {
-        entry: Entry;
-        entryMode: EntryFormMode;
-    }) {
-        const localDate = fmtUtc(
-            entry.created,
-            entry.createdTZOffset,
-            'YYYY-MM-DD'
-        );
-        entries[localDate] = [entry, ...(entries?.[localDate] || [])];
-        entries = { ...entries };
-
-        if (entryMode === EntryFormMode.Standard) {
-            // if a normal entry, scroll to it
-            setTimeout(() => {
-                const el = document.getElementById(entry.id);
-                if (!el) {
-                    console.error('Could not find new entry element');
-                    return;
-                }
-                el.tabIndex = -1;
-                el.focus({ preventScroll: false });
-            }, 10);
-        }
-    }
-
-    function onDeleteEntry(id: string) {
-        for (const day in entries) {
-            entries[day] = entries[day].filter(entry => entry.id !== id);
-        }
+    function scrollToEntry(id: string) {
+        setTimeout(() => {
+            const el = document.getElementById(id);
+            if (!el) {
+                console.error('Could not find new entry element');
+                return;
+            }
+            el.tabIndex = -1;
+            el.focus({ preventScroll: false });
+        }, 10);
     }
 
     async function loadLocations() {
@@ -201,8 +178,34 @@
         void loadLocations();
     });
 
-    listen.entry.onCreate(onNewEntry);
-    listen.entry.onDelete(onDeleteEntry);
+    listen.entry.onCreate(
+        ({ entry, entryMode }: { entry: Entry; entryMode: EntryFormMode }) => {
+            const localDate = fmtUtc(
+                entry.created,
+                entry.createdTZOffset,
+                'YYYY-MM-DD'
+            );
+            entries[localDate] = [entry, ...(entries?.[localDate] || [])];
+            entries = { ...entries };
+
+            if (entryMode === EntryFormMode.Standard) {
+                scrollToEntry(entry.id);
+            }
+        }
+    );
+    listen.entry.onDelete(id => {
+        for (const day in entries) {
+            entries[day] = entries[day].filter(entry => entry.id !== id);
+        }
+    });
+    listen.entry.onUpdate(entry => {
+        for (const day in entries) {
+            const i = entries[day].findIndex(e => e.id === entry.id);
+            if (i !== -1) {
+                entries[day][i] = entry;
+            }
+        }
+    });
 
     $: if (options.search !== undefined && browser) void reloadEntries();
     $: sortedEntryKeys = Object.keys(entries).sort(

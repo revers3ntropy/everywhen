@@ -8,6 +8,45 @@ import { Location } from './location';
 import type { Auth } from './user';
 import { UUID } from './uuid';
 
+export enum EntryFlags {
+    DELETED = 0b1,
+    PINNED = 0b10
+}
+
+export namespace EntryFlags {
+    export const NONE = 0;
+
+    export function toString(flags: number): string {
+        const parts: string[] = [];
+        if ((flags & EntryFlags.DELETED) !== 0) {
+            parts.push('deleted');
+        }
+        if ((flags & EntryFlags.PINNED) !== 0) {
+            parts.push('pinned');
+        }
+        if (parts.length < 2) {
+            return parts[0] || 'none';
+        }
+        return parts.join(', ');
+    }
+
+    export function isDeleted(flags: number): boolean {
+        return (flags & EntryFlags.DELETED) !== 0;
+    }
+    export function setDeleted(flags: number, deleted: boolean): number {
+        return deleted
+            ? flags | EntryFlags.DELETED
+            : flags & ~EntryFlags.DELETED;
+    }
+
+    export function isPinned(flags: number): boolean {
+        return (flags & EntryFlags.PINNED) !== 0;
+    }
+    export function setPinned(flags: number, pinned: boolean): number {
+        return pinned ? flags | EntryFlags.PINNED : flags & ~EntryFlags.PINNED;
+    }
+}
+
 export interface EntryFilter {
     readonly search?: string;
     readonly labelId?: string;
@@ -41,17 +80,24 @@ export class Entry {
     public edits?: EntryEdit[];
     public readonly decrypted = true;
 
-    private constructor(
+    public constructor(
         public readonly id: string,
         public readonly title: string,
         public readonly entry: string,
         public readonly created: TimestampSecs,
         public readonly createdTZOffset: Hours,
-        public readonly deleted: boolean,
+        public readonly flags: number,
         public readonly latitude: number | null,
         public readonly longitude: number | null,
         public readonly agentData: string | undefined
     ) {}
+
+    public static isDeleted(self: { flags: number }): boolean {
+        return EntryFlags.isDeleted(self.flags);
+    }
+    public static isPinned(self: { flags: number }): boolean {
+        return EntryFlags.isPinned(self.flags);
+    }
 
     public static async delete(
         query: QueryFunc,
@@ -59,24 +105,27 @@ export class Entry {
         id: string,
         restore: boolean
     ): Promise<Result> {
-        const entry = await query<{ deleted: boolean }[]>`
-            SELECT deleted
+        const entries = await query<{ flags: number }[]>`
+            SELECT flags
             FROM entries
             WHERE id = ${id}
               AND user = ${auth.id}
         `;
-
-        if (!entry.length) {
+        if (!entries.length) {
             return Result.err('Entry not found');
         }
-        if (entry[0].deleted === !restore) {
-            return Result.err('Entry is already in that state');
+        if (Entry.isDeleted(entries[0]) === !restore) {
+            return Result.err(
+                restore ? 'Entry is not deleted' : 'Entry already deleted'
+            );
         }
+
+        const newFlags = EntryFlags.setDeleted(entries[0].flags, !restore);
 
         await query`
             UPDATE entries
-            SET deleted = ${!restore},
-                label   = ${null}
+            SET flags = ${newFlags},
+                label = ${null}
             WHERE entries.id = ${id}
               AND user = ${auth.id}
         `;
@@ -119,17 +168,17 @@ export class Entry {
                    created,
                    createdTZOffset,
                    title,
-                   deleted,
+                   flags,
                    label,
                    entry,
                    latitude,
                    longitude,
                    agentData
             FROM entries
-            WHERE (deleted = ${filter.deleted ? 1 : 0} OR ${
-            filter.deleted === 'both'
-        })
-              AND (label = ${filter.labelId || ''} OR ${
+            WHERE ((flags & ${EntryFlags.DELETED}) = ${
+            filter.deleted ? EntryFlags.DELETED : 0
+        } OR ${filter.deleted === 'both'})
+                  AND (label = ${filter.labelId || ''} OR ${
             filter.labelId === undefined
         })
               AND (${location === undefined} OR (
@@ -238,7 +287,7 @@ export class Entry {
             decryptedEntry,
             rawEntry.created,
             rawEntry.createdTZOffset,
-            rawEntry.deleted,
+            rawEntry.flags,
             rawEntry.latitude,
             rawEntry.longitude,
             decryptedAgent
@@ -301,7 +350,7 @@ export class Entry {
     ): Promise<Result<Entry>> {
         const entries = await query<RawEntry[]>`
             SELECT label,
-                   deleted,
+                   flags,
                    id,
                    created,
                    createdTZOffset,
@@ -318,7 +367,7 @@ export class Entry {
         if (entries.length !== 1) {
             return Result.err('Entry not found');
         }
-        if (mustNotBeDeleted && entries[0].deleted) {
+        if (mustNotBeDeleted && Entry.isDeleted(entries[0])) {
             return Result.err('Entry is deleted');
         }
 
@@ -350,10 +399,7 @@ export class Entry {
             (!('agentData' in json) ||
                 typeof json.agentData === 'string' ||
                 !json.agentData) &&
-            (!('deleted' in json) ||
-                typeof json.deleted === 'boolean' ||
-                json.deleted === 1 ||
-                !json.deleted) &&
+            (!('flags' in json) || typeof json.flags === 'number') &&
             'created' in json &&
             typeof json.created === 'number' &&
             (isEdit ||
@@ -368,7 +414,7 @@ export class Entry {
         auth: Auth,
         json_: PickOptionalAndMutable<
             DecryptedRawEntry,
-            'id' | 'deleted' | 'decrypted' | 'created'
+            'id' | 'flags' | 'decrypted' | 'created'
         >
     ): Promise<Result<Entry>> {
         const json: typeof json_ & { id: string } = {
@@ -383,7 +429,7 @@ export class Entry {
             json.entry,
             json.created,
             json.createdTZOffset,
-            !!json.deleted,
+            json.flags || EntryFlags.NONE,
             json.latitude,
             json.longitude,
             json.agentData
@@ -398,7 +444,7 @@ export class Entry {
                         e.entry,
                         e.created,
                         e.createdTZOffset,
-                        false,
+                        EntryFlags.NONE,
                         e.latitude,
                         e.longitude,
                         e.agentData
@@ -436,7 +482,7 @@ export class Entry {
 
         await query`
             INSERT INTO entries
-            (id, user, title, entry, created, createdTZOffset, deleted,
+            (id, user, title, entry, created, createdTZOffset, flags,
              label, latitude, longitude, agentData)
             VALUES (${entry.id},
                     ${auth.id},
@@ -444,7 +490,7 @@ export class Entry {
                     ${encryptedEntry},
                     ${entry.created},
                     ${entry.createdTZOffset ?? 0},
-                    ${entry.deleted},
+                    ${entry.flags},
                     ${entry.label?.id ?? null},
                     ${entry.latitude ?? null},
                     ${entry.longitude ?? null},
@@ -544,13 +590,39 @@ export class Entry {
             self.entry,
             self.created,
             self.createdTZOffset,
-            self.deleted,
+            self.flags,
             self.latitude,
             self.longitude,
             self.agentData
         );
         entry.label = self.label;
         return entry;
+    }
+
+    public static async setPinned(
+        query: QueryFunc,
+        auth: Auth,
+        self: Entry,
+        pinned: boolean
+    ): Promise<Result<Entry>> {
+        if (Entry.isPinned(self) === pinned) {
+            return Result.ok(self);
+        }
+
+        const newFlags = EntryFlags.setPinned(self.flags, pinned);
+        console.log(newFlags);
+
+        await query`
+            UPDATE entries
+            SET flags = ${newFlags}
+            WHERE id = ${self.id}
+              AND user = ${auth.id}
+        `;
+
+        return Result.ok({
+            ...self,
+            flags: newFlags
+        });
     }
 
     public static async edit(
@@ -616,13 +688,18 @@ export class Entry {
         return Result.ok(null);
     }
 
+    private static stringToShortTitle(str: string): string {
+        return str
+            .replace(/[^0-9a-zA-Z#_\-!?:| ]/gi, ' ')
+            .replace(/ +/gi, ' ')
+            .substring(0, Entry.TITLE_CUTOFF);
+    }
+
     public static entryToTitleEntry(this: void, entry: Entry): Entry {
         return {
             ...entry,
-            entry: entry.entry
-                .replace(/[^0-9a-z# ]/gi, ' ')
-                .replace(/ +/gi, ' ')
-                .substring(0, Entry.TITLE_CUTOFF)
+            title: Entry.stringToShortTitle(entry.title),
+            entry: Entry.stringToShortTitle(entry.entry)
         };
     }
 
@@ -633,9 +710,7 @@ export class Entry {
         const { val: entries, err } = await Entry.all(query, auth);
         if (err) return Result.err(err);
 
-        entries.map(Entry.entryToTitleEntry);
-
-        return Result.ok(entries);
+        return Result.ok(entries.map(Entry.entryToTitleEntry));
     }
 
     public static async reassignAllLabels(
@@ -696,7 +771,7 @@ export class Entry {
         >`
             SELECT created, createdTZOffset
             FROM entries
-            WHERE deleted = 0
+            WHERE (flags & ${EntryFlags.DELETED}) = 0
               AND user = ${auth.id}
             ORDER BY created DESC, id
         `;
@@ -793,7 +868,7 @@ export class Entry {
             SELECT id,
                    created,
                    createdTZOffset,
-                   deleted,
+                   flags,
                    latitude,
                    longitude,
                    title,
@@ -801,7 +876,9 @@ export class Entry {
                    label,
                    agentData
             FROM entries
-            WHERE (deleted = ${deleted ? 1 : 0} OR ${deleted === 'both'})
+            WHERE ((flags & ${EntryFlags.DELETED}) = ${
+                deleted ? EntryFlags.DELETED : 0
+            } OR ${deleted === 'both'})
               AND user = ${auth.id}
               AND latitude IS NOT NULL
               AND longitude IS NOT NULL
@@ -901,7 +978,7 @@ export class Entry {
                     decryptedEntry,
                     rawEntry.created,
                     rawEntry.createdTZOffset,
-                    rawEntry.deleted,
+                    rawEntry.flags,
                     rawEntry.latitude,
                     rawEntry.longitude,
                     decryptedAgentData

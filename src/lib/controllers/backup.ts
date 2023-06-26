@@ -1,13 +1,13 @@
 import { Location } from '$lib/controllers/location';
+import { SemVer } from '$lib/utils/semVer';
 import schemion from 'schemion';
-import { parseSemVer } from 'semver-parser';
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { download as downloadFile } from '../utils/files';
 import { Result } from '../utils/result';
 import { currentTzOffset, fmtUtc, nowUtc } from '../utils/time';
 import { Asset } from './asset';
-import { Entry } from './entry';
+import { Entry, EntryFlags } from './entry';
 import { Event } from './event';
 import { Label } from './label';
 import type { Auth } from './user';
@@ -23,7 +23,7 @@ export class Backup {
             created: number;
             createdTZOffset: number;
             agentData?: string;
-            deleted?: boolean;
+            flags?: number;
             edits: {
                 title: string;
                 label?: string; // label's name
@@ -101,7 +101,7 @@ export class Backup {
                     longitude: entry.longitude ?? undefined,
                     title: entry.title,
                     agentData: entry.agentData,
-                    deleted: entry.deleted,
+                    flags: entry.flags,
                     edits:
                         entry.edits?.map(edit => ({
                             entry: edit.entry,
@@ -316,11 +316,24 @@ export class Backup {
         json: Partial<Backup> & Record<string, unknown>
     ): Result<Backup> {
         json.appVersion ||= '0.0.0';
-        const version = parseSemVer(json.appVersion);
-        version.major ||= 0;
+        const version = SemVer.fromString(json.appVersion);
 
-        if (version.major > 1) {
+        if (version.isGreaterThan('1.0.0', true)) {
             return Result.err(`Cannot time travel to version 1`);
+        }
+
+        if (version.isLessThan('0.4.72')) {
+            // entry.deleted -> entry.flags
+            if (json.entries) {
+                for (const entry of json.entries) {
+                    const e: typeof entry & { deleted?: boolean } = entry;
+                    e.flags ??= EntryFlags.NONE;
+                    if (e.deleted) {
+                        e.flags |= EntryFlags.DELETED;
+                    }
+                    delete e.deleted;
+                }
+            }
         }
 
         return Result.ok(json as Backup);

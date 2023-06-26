@@ -97,7 +97,7 @@
 </div>
 
 <style lang="less">
-    @import '../styles/layout';
+    @import '../../../styles/layout';
 
     h1 {
         text-align: left;

@@ -22,8 +22,8 @@ CREATE TABLE entries
     longitude       double       DEFAULT NULL,
     title           text         NULL,
     entry           longtext     NOT NULL,
-    deleted         int(1)       DEFAULT 0,
     label           varchar(128) DEFAULT NULL,
+    flags           int(8)       DEFAULT 0,
     agentData       longtext     NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB

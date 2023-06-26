@@ -3,6 +3,7 @@
     import { displayNotifOnErr } from '$lib/notifications/notifications';
     import { api } from '$lib/utils/apiRequest';
     import { onMount } from 'svelte';
+    import { Entry as EntryController } from '$lib/controllers/entry';
     import Entry from '$lib/components/entry/Entry.svelte';
     import { obfuscated } from '$lib/stores';
     import type { PageData } from './$types';
@@ -29,7 +30,7 @@
 </svelte:head>
 
 <main>
-    {#if data.entry.deleted}
+    {#if EntryController.isDeleted(data.entry)}
         <i>This entry has been deleted. </i>
     {:else if data.history}
         <i>Current Version</i>
