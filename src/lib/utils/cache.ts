@@ -74,10 +74,9 @@ export function getCachedResponse<T>(
     if (url in userCache) {
         logCacheReq(true, new URL(url));
         return userCache[url] as T;
-    } else {
-        logCacheReq(false, new URL(url));
-        return undefined;
     }
+    logCacheReq(false, new URL(url));
+    return;
 }
 
 export function invalidateCache(userId: string): void {

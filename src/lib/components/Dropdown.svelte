@@ -18,6 +18,7 @@
     export let fromTop = false;
     export let openOnHover = false;
     export let stayOpenWhenClicked = false;
+    export let fillWidthMobile = false;
 
     export let close = () => {
         open = false;
@@ -59,6 +60,7 @@
     class:from-right={fromRight}
     class:from-top={fromTop}
     class:open-on-hover={openOnHover}
+    class:fill-width-mobile={fillWidthMobile}
     {id}
 >
     <button
@@ -69,7 +71,7 @@
         <slot name="button" />
     </button>
     <span class="popup">
-        <span class="content container shadowed" style="width: {width}">
+        <span class="content container shadowed" style="--width: {width}">
             <slot />
         </span>
     </span>
@@ -108,6 +110,16 @@
             }
         }
 
+        &.fill-width-mobile {
+            .popup {
+                @media @mobile {
+                    left: 0;
+                    right: 0;
+                    width: 100vw;
+                }
+            }
+        }
+
         &.open,
         &.open-on-hover:hover {
             .popup {
@@ -121,5 +133,6 @@
         margin: 0;
         padding: 0;
         background: var(--light-accent);
+        width: var(--width);
     }
 </style>

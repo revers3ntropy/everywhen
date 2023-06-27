@@ -1,12 +1,8 @@
 <script lang="ts">
+    import { uploadImage } from '$lib/components/asset/uploadImage';
     import InfiniteScroller from '$lib/components/InfiniteScroller.svelte';
-    import { MAX_IMAGE_SIZE } from '$lib/constants';
     import { api } from '$lib/utils/apiRequest';
-    import {
-        displayNotifOnErr,
-        notify
-    } from '$lib/notifications/notifications';
-    import { getFileContents } from '$lib/utils/files';
+    import { displayNotifOnErr } from '$lib/notifications/notifications';
     import { nowUtc } from '$lib/utils/time';
     import ImageOutline from 'svelte-material-icons/ImageOutline.svelte';
     import Upload from 'svelte-material-icons/Upload.svelte';
@@ -34,26 +30,11 @@
             return;
         }
         const files = e.target.files as FileList;
-        if (files.length < 1) return;
-        if (files.length !== 1) {
-            notify.error('Please select exactly one file');
+        const res = await uploadImage(data, files);
+        if (res === null) {
             return;
         }
-        const file = files[0];
-        const content = displayNotifOnErr(await getFileContents(file, 'b64'));
-
-        if (!content) return;
-        if (content.length > MAX_IMAGE_SIZE) {
-            notify.error('Image is too large');
-            return;
-        }
-
-        const { id, publicId } = displayNotifOnErr(
-            await api.post(data, '/assets', {
-                fileName: file.name,
-                content
-            })
-        );
+        const { id, publicId, fileName } = res;
 
         data = {
             ...data,
@@ -62,7 +43,7 @@
                     id,
                     publicId,
                     undefined as unknown as string,
-                    file.name,
+                    fileName,
                     '',
                     nowUtc()
                 ),

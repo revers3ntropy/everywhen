@@ -6,7 +6,7 @@
 
     export let showSpinner = true;
     export let margin = 300;
-    export let items: Item[] = [];
+    export let items = [] as Item[];
     export let batchSize = 10;
     export let numItems: number;
 
@@ -49,10 +49,11 @@
 <slot />
 
 {#if numItems !== 0}
-    {#if ((loadingAt !== null && loadingAt < numItems) || !loadedAny) && showSpinner}
+    {#if showSpinner && ((loadingAt !== null && loadingAt < numItems) || !loadedAny)}
         <Spinner />
     {/if}
     <div
+        style="height: 1px"
         use:inview={{ rootMargin: `${margin}px` }}
         on:inview_enter={load}
         on:inview_leave={() => (pageEndInView = false)}

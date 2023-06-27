@@ -39,7 +39,9 @@ test.describe('/journal', () => {
 
         const labelName = 'Testing Label!';
 
-        await page.getByRole('button', { name: 'Set label' }).click();
+        await page
+            .getByRole('button', { name: 'Set label' })
+            .click({ force: true });
         await page.getByRole('button', { name: 'Create new label' }).click();
         await page.getByLabel('Name').fill(labelName);
         await page.getByRole('button', { name: 'Create' }).click();

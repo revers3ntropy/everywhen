@@ -2,23 +2,20 @@
     import { browser } from '$app/environment';
     import { beforeNavigate, goto } from '$app/navigation';
     import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
+    import InsertImage from '$lib/components/asset/InsertImage.svelte';
     import { dispatch, listen } from '$lib/dataChangeEvents.js';
     import { serializedAgentData } from '$lib/utils/userAgent';
     import { tooltip } from '@svelte-plugins/tooltips';
-    import { filedrop, type Files } from 'filedrop-svelte';
     import { onMount } from 'svelte';
     import FormatListBulleted from 'svelte-material-icons/FormatListBulleted.svelte';
-    import ImageArea from 'svelte-material-icons/ImageArea.svelte';
     import Send from 'svelte-material-icons/Send.svelte';
     import LabelSelect from '$lib/components/label/LabelSelect.svelte';
-    import { LS_KEY, MAX_IMAGE_SIZE } from '$lib/constants';
-    import { Asset } from '$lib/controllers/asset';
+    import { LS_KEY } from '$lib/constants';
     import type { Entry, RawEntry } from '$lib/controllers/entry';
     import type { Label } from '$lib/controllers/label';
     import type { Auth } from '$lib/controllers/user';
     import { enabledLocation } from '$lib/stores.js';
     import { api, apiPath } from '$lib/utils/apiRequest';
-    import { getFileContents } from '$lib/utils/files';
     import { getLocation } from '$lib/utils/geolocation';
     import { errorLogger } from '$lib/utils/log';
     import {
@@ -151,7 +148,7 @@
         const entry = {
             ...body,
             id: res.id,
-            deleted: false,
+            flags: 0,
             decrypted: true
         } as Mutable<Entry>;
 
@@ -219,38 +216,8 @@
         }
     }
 
-    async function onFileDrop(e: CustomEvent<{ files: Files }>) {
-        const files = e.detail.files;
-        if (files.rejected.length > 0) {
-            notify.error('File could not be read, please try again');
-            return;
-        }
-        if (files.accepted.length < 1) return;
-        if (files.accepted.length !== 1) {
-            notify.error('Please select exactly one file');
-            return;
-        }
-        const file = files.accepted[0];
-        const content = displayNotifOnErr(await getFileContents(file, 'b64'));
-
-        if (!content) return;
-        if (content.length > MAX_IMAGE_SIZE) {
-            notify.error('Image is too large');
-            return;
-        }
-
-        const { id } = displayNotifOnErr(
-            await api.post(auth, '/assets', {
-                fileName: file.name,
-                content
-            })
-        );
-
-        // insert markdown to link to image
-        insertAtCursor(
-            newEntryInputElement,
-            `\n${Asset.mdLink(file.name, id)}\n`
-        );
+    function onNewImage(md: string) {
+        insertAtCursor(newEntryInputElement, `\n${md}\n`);
     }
 
     async function stopSpaceAndEnterBeingInterceptedByFileDrop() {
@@ -272,15 +239,6 @@
                 true
             );
         }
-    }
-
-    function triggerFileDrop() {
-        // bit hacky... TODO make less hacky
-        (
-            document.querySelector(
-                '.entry-file-drop > input'
-            ) as HTMLInputElement
-        ).click();
     }
 
     async function loadLabels() {
@@ -358,126 +316,101 @@
     }
 </script>
 
-<div
-    class="wrapper entry-file-drop"
-    on:filedrop={onFileDrop}
-    use:filedrop={{
-        fileLimit: 1,
-        windowDrop: false,
-        hideInput: true,
-        clickToUpload: false,
-        tabIndex: -1,
-        multiple: false,
-        accept: 'image/*',
-        id: 'entry-file-drop'
-    }}
->
-    <div>
-        <div class="head">
-            <div class="left-options">
-                {#if setEntryFormMode}
-                    <button
-                        aria-label="Switch to bullet journaling"
-                        class="with-circled-icon"
-                        on:click={() =>
-                            setEntryFormMode?.(EntryFormMode.Bullet)}
-                        style="margin: 0"
-                        use:tooltip={{
-                            content: 'Switch to Bullet Journaling',
-                            position: 'right'
-                        }}
-                    >
-                        <FormatListBulleted size="30" />
-                    </button>
-                {/if}
-
-                <LocationToggle />
-
-                <FormatOptions {makeWrapper} />
-
+<div class="wrapper">
+    <div class="head">
+        <div class="left-options">
+            {#if setEntryFormMode}
                 <button
-                    aria-label="Insert Image"
-                    disabled={submitted}
-                    on:click={triggerFileDrop}
+                    aria-label="Switch to bullet journaling"
+                    class="with-circled-icon"
+                    on:click={() => setEntryFormMode?.(EntryFormMode.Bullet)}
+                    style="margin: 0"
                     use:tooltip={{
-                        content: '<span class="oneline">Upload Image</span>',
-                        position: 'bottom'
+                        content: 'Switch to Bullet Journaling',
+                        position: 'right'
                     }}
                 >
-                    <ImageArea size="30" />
+                    <FormatListBulleted size="30" />
                 </button>
-            </div>
-            <div class="right-options {obfuscated ? 'blur' : ''}">
-                <div class="label-select-container">
-                    <LabelSelect
-                        {auth}
-                        bind:value={newEntryLabel}
-                        {labels}
-                        fromRight
-                    />
-                </div>
-
-                <button
-                    aria-label="Submit Entry"
-                    class="primary with-icon hide-mobile"
-                    disabled={submitted}
-                    on:click={submit}
-                    style="padding: 2px 5px; margin: 0 0 3px 0;"
-                >
-                    Submit
-                    <Send size="26" />
-                </button>
-            </div>
-        </div>
-        <div class="entry-title-container">
-            {#if obfuscated}
-                <input
-                    aria-label="Entry Title"
-                    value={obfuscate(newEntryTitle)}
-                    class="title obfuscated"
-                    disabled
-                    placeholder="..."
-                />
-            {:else}
-                <input
-                    aria-label="Entry Title"
-                    bind:value={newEntryTitle}
-                    class="title"
-                    placeholder="Title (optional)"
-                    disabled={submitted}
-                />
             {/if}
-        </div>
-        <div class="entry-container">
-            {#if obfuscated}
-                <textarea
-                    placeholder="..."
-                    aria-label="Entry Body"
-                    disabled
-                    class="obfuscated">{obfuscate(newEntryBody)}</textarea
-                >
-            {:else}
-                <textarea
-                    bind:this={newEntryInputElement}
-                    bind:value={newEntryBody}
-                    on:keydown={handleEntryInputKeydown}
-                    disabled={submitted}
-                    aria-label="Entry Body"
-                />
-            {/if}
-        </div>
 
-        <div class="send-mobile flex-center">
+            <LocationToggle />
+
+            <FormatOptions {makeWrapper} />
+
+            <InsertImage {auth} onInput={onNewImage} />
+        </div>
+        <div class="right-options {obfuscated ? 'blur' : ''}">
+            <div class="label-select-container">
+                <LabelSelect
+                    {auth}
+                    bind:value={newEntryLabel}
+                    {labels}
+                    fromRight
+                />
+            </div>
+
             <button
                 aria-label="Submit Entry"
-                class="primary with-icon"
+                class="primary with-icon hide-mobile"
                 disabled={submitted}
                 on:click={submit}
+                style="padding: 2px 5px; margin: 0 0 3px 0;"
             >
-                <Send size="30" />
-                Submit Entry
+                Submit
+                <Send size="26" />
             </button>
         </div>
+    </div>
+    <div class="entry-title-container">
+        {#if obfuscated}
+            <input
+                aria-label="Entry Title"
+                value={obfuscate(newEntryTitle)}
+                class="title obfuscated"
+                disabled
+                placeholder="..."
+            />
+        {:else}
+            <input
+                aria-label="Entry Title"
+                bind:value={newEntryTitle}
+                class="title"
+                placeholder="Title (optional)"
+                disabled={submitted}
+            />
+        {/if}
+    </div>
+    <div class="entry-container">
+        {#if obfuscated}
+            <textarea
+                placeholder="..."
+                aria-label="Entry Body"
+                disabled
+                class="obfuscated">{obfuscate(newEntryBody)}</textarea
+            >
+        {:else}
+            <textarea
+                bind:this={newEntryInputElement}
+                bind:value={newEntryBody}
+                on:keydown={handleEntryInputKeydown}
+                disabled={submitted}
+                aria-label="Entry Body"
+                placeholder="Start writing here..."
+            />
+        {/if}
+    </div>
+
+    <div class="send-mobile flex-center">
+        <button
+            aria-label="Submit Entry"
+            class="primary with-icon"
+            disabled={submitted}
+            on:click={submit}
+        >
+            <Send size="30" />
+            Submit Entry
+        </button>
     </div>
 </div>
 
