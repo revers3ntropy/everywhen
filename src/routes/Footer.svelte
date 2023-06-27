@@ -1,6 +1,7 @@
 <script>
     import Github from 'svelte-material-icons/Github.svelte';
     import OpenInNew from 'svelte-material-icons/OpenInNew.svelte';
+    import DonateWidget from '$lib/components/DonateWidget.svelte';
 
     const version = __VERSION__;
 </script>
@@ -32,6 +33,10 @@
             <Github size="30" />
         </a>
     </div>
+    <div>
+        <DonateWidget />
+    </div>
+    <div class="spacer" />
 </footer>
 
 <style lang="less">
@@ -40,14 +45,14 @@
 
     footer {
         background-color: var(--nav-bg);
-        height: 200px;
         display: grid;
         grid-template-columns: 100%;
 
-        padding: 5rem 0 0 0;
+        padding: 5rem 0 5rem 0;
         border-top: 1px solid var(--border-color);
 
         div {
+            margin: 1rem;
             .flex-center();
         }
 
