@@ -78,14 +78,14 @@
     <div class="left">
         <div class="header">
             <div>
-                <h3 class="oneline">
+                <h2 class="oneline">
                     {#if saving}
                         <Sync size={20} class="gradient-icon" />
                     {:else}
                         <CloudCheckOutline size={20} />
                     {/if}
                     {name}
-                </h3>
+                </h2>
             </div>
 
             {#if created}
@@ -272,7 +272,8 @@
             }
         }
 
-        h3 {
+        h2 {
+            font-size: 20px;
             display: grid;
             grid-template-columns: 40px 1fr;
             justify-content: center;

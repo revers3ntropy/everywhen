@@ -133,7 +133,7 @@
             border-radius: @border-radius;
 
             @media @mobile {
-                padding: 2rem 4px 3rem 4px;
+                padding: 2rem 4px 3rem 1rem;
                 width: 100%;
                 border-radius: 0;
             }
