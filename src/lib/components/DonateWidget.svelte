@@ -1,7 +1,12 @@
+<script>
+    import OpenInNew from 'svelte-material-icons/OpenInNew.svelte';
+</script>
+
 <a
     href="https://www.paypal.com/donate/?hosted_button_id=9ASS89B25RWM2"
     target="_blank"
     aria-label="Donate with PayPal"
+    class="icon-gradient-on-hover"
 >
     <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -28,7 +33,7 @@
             d="M216.952 72.128a89.928 89.928 0 0 0-5.818-1.49 109.904 109.904 0 0 0-6.177-1.174c-7.408-1.199-15.5-1.765-24.19-1.765h-73.309a11.57 11.57 0 0 0-5.053 1.149 11.683 11.683 0 0 0-6.51 8.74l-15.582 98.798-.45 2.88c1.025-6.501 6.585-11.296 13.17-11.296h27.444c53.898 0 96.1-21.892 108.428-85.221.367-1.873.675-3.688.958-5.477-3.122-1.648-6.501-3.072-10.14-4.279a83.26 83.26 0 0 0-2.77-.865"
         />
     </svg>
-    Donate
+    <span> Donate <OpenInNew size="15" /> </span>
 </a>
 
 <style lang="less">

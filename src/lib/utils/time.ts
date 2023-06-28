@@ -1,5 +1,4 @@
 import moment from 'moment';
-import type { Hours, Seconds, TimestampSecs } from '../../app';
 
 /**
  * Get the UTC timestamp of now in seconds

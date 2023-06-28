@@ -1,6 +1,5 @@
 import type { QueryFunc } from '$lib/db/mysql';
 import { roundNDP } from '$lib/utils/text';
-import type { Milliseconds, TimestampSecs } from '../../app';
 
 export class PageLoadLog {
     public static async createLog(

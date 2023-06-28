@@ -21,7 +21,7 @@
     import {
         displayNotifOnErr,
         notify
-    } from '$lib/notifications/notifications';
+    } from '$lib/components/notifications/notifications';
     import { obfuscate, rawMdToHtml } from '$lib/utils/text';
     import UtcTime from '$lib/components/UtcTime.svelte';
     import Dropdown from '$lib/components/Dropdown.svelte';
@@ -29,7 +29,7 @@
     import AgentWidget from './AgentWidget.svelte';
     import Dot from '../Dot.svelte';
     import Label from '$lib/components/label/Label.svelte';
-    import LocationWidget from './LocationWidget.svelte';
+    import LocationWidget from '../location/LocationWidget.svelte';
 
     export let id: string;
     export let title: string;

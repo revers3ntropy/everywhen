@@ -2,7 +2,7 @@
     import { uploadImage } from '$lib/components/asset/uploadImage';
     import InfiniteScroller from '$lib/components/InfiniteScroller.svelte';
     import type { Auth } from '$lib/controllers/user';
-    import { displayNotifOnErr } from '$lib/notifications/notifications';
+    import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import { api } from '$lib/utils/apiRequest';
     import { nowUtc } from '$lib/utils/time';
     import { onMount } from 'svelte';

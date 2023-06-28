@@ -12,7 +12,7 @@
     import {
         displayNotifOnErr,
         notify
-    } from '$lib/notifications/notifications';
+    } from '$lib/components/notifications/notifications';
     import { enabledLocation } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { getLocation } from '$lib/utils/geolocation';
@@ -21,7 +21,6 @@
     import { serializedAgentData } from '$lib/utils/userAgent';
     import { onMount } from 'svelte';
     import Send from 'svelte-material-icons/Send.svelte';
-    import type { Mutable } from '../../../app';
 
     export let auth: Auth;
     export let obfuscated = true;

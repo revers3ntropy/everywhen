@@ -1,6 +1,9 @@
 import { MAX_IMAGE_SIZE } from '$lib/constants';
 import type { Auth } from '$lib/controllers/user';
-import { displayNotifOnErr, notify } from '$lib/notifications/notifications';
+import {
+    displayNotifOnErr,
+    notify
+} from '$lib/components/notifications/notifications';
 import { api } from '$lib/utils/apiRequest';
 import { getFileContents } from '$lib/utils/files';
 

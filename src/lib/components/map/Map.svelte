@@ -33,7 +33,7 @@
     import EntryDialog from '$lib/components/dialogs/EntryDialog.svelte';
     import EntryTooltipOnMap from './EntryTooltipOnMap.svelte';
     import { errorLogger } from '$lib/utils/log';
-    import { displayNotifOnErr } from '$lib/notifications/notifications';
+    import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import {
         type EntryFeature,
         lastEntry,

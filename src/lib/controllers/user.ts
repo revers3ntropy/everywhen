@@ -112,7 +112,7 @@ export class User {
         let existingSalts: { salt: string }[];
         do {
             salt = cryptoRandomStr(10);
-            existingSalts = await query`
+            existingSalts = await query<{ salt: string }[]>`
                 SELECT salt
                 FROM users
                 WHERE salt = ${salt}

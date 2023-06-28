@@ -3,7 +3,7 @@
     import { popup } from '$lib/stores';
     import type { Auth } from '$lib/controllers/user';
     import { api } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/notifications/notifications';
+    import { displayNotifOnErr } from '$lib/components/notifications/notifications';
 
     export let auth: Auth;
 

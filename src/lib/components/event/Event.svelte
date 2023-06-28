@@ -9,7 +9,6 @@
     import TimelineClockOutline from 'svelte-material-icons/TimelineClockOutline.svelte';
     import TimelineOutline from 'svelte-material-icons/TimelineOutline.svelte';
     import type { ChangeEventHandler } from 'svelte/elements';
-    import type { TimestampSecs } from '../../../app';
     import LabelSelect from '$lib/components/label/LabelSelect.svelte';
     import UtcTime from '../UtcTime.svelte';
     import { Event as EventController } from '../../controllers/event';
@@ -17,7 +16,7 @@
     import type { Label as LabelController } from '../../controllers/label';
     import type { Auth } from '$lib/controllers/user';
     import { api, apiPath } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/notifications/notifications';
+    import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import { obfuscate } from '$lib/utils/text';
     import {
         fmtDuration,

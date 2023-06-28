@@ -17,11 +17,10 @@
     import Television from 'svelte-material-icons/Television.svelte';
     import Watch from 'svelte-material-icons/Watch.svelte';
     import UAParser from 'ua-parser-js';
-    import type { Pixels } from '../../../app';
 
     export let data = '';
     export let size: Pixels = 20;
-    export let tooltipPosition = 'right';
+    export let tooltipPosition = 'right' as TooltipPosition;
 
     let ua = null as ReturnType<typeof UAParser> | null;
 

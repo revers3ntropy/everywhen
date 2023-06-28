@@ -1,4 +1,4 @@
-import { notify } from '$lib/notifications/notifications';
+import { notify } from '$lib/components/notifications/notifications';
 
 type OptionalCoords = [number, number] | [null, null];
 

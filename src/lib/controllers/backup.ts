@@ -316,13 +316,14 @@ export class Backup {
         json: Partial<Backup> & Record<string, unknown>
     ): Result<Backup> {
         json.appVersion ||= '0.0.0';
-        const version = SemVer.fromString(json.appVersion);
+        const { val: version, err } = SemVer.fromString(json.appVersion);
+        if (err) return Result.err(err);
 
-        if (version.isGreaterThan('1.0.0', true)) {
+        if (version.isGreaterThan(SemVer.fromString('1.0.0').val, true)) {
             return Result.err(`Cannot time travel to version 1`);
         }
 
-        if (version.isLessThan('0.4.72')) {
+        if (version.isLessThan(SemVer.fromString('0.4.72').val)) {
             // entry.deleted -> entry.flags
             if (json.entries) {
                 for (const entry of json.entries) {

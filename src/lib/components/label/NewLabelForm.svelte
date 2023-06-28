@@ -9,7 +9,7 @@
     import {
         displayNotifOnErr,
         notify
-    } from '$lib/notifications/notifications';
+    } from '$lib/components/notifications/notifications';
 
     const dispatchEvent = createEventDispatcher();
 

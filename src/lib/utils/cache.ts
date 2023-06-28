@@ -1,9 +1,8 @@
 import { ENABLE_CACHING } from '$lib/constants';
+import { error } from '@sveltejs/kit';
 import type { RequestEvent, ServerLoadEvent } from '@sveltejs/kit';
 import chalk from 'chalk';
-import type { Bytes, MaybePromise, Seconds } from '../../app';
 import type { Auth } from '../controllers/user';
-import { getAuthFromCookies } from '../security/getAuthFromCookies';
 import type { GenericResponse } from './apiResponse';
 import { makeLogger } from './log';
 import { fmtBytes } from './text';
@@ -138,7 +137,10 @@ export function cachedApiRoute<
         props: RequestEvent<Params, RouteId>
     ): Promise<GenericResponse<Res>> => {
         const url = props.url.href;
-        const auth = await getAuthFromCookies(props.cookies);
+        const auth = props.locals.auth;
+
+        if (!auth) throw error(401, 'Unauthorized');
+
         const cached = getCachedResponse<Response>(url, auth.id)?.clone();
         if (cached) {
             return cached as GenericResponse<Res>;
@@ -174,16 +176,16 @@ export function cachedPageRoute<
         auth: Auth,
         event: ServerLoadEvent<Params, ParentData, RouteId>
     ) => MaybePromise<OutputData>
-    // doesn't actually return `OutputData & App.PageData`,
-    // but needs to act like it to satisfy the type checker with `svelte-check`
 ): (
     event: ServerLoadEvent<Params, ParentData, RouteId>
-) => MaybePromise<OutputData & App.PageData> {
+) => MaybePromise<OutputData> {
     return (async (
         props: ServerLoadEvent<Params, ParentData, RouteId>
     ): Promise<OutputData & App.PageData> => {
         const url = props.url.href;
-        const auth = await getAuthFromCookies(props.cookies);
+        const auth = props.locals.auth;
+        if (!auth) throw error(401, 'Unauthorized');
+
         const cached = getCachedResponse(url, auth.id);
 
         if (cached) {

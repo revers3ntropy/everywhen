@@ -6,7 +6,10 @@
     import type { Auth } from '../controllers/user';
     import { encryptionKeyFromPassword } from '../security/authUtils';
     import { api } from '../utils/apiRequest';
-    import { displayNotifOnErr, notify } from '../notifications/notifications';
+    import {
+        displayNotifOnErr,
+        notify
+    } from '$lib/components/notifications/notifications';
     import { showPopup } from '../utils/popups';
     import type { Result } from '../utils/result';
     import FileDropDialog from '$lib/components/dialogs/FileDropDialog.svelte';

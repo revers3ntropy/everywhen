@@ -5,7 +5,7 @@
     import type { Auth } from '$lib/controllers/user';
     import { popup } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/notifications/notifications';
+    import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import BookSpinner from '../BookSpinner.svelte';
     import Entry from '$lib/components/entry/Entry.svelte';
 

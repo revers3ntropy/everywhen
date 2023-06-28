@@ -1,5 +1,3 @@
-import type { Bytes, Milliseconds, Pixels, Seconds } from '../app';
-
 export const COOKIE_TIMEOUT: Seconds = 60 * 60;
 
 export const KEY_PREFIX = '__misc_3_';
@@ -15,7 +13,8 @@ export const LS_KEY = {
     enabledLocation: `${KEY_PREFIX}enabled_location`,
     sortEventsKey: `${KEY_PREFIX}events_sort_key`,
     journalingMode: `${KEY_PREFIX}journaling_mode`,
-    obfuscated: `${KEY_PREFIX}obfuscated`
+    obfuscated: `${KEY_PREFIX}obfuscated`,
+    theme: `${KEY_PREFIX}theme`
 };
 
 // possible characters to show when the text is blurred
@@ -36,13 +35,6 @@ export const USERNAME_COOKIE_OPTIONS = Object.freeze({
     ...KEY_COOKIE_OPTIONS,
     httpOnly: false
 });
-
-export const NON_AUTH_ROUTES = Object.freeze([
-    '/',
-    '/about',
-    '/about/history',
-    '/signup'
-]);
 
 export const NO_SIGNED_IN_ROUTES = Object.freeze(['/signup', '/']);
 

@@ -1,7 +1,6 @@
 import { localStorageWritable } from '$lib/lsWritable';
 import type { SvelteComponent } from 'svelte';
 import { writable } from 'svelte/store';
-import type { EventsSortKey } from '../app';
 import { LS_KEY } from './constants';
 
 export const enabledLocation = localStorageWritable<boolean, null>(
@@ -26,3 +25,9 @@ export const obfuscated = localStorageWritable<boolean>(
 );
 
 export const popup = writable<typeof SvelteComponent | null | undefined>(null);
+
+export const theme = localStorageWritable<'light' | 'dark'>(
+    LS_KEY.theme,
+    'light',
+    'light'
+);

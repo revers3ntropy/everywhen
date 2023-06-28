@@ -4,7 +4,6 @@ import type { Label } from '$lib/controllers/label';
 import type { Event } from '$lib/controllers/event';
 import type { SettingsConfig } from '$lib/controllers/settings';
 import { onDestroy } from 'svelte';
-import type { MaybePromise } from '../app';
 
 type Entities = 'entry' | 'label' | 'event' | 'setting';
 

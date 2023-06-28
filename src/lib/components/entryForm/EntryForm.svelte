@@ -21,10 +21,9 @@
     import {
         displayNotifOnErr,
         notify
-    } from '$lib/notifications/notifications';
+    } from '$lib/components/notifications/notifications';
     import { obfuscate } from '$lib/utils/text';
     import { currentTzOffset, nowUtc } from '$lib/utils/time';
-    import type { Mutable } from '../../../app';
     import FormatOptions from './FormatOptions.svelte';
     import LocationToggle from '../location/LocationToggle.svelte';
 
@@ -511,7 +510,7 @@
             font-size: 20px;
             background: var(--light-accent);
             border-radius: @border-radius @border-radius 0 0;
-            border-bottom: 2px solid var(--bg);
+            border-bottom: 2px solid var(--background-color);
             width: 100%;
 
             @media @mobile {

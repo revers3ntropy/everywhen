@@ -9,7 +9,6 @@ import {
 import { Backup } from '$lib/controllers/backup';
 import { User } from '$lib/controllers/user';
 import { query } from '$lib/db/mysql';
-import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse';
 import { invalidateCache } from '$lib/utils/cache';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody';
@@ -20,17 +19,17 @@ export const POST = (async ({ request, cookies }) => {
         password: 'string'
     });
 
-    const { err } = await User.create(query, body.username, body.password);
+    const { err, val } = await User.create(query, body.username, body.password);
     if (err) throw error(400, err);
 
     cookies.set(KEY_COOKIE_KEY, body.password, KEY_COOKIE_OPTIONS);
     cookies.set(USERNAME_COOKIE_KEY, body.username, USERNAME_COOKIE_OPTIONS);
 
-    return apiResponse({});
+    return apiResponse({ ...val });
 }) satisfies RequestHandler;
 
-export const DELETE = (async ({ cookies }) => {
-    const auth = await getAuthFromCookies(cookies);
+export const DELETE = (async ({ cookies, locals: { auth } }) => {
+    if (!auth) throw error(401, 'Invalid authentication');
     invalidateCache(auth.id);
 
     const { err, val: backup } = await Backup.generate(query, auth);

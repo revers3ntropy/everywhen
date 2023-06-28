@@ -13,9 +13,7 @@
             <ul>
                 <li>Backup to Google Drive</li>
                 <li>Resize images</li>
-                <li>Filter by Label in timeline</li>
                 <li>Better zooming the timeline on mobile</li>
-                <li>More easily link to already uploaded images</li>
                 <li>Tags with '#' in entry or separately</li>
                 <li>Mood attached to entries</li>
                 <li>Automatic mood tracking with Tone Analysis</li>
@@ -37,6 +35,8 @@
         <section>
             <h2>0.4</h2>
             <ul>
+                <li>Easily link to already uploaded images</li>
+                <li>Filter by Label in timeline</li>
                 <li>Themes (light/dark mode)</li>
                 <li>Forgot Passcode</li>
                 <li>Formatting options in entry form</li>

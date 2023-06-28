@@ -1,4 +1,3 @@
-import type { Seconds } from '../../app';
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { Result } from '../utils/result';
@@ -25,12 +24,6 @@ export type SettingsConfig = {
 
 export class Settings<T = unknown> {
     public static config = {
-        darkMode: {
-            type: 'boolean',
-            defaultValue: false,
-            name: 'Dark Mode',
-            description: 'Use a darker theme.'
-        } as SettingConfig<boolean>,
         hideEntriesByDefault: {
             type: 'boolean',
             defaultValue: false,

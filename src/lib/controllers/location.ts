@@ -1,5 +1,4 @@
 import type { ResultSetHeader } from 'mysql2';
-import type { Degrees, Meters, TimestampSecs } from '../../app';
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { Result } from '../utils/result';

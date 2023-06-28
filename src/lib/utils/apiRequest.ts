@@ -116,7 +116,7 @@ export async function makeApiReq<
     Path extends keyof ApiResponse[Verb],
     Body extends ReqBody
 >(
-    auth: Auth,
+    auth: Auth | null,
     method: Verb,
     path: string,
     body: Body | null = null
@@ -139,19 +139,24 @@ export async function makeApiReq<
         body.utcTimeS ??= nowUtc();
     }
 
+    let cookie = '';
+    if (auth) {
+        cookie =
+            serialize(KEY_COOKIE_KEY, auth.key, KEY_COOKIE_OPTIONS) +
+            ' ; ' +
+            serialize(
+                USERNAME_COOKIE_KEY,
+                auth.username,
+                USERNAME_COOKIE_OPTIONS
+            );
+    }
+
     const init: RequestInit = {
         method,
         headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json',
-            Cookie:
-                serialize(KEY_COOKIE_KEY, auth.key, KEY_COOKIE_OPTIONS) +
-                ' ; ' +
-                serialize(
-                    USERNAME_COOKIE_KEY,
-                    auth.username,
-                    USERNAME_COOKIE_OPTIONS
-                )
+            Cookie: cookie
         }
     };
 
@@ -218,7 +223,7 @@ export async function makeApiReq<
 
 export const api = {
     get: async <Path extends keyof ApiResponse['GET'], Body extends ReqBody>(
-        auth: Auth,
+        auth: Auth | null,
         path: Path,
         args: Record<string, string | number | boolean | undefined> = {}
     ) =>
@@ -229,13 +234,13 @@ export const api = {
         ),
 
     post: async <Path extends keyof ApiResponse['POST'], Body extends ReqBody>(
-        auth: Auth,
+        auth: Auth | null,
         path: Path,
         body: Body = {} as Body
     ) => await makeApiReq<'POST', Path, Body>(auth, 'POST', path, body),
 
     put: async <Path extends keyof ApiResponse['PUT'], Body extends ReqBody>(
-        auth: Auth,
+        auth: Auth | null,
         path: Path,
         body: Body = {} as Body
     ) => await makeApiReq<'PUT', Path, Body>(auth, 'PUT', path, body),
@@ -244,7 +249,7 @@ export const api = {
         Path extends keyof ApiResponse['DELETE'],
         Body extends ReqBody
     >(
-        auth: Auth,
+        auth: Auth | null,
         path: Path,
         body: Body = {} as Body
     ) => await makeApiReq<'DELETE', Path, Body>(auth, 'DELETE', path, body)

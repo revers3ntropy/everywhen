@@ -8,13 +8,13 @@
     export let key: string;
     export let open = false;
 
-    export let value = null;
+    export let value: string | number;
     $: value = options[key];
 
     $: if (!(key in options)) key = Object.keys(options)[0];
 </script>
 
-<Dropdown bind:open fromRight>
+<Dropdown bind:open {fromRight}>
     <span class="selector" slot="button">
         {key}
         {#if open}

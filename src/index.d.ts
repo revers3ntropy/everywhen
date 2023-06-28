@@ -1,6 +1,5 @@
 declare module '@svelte-plugins/tooltips' {
     import type { ActionReturn } from 'svelte/action';
-    import type { TooltipPosition } from './app';
 
     export function tooltip(
         el: HTMLElement,

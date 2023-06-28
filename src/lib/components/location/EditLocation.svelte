@@ -8,7 +8,7 @@
     import type { Auth } from '$lib/controllers/user';
     import { popup } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/notifications/notifications';
+    import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import { round1DP } from '$lib/utils/text';
 
     export let isInDialog = false;

@@ -1,25 +1,21 @@
-import c from 'chalk';
+import { Result } from '$lib/utils/result';
 
 export class SemVer {
     constructor(public major = 0, public minor = 0, public patch = 0) {}
 
-    static fromString(version: string): SemVer {
+    static fromString(version: string): Result<SemVer> {
         const v = new SemVer();
         const parts = version.split('.');
         if (parts.length !== 3) {
-            console.error(c.red('Invalid SemVer string: ' + version));
-            throw new Error();
+            return Result.err('Invalid SemVer string: ' + version);
         }
         v.major = parseInt(parts[0]);
         v.minor = parseInt(parts[1]);
         v.patch = parseInt(parts[2]);
-        return v;
+        return Result.ok(v);
     }
 
-    isGreaterThan(version: SemVer | string, orEqual = false): boolean {
-        if (typeof version === 'string') {
-            version = SemVer.fromString(version);
-        }
+    isGreaterThan(version: SemVer, orEqual = false): boolean {
         if (orEqual && this.isEqual(version)) {
             return true;
         }
@@ -37,10 +33,7 @@ export class SemVer {
         return false;
     }
 
-    isEqual(version: SemVer | string): boolean {
-        if (typeof version === 'string') {
-            version = SemVer.fromString(version);
-        }
+    isEqual(version: SemVer): boolean {
         return (
             this.major === version.major &&
             this.minor === version.minor &&
@@ -48,10 +41,7 @@ export class SemVer {
         );
     }
 
-    isLessThan(version: SemVer | string, orEqual = false): boolean {
-        if (typeof version === 'string') {
-            version = SemVer.fromString(version);
-        }
+    isLessThan(version: SemVer, orEqual = false): boolean {
         if (version.isEqual(this)) {
             return orEqual;
         }

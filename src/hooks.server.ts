@@ -1,4 +1,5 @@
 import { PageLoadLog } from '$lib/controllers/log';
+import type { Auth } from '$lib/controllers/user';
 import { tryGetAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import { nowUtc } from '$lib/utils/time';
 import type { Handle, RequestEvent } from '@sveltejs/kit';
@@ -6,7 +7,6 @@ import chalk from 'chalk';
 import { connect, dbConnection, query } from '$lib/db/mysql';
 import { cleanupCache } from '$lib/utils/cache';
 import { errorLogger, makeLogger } from '$lib/utils/log';
-import type { Milliseconds, TimestampSecs } from './app';
 
 const reqLogger = makeLogger('REQ', chalk.bgWhite.black, 'general.log');
 
@@ -35,19 +35,7 @@ process.on('SIGUSR1', exitHandler);
 process.on('SIGUSR2', exitHandler);
 process.on('uncaughtException', exitHandler);
 
-async function logReq(
-    duration: Milliseconds,
-    now: TimestampSecs,
-    req: RequestEvent,
-    res: Response
-): Promise<void> {
-    const path = req.route.id || '[unknown]';
-
-    void reqLogger.logToFile(req.request.method, path);
-
-    const auth = await tryGetAuthFromCookies(req.cookies);
-    const userId = (auth?.id || '').toString();
-
+function getIp(req: RequestEvent): string {
     let ip = '';
 
     // might be set by the apache reverse proxy
@@ -64,14 +52,31 @@ async function logReq(
             ip = '[unknown]';
         }
     }
-    if (!ip) ip = '[unknown]';
+
+    return ip || '[unknown]';
+}
+
+async function logReq(
+    duration: Milliseconds,
+    now: TimestampSecs,
+    req: RequestEvent,
+    res: Response,
+    auth: Auth | null
+): Promise<void> {
+    const path = req.route.id || '[unknown]';
+
+    void reqLogger.logToFile(req.request.method, path);
+
+    const userId = (auth?.id || '').toString();
+
+    const ip = getIp(req);
 
     await PageLoadLog.createLog(
         query.unlogged,
         now,
         req.request.method,
         req.url.href,
-        (req.route.id as string) || '[unknown]',
+        path,
         duration,
         res.status,
         userId,
@@ -89,6 +94,9 @@ async function logReq(
 export const handle = (async ({ event, resolve }) => {
     const start = performance.now();
     const now = nowUtc();
+
+    const auth = await tryGetAuthFromCookies(event.cookies);
+    event.locals.auth = auth;
 
     const eventClone: RequestEvent = {
         ...event,
@@ -109,7 +117,8 @@ export const handle = (async ({ event, resolve }) => {
         performance.now() - start,
         now,
         eventClone,
-        result.clone()
+        result.clone(),
+        auth
     ).catch(errorLogger.error);
 
     return result;

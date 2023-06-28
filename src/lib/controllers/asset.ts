@@ -1,7 +1,6 @@
 import fs from 'fs';
 import type { ResultSetHeader } from 'mysql2';
 import webp from 'webp-converter';
-import type { TimestampSecs } from '../../app';
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { Result } from '../utils/result';

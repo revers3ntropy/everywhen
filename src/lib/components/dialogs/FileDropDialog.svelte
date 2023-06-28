@@ -1,6 +1,6 @@
 <script lang="ts">
     import BookSpinner from '$lib/components/BookSpinner.svelte';
-    import { notify } from '$lib/notifications/notifications';
+    import { notify } from '$lib/components/notifications/notifications';
     import {
         filedrop,
         type FileDropOptions,

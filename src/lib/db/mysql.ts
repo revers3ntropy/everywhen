@@ -2,7 +2,6 @@ import { browser } from '$app/environment';
 import { DB, DB_HOST, DB_PASS, DB_PORT, DB_USER } from '$env/static/private';
 import chalk from 'chalk';
 import mysql from 'mysql2/promise';
-import type { Milliseconds, NonFunctionProperties } from '../../app';
 import '../require';
 import { makeLogger } from '../utils/log';
 

@@ -187,7 +187,7 @@
             border: 1px solid var(--light-accent);
 
             &:hover {
-                background: var(--bg);
+                background: var(--background-color);
             }
         }
 
