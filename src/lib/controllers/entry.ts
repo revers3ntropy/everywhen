@@ -13,6 +13,13 @@ export enum EntryFlags {
     PINNED = 0b10
 }
 
+export interface EntryLocation {
+    id: string;
+    created: number;
+    latitude: number | null;
+    longitude: number | null;
+}
+
 export namespace EntryFlags {
     export const NONE = 0;
 

@@ -9,13 +9,6 @@ export type EntryWithWordCount = PickOptionalAndMutable<
     wordCount: number;
 };
 
-export interface EntryLocation {
-    id: string;
-    created: number;
-    latitude: number | null;
-    longitude: number | null;
-}
-
 export enum By {
     Words,
     Entries

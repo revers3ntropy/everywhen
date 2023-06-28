@@ -1,7 +1,5 @@
 <script lang="ts">
     import { browser } from '$app/environment';
-    import Dropdown from '$lib/components/Dropdown.svelte';
-    import Map from '$lib/components/map/Map.svelte';
     import { ANIMATION_DURATION } from '$lib/constants';
     import { dispatch } from '$lib/dataChangeEvents';
     import Bin from 'svelte-material-icons/Delete.svelte';
@@ -14,7 +12,6 @@
     import DotsVertical from 'svelte-material-icons/DotsVertical.svelte';
     import Heart from 'svelte-material-icons/Heart.svelte';
     import HeartOffOutline from 'svelte-material-icons/HeartOffOutline.svelte';
-    import UtcTime from '$lib/components/UtcTime.svelte';
     import type { Location } from '$lib/controllers/location';
     import { Entry, EntryFlags } from '$lib/controllers/entry';
     import type { Label as LabelController } from '../../controllers/label';
@@ -26,6 +23,9 @@
         notify
     } from '$lib/notifications/notifications';
     import { obfuscate, rawMdToHtml } from '$lib/utils/text';
+    import UtcTime from '$lib/components/UtcTime.svelte';
+    import Dropdown from '$lib/components/Dropdown.svelte';
+    import Map from '$lib/components/map/Map.svelte';
     import AgentWidget from './AgentWidget.svelte';
     import Dot from '../Dot.svelte';
     import Label from '$lib/components/label/Label.svelte';

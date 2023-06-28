@@ -232,9 +232,11 @@
                 on:click={lock}
                 class="danger lock-button"
                 use:tooltip={{
-                    content: '<span class="oneline">Require Passcode</span>',
+                    content:
+                        '<span class="oneline">Lock (require passcode)</span>',
                     position: 'bottom'
                 }}
+                aria-label="Lock"
             >
                 <Lock size="25" />
             </button>

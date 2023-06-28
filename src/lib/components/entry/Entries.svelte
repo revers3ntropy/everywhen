@@ -239,7 +239,7 @@
                             placeholder="Search..."
                             type="text"
                         />
-                        <button on:click={updateSearch}>
+                        <button on:click={updateSearch} aria-label="search">
                             <Search />
                         </button>
                     {/if}

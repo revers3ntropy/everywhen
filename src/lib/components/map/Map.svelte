@@ -7,14 +7,13 @@
 </script>
 
 <script lang="ts">
+    import type { EntryLocation } from '$lib/controllers/entry';
+    import { writable } from 'svelte/store';
     import { Collection } from 'ol';
     import type { CallbackObject } from 'ol-contextmenu/dist/types';
     import type { Circle } from 'ol/geom';
     import { Modify } from 'ol/interaction';
     import { Style } from 'ol/style';
-    import { writable } from 'svelte/store';
-    import { errorLogger } from '$lib/utils/log';
-    import { displayNotifOnErr } from '$lib/notifications/notifications';
     import type { MapBrowserEvent } from 'ol';
     import Map from 'ol/Map';
     import TileLayer from 'ol/layer/Tile';
@@ -23,9 +22,8 @@
     import SourceVector from 'ol/source/Vector';
     import LayerVector from 'ol/layer/Vector';
     import Overlay from 'ol/Overlay';
-    import ContextMenu from 'ol-contextmenu';
     import { fromLonLat, toLonLat } from 'ol/proj';
-    import type { EntryLocation } from '../../../routes/stats/helpers';
+    import ContextMenu from 'ol-contextmenu';
     import type { Auth } from '$lib/controllers/user';
     import { Location } from '$lib/controllers/location';
     import { popup } from '$lib/stores';
@@ -34,6 +32,8 @@
     import EditLocation from '../location/EditLocation.svelte';
     import EntryDialog from '$lib/components/dialogs/EntryDialog.svelte';
     import EntryTooltipOnMap from './EntryTooltipOnMap.svelte';
+    import { errorLogger } from '$lib/utils/log';
+    import { displayNotifOnErr } from '$lib/notifications/notifications';
     import {
         type EntryFeature,
         lastEntry,
