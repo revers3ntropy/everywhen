@@ -18,16 +18,13 @@
     let locations = null as Location[] | null;
 
     async function loadEntry() {
-        entry = displayNotifOnErr(
-            await api.get(auth, apiPath('/entries/?', id)),
-            () => popup.set(null)
+        entry = displayNotifOnErr(await api.get(auth, apiPath('/entries/?', id)), () =>
+            popup.set(null)
         );
     }
 
     async function loadLocations() {
-        locations = displayNotifOnErr(
-            await api.get(auth, '/locations')
-        ).locations;
+        locations = displayNotifOnErr(await api.get(auth, '/locations')).locations;
     }
 
     onMount(() => {

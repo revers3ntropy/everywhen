@@ -49,9 +49,7 @@ function osGroupFromOS(os: string): OsGroup {
     return 'unknown';
 }
 
-export function osFromUserAgentString(
-    userAgentString: string
-): string | undefined {
+export function osFromUserAgentString(userAgentString: string): string | undefined {
     if (!userAgentString) return undefined;
     const ua = new UAParser(userAgentString).getResult();
     return ua?.os?.name;

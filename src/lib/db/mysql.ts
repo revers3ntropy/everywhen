@@ -21,9 +21,7 @@ export let dbConnection: mysql.Connection | null = null;
 export async function connect() {
     const config = getConfig();
     dbConnection = await mysql.createConnection(config).catch((e: unknown) => {
-        void dbLogger.logToFile(
-            `Error connecting to mysql db '${config.database || '?'}'`
-        );
+        void dbLogger.logToFile(`Error connecting to mysql db '${config.database || '?'}'`);
         void dbLogger.logToFile(e);
         throw e;
     });
@@ -42,12 +40,7 @@ export function getConfig(): mysql.ConnectionOptions {
     };
 }
 
-function logQuery(
-    query: string,
-    params: unknown[],
-    result: unknown,
-    time: Milliseconds
-) {
+function logQuery(query: string, params: unknown[], result: unknown, time: Milliseconds) {
     params = params.map(p => {
         if (typeof p === 'string') {
             return `String(${p.length})`;
@@ -56,9 +49,7 @@ function logQuery(
         }
     });
 
-    const resultStr = Array.isArray(result)
-        ? `Array(${result.length})`
-        : JSON.stringify(result);
+    const resultStr = Array.isArray(result) ? `Array(${result.length})` : JSON.stringify(result);
 
     const queryStr = query.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
 
@@ -69,10 +60,7 @@ function logQuery(
     );
 }
 
-function buildQuery(
-    queryParts: TemplateStringsArray,
-    params: QueryParam[]
-): [string, unknown[]] {
+function buildQuery(queryParts: TemplateStringsArray, params: QueryParam[]): [string, unknown[]] {
     params = [...params];
     const query = queryParts.reduce((acc, cur, i) => {
         const str = acc + cur;
@@ -122,16 +110,12 @@ export const query = (async <Res extends QueryResult = never>(
 
     const [query, queryParams] = buildQuery(queryParts, params);
 
-    const result = ((await dbConnection
-        ?.query(query, queryParams)
-        .catch((e: unknown) => {
-            const end = performance.now();
-            logQuery(query, queryParams, null, end - start);
-            void dbLogger.logToFile(`Error querying mysql db '${DB}'`);
-            void dbLogger.logToFile(e);
-        })) || [])[0] as Res extends (infer A)[]
-        ? NonFunctionProperties<A>[]
-        : Res;
+    const result = ((await dbConnection?.query(query, queryParams).catch((e: unknown) => {
+        const end = performance.now();
+        logQuery(query, queryParams, null, end - start);
+        void dbLogger.logToFile(`Error querying mysql db '${DB}'`);
+        void dbLogger.logToFile(e);
+    })) || [])[0] as Res extends (infer A)[] ? NonFunctionProperties<A>[] : Res;
 
     const end = performance.now();
 
@@ -149,14 +133,10 @@ query.unlogged = (async <Res extends QueryResult = never>(
 
     const [query, queryParams] = buildQuery(queryParts, params);
 
-    return ((await dbConnection
-        ?.query(query, queryParams)
-        .catch((e: unknown) => {
-            void dbLogger.logToFile(`Error querying mysql db '${DB}'`);
-            void dbLogger.logToFile(e);
-        })) || [])[0] as Res extends (infer A)[]
-        ? NonFunctionProperties<A>[]
-        : Res;
+    return ((await dbConnection?.query(query, queryParams).catch((e: unknown) => {
+        void dbLogger.logToFile(`Error querying mysql db '${DB}'`);
+        void dbLogger.logToFile(e);
+    })) || [])[0] as Res extends (infer A)[] ? NonFunctionProperties<A>[] : Res;
 }) as QueryFunc;
 
 query.unlogged.unlogged = query.unlogged;

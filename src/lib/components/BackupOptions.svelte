@@ -6,10 +6,7 @@
     import type { Auth } from '../controllers/user';
     import { encryptionKeyFromPassword } from '../security/authUtils';
     import { api } from '../utils/apiRequest';
-    import {
-        displayNotifOnErr,
-        notify
-    } from '$lib/components/notifications/notifications';
+    import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
     import { showPopup } from '../utils/popups';
     import type { Result } from '../utils/result';
     import FileDropDialog from '$lib/components/dialogs/FileDropDialog.svelte';
@@ -35,8 +32,7 @@
             showTextBox: true,
             textBoxType: 'password',
             textBoxLabel:
-                'Password of account the backup came from ' +
-                '(leave blank if same account)',
+                'Password of account the backup came from ' + '(leave blank if same account)',
             withContents: async (res: Result<string>, password?: string) => {
                 let contents = displayNotifOnErr(res);
 

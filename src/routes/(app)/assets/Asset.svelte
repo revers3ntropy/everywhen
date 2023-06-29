@@ -10,10 +10,7 @@
     import { Asset } from '$lib/controllers/asset';
     import type { Auth } from '$lib/controllers/user';
     import { api, apiPath } from '$lib/utils/apiRequest';
-    import {
-        displayNotifOnErr,
-        notify
-    } from '$lib/components/notifications/notifications';
+    import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
 
     const dispatch = createEventDispatcher();
 
@@ -37,9 +34,7 @@
             )
         )
             return;
-        displayNotifOnErr(
-            await api.delete(auth, apiPath(`/assets/?`, publicId))
-        );
+        displayNotifOnErr(await api.delete(auth, apiPath(`/assets/?`, publicId)));
         notify.success('Deleted asset');
         deleted = true;
         dispatch('delete');
@@ -100,11 +95,7 @@
         <div>
             {#if !obfuscated}
                 <!-- TODO use tzOffset from db -->
-                <UtcTime
-                    timestamp={created}
-                    fmt="MMMM Do YYYY, h:mma"
-                    tooltipPosition="bottom"
-                />
+                <UtcTime timestamp={created} fmt="MMMM Do YYYY, h:mma" tooltipPosition="bottom" />
             {/if}
         </div>
         <div>

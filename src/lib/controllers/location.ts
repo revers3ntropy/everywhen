@@ -50,28 +50,17 @@ export class Location {
         `;
 
         return Result.ok(
-            new Location(
-                id,
-                created,
-                createdTZOffset,
-                name,
-                latitude,
-                longitude,
-                radius
-            )
+            new Location(id, created, createdTZOffset, name, latitude, longitude, radius)
         );
     }
 
-    public static jsonIsRawLocation(
-        json: unknown
-    ): json is Omit<Location, 'id'> {
+    public static jsonIsRawLocation(json: unknown): json is Omit<Location, 'id'> {
         return (
             typeof json === 'object' &&
             json !== null &&
             'created' in json &&
             typeof json.created === 'number' &&
-            (!('createdTZOffset' in json) ||
-                typeof json.createdTZOffset === 'number') &&
+            (!('createdTZOffset' in json) || typeof json.createdTZOffset === 'number') &&
             'name' in json &&
             typeof json.name === 'string' &&
             'latitude' in json &&
@@ -83,10 +72,7 @@ export class Location {
         );
     }
 
-    public static async all(
-        query: QueryFunc,
-        auth: Auth
-    ): Promise<Result<Location[]>> {
+    public static async all(query: QueryFunc, auth: Auth): Promise<Result<Location[]>> {
         return Location.fromRaw(
             auth,
             await query<Location[]>`
@@ -271,11 +257,7 @@ export class Location {
         );
     }
 
-    public static async purge(
-        query: QueryFunc,
-        auth: Auth,
-        id: string
-    ): Promise<Result> {
+    public static async purge(query: QueryFunc, auth: Auth, id: string): Promise<Result> {
         const res = await query<ResultSetHeader>`
             DELETE
             FROM locations
@@ -288,10 +270,7 @@ export class Location {
         return Result.ok(null);
     }
 
-    public static async purgeAll(
-        query: QueryFunc,
-        auth: Auth
-    ): Promise<Result> {
+    public static async purgeAll(query: QueryFunc, auth: Auth): Promise<Result> {
         await query`
             DELETE
             FROM locations
@@ -343,50 +322,26 @@ export class Location {
 
     public static filterByCirclePrecise<
         T extends { latitude: Degrees | null; longitude: Degrees | null }
-    >(
-        values: T[],
-        lat: number,
-        lng: number,
-        radius: Meters,
-        acceptNoLocation = false
-    ): T[] {
+    >(values: T[], lat: number, lng: number, radius: Meters, acceptNoLocation = false): T[] {
         return values.filter(({ latitude, longitude }) => {
             if (latitude === null || longitude === null) {
                 return acceptNoLocation;
             }
-            return (
-                Location.distBetweenPointsPrecise(
-                    lat,
-                    lng,
-                    latitude,
-                    longitude
-                ) <= radius
-            );
+            return Location.distBetweenPointsPrecise(lat, lng, latitude, longitude) <= radius;
         });
     }
 
     private static filterByDynCirclePrecise<
         T extends { latitude: Degrees; longitude: Degrees; radius: Meters }
-    >(
-        values: T[],
-        lat: number,
-        lng: number,
-        mapRadius = (r: number) => r
-    ): T[] {
+    >(values: T[], lat: number, lng: number, mapRadius = (r: number) => r): T[] {
         return values.filter(
             ({ latitude, longitude, radius }) =>
-                Location.distBetweenPointsPrecise(
-                    lat,
-                    lng,
-                    latitude,
-                    longitude
-                ) <= mapRadius(radius)
+                Location.distBetweenPointsPrecise(lat, lng, latitude, longitude) <=
+                mapRadius(radius)
         );
     }
 
-    public static filterLocationsByPoint<
-        T extends { latitude: Degrees; longitude: Degrees }
-    >(
+    public static filterLocationsByPoint<T extends { latitude: Degrees; longitude: Degrees }>(
         locations: Location[],
         point: T
     ): { touching: Location[]; near: Location[] } {

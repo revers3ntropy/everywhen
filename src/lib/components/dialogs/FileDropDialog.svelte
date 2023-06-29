@@ -1,11 +1,7 @@
 <script lang="ts">
     import BookSpinner from '$lib/components/BookSpinner.svelte';
     import { notify } from '$lib/components/notifications/notifications';
-    import {
-        filedrop,
-        type FileDropOptions,
-        type Files
-    } from 'filedrop-svelte';
+    import { filedrop, type FileDropOptions, type Files } from 'filedrop-svelte';
     import { popup } from '$lib/stores';
     import { getFileContents } from '$lib/utils/files';
     import type { Result } from '$lib/utils/result';
@@ -76,11 +72,7 @@
             {/if}
         </div>
 
-        <div
-            class="dropzone"
-            on:filedrop={onFileDrop}
-            use:filedrop={fileOptions}
-        >
+        <div class="dropzone" on:filedrop={onFileDrop} use:filedrop={fileOptions}>
             {message}
         </div>
     {/if}

@@ -12,9 +12,7 @@ export function localStorageWritable<T, S = T>(
     serverSideInitial: S
 ): Writable<T | S> {
     if (typeof initial === 'function') {
-        throw new Error(
-            'localStorageWritable does not support setting a function'
-        );
+        throw new Error('localStorageWritable does not support setting a function');
     }
 
     let initialValue: T | S = initial;
@@ -43,9 +41,7 @@ export function localStorageWritable<T, S = T>(
         subscribe,
         set: value => {
             if (typeof value === 'function') {
-                throw new Error(
-                    'localStorageWritable does not support setting a function'
-                );
+                throw new Error('localStorageWritable does not support setting a function');
             }
             set(value);
             if (!browser) return;
@@ -60,9 +56,7 @@ export function localStorageWritable<T, S = T>(
                 const newValue = fn(value);
 
                 if (typeof newValue === 'function') {
-                    throw new Error(
-                        'localStorageWritable does not support setting a function'
-                    );
+                    throw new Error('localStorageWritable does not support setting a function');
                 }
 
                 if (!browser) return newValue;

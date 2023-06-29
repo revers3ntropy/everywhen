@@ -9,7 +9,7 @@
     "tabWidth": 4,
     "semi": true,
     "singleQuote": true,
-    "printWidth": 80,
+    "printWidth": 100,
     "quoteProps": "as-needed",
     "bracketSameLine": false,
     "embeddedLanguageFormatting": "auto",
@@ -17,5 +17,7 @@
     "proseWrap": "always",
     "plugins": [
         "prettier-plugin-svelte"
-    ]
+    ],
+    "pluginSearchDirs": ["."],
+    "overrides": [{ "files": "*.svelte", "options": { "parser": "svelte" } }]
 }

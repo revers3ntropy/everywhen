@@ -28,10 +28,7 @@ export class Event {
         public created: TimestampSecs
     ) {}
 
-    public static async allRaw(
-        query: QueryFunc,
-        auth: Auth
-    ): Promise<RawEvent[]> {
+    public static async allRaw(query: QueryFunc, auth: Auth): Promise<RawEvent[]> {
         return await query<RawEvent[]>`
             SELECT id,
                    name,
@@ -45,10 +42,7 @@ export class Event {
         `;
     }
 
-    public static async all(
-        query: QueryFunc,
-        auth: Auth
-    ): Promise<Result<Event[]>> {
+    public static async all(query: QueryFunc, auth: Auth): Promise<Result<Event[]>> {
         const { err, val: labels } = await Label.all(query, auth);
         if (err) return Result.err(err);
 
@@ -57,12 +51,7 @@ export class Event {
         const events = [];
 
         for (const rawEvent of rawEvents) {
-            const { err, val } = await Event.fromRaw(
-                query,
-                auth,
-                rawEvent,
-                labels
-            );
+            const { err, val } = await Event.fromRaw(query, auth, rawEvent, labels);
             if (err) return Result.err(err);
             events.push(val);
         }
@@ -70,11 +59,7 @@ export class Event {
         return Result.ok(events);
     }
 
-    public static async fromId(
-        query: QueryFunc,
-        auth: Auth,
-        id: string
-    ): Promise<Result<Event>> {
+    public static async fromId(query: QueryFunc, auth: Auth, id: string): Promise<Result<Event>> {
         const events = await query<RawEvent[]>`
             SELECT id,
                    name,
@@ -115,12 +100,7 @@ export class Event {
                 event.label = labels.find(l => l.id === rawEvent.label);
             }
             if (!event.label) {
-                const { err } = await Event.addLabel(
-                    query,
-                    auth,
-                    event,
-                    rawEvent.label
-                );
+                const { err } = await Event.addLabel(query, auth, event, rawEvent.label);
                 if (err) return Result.err(err);
             }
             if (!event.label) {
@@ -184,10 +164,7 @@ export class Event {
         `;
     }
 
-    public static jsonIsRawEvent(json: unknown): json is Omit<
-        Event,
-        'id' | 'label'
-    > & {
+    public static jsonIsRawEvent(json: unknown): json is Omit<Event, 'id' | 'label'> & {
         label?: string;
     } {
         return (
@@ -208,10 +185,7 @@ export class Event {
         );
     }
 
-    public static duration(evt: {
-        start: TimestampSecs;
-        end: TimestampSecs;
-    }): Seconds {
+    public static duration(evt: { start: TimestampSecs; end: TimestampSecs }): Seconds {
         return evt.end - evt.start;
     }
 
@@ -242,10 +216,7 @@ export class Event {
         return evt1.id.localeCompare(evt2.id) > 0;
     }
 
-    public static isInstantEvent(evt: {
-        start: TimestampSecs;
-        end: TimestampSecs;
-    }): boolean {
+    public static isInstantEvent(evt: { start: TimestampSecs; end: TimestampSecs }): boolean {
         return Event.duration(evt) < 60;
     }
 
@@ -391,11 +362,7 @@ export class Event {
         return Result.ok(self);
     }
 
-    public static async purge(
-        query: QueryFunc,
-        auth: Auth,
-        self: Event
-    ): Promise<Result> {
+    public static async purge(query: QueryFunc, auth: Auth, self: Event): Promise<Result> {
         await query`
             DELETE
             FROM events

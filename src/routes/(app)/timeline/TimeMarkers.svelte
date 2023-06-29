@@ -8,18 +8,6 @@
 
     export let startYear = 2000;
 
-    const showYears = 200;
-
-    $: if (startYear + showYears < new Date().getFullYear()) {
-        if (browser) alert(`Born in ${startYear}?? You are old!`);
-        startYear = new Date().getFullYear() - showYears;
-    }
-
-    $: if (startYear > new Date().getFullYear()) {
-        if (browser) alert(`Born in ${startYear}?? You are young!`);
-        startYear = new Date().getFullYear();
-    }
-
     function drawYears(state: RenderProps) {
         let year = Math.max(
             new Date(state.renderPosToTime(0) * 1000).getFullYear() || 0,
@@ -45,11 +33,7 @@
                 state.text(year.toString(), renderPos + 5, NAVBAR_HEIGHT + 10);
             }
             if (showBothSidesText) {
-                state.text(
-                    (year - 1).toString(),
-                    renderPos - 25,
-                    NAVBAR_HEIGHT + 10
-                );
+                state.text((year - 1).toString(), renderPos - 25, NAVBAR_HEIGHT + 10);
             }
 
             year++;
@@ -97,16 +81,8 @@
 
         let leftMost = state.renderPosToTime(0);
         const thisWeek = fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-WW');
-        const lastWeek = fmtUtc(
-            nowUtc() - 604800,
-            currentTzOffset(),
-            'YYYY-WW'
-        );
-        const nextWeek = fmtUtc(
-            nowUtc() + 604800,
-            currentTzOffset(),
-            'YYYY-WW'
-        );
+        const lastWeek = fmtUtc(nowUtc() - 604800, currentTzOffset(), 'YYYY-WW');
+        const nextWeek = fmtUtc(nowUtc() + 604800, currentTzOffset(), 'YYYY-WW');
 
         const firstDayTimestamp = new Date(startYear, 0, 1).getTime() / 1000;
         if (leftMost < firstDayTimestamp) {
@@ -127,25 +103,19 @@
         while (true) {
             const dayDate = new Date(day * 1000);
             let dayStart =
-                new Date(
-                    dayDate.getFullYear(),
-                    dayDate.getMonth(),
-                    dayDate.getDate()
-                ).getTime() / 1000;
+                new Date(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate()).getTime() /
+                1000;
             let renderPos = state.timeToRenderPos(dayStart);
 
             if (renderPos > state.width) break;
 
-            const isMonday =
-                fmtUtc(dayStart, currentTzOffset(), 'ddd') === 'Mon';
+            const isMonday = fmtUtc(dayStart, currentTzOffset(), 'ddd') === 'Mon';
 
             const shouldShow = (isMonday && showWeeks) || showDays;
 
             if (shouldShow) {
                 state.rect(renderPos, 0, 1, state.height, {
-                    color: isMonday
-                        ? state.colors.primary
-                        : state.colors.lightAccent
+                    color: isMonday ? state.colors.primary : state.colors.lightAccent
                 });
             }
 
@@ -183,9 +153,7 @@
                 } else if (week === nextWeek) {
                     text = 'Next week';
                 } else {
-                    const [thisYear, thisWeekIdx] = thisWeek
-                        .split('-')
-                        .map(parseInt);
+                    const [thisYear, thisWeekIdx] = thisWeek.split('-').map(parseInt);
                     const [weekYear, weekIdx] = week.split('-').map(parseInt);
 
                     if (thisYear === weekYear && thisWeekIdx > weekIdx) {
@@ -237,6 +205,18 @@
 
             hour += 60 * 60;
         }
+    }
+
+    const showYears = 100;
+
+    $: if (startYear + showYears < new Date().getFullYear()) {
+        if (browser) alert(`Born in ${startYear}?? You are old!`);
+        startYear = new Date().getFullYear() - showYears;
+    }
+
+    $: if (startYear > new Date().getFullYear()) {
+        if (browser) alert(`Born in ${startYear}?? You are young!`);
+        startYear = new Date().getFullYear();
     }
 
     renderable(state => {

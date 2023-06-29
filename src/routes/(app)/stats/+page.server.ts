@@ -23,8 +23,7 @@ export const load = cachedPageRoute(async auth => {
         if (entry.created < earliestEntryTimeStamp) {
             earliestEntryTimeStamp = entry.created;
         }
-        const entryWordCount =
-            txtWordCount(entry.entry) + txtWordCount(entry.title);
+        const entryWordCount = txtWordCount(entry.entry) + txtWordCount(entry.title);
         wordCount += entryWordCount;
         charCount += entry.entry.length + entry.title.length;
         commonWords = commonWordsFromText(entry.entry, commonWords);

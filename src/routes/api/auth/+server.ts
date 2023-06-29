@@ -15,8 +15,7 @@ import { apiRes404, apiResponse } from '$lib/utils/apiResponse';
 
 export const GET = (async ({ url, cookies }) => {
     let key: string | undefined | null = url.searchParams.get('key');
-    const username: string | undefined | null =
-        url.searchParams.get('username');
+    const username: string | undefined | null = url.searchParams.get('username');
 
     if (!key) {
         key = cookies.get(KEY_COOKIE_KEY);
@@ -44,20 +43,12 @@ export const PUT = (async ({ request, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
-    const { newPassword, currentPassword } = await getUnwrappedReqBody(
-        request,
-        {
-            currentPassword: 'string',
-            newPassword: 'string'
-        }
-    );
+    const { newPassword, currentPassword } = await getUnwrappedReqBody(request, {
+        currentPassword: 'string',
+        newPassword: 'string'
+    });
 
-    const { err } = await User.changePassword(
-        query,
-        auth,
-        currentPassword,
-        newPassword
-    );
+    const { err } = await User.changePassword(query, auth, currentPassword, newPassword);
     if (err) throw error(400, err);
 
     return apiResponse({});

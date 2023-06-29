@@ -13,11 +13,7 @@
     import TimeCursor from './TimeCursor.svelte';
     import ContextMenu from './ContextMenu.svelte';
     import TimeMarkers from './TimeMarkers.svelte';
-    import {
-        addYToEvents,
-        type EventWithYLevel,
-        getInitialZoomAndPos
-    } from './utils';
+    import { addYToEvents, type EventWithYLevel, getInitialZoomAndPos } from './utils';
     import type { PageData } from './$types';
 
     export let data: PageData;
@@ -27,19 +23,13 @@
     let instantEvents: EventWithYLevel[];
     let durationEvents: EventWithYLevel[];
     $: [instantEvents, durationEvents] = addYToEvents(
-        data.events.filter(event =>
-            selectedLabels.includes(event.label?.id || '')
-        )
+        data.events.filter(event => selectedLabels.includes(event.label?.id || ''))
     );
 
     onMount(() => {
         document.title = 'Timeline';
 
-        const [zoom, offset] = getInitialZoomAndPos(
-            $canvasState,
-            data.entries,
-            data.events
-        );
+        const [zoom, offset] = getInitialZoomAndPos($canvasState, data.entries, data.events);
         $canvasState.zoom = zoom;
         $canvasState.cameraOffset = offset;
     });
@@ -56,10 +46,7 @@
     listen.event.onUpdate(changedEvent => {
         data = {
             ...data,
-            events: [
-                ...data.events.filter(event => event.id !== changedEvent.id),
-                changedEvent
-            ]
+            events: [...data.events.filter(event => event.id !== changedEvent.id), changedEvent]
         };
     });
     listen.entry.onDelete(id => {
@@ -117,7 +104,7 @@
     <Canvas>
         <Controls />
         <Background />
-        <ContextMenu auth={data} />
+        <ContextMenu auth={data.auth} />
 
         <TimeMarkers startYear={data.settings.yearOfBirth.value} />
 
@@ -128,9 +115,8 @@
                 <EntryInTimeline
                     {...entry}
                     entryTextParityHeight={i % 2 === 0}
-                    auth={data}
-                    hideAgentWidget={!data.settings.showAgentWidgetOnEntries
-                        .value}
+                    auth={data.auth}
+                    hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
                 />
             {/if}
         {/each}
@@ -139,7 +125,7 @@
             {#key durationEvents}
                 {#each durationEvents as event (event.id)}
                     <EventInTimeline
-                        auth={data}
+                        auth={data.auth}
                         labels={data.labels}
                         {...event}
                         yLevel={1 + event.yLevel}
@@ -148,7 +134,7 @@
                 {/each}
                 {#each instantEvents as event, i (event.id)}
                     <EventInTimeline
-                        auth={data}
+                        auth={data.auth}
                         labels={data.labels}
                         {...event}
                         eventTextParityHeight={i % 2 === 0}
@@ -158,8 +144,8 @@
         {/key}
 
         <CenterLine />
-        <TimeCursor auth={data} />
+        <TimeCursor auth={data.auth} />
     </Canvas>
 
-    <Filters auth={data} labels={data.labels} bind:selectedLabels />
+    <Filters auth={data.auth} labels={data.labels} bind:selectedLabels />
 </main>

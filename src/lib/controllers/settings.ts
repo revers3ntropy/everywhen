@@ -15,9 +15,7 @@ export interface SettingConfig<T> {
 
 export type SettingsKey = keyof typeof Settings.config;
 export type SettingsConfig = {
-    [key in SettingsKey]: Settings<
-        (typeof Settings.config)[key]['defaultValue']
-    >;
+    [key in SettingsKey]: Settings<(typeof Settings.config)[key]['defaultValue']>;
 } & {
     [key: string]: Settings<string | number | boolean>;
 };
@@ -40,8 +38,7 @@ export class Settings<T = unknown> {
             type: 'boolean',
             defaultValue: false,
             name: 'Show Device',
-            description:
-                'Shows the operating system of the device the entry was submitted on.'
+            description: 'Shows the operating system of the device the entry was submitted on.'
         } as SettingConfig<boolean>,
         autoHideEntriesDelay: {
             type: 'number',
@@ -107,10 +104,7 @@ export class Settings<T = unknown> {
             );
         }
 
-        const { err, val: valEncrypted } = encrypt(
-            JSON.stringify(value),
-            auth.key
-        );
+        const { err, val: valEncrypted } = encrypt(JSON.stringify(value), auth.key);
         if (err) return Result.err(err);
 
         const alreadyInDb = await query<{ id: string }[]>`
@@ -141,10 +135,7 @@ export class Settings<T = unknown> {
         return Result.ok(new Settings(id, now, key, value));
     }
 
-    public static async all(
-        query: QueryFunc,
-        auth: Auth
-    ): Promise<Result<Settings[]>> {
+    public static async all(query: QueryFunc, auth: Auth): Promise<Result<Settings[]>> {
         const settings = await query<
             {
                 id: string;
@@ -160,10 +151,7 @@ export class Settings<T = unknown> {
 
         return Result.collect(
             settings.map(setting => {
-                const { err, val: unencryptedVal } = decrypt(
-                    setting.value,
-                    auth.key
-                );
+                const { err, val: unencryptedVal } = decrypt(setting.value, auth.key);
                 if (err) return Result.err(err);
                 return Result.ok(
                     new Settings(
@@ -201,9 +189,7 @@ export class Settings<T = unknown> {
         }
         const { err, val } = decrypt(settings[0].value, auth.key);
         if (err) return Result.err(err);
-        return Result.ok(
-            JSON.parse(val) as (typeof Settings.config)[T]['defaultValue']
-        );
+        return Result.ok(JSON.parse(val) as (typeof Settings.config)[T]['defaultValue']);
     }
 
     public static async allAsMap(
@@ -215,15 +201,11 @@ export class Settings<T = unknown> {
             return Result.err(res.err);
         }
         return Result.ok(
-            Object.fromEntries(
-                res.val.map(s => [s.key, s])
-            ) as Partial<SettingsConfig>
+            Object.fromEntries(res.val.map(s => [s.key, s])) as Partial<SettingsConfig>
         );
     }
 
-    public static fillWithDefaults(
-        map: Record<string, Settings>
-    ): SettingsConfig {
+    public static fillWithDefaults(map: Record<string, Settings>): SettingsConfig {
         const newMap = { ...map };
         for (const [key, config] of Object.entries(Settings.config)) {
             if (!newMap[key]) {
@@ -233,10 +215,7 @@ export class Settings<T = unknown> {
         return newMap as SettingsConfig;
     }
 
-    public static async purgeAll(
-        query: QueryFunc,
-        auth: Auth
-    ): Promise<Result> {
+    public static async purgeAll(query: QueryFunc, auth: Auth): Promise<Result> {
         await query`
             DELETE
             FROM settings
@@ -245,21 +224,11 @@ export class Settings<T = unknown> {
         return Result.ok(null);
     }
 
-    public static async changeKey(
-        query: QueryFunc,
-        auth: Auth,
-        newKey: string
-    ): Promise<Result> {
-        const { val: unencryptedSettings, err } = await Settings.all(
-            query,
-            auth
-        );
+    public static async changeKey(query: QueryFunc, auth: Auth, newKey: string): Promise<Result> {
+        const { val: unencryptedSettings, err } = await Settings.all(query, auth);
         if (err) return Result.err(err);
         for (const setting of unencryptedSettings) {
-            const { err, val: newValue } = encrypt(
-                JSON.stringify(setting.value),
-                newKey
-            );
+            const { err, val: newValue } = encrypt(JSON.stringify(setting.value), newKey);
             if (err) return Result.err(err);
 
             await query`

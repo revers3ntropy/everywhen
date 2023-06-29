@@ -44,7 +44,7 @@
                 </h1>
             </div>
             <div class="search-for-word">
-                <SearchForWord auth={data} />
+                <SearchForWord auth={data.auth} />
             </div>
         </div>
 
@@ -74,9 +74,7 @@
                     tooltip="The average English word is 4.7 letters long"
                 />
                 <StatPill
-                    value={(
-                        data.entryCount / Math.max(data.days / 7, 1)
-                    ).toFixed(1)}
+                    value={(data.entryCount / Math.max(data.days / 7, 1)).toFixed(1)}
                     label="entries / week"
                     tooltip="7 would be one per day"
                 />
@@ -96,11 +94,7 @@
                         delay: ANIMATION_DURATION
                     }}
                 >
-                    <EntryBarChart
-                        {by}
-                        entries={data.entries}
-                        days={data.days}
-                    />
+                    <EntryBarChart {by} entries={data.entries} days={data.days} />
                 </div>
             {/if}
         </section>
@@ -110,7 +104,7 @@
             <CommonWordsList
                 entryCount={data.entryCount}
                 words={data.commonWords}
-                auth={data}
+                auth={data.auth}
             />
         </section>
     {/if}

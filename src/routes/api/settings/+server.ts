@@ -22,12 +22,7 @@ export const PUT = (async ({ request, cookies }) => {
         value: 'any'
     });
 
-    const { val: setting, err } = await Settings.update(
-        query,
-        auth,
-        body.key,
-        body.value
-    );
+    const { val: setting, err } = await Settings.update(query, auth, body.key, body.value);
     if (err) throw error(400, err);
 
     return apiResponse({ id: setting.id });

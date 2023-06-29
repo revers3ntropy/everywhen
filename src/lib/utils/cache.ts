@@ -27,10 +27,7 @@ function roughSizeOfObject(object: unknown): number {
             bytes += value.length * 2;
         } else if (typeof value === 'number') {
             bytes += 8;
-        } else if (
-            typeof value === 'object' &&
-            objectList.indexOf(value) === -1
-        ) {
+        } else if (typeof value === 'object' && objectList.indexOf(value) === -1) {
             objectList.push(value);
 
             for (const i in value) {
@@ -42,17 +39,10 @@ function roughSizeOfObject(object: unknown): number {
 }
 
 function logCacheReq(hit: boolean, url: URL) {
-    void cacheLogger.logToFile(
-        hit ? chalk.green('HIT ') : chalk.red('MISS'),
-        url.pathname
-    );
+    void cacheLogger.logToFile(hit ? chalk.green('HIT ') : chalk.red('MISS'), url.pathname);
 }
 
-export function cacheResponse<T>(
-    url: string,
-    userId: string,
-    response: T
-): void {
+export function cacheResponse<T>(url: string, userId: string, response: T): void {
     if (!ENABLE_CACHING) return;
 
     cacheLastUsed[userId] = nowUtc(false);
@@ -62,10 +52,7 @@ export function cacheResponse<T>(
     (cache[userId] as Record<string, T>)[url] = response;
 }
 
-export function getCachedResponse<T>(
-    url: string,
-    userId: string
-): T | undefined {
+export function getCachedResponse<T>(url: string, userId: string): T | undefined {
     if (!ENABLE_CACHING) return;
 
     cacheLastUsed[userId] = nowUtc();
@@ -133,9 +120,7 @@ export function cachedApiRoute<
 >(
     handler: (auth: Auth, event: RequestEvent<Params, RouteId>) => Promise<Res>
 ): (event: RequestEvent<Params, RouteId>) => Promise<GenericResponse<Res>> {
-    return (async (
-        props: RequestEvent<Params, RouteId>
-    ): Promise<GenericResponse<Res>> => {
+    return (async (props: RequestEvent<Params, RouteId>): Promise<GenericResponse<Res>> => {
         const url = props.url.href;
         const auth = props.locals.auth;
 
@@ -161,9 +146,7 @@ export function cachedApiRoute<
 
         cacheResponse(url, auth.id, responseObj.clone());
         return responseObj;
-    }) satisfies (
-        event: RequestEvent<Params, RouteId>
-    ) => Promise<GenericResponse<Res>>;
+    }) satisfies (event: RequestEvent<Params, RouteId>) => Promise<GenericResponse<Res>>;
 }
 
 export function cachedPageRoute<
@@ -176,9 +159,7 @@ export function cachedPageRoute<
         auth: Auth,
         event: ServerLoadEvent<Params, ParentData, RouteId>
     ) => MaybePromise<OutputData>
-): (
-    event: ServerLoadEvent<Params, ParentData, RouteId>
-) => MaybePromise<OutputData> {
+): (event: ServerLoadEvent<Params, ParentData, RouteId>) => MaybePromise<OutputData> {
     return (async (
         props: ServerLoadEvent<Params, ParentData, RouteId>
     ): Promise<OutputData & App.PageData> => {

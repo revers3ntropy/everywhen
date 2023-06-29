@@ -60,11 +60,7 @@
                         <ChevronUp size="25" />
                     {/if}
 
-                    <UtcTime
-                        fmt="ddd, Do MMMM YYYY"
-                        noTooltip
-                        timestamp={day}
-                    />
+                    <UtcTime fmt="ddd, Do MMMM YYYY" noTooltip timestamp={day} />
 
                     <Dot light marginX={10} />
 

@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { USERNAME_COOKIE_KEY } from '../../src/lib/constants.js';
 import { encryptionKeyFromPassword } from '../../src/lib/security/authUtils.js';
-import { expectDeleteUser, generateApiCtx, randStr } from '../helpers.js';
+import { deleteUser, expectDeleteUser, generateApiCtx, generateUser, randStr } from '../helpers.js';
 
 test.describe('/signup', () => {
     test('Has title', async ({ page }) => {
@@ -10,7 +10,7 @@ test.describe('/signup', () => {
     });
 
     test('Can create account with form', async ({ page }) => {
-        await page.goto('/', { waitUntil: 'networkidle' });
+        await page.goto('/login', { waitUntil: 'networkidle' });
 
         const auth = {
             username: randStr(),
@@ -19,9 +19,7 @@ test.describe('/signup', () => {
 
         expect(await page.isVisible('input[aria-label="Password"]')).toBe(true);
         expect(await page.isVisible('input[aria-label="Username"]')).toBe(true);
-        expect(await page.isVisible('a[aria-label="Create Account"]')).toBe(
-            true
-        );
+        expect(await page.isVisible('a[aria-label="Create Account"]')).toBe(true);
         expect(await page.isVisible('button[aria-label="Log In"]')).toBe(true);
 
         await page.getByLabel('Username').fill(auth.username);
@@ -30,12 +28,12 @@ test.describe('/signup', () => {
         await page.getByRole('button', { name: 'Log In' }).click();
 
         // haven't been signed in with random credentials
-        await expect(page).toHaveURL('/');
+        await expect(page).toHaveURL('/login');
 
         await page.goto('/home', { waitUntil: 'networkidle' });
-        await expect(page).toHaveURL('/?redirect=home');
-        await page.goto('/', { waitUntil: 'networkidle' });
-        await expect(page).toHaveURL('/');
+        await expect(page).toHaveURL('/login?redirect=home');
+        await page.goto('/login', { waitUntil: 'networkidle' });
+        await expect(page).toHaveURL('/login');
 
         await page.goto('/signup', { waitUntil: 'networkidle' });
         await expect(page).toHaveURL('/signup');
@@ -59,9 +57,7 @@ test.describe('/signup', () => {
         await page.goto('/settings', { waitUntil: 'networkidle' });
         await expect(page).toHaveURL('/settings');
 
-        expect(
-            await page.isVisible('button[aria-label="Delete Account"]')
-        ).toBe(true);
+        expect(await page.isVisible('button[aria-label="Delete Account"]')).toBe(true);
 
         const api = await generateApiCtx({
             username: auth.username,
@@ -71,8 +67,8 @@ test.describe('/signup', () => {
         await expectDeleteUser(api, expect);
 
         await page.waitForLoadState();
-        await page.goto('/', { waitUntil: 'networkidle' });
-        await expect(page).toHaveURL('/');
+        await page.goto('/login', { waitUntil: 'networkidle' });
+        await expect(page).toHaveURL('/login');
 
         await page.getByLabel('Username').fill(auth.username);
         await page.getByLabel('Password').fill(auth.password);
@@ -81,6 +77,24 @@ test.describe('/signup', () => {
 
         // account doesn't exist and wil be redirected if try to log in
         await page.goto('/home', { waitUntil: 'networkidle' });
-        await expect(page).toHaveURL('/?redirect=home');
+        await expect(page).toHaveURL('/login?redirect=home');
+    });
+
+    test('Can log into account', async ({ page }) => {
+        const { auth, api } = await generateUser();
+        await page.goto('/login', { waitUntil: 'networkidle' });
+
+        await page.getByLabel('Username').fill(auth.username);
+        await page.getByLabel('Password').fill(auth.password);
+
+        await page.getByRole('button', { name: 'Log In' }).click();
+
+        await page.waitForURL('/home', { waitUntil: 'networkidle' });
+
+        const { err } = await deleteUser(api);
+        expect(err).toBe(null);
+
+        await page.goto('/home', { waitUntil: 'networkidle' });
+        await expect(page).toHaveURL('/login?redirect=home');
     });
 });

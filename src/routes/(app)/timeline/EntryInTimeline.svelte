@@ -10,8 +10,6 @@
     import { showPopup } from '$lib/utils/popups';
     import { limitStrLen } from '$lib/utils/text.js';
 
-    const WIDTH = 4;
-
     export let auth: Auth;
 
     export let id: string;
@@ -29,6 +27,7 @@
     export let longitude = null as number | null;
     export let hideAgentWidget: boolean;
 
+    const WIDTH = 4;
     const height = 0.2 * wordCount + 20;
 
     interactable({
@@ -37,37 +36,19 @@
             const renderPos = state.timeToRenderPos(created);
             if (renderPos < 0 || renderPos > state.width) return;
 
-            state.rect(
-                renderPos - WIDTH / 2,
-                state.centerLnY(),
-                WIDTH,
-                height,
-                {
-                    radius: 2,
-                    color: this.hovering
-                        ? 'rgb(100, 100, 100)'
-                        : 'rgb(200, 200, 200)',
-                    zIndex: this.hovering ? 1 : 0
-                }
-            );
+            state.rect(renderPos - WIDTH / 2, state.centerLnY(), WIDTH, height, {
+                radius: 2,
+                color: this.hovering ? 'rgb(100, 100, 100)' : 'rgb(200, 200, 200)',
+                zIndex: this.hovering ? 1 : 0
+            });
 
             if (label) {
-                state.rect(
-                    renderPos - WIDTH / 2,
-                    state.centerLnY() + height - 1,
-                    WIDTH,
-                    2,
-                    {
-                        color: label.color
-                    }
-                );
+                state.rect(renderPos - WIDTH / 2, state.centerLnY() + height - 1, WIDTH, 2, {
+                    color: label.color
+                });
             }
 
-            if (
-                (this.hovering || state.zoom > START_ZOOM * 2) &&
-                !$obfuscated &&
-                title
-            ) {
+            if ((this.hovering || state.zoom > START_ZOOM * 2) && !$obfuscated && title) {
                 let y = state.centerLnY();
 
                 if (height < 10) {
@@ -78,9 +59,7 @@
 
                 state.text(limitStrLen(title, 20), renderPos, y - 5, {
                     align: 'center',
-                    backgroundColor: this.hovering
-                        ? state.colors.primary
-                        : undefined,
+                    backgroundColor: this.hovering ? state.colors.primary : undefined,
                     fontSize: this.hovering ? 14 : 12,
                     backgroundPadding: 4,
                     backgroundRadius: 2

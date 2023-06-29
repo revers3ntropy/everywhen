@@ -36,8 +36,6 @@ export const USERNAME_COOKIE_OPTIONS = Object.freeze({
     httpOnly: false
 });
 
-export const NO_SIGNED_IN_ROUTES = Object.freeze(['/signup', '/']);
-
 export const MAX_IMAGE_SIZE: Bytes = 1024 * 1024 * 8; // 8MiB
 
 export const NAVBAR_HEIGHT: Pixels = 60;
@@ -50,3 +48,5 @@ export const API_DOCS_LINK =
 export const DEBUG_RENDER_COLLIDERS = false;
 
 export const ENABLE_CACHING = true;
+
+export const POLL_FOR_UPDATE_INTERVAL: Milliseconds = 1000 * 15;

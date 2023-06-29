@@ -16,9 +16,7 @@
             start,
             end
         };
-        const { id } = displayNotifOnErr(
-            await api.post(auth, '/events', event)
-        );
+        const { id } = displayNotifOnErr(await api.post(auth, '/events', event));
         await dispatch.create(
             'event',
             new Event(
@@ -47,10 +45,7 @@
             {
                 label: 'Add Event',
                 async action(state, x): Promise<void> {
-                    await newEvent(
-                        state.renderPosToTime(x),
-                        state.renderPosToTime(x + 200)
-                    );
+                    await newEvent(state.renderPosToTime(x), state.renderPosToTime(x + 200));
                 }
             },
             {

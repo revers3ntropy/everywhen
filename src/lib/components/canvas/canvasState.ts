@@ -22,26 +22,17 @@ const EMPTY_COLORS: Colors = {
     vLightAccent: ''
 };
 
-type CanvasListener<T = MouseEvent & TouchEvent & WheelEvent> = (
-    event: T
-) => void;
+type CanvasListener<T = MouseEvent & TouchEvent & WheelEvent> = (event: T) => void;
 
 export type RenderProps = Omit<Readonly<CanvasState>, 'ctx'> & {
     ctx: CanvasRenderingContext2D;
 };
 export type SetupCallback = (props: RenderProps) => void | Promise<void>;
-export type RenderCallback = (
-    props: RenderProps,
-    dt: number
-) => void | Promise<void>;
+export type RenderCallback = (props: RenderProps, dt: number) => void | Promise<void>;
 
 export interface ContextMenuElement {
     label: string;
-    action?: (
-        state: RenderProps,
-        clickX: Pixels,
-        clickY: Pixels
-    ) => void | Promise<void>;
+    action?: (state: RenderProps, clickX: Pixels, clickY: Pixels) => void | Promise<void>;
 }
 
 export type ContextMenuOptions = ContextMenuElement[];
@@ -154,22 +145,14 @@ export class CanvasState implements CanvasListeners {
 
             for (const interactable of this.interactables) {
                 if (!interactable.hovering || !interactable.mounted) continue;
-                interactable.onMouseUp?.(
-                    this.asRenderProps(),
-                    this.mouseTime,
-                    this.mouseY
-                );
+                interactable.onMouseUp?.(this.asRenderProps(), this.mouseTime, this.mouseY);
                 return;
             }
         });
 
         this.listen('contextmenu', evt => {
             for (const interactable of this.interactables) {
-                if (
-                    !interactable.hovering ||
-                    !interactable.contextMenu ||
-                    !interactable.mounted
-                ) {
+                if (!interactable.hovering || !interactable.contextMenu || !interactable.mounted) {
                     continue;
                 }
                 evt.preventDefault();
@@ -226,11 +209,7 @@ export class CanvasState implements CanvasListeners {
     private updateHoveringOnInteractables() {
         const queue = this.interactables
             .filter(e => e.mounted)
-            .map(i =>
-                i.collider
-                    ? ([i.collider?.(this.asRenderProps()), i] as const)
-                    : null
-            )
+            .map(i => (i.collider ? ([i.collider?.(this.asRenderProps()), i] as const) : null))
             .filter(Boolean)
             .sort(([a], [b]) => (b?.zIndex || 0) - (a?.zIndex || 0));
 
@@ -306,11 +285,7 @@ export class CanvasState implements CanvasListeners {
         return (this.height * 3) / 4;
     }
 
-    public zoomScaledPosition(
-        pos: number,
-        zoom: number,
-        center: number
-    ): number {
+    public zoomScaledPosition(pos: number, zoom: number, center: number): number {
         return (pos - center) * zoom + center;
     }
 
@@ -329,20 +304,14 @@ export class CanvasState implements CanvasListeners {
         minute = 0,
         second = 0
     ): number {
-        const t =
-            new Date(year, month, date, hour, minute, second).getTime() / 1000;
+        const t = new Date(year, month, date, hour, minute, second).getTime() / 1000;
         return this.timeToRenderPos(t);
     }
 
     public renderPosToTime(pos: number): TimestampSecs {
         pos = this.width - pos;
         pos = this.zoomScaledPosition(pos, 1 / this.zoom, this.cameraOffset);
-        return (
-            nowUtc(false) -
-            pos +
-            this.cameraOffset +
-            new Date().getTimezoneOffset() * 60
-        );
+        return nowUtc(false) - pos + this.cameraOffset + new Date().getTimezoneOffset() * 60;
     }
 
     public zoomOnCenter(deltaZoom: number) {
@@ -370,17 +339,12 @@ export class CanvasState implements CanvasListeners {
                 'originalEvent' in event
                     ? (event.originalEvent as TouchEvent)
                     : (event as TouchEvent);
-            pageX =
-                evt.touches?.[0]?.pageX || evt.changedTouches?.[0]?.pageX || 0;
+            pageX = evt.touches?.[0]?.pageX || evt.changedTouches?.[0]?.pageX || 0;
         } else {
             pageX = (event as MouseEvent).pageX;
         }
 
-        return (
-            ((pageX - rect.left) * this.canvas.width) /
-            rect.width /
-            this.pixelRatio
-        );
+        return ((pageX - rect.left) * this.canvas.width) / rect.width / this.pixelRatio;
     }
 
     public getMouseYRaw(event: MouseEvent | TouchEvent): number {
@@ -398,23 +362,15 @@ export class CanvasState implements CanvasListeners {
                 'originalEvent' in event
                     ? (event.originalEvent as TouchEvent)
                     : (event as TouchEvent);
-            pageY =
-                evt.touches?.[0]?.pageY || evt.changedTouches?.[0]?.pageY || 0;
+            pageY = evt.touches?.[0]?.pageY || evt.changedTouches?.[0]?.pageY || 0;
         } else {
             pageY = (event as MouseEvent).pageY;
         }
 
-        return (
-            ((pageY - rect.top) * this.canvas.height) /
-            rect.height /
-            this.pixelRatio
-        );
+        return ((pageY - rect.top) * this.canvas.height) / rect.height / this.pixelRatio;
     }
 
-    public cameraOffsetForTime(
-        time: TimestampSecs | null = null,
-        acrossScreen = 3 / 4
-    ): number {
+    public cameraOffsetForTime(time: TimestampSecs | null = null, acrossScreen = 3 / 4): number {
         if (time === null) {
             time = nowUtc(false);
         }
@@ -429,11 +385,7 @@ export class CanvasState implements CanvasListeners {
         return this.renderPosToTime(this.getMouseXRaw(event));
     }
 
-    public zoomTo(
-        start: TimestampSecs,
-        end: TimestampSecs,
-        marginPercent = 0.25
-    ) {
+    public zoomTo(start: TimestampSecs, end: TimestampSecs, marginPercent = 0.25) {
         const marginedStart = start - (end - start) * marginPercent;
         const marginedEnd = end + (end - start) * marginPercent;
         this.zoom = this.width / (marginedEnd - marginedStart);
@@ -445,12 +397,7 @@ export class CanvasState implements CanvasListeners {
         y: number,
         w: number,
         h: number,
-        {
-            radius = 0,
-            color = this.colors.primary,
-            wireframe = false,
-            zIndex = 0
-        } = {}
+        { radius = 0, color = this.colors.primary, wireframe = false, zIndex = 0 } = {}
     ) {
         if (!this.ctx) throw new Error('Canvas not set');
         if (zIndex !== 0) {

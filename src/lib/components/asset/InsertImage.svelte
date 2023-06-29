@@ -20,9 +20,7 @@
         offset: number,
         count: number
     ): Promise<Omit<Asset, 'content'>[]> {
-        const res = displayNotifOnErr(
-            await api.get(auth, `/assets`, { offset, count })
-        );
+        const res = displayNotifOnErr(await api.get(auth, `/assets`, { offset, count }));
         assetCount = res.assetCount;
         return res.assets;
     }
@@ -36,14 +34,7 @@
         if (res === null) return;
         const { publicId, fileName, id } = res;
         assets = [
-            new Asset(
-                id,
-                publicId,
-                undefined as unknown as string,
-                fileName,
-                '',
-                nowUtc()
-            ),
+            new Asset(id, publicId, undefined as unknown as string, fileName, '', nowUtc()),
             ...assets
         ];
         onInput(Asset.mdLink(fileName, publicId));
@@ -61,19 +52,11 @@
 </script>
 
 <div class="dropdown-contents">
-    <Dropdown
-        openOnHover
-        fillWidthMobile
-        stayOpenWhenClicked
-        bind:close={closePopup}
-    >
+    <Dropdown openOnHover fillWidthMobile stayOpenWhenClicked bind:close={closePopup}>
         <span slot="button">
             <ImageArea {size} />
         </span>
-        <button
-            on:click={() => fileDropInput.click()}
-            class="with-icon upload-button"
-        >
+        <button on:click={() => fileDropInput.click()} class="with-icon upload-button">
             <Upload size="30" />
             Upload
         </button>
@@ -100,9 +83,7 @@
                         <button
                             class="asset"
                             on:click={() => {
-                                onInput(
-                                    Asset.mdLink(asset.fileName, asset.publicId)
-                                );
+                                onInput(Asset.mdLink(asset.fileName, asset.publicId));
                                 closePopup();
                             }}
                         >

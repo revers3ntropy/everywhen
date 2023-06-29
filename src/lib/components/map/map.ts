@@ -28,10 +28,7 @@ export function lastEntry(entries: EntryLocation[]): EntryLocation | null {
     return lastEntry;
 }
 
-export function olFeatureFromLocation(
-    location: Location,
-    map: Map
-): LocationFeature {
+export function olFeatureFromLocation(location: Location, map: Map): LocationFeature {
     const mPerUnit = map.getView().getProjection().getMetersPerUnit();
     if (!mPerUnit) {
         throw new Error('mPerUnit is null');
@@ -63,10 +60,7 @@ export function olFeatureFromLocation(
 
                 const ctx = state.context;
 
-                const mPerUnit = map
-                    .getView()
-                    .getProjection()
-                    .getMetersPerUnit();
+                const mPerUnit = map.getView().getProjection().getMetersPerUnit();
                 if (!mPerUnit) {
                     throw new Error('mPerUnit is null');
                 }
@@ -85,14 +79,7 @@ export function olFeatureFromLocation(
                 const innerRadius = 0;
                 const outerRadius = radius * 1.4;
 
-                const gradient = ctx.createRadialGradient(
-                    x,
-                    y,
-                    innerRadius,
-                    x,
-                    y,
-                    outerRadius
-                );
+                const gradient = ctx.createRadialGradient(x, y, innerRadius, x, y, outerRadius);
                 gradient.addColorStop(0, 'rgba(9,221,237,0.1)');
                 gradient.addColorStop(0.6, 'rgba(34,157,214,0.1)');
                 gradient.addColorStop(1, 'rgba(113,37,186,0.3)');

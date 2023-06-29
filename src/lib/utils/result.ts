@@ -26,9 +26,7 @@ export class Result<T = null, E extends NonNullable<unknown> = string> {
         return this.value !== RESULT_NULL;
     }
 
-    public static collect<T, E extends NonNullable<unknown>>(
-        iter: Result<T, E>[]
-    ): Result<T[], E> {
+    public static collect<T, E extends NonNullable<unknown>>(iter: Result<T, E>[]): Result<T[], E> {
         const results: T[] = [];
         for (const result of iter) {
             if (result.err) {
@@ -45,15 +43,11 @@ export class Result<T = null, E extends NonNullable<unknown> = string> {
         return Result.collect(await Promise.all(iter));
     }
 
-    public static ok<T, E extends NonNullable<unknown>>(
-        value: T
-    ): Result<T, E> {
+    public static ok<T, E extends NonNullable<unknown>>(value: T): Result<T, E> {
         return new Result<T, E>(value, RESULT_NULL);
     }
 
-    public static err<T, E extends NonNullable<unknown>>(
-        error: E
-    ): Result<T, E> {
+    public static err<T, E extends NonNullable<unknown>>(error: E): Result<T, E> {
         return new Result<T, E>(RESULT_NULL, error);
     }
 

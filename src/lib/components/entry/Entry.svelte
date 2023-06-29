@@ -18,10 +18,7 @@
     import type { Auth } from '$lib/controllers/user';
     import { popup } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
-    import {
-        displayNotifOnErr,
-        notify
-    } from '$lib/components/notifications/notifications';
+    import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
     import { obfuscate, rawMdToHtml } from '$lib/utils/text';
     import UtcTime from '$lib/components/UtcTime.svelte';
     import Dropdown from '$lib/components/Dropdown.svelte';
@@ -66,13 +63,7 @@
 
     async function deleteSelf() {
         const deleted = EntryFlags.isDeleted(flags);
-        if (
-            !confirm(
-                `Are you sure you want to ${
-                    deleted ? 'restore' : 'delete'
-                } this entry?`
-            )
-        ) {
+        if (!confirm(`Are you sure you want to ${deleted ? 'restore' : 'delete'} this entry?`)) {
             return;
         }
 
@@ -142,9 +133,7 @@
         {obfuscated ? obfuscate(title) : title}
     </p>
     <div class="header">
-        <div
-            style="display: flex; align-items: center; max-width: calc(100% - 60px)"
-        >
+        <div style="display: flex; align-items: center; max-width: calc(100% - 60px)">
             {#if !showFullDate}
                 <span class="time">
                     <UtcTime
@@ -157,10 +146,7 @@
             {/if}
 
             {#if pinned}
-                <span
-                    class="gradient-icon"
-                    use:tooltip={{ content: 'Favourited' }}
-                >
+                <span class="gradient-icon" use:tooltip={{ content: 'Favourited' }}>
                     <Heart size="20" />
                 </span>
             {/if}
@@ -170,10 +156,7 @@
             {/if}
 
             {#if latitude && longitude && showLocations}
-                <button
-                    on:click={() => (showingMap = !showingMap)}
-                    aria-label="Expand map"
-                >
+                <button on:click={() => (showingMap = !showingMap)} aria-label="Expand map">
                     <LocationWidget
                         {locations}
                         {auth}
@@ -189,10 +172,7 @@
                 {#if (latitude && longitude && showLocations) || (hideAgentWidget && !showFullDate)}
                     <Dot />
                 {/if}
-                <a
-                    href="/journal/{id}?history=on&obfuscate=0"
-                    class="edits-link link"
-                >
+                <a href="/journal/{id}?history=on&obfuscate=0" class="edits-link link">
                     {edits.length} edit{edits.length > 1 ? 's' : ''}
                 </a>
             {/if}

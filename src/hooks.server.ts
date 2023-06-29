@@ -96,7 +96,11 @@ export const handle = (async ({ event, resolve }) => {
     const now = nowUtc();
 
     const auth = await tryGetAuthFromCookies(event.cookies);
-    event.locals.auth = auth;
+    if (auth) {
+        event.locals.auth = { ...auth };
+    } else {
+        event.locals.auth = null;
+    }
 
     const eventClone: RequestEvent = {
         ...event,
@@ -113,13 +117,9 @@ export const handle = (async ({ event, resolve }) => {
         });
     }
 
-    void logReq(
-        performance.now() - start,
-        now,
-        eventClone,
-        result.clone(),
-        auth
-    ).catch(errorLogger.error);
+    void logReq(performance.now() - start, now, eventClone, result.clone(), auth).catch(
+        errorLogger.error
+    );
 
     return result;
 }) satisfies Handle;

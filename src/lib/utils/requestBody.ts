@@ -9,9 +9,7 @@ export async function bodyFromReq<T extends Schema & object>(
     defaults: { [P in keyof T]?: SchemaResult<T[P]> | undefined } = {}
 ): Promise<Result<Readonly<SchemaResult<T>>>> {
     if (request.method === 'GET') {
-        void errorLogger.logToFile(
-            'GET requests are not supported in bodyFromReq()'
-        );
+        void errorLogger.logToFile('GET requests are not supported in bodyFromReq()');
         return Result.err('Something went wrong');
     }
 

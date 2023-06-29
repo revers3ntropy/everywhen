@@ -16,7 +16,7 @@
 
     async function updateName() {
         displayNotifOnErr(
-            await api.put(data, apiPath('/labels/?', data.label.id), {
+            await api.put(data.auth, apiPath('/labels/?', data.label.id), {
                 name: data.label.name
             })
         );
@@ -24,7 +24,7 @@
 
     async function updateColor() {
         displayNotifOnErr(
-            await api.put(data, apiPath('/labels/?', data.label.id), {
+            await api.put(data.auth, apiPath('/labels/?', data.label.id), {
                 color: data.label.color
             })
         );
@@ -36,9 +36,7 @@
         // a more complex approach is required to clear the
         // label from the entries and events
         if (data.entryCount + eventCount < 1) {
-            displayNotifOnErr(
-                await api.delete(data, apiPath(`/labels/?`, data.label.id))
-            );
+            displayNotifOnErr(await api.delete(data.auth, apiPath(`/labels/?`, data.label.id)));
             await goto('../');
             return;
         }
@@ -89,18 +87,10 @@
 <main>
     <div class="color-select" style="border-color: {data.label.color}">
         {data.label.color}
-        <input
-            type="color"
-            bind:value={data.label.color}
-            on:change={updateColor}
-        />
+        <input type="color" bind:value={data.label.color} on:change={updateColor} />
     </div>
     <div class="title-line">
-        <input
-            class="name editable-text"
-            bind:value={data.label.name}
-            on:change={updateName}
-        />
+        <input class="name editable-text" bind:value={data.label.name} on:change={updateName} />
         <button class="with-circled-icon danger" on:click={deleteLabel}>
             <Delete size="30" />
             Delete this Label
@@ -114,12 +104,7 @@
         </h1>
         <div class="events">
             {#each data.events as event}
-                <Event
-                    auth={data}
-                    {event}
-                    labels={data.labels}
-                    obfuscated={$obfuscated}
-                />
+                <Event auth={data.auth} {event} labels={data.labels} obfuscated={$obfuscated} />
             {/each}
         </div>
     </section>
@@ -127,7 +112,7 @@
     <section>
         <h1>{data.entryCount} Entr{data.entryCount === 1 ? 'y' : 'ies'}</h1>
         <Entries
-            auth={data}
+            auth={data.auth}
             options={{ labelId: data.label.id }}
             showLabels={false}
             hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}

@@ -42,10 +42,7 @@ export function addYToEvents(
         }
 
         const overlappedLargerEvents = evts.filter(
-            e =>
-                e !== event &&
-                Event.intersects(e, event) &&
-                Event.compare(e, event)
+            e => e !== event && Event.intersects(e, event) && Event.compare(e, event)
         );
 
         for (const e of overlappedLargerEvents) {
@@ -63,10 +60,7 @@ export function getInitialZoomAndPos(
     entries: EntryWithWordCount[],
     events: Event[]
 ): [number, number] {
-    const earliestTimestamp = Math.min(
-        ...entries.map(e => e.created),
-        ...events.map(e => e.start)
-    );
+    const earliestTimestamp = Math.min(...entries.map(e => e.created), ...events.map(e => e.start));
     const earliestTimestampTimeAgo = nowUtc(false) - earliestTimestamp;
     const daysAgo = Math.round(
         Math.min(52, Math.max(earliestTimestampTimeAgo / (60 * 60 * 24), 0))

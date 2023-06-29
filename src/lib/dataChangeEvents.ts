@@ -62,56 +62,44 @@ const listeners = {
     }>;
 };
 
-export const listen = (Object.keys(listeners) as Entities[]).reduce(
-    (acc, key) => {
-        acc[key] = {
-            onUpdate(listener: UpdateListener<Update[typeof key]>) {
-                listeners[key].onUpdate.push(listener);
-                const remove = () => {
-                    const idx = (listeners[key].onUpdate as unknown[]).indexOf(
-                        listener
-                    );
-                    if (idx !== -1) {
-                        listeners[key].onUpdate.splice(idx, 1);
-                    }
-                };
-                onDestroy(remove);
-                return remove;
-            },
-            onDelete(listener: DelListener<Delete[typeof key]>) {
-                listeners[key].onDelete.push(listener);
-                const remove = () => {
-                    const idx = (listeners[key].onDelete as unknown[]).indexOf(
-                        listener
-                    );
-                    if (idx !== -1) {
-                        listeners[key].onDelete.splice(idx, 1);
-                    }
-                };
-                onDestroy(remove);
-                return remove;
-            },
-            onCreate(listener: CreateListener<Create[typeof key]>) {
-                listeners[key].onCreate.push(listener);
-                const remove = () => {
-                    const idx = (listeners[key].onCreate as unknown[]).indexOf(
-                        listener
-                    );
-                    if (idx !== -1) {
-                        listeners[key].onCreate.splice(idx, 1);
-                    }
-                };
-                onDestroy(remove);
-                return remove;
-            }
-        };
-        return acc;
-    },
-    {} as Record<
-        Entities,
-        SetupListener<Update[Entities], Delete[Entities], Create[Entities]>
-    >
-) as {
+export const listen = (Object.keys(listeners) as Entities[]).reduce((acc, key) => {
+    acc[key] = {
+        onUpdate(listener: UpdateListener<Update[typeof key]>) {
+            listeners[key].onUpdate.push(listener);
+            const remove = () => {
+                const idx = (listeners[key].onUpdate as unknown[]).indexOf(listener);
+                if (idx !== -1) {
+                    listeners[key].onUpdate.splice(idx, 1);
+                }
+            };
+            onDestroy(remove);
+            return remove;
+        },
+        onDelete(listener: DelListener<Delete[typeof key]>) {
+            listeners[key].onDelete.push(listener);
+            const remove = () => {
+                const idx = (listeners[key].onDelete as unknown[]).indexOf(listener);
+                if (idx !== -1) {
+                    listeners[key].onDelete.splice(idx, 1);
+                }
+            };
+            onDestroy(remove);
+            return remove;
+        },
+        onCreate(listener: CreateListener<Create[typeof key]>) {
+            listeners[key].onCreate.push(listener);
+            const remove = () => {
+                const idx = (listeners[key].onCreate as unknown[]).indexOf(listener);
+                if (idx !== -1) {
+                    listeners[key].onCreate.splice(idx, 1);
+                }
+            };
+            onDestroy(remove);
+            return remove;
+        }
+    };
+    return acc;
+}, {} as Record<Entities, SetupListener<Update[Entities], Delete[Entities], Create[Entities]>>) as {
     [K in Entities]: SetupListener<Update[K], Delete[K], Create[K]>;
 };
 

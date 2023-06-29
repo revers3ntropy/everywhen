@@ -18,12 +18,7 @@ export const GET = cachedApiRoute(async (auth, { url }) => {
         return { locations };
     }
 
-    const { err, val: locations } = await Location.search(
-        query,
-        auth,
-        lat,
-        lon
-    );
+    const { err, val: locations } = await Location.search(query, auth, lat, lon);
     if (err) throw error(500, err);
     return { ...locations };
 }) satisfies RequestHandler;

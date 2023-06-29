@@ -18,10 +18,7 @@
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { getLocation } from '$lib/utils/geolocation';
     import { errorLogger } from '$lib/utils/log';
-    import {
-        displayNotifOnErr,
-        notify
-    } from '$lib/components/notifications/notifications';
+    import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
     import { obfuscate } from '$lib/utils/text';
     import { currentTzOffset, nowUtc } from '$lib/utils/time';
     import FormatOptions from './FormatOptions.svelte';
@@ -43,9 +40,7 @@
 
     export let auth: Auth;
     export let obfuscated = true;
-    export let setEntryFormMode = null as
-        | null
-        | ((mode: EntryFormMode) => Promise<void>);
+    export let setEntryFormMode = null as null | ((mode: EntryFormMode) => Promise<void>);
 
     function resetEntryForm() {
         newEntryTitle = '';
@@ -76,10 +71,7 @@
     /**
      * @src https://stackoverflow.com/questions/11076975
      */
-    function insertAtCursor(
-        input: HTMLInputElement | HTMLTextAreaElement,
-        text: string
-    ) {
+    function insertAtCursor(input: HTMLInputElement | HTMLTextAreaElement, text: string) {
         if (input.selectionStart || input.selectionStart === 0) {
             const startPos = input.selectionStart ?? undefined;
             const endPos = input.selectionEnd ?? 0;
@@ -103,10 +95,7 @@
         after: string,
         insertSpaceIfEmpty = true
     ) {
-        const selected = input.value.substring(
-            input.selectionStart ?? 0,
-            input.selectionEnd ?? 0
-        );
+        const selected = input.value.substring(input.selectionStart ?? 0, input.selectionEnd ?? 0);
         if (selected.length === 0 && insertSpaceIfEmpty) {
             insertAtCursor(input, `${before} ${after}`);
             return;
@@ -114,27 +103,16 @@
         insertAtCursor(input, before + selected + after);
     }
 
-    function makeWrapper(
-        before: string,
-        after: string,
-        insertSpaceIfEmpty = true
-    ): () => void {
+    function makeWrapper(before: string, after: string, insertSpaceIfEmpty = true): () => void {
         return () => {
             if (newEntryInputElement) {
-                wrapSelectedWith(
-                    newEntryInputElement,
-                    before,
-                    after,
-                    insertSpaceIfEmpty
-                );
+                wrapSelectedWith(newEntryInputElement, before, after, insertSpaceIfEmpty);
             }
         };
     }
 
     async function onEntryCreation(body: RawEntry) {
-        const res = displayNotifOnErr(
-            await api.post(auth, '/entries', { ...body })
-        );
+        const res = displayNotifOnErr(await api.post(auth, '/entries', { ...body }));
         submitted = false;
         if (res.id) {
             // make really sure it's saved before resetting
@@ -171,26 +149,18 @@
             return;
         }
         if (!areUnsavedChanges()) {
-            if (
-                !confirm(
-                    'No changes have been made, are you sure you want to edit this entry?'
-                )
-            ) {
+            if (!confirm('No changes have been made, are you sure you want to edit this entry?')) {
                 return;
             }
         }
-        displayNotifOnErr(
-            await api.put(auth, apiPath('/entries/?', entry.id), body)
-        );
+        displayNotifOnErr(await api.put(auth, apiPath('/entries/?', entry.id), body));
         await goto(`/journal/${entry.id}?obfuscate=0`);
     }
 
     async function submit() {
         submitted = true;
 
-        const currentLocation = $enabledLocation
-            ? await getLocation()
-            : [null, null];
+        const currentLocation = $enabledLocation ? await getLocation() : [null, null];
 
         const body = {
             title: newEntryTitle,
@@ -258,9 +228,7 @@
         if (submitted || !areUnsavedChanges()) {
             return;
         }
-        const shouldProceed = confirm(
-            'You have unsaved changes, are you sure you want to leave?'
-        );
+        const shouldProceed = confirm('You have unsaved changes, are you sure you want to leave?');
         if (!shouldProceed) {
             cancel();
         }
@@ -341,12 +309,7 @@
         </div>
         <div class="right-options {obfuscated ? 'blur' : ''}">
             <div class="label-select-container">
-                <LabelSelect
-                    {auth}
-                    bind:value={newEntryLabel}
-                    {labels}
-                    fromRight
-                />
+                <LabelSelect {auth} bind:value={newEntryLabel} {labels} fromRight />
             </div>
 
             <button
@@ -382,11 +345,8 @@
     </div>
     <div class="entry-container">
         {#if obfuscated}
-            <textarea
-                placeholder="..."
-                aria-label="Entry Body"
-                disabled
-                class="obfuscated">{obfuscate(newEntryBody)}</textarea
+            <textarea placeholder="..." aria-label="Entry Body" disabled class="obfuscated"
+                >{obfuscate(newEntryBody)}</textarea
             >
         {:else}
             <textarea

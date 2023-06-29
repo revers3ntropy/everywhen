@@ -65,7 +65,7 @@ export async function generateUser(): Promise<{
         key,
         username,
         password,
-        id: (await authRes.json()).id
+        id: ((await authRes.json()) as { id: string }).id
     };
 
     return {
@@ -78,7 +78,7 @@ export async function generateUserAndSignIn(page: Page): Promise<{
     auth: Auth & { password: string };
     api: APIRequestContext;
 }> {
-    await page.goto('/', { waitUntil: 'networkidle' });
+    await page.goto('/login', { waitUntil: 'networkidle' });
     const { auth, api } = await generateUser();
 
     await page.getByLabel('Username').click();

@@ -28,17 +28,9 @@
 <div class="wrapper">
     {#if entry}
         <div class="datetime">
-            <UtcTime
-                timestamp={entry.created}
-                fmt="ddd Do MMMM YYYY, h:mm a"
-                noTooltip={true}
-            />
+            <UtcTime timestamp={entry.created} fmt="ddd Do MMMM YYYY, h:mm a" noTooltip={true} />
             <Dot />
-            <UtcTime
-                timestamp={entry.created}
-                relative={true}
-                noTooltip={true}
-            />
+            <UtcTime timestamp={entry.created} relative={true} noTooltip={true} />
         </div>
         {#if entry.title}
             <h1 class="ellipsis">{entry.title}</h1>

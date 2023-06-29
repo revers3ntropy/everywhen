@@ -10,20 +10,11 @@ export interface Logger<HasFile extends string | null> {
     log: (...args: unknown[]) => void;
     warn: (...args: unknown[]) => void;
     error: (...args: unknown[]) => void;
-    logToFile: HasFile extends string
-        ? (...args: unknown[]) => Promise<void>
-        : never;
+    logToFile: HasFile extends string ? (...args: unknown[]) => Promise<void> : never;
 }
 
-function fmt(
-    useUTC: boolean,
-    nameLength: number,
-    name: string,
-    ...args: unknown[]
-): string {
-    const time = chalk.dim(
-        new Date()[useUTC ? 'toUTCString' : 'toLocaleTimeString']()
-    );
+function fmt(useUTC: boolean, nameLength: number, name: string, ...args: unknown[]): string {
+    const time = chalk.dim(new Date()[useUTC ? 'toUTCString' : 'toLocaleTimeString']());
     const padding = ' '.repeat(maxLogNameLen - nameLength || 0);
     return (
         `${time} [${name}] ` +
@@ -91,12 +82,8 @@ export function makeLogger<File extends string | null>(
             if (browser || !fileHandle) {
                 return;
             }
-            await fileHandle.write(
-                removeAnsi(fmt(true, name.length, name, ...args)) + '\n'
-            );
-        }) as File extends string
-            ? (...args: unknown[]) => Promise<void>
-            : never
+            await fileHandle.write(removeAnsi(fmt(true, name.length, name, ...args)) + '\n');
+        }) as File extends string ? (...args: unknown[]) => Promise<void> : never
     };
     void self.logToFile('SETUP');
     return self;

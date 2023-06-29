@@ -13,9 +13,7 @@
 
     listen.setting.onUpdate(({ key, value }) => {
         if (key === 'entryFormMode') {
-            entryFormMode = value
-                ? EntryFormMode.Bullet
-                : EntryFormMode.Standard;
+            entryFormMode = value ? EntryFormMode.Bullet : EntryFormMode.Standard;
         }
     });
 
@@ -29,7 +27,7 @@
 
 <main>
     <Entries
-        auth={data}
+        auth={data.auth}
         showBin
         showLabels
         showSearch

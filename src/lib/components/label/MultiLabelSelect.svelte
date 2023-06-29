@@ -54,11 +54,7 @@
 </script>
 
 <span class="select-label">
-    <button
-        on:click={() => toggleLabel('')}
-        class="label-button"
-        aria-label="Remove label"
-    >
+    <button on:click={() => toggleLabel('')} class="label-button" aria-label="Remove label">
         <span class="flex-center">
             <span
                 class="entry-color"
@@ -66,10 +62,7 @@
                 style="--label-color: var(--text-color)"
             />
         </span>
-        <span
-            class="flex-center"
-            style="justify-content: start; width: 100%; padding: 0 0.5rem"
-        >
+        <span class="flex-center" style="justify-content: start; width: 100%; padding: 0 0.5rem">
             <span class="flex-center">
                 <LabelOffOutline size="25" />
             </span>
@@ -95,11 +88,7 @@
         </button>
     {/each}
     {#if showAddButton}
-        <button
-            on:click={showNewLabelPopup}
-            class="label-button"
-            aria-label="Create new label"
-        >
+        <button on:click={showNewLabelPopup} class="label-button" aria-label="Create new label">
             <span class="flex-center">
                 <Plus size="25" />
             </span>

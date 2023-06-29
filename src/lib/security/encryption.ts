@@ -27,19 +27,15 @@ export function encrypt(plainText: string, key: string): Result<string> {
     let encryptedData = '';
 
     try {
-        const cipher = crypto.createCipheriv(
-            ALGORITHM,
-            key,
-            PUBLIC_INIT_VECTOR
-        );
+        const cipher = crypto.createCipheriv(ALGORITHM, key, PUBLIC_INIT_VECTOR);
 
         encryptedData = cipher.update(plainText, 'utf-8', 'hex');
         encryptedData += cipher.final('hex');
     } catch (e) {
         void errorLogger.logToFile(
-            `Error encrypting ${typeof plainText} of length ${
-                plainText.length
-            } with key len ${key.length}:`,
+            `Error encrypting ${typeof plainText} of length ${plainText.length} with key len ${
+                key.length
+            }:`,
             e
         );
         return Result.err('Error encrypting');
@@ -57,11 +53,7 @@ export function decrypt(cypherText: string, key: string): Result<string> {
     let decryptedData = '';
 
     try {
-        const decipher = crypto.createDecipheriv(
-            ALGORITHM,
-            key,
-            PUBLIC_INIT_VECTOR
-        );
+        const decipher = crypto.createDecipheriv(ALGORITHM, key, PUBLIC_INIT_VECTOR);
 
         decryptedData = decipher.update(cypherText, 'hex', 'utf-8');
         decryptedData += decipher.final('utf8');
@@ -82,11 +74,6 @@ export function decrypt(cypherText: string, key: string): Result<string> {
     return Result.ok(decryptedData);
 }
 
-export function encryptMulti<T extends string[]>(
-    key: string,
-    ...plainTexts: T
-): Result<T> {
-    return Result.collect(
-        plainTexts.map(text => encrypt(text, key))
-    ) as Result<T>;
+export function encryptMulti<T extends string[]>(key: string, ...plainTexts: T): Result<T> {
+    return Result.collect(plainTexts.map(text => encrypt(text, key))) as Result<T>;
 }

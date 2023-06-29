@@ -1,5 +1,4 @@
 <script lang="ts">
-    import type { PageData } from './$types';
     import { goto } from '$app/navigation';
     import ChangePasswordDialog from '$lib/components/dialogs/ChangePasswordDialog.svelte';
     import { showPopup } from '$lib/utils/popups';
@@ -16,7 +15,7 @@
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import Settings from './Settings.svelte';
 
-    export let data: PageData;
+    export let data;
 
     async function deleteAccount() {
         if (
@@ -28,10 +27,8 @@
             return;
         }
 
-        const { backup: backupData } = displayNotifOnErr(
-            await api.delete(data, '/users')
-        );
-        Backup.download(backupData, data.username, true);
+        const { backup: backupData } = displayNotifOnErr(await api.delete(data.auth, '/users'));
+        Backup.download(backupData, data.auth.username, true);
         void goto('/');
     }
 
@@ -57,27 +54,18 @@
         </h1>
 
         <div class="buttons">
-            <BackupOptions auth={data} />
+            <BackupOptions auth={data.auth} />
         </div>
         <div class="buttons">
             <button aria-label="Change password" on:click={changePassword}>
                 <LockOutline size="30" />
                 Change Password
             </button>
-            <a
-                aria-label="Log Out"
-                class="danger"
-                href="/logout"
-                data-sveltekit-preload-data="tap"
-            >
+            <a aria-label="Log Out" class="danger" href="/logout" data-sveltekit-preload-data="tap">
                 <Logout size="30" />
                 Log Out
             </a>
-            <button
-                aria-label="Delete Account"
-                class="danger"
-                on:click={deleteAccount}
-            >
+            <button aria-label="Delete Account" class="danger" on:click={deleteAccount}>
                 <Skull size="30" />
                 Delete Account and Erase Data
             </button>
@@ -89,15 +77,12 @@
             <span>General Settings</span>
         </h1>
         <div style="padding: 1rem 0 2rem 0">
-            <i>
-                Please note you will have to reload the page for changes to take
-                effect
-            </i>
+            <i> Please note you will have to reload the page for changes to take effect </i>
         </div>
 
         <div class="settings">
             {#each Object.entries(SettingsController.config) as [key, config] (key)}
-                <Settings {...config} {...data.settings[key]} auth={data} />
+                <Settings {...config} {...data.settings[key]} auth={data.auth} />
             {/each}
         </div>
     </section>

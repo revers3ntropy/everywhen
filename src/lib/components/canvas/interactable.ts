@@ -30,8 +30,7 @@ export function interactable(interactable: Interactable): void {
         render(state, dt) {
             if (interactable.hovering) {
                 if (interactable.cursorOnHover) {
-                    (state as CanvasState).cursor =
-                        interactable.cursorOnHover || 'default';
+                    (state as CanvasState).cursor = interactable.cursorOnHover || 'default';
                 }
 
                 if (!wasHovering && interactable.onHover) {

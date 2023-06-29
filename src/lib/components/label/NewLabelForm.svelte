@@ -6,10 +6,7 @@
     import type { Auth } from '$lib/controllers/user';
     import { Event } from '$lib/controllers/event';
     import { api } from '$lib/utils/apiRequest';
-    import {
-        displayNotifOnErr,
-        notify
-    } from '$lib/components/notifications/notifications';
+    import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
 
     const dispatchEvent = createEventDispatcher();
 
@@ -31,13 +28,12 @@
             })
         );
 
-        notify.success('Label created');
-        await dispatch.create(
-            'label',
-            new Label(id, labelColor, labelName, nowUtc())
-        );
+        const label = new Label(id, labelColor, labelName, nowUtc());
+        await dispatch.create('label', label);
+
         labelName = '';
 
+        notify.success('Label created');
         dispatchEvent('submit');
     }
 </script>
@@ -48,17 +44,17 @@
     </div>
     <div class="content">
         <label>
-            Name<br />
+            Name <br />
             <input bind:value={labelName} type="text" />
         </label>
         <label>
-            Color<br />
+            Color <br />
             <input bind:value={labelColor} type="color" />
             <input bind:value={labelColor} type="text" />
         </label>
     </div>
     <div class="actions">
-        <button class="primary" on:click={closeHandler}> Create </button>
+        <button class="primary" on:click={closeHandler} aria-label="Create"> Create </button>
     </div>
 </div>
 

@@ -36,28 +36,18 @@ export type DELETE<T extends { DELETE: unknown }> = ResType<T['DELETE']>;
 interface ApiResponse {
     GET: {
         '/labels': GET<typeof import('../../routes/api/labels/+server')>;
-        '/labels/?': GET<
-            typeof import('../../routes/api/labels/[labelId]/+server')
-        >;
+        '/labels/?': GET<typeof import('../../routes/api/labels/[labelId]/+server')>;
         '/events': GET<typeof import('../../routes/api/events/+server')>;
         '/entries': GET<typeof import('../../routes/api/entries/+server')>;
-        '/entries/titles': GET<
-            typeof import('../../routes/api/entries/titles/+server')
-        >;
-        '/entries/streaks': GET<
-            typeof import('../../routes/api/entries/streaks/+server')
-        >;
-        '/entries/?': GET<
-            typeof import('../../routes/api/entries/[entryId]/+server')
-        >;
+        '/entries/titles': GET<typeof import('../../routes/api/entries/titles/+server')>;
+        '/entries/streaks': GET<typeof import('../../routes/api/entries/streaks/+server')>;
+        '/entries/?': GET<typeof import('../../routes/api/entries/[entryId]/+server')>;
         '/entries/?/pinned': GET<
             typeof import('../../routes/api/entries/[entryId]/pinned/+server')
         >;
         '/backups': GET<typeof import('../../routes/api/backups/+server')>;
         '/auth': GET<typeof import('../../routes/api/auth/+server')>;
-        '/assets/?': GET<
-            typeof import('../../routes/api/assets/[asset]/+server')
-        >;
+        '/assets/?': GET<typeof import('../../routes/api/assets/[asset]/+server')>;
         '/settings': GET<typeof import('../../routes/api/settings/+server')>;
         '/version': GET<typeof import('../../routes/api/version/+server')>;
         '/locations': GET<typeof import('../../routes/api/locations/+server')>;
@@ -74,39 +64,21 @@ interface ApiResponse {
     };
     DELETE: {
         '/users': DELETE<typeof import('../../routes/api/users/+server')>;
-        '/labels/?': DELETE<
-            typeof import('../../routes/api/labels/[labelId]/+server')
-        >;
-        '/events/?': DELETE<
-            typeof import('../../routes/api/events/[eventId]/+server')
-        >;
-        '/entries/?': DELETE<
-            typeof import('../../routes/api/entries/[entryId]/+server')
-        >;
-        '/assets/?': DELETE<
-            typeof import('../../routes/api/assets/[asset]/+server')
-        >;
-        '/locations/?': DELETE<
-            typeof import('../../routes/api/locations/[locationId]/+server')
-        >;
+        '/labels/?': DELETE<typeof import('../../routes/api/labels/[labelId]/+server')>;
+        '/events/?': DELETE<typeof import('../../routes/api/events/[eventId]/+server')>;
+        '/entries/?': DELETE<typeof import('../../routes/api/entries/[entryId]/+server')>;
+        '/assets/?': DELETE<typeof import('../../routes/api/assets/[asset]/+server')>;
+        '/locations/?': DELETE<typeof import('../../routes/api/locations/[locationId]/+server')>;
     };
     PUT: {
-        '/labels/?': PUT<
-            typeof import('../../routes/api/labels/[labelId]/+server')
-        >;
-        '/events/?': PUT<
-            typeof import('../../routes/api/events/[eventId]/+server')
-        >;
+        '/labels/?': PUT<typeof import('../../routes/api/labels/[labelId]/+server')>;
+        '/events/?': PUT<typeof import('../../routes/api/events/[eventId]/+server')>;
         '/settings': PUT<typeof import('../../routes/api/settings/+server')>;
-        '/entries/?': PUT<
-            typeof import('../../routes/api/entries/[entryId]/+server')
-        >;
+        '/entries/?': PUT<typeof import('../../routes/api/entries/[entryId]/+server')>;
         '/entries/?/pinned': PUT<
             typeof import('../../routes/api/entries/[entryId]/pinned/+server')
         >;
-        '/locations/?': PUT<
-            typeof import('../../routes/api/locations/[locationId]/+server')
-        >;
+        '/locations/?': PUT<typeof import('../../routes/api/locations/[locationId]/+server')>;
         '/auth': PUT<typeof import('../../routes/api/auth/+server')>;
     };
 }
@@ -144,11 +116,7 @@ export async function makeApiReq<
         cookie =
             serialize(KEY_COOKIE_KEY, auth.key, KEY_COOKIE_OPTIONS) +
             ' ; ' +
-            serialize(
-                USERNAME_COOKIE_KEY,
-                auth.username,
-                USERNAME_COOKIE_OPTIONS
-            );
+            serialize(USERNAME_COOKIE_KEY, auth.username, USERNAME_COOKIE_OPTIONS);
     }
 
     const init: RequestInit = {
@@ -199,16 +167,12 @@ export async function makeApiReq<
             if (typeof res === 'object' && res !== null) {
                 if ('error' in res) {
                     return Result.err(
-                        typeof res.error === 'string'
-                            ? res.error
-                            : JSON.stringify(res.error)
+                        typeof res.error === 'string' ? res.error : JSON.stringify(res.error)
                     );
                 }
                 if ('message' in res) {
                     return Result.err(
-                        typeof res.message === 'string'
-                            ? res.message
-                            : JSON.stringify(res.message)
+                        typeof res.message === 'string' ? res.message : JSON.stringify(res.message)
                     );
                 }
             }
@@ -226,12 +190,7 @@ export const api = {
         auth: Auth | null,
         path: Path,
         args: Record<string, string | number | boolean | undefined> = {}
-    ) =>
-        await makeApiReq<'GET', Path, Body>(
-            auth,
-            'GET',
-            path + serializeGETArgs(args)
-        ),
+    ) => await makeApiReq<'GET', Path, Body>(auth, 'GET', path + serializeGETArgs(args)),
 
     post: async <Path extends keyof ApiResponse['POST'], Body extends ReqBody>(
         auth: Auth | null,
@@ -245,10 +204,7 @@ export const api = {
         body: Body = {} as Body
     ) => await makeApiReq<'PUT', Path, Body>(auth, 'PUT', path, body),
 
-    delete: async <
-        Path extends keyof ApiResponse['DELETE'],
-        Body extends ReqBody
-    >(
+    delete: async <Path extends keyof ApiResponse['DELETE'], Body extends ReqBody>(
         auth: Auth | null,
         path: Path,
         body: Body = {} as Body

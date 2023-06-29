@@ -29,11 +29,7 @@
     import { Event as EventController } from '$lib/controllers/event';
     import type { SettingsConfig } from '$lib/controllers/settings';
     import { nowUtc } from '$lib/utils/time';
-    import {
-        eventsSortKey,
-        obfuscated,
-        passcodeLastEntered
-    } from '$lib/stores';
+    import { eventsSortKey, obfuscated, passcodeLastEntered } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
 
@@ -81,10 +77,7 @@
             key: 'entryFormMode',
             value: false
         });
-        const labelId = await makeLabelFromNameIfDoesntExist(
-            name,
-            defaultColor
-        );
+        const labelId = await makeLabelFromNameIfDoesntExist(name, defaultColor);
         localStorage.setItem(LS_KEY.newEntryLabel, labelId);
         await gotoIfNotAt('/journal');
     }
@@ -232,8 +225,7 @@
                 on:click={lock}
                 class="danger lock-button"
                 use:tooltip={{
-                    content:
-                        '<span class="oneline">Lock (require passcode)</span>',
+                    content: '<span class="oneline">Lock (require passcode)</span>',
                     position: 'bottom'
                 }}
                 aria-label="Lock"
@@ -259,49 +251,31 @@
             </span>
 
             <div class="record-something-buttons">
-                <button
-                    class="with-icon oneline record-entry"
-                    on:click={makeEntry}
-                >
+                <button class="with-icon oneline record-entry" on:click={makeEntry}>
                     <Pencil size="30" />
                     Record Entry
                 </button>
-                <button
-                    class="with-icon oneline record-bullet"
-                    on:click={makeBullet}
-                >
+                <button class="with-icon oneline record-bullet" on:click={makeBullet}>
                     <BulletPoints size="30" />
                     Record Bullet
                 </button>
 
-                <button
-                    class="with-icon oneline record-dream"
-                    on:click={makeDream}
-                >
+                <button class="with-icon oneline record-dream" on:click={makeDream}>
                     <Moon size="30" />
                     Record Dream
                 </button>
 
-                <button
-                    class="with-icon oneline record-idea"
-                    on:click={makeIdea}
-                >
+                <button class="with-icon oneline record-idea" on:click={makeIdea}>
                     <Lightbulb size="30" />
                     Record Idea
                 </button>
 
-                <button
-                    class="with-icon oneline record-thought"
-                    on:click={makeThought}
-                >
+                <button class="with-icon oneline record-thought" on:click={makeThought}>
                     <Brain size="30" />
                     Record Thought
                 </button>
 
-                <button
-                    class="with-icon oneline new-event"
-                    on:click={makeEvent}
-                >
+                <button class="with-icon oneline new-event" on:click={makeEvent}>
                     <Calendar size="30" />
                     New Event
                 </button>
@@ -342,11 +316,7 @@
                     {/if}
                 </button>
 
-                <a
-                    aria-label="settings"
-                    class="account-dropdown-button"
-                    href="/settings"
-                >
+                <a aria-label="settings" class="account-dropdown-button" href="/settings">
                     <Cog size="30" />
                     Settings
                 </a>

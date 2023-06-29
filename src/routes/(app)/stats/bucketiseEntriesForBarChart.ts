@@ -1,10 +1,5 @@
 import { capitalise } from '$lib/utils/text';
-import {
-    currentTzOffset,
-    dayUtcFromTimestamp,
-    fmtUtc,
-    nowUtc
-} from '$lib/utils/time';
+import { currentTzOffset, dayUtcFromTimestamp, fmtUtc, nowUtc } from '$lib/utils/time';
 import { type OsGroup, osGroupFromEntry, osGroups } from '$lib/utils/userAgent';
 import moment from 'moment/moment';
 import { Bucket, By, type EntryWithWordCount } from './helpers';
@@ -20,16 +15,11 @@ export interface ChartData {
     labels: string[];
 }
 
-const generateLabelsDayAndWeek = (
-    start: TimestampSecs,
-    buckets: string[]
-): string[] => {
+const generateLabelsDayAndWeek = (start: TimestampSecs, buckets: string[]): string[] => {
     let year = parseInt(fmtUtc(start, currentTzOffset(), 'YYYY'));
     return buckets.map(bucket => {
         const bucketTime = parseInt(bucket);
-        const thisYear = parseInt(
-            fmtUtc(bucketTime, currentTzOffset(), 'YYYY')
-        );
+        const thisYear = parseInt(fmtUtc(bucketTime, currentTzOffset(), 'YYYY'));
         if (thisYear !== year) {
             year = thisYear;
             return fmtUtc(bucketTime, currentTzOffset(), 'Do MMM YYYY');
@@ -40,11 +30,7 @@ const generateLabelsDayAndWeek = (
 
 const generateLabels: Record<
     Bucket,
-    (
-        start: TimestampSecs,
-        buckets: string[],
-        selectedBucket: Bucket
-    ) => string[]
+    (start: TimestampSecs, buckets: string[], selectedBucket: Bucket) => string[]
 > = {
     [Bucket.Hour]: (): string[] => {
         const today = moment().startOf('day').unix();
@@ -63,9 +49,7 @@ const generateLabels: Record<
         let year = parseInt(fmtUtc(start, currentTzOffset(), 'YY'));
         return buckets.map((bucket, i) => {
             const bucketTime = parseInt(bucket);
-            const thisYear = parseInt(
-                fmtUtc(bucketTime, currentTzOffset(), 'YY')
-            );
+            const thisYear = parseInt(fmtUtc(bucketTime, currentTzOffset(), 'YY'));
             if (thisYear !== year || i === 0) {
                 year = thisYear;
                 return fmtUtc(bucketTime, currentTzOffset(), `MMM 'YY`);
@@ -111,13 +95,8 @@ function datasetFactoryForStandardBuckets(
         throw new Error(`Invalid bucket ${time} ${bucket}`);
     }
 
-    return (
-        sortedEntries: EntryWithWordCount[],
-        by: By
-    ): Record<string | number, number> => {
-        const start =
-            sortedEntries[0].created +
-            sortedEntries[0].createdTZOffset * 60 * 60;
+    return (sortedEntries: EntryWithWordCount[], by: By): Record<string | number, number> => {
+        const start = sortedEntries[0].created + sortedEntries[0].createdTZOffset * 60 * 60;
 
         const buckets: Record<string, number> = {};
         const end = nowUtc() + bucketSize(selectedBucket);
@@ -129,10 +108,7 @@ function datasetFactoryForStandardBuckets(
         }
 
         for (const entry of sortedEntries) {
-            const bucket = bucketiseTime(
-                entry.created,
-                selectedBucket
-            ).toString();
+            const bucket = bucketiseTime(entry.created, selectedBucket).toString();
             buckets[bucket] += by === By.Entries ? 1 : entry.wordCount;
         }
 
@@ -166,9 +142,7 @@ const generateDataset: Record<
         const buckets = Array<number>(24).fill(0);
 
         for (const entry of sortedEntries) {
-            const bucket = parseInt(
-                fmtUtc(entry.created, entry.createdTZOffset, 'H')
-            );
+            const bucket = parseInt(fmtUtc(entry.created, entry.createdTZOffset, 'H'));
             buckets[bucket] += by === By.Entries ? 1 : entry.wordCount;
         }
 
@@ -207,11 +181,7 @@ export function getGraphData(
     const start = sortedEntries[0].created;
 
     const bucketsMap = generateDataset[selectedBucket](sortedEntries, by);
-    const labels = generateLabels[selectedBucket](
-        start,
-        Object.keys(bucketsMap),
-        selectedBucket
-    );
+    const labels = generateLabels[selectedBucket](start, Object.keys(bucketsMap), selectedBucket);
     return {
         labels,
         datasets: [

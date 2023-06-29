@@ -64,10 +64,7 @@
         entries = emptyEntries();
         numberOfEntries = Infinity;
 
-        await Promise.all([
-            loadMoreEntries(true),
-            reloadTitles ? loadTitles() : Promise.resolve()
-        ]);
+        await Promise.all([loadMoreEntries(true), reloadTitles ? loadTitles() : Promise.resolve()]);
     }
 
     async function loadMoreEntries(isInitialLoad = false) {
@@ -88,19 +85,14 @@
             await api.get(
                 auth,
                 `/entries`,
-                entriesOptions as Record<
-                    string,
-                    number | string | boolean | undefined
-                >
+                entriesOptions as Record<string, number | string | boolean | undefined>
             )
         );
 
         numberOfEntries = res.totalEntries;
 
         currentOffset += res.entries.length;
-        entries = ensureNoDuplicateEntries(
-            Entry.groupEntriesByDay(res.entries, entries)
-        );
+        entries = ensureNoDuplicateEntries(Entry.groupEntriesByDay(res.entries, entries));
 
         // if still loading at this offset, so another req has not been sent,
         // say we have stopped loading
@@ -113,9 +105,7 @@
         }
     }
 
-    function ensureNoDuplicateEntries(
-        entries: Record<string, Entry[]>
-    ): Record<string, Entry[]> {
+    function ensureNoDuplicateEntries(entries: Record<string, Entry[]>): Record<string, Entry[]> {
         // Very occasionally, the same entries are loaded twice by accident,
         // so filter out duplicates. TODO make it so they are never loaded twice
         for (const day in entries) {
@@ -127,9 +117,7 @@
     }
 
     function updateSearch() {
-        const searchEncrypted = displayNotifOnErr(
-            encrypt(searchInput.value, auth.key)
-        );
+        const searchEncrypted = displayNotifOnErr(encrypt(searchInput.value, auth.key));
 
         options = {
             ...options,
@@ -150,9 +138,7 @@
     }
 
     async function loadLocations() {
-        locations = displayNotifOnErr(
-            await api.get(auth, '/locations')
-        ).locations;
+        locations = displayNotifOnErr(await api.get(auth, '/locations')).locations;
     }
 
     function emptyEntries(): Record<string, Entry[]> {
@@ -177,21 +163,15 @@
         void loadLocations();
     });
 
-    listen.entry.onCreate(
-        ({ entry, entryMode }: { entry: Entry; entryMode: EntryFormMode }) => {
-            const localDate = fmtUtc(
-                entry.created,
-                entry.createdTZOffset,
-                'YYYY-MM-DD'
-            );
-            entries[localDate] = [entry, ...(entries?.[localDate] || [])];
-            entries = { ...entries };
+    listen.entry.onCreate(({ entry, entryMode }: { entry: Entry; entryMode: EntryFormMode }) => {
+        const localDate = fmtUtc(entry.created, entry.createdTZOffset, 'YYYY-MM-DD');
+        entries[localDate] = [entry, ...(entries?.[localDate] || [])];
+        entries = { ...entries };
 
-            if (entryMode === EntryFormMode.Standard) {
-                scrollToEntry(entry.id);
-            }
+        if (entryMode === EntryFormMode.Standard) {
+            scrollToEntry(entry.id);
         }
-    );
+    });
     listen.entry.onDelete(id => {
         for (const day in entries) {
             entries[day] = entries[day].filter(entry => entry.id !== id);

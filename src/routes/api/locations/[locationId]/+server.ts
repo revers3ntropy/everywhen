@@ -34,23 +34,13 @@ export const PUT = (async ({ cookies, request, params }) => {
     let location = val;
 
     if (body.name) {
-        const { err, val } = await Location.updateName(
-            query,
-            auth,
-            location,
-            body.name
-        );
+        const { err, val } = await Location.updateName(query, auth, location, body.name);
         if (err) throw error(400, err);
         location = val;
     }
 
     if (body.radius > 0) {
-        const { err, val } = await Location.updateRadius(
-            query,
-            auth,
-            location,
-            body.radius
-        );
+        const { err, val } = await Location.updateRadius(query, auth, location, body.radius);
         if (err) throw error(400, err);
         location = val;
     }
@@ -74,11 +64,7 @@ export const DELETE = (async ({ params, cookies }) => {
     if (!params.locationId) throw error(400, 'invalid location id');
     invalidateCache(auth.id);
 
-    const { err: deleteErr } = await Location.purge(
-        query,
-        auth,
-        params.locationId
-    );
+    const { err: deleteErr } = await Location.purge(query, auth, params.locationId);
     if (deleteErr) throw error(400, deleteErr);
 
     return apiResponse({});

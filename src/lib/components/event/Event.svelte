@@ -18,11 +18,7 @@
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import { obfuscate } from '$lib/utils/text';
-    import {
-        fmtDuration,
-        fmtTimestampForInput,
-        parseTimestampFromInputUtc
-    } from '$lib/utils/time';
+    import { fmtDuration, fmtTimestampForInput, parseTimestampFromInputUtc } from '$lib/utils/time';
     import { slide, fly } from 'svelte/transition';
 
     export let auth: Auth;
@@ -43,13 +39,9 @@
         end?: TimestampSecs;
         label?: LabelController['id'];
     }) {
-        displayNotifOnErr(
-            await api.put(auth, apiPath('/events/?', event.id), changes)
-        );
+        displayNotifOnErr(await api.put(auth, apiPath('/events/?', event.id), changes));
 
-        const label = changes.label
-            ? labels?.find(l => l.id === changes.label)
-            : event.label;
+        const label = changes.label ? labels?.find(l => l.id === changes.label) : event.label;
 
         event = {
             ...new EventController(
@@ -65,11 +57,7 @@
     }
 
     const updateName = (async ({ target }) => {
-        if (
-            !target ||
-            !('value' in target) ||
-            typeof target.value !== 'string'
-        ) {
+        if (!target || !('value' in target) || typeof target.value !== 'string') {
             throw target;
         }
         await updateEvent({
@@ -78,11 +66,7 @@
     }) satisfies ChangeEventHandler<HTMLInputElement>;
 
     const updateStart = (async ({ target }) => {
-        if (
-            !target ||
-            !('value' in target) ||
-            typeof target.value !== 'string'
-        ) {
+        if (!target || !('value' in target) || typeof target.value !== 'string') {
             throw target;
         }
         await updateEvent({
@@ -91,11 +75,7 @@
     }) satisfies ChangeEventHandler<HTMLInputElement>;
 
     const updateStartAndEnd = (async ({ target }) => {
-        if (
-            !target ||
-            !('value' in target) ||
-            typeof target.value !== 'string'
-        ) {
+        if (!target || !('value' in target) || typeof target.value !== 'string') {
             throw target;
         }
         await updateEvent({
@@ -105,11 +85,7 @@
     }) satisfies ChangeEventHandler<HTMLInputElement>;
 
     const updateEnd = (async ({ target }) => {
-        if (
-            !target ||
-            !('value' in target) ||
-            typeof target.value !== 'string'
-        ) {
+        if (!target || !('value' in target) || typeof target.value !== 'string') {
             throw target;
         }
         await updateEvent({
@@ -119,9 +95,7 @@
 
     async function deleteEvent() {
         event.deleted = true;
-        displayNotifOnErr(
-            await api.delete(auth, apiPath('/events/?', event.id))
-        );
+        displayNotifOnErr(await api.delete(auth, apiPath('/events/?', event.id)));
         await dispatch.delete('event', event.id);
     }
 
@@ -158,9 +132,7 @@
         });
     }
 
-    async function updateLabel({
-        detail: { id }
-    }: CustomEvent<{ id: string }>) {
+    async function updateLabel({ detail: { id } }: CustomEvent<{ id: string }>) {
         if (id === (event.label?.id || '')) return;
         if (!labels) return;
 
@@ -350,10 +322,7 @@
                             Make Instant Event
                         </button>
                     {/if}
-                    <button
-                        class="with-icon bordered danger"
-                        on:click={deleteEvent}
-                    >
+                    <button class="with-icon bordered danger" on:click={deleteEvent}>
                         <Bin size="25" />
                         Delete
                     </button>
@@ -362,10 +331,7 @@
                     <i>
                         Created
                         <!-- TODO use tz from db -->
-                        <UtcTime
-                            timestamp={event.created}
-                            fmt="MMMM Do YYYY, h:mma"
-                        />
+                        <UtcTime timestamp={event.created} fmt="MMMM Do YYYY, h:mma" />
                         (<UtcTime timestamp={event.created} relative />)
                     </i>
                 </div>

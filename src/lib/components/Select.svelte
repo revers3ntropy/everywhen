@@ -8,7 +8,7 @@
     export let key: string;
     export let open = false;
 
-    export let value: string | number;
+    export let value = options[key];
     $: value = options[key];
 
     $: if (!(key in options)) key = Object.keys(options)[0];

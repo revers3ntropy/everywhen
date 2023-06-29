@@ -25,14 +25,10 @@
     async function reloadEntries() {
         loaded = false;
 
-        const entriesRes = displayNotifOnErr(
-            await api.get(auth, `/entries`, { labelId: id })
-        );
+        const entriesRes = displayNotifOnErr(await api.get(auth, `/entries`, { labelId: id }));
         entryCount = entriesRes.totalEntries;
 
-        const eventsRes = displayNotifOnErr(
-            await api.get(auth, `/events`, { labelId: id })
-        );
+        const eventsRes = displayNotifOnErr(await api.get(auth, `/events`, { labelId: id }));
         eventCount = eventsRes.events.filter(e => e.label?.id === id).length;
 
         const labelsRes = displayNotifOnErr(await api.get(auth, '/labels'));
@@ -93,12 +89,7 @@
         <div class="options">
             <div>
                 {#if labels}
-                    <LabelSelect
-                        {auth}
-                        bind:value={changeLabelId}
-                        {filter}
-                        {labels}
-                    />
+                    <LabelSelect {auth} bind:value={changeLabelId} {filter} {labels} />
                 {:else}
                     Loading...
                 {/if}
@@ -110,9 +101,7 @@
             <h2>OR</h2>
 
             <div>
-                <button on:click={rmLabel}>
-                    Delete Label and Remove from Entries/Events
-                </button>
+                <button on:click={rmLabel}> Delete Label and Remove from Entries/Events </button>
             </div>
 
             <div class="cancel">

@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { Entry } from '$lib/controllers/entry';
     import { onMount } from 'svelte';
     import Cog from 'svelte-material-icons/Cog.svelte';
     import ImageOutline from 'svelte-material-icons/ImageOutline.svelte';
@@ -10,10 +9,11 @@
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import History from 'svelte-material-icons/History.svelte';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
-    import EntryTitles from '$lib/components/entry/EntryTitles.svelte';
+    import { Entry } from '$lib/controllers/entry';
     import { obfuscated } from '$lib/stores.js';
     import { dayUtcFromTimestamp, fmtUtc } from '$lib/utils/time';
     import type { PageData } from './$types';
+    import EntryTitles from '$lib/components/entry/EntryTitles.svelte';
 
     export let data: PageData;
 
@@ -32,8 +32,7 @@
                   .slice(0, showLimitPinnedEntries)
     );
     $: areHiddenPinnedEntries =
-        data.pinnedEntriesList.length > showLimitPinnedEntries &&
-        !showingAllPinned;
+        data.pinnedEntriesList.length > showLimitPinnedEntries && !showingAllPinned;
 </script>
 
 <main>
@@ -69,19 +68,15 @@
     <div style="width: 100%; max-width: 800px;">
         {#if Object.keys(data.recentTitles).length}
             <section>
-                <h1
-                    class="flex-center"
-                    style="justify-content: start; gap: 8px;"
-                >
+                <h1 class="flex-center" style="justify-content: start; gap: 8px;">
                     <History size="25" />
                     Recent Entries
                 </h1>
                 <EntryTitles
-                    auth={data}
+                    auth={data.auth}
                     titles={data.recentTitles}
                     obfuscated={$obfuscated}
-                    hideAgentWidget={!data.settings.showAgentWidgetOnEntries
-                        .value}
+                    hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
                 />
             </section>
         {:else}
@@ -99,19 +94,15 @@
         {#key [data.pinnedEntriesList, showingAllPinned]}
             {#if Object.keys(pinnedEntries).length}
                 <section>
-                    <h1
-                        class="gradient-icon flex-center"
-                        style="justify-content: start; gap: 8px;"
-                    >
+                    <h1 class="gradient-icon flex-center" style="justify-content: start; gap: 8px;">
                         <Heart size="25" />
                         Favourited Entries
                     </h1>
                     <EntryTitles
-                        auth={data}
+                        auth={data.auth}
                         titles={pinnedEntries}
                         obfuscated={$obfuscated}
-                        hideAgentWidget={!data.settings.showAgentWidgetOnEntries
-                            .value}
+                        hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
                     />
                     {#if areHiddenPinnedEntries}
                         <button
@@ -121,8 +112,8 @@
                             }}
                         >
                             <ChevronDown />
-                            Show all favourited entries ({data.pinnedEntriesList
-                                .length - showLimitPinnedEntries})
+                            Show all favourited entries ({data.pinnedEntriesList.length -
+                                showLimitPinnedEntries})
                         </button>
                     {/if}
                 </section>
@@ -136,19 +127,15 @@
                 <EntryTitles
                     titles={{
                         [fmtUtc(
-                            dayUtcFromTimestamp(
-                                entries[0].created,
-                                entries[0].createdTZOffset
-                            ),
+                            dayUtcFromTimestamp(entries[0].created, entries[0].createdTZOffset),
                             0,
                             'YYYY-MM-DD'
                         )]: entries
                     }}
                     obfuscated={$obfuscated}
                     showTimeAgo={false}
-                    auth={data}
-                    hideAgentWidget={!data.settings.showAgentWidgetOnEntries
-                        .value}
+                    auth={data.auth}
+                    hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
                 />
             </section>
         {/each}

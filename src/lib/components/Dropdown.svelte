@@ -63,11 +63,7 @@
     class:fill-width-mobile={fillWidthMobile}
     {id}
 >
-    <button
-        aria-label={label}
-        on:click={() => (open = !open)}
-        class="dropdown-button"
-    >
+    <button aria-label={label} on:click={() => (open = !open)} class="dropdown-button">
         <slot name="button" />
     </button>
     <span class="popup">

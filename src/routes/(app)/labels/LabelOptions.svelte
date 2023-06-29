@@ -19,9 +19,7 @@
     export let eventCount: number;
 
     async function updateLabel(changes: { name?: string; color?: string }) {
-        displayNotifOnErr(
-            await api.put(auth, apiPath(`/labels/?`, id), changes)
-        );
+        displayNotifOnErr(await api.put(auth, apiPath(`/labels/?`, id), changes));
         await dispatch.update('label', {
             id,
             created,
@@ -53,11 +51,7 @@
 
 <div class="label {editable ? 'editable' : ''}">
     {#if editable}
-        <input
-            type="color"
-            bind:value={color}
-            on:change={() => updateLabel({ color })}
-        />
+        <input type="color" bind:value={color} on:change={() => updateLabel({ color })} />
         <input
             bind:value={name}
             class="editable-text"

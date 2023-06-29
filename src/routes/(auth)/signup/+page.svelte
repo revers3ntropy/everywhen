@@ -65,9 +65,7 @@
                 <Dot />
                 <i
                     use:tooltip={{
-                        content:
-                            'Your account cannot be recovered ' +
-                            'if you lose your password!'
+                        content: 'Your account cannot be recovered ' + 'if you lose your password!'
                     }}
                 >
                     <span class="text-warning">Warning</span>

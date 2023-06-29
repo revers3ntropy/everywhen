@@ -13,10 +13,9 @@ export const load = cachedPageRoute(async (auth, { params }) => {
     });
     if (err) throw error(400, err);
 
-    const { err: decryptErr, val: theWord } = decrypt(
-        params.word,
-        auth.key
-    ).map(w => w.toLowerCase());
+    const { err: decryptErr, val: theWord } = decrypt(params.word, auth.key).map(w =>
+        w.toLowerCase()
+    );
     if (decryptErr) throw error(400, decryptErr);
 
     const filteredEntries: EntryWithWordCount[] = [];
@@ -26,10 +25,7 @@ export const load = cachedPageRoute(async (auth, { params }) => {
     const totalEntries = entries.length;
 
     for (const entry of entries) {
-        const entryAsWords = [
-            ...splitText(entry.title),
-            ...splitText(entry.entry)
-        ];
+        const entryAsWords = [...splitText(entry.title), ...splitText(entry.entry)];
 
         let instancesInEntry = 0;
         for (const word of entryAsWords) {

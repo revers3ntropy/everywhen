@@ -9,7 +9,7 @@ const LONG_TEXT =
 test.describe('/journal', () => {
     test('Cannot visit page without authentication', async ({ page }) => {
         await page.goto('/journal', { waitUntil: 'networkidle' });
-        await expect(page).toHaveURL('/?redirect=journal');
+        await expect(page).toHaveURL('/login?redirect=journal');
     });
 
     test('Can create and view entry', async ({ page }) => {
@@ -39,9 +39,7 @@ test.describe('/journal', () => {
 
         const labelName = 'Testing Label!';
 
-        await page
-            .getByRole('button', { name: 'Set label' })
-            .click({ force: true });
+        await page.getByRole('button', { name: 'Set label' }).click({ force: true });
         await page.getByRole('button', { name: 'Create new label' }).click();
         await page.getByLabel('Name').fill(labelName);
         await page.getByRole('button', { name: 'Create' }).click();
@@ -74,35 +72,23 @@ test.describe('/journal', () => {
         await expect(page.getByText(entry)).toBeAttached();
 
         // can pin entry
-        await page
-            .locator(`[id="${id}"]`)
-            .getByRole('button', { name: 'Open popup' })
-            .click();
+        await page.locator(`[id="${id}"]`).getByRole('button', { name: 'Open popup' }).click();
         await page.getByRole('button', { name: 'Pin Entry' }).click();
 
         // can then unpin without reloading page
-        await page
-            .locator(`[id="${id}"]`)
-            .getByRole('button', { name: 'Open popup' })
-            .click();
+        await page.locator(`[id="${id}"]`).getByRole('button', { name: 'Open popup' }).click();
         await page.getByRole('button', { name: 'Unpin Entry' }).click();
 
         await page.reload();
 
         // can pin entry
-        await page
-            .locator(`[id="${id}"]`)
-            .getByRole('button', { name: 'Open popup' })
-            .click();
+        await page.locator(`[id="${id}"]`).getByRole('button', { name: 'Open popup' }).click();
         await page.getByRole('button', { name: 'Pin Entry' }).click();
 
         await page.reload();
 
         // can then unpin after reloading page
-        await page
-            .locator(`[id="${id}"]`)
-            .getByRole('button', { name: 'Open popup' })
-            .click();
+        await page.locator(`[id="${id}"]`).getByRole('button', { name: 'Open popup' }).click();
         await page.getByRole('button', { name: 'Unpin Entry' }).click();
     });
 });

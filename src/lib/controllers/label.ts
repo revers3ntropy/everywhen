@@ -18,11 +18,7 @@ export class Label {
         public created: number
     ) {}
 
-    public static async fromId(
-        query: QueryFunc,
-        auth: Auth,
-        id: string
-    ): Promise<Result<Label>> {
+    public static async fromId(query: QueryFunc, auth: Auth, id: string): Promise<Result<Label>> {
         const res = await query<Required<Label>[]>`
             SELECT id, color, name, created
             FROM labels
@@ -37,9 +33,7 @@ export class Label {
         const { err, val: nameDecrypted } = decrypt(res[0].name, auth.key);
         if (err) return Result.err(err);
 
-        return Result.ok(
-            new Label(res[0].id, res[0].color, nameDecrypted, res[0].created)
-        );
+        return Result.ok(new Label(res[0].id, res[0].color, nameDecrypted, res[0].created));
     }
 
     public static async getIdFromName(
@@ -83,15 +77,10 @@ export class Label {
             return Result.err('Label not found');
         }
 
-        return Result.ok(
-            new Label(res[0].id, res[0].color, nameDecrypted, res[0].created)
-        );
+        return Result.ok(new Label(res[0].id, res[0].color, nameDecrypted, res[0].created));
     }
 
-    public static async all(
-        query: QueryFunc,
-        auth: Auth
-    ): Promise<Result<Label[]>> {
+    public static async all(query: QueryFunc, auth: Auth): Promise<Result<Label[]>> {
         const res = await query<Required<Label>[]>`
             SELECT id, color, name, created
             FROM labels
@@ -101,19 +90,9 @@ export class Label {
 
         return Result.collect(
             res.map(label => {
-                const { err, val: nameDecrypted } = decrypt(
-                    label.name,
-                    auth.key
-                );
+                const { err, val: nameDecrypted } = decrypt(label.name, auth.key);
                 if (err) return Result.err(err);
-                return Result.ok(
-                    new Label(
-                        label.id,
-                        label.color,
-                        nameDecrypted,
-                        label.created
-                    )
-                );
+                return Result.ok(new Label(label.id, label.color, nameDecrypted, label.created));
             })
         );
     }
@@ -147,11 +126,7 @@ export class Label {
         );
     }
 
-    public static async purgeWithId(
-        query: QueryFunc,
-        auth: Auth,
-        id: string
-    ): Promise<void> {
+    public static async purgeWithId(query: QueryFunc, auth: Auth, id: string): Promise<void> {
         await query`
             DELETE
             FROM labels
@@ -197,9 +172,7 @@ export class Label {
                     ${json.created})
         `;
 
-        return Result.ok(
-            new Label(json.id, json.color, json.name, json.created)
-        );
+        return Result.ok(new Label(json.id, json.color, json.name, json.created));
     }
 
     public static async updateName(

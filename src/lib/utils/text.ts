@@ -40,9 +40,14 @@ export function roundNDP(num: number, n: number): number {
 }
 
 export function rawMdToHtml(md: string, obfuscated = false): string {
-    return DomPurify.sanitize(marked(obfuscated ? obfuscate(md) : md), {
-        USE_PROFILES: { html: true }
+    // this is pretty dumb...
+    // https://github.com/markedjs/marked/issues/2793
+    marked.use({
+        mangle: false,
+        headerIds: false
     });
+
+    return DomPurify.sanitize(marked.parse(obfuscated ? obfuscate(md) : md));
 }
 
 export function limitStrLen(str: string, len: number, append = '..'): string {

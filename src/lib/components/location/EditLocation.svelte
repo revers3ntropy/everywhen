@@ -21,8 +21,7 @@
     export let latitude: number;
     export let longitude: number;
 
-    export let onChange: ((location: Location | null) => Promise<void>) | null =
-        null;
+    export let onChange: ((location: Location | null) => Promise<void>) | null = null;
 
     let synced = true;
 
@@ -36,41 +35,22 @@
         );
         if (onChange !== null) {
             await onChange(
-                new Location(
-                    id,
-                    created,
-                    createdTZOffset,
-                    name,
-                    latitude,
-                    longitude,
-                    radius
-                )
+                new Location(id, created, createdTZOffset, name, latitude, longitude, radius)
             );
         }
         synced = true;
     }
 
     const onRadiusChange = (async ({ target }) => {
-        if (
-            !target ||
-            !('value' in target) ||
-            typeof target.value !== 'string'
-        ) {
+        if (!target || !('value' in target) || typeof target.value !== 'string') {
             throw target;
         }
-        radius = Location.metersToDegreesPrecise(
-            parseFloat(target.value),
-            1,
-            1,
-            latitude
-        );
+        radius = Location.metersToDegreesPrecise(parseFloat(target.value), 1, 1, latitude);
         await syncWithServer();
     }) satisfies ChangeEventHandler<HTMLInputElement>;
 
     async function bin() {
-        if (
-            !confirm(`Are you sure you want to delete the location '${name}'?`)
-        ) {
+        if (!confirm(`Are you sure you want to delete the location '${name}'?`)) {
             return;
         }
         displayNotifOnErr(await api.delete(auth, apiPath('/locations/?', id)));
@@ -105,9 +85,7 @@
 
         {#if isInDialog}
             <button>
-                <a class="flex-center" href="/map/{id}" style="padding: 4px">
-                    See more
-                </a>
+                <a class="flex-center" href="/map/{id}" style="padding: 4px"> See more </a>
             </button>
         {/if}
     </div>
@@ -123,9 +101,7 @@
             on:change={onRadiusChange}
             step="0.1"
             type="number"
-            value={round1DP(
-                Location.degreesToMetersPrecise(radius, 1, 1, latitude)
-            )}
+            value={round1DP(Location.degreesToMetersPrecise(radius, 1, 1, latitude))}
             style="width: 100px"
         />
         m

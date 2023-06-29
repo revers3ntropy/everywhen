@@ -12,11 +12,7 @@ import { Settings } from './settings';
 import { UUID } from './uuid';
 
 export class User {
-    public constructor(
-        public id: string,
-        public username: string,
-        public key: string
-    ) {}
+    public constructor(public id: string, public username: string, public key: string) {}
 
     public static async authenticate(
         query: QueryFunc,
@@ -151,14 +147,10 @@ export class User {
             key: newKey
         };
 
-        const { val: backup, err: generateErr } = await Backup.generate(
-            query,
-            auth
-        );
+        const { val: backup, err: generateErr } = await Backup.generate(query, auth);
         if (generateErr) return Result.err(generateErr);
 
-        const { err: encryptErr, val: encryptedBackup } =
-            Backup.asEncryptedString(backup, auth);
+        const { err: encryptErr, val: encryptedBackup } = Backup.asEncryptedString(backup, auth);
 
         if (encryptErr) return Result.err(encryptErr);
 
@@ -168,12 +160,7 @@ export class User {
             WHERE id = ${auth.id}
         `;
 
-        const { err } = await Backup.restore(
-            query,
-            newAuth,
-            encryptedBackup,
-            auth.key
-        );
+        const { err } = await Backup.restore(query, newAuth, encryptedBackup, auth.key);
         if (err) return Result.err(err);
 
         return await Settings.changeKey(query, auth, newKey);

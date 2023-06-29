@@ -8,7 +8,7 @@
 <main>
     <section>
         <Map
-            auth={data}
+            auth={data.auth}
             entries={data.entries}
             locations={data.locations}
             hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}

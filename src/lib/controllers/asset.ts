@@ -9,9 +9,7 @@ import type { Auth } from './user';
 import { UUID } from './uuid';
 
 export class Asset {
-    public static readonly fileExtToContentType: Readonly<
-        Record<string, string>
-    > = Object.freeze({
+    public static readonly fileExtToContentType: Readonly<Record<string, string>> = Object.freeze({
         png: 'image/png',
         jpg: 'image/jpeg',
         jpeg: 'image/jpeg',
@@ -50,16 +48,10 @@ export class Asset {
             );
         }
 
-        const { err: contentsErr, val: encryptedContents } = encrypt(
-            contentsPlainText,
-            auth.key
-        );
+        const { err: contentsErr, val: encryptedContents } = encrypt(contentsPlainText, auth.key);
         if (contentsErr) return Result.err(contentsErr);
 
-        const { err: fileNameErr, val: encryptedFileName } = encrypt(
-            fileNamePlainText,
-            auth.key
-        );
+        const { err: fileNameErr, val: encryptedFileName } = encrypt(fileNamePlainText, auth.key);
         if (fileNameErr) return Result.err(fileNameErr);
 
         await query`
@@ -100,34 +92,18 @@ export class Asset {
 
         const [row] = res;
 
-        const { err: contentsErr, val: contents } = decrypt(
-            row.content,
-            auth.key
-        );
+        const { err: contentsErr, val: contents } = decrypt(row.content, auth.key);
         if (contentsErr) return Result.err(contentsErr);
 
-        const { err: fileNameErr, val: fileName } = decrypt(
-            row.fileName,
-            auth.key
-        );
+        const { err: fileNameErr, val: fileName } = decrypt(row.fileName, auth.key);
         if (fileNameErr) return Result.err(fileNameErr);
 
         return Result.ok(
-            new Asset(
-                row.id,
-                row.publicId,
-                contents,
-                fileName,
-                row.contentType,
-                row.created
-            )
+            new Asset(row.id, row.publicId, contents, fileName, row.contentType, row.created)
         );
     }
 
-    public static async all(
-        query: QueryFunc,
-        auth: Auth
-    ): Promise<Result<Asset[]>> {
+    public static async all(query: QueryFunc, auth: Auth): Promise<Result<Asset[]>> {
         const res = await query<Asset[]>`
             SELECT id,
                    publicId,
@@ -141,27 +117,14 @@ export class Asset {
 
         return Result.collect(
             res.map(row => {
-                const { err: contentErr, val: content } = decrypt(
-                    row.content,
-                    auth.key
-                );
+                const { err: contentErr, val: content } = decrypt(row.content, auth.key);
                 if (contentErr) return Result.err(contentErr);
 
-                const { err: fileNameErr, val: fileName } = decrypt(
-                    row.fileName,
-                    auth.key
-                );
+                const { err: fileNameErr, val: fileName } = decrypt(row.fileName, auth.key);
                 if (fileNameErr) return Result.err(fileNameErr);
 
                 return Result.ok(
-                    new Asset(
-                        row.id,
-                        row.publicId,
-                        content,
-                        fileName,
-                        row.contentType,
-                        row.created
-                    )
+                    new Asset(row.id, row.publicId, content, fileName, row.contentType, row.created)
                 );
             })
         );
@@ -192,10 +155,7 @@ export class Asset {
 
         const { err, val: metadata } = Result.collect(
             res.map((row): Result<Asset> => {
-                const { err: fileNameErr, val: fileName } = decrypt(
-                    row.fileName,
-                    auth.key
-                );
+                const { err: fileNameErr, val: fileName } = decrypt(row.fileName, auth.key);
                 if (fileNameErr) return Result.err(fileNameErr);
 
                 return Result.ok(
@@ -268,11 +228,7 @@ export class Asset {
         return `![${fileName}](/api/assets/${publicId})`;
     }
 
-    public static async base64ToWebP(
-        b64: string,
-        fileExt: string,
-        quality: number
-    ) {
+    public static async base64ToWebP(b64: string, fileExt: string, quality: number) {
         // it's either do it here or when deploying,
         // and doing it here is somehow less painful...
         const exePath = './server/bin/libwebp_linux/bin/cwebp';
@@ -280,10 +236,7 @@ export class Asset {
             fs.chmodSync(exePath, 0o755);
         }
 
-        const imgB64 = b64.replace(
-            /^data:image\/((jpeg)|(jpg)|(png)|(webp));base64,/,
-            ''
-        );
+        const imgB64 = b64.replace(/^data:image\/((jpeg)|(jpg)|(png)|(webp));base64,/, '');
 
         return await webp.str2webpstr(imgB64, fileExt, `-q ${quality}`);
     }
@@ -294,10 +247,7 @@ export class Asset {
         publicId: string,
         webp: string
     ): Promise<Result> {
-        const { err: contentsErr, val: encryptedContents } = encrypt(
-            webp,
-            auth.key
-        );
+        const { err: contentsErr, val: encryptedContents } = encrypt(webp, auth.key);
         if (contentsErr) return Result.err(contentsErr);
 
         await query`

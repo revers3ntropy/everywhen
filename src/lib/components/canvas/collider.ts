@@ -52,12 +52,7 @@ export class RectCollider implements Collider {
 
     colliding(state: RenderProps, time: TimestampSecs, y: Pixels): boolean {
         const x = state.timeToRenderPos(time);
-        return (
-            x >= this.x &&
-            x <= this.x + this.width &&
-            y >= this.y &&
-            y <= this.y + this.height
-        );
+        return x >= this.x && x <= this.x + this.width && y >= this.y && y <= this.y + this.height;
     }
 
     public debugDraw(state: RenderProps): void {

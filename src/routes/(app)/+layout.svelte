@@ -11,10 +11,7 @@
     import { api } from '$lib/utils/apiRequest';
     import { GETParamIsFalsy } from '$lib/utils/GETArgs';
     import { errorLogger } from '$lib/utils/log';
-    import {
-        displayNotifOnErr,
-        notify
-    } from '$lib/components/notifications/notifications';
+    import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
     import { nowUtc } from '$lib/utils/time';
     import Nav from '$lib/components/Nav.svelte';
     import PasscodeModal from '$lib/components/dialogs/PasscodeModal.svelte';
@@ -44,10 +41,7 @@
         if (!cookies[USERNAME_COOKIE_KEY]) {
             errorLogger.error('Cookies have expired');
             await goto(
-                '/?redirect=' +
-                    encodeURIComponent(
-                        location.pathname.substring(1) + location.search
-                    )
+                '/?redirect=' + encodeURIComponent(location.pathname.substring(1) + location.search)
             );
         }
     }
@@ -56,8 +50,7 @@
         if (lastEntered === null) return;
 
         const secondsSinceLastEntered = nowUtc() - lastEntered;
-        showPasscodeModal =
-            secondsSinceLastEntered > data.settings.passcodeTimeout.value;
+        showPasscodeModal = secondsSinceLastEntered > data.settings.passcodeTimeout.value;
     }
 
     function activity() {
@@ -68,9 +61,9 @@
         if (downloadingBackup) return;
         downloadingBackup = true;
         const { data: backupData } = displayNotifOnErr(
-            await api.get(data, '/backups', { encrypted: 1 })
+            await api.get(data.auth, '/backups', { encrypted: 1 })
         );
-        Backup.download(backupData, data.username, true);
+        Backup.download(backupData, data.auth.username, true);
         downloadingBackup = false;
     }
 
@@ -122,15 +115,15 @@
 
 <Notifications />
 
-{#if data.settings.passcode.value && nowUtc() - ($passcodeLastEntered || 0) > data.settings.passcodeTimeout.value && showPasscodeModal && !home && (data.settings.passcodeTimeout.value > 0 || !$passcodeLastEntered || !browser)}
+{#if data.settings.passcode.value && nowUtc() - ($passcodeLastEntered || 0) > data.settings.passcodeTimeout.value && showPasscodeModal && (data.settings.passcodeTimeout.value > 0 || !$passcodeLastEntered || !browser)}
     <PasscodeModal
         bind:show={showPasscodeModal}
         passcode={data.settings.passcode.value}
-        auth={data}
+        auth={data.auth}
     />
 {/if}
 
-<Nav auth={data} settings={data.settings} />
+<Nav auth={data.auth} settings={data.settings} />
 
 {#key data.path}
     <div

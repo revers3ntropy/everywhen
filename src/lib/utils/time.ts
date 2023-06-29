@@ -13,11 +13,7 @@ export function currentTzOffset(): Hours {
     return -(new Date().getTimezoneOffset() / 60);
 }
 
-export function fmtUtc(
-    timestamp: TimestampSecs,
-    tzOffset: Hours,
-    fmt: string
-): string {
+export function fmtUtc(timestamp: TimestampSecs, tzOffset: Hours, fmt: string): string {
     return moment(new Date((timestamp + tzOffset * 60 * 60) * 1000))
         .utc()
         .format(fmt);

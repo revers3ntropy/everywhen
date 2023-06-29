@@ -13,11 +13,7 @@ declare module '@svelte-plugins/tooltips' {
 }
 
 declare class WebpConverter {
-    static str2webpstr(
-        str: string,
-        type: string,
-        options: string
-    ): Promise<string>;
+    static str2webpstr(str: string, type: string, options: string): Promise<string>;
     static grant_permission(): Promise<void>;
 }
 

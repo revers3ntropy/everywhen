@@ -29,8 +29,8 @@
     $: if (browser) {
         let valid = (input || '') === passcode;
         if (showingForgotPassword) {
-            valid ||=
-                encryptionKeyFromPassword(passwordInput || '') === auth.key;
+            const passwordIsValid = encryptionKeyFromPassword(passwordInput || '') === auth.key;
+            valid ||= passwordIsValid;
         }
         if (valid) {
             input = '';
@@ -54,7 +54,6 @@
     {#if loaded}
         <div class="content">
             <h1>Enter your passcode</h1>
-            <!-- svelte-ignore a11y-autofocus -->
             <input
                 type="text"
                 bind:value={input}
@@ -69,10 +68,7 @@
             </button>
 
             <div class="forgot-passcode">
-                <button
-                    class="text-light"
-                    on:click={() => (showingForgotPassword = true)}
-                >
+                <button class="text-light" on:click={() => (showingForgotPassword = true)}>
                     Forgot Passcode?
                 </button>
                 <div>

@@ -1,10 +1,6 @@
 import { getContext, onMount } from 'svelte';
 import { key, type Listener } from './canvasState';
-import type {
-    CanvasContext,
-    RenderCallback,
-    SetupCallback
-} from './canvasState';
+import type { CanvasContext, RenderCallback, SetupCallback } from './canvasState';
 
 export interface Renderable {
     render?: RenderCallback;

@@ -11,10 +11,7 @@ export const load = cachedPageRoute(async auth => {
     });
     if (err) throw error(400, err);
 
-    const { err: locationErr, val: locations } = await Location.all(
-        query,
-        auth
-    );
+    const { err: locationErr, val: locations } = await Location.all(query, auth);
     if (locationErr) throw error(400, locationErr);
 
     return {

@@ -17,8 +17,7 @@
     export let value = '';
     export let auth: Auth;
     export let showAddButton = true;
-    export let filter: (l: Label, i: number, arr: Label[]) => boolean = () =>
-        true;
+    export let filter: (l: Label, i: number, arr: Label[]) => boolean = () => true;
     export let condensed = false;
 
     function showNewLabelPopup() {
@@ -63,19 +62,14 @@
 </script>
 
 <span class="select-label" class:condensed>
-    <Dropdown
-        bind:close={closeDropDown}
-        ariaLabel={() => 'Set label'}
-        {fromRight}
-    >
+    <Dropdown bind:close={closeDropDown} ariaLabel={() => 'Set label'} {fromRight}>
         <span slot="button" class="select-button">
             {#if labels}
                 {#if selectedLabel}
                     <span
                         class="entry-label-color"
-                        style="background: {(labels ?? []).find(
-                            l => l.id === value
-                        )?.color || 'transparent'}"
+                        style="background: {(labels ?? []).find(l => l.id === value)?.color ||
+                            'transparent'}"
                     />
                     {#if !condensed}
                         <span class="label-name">

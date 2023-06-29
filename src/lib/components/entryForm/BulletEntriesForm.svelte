@@ -9,10 +9,7 @@
     import type { Label } from '$lib/controllers/label';
     import type { Auth } from '$lib/controllers/user';
     import { dispatch } from '$lib/dataChangeEvents';
-    import {
-        displayNotifOnErr,
-        notify
-    } from '$lib/components/notifications/notifications';
+    import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
     import { enabledLocation } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { getLocation } from '$lib/utils/geolocation';
@@ -25,9 +22,7 @@
     export let auth: Auth;
     export let obfuscated = true;
 
-    export let setEntryFormMode = null as
-        | null
-        | ((mode: EntryFormMode) => Promise<void>);
+    export let setEntryFormMode = null as null | ((mode: EntryFormMode) => Promise<void>);
 
     function resetEntryForm() {
         entry.value = '';
@@ -38,9 +33,7 @@
 
         resetEntryForm();
 
-        const currentLocation = $enabledLocation
-            ? await getLocation()
-            : [null, null];
+        const currentLocation = $enabledLocation ? await getLocation() : [null, null];
 
         const body = {
             title: '',
@@ -53,9 +46,7 @@
             createdTZOffset: currentTzOffset()
         } as RawEntry;
 
-        const res = displayNotifOnErr(
-            await api.post(auth, '/entries', { ...body })
-        );
+        const res = displayNotifOnErr(await api.post(auth, '/entries', { ...body }));
 
         if (!res.id) {
             errorLogger.error(res);
@@ -75,9 +66,7 @@
             if (!newEntry.label) {
                 notify.error(`Failed to find label`);
                 errorLogger.error(
-                    `Failed to find label ${body.label} in ${JSON.stringify(
-                        labels
-                    )}`
+                    `Failed to find label ${body.label} in ${JSON.stringify(labels)}`
                 );
             }
         }
@@ -104,10 +93,7 @@
 </script>
 
 <div class="wrapper">
-    <div
-        class="flex-center"
-        style="justify-content: start; width: 100%; gap: 3px;"
-    >
+    <div class="flex-center" style="justify-content: start; width: 100%; gap: 3px;">
         <button
             aria-label="Switch to bullet journaling"
             class="with-circled-icon"
@@ -132,11 +118,7 @@
             />
         </div>
         <div class="flex-center" style="justify-content: end">
-            <button
-                class="primary with-icon"
-                on:click={submit}
-                style="padding: 2px 5px; margin: 0"
-            >
+            <button class="primary with-icon" on:click={submit} style="padding: 2px 5px; margin: 0">
                 Submit
                 <Send size="26" />
             </button>

@@ -20,8 +20,7 @@ export const GET = cachedApiRoute(async (auth, { url }) => {
         };
     }
 
-    const { err: encryptErr, val: encryptedResponse } =
-        Backup.asEncryptedString(backup, auth);
+    const { err: encryptErr, val: encryptedResponse } = Backup.asEncryptedString(backup, auth);
     if (encryptErr) throw error(400, encryptErr);
 
     return { data: encryptedResponse };

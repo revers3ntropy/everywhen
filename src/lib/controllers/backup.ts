@@ -81,10 +81,7 @@ export class Backup {
         if (labelsErr) return Result.err(labelsErr);
         const { err: assetsErr, val: assets } = await Asset.all(query, auth);
         if (assetsErr) return Result.err(assetsErr);
-        const { err: locationsErr, val: locations } = await Location.all(
-            query,
-            auth
-        );
+        const { err: locationsErr, val: locations } = await Location.all(query, auth);
         if (locationsErr) return Result.err(locationsErr);
 
         return Result.ok(
@@ -198,9 +195,7 @@ export class Backup {
             !Array.isArray(events) ||
             !Array.isArray(locations)
         ) {
-            return Result.err(
-                'data must be an object with entries and labels properties'
-            );
+            return Result.err('data must be an object with entries and labels properties');
         }
 
         // set up labels first
@@ -223,11 +218,7 @@ export class Backup {
             }
 
             if (entry.label) {
-                const { err, val } = await Label.getIdFromName(
-                    query,
-                    auth,
-                    entry.label
-                );
+                const { err, val } = await Label.getIdFromName(query, auth, entry.label);
                 if (err) return Result.err(err);
                 entry.label = val;
             }
@@ -244,11 +235,7 @@ export class Backup {
             }
 
             if (event.label) {
-                const { err, val } = await Label.getIdFromName(
-                    query,
-                    auth,
-                    event.label
-                );
+                const { err, val } = await Label.getIdFromName(query, auth, event.label);
                 if (err) return Result.err(err);
                 event.label = val;
             }
@@ -312,9 +299,7 @@ export class Backup {
         return encrypt(JSON.stringify(self), auth.key);
     }
 
-    public static migrate(
-        json: Partial<Backup> & Record<string, unknown>
-    ): Result<Backup> {
+    public static migrate(json: Partial<Backup> & Record<string, unknown>): Result<Backup> {
         json.appVersion ||= '0.0.0';
         const { val: version, err } = SemVer.fromString(json.appVersion);
         if (err) return Result.err(err);
@@ -340,11 +325,7 @@ export class Backup {
         return Result.ok(json as Backup);
     }
 
-    public static download(
-        data: string,
-        username: string,
-        encrypted: boolean
-    ): void {
+    public static download(data: string, username: string, encrypted: boolean): void {
         const dateFmt = fmtUtc(nowUtc(), currentTzOffset(), 'yyyyMMDD-HHmm');
         const encryptedExt = encrypted ? '.encrypted' : '';
         downloadFile(`${dateFmt}-${username}.backup${encryptedExt}.json`, data);

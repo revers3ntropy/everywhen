@@ -13,9 +13,7 @@
     let locations = null as Location[] | null;
 
     async function loadLocations() {
-        locations = displayNotifOnErr(
-            await api.get(data, '/locations')
-        ).locations;
+        locations = displayNotifOnErr(await api.get(data.auth, '/locations')).locations;
     }
 
     onMount(() => {
@@ -38,7 +36,7 @@
 
     <Entry
         {...data.entry}
-        auth={data}
+        auth={data.auth}
         obfuscated={$obfuscated}
         on:updated={() => location.reload()}
         showFullDate={true}
@@ -61,20 +59,17 @@
             </a>
         </div>
         {#if !data.entry.edits?.length}
-            <div class="flex-center">
-                No edits have been made to this entry
-            </div>
+            <div class="flex-center"> No edits have been made to this entry </div>
         {:else}
             <i>Older Versions</i>
             {#each (data.entry.edits || []).sort((a, b) => b.created - a.created) as edit}
                 <Entry
                     {...edit}
-                    auth={data}
+                    auth={data.auth}
                     obfuscated={$obfuscated}
                     isEdit={true}
                     showFullDate={true}
-                    hideAgentWidget={!data.settings.showAgentWidgetOnEntries
-                        .value}
+                    hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
                     {locations}
                 />
             {/each}

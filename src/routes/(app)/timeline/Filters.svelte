@@ -1,9 +1,9 @@
 <script lang="ts">
-    import type { Label } from '$lib/controllers/label';
     import FilterVariant from 'svelte-material-icons/FilterVariant.svelte';
+    import type { Label } from '$lib/controllers/label';
+    import type { Auth } from '$lib/controllers/user';
     import Dropdown from '$lib/components/Dropdown.svelte';
     import MultiLabelSelect from '$lib/components/label/MultiLabelSelect.svelte';
-    import type { Auth } from '$lib/controllers/user';
 
     export let auth: Auth;
     export let labels = null as null | Label[];

@@ -36,20 +36,14 @@
         const now = nowUtc();
 
         const { id } = displayNotifOnErr(
-            await api.post(data, '/events', {
+            await api.post(data.auth, '/events', {
                 name: EventController.NEW_EVENT_NAME,
                 start: now,
                 end: now
             })
         );
 
-        const event = new EventController(
-            id,
-            EventController.NEW_EVENT_NAME,
-            now,
-            now,
-            now
-        );
+        const event = new EventController(id, EventController.NEW_EVENT_NAME, now, now, now);
 
         await dispatch.create('event', event);
         events = sortEvents([...events, event], $eventsSortKey || 'created');
@@ -65,11 +59,8 @@
 
     let selectNameId: string;
     $: selectNameId =
-        events[
-            events.findIndex(
-                e => e.name === EventController.NEW_EVENT_NAME && !e.deleted
-            )
-        ]?.id || '';
+        events[events.findIndex(e => e.name === EventController.NEW_EVENT_NAME && !e.deleted)]
+            ?.id || '';
 
     const sortEventsKeys = {
         created: 'created',
@@ -110,11 +101,7 @@
             <span class="text-light">Sort by</span>
             {#if $eventsSortKey !== null}
                 <span class="sort-by-select">
-                    <Select
-                        bind:key={$eventsSortKey}
-                        options={sortEventsKeys}
-                        fromRight
-                    />
+                    <Select bind:key={$eventsSortKey} options={sortEventsKeys} fromRight />
                 </span>
             {:else}
                 ...
@@ -126,7 +113,7 @@
             <li>
                 <Event
                     {event}
-                    auth={data}
+                    auth={data.auth}
                     {selectNameId}
                     labels={data.labels}
                     obfuscated={$obfuscated}

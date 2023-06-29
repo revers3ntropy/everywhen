@@ -10,12 +10,7 @@ import type { RequestHandler } from './$types';
 export const GET = cachedApiRoute(async (auth, { params }) => {
     if (!params.entryId) throw error(400, 'invalid id');
 
-    const { err, val: entry } = await Entry.fromId(
-        query,
-        auth,
-        params.entryId,
-        true
-    );
+    const { err, val: entry } = await Entry.fromId(query, auth, params.entryId, true);
 
     if (err) throw error(400, err);
 
@@ -31,12 +26,7 @@ export const DELETE = (async ({ request, params, cookies }) => {
         restore: 'boolean'
     });
 
-    const { err: deleteErr } = await Entry.delete(
-        query,
-        auth,
-        params.entryId,
-        body.restore
-    );
+    const { err: deleteErr } = await Entry.delete(query, auth, params.entryId, body.restore);
     if (deleteErr) throw error(400, deleteErr);
 
     return apiResponse({ id: params.entryId });
@@ -69,12 +59,7 @@ export const PUT = (async ({ request, params, cookies }) => {
         }
     );
 
-    const { err: entryErr, val: entry } = await Entry.fromId(
-        query,
-        auth,
-        params.entryId,
-        true
-    );
+    const { err: entryErr, val: entry } = await Entry.fromId(query, auth, params.entryId, true);
     if (entryErr) throw error(400, entryErr);
 
     const { err } = await Entry.edit(

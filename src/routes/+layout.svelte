@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { POLL_FOR_UPDATE_INTERVAL } from '$lib/constants';
     import { onMount } from 'svelte';
     import { page } from '$app/stores';
     import Modal from 'svelte-simple-modal';
@@ -14,9 +15,7 @@
 
     async function checkForUpdate() {
         const currentVersion = __VERSION__;
-        const versionResult = displayNotifOnErr(
-            await api.get(null, '/version')
-        );
+        const versionResult = displayNotifOnErr(await api.get(null, '/version'));
 
         newVersionAvailable = versionResult.v !== currentVersion;
         newVersion = versionResult.v;
@@ -25,7 +24,7 @@
     onMount(() => {
         setInterval(() => {
             void checkForUpdate();
-        }, 1000 * 10);
+        }, POLL_FOR_UPDATE_INTERVAL);
     });
 
     let newVersionAvailable = false;
@@ -39,11 +38,7 @@
     <meta content="Journal and Life Logging app" name="description" />
 
     <link href="https://fonts.googleapis.com" rel="preconnect" />
-    <link
-        crossorigin="anonymous"
-        href="https://fonts.gstatic.com"
-        rel="preconnect"
-    />
+    <link crossorigin="anonymous" href="https://fonts.gstatic.com" rel="preconnect" />
     <link
         href="https://fonts.googleapis.com/css2?family=Quicksand&family=Dosis&family=Edu+NSW+ACT+Foundation:wght@500&family=Raleway:wght@300&display=swap"
         rel="stylesheet"
@@ -64,11 +59,7 @@
         <NewVersionAvailable {newVersion} />
     {/if}
 
-    <Modal
-        classContent="popup-background"
-        classWindow="popup-background"
-        show={$popup}
-    />
+    <Modal classContent="popup-background" classWindow="popup-background" show={$popup} />
 
     <Footer />
 </div>

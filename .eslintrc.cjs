@@ -1,36 +1,32 @@
 module.exports = {
+    root: true,
+    extends: [
+        'eslint:recommended',
+        'plugin:@typescript-eslint/recommended',
+        'plugin:svelte/recommended',
+        'prettier'
+    ],
     parser: '@typescript-eslint/parser',
+    plugins: ['@typescript-eslint'],
     parserOptions: {
-        parser: '@typescript-eslint/parser',
-        ecmaVersion: 2021,
         sourceType: 'module',
-        tsconfigRootDir: __dirname,
-        project: ['./tsconfig.json'],
+        ecmaVersion: 2020,
         extraFileExtensions: ['.svelte'],
+    },
+    env: {
+        browser: true,
+        es2017: true,
+        node: true
     },
     overrides: [
         {
             files: ['*.svelte'],
             parser: 'svelte-eslint-parser',
-            // Parse the `<script>` in `.svelte` as TypeScript by adding the following configuration.
             parserOptions: {
-                parser: '@typescript-eslint/parser',
-            },
-        },
+                parser: '@typescript-eslint/parser'
+            }
+        }
     ],
-    extends: [
-        'eslint:recommended',
-        'plugin:@typescript-eslint/recommended',
-        'plugin:@typescript-eslint/recommended-requiring-type-checking',
-        'plugin:@typescript-eslint/eslint-recommended',
-    ],
-    plugins: [
-        '@typescript-eslint',
-    ],
-    env: {
-        es6: true,
-        browser: true,
-    },
     rules: {
         'no-constant-condition': 'off',
         // treats <script> tags as functions or something and complains

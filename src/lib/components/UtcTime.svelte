@@ -18,11 +18,7 @@
             content:
                 `UTC ${fmtUtc(timestamp, 0, 'hh:mma')}` +
                 ` (${numberAsSignedStr(tzOffset)}h)` +
-                `<p>${fmtUtc(
-                    timestamp,
-                    currentTzOffset(),
-                    'hh:mma'
-                )} local time</p>`,
+                `<p>${fmtUtc(timestamp, currentTzOffset(), 'hh:mma')} local time</p>`,
             autoPosition: true,
             position: tooltipPosition
         }}

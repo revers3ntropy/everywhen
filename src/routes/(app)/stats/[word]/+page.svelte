@@ -43,7 +43,7 @@
             </h1>
         </div>
         <div class="search-for-word">
-            <SearchForWord value={data.theWord} auth={data} />
+            <SearchForWord value={data.theWord} auth={data.auth} />
         </div>
     </div>
     {#if data.wordInstances === 0}
@@ -58,27 +58,15 @@
     {:else}
         <section class="container invisible">
             <div class="stats">
-                <StatPill
-                    primary
-                    beforeLabel="appears"
-                    value={data.wordInstances}
-                    label="times"
-                />
-                <StatPill
-                    beforeLabel="in"
-                    value={data.entries.length}
-                    label="entries"
-                />
+                <StatPill primary beforeLabel="appears" value={data.wordInstances} label="times" />
+                <StatPill beforeLabel="in" value={data.entries.length} label="entries" />
                 <StatPill
                     value={(data.wordInstances / data.totalEntries).toFixed(1)}
                     label="/ entry"
                 />
                 <StatPill
                     beforeLabel="appears in"
-                    value={(
-                        (data.entries.length / data.totalEntries) *
-                        100
-                    ).toFixed(1)}
+                    value={((data.entries.length / data.totalEntries) * 100).toFixed(1)}
                     label="% of entries"
                 />
             </div>
@@ -95,7 +83,7 @@
 
         <section class="entries">
             <Entries
-                auth={data}
+                auth={data.auth}
                 options={{
                     search: displayNotifOnErr(encrypt(data.theWord, data.key))
                 }}

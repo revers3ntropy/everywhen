@@ -24,9 +24,7 @@
             color: '#000'
         };
 
-        const { id } = displayNotifOnErr(
-            await api.post(data, '/labels', newLabel)
-        );
+        const { id } = displayNotifOnErr(await api.post(data.auth, '/labels', newLabel));
 
         data = {
             ...data,
@@ -70,7 +68,7 @@
     <div class="labels">
         <div class="label-list">
             {#each data.labels as label}
-                <LabelOptions {...label} auth={data} />
+                <LabelOptions {...label} auth={data.auth} />
             {/each}
 
             <div class="flex-center">

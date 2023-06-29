@@ -9,11 +9,7 @@ import {
     type GenericResponse,
     rawApiResponse
 } from '$lib/utils/apiResponse';
-import {
-    cacheResponse,
-    getCachedResponse,
-    invalidateCache
-} from '$lib/utils/cache';
+import { cacheResponse, getCachedResponse, invalidateCache } from '$lib/utils/cache';
 
 export const GET = (async ({ params, url, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
@@ -21,22 +17,14 @@ export const GET = (async ({ params, url, cookies }) => {
     const cached = getCachedResponse<Response>(url.href, auth.id);
     if (cached) return cached.clone() as GenericResponse<Buffer>;
 
-    const { err, val: asset } = await Asset.fromPublicId(
-        query,
-        auth,
-        params.asset || ''
-    );
+    const { err, val: asset } = await Asset.fromPublicId(query, auth, params.asset || '');
     if (err) throw error(404, err);
 
     let img;
     // backwards compatibility with old image formats
     if (/^data:image\/((jpeg)|(jpg)|(png));base64,/i.test(asset.content)) {
         console.log('\n\n   !! Converting image to webp\n\n');
-        const webP = await Asset.base64ToWebP(
-            asset.content,
-            asset.contentType.split('/')[1],
-            100
-        );
+        const webP = await Asset.base64ToWebP(asset.content, asset.contentType.split('/')[1], 100);
         img = Buffer.from(webP, 'base64');
         // update the asset in the database to use webp
         void Asset.updateAssetContentToWebP(query, auth, asset.publicId, webP);
@@ -61,11 +49,7 @@ export const DELETE = (async ({ params, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
-    const { err } = await Asset.purgeWithPublicId(
-        query,
-        auth,
-        params.asset || ''
-    );
+    const { err } = await Asset.purgeWithPublicId(query, auth, params.asset || '');
     if (err) throw error(404, err);
 
     return apiResponse({});

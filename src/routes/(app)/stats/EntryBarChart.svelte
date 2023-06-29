@@ -13,10 +13,7 @@
     import ToggleSwitch from 'svelte-material-icons/ToggleSwitch.svelte';
     import ToggleSwitchOff from 'svelte-material-icons/ToggleSwitchOff.svelte';
     import Select from '$lib/components/Select.svelte';
-    import {
-        getGraphData,
-        type ChartData
-    } from './bucketiseEntriesForBarChart';
+    import { getGraphData, type ChartData } from './bucketiseEntriesForBarChart';
     import {
         bucketNames,
         By,
@@ -25,14 +22,7 @@
         initialBucketName
     } from './helpers';
 
-    Chart.register(
-        Title,
-        Tooltip,
-        Legend,
-        BarElement,
-        CategoryScale,
-        LinearScale
-    );
+    Chart.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
     export let entries: EntryWithWordCount[];
     export let by: By;
@@ -52,9 +42,9 @@
     }
 
     $: axisLabelTextColor = browser
-        ? getComputedStyle(
-              document.querySelector('.root') as Element
-          ).getPropertyValue('--text-color-light')
+        ? getComputedStyle(document.querySelector('.root') as Element).getPropertyValue(
+              '--text-color-light'
+          )
         : '';
 </script>
 
@@ -81,11 +71,7 @@
 <div class="options">
     <div class="flex-center">
         <span class="text-light" style="margin: 0.3rem">Group by</span>
-        <Select
-            bind:value={selectedBucket}
-            key={initialBucketName(days)}
-            options={bucketNames}
-        />
+        <Select bind:value={selectedBucket} key={initialBucketName(days)} options={bucketNames} />
     </div>
     <div>
         <button class="toggle-by-button" on:click={toggleBy}>

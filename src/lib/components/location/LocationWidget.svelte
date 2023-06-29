@@ -92,7 +92,7 @@
 </span>
 
 <style lang="less">
-    @import 'variables';
+    @import '../../../styles/variables';
 
     .outer {
         display: flex;

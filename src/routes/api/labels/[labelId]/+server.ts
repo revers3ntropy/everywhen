@@ -36,12 +36,7 @@ export const PUT = (async ({ cookies, request, params }) => {
     let label = val;
 
     if (body.name) {
-        const { err, val } = await Label.updateName(
-            query,
-            auth,
-            label,
-            body.name
-        );
+        const { err, val } = await Label.updateName(query, auth, label, body.name);
         if (err) throw error(400, err);
         label = val;
     }

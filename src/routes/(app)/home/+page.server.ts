@@ -17,11 +17,7 @@ function entriesYearsAgoToday(entries: Entry[]): Record<string, Entry[]> {
         const entryDate = fmtUtc(entry.created, entry.createdTZOffset, 'MM-DD');
         // entries on the same day and month, but not this year
         if (entryDate === nowDate) {
-            const entryYear = fmtUtc(
-                entry.created,
-                entry.createdTZOffset,
-                'YYYY'
-            );
+            const entryYear = fmtUtc(entry.created, entry.createdTZOffset, 'YYYY');
             if (entryYear !== nowYear) {
                 const yearsAgo = parseInt(nowYear) - parseInt(entryYear);
                 if (!res[yearsAgo]) {
@@ -39,9 +35,7 @@ export const load = cachedPageRoute(async auth => {
     if (err) throw error(400, err);
 
     const firstNTitles = Entry.groupEntriesByDay(
-        titles
-            .sort((a, b) => b.created - a.created)
-            .slice(0, NUMBER_OF_RECENT_TITLES)
+        titles.sort((a, b) => b.created - a.created).slice(0, NUMBER_OF_RECENT_TITLES)
     );
 
     let nYearsAgo = {} as Record<string, Entry[]>;

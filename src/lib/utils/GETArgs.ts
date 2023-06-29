@@ -5,14 +5,7 @@ export function serializeGETArgs(
     if (!keys.length) return '';
     return (
         '?' +
-        keys
-            .map(
-                key =>
-                    `${key}=${(
-                        args[key] as string | number | boolean
-                    ).toString()}`
-            )
-            .join('&')
+        keys.map(key => `${key}=${(args[key] as string | number | boolean).toString()}`).join('&')
     );
 }
 

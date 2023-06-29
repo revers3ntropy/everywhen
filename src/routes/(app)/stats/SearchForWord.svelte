@@ -15,8 +15,4 @@
     }) satisfies ChangeEventHandler<HTMLInputElement>;
 </script>
 
-<input
-    bind:value
-    on:change={searchWordChange}
-    placeholder="Search for Word..."
-/>
+<input bind:value on:change={searchWordChange} placeholder="Search for Word..." />

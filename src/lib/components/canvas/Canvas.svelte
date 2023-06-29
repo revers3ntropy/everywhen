@@ -79,10 +79,7 @@
         if (!$canvasState.ctx) throw 'Canvas context not initialized';
 
         $canvasState.ctx.save();
-        $canvasState.ctx.scale(
-            $canvasState.pixelRatio,
-            $canvasState.pixelRatio
-        );
+        $canvasState.ctx.scale($canvasState.pixelRatio, $canvasState.pixelRatio);
 
         for (const entity of listeners) {
             try {
@@ -130,8 +127,7 @@
     function executeListeners(event: Event, fn: keyof ICanvasState) {
         const listeners = $canvasState[fn];
         if (!listeners) throw `No listeners found for ${fn}`;
-        if (!Array.isArray(listeners))
-            throw `Listeners for ${fn} is not an array`;
+        if (!Array.isArray(listeners)) throw `Listeners for ${fn} is not an array`;
         for (const listener of listeners) {
             if (!listener || typeof listener !== 'function') {
                 errorLogger.error(`Invalid listener for ${fn}`, listener);
@@ -179,10 +175,7 @@
 />
 
 {#if $contextMenuState}
-    <div
-        class="context-menu"
-        style="top: {$contextMenuState.y}px; left: {$contextMenuState.x}px"
-    >
+    <div class="context-menu" style="top: {$contextMenuState.y}px; left: {$contextMenuState.x}px">
         {#each $contextMenuState.options as ctxItem}
             <div class="context-menu-item">
                 <button on:click={ctxMenuAction(ctxItem)}>

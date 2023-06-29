@@ -19,9 +19,7 @@
         offset: number,
         count: number
     ): Promise<Omit<AssetController, 'content'>[]> {
-        const res = displayNotifOnErr(
-            await api.get(data, `/assets`, { offset, count })
-        );
+        const res = displayNotifOnErr(await api.get(data.auth, `/assets`, { offset, count }));
         return res.assets;
     }
 
@@ -30,7 +28,7 @@
             return;
         }
         const files = e.target.files as FileList;
-        const res = await uploadImage(data, files);
+        const res = await uploadImage(data.auth, files);
         if (res === null) {
             return;
         }
@@ -59,10 +57,7 @@
 <main>
     <div class="head">
         <div class="flex-center" style="justify-content: start">
-            <button
-                on:click={() => fileDropInput.click()}
-                class="primary with-icon"
-            >
+            <button on:click={() => fileDropInput.click()} class="primary with-icon">
                 <Upload size="30" />
                 Upload
             </button>
@@ -101,7 +96,7 @@
                 {#each data.assets as asset}
                     <Asset
                         {...asset}
-                        auth={data}
+                        auth={data.auth}
                         on:delete={() => data.assetCount--}
                         obfuscated={$obfuscated}
                     />

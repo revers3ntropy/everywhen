@@ -167,10 +167,7 @@
                 const resolution = map.getView().getResolution();
                 if (!resolution) return;
 
-                const mPerUnit = map
-                    .getView()
-                    .getProjection()
-                    .getMetersPerUnit();
+                const mPerUnit = map.getView().getProjection().getMetersPerUnit();
                 if (!mPerUnit) {
                     throw new Error('mPerUnit is null');
                 }
@@ -216,15 +213,13 @@
             }
 
             features = features
-                .filter(
-                    (feature): feature is LocationFeature | EntryFeature => {
-                        // only locations and entries are clickable
-                        if ('entry' in feature) {
-                            return entriesInteractable;
-                        }
-                        return 'location' in feature;
+                .filter((feature): feature is LocationFeature | EntryFeature => {
+                    // only locations and entries are clickable
+                    if ('entry' in feature) {
+                        return entriesInteractable;
                     }
-                )
+                    return 'location' in feature;
+                })
                 .sort((a, b) => {
                     // pick entries over locations
                     if ('entry' in a && 'entry' in b) {
@@ -276,8 +271,7 @@
                     {
                         text: 'Add Named Location',
                         classname: 'context-menu-option',
-                        callback: (o: CallbackObject) =>
-                            void addNamedLocation(o)
+                        callback: (o: CallbackObject) => void addNamedLocation(o)
                     }
                 ]
             })
@@ -332,10 +326,7 @@
 
     function map(
         node: HTMLElement,
-        {
-            locations,
-            entries
-        }: { locations: Location[]; entries: EntryLocation[] }
+        { locations, entries }: { locations: Location[]; entries: EntryLocation[] }
     ) {
         let map = setupMap(node, { locations, entries });
         return {
@@ -369,12 +360,7 @@
     setInterval(() => {
         for (const [id, changes] of Object.entries(locationChangeQueue)) {
             const last = changes[changes.length - 1];
-            void syncLocationInBackground(
-                id,
-                last.latitude,
-                last.longitude,
-                last.radius
-            );
+            void syncLocationInBackground(id, last.latitude, last.longitude, last.radius);
         }
         locationChangeQueue = {};
     }, 500);

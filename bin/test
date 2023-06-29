@@ -4,4 +4,6 @@ svelte-kit sync
 
 bin/build
 
+vitest run
+
 npx playwright test "$@"

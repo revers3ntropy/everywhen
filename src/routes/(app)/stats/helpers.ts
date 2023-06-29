@@ -1,10 +1,7 @@
 import type { Entry } from '$lib/controllers/entry';
 import { splitText } from '$lib/utils/text';
 
-export type EntryWithWordCount = PickOptionalAndMutable<
-    Entry,
-    'entry' | 'decrypted' | 'title'
-> & {
+export type EntryWithWordCount = PickOptionalAndMutable<Entry, 'entry' | 'decrypted' | 'title'> & {
     wordCount: number;
 };
 

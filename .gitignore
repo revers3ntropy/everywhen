@@ -23,6 +23,8 @@ node_modules
 # Build files
 .output
 /build
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
 
 # Testing
 /test-results/

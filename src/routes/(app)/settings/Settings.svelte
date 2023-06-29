@@ -6,12 +6,7 @@
     import type { Auth } from '$lib/controllers/user';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications.js';
-    import {
-        currentTzOffset,
-        fmtDuration,
-        fmtUtc,
-        nowUtc
-    } from '$lib/utils/time.js';
+    import { currentTzOffset, fmtDuration, fmtUtc, nowUtc } from '$lib/utils/time.js';
 
     export let id: string;
     export let auth: Auth;
@@ -92,11 +87,7 @@
                 <p
                     class="last-updated hide-mobile"
                     use:tooltip={{
-                        content: fmtUtc(
-                            created,
-                            currentTzOffset(),
-                            'DD/MM/YYYY h:mma'
-                        )
+                        content: fmtUtc(created, currentTzOffset(), 'DD/MM/YYYY h:mma')
                     }}
                 >
                     <span class="oneline">

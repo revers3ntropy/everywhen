@@ -16,10 +16,7 @@
 </script>
 
 <div class="floating-button only-mobile">
-    <button
-        aria-label="Show sidebar menu"
-        on:click={() => (showing = !showing)}
-    >
+    <button aria-label="Show sidebar menu" on:click={() => (showing = !showing)}>
         <Menu size="40" />
     </button>
 </div>
@@ -45,13 +42,7 @@
         </button>
     </div>
     <div class="content">
-        <EntryTitles
-            {auth}
-            {obfuscated}
-            {titles}
-            hideBlurToggle
-            {hideAgentWidget}
-        />
+        <EntryTitles {auth} {obfuscated} {titles} hideBlurToggle {hideAgentWidget} />
     </div>
 </div>
 

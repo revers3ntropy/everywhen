@@ -29,73 +29,40 @@
     </span>
 
     <div class="format-options">
-        <button
-            class="with-icon icon-small"
-            on:click={makeWrapper('**', '**', false)}
-        >
+        <button class="with-icon icon-small" on:click={makeWrapper('**', '**', false)}>
             <FormatBold /> Bold
         </button>
-        <button
-            class="with-icon icon-small"
-            on:click={makeWrapper('*', '*', false)}
-        >
+        <button class="with-icon icon-small" on:click={makeWrapper('*', '*', false)}>
             <FormatItalic /> Italic
         </button>
-        <button
-            class="with-icon icon-small"
-            on:click={makeWrapper('~~', '~~', false)}
-        >
+        <button class="with-icon icon-small" on:click={makeWrapper('~~', '~~', false)}>
             <FormatStrikethrough /> Strikethrough
         </button>
-        <button
-            class="with-icon icon-small"
-            on:click={makeWrapper('# ', '', false)}
-        >
+        <button class="with-icon icon-small" on:click={makeWrapper('# ', '', false)}>
             <FormatHeader1 /> Header
         </button>
         <button class="with-icon icon-small" on:click={makeWrapper('`', '`')}>
             <CodeTags /> Code
         </button>
-        <button
-            class="with-icon icon-small"
-            on:click={makeWrapper('```', '```')}
-        >
+        <button class="with-icon icon-small" on:click={makeWrapper('```', '```')}>
             <CodeBrackets /> Code Block
         </button>
-        <button
-            class="with-icon icon-small"
-            on:click={makeWrapper('\n > ', '', false)}
-        >
+        <button class="with-icon icon-small" on:click={makeWrapper('\n > ', '', false)}>
             <FormatQuoteClose /> Quote
         </button>
-        <button
-            class="with-icon icon-small"
-            on:click={makeWrapper('\n - ', '', false)}
-        >
+        <button class="with-icon icon-small" on:click={makeWrapper('\n - ', '', false)}>
             <FormatListBulleted /> Bullet List
         </button>
-        <button
-            class="with-icon icon-small"
-            on:click={makeWrapper('\n 1. ', '', false)}
-        >
+        <button class="with-icon icon-small" on:click={makeWrapper('\n 1. ', '', false)}>
             <FormatListNumbered /> Numbered List
         </button>
-        <button
-            class="with-icon icon-small"
-            on:click={makeWrapper('[', '](url)')}
-        >
+        <button class="with-icon icon-small" on:click={makeWrapper('[', '](url)')}>
             <Link /> Link
         </button>
-        <button
-            class="with-icon icon-small"
-            on:click={makeWrapper('![', '](url)')}
-        >
+        <button class="with-icon icon-small" on:click={makeWrapper('![', '](url)')}>
             <ImageArea /> Image
         </button>
-        <button
-            class="with-icon icon-small"
-            on:click={makeWrapper('\n---\n', '', false)}
-        >
+        <button class="with-icon icon-small" on:click={makeWrapper('\n---\n', '', false)}>
             <HorizontalRule /> Break
         </button>
     </div>

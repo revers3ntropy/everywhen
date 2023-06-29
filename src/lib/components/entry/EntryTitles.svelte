@@ -32,16 +32,9 @@
     listen.entry.onCreate(({ entry }) => {
         if (!titles) titles = {};
 
-        const localDate = fmtUtc(
-            entry.created,
-            entry.createdTZOffset,
-            'YYYY-MM-DD'
-        );
+        const localDate = fmtUtc(entry.created, entry.createdTZOffset, 'YYYY-MM-DD');
 
-        titles[localDate] = [
-            Entry.entryToTitleEntry(entry),
-            ...(titles?.[localDate] || [])
-        ];
+        titles[localDate] = [Entry.entryToTitleEntry(entry), ...(titles?.[localDate] || [])];
 
         // force reactivity
         titles = { ...titles };
@@ -87,11 +80,7 @@
         {#each sortedTitles as [day, date]}
             <div class="day">
                 <h2>
-                    <UtcTime
-                        timestamp={day}
-                        fmt="dddd DD/MM/YY"
-                        noTooltip={true}
-                    />
+                    <UtcTime timestamp={day} fmt="dddd DD/MM/YY" noTooltip={true} />
                     {#if showTimeAgo}
                         <Dot />
                         <span class="text-light">
@@ -100,27 +89,18 @@
                             {:else if utcEq(nowUtc() - 60 * 60 * 24, day)}
                                 <span>Yesterday</span>
                             {:else}
-                                <UtcTime
-                                    relative
-                                    timestamp={day}
-                                    noTooltip={true}
-                                />
+                                <UtcTime relative timestamp={day} noTooltip={true} />
                             {/if}
                         </span>
                     {/if}
                 </h2>
 
                 {#if (titles || {})[date].length < 1}
-                    <i class="text-light flex-center">
-                        No entries on this day
-                    </i>
+                    <i class="text-light flex-center"> No entries on this day </i>
                 {/if}
 
                 {#each (titles || {})[date] as entry}
-                    <button
-                        class="entry"
-                        on:click={() => showEntryPopup(entry.id)}
-                    >
+                    <button class="entry" on:click={() => showEntryPopup(entry.id)}>
                         <span class="entry-time">
                             <UtcTime
                                 timestamp={entry.created}
@@ -132,8 +112,7 @@
                         {#if entry.label}
                             <span
                                 class="entry-label-color"
-                                style="background: {entry.label?.color ||
-                                    'transparent'}"
+                                style="background: {entry.label?.color || 'transparent'}"
                                 use:tooltip={{ content: entry.label?.name }}
                             />
                         {:else}
@@ -142,9 +121,7 @@
 
                         <span class="title {obfuscated ? 'obfuscated' : ''}">
                             {#if entry.title}
-                                {obfuscated
-                                    ? obfuscate(entry.title)
-                                    : entry.title}
+                                {obfuscated ? obfuscate(entry.title) : entry.title}
                             {:else}
                                 <i class="text-light">
                                     {obfuscated

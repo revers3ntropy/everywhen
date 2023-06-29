@@ -9,9 +9,6 @@
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications.js';
 
-    const COLLIDER_ABOVE = 60;
-    const COLLIDER_BELOW = 40;
-
     export let auth: Auth;
 
     async function newEvent(start: TimestampSecs, end: TimestampSecs) {
@@ -20,9 +17,7 @@
             start,
             end
         };
-        const { id } = displayNotifOnErr(
-            await api.post(auth, '/events', event)
-        );
+        const { id } = displayNotifOnErr(await api.post(auth, '/events', event));
         await dispatch.create(
             'event',
             new Event(
@@ -34,6 +29,9 @@
             )
         );
     }
+
+    const COLLIDER_ABOVE = 60;
+    const COLLIDER_BELOW = 40;
 
     interactable({
         cursorOnHover: 'crosshair',
@@ -59,15 +57,9 @@
             }
 
             // cursor line
-            state.rect(
-                state.timeToRenderPos(time),
-                state.centerLnY() - 20,
-                1,
-                40,
-                {
-                    color: state.colors.accent
-                }
-            );
+            state.rect(state.timeToRenderPos(time), state.centerLnY() - 20, 1, 40, {
+                color: state.colors.accent
+            });
         },
 
         collider(state) {
@@ -84,9 +76,7 @@
             if (!confirm('Create new event?')) return;
             void newEvent(
                 Math.floor(time),
-                state.renderPosToTime(
-                    state.timeToRenderPos(Math.floor(time)) + 200
-                )
+                state.renderPosToTime(state.timeToRenderPos(Math.floor(time)) + 200)
             );
         }
     });
