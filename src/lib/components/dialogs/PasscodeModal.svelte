@@ -1,11 +1,11 @@
 <script lang="ts">
-    import { ANIMATION_DURATION } from '$lib/constants';
+    import { onMount } from 'svelte';
     import { slide } from 'svelte/transition';
     import { browser } from '$app/environment';
-    import type { Auth } from '$lib/controllers/user';
-    import { encryptionKeyFromPassword } from '$lib/security/authUtils';
-    import { onMount } from 'svelte';
     import Close from 'svelte-material-icons/Close.svelte';
+    import type { Auth } from '$lib/controllers/user';
+    import { ANIMATION_DURATION } from '$lib/constants';
+    import { encryptionKeyFromPassword } from '$lib/security/authUtils';
     import { passcodeLastEntered } from '$lib/stores';
     import { nowUtc } from '$lib/utils/time';
     import { wheel } from '$lib/utils/toggleScrollable';
