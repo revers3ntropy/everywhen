@@ -17,6 +17,7 @@
     import type { PageData } from './$types';
 
     export let data: PageData;
+    if (!('auth' in data)) throw '';
 
     let selectedLabels = [...(data.labels.map(l => l.id) || []), ''];
 

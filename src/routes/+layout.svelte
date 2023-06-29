@@ -9,9 +9,6 @@
     import { api } from '$lib/utils/apiRequest';
     import NewVersionAvailable from '$lib/components/NewVersionAvailable.svelte';
     import Footer from '$lib/components/Footer.svelte';
-    import type { PageData } from './$types';
-
-    export let data: PageData;
 
     async function checkForUpdate() {
         const currentVersion = __VERSION__;

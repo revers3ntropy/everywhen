@@ -42,7 +42,7 @@ test.describe('/journal', () => {
         await page.getByRole('button', { name: 'Set label' }).click({ force: true });
         await page.getByRole('button', { name: 'Create new label' }).click();
         await page.getByLabel('Name').fill(labelName);
-        await page.getByRole('button', { name: 'Create' }).click();
+        await page.getByText('Create', { exact: true }).click();
         await page.getByRole('textbox', { name: 'Entry Body' }).fill(LONG_TEXT);
         await page.getByRole('button', { name: 'Submit Entry' }).click();
 

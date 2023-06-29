@@ -16,8 +16,6 @@ export interface SettingConfig<T> {
 export type SettingsKey = keyof typeof Settings.config;
 export type SettingsConfig = {
     [key in SettingsKey]: Settings<(typeof Settings.config)[key]['defaultValue']>;
-} & {
-    [key: string]: Settings<string | number | boolean>;
 };
 
 export class Settings<T = unknown> {
