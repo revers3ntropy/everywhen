@@ -85,7 +85,7 @@
             <Entries
                 auth={data.auth}
                 options={{
-                    search: displayNotifOnErr(encrypt(data.theWord, data.key))
+                    search: displayNotifOnErr(encrypt(data.theWord, data.auth.key))
                 }}
                 showSearch={false}
                 hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}

@@ -3,31 +3,38 @@ module.exports = {
     extends: [
         'eslint:recommended',
         'plugin:@typescript-eslint/recommended',
-        'plugin:svelte/recommended',
+        'plugin:@typescript-eslint/recommended-requiring-type-checking',
+        'plugin:@typescript-eslint/eslint-recommended',
         'prettier'
     ],
     parser: '@typescript-eslint/parser',
-    plugins: ['@typescript-eslint'],
     parserOptions: {
+        parser: '@typescript-eslint/parser',
+        ecmaVersion: 2021,
         sourceType: 'module',
-        ecmaVersion: 2020,
-        extraFileExtensions: ['.svelte']
-    },
-    env: {
-        browser: true,
-        es2017: true,
-        node: true
+        tsconfigRootDir: __dirname,
+        project: ['./tsconfig.json'],
+        extraFileExtensions: ['.svelte'],
     },
     overrides: [
         {
             files: ['*.svelte'],
             parser: 'svelte-eslint-parser',
             parserOptions: {
-                parser: '@typescript-eslint/parser'
-            }
-        }
+                parser: '@typescript-eslint/parser',
+            },
+        },
     ],
+    plugins: [
+        '@typescript-eslint',
+    ],
+    env: {
+        es6: true,
+        browser: true,
+        node: true
+    },
     rules: {
+        // so I can do `while (true)`
         'no-constant-condition': 'off',
         // treats <script> tags as functions or something and complains
         // all functions are inner-ly declared

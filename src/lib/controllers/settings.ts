@@ -5,7 +5,7 @@ import { nowUtc } from '../utils/time';
 import type { Auth } from './user';
 import { UUID } from './uuid';
 
-export interface SettingConfig<T> {
+export interface SettingConfig<T extends SettingValue> {
     type: 'string' | 'boolean' | 'number';
     name: string;
     description: string;
@@ -13,6 +13,7 @@ export interface SettingConfig<T> {
     unit?: string;
 }
 
+export type SettingValue = string | boolean | number;
 export type SettingsKey = keyof typeof Settings.config;
 export type SettingsConfig = {
     [key in SettingsKey]: Settings<(typeof Settings.config)[key]['defaultValue']>;
@@ -74,7 +75,7 @@ export class Settings<T = unknown> {
             name: 'Show "On this Day" Entries',
             description: `Show entries which happened on this day some number of years ago on the home page.`
         } as SettingConfig<boolean>
-    } satisfies Record<string, SettingConfig<unknown>>;
+    } satisfies Record<string, SettingConfig<SettingValue>>;
 
     constructor(
         public readonly id: string,

@@ -10,12 +10,18 @@
     import LockOutline from 'svelte-material-icons/LockOutline.svelte';
     import BackupOptions from '$lib/components/BackupOptions.svelte';
     import { Backup } from '$lib/controllers/backup';
-    import { Settings as SettingsController } from '$lib/controllers/settings';
+    import {
+        type SettingConfig,
+        Settings as SettingsController,
+        type SettingsKey,
+        type SettingValue
+    } from '$lib/controllers/settings';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import Settings from './Settings.svelte';
+    import type { PageData } from './$types';
 
-    export let data;
+    export let data: PageData;
 
     async function deleteAccount() {
         if (
@@ -37,6 +43,11 @@
             auth: data
         });
     }
+
+    const settingsConfig = Object.entries(SettingsController.config) as [
+        SettingsKey,
+        SettingConfig<SettingValue>
+    ][];
 
     onMount(() => (document.title = 'Settings'));
 </script>
@@ -81,7 +92,7 @@
         </div>
 
         <div class="settings">
-            {#each Object.entries(SettingsController.config) as [key, config] (key)}
+            {#each settingsConfig as [key, config] (key)}
                 <Settings {...config} {...data.settings[key]} auth={data.auth} />
             {/each}
         </div>

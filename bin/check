@@ -4,7 +4,7 @@ svelte-kit sync
 
 eslint --fix --config .eslintrc.cjs './src/**/*.{js,ts,svelte}' || exit 1
 
-npx svelte-check \
+svelte-check \
   --tsconfig ./tsconfig.json \
   --compiler-warnings "css-unused-selector:ignore,unused-export-let:ignore" \
   "$@" || exit 1

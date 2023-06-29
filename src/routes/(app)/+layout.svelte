@@ -125,7 +125,7 @@
 
 <Nav auth={data.auth} settings={data.settings} />
 
-{#key data.path}
+{#key $page.url}
     <div
         class="page-content"
         in:blur|global={{
