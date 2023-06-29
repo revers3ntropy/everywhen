@@ -42,7 +42,6 @@ export const load = cachedPageRoute(async (auth, { params }) => {
         const e: EntryWithWordCount = entry as EntryWithWordCount;
         e.wordCount = instancesInEntry;
         delete e.entry;
-        delete e.decrypted;
         delete e.title;
         filteredEntries.push(e);
     }

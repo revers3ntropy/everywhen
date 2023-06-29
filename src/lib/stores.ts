@@ -18,4 +18,9 @@ export const obfuscated = localStorageWritable<boolean>(LS_KEY.obfuscated, false
 
 export const popup = writable<typeof SvelteComponent | null | undefined>(null);
 
-export const theme = localStorageWritable<'light' | 'dark'>(LS_KEY.theme, 'light', 'light');
+export enum Theme {
+    light = 'light',
+    dark = 'dark'
+}
+
+export const theme = localStorageWritable<Theme>(LS_KEY.theme, Theme.light, Theme.light);

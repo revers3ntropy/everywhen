@@ -16,6 +16,8 @@ export const load = (async ({ url, locals }) => {
         JSON.stringify(Settings.fillWithDefaults(settings as Record<string, Settings>))
     ) as SettingsConfig;
 
+    locals.settings = settingsValues;
+
     return {
         auth,
         settings: settingsValues

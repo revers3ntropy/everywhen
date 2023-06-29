@@ -1,6 +1,8 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import ChangePasswordDialog from '$lib/components/dialogs/ChangePasswordDialog.svelte';
+
+    import { logOut } from '$lib/security/logOut';
     import { showPopup } from '$lib/utils/popups';
     import { onMount } from 'svelte';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
@@ -72,10 +74,10 @@
                 <LockOutline size="30" />
                 Change Password
             </button>
-            <a aria-label="Log Out" class="danger" href="/logout" data-sveltekit-preload-data="tap">
+            <button aria-label="Log Out" class="danger" on:click={logOut}>
                 <Logout size="30" />
                 Log Out
-            </a>
+            </button>
             <button aria-label="Delete Account" class="danger" on:click={deleteAccount}>
                 <Skull size="30" />
                 Delete Account and Erase Data

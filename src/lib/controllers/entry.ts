@@ -82,7 +82,6 @@ export class Entry {
 
     public label?: Label;
     public edits?: EntryEdit[];
-    public readonly decrypted = true;
 
     public constructor(
         public readonly id: string,

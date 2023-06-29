@@ -51,60 +51,59 @@
     let assetCount = -1;
 </script>
 
-<div class="dropdown-contents">
+<div>
     <Dropdown openOnHover fillWidthMobile stayOpenWhenClicked bind:close={closePopup}>
         <span slot="button">
             <ImageArea {size} />
         </span>
-        <button on:click={() => fileDropInput.click()} class="with-icon upload-button">
-            <Upload size="30" />
-            Upload
-        </button>
-        <input
-            type="file"
-            on:change={upload}
-            bind:this={fileDropInput}
-            style="display: none"
-            accept="image/png, image/jpeg, image/jpg, image/webp"
-        />
+        <div style="padding: 1rem 0">
+            <button on:click={() => fileDropInput.click()} class="with-icon upload-button">
+                <Upload size="30" />
+                Upload
+            </button>
+            <input
+                type="file"
+                on:change={upload}
+                bind:this={fileDropInput}
+                style="display: none"
+                accept="image/png, image/jpeg, image/jpg, image/webp"
+            />
 
-        <hr />
+            <hr />
 
-        <div style="width: 300px; height: 500px; overflow-y: scroll">
-            {#if assetCount > -1 && assets.length}
-                <InfiniteScroller
-                    bind:items={assets}
-                    batchSize={4}
-                    numItems={assetCount}
-                    loadItems={loadMoreAssets}
-                    margin={100}
-                >
-                    {#each assets as asset}
-                        <button
-                            class="asset"
-                            on:click={() => {
-                                onInput(Asset.mdLink(asset.fileName, asset.publicId));
-                                closePopup();
-                            }}
-                        >
-                            <img
-                                src="/api/assets/{asset.publicId}"
-                                alt={asset.fileName}
-                                loading="lazy"
-                            />
-                        </button>
-                    {/each}
-                </InfiniteScroller>
-            {/if}
+            <div style="width: 300px; height: 500px; overflow-y: scroll">
+                {#if assetCount > -1 && assets.length}
+                    <InfiniteScroller
+                        bind:items={assets}
+                        batchSize={4}
+                        numItems={assetCount}
+                        loadItems={loadMoreAssets}
+                        margin={100}
+                    >
+                        {#each assets as asset}
+                            <button
+                                class="asset"
+                                on:click={() => {
+                                    onInput(Asset.mdLink(asset.fileName, asset.publicId));
+                                    closePopup();
+                                }}
+                            >
+                                <img
+                                    src="/api/assets/{asset.publicId}"
+                                    alt={asset.fileName}
+                                    loading="lazy"
+                                />
+                            </button>
+                        {/each}
+                    </InfiniteScroller>
+                {/if}
+            </div>
         </div>
     </Dropdown>
 </div>
 
 <style lang="less">
     .dropdown-contents {
-        padding: 0;
-        width: 300px;
-
         .upload-button {
             width: 100%;
             padding: 4px;

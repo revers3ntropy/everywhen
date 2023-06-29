@@ -114,7 +114,7 @@
             <input
                 on:keyup={onInput}
                 bind:this={entry}
-                placeholder="New bullet entry... (Enter to submit)"
+                placeholder="Write a bullet... (Enter to submit)"
             />
         </div>
         <div class="flex-center" style="justify-content: end">

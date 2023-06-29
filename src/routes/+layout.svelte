@@ -1,9 +1,10 @@
 <script lang="ts">
-    import { POLL_FOR_UPDATE_INTERVAL } from '$lib/constants';
+    import '../app.less';
     import { onMount } from 'svelte';
     import { page } from '$app/stores';
     import Modal from 'svelte-simple-modal';
-    import '../app.less';
+    import Notifications from '$lib/components/notifications/Notifications.svelte';
+    import { POLL_FOR_UPDATE_INTERVAL } from '$lib/constants';
     import { popup, theme } from '$lib/stores';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import { api } from '$lib/utils/apiRequest';
@@ -42,21 +43,23 @@
     />
 </svelte:head>
 
-<svg class="accent-gradient-svg" height={0} width={0}>
-    <linearGradient id="accent-gradient" x1={1} x2={1} y1={0} y2={1}>
-        <stop offset={0} stop-color="var(--secondary)" />
-        <stop offset={1} stop-color="var(--primary)" />
-    </linearGradient>
-</svg>
-
 <div data-sveltekit-preload-data="hover" data-theme={$theme} class="root">
-    <slot />
+    <svg class="accent-gradient-svg" height={0} width={0}>
+        <linearGradient id="accent-gradient" x1={1} x2={1} y1={0} y2={1}>
+            <stop offset={0} stop-color="var(--secondary)" />
+            <stop offset={1} stop-color="var(--primary)" />
+        </linearGradient>
+    </svg>
+
+    <Notifications />
 
     {#if newVersionAvailable}
         <NewVersionAvailable {newVersion} />
     {/if}
 
     <Modal classContent="popup-background" classWindow="popup-background" show={$popup} />
+
+    <slot />
 
     <Footer />
 </div>
@@ -69,16 +72,15 @@
         width: 100%;
         margin: 0;
         padding: 0;
+        overflow-y: hidden;
     }
 
     .root {
-        height: fit-content;
-        min-height: 100vh;
+        // scroll inside root so that the scrollbar is styled
+        // with correct theme
+        height: 100vh;
         background: var(--background-color);
         padding: 0;
-
-        @media @mobile {
-            padding: 4px;
-        }
+        overflow-y: scroll;
     }
 </style>

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { goto } from '$app/navigation';
+    import { logOut } from '$lib/security/logOut';
     import { popup } from '$lib/stores';
     import type { Auth } from '$lib/controllers/user';
     import { api } from '$lib/utils/apiRequest';
@@ -31,7 +31,7 @@
             () => (submitted = false)
         );
 
-        await goto('/logout');
+        await logOut();
     }
 </script>
 

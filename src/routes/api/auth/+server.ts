@@ -54,5 +54,10 @@ export const PUT = (async ({ request, cookies }) => {
     return apiResponse({});
 }) satisfies RequestHandler;
 
+export const DELETE = (({ cookies }) => {
+    cookies.delete(KEY_COOKIE_KEY, KEY_COOKIE_OPTIONS);
+    cookies.delete(USERNAME_COOKIE_KEY, USERNAME_COOKIE_OPTIONS);
+    return apiResponse({});
+}) satisfies RequestHandler;
+
 export const POST = apiRes404;
-export const DELETE = apiRes404;

@@ -125,6 +125,11 @@
 
         .search-for-word {
             text-align: right;
+
+            @media @mobile {
+                text-align: center;
+                margin: 2rem 0 0 0;
+            }
         }
 
         @media @mobile {
@@ -132,10 +137,6 @@
 
             & > * {
                 margin: 0.5rem 0;
-            }
-
-            .search-for-word {
-                text-align: center;
             }
         }
     }
@@ -159,6 +160,12 @@
     }
 
     .charts {
+        padding: 2rem;
+
+        @media @mobile {
+            padding: 0;
+        }
+
         & > * {
             margin: 0.5em 0;
         }

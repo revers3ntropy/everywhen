@@ -69,6 +69,7 @@ interface ApiResponse {
         '/entries/?': DELETE<typeof import('../../routes/api/entries/[entryId]/+server')>;
         '/assets/?': DELETE<typeof import('../../routes/api/assets/[asset]/+server')>;
         '/locations/?': DELETE<typeof import('../../routes/api/locations/[locationId]/+server')>;
+        '/auth': DELETE<typeof import('../../routes/api/auth/+server')>;
     };
     PUT: {
         '/labels/?': PUT<typeof import('../../routes/api/labels/[labelId]/+server')>;

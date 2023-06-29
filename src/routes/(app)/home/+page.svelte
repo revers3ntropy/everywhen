@@ -153,6 +153,7 @@
         margin: 1rem;
 
         @media @mobile {
+            margin: 0;
             flex-direction: column;
         }
 

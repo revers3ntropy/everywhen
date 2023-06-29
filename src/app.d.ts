@@ -1,4 +1,5 @@
 import '@total-typescript/ts-reset';
+import type { SettingsConfig } from '$lib/controllers/settings';
 import type { Auth } from '$lib/controllers/user';
 
 declare module '$env/static/private' {
@@ -25,6 +26,7 @@ declare global {
         // interface Error {}
         interface Locals {
             auth: Auth | null;
+            settings: SettingsConfig | null;
         }
         // interface Platform {}
     }

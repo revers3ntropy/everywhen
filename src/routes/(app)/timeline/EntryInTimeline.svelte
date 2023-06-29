@@ -17,7 +17,6 @@
     export let title: string;
     export let wordCount: number;
     export let entryTextParityHeight: boolean;
-    export let decrypted: boolean;
     export let flags: number;
     export let label = null as Label | null;
     export let edits = [] as EntryEdit[];

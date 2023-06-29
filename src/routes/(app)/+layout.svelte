@@ -1,10 +1,10 @@
 <script lang="ts">
+    import { onDestroy } from 'svelte';
     import { browser } from '$app/environment';
     import { goto } from '$app/navigation';
     import { page } from '$app/stores';
-    import Notifications from '$lib/components/notifications/Notifications.svelte';
+    import { blur } from 'svelte/transition';
     import { parse } from 'cookie';
-    import { onMount } from 'svelte';
     import { ANIMATION_DURATION, USERNAME_COOKIE_KEY } from '$lib/constants';
     import { Backup } from '$lib/controllers/backup';
     import { obfuscated, passcodeLastEntered } from '$lib/stores';
@@ -15,7 +15,7 @@
     import { nowUtc } from '$lib/utils/time';
     import Nav from '$lib/components/Nav.svelte';
     import PasscodeModal from '$lib/components/dialogs/PasscodeModal.svelte';
-    import { blur } from 'svelte/transition';
+
     import type { LayoutData } from './$types';
 
     export let data: LayoutData;
@@ -39,9 +39,11 @@
         // the key cookie is HttpOnly, so we can't read it from JS
         // https://owasp.org/www-community/HttpOnly
         if (!cookies[USERNAME_COOKIE_KEY]) {
+            console.log($page);
             errorLogger.error('Cookies have expired');
             await goto(
-                '/?redirect=' + encodeURIComponent(location.pathname.substring(1) + location.search)
+                '/login?redirect=' +
+                    encodeURIComponent(location.pathname.substring(1) + location.search)
             );
         }
     }
@@ -96,12 +98,22 @@
 
     let downloadingBackup = false;
 
-    onMount(() => {
-        setInterval(() => {
+    let intervalId: number | null = null;
+    $: if ($page && browser) {
+        if (intervalId !== null) {
+            window.clearInterval(intervalId);
+        }
+        intervalId = window.setInterval(() => {
             void checkCookies();
             checkObfuscatedTimeout();
             checkPasscode($passcodeLastEntered);
         }, 1000);
+    }
+
+    onDestroy(() => {
+        if (intervalId !== null) {
+            window.clearInterval(intervalId);
+        }
     });
 
     passcodeLastEntered.subscribe(v => void checkPasscode(v));
@@ -113,7 +125,7 @@
     on:scroll|passive={activity}
 />
 
-<Notifications />
+<Nav auth={data.auth} settings={data.settings} />
 
 {#if data.settings.passcode.value && nowUtc() - ($passcodeLastEntered || 0) > data.settings.passcodeTimeout.value && showPasscodeModal && (data.settings.passcodeTimeout.value > 0 || !$passcodeLastEntered || !browser)}
     <PasscodeModal
@@ -123,20 +135,8 @@
     />
 {/if}
 
-<Nav auth={data.auth} settings={data.settings} />
-
-{#key $page.url}
-    <div
-        class="page-content"
-        in:blur|global={{
-            // half as total = in + out
-            duration: ANIMATION_DURATION * 0.5,
-            delay: ANIMATION_DURATION * 0.5
-        }}
-        out:blur|global={{
-            duration: ANIMATION_DURATION * 0.5
-        }}
-    >
+{#key $page.url.href}
+    <div class="page-content" in:blur={{ duration: ANIMATION_DURATION }}>
         <slot />
     </div>
 {/key}
@@ -146,10 +146,10 @@
 
     .page-content {
         min-height: calc(100vh - var(--nav-height));
-        padding: 0 1rem 4rem 1rem;
+        margin: 0 1rem 200px 1rem;
 
         @media @mobile {
-            padding: 0 5px 200px 5px;
+            margin: 0 5px 200px 5px;
         }
     }
 </style>

@@ -215,7 +215,7 @@
                         <input
                             bind:this={searchInput}
                             on:change={updateSearch}
-                            placeholder="Search..."
+                            placeholder="Search for entry..."
                             type="text"
                         />
                         <button on:click={updateSearch} aria-label="search">

@@ -280,9 +280,7 @@ async function doMigrations(migrations) {
     }
 
     const time = (now() - start).toPrecision(3);
-    console.log(
-        c.green(`${migrations.length} migrations complete in ${time}ms`)
-    );
+    console.log(c.green(`${migrations.length} migrations complete in ${time}ms`));
 }
 
 /**
@@ -303,9 +301,7 @@ async function getMigrations(remoteVersion, localVersion) {
         }
     }
 
-    const migrationsToRun = migrations.filter(migration =>
-        migration.isGreaterThan(remoteVersion)
-    );
+    const migrationsToRun = migrations.filter(migration => migration.isGreaterThan(remoteVersion));
 
     if (migrationsToRun.length === 0) {
         console.log(c.green('No migrations found'));
@@ -341,12 +337,10 @@ async function getMigrations(remoteVersion, localVersion) {
 }
 
 /**
- * @returns {Promise<Version>}
+ * @returns {Promise<Version | null>}
  */
 async function getRemoteVersion() {
-    console.log(
-        `Getting remote version from '${remoteAddress()}/api/version'...`
-    );
+    console.log(`Getting remote version from '${remoteAddress()}/api/version'...`);
     const rawVersion = await fetch(`https://${remoteAddress()}/api/version`, {
         agent: noSslAgent
     });
@@ -355,11 +349,7 @@ async function getRemoteVersion() {
     try {
         apiVersion = await rawVersion.json();
     } catch (e) {
-        console.log(c.red('Failed to get remote version'));
-        return Version.fromString(
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-call
-            prompt({ sigint: true })('Enter remote version: ')
-        );
+        return null;
     }
     if (typeof apiVersion !== 'object' || apiVersion === null) {
         console.error(apiVersion);
@@ -391,11 +381,7 @@ async function restartServer(localVersion) {
         try {
             const remoteVersion = await getRemoteVersion().catch(console.error);
             if (remoteVersion && remoteVersion.isEqual(localVersion)) {
-                console.log(
-                    c.green(
-                        `Complete: v${localVersion.str()} is live on ${env}`
-                    )
-                );
+                console.log(c.green(`Complete: v${localVersion.str()} is live on ${env}`));
                 return;
             }
         } catch (e) {
@@ -424,16 +410,21 @@ async function getAndCheckVersions() {
     dotenv.config({ path: `./secrets/${env}/.env` });
     console.log(c.cyan(`Deploying to ${remoteSshAddress()} (${env})`));
 
-    const remoteVersion = await getRemoteVersion();
+    let remoteVersion = await getRemoteVersion();
+    if (remoteVersion === null) {
+        console.log(c.red('Failed to get remote version'));
+        remoteVersion = Version.fromString(
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-call
+            prompt({ sigint: true })('Enter remote version: ')
+        );
+    }
+
     const localVersion = Version.fromPackageJson('./package.json');
 
     console.log(`Found remote version: ${c.yellow(remoteVersion.str())}`);
     console.log(`Found local version: ${c.yellow(localVersion.str())}`);
 
-    if (
-        remoteVersion.isEqual(localVersion) ||
-        remoteVersion.isGreaterThan(localVersion)
-    ) {
+    if (remoteVersion.isEqual(localVersion) || remoteVersion.isGreaterThan(localVersion)) {
         console.log(c.red(`Remote version is equal to (or gt) local version`));
         console.log(c.red(`${localVersion.str()} <= ${remoteVersion.str()}`));
         throw new Error();
@@ -473,9 +464,7 @@ async function stopRemoteServer() {
 
 async function setupLibWebP() {
     // Required by 'webp-converter' package TODO: Remove this requirement
-    await runRemoteCommand(
-        `mkdir -p ~/${remoteDir()}/server/bin/libwebp_linux/bin`
-    );
+    await runRemoteCommand(`mkdir -p ~/${remoteDir()}/server/bin/libwebp_linux/bin`);
     await runRemoteCommand(`mkdir -p ~/${remoteDir()}/server/temp`);
 }
 

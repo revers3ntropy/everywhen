@@ -61,14 +61,15 @@ test.describe('/journal', () => {
         const makeEntryRes = await api.post('./entries', {
             data: { entry }
         });
-        await page.goto('/journal');
-
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const { id } = await makeEntryRes.json();
         expect(typeof id === 'string').toBe(true);
         if (typeof id !== 'string') throw id;
         expect(id).toHaveLength(36);
 
+        await page.goto('/journal');
+        // must scroll entries into view to load them
+        await page.mouse.wheel(0, 1000);
         await expect(page.getByText(entry)).toBeAttached();
 
         // can pin entry
@@ -80,12 +81,15 @@ test.describe('/journal', () => {
         await page.getByRole('button', { name: 'Unpin Entry' }).click();
 
         await page.reload();
+        // force entries to load
+        await page.mouse.wheel(0, 1000);
 
         // can pin entry
         await page.locator(`[id="${id}"]`).getByRole('button', { name: 'Open popup' }).click();
         await page.getByRole('button', { name: 'Pin Entry' }).click();
 
         await page.reload();
+        await page.mouse.wheel(0, 1000);
 
         // can then unpin after reloading page
         await page.locator(`[id="${id}"]`).getByRole('button', { name: 'Open popup' }).click();

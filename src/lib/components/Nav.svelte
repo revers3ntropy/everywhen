@@ -1,6 +1,8 @@
 <script lang="ts">
     import { afterNavigate, beforeNavigate, goto } from '$app/navigation';
     import { page } from '$app/stores';
+
+    import { logOut } from '$lib/security/logOut';
     import { tooltip } from '@svelte-plugins/tooltips';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import Brain from 'svelte-material-icons/Brain.svelte';
@@ -20,6 +22,8 @@
     import Notebook from 'svelte-material-icons/Notebook.svelte';
     import Pencil from 'svelte-material-icons/Pencil.svelte';
     import BulletPoints from 'svelte-material-icons/FormatListBulleted.svelte';
+    import LightTheme from 'svelte-material-icons/WhiteBalanceSunny.svelte';
+    import DarkTheme from 'svelte-material-icons/WeatherNight.svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import Dropdown from '$lib/components/Dropdown.svelte';
     import Streaks from '$lib/components/Streaks.svelte';
@@ -29,7 +33,7 @@
     import { Event as EventController } from '$lib/controllers/event';
     import type { SettingsConfig } from '$lib/controllers/settings';
     import { nowUtc } from '$lib/utils/time';
-    import { eventsSortKey, obfuscated, passcodeLastEntered } from '$lib/stores';
+    import { eventsSortKey, obfuscated, passcodeLastEntered, Theme, theme } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
 
@@ -133,6 +137,10 @@
 
     function lock() {
         passcodeLastEntered.set(0);
+    }
+
+    function switchTheme() {
+        theme.set($theme === Theme.light ? Theme.dark : Theme.light);
     }
 
     let isDownloadingBackup = false;
@@ -316,20 +324,29 @@
                     {/if}
                 </button>
 
+                <button class="account-dropdown-button" on:click={switchTheme}>
+                    {#if $theme === Theme.light}
+                        <DarkTheme size="30" />
+                        Use Dark Mode
+                    {:else}
+                        <LightTheme size="30" />
+                        Use Light Mode
+                    {/if}
+                </button>
+
                 <a aria-label="settings" class="account-dropdown-button" href="/settings">
                     <Cog size="30" />
                     Settings
                 </a>
 
-                <a
+                <button
                     aria-label="log out"
                     class="account-dropdown-button danger"
-                    href="/logout"
-                    data-sveltekit-preload-data="tap"
+                    on:click={logOut}
                 >
                     <Logout size="30" />
                     Log Out
-                </a>
+                </button>
             </div>
         </Dropdown>
     </div>

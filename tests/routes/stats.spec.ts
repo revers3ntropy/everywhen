@@ -11,7 +11,7 @@ test.describe('/stats', () => {
         const { api } = await generateUserAndSignIn(page);
         await page.goto('/stats', { waitUntil: 'networkidle' });
         await expect(page).toHaveURL('/stats');
-        expect(page.getByText('No Entries')).toBeTruthy();
+        await expect(page.getByText('No Entries')).toBeAttached();
         await expectDeleteUser(api, expect);
     });
 });
