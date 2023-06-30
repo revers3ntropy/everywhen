@@ -14,6 +14,8 @@ const config = {
     },
 
     compilerOptions: {
+        preserveComments: false,
+        preserveWhitespace: false,
         discloseVersion: true
     },
 
