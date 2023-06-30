@@ -99,13 +99,16 @@
             {/if}
         </section>
 
-        <section>
-            <h2> Common Words </h2>
-            <CommonWordsList
-                entryCount={data.entryCount}
-                words={data.commonWords}
-                auth={data.auth}
-            />
+        <section class="flex-center" style="flex-direction: column">
+            <div style="max-width: 500px; width: 100%">
+                <h2 style="text-align: left"> Common Words </h2>
+
+                <CommonWordsList
+                    entryCount={data.entryCount}
+                    words={data.commonWords}
+                    auth={data.auth}
+                />
+            </div>
         </section>
     {/if}
 </main>
@@ -115,7 +118,7 @@
     @import '../../../styles/variables';
 
     h2 {
-        margin: 2rem 0 1rem 0;
+        padding: 2rem 0;
     }
 
     .title-line {

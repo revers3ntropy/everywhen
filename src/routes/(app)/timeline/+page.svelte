@@ -85,8 +85,13 @@
             display: none !important;
         }
 
-        body {
+        body,
+        .root {
             max-height: 100vw;
+
+            &::-webkit-scrollbar {
+                display: none;
+            }
         }
 
         nav {
