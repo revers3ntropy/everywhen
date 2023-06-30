@@ -74,7 +74,7 @@
                 <LockOutline size="30" />
                 Change Password
             </button>
-            <button aria-label="Log Out" class="danger" on:click={logOut}>
+            <button aria-label="Log Out" class="danger" on:click={() => logOut()}>
                 <Logout size="30" />
                 Log Out
             </button>

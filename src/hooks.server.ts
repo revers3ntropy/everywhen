@@ -1,8 +1,9 @@
+import { COOKIE_WRITEABLE_DEFAULTS, COOKIE_WRITEABLE_KEYS } from '$lib/constants';
 import { PageLoadLog } from '$lib/controllers/log';
 import type { Auth } from '$lib/controllers/user';
 import { tryGetAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import { nowUtc } from '$lib/utils/time';
-import type { Handle, RequestEvent } from '@sveltejs/kit';
+import type { Cookies, Handle, RequestEvent } from '@sveltejs/kit';
 import chalk from 'chalk';
 import { connect, dbConnection, query } from '$lib/db/mysql';
 import { cleanupCache } from '$lib/utils/cache';
@@ -91,6 +92,31 @@ async function logReq(
     );
 }
 
+function getCookieWritableCookies(cookies: Cookies): App.Locals['__cookieWritables'] {
+    const result = {} as Mutable<Partial<App.Locals['__cookieWritables']>>;
+
+    const cookieKeys = COOKIE_WRITEABLE_KEYS;
+    const keyToNameMap = Object.fromEntries(
+        (Object.keys(cookieKeys) as (keyof typeof cookieKeys)[]).map(key => [cookieKeys[key], key])
+    );
+
+    for (const { name, value } of cookies.getAll()) {
+        if (name in keyToNameMap) {
+            result[keyToNameMap[name]] = value;
+        }
+    }
+
+    for (const key in COOKIE_WRITEABLE_DEFAULTS) {
+        if (!(key in result)) {
+            result[key as keyof typeof COOKIE_WRITEABLE_DEFAULTS] = JSON.stringify(
+                COOKIE_WRITEABLE_DEFAULTS[key as keyof typeof COOKIE_WRITEABLE_DEFAULTS]
+            );
+        }
+    }
+
+    return result as App.Locals['__cookieWritables'];
+}
+
 export const handle = (async ({ event, resolve }) => {
     const start = performance.now();
     const now = nowUtc();
@@ -101,6 +127,8 @@ export const handle = (async ({ event, resolve }) => {
     } else {
         event.locals.auth = null;
     }
+
+    event.locals.__cookieWritables = getCookieWritableCookies(event.cookies);
 
     const eventClone: RequestEvent = {
         ...event,

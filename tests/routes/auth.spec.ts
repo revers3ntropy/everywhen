@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { USERNAME_COOKIE_KEY } from '../../src/lib/constants.js';
+import { STORE_KEY } from '../../src/lib/constants.js';
 import { encryptionKeyFromPassword } from '../../src/lib/security/authUtils.js';
 import { deleteUser, expectDeleteUser, generateApiCtx, generateUser, randStr } from '../helpers.js';
 
@@ -48,7 +48,7 @@ test.describe('/signup', () => {
         await page.waitForURL('/home');
 
         const usernameCookieIdx = (await page.context().cookies()).findIndex(
-            c => c.name === USERNAME_COOKIE_KEY
+            c => c.name === STORE_KEY.username
         );
         expect(usernameCookieIdx).toBeGreaterThan(-1);
 

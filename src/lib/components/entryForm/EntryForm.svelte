@@ -10,7 +10,7 @@
     import FormatListBulleted from 'svelte-material-icons/FormatListBulleted.svelte';
     import Send from 'svelte-material-icons/Send.svelte';
     import LabelSelect from '$lib/components/label/LabelSelect.svelte';
-    import { LS_KEY } from '$lib/constants';
+    import { STORE_KEY } from '$lib/constants';
     import type { Entry, RawEntry } from '$lib/controllers/entry';
     import type { Label } from '$lib/controllers/label';
     import type { Auth } from '$lib/controllers/user';
@@ -50,9 +50,9 @@
 
     function saveToLS() {
         if (loadFromLS) {
-            localStorage.setItem(LS_KEY.newEntryTitle, newEntryTitle);
-            localStorage.setItem(LS_KEY.newEntryBody, newEntryBody);
-            localStorage.setItem(LS_KEY.newEntryLabel, newEntryLabel);
+            localStorage.setItem(STORE_KEY.newEntryTitle, newEntryTitle);
+            localStorage.setItem(STORE_KEY.newEntryBody, newEntryBody);
+            localStorage.setItem(STORE_KEY.newEntryLabel, newEntryLabel);
         }
     }
 
@@ -238,9 +238,9 @@
         void loadLabels();
 
         if (loadFromLS) {
-            newEntryTitle = localStorage.getItem(LS_KEY.newEntryTitle) || '';
-            newEntryBody = localStorage.getItem(LS_KEY.newEntryBody) || '';
-            newEntryLabel = localStorage.getItem(LS_KEY.newEntryLabel) || '';
+            newEntryTitle = localStorage.getItem(STORE_KEY.newEntryTitle) || '';
+            newEntryBody = localStorage.getItem(STORE_KEY.newEntryBody) || '';
+            newEntryLabel = localStorage.getItem(STORE_KEY.newEntryLabel) || '';
 
             if (!newEntryBody && !newEntryTitle) {
                 obfuscated = false;

@@ -1,7 +1,6 @@
 <script lang="ts">
     import { afterNavigate, beforeNavigate, goto } from '$app/navigation';
     import { page } from '$app/stores';
-
     import { logOut } from '$lib/security/logOut';
     import { tooltip } from '@svelte-plugins/tooltips';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
@@ -27,13 +26,13 @@
     import Plus from 'svelte-material-icons/Plus.svelte';
     import Dropdown from '$lib/components/Dropdown.svelte';
     import Streaks from '$lib/components/Streaks.svelte';
-    import { LS_KEY } from '$lib/constants';
+    import { STORE_KEY, Theme } from '$lib/constants';
     import { Backup } from '$lib/controllers/backup';
     import type { Auth } from '$lib/controllers/user';
     import { Event as EventController } from '$lib/controllers/event';
     import type { SettingsConfig } from '$lib/controllers/settings';
     import { nowUtc } from '$lib/utils/time';
-    import { eventsSortKey, obfuscated, passcodeLastEntered, Theme, theme } from '$lib/stores';
+    import { eventsSortKey, obfuscated, passcodeLastEntered, theme } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
 
@@ -82,7 +81,7 @@
             value: false
         });
         const labelId = await makeLabelFromNameIfDoesntExist(name, defaultColor);
-        localStorage.setItem(LS_KEY.newEntryLabel, labelId);
+        localStorage.setItem(STORE_KEY.newEntryLabel, labelId);
         await gotoIfNotAt('/journal');
     }
 
@@ -103,7 +102,7 @@
             key: 'entryFormMode',
             value: false
         });
-        localStorage.removeItem(LS_KEY.newEntryLabel);
+        localStorage.removeItem(STORE_KEY.newEntryLabel);
         await gotoIfNotAt('/journal');
     }
 
@@ -342,7 +341,7 @@
                 <button
                     aria-label="log out"
                     class="account-dropdown-button danger"
-                    on:click={logOut}
+                    on:click={() => logOut()}
                 >
                     <Logout size="30" />
                     Log Out

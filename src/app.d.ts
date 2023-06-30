@@ -1,4 +1,5 @@
 import '@total-typescript/ts-reset';
+import { COOKIE_WRITEABLE_KEYS } from '$lib/constants';
 import type { SettingsConfig } from '$lib/controllers/settings';
 import type { Auth } from '$lib/controllers/user';
 
@@ -20,14 +21,21 @@ declare global {
         toLowerCase(): Lowercase<string>;
     }
 
+    type RawCookies = { [K in keyof typeof COOKIE_WRITEABLE_KEYS]: string };
+
     // See https://kit.svelte.dev/docs/types#app
     declare namespace App {
-        // interface PageData {}
-        // interface Error {}
+        interface PageData {
+            __cookieWritables: RawCookies;
+        }
+
         interface Locals {
             auth: Auth | null;
             settings: SettingsConfig | null;
+            __cookieWritables: RawCookies;
         }
+
+        // interface Error {}
         // interface Platform {}
     }
 

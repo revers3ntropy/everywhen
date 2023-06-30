@@ -1,15 +1,24 @@
 <script lang="ts">
     import '../app.less';
+    import type { PageData } from './$types';
     import { onMount } from 'svelte';
     import { page } from '$app/stores';
     import Modal from 'svelte-simple-modal';
     import Notifications from '$lib/components/notifications/Notifications.svelte';
     import { POLL_FOR_UPDATE_INTERVAL } from '$lib/constants';
-    import { popup, theme } from '$lib/stores';
+    import { populateCookieWritablesWithCookies, popup, theme } from '$lib/stores';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import { api } from '$lib/utils/apiRequest';
     import NewVersionAvailable from '$lib/components/NewVersionAvailable.svelte';
     import Footer from '$lib/components/Footer.svelte';
+
+    export let data: PageData;
+
+    // Fill the stores with the data from the server, while server side
+    // and client side.
+    // This means that the stores will be populated the whole time,
+    // e.g. the theme will be loaded server side so no flash of light
+    populateCookieWritablesWithCookies(data.__cookieWritables);
 
     async function checkForUpdate() {
         const currentVersion = __VERSION__;
@@ -82,5 +91,6 @@
         background: var(--background-color);
         padding: 0;
         overflow-y: scroll;
+        overflow-x: hidden;
     }
 </style>

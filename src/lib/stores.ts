@@ -1,26 +1,38 @@
+import { cookieWritable } from '$lib/cookieWritable';
 import { localStorageWritable } from '$lib/lsWritable';
 import type { SvelteComponent } from 'svelte';
 import { writable } from 'svelte/store';
-import { LS_KEY } from './constants';
+import {
+    COOKIE_WRITEABLE_DEFAULTS,
+    COOKIE_WRITEABLE_KEYS,
+    STORE_KEY,
+    type Theme
+} from './constants';
 
 export const enabledLocation = localStorageWritable<boolean, null>(
-    LS_KEY.enabledLocation,
+    STORE_KEY.enabledLocation,
     false,
     null
 );
-export const passcodeLastEntered = localStorageWritable<number>(LS_KEY.passcodeLastEntered, 0, 0);
+export const passcodeLastEntered = localStorageWritable<number>(
+    STORE_KEY.passcodeLastEntered,
+    0,
+    0
+);
 export const eventsSortKey = localStorageWritable<EventsSortKey, null>(
-    LS_KEY.sortEventsKey,
+    STORE_KEY.sortEventsKey,
     'created',
     null
 );
-export const obfuscated = localStorageWritable<boolean>(LS_KEY.obfuscated, false, true);
+export const obfuscated = localStorageWritable<boolean>(STORE_KEY.obfuscated, false, true);
 
 export const popup = writable<typeof SvelteComponent | null | undefined>(null);
 
-export enum Theme {
-    light = 'light',
-    dark = 'dark'
-}
+export const theme = cookieWritable<Theme>(
+    COOKIE_WRITEABLE_KEYS.theme,
+    COOKIE_WRITEABLE_DEFAULTS.theme
+);
 
-export const theme = localStorageWritable<Theme>(LS_KEY.theme, Theme.light, Theme.light);
+export function populateCookieWritablesWithCookies(cookies: RawCookies) {
+    theme.set(JSON.parse(cookies.theme) as Theme);
+}

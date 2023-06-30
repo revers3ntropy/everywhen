@@ -1,11 +1,12 @@
 <script lang="ts">
+    import type { LayoutData } from './$types';
+    import { logOut } from '$lib/security/logOut';
     import { onDestroy } from 'svelte';
     import { browser } from '$app/environment';
-    import { goto } from '$app/navigation';
     import { page } from '$app/stores';
     import { blur } from 'svelte/transition';
-    import { parse } from 'cookie';
-    import { ANIMATION_DURATION, USERNAME_COOKIE_KEY } from '$lib/constants';
+    import Cookie from 'js-cookie';
+    import { ANIMATION_DURATION, STORE_KEY } from '$lib/constants';
     import { Backup } from '$lib/controllers/backup';
     import { obfuscated, passcodeLastEntered } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
@@ -15,8 +16,6 @@
     import { nowUtc } from '$lib/utils/time';
     import Nav from '$lib/components/Nav.svelte';
     import PasscodeModal from '$lib/components/dialogs/PasscodeModal.svelte';
-
-    import type { LayoutData } from './$types';
 
     export let data: LayoutData;
 
@@ -34,17 +33,11 @@
     }
 
     async function checkCookies() {
-        const cookies = parse(document.cookie);
-
         // the key cookie is HttpOnly, so we can't read it from JS
         // https://owasp.org/www-community/HttpOnly
-        if (!cookies[USERNAME_COOKIE_KEY]) {
-            console.log($page);
+        if (!Cookie.get(STORE_KEY.username)) {
             errorLogger.error('Cookies have expired');
-            await goto(
-                '/login?redirect=' +
-                    encodeURIComponent(location.pathname.substring(1) + location.search)
-            );
+            await logOut(true);
         }
     }
 

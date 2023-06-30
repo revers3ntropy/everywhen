@@ -1,11 +1,8 @@
 export const COOKIE_TIMEOUT: Seconds = 60 * 60;
 
-export const KEY_PREFIX = '__misc_3_';
+export const KEY_PREFIX = '__halcyon_land_';
 
-export const KEY_COOKIE_KEY = `${KEY_PREFIX}key_v2`;
-export const USERNAME_COOKIE_KEY = `${KEY_PREFIX}username_v2`;
-
-export const LS_KEY = {
+export const STORE_KEY = {
     newEntryBody: `${KEY_PREFIX}new_entry_body`,
     newEntryTitle: `${KEY_PREFIX}new_entry_title`,
     newEntryLabel: `${KEY_PREFIX}new_entry_label`,
@@ -14,8 +11,22 @@ export const LS_KEY = {
     sortEventsKey: `${KEY_PREFIX}events_sort_key`,
     journalingMode: `${KEY_PREFIX}journaling_mode`,
     obfuscated: `${KEY_PREFIX}obfuscated`,
+    key: `${KEY_PREFIX}key`,
+    username: `${KEY_PREFIX}username`
+} as const;
+
+export enum Theme {
+    light = 'light',
+    dark = 'dark'
+}
+
+export const COOKIE_WRITEABLE_KEYS = {
     theme: `${KEY_PREFIX}theme`
-};
+} as const;
+
+export const COOKIE_WRITEABLE_DEFAULTS = {
+    theme: Theme.light
+} as const;
 
 // possible characters to show when the text is blurred
 export const OBFUSCATE_CHARS = 'abcdefghijklmnopqrstuvwxyz ';

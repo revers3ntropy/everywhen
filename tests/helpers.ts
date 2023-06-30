@@ -1,16 +1,6 @@
-import {
-    type APIRequestContext,
-    type Expect,
-    type Page,
-    request
-} from '@playwright/test';
+import { type APIRequestContext, type Expect, type Page, request } from '@playwright/test';
 import { serialize } from 'cookie';
-import {
-    KEY_COOKIE_KEY,
-    KEY_COOKIE_OPTIONS,
-    USERNAME_COOKIE_KEY,
-    USERNAME_COOKIE_OPTIONS
-} from '../src/lib/constants.js';
+import { STORE_KEY, KEY_COOKIE_OPTIONS, USERNAME_COOKIE_OPTIONS } from '../src/lib/constants.js';
 import type { Auth, RawAuth } from '../src/lib/controllers/user.js';
 import { encryptionKeyFromPassword } from '../src/lib/security/authUtils.js';
 import { Result } from '../src/lib/utils/result.js';
@@ -22,9 +12,7 @@ export function randStr(
     let result = '';
     const charactersLength = characters.length;
     for (let i = 0; i < length; i++) {
-        result += characters.charAt(
-            Math.floor(Math.random() * charactersLength)
-        );
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
 
     return result;
@@ -96,40 +84,27 @@ export async function deleteUser(api: APIRequestContext): Promise<Result> {
     if (res.ok()) return Result.ok(null);
     const body = await res.text();
     try {
-        return Result.err(
-            String(
-                (JSON.parse(body) as Record<string, unknown>)?.message || body
-            )
-        );
+        return Result.err(String((JSON.parse(body) as Record<string, unknown>)?.message || body));
     } catch (e) {
         return Result.err(body);
     }
 }
 
-export async function expectDeleteUser(
-    api: APIRequestContext,
-    expect: Expect
-): Promise<void> {
+export async function expectDeleteUser(api: APIRequestContext, expect: Expect): Promise<void> {
     const { err } = await deleteUser(api);
     expect(err).toBe(null);
 }
 
-export async function generateApiCtx(
-    auth: RawAuth | null = null
-): Promise<APIRequestContext> {
+export async function generateApiCtx(auth: RawAuth | null = null): Promise<APIRequestContext> {
     return await request.newContext({
         baseURL: 'http://localhost:5173/api/',
         extraHTTPHeaders: {
             'Content-Type': 'application/json',
             Accept: 'application/json',
             Cookie: auth
-                ? serialize(KEY_COOKIE_KEY, auth.key, KEY_COOKIE_OPTIONS) +
+                ? serialize(STORE_KEY.key, auth.key, KEY_COOKIE_OPTIONS) +
                   ' ; ' +
-                  serialize(
-                      USERNAME_COOKIE_KEY,
-                      auth.username,
-                      USERNAME_COOKIE_OPTIONS
-                  )
+                  serialize(STORE_KEY.username, auth.username, USERNAME_COOKIE_OPTIONS)
                 : ''
         }
     });

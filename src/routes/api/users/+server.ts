@@ -1,11 +1,6 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
-import {
-    KEY_COOKIE_KEY,
-    KEY_COOKIE_OPTIONS,
-    USERNAME_COOKIE_KEY,
-    USERNAME_COOKIE_OPTIONS
-} from '$lib/constants';
+import { KEY_COOKIE_OPTIONS, STORE_KEY, USERNAME_COOKIE_OPTIONS } from '$lib/constants';
 import { Backup } from '$lib/controllers/backup';
 import { User } from '$lib/controllers/user';
 import { query } from '$lib/db/mysql';
@@ -22,8 +17,8 @@ export const POST = (async ({ request, cookies }) => {
     const { err, val } = await User.create(query, body.username, body.password);
     if (err) throw error(400, err);
 
-    cookies.set(KEY_COOKIE_KEY, body.password, KEY_COOKIE_OPTIONS);
-    cookies.set(USERNAME_COOKIE_KEY, body.username, USERNAME_COOKIE_OPTIONS);
+    cookies.set(STORE_KEY.key, body.password, KEY_COOKIE_OPTIONS);
+    cookies.set(STORE_KEY.username, body.username, USERNAME_COOKIE_OPTIONS);
 
     return apiResponse({ ...val });
 }) satisfies RequestHandler;
@@ -37,8 +32,8 @@ export const DELETE = (async ({ cookies, locals: { auth } }) => {
 
     await User.purge(query, auth);
 
-    cookies.delete(KEY_COOKIE_KEY, KEY_COOKIE_OPTIONS);
-    cookies.delete(USERNAME_COOKIE_KEY, USERNAME_COOKIE_OPTIONS);
+    cookies.delete(STORE_KEY.key, KEY_COOKIE_OPTIONS);
+    cookies.delete(STORE_KEY.username, USERNAME_COOKIE_OPTIONS);
 
     const { err: backupErr, val: backupEncrypted } = Backup.asEncryptedString(backup, auth);
     if (backupErr) throw error(400, backupErr);
