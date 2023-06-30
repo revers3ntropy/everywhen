@@ -13,7 +13,7 @@ export const load = (async ({ url, locals }) => {
     if (settingsErr) throw error(500, settingsErr);
 
     const settingsValues = JSON.parse(
-        JSON.stringify(Settings.fillWithDefaults(settings as Record<string, Settings>))
+        JSON.stringify(Settings.fillWithDefaults(settings))
     ) as SettingsConfig;
 
     locals.settings = settingsValues;

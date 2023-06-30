@@ -66,7 +66,7 @@ async function logReq(
 ): Promise<void> {
     const path = req.route.id || '[unknown]';
 
-    void reqLogger.logToFile(req.request.method, path);
+    void reqLogger.logToFile(req.request.method, req.url.href);
 
     const userId = (auth?.id || '').toString();
 

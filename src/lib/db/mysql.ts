@@ -49,7 +49,18 @@ function logQuery(query: string, params: unknown[], result: unknown, time: Milli
         }
     });
 
-    const resultStr = Array.isArray(result) ? `Array(${result.length})` : JSON.stringify(result);
+    let resultStr = JSON.stringify(result);
+    if (Array.isArray(result)) {
+        resultStr = `Array(${result.length})`;
+    }
+    if (
+        typeof result === 'object' &&
+        result !== null &&
+        'info' in result &&
+        typeof result.info === 'string'
+    ) {
+        resultStr = result.info;
+    }
 
     const queryStr = query.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
 

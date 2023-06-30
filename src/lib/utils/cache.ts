@@ -153,21 +153,31 @@ export function cachedPageRoute<
     Params extends Partial<Record<string, string>>,
     ParentData extends Record<string, unknown>,
     OutputData extends Record<string, unknown>,
-    RouteId extends string
+    RouteId extends string,
+    MustHaveAuth extends boolean = true
 >(
     handler: (
-        auth: Auth,
+        auth: Auth | (MustHaveAuth extends true ? Auth : undefined),
         event: ServerLoadEvent<Params, ParentData, RouteId>
-    ) => MaybePromise<OutputData>
+    ) => MaybePromise<OutputData>,
+    requireAuth?: MustHaveAuth
 ): (event: ServerLoadEvent<Params, ParentData, RouteId>) => MaybePromise<OutputData> {
     return (async (
         props: ServerLoadEvent<Params, ParentData, RouteId>
     ): Promise<OutputData & App.PageData> => {
-        const url = props.url.href;
-        const auth = props.locals.auth;
-        if (!auth) throw error(401, 'Unauthorized');
+        if (requireAuth === undefined) {
+            requireAuth = true as MustHaveAuth;
+        }
 
-        const cached = getCachedResponse(url, auth.id);
+        const url = props.url.href;
+        let auth = props.locals.auth as Auth | MustHaveAuth extends true ? Auth : undefined;
+        if (requireAuth) {
+            if (!auth) throw error(401, 'Unauthorized');
+        } else {
+            auth = undefined as MustHaveAuth extends true ? Auth : undefined;
+        }
+
+        const cached = getCachedResponse(url, auth?.id || '');
 
         if (cached) {
             return cached as OutputData & App.PageData;
@@ -178,7 +188,7 @@ export function cachedPageRoute<
         // stringify and parse to turn into a plain object
         const response = JSON.parse(JSON.stringify(res)) as OutputData;
 
-        cacheResponse(url, auth.id, response);
+        cacheResponse(url, auth?.id || '', response);
 
         return response as OutputData & App.PageData;
     }) satisfies (

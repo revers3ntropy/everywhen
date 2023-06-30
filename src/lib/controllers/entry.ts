@@ -549,7 +549,6 @@ export class Entry {
         }
 
         const newFlags = EntryFlags.setPinned(self.flags, pinned);
-        console.log(newFlags);
 
         await query`
             UPDATE entries

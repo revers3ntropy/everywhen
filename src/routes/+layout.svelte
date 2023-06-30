@@ -2,7 +2,7 @@
     import '../app.less';
     import type { PageData } from './$types';
     import { onMount } from 'svelte';
-    import { page } from '$app/stores';
+    import { navigating } from '$app/stores';
     import Modal from 'svelte-simple-modal';
     import Notifications from '$lib/components/notifications/Notifications.svelte';
     import { POLL_FOR_UPDATE_INTERVAL } from '$lib/constants';
@@ -36,8 +36,16 @@
 
     let newVersionAvailable = false;
     let newVersion = '<error>';
+    let root: HTMLDivElement;
 
-    $: $page && popup.set(null);
+    $: if ($navigating) {
+        // when the page changes, close the popup
+        // and scroll to the top
+        popup.set(null);
+        if (root) {
+            root.scrollTop = 0;
+        }
+    }
 </script>
 
 <svelte:head>
@@ -52,7 +60,7 @@
     />
 </svelte:head>
 
-<div data-sveltekit-preload-data="hover" data-theme={$theme} class="root">
+<div data-sveltekit-preload-data="hover" data-theme={$theme} class="root" bind:this={root}>
     <svg class="accent-gradient-svg" height={0} width={0}>
         <linearGradient id="accent-gradient" x1={1} x2={1} y1={0} y2={1}>
             <stop offset={0} stop-color="var(--secondary)" />

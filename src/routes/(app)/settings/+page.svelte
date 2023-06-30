@@ -42,7 +42,7 @@
 
     function changePassword() {
         showPopup(ChangePasswordDialog, {
-            auth: data
+            auth: data.auth
         });
     }
 

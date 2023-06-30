@@ -1,3 +1,4 @@
+import { errorLogger } from '$lib/utils/log';
 import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { Result } from '../utils/result';
@@ -134,6 +135,27 @@ export class Settings<T = unknown> {
         return Result.ok(new Settings(id, now, key, value));
     }
 
+    /**
+     * This should very rarely be called,
+     * only as an error correction measure
+     */
+    public static async clearDuplicateKeys(
+        query: QueryFunc,
+        auth: Auth,
+        duplicated: Set<string>
+    ): Promise<void> {
+        errorLogger.error('Clearing duplicate settings keys: ', [...duplicated]);
+        for (const key of duplicated) {
+            await query`
+                DELETE FROM settings
+                WHERE user = ${auth.id}
+                    AND \`key\` = ${key}
+                ORDER BY created
+                LIMIT 1
+            `;
+        }
+    }
+
     public static async all(query: QueryFunc, auth: Auth): Promise<Result<Settings[]>> {
         const settings = await query<
             {
@@ -147,6 +169,19 @@ export class Settings<T = unknown> {
             FROM settings
             WHERE user = ${auth.id}
         `;
+
+        // check for duplicates
+        const seenKeys = new Set<string>();
+        const duplicateKeys = new Set<string>();
+        settings.forEach(setting => {
+            if (seenKeys.has(setting.key)) {
+                duplicateKeys.add(setting.key);
+            }
+            seenKeys.add(setting.key);
+        });
+        if (duplicateKeys.size > 0) {
+            await Settings.clearDuplicateKeys(query, auth, duplicateKeys);
+        }
 
         return Result.collect(
             settings.map(setting => {
@@ -223,7 +258,11 @@ export class Settings<T = unknown> {
         return Result.ok(null);
     }
 
-    public static async changeKey(query: QueryFunc, auth: Auth, newKey: string): Promise<Result> {
+    public static async changeEncryptionKeyInDB(
+        query: QueryFunc,
+        auth: Auth,
+        newKey: string
+    ): Promise<Result> {
         const { val: unencryptedSettings, err } = await Settings.all(query, auth);
         if (err) return Result.err(err);
         for (const setting of unencryptedSettings) {

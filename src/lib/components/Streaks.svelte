@@ -41,7 +41,7 @@
 
         const { err, val } = await api.get(auth, '/entries/streaks', {
             // cache busting - otherwise streaks are static through day changes
-            x: fmtUtc(nowUtc(), currentTzOffset(), 'yyyy-MM-dd')
+            x: fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD')
         });
         if (err) {
             errorLogger.error('Failed to get streaks', err);

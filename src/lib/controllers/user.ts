@@ -163,7 +163,7 @@ export class User {
         const { err } = await Backup.restore(query, newAuth, encryptedBackup, auth.key);
         if (err) return Result.err(err);
 
-        return await Settings.changeKey(query, auth, newKey);
+        return await Settings.changeEncryptionKeyInDB(query, auth, newKey);
     }
 }
 
