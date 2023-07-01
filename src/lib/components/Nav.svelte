@@ -29,7 +29,7 @@
     import { STORE_KEY, Theme } from '$lib/constants';
     import { Backup } from '$lib/controllers/backup/backup.client';
     import type { Auth } from '$lib/controllers/user/user';
-    import { Event as EventController } from '$lib/controllers/event/event';
+    import { Event as EventController } from '$lib/controllers/event/event.client';
     import type { SettingsConfig } from '$lib/controllers/settings/settings';
     import { nowUtc } from '$lib/utils/time';
     import { eventsSortKey, obfuscated, passcodeLastEntered, theme } from '$lib/stores';

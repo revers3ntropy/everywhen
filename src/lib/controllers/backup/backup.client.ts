@@ -1,4 +1,4 @@
-import { Entry } from '$lib/controllers/entry/entry';
+import { Entry } from '$lib/controllers/entry/entry.client';
 import { SemVer } from '$lib/utils/semVer';
 import { encrypt } from '$lib/security/encryption';
 import { download as downloadFile } from '../../utils/files';

@@ -1,10 +1,11 @@
 <script lang="ts">
     import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
+    import type { RawEntry } from '$lib/controllers/entry/entry';
     import { tooltip } from '@svelte-plugins/tooltips';
     import LocationToggle from '$lib/components/location/LocationToggle.svelte';
     import LabelSelect from '$lib/components/label/LabelSelect.svelte';
     import TextBoxOutline from 'svelte-material-icons/TextBoxOutline.svelte';
-    import { Entry, type RawEntry } from '$lib/controllers/entry/entry';
+    import { Entry } from '$lib/controllers/entry/entry.client';
     import type { Label } from '$lib/controllers/label/label';
     import type { Auth } from '$lib/controllers/user/user';
     import { dispatch } from '$lib/dataChangeEvents';

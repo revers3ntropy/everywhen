@@ -3,8 +3,8 @@
     import { tooltip } from '@svelte-plugins/tooltips';
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
-    import { Entry } from '$lib/controllers/entry/entry';
     import type { Auth } from '$lib/controllers/user/user';
+    import { Entry } from '$lib/controllers/entry/entry.client';
     import { showPopup } from '$lib/utils/popups';
     import { obfuscate } from '$lib/utils/text';
     import { fmtUtc, nowUtc, utcEq } from '$lib/utils/time';

@@ -3,7 +3,7 @@
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import { api } from '$lib/utils/apiRequest';
     import { onMount } from 'svelte';
-    import { Entry as EntryController } from '$lib/controllers/entry/entry';
+    import { Entry as EntryController } from '$lib/controllers/entry/entry.client';
     import Entry from '$lib/components/entry/Entry.svelte';
     import { obfuscated } from '$lib/stores';
     import type { PageData } from './$types';

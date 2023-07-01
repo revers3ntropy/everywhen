@@ -1,10 +1,9 @@
 <script lang="ts">
     import { browser } from '$app/environment';
-    import { ANIMATION_DURATION } from '$lib/constants';
-    import { dispatch } from '$lib/dataChangeEvents';
-    import Bin from 'svelte-material-icons/Delete.svelte';
-    import { tooltip } from '@svelte-plugins/tooltips';
     import { slide } from 'svelte/transition';
+    import { dispatch } from '$lib/dataChangeEvents';
+    import { tooltip } from '@svelte-plugins/tooltips';
+    import Bin from 'svelte-material-icons/Delete.svelte';
     import Restore from 'svelte-material-icons/DeleteRestore.svelte';
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
@@ -13,10 +12,11 @@
     import Heart from 'svelte-material-icons/Heart.svelte';
     import HeartOffOutline from 'svelte-material-icons/HeartOffOutline.svelte';
     import type { Location } from '$lib/controllers/location/location';
-    import { Entry } from '$lib/controllers/entry/entry';
+    import { Entry } from '$lib/controllers/entry/entry.client';
     import type { Label as LabelController } from '../../controllers/label/label';
     import type { Auth } from '$lib/controllers/user/user';
     import { popup } from '$lib/stores';
+    import { ANIMATION_DURATION } from '$lib/constants';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
     import { obfuscate, rawMdToHtml } from '$lib/utils/text';

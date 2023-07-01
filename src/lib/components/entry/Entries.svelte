@@ -1,22 +1,23 @@
 <script lang="ts">
-    import { browser } from '$app/environment';
-    import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
-    import { listen } from '$lib/dataChangeEvents';
-    import { encrypt } from '$lib/security/encryption.js';
-    import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
     import { onMount } from 'svelte';
+    import { browser } from '$app/environment';
     import { inview } from 'svelte-inview';
     import Bin from 'svelte-material-icons/Delete.svelte';
     import Search from 'svelte-material-icons/Magnify.svelte';
-    import EntryGroup from '$lib/components/entry/EntryGroup.svelte';
-    import { Entry, type EntryFilter } from '$lib/controllers/entry/entry';
+    import type { Location } from '$lib/controllers/location/location';
+    import type { EntryFilter } from '$lib/controllers/entry/entry';
     import type { Auth } from '$lib/controllers/user/user';
     import { obfuscated } from '$lib/stores';
+    import { listen } from '$lib/dataChangeEvents';
     import { api } from '$lib/utils/apiRequest';
+    import { encrypt } from '$lib/security/encryption.js';
+    import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
+    import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
+    import { Entry } from '$lib/controllers/entry/entry.client';
     import Spinner from '../BookSpinner.svelte';
+    import EntryGroup from '$lib/components/entry/EntryGroup.svelte';
     import Sidebar from './EntriesSidebar.svelte';
-    import type { Location } from '$lib/controllers/location/location';
 
     interface IOptions extends EntryFilter {
         readonly count?: number;

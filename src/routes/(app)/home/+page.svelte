@@ -9,7 +9,7 @@
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import History from 'svelte-material-icons/History.svelte';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
-    import { Entry } from '$lib/controllers/entry/entry';
+    import { Entry } from '$lib/controllers/entry/entry.client';
     import { obfuscated } from '$lib/stores.js';
     import { dayUtcFromTimestamp, fmtUtc } from '$lib/utils/time';
     import type { PageData } from './$types';

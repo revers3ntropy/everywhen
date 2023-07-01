@@ -1,6 +1,6 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
-    import { Settings } from '$lib/controllers/settings/settings';
+    import { Settings } from '$lib/controllers/settings/settings.client';
     import { populateCookieWritablesWithCookies } from '$lib/stores';
     import ChevronRight from 'svelte-material-icons/ChevronRight.svelte';
     import Cookie from 'js-cookie';
