@@ -9,10 +9,7 @@
     export let startYear = 2000;
 
     function drawYears(state: RenderProps) {
-        let year = Math.max(
-            new Date(state.renderPosToTime(0) * 1000).getFullYear() || 0,
-            startYear
-        );
+        let year = Math.max(new Date(state.xToTime(0) * 1000).getFullYear() || 0, startYear);
 
         let showYearText = state.zoom >= 2e-6;
         let showBothSidesText = state.zoom >= 1e-5;
@@ -43,10 +40,7 @@
     function drawMonths(state: RenderProps) {
         if (state.zoom < 1e-5) return;
 
-        let year = Math.max(
-            new Date(state.renderPosToTime(0) * 1000).getFullYear() || 0,
-            startYear
-        );
+        let year = Math.max(new Date(state.xToTime(0) * 1000).getFullYear() || 0, startYear);
 
         let month = 0;
 
@@ -79,7 +73,7 @@
     function drawDays(state: RenderProps) {
         if (state.zoom < 5e-5) return;
 
-        let leftMost = state.renderPosToTime(0);
+        let leftMost = state.xToTime(0);
         const thisWeek = fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-WW');
         const lastWeek = fmtUtc(nowUtc() - 604800, currentTzOffset(), 'YYYY-WW');
         const nextWeek = fmtUtc(nowUtc() + 604800, currentTzOffset(), 'YYYY-WW');
@@ -105,7 +99,7 @@
             let dayStart =
                 new Date(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate()).getTime() /
                 1000;
-            let renderPos = state.timeToRenderPos(dayStart);
+            let renderPos = state.timeToX(dayStart);
 
             if (renderPos > state.width) break;
 
@@ -173,7 +167,7 @@
     function drawHours(state: RenderProps) {
         if (state.zoom < 5e-3) return;
 
-        let leftMost = state.renderPosToTime(0);
+        let leftMost = state.xToTime(0);
 
         const firstHourTimestamp = new Date(startYear, 0, 1).getTime() / 1000;
         if (leftMost < firstHourTimestamp) {
@@ -187,7 +181,7 @@
         const showHourText = state.zoom >= 1.2e-2;
 
         while (true) {
-            let renderPos = state.timeToRenderPos(hour);
+            let renderPos = state.timeToX(hour);
 
             if (renderPos > state.width) break;
 

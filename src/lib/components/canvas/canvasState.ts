@@ -150,6 +150,16 @@ export class CanvasState implements CanvasListeners {
             }
         });
 
+        this.listen('mousedown', event => {
+            if (event.button !== 0) return;
+
+            for (const interactable of this.interactables) {
+                if (!interactable.hovering || !interactable.mounted) continue;
+                interactable.onMouseDown?.(this.asRenderProps(), this.mouseTime, this.mouseY);
+                return;
+            }
+        });
+
         this.listen('contextmenu', evt => {
             for (const interactable of this.interactables) {
                 if (!interactable.hovering || !interactable.contextMenu || !interactable.mounted) {
@@ -273,10 +283,6 @@ export class CanvasState implements CanvasListeners {
         this.interactables.push(interactable);
     }
 
-    public removeInteractable(interactable: Interactable) {
-        this.interactables = this.interactables.filter(i => i !== interactable);
-    }
-
     public center(): number {
         return this.width / 2;
     }
@@ -289,7 +295,7 @@ export class CanvasState implements CanvasListeners {
         return (pos - center) * zoom + center;
     }
 
-    public timeToRenderPos(t: TimestampSecs): number {
+    public timeToX(t: TimestampSecs): number {
         t -= new Date().getTimezoneOffset() * 60;
         t = nowUtc(false) - t + this.cameraOffset;
         t = this.zoomScaledPosition(t, this.zoom, this.cameraOffset);
@@ -305,22 +311,22 @@ export class CanvasState implements CanvasListeners {
         second = 0
     ): number {
         const t = new Date(year, month, date, hour, minute, second).getTime() / 1000;
-        return this.timeToRenderPos(t);
+        return this.timeToX(t);
     }
 
-    public renderPosToTime(pos: number): TimestampSecs {
+    public xToTime(pos: number): TimestampSecs {
         pos = this.width - pos;
         pos = this.zoomScaledPosition(pos, 1 / this.zoom, this.cameraOffset);
         return nowUtc(false) - pos + this.cameraOffset + new Date().getTimezoneOffset() * 60;
     }
 
     public zoomOnCenter(deltaZoom: number) {
-        const centerTime = this.renderPosToTime(this.width / 2);
+        const centerTime = this.xToTime(this.width / 2);
 
         this.zoom *= deltaZoom;
         this.zoom = Math.max(Math.min(100, this.zoom), 1e-10);
 
-        const newCenterTime = this.renderPosToTime(this.width / 2);
+        const newCenterTime = this.xToTime(this.width / 2);
         this.cameraOffset -= (newCenterTime - centerTime) * this.zoom;
     }
 
@@ -376,13 +382,17 @@ export class CanvasState implements CanvasListeners {
         }
         const offset = this.cameraOffset;
         this.cameraOffset = 0;
-        const nowRenderPos = this.timeToRenderPos(time);
+        const nowRenderPos = this.timeToX(time);
         this.cameraOffset = offset;
         return nowRenderPos - this.width * acrossScreen;
     }
 
     public getMouseTime(event: MouseEvent | TouchEvent): number {
-        return this.renderPosToTime(this.getMouseXRaw(event));
+        return this.xToTime(this.getMouseXRaw(event));
+    }
+
+    public moveX(x: number) {
+        this.cameraOffset += x;
     }
 
     public zoomTo(start: TimestampSecs, end: TimestampSecs, marginPercent = 0.25) {

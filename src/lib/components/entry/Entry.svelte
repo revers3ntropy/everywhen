@@ -248,15 +248,16 @@
     </div>
 
     {#if showingMap}
-        <div
-            transition:slide={{ duration: ANIMATION_DURATION, axis: 'y' }}
-            style="margin-bottom: 1rem"
-        >
+        <i class="text-light" style="font-size: 0.9rem">
+            Created at lat {latitude}, lng {longitude}
+        </i>
+        <div transition:slide={{ duration: ANIMATION_DURATION, axis: 'y' }} class="map-container">
             <Map
                 entriesInteractable={false}
                 {auth}
-                width="calc(100% - 2rem)"
+                width="100%"
                 height="300px"
+                mobileHeight="200px"
                 entries={[
                     {
                         id,
@@ -451,6 +452,14 @@
             &:hover {
                 background: var(--v-light-accent);
             }
+        }
+    }
+
+    .map-container {
+        margin: 0.5rem 1rem 1rem 1rem;
+
+        @media @mobile {
+            margin: 0.5rem 0;
         }
     }
 </style>

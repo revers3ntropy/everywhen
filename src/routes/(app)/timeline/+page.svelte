@@ -11,7 +11,6 @@
     import Filters from './Filters.svelte';
     import NowLine from './NowLine.svelte';
     import TimeCursor from './TimeCursor.svelte';
-    import ContextMenu from './ContextMenu.svelte';
     import TimeMarkers from './TimeMarkers.svelte';
     import { addYToEvents, type EventWithYLevel, getInitialZoomAndPos } from './utils';
     import type { PageData } from './$types';
@@ -87,7 +86,7 @@
 
         body,
         .root {
-            max-height: 100vw;
+            max-height: 100vh;
 
             &::-webkit-scrollbar {
                 display: none;
@@ -108,9 +107,8 @@
 
 <main>
     <Canvas>
-        <Controls />
+        <Controls auth={data.auth} />
         <Background />
-        <ContextMenu auth={data.auth} />
 
         <TimeMarkers startYear={data.settings.yearOfBirth.value} />
 

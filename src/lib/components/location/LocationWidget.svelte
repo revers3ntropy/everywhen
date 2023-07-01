@@ -26,23 +26,12 @@
         nearby = res.near;
         touching = res.touching;
     }
-
-    $: coordsTooltip = {
-        content: `Created at ${latitude}, ${longitude} (lat, lng)`,
-        position: 'right' as TooltipPosition
-    };
 </script>
 
 <span class="outer">
-    {#if entryId}
-        <span use:tooltip={coordsTooltip} class="flex-center">
-            <MapMarker size="20" />
-        </span>
-    {:else}
-        <span use:tooltip={coordsTooltip} class="flex-center">
-            <MapMarker size="20" />
-        </span>
-    {/if}
+    <span class="flex-center">
+        <MapMarker size="20" />
+    </span>
     {#if touching.length}
         <span class="multi-locations-container">
             {#each touching as location, i}

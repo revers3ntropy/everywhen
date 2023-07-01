@@ -49,7 +49,7 @@
         render(state) {
             if (thisIsDeleted) return;
 
-            const x = state.timeToRenderPos(start);
+            const x = state.timeToX(start);
             const y = yRenderPos(state.centerLnY());
             const width = duration * state.zoom;
 
@@ -116,7 +116,7 @@
             if (isInstantEvent) {
                 const h = state.centerLnY() - (yRenderPos(state.centerLnY()) + HEIGHT);
                 return new DurationRectCollider(
-                    state.renderPosToTime(state.timeToRenderPos(start) - 5),
+                    state.xToTime(state.timeToX(start) - 5),
                     yRenderPos(state.centerLnY()) + HEIGHT - SINGLE_EVENT_CIRCLE_RADIUS,
                     10 / state.zoom,
                     h + SINGLE_EVENT_CIRCLE_RADIUS

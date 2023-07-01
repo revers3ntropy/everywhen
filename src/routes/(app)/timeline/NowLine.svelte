@@ -6,7 +6,7 @@
 
     interactable({
         render(state) {
-            const nowLinePos = state.timeToRenderPos(nowUtc(false));
+            const nowLinePos = state.timeToX(nowUtc(false));
 
             if (nowLinePos <= 0) {
                 // not on screen
@@ -26,13 +26,9 @@
         },
 
         collider(state: RenderProps) {
-            return new RectCollider(
-                state.timeToRenderPos(nowUtc(false)) - 10,
-                0,
-                20,
-                state.height,
-                { zIndex: -2 }
-            );
+            return new RectCollider(state.timeToX(nowUtc(false)) - 10, 0, 20, state.height, {
+                zIndex: -2
+            });
         }
     });
 </script>

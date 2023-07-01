@@ -32,7 +32,7 @@
     interactable({
         cursorOnHover: 'pointer',
         render(state) {
-            const renderPos = state.timeToRenderPos(created);
+            const renderPos = state.timeToX(created);
             if (renderPos < 0 || renderPos > state.width) return;
 
             state.rect(renderPos - WIDTH / 2, state.centerLnY(), WIDTH, height, {
@@ -68,7 +68,7 @@
 
         collider(state) {
             return new RectCollider(
-                state.timeToRenderPos(created) - WIDTH / 2 - 1,
+                state.timeToX(created) - WIDTH / 2 - 1,
                 state.centerLnY(),
                 WIDTH + 2,
                 state.height - state.centerLnY()

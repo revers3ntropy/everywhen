@@ -25,16 +25,10 @@ export class DurationRectCollider implements Collider {
     }
 
     public debugDraw(state: RenderProps): void {
-        state.rect(
-            state.timeToRenderPos(this.time),
-            this.y,
-            this.duration * state.zoom,
-            this.height,
-            {
-                color: '#F00',
-                wireframe: true
-            }
-        );
+        state.rect(state.timeToX(this.time), this.y, this.duration * state.zoom, this.height, {
+            color: '#F00',
+            wireframe: true
+        });
     }
 }
 
@@ -51,7 +45,7 @@ export class RectCollider implements Collider {
     }
 
     colliding(state: RenderProps, time: TimestampSecs, y: Pixels): boolean {
-        const x = state.timeToRenderPos(time);
+        const x = state.timeToX(time);
         return x >= this.x && x <= this.x + this.width && y >= this.y && y <= this.y + this.height;
     }
 

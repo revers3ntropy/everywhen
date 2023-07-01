@@ -43,21 +43,21 @@
 
             state.text(
                 fmtUtc(time, currentTzOffset(), 'ddd DD MMM YYYY'),
-                state.timeToRenderPos(time),
+                state.timeToX(time),
                 state.centerLnY() - 32,
                 { color: state.colors.accent }
             );
             if (state.zoom > START_ZOOM) {
                 state.text(
                     fmtUtc(time, currentTzOffset(), 'hh:mma'),
-                    state.timeToRenderPos(time),
+                    state.timeToX(time),
                     state.centerLnY() - 44,
                     { color: state.colors.accent }
                 );
             }
 
             // cursor line
-            state.rect(state.timeToRenderPos(time), state.centerLnY() - 20, 1, 40, {
+            state.rect(state.timeToX(time), state.centerLnY() - 20, 1, 40, {
                 color: state.colors.accent
             });
         },
@@ -74,10 +74,7 @@
 
         onMouseUp(state, time) {
             if (!confirm('Create new event?')) return;
-            void newEvent(
-                Math.floor(time),
-                state.renderPosToTime(state.timeToRenderPos(Math.floor(time)) + 200)
-            );
+            void newEvent(Math.floor(time), state.xToTime(state.timeToX(Math.floor(time)) + 200));
         }
     });
 </script>

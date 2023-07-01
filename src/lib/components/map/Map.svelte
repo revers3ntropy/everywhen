@@ -44,13 +44,15 @@
 
     // https://openlayers.org/
 
-    export let entries: EntryLocation[] = [];
-    export let locations: Location[] = [];
     export let auth: Auth;
+    export let entries = [] as EntryLocation[];
+    export let locations = [] as Location[];
     export let hideAgentWidget: boolean;
-    export let width = 'calc(100vw - 5rem)';
-    export let height = '89vh';
     export let entriesInteractable = true;
+    export let width = 'calc(100vw - 2rem)';
+    export let height = 'calc(100vh - var(--nav-height) - 1rem)';
+    export let mobileWidth = '100%';
+    export let mobileHeight = 'calc(100vh - var(--nav-height) - 5rem)';
 
     async function reloadLocations() {
         const res = displayNotifOnErr(await api.get(auth, '/locations'));
@@ -369,7 +371,7 @@
 <div
     class="map"
     class:hovering={hoveringSomething}
-    style="width: {width}; height: {height};"
+    style="--width: {width}; --height: {height}; --mobile-width: {mobileWidth}; --mobile-height: {mobileHeight};"
     id="ol-map-{mapId}"
     use:map={{ locations, entries }}
 >
@@ -388,23 +390,26 @@
     .map {
         .container();
         padding: 0;
-        margin: 0 0 0 1rem;
+        margin: 0;
         border: none;
         position: relative;
         overflow: hidden;
 
+        width: var(--width);
+        height: var(--height);
+
         @media @mobile {
-            width: 100%;
-            height: calc(100vh - var(--nav-height));
+            width: var(--mobile-width);
+            height: var(--mobile-height);
+            padding: 0;
             margin: 0;
-            border-radius: 0;
         }
 
         &.hovering {
             cursor: pointer;
         }
 
-        :global(*) {
+        & :global(*) {
             color: black;
         }
 
@@ -444,12 +449,6 @@
         &.right {
             left: auto;
             right: 0.5rem;
-        }
-    }
-
-    @media @mobile {
-        :global(main) {
-            padding: 0;
         }
     }
 </style>

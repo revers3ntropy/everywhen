@@ -13,9 +13,11 @@ import type { Collider } from './collider';
 export interface Interactable extends Listener {
     onHover?: (time: TimestampSecs, y: number) => void;
     onMouseUp?: (state: RenderProps, time: TimestampSecs, y: number) => void;
+    onMouseDown?: (state: RenderProps, time: TimestampSecs, y: number) => void;
     collider?: (state: RenderProps) => Collider | null;
     cursorOnHover?: CursorStyle;
     contextMenu?: ContextMenuOptions;
+    [k: string]: unknown;
 }
 
 export function interactable(interactable: Interactable): void {
