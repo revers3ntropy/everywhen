@@ -46,6 +46,7 @@
 
     interactable({
         cursorOnHover: 'pointer',
+        hovering: false,
         render(state) {
             if (thisIsDeleted) return;
 

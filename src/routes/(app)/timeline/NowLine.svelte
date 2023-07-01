@@ -5,6 +5,7 @@
     import { nowUtc } from '$lib/utils/time';
 
     interactable({
+        hovering: false,
         render(state) {
             const nowLinePos = state.timeToX(nowUtc(false));
 

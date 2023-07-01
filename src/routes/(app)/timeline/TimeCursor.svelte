@@ -35,6 +35,7 @@
 
     interactable({
         cursorOnHover: 'crosshair',
+        hovering: false,
         render(state) {
             if (!this.hovering) return;
 

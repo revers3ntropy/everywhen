@@ -9,6 +9,7 @@
     import EntryInTimeline from './EntryInTimeline.svelte';
     import EventInTimeline from './EventInTimeline.svelte';
     import Filters from './Filters.svelte';
+    import MobileZoom from './MobileZoom.svelte';
     import NowLine from './NowLine.svelte';
     import TimeCursor from './TimeCursor.svelte';
     import TimeMarkers from './TimeMarkers.svelte';
@@ -108,6 +109,7 @@
 <main>
     <Canvas>
         <Controls auth={data.auth} />
+        <MobileZoom auth={data.auth} />
         <Background />
 
         <TimeMarkers startYear={data.settings.yearOfBirth.value} />

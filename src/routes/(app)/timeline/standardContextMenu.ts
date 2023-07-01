@@ -8,7 +8,7 @@ import { nowUtc } from '$lib/utils/time';
 import type { CanvasState } from '$lib/components/canvas/canvasState';
 import type { Writable } from 'svelte/store';
 
-export function makeContextMenu(
+export function makeStandardContextMenu(
     auth: Auth,
     canvasState: Writable<CanvasState>
 ): ContextMenuOptions {

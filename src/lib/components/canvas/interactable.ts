@@ -12,15 +12,14 @@ import type { Collider } from './collider';
 
 export interface Interactable extends Listener {
     onHover?: (time: TimestampSecs, y: number) => void;
-    onMouseUp?: (state: RenderProps, time: TimestampSecs, y: number) => void;
-    onMouseDown?: (state: RenderProps, time: TimestampSecs, y: number) => void;
+    onMouseUp?: (state: RenderProps, time: TimestampSecs, y: number, isTouch: boolean) => void;
+    onMouseDown?: (state: RenderProps, time: TimestampSecs, y: number, isTouch: boolean) => void;
     collider?: (state: RenderProps) => Collider | null;
     cursorOnHover?: CursorStyle;
     contextMenu?: ContextMenuOptions;
-    [k: string]: unknown;
 }
 
-export function interactable(interactable: Interactable): void {
+export function interactable<T extends Interactable>(interactable: T): void {
     let wasHovering = false;
 
     const ctx = getContext<CanvasContext>(key);
@@ -28,7 +27,6 @@ export function interactable(interactable: Interactable): void {
     const element = {
         ready: false,
         mounted: false,
-        hovering: false,
         render(state, dt) {
             if (interactable.hovering) {
                 if (interactable.cursorOnHover) {

@@ -31,6 +31,7 @@
 
     interactable({
         cursorOnHover: 'pointer',
+        hovering: false,
         render(state) {
             const renderPos = state.timeToX(created);
             if (renderPos < 0 || renderPos > state.width) return;

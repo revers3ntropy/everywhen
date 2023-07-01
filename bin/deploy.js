@@ -376,7 +376,7 @@ async function restartServer(localVersion) {
         console.log('Restarting remote server...');
         await runRemoteCommand(`cd ~/${remoteDir()} && npm run start`);
 
-        await sleep(500);
+        await sleep(1000);
 
         try {
             const remoteVersion = await getRemoteVersion().catch(console.error);

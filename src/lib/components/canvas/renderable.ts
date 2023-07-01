@@ -7,7 +7,7 @@ export interface Renderable {
     setup?: SetupCallback;
 }
 
-export function renderable(render?: RenderCallback | Renderable): void {
+export function renderable<T extends RenderCallback | Renderable>(render: T): void {
     const ctx: CanvasContext = getContext(key);
     const element = {
         ready: false,

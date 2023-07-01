@@ -27,7 +27,8 @@ export class DurationRectCollider implements Collider {
     public debugDraw(state: RenderProps): void {
         state.rect(state.timeToX(this.time), this.y, this.duration * state.zoom, this.height, {
             color: '#F00',
-            wireframe: true
+            wireframe: true,
+            zIndex: 100
         });
     }
 }
@@ -52,7 +53,8 @@ export class RectCollider implements Collider {
     public debugDraw(state: RenderProps): void {
         state.rect(this.x, this.y, this.width, this.height, {
             color: '#FF0000',
-            wireframe: true
+            wireframe: true,
+            zIndex: 100
         });
     }
 }

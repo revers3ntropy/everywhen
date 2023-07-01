@@ -134,7 +134,12 @@ export class CanvasState implements CanvasListeners {
         this.listen('mousemove', e => {
             this.mouseTime = this.getMouseTime(e);
             this.mouseY = this.getMouseYRaw(e);
+            this.updateHoveringOnInteractables();
+        });
 
+        this.listen('touchmove', e => {
+            this.mouseTime = this.getMouseTime(e);
+            this.mouseY = this.getMouseYRaw(e);
             this.updateHoveringOnInteractables();
         });
 
@@ -142,10 +147,11 @@ export class CanvasState implements CanvasListeners {
             if (event.button !== 0) return;
 
             this.hideContextMenu();
+            const state = this.asRenderProps();
 
             for (const interactable of this.interactables) {
                 if (!interactable.hovering || !interactable.mounted) continue;
-                interactable.onMouseUp?.(this.asRenderProps(), this.mouseTime, this.mouseY);
+                interactable.onMouseUp?.(state, this.mouseTime, this.mouseY, false);
                 return;
             }
         });
@@ -153,9 +159,39 @@ export class CanvasState implements CanvasListeners {
         this.listen('mousedown', event => {
             if (event.button !== 0) return;
 
+            const state = this.asRenderProps();
+
             for (const interactable of this.interactables) {
                 if (!interactable.hovering || !interactable.mounted) continue;
-                interactable.onMouseDown?.(this.asRenderProps(), this.mouseTime, this.mouseY);
+                interactable.onMouseDown?.(state, this.mouseTime, this.mouseY, false);
+                return;
+            }
+        });
+
+        this.listen('touchend', event => {
+            const time = this.getMouseTime(event);
+            const y = this.getMouseYRaw(event);
+            const state = this.asRenderProps();
+
+            for (const interactable of this.interactables) {
+                if (!interactable.hovering || !interactable.mounted) continue;
+                interactable.onMouseUp?.(state, time, y, true);
+                return;
+            }
+        });
+
+        this.listen('touchstart', event => {
+            const time = this.getMouseTime(event);
+            const y = this.getMouseYRaw(event);
+            const state = this.asRenderProps();
+
+            this.mouseTime = time;
+            this.mouseY = y;
+            this.updateHoveringOnInteractables();
+
+            for (const interactable of this.interactables) {
+                if (!interactable.hovering || !interactable.mounted) continue;
+                interactable.onMouseDown?.(state, time, y, true);
                 return;
             }
         });
@@ -409,7 +445,8 @@ export class CanvasState implements CanvasListeners {
         h: number,
         { radius = 0, color = this.colors.primary, wireframe = false, zIndex = 0 } = {}
     ) {
-        if (!this.ctx) throw new Error('Canvas not set');
+        if (!this.ctx) throw 'Canvas not set';
+        if (zIndex < 0) throw 'zIndex < 0';
         if (zIndex !== 0) {
             this.renderQueue.push({
                 zIndex,
@@ -456,6 +493,7 @@ export class CanvasState implements CanvasListeners {
         } = {}
     ) {
         if (!this.ctx) throw new Error('Canvas not set');
+        if (zIndex < 0) throw 'zIndex < 0';
         if (zIndex !== 0) {
             this.renderQueue.push({
                 zIndex,
@@ -519,6 +557,7 @@ export class CanvasState implements CanvasListeners {
         { color = this.colors.primary, zIndex = 0 } = {}
     ) {
         if (!this.ctx) throw new Error('Canvas not set');
+        if (zIndex < 0) throw 'zIndex < 0';
         if (zIndex !== 0) {
             this.renderQueue.push({
                 zIndex,
