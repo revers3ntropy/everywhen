@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Label } from '$lib/controllers/label';
+    import type { Label } from '$lib/controllers/label';
     import { dispatch } from '$lib/dataChangeEvents';
     import { nowUtc } from '$lib/utils/time';
     import { createEventDispatcher } from 'svelte';
@@ -28,7 +28,7 @@
             })
         );
 
-        const label = new Label(id, labelColor, labelName, nowUtc());
+        const label: Label = { id, color: labelColor, name: labelName, created: nowUtc() };
         await dispatch.create('label', label);
 
         labelName = '';

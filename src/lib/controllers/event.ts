@@ -1,6 +1,5 @@
 import * as client from './event.client';
 import * as server from './event.server';
-
 import type { Label } from './label';
 
 // RawEvent is the raw data from the database,

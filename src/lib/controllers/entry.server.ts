@@ -360,13 +360,10 @@ namespace EntryUtils {
         query: QueryFunc,
         auth: Auth,
         self: Entry,
-        label: Label | string | null
+        label: string | null
     ): Promise<Result<Entry>> {
         if (label == null) {
             return Entry.removeLabel(query, auth, self);
-        }
-        if (label instanceof Label) {
-            label = label.id;
         }
 
         if (self.label?.id === label) {
@@ -416,7 +413,7 @@ namespace EntryUtils {
         newEntry: string,
         newLatitude: number | undefined,
         newLongitude: number | undefined,
-        newLabel: Label | string,
+        newLabel: string,
         tzOffset: number,
         agentData: string
     ): Promise<Result> {
@@ -449,10 +446,6 @@ namespace EntryUtils {
                     ${entry.label?.id ?? null},
                     ${encryptedEditAgentData || ''})
         `;
-
-        if (newLabel instanceof Label) {
-            newLabel = newLabel.id;
-        }
 
         await query`
             UPDATE entries
