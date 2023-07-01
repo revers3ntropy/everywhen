@@ -10,7 +10,6 @@
     import { Backup } from '$lib/controllers/backup';
     import { obfuscated, passcodeLastEntered } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
-    import { GETParamIsFalsy } from '$lib/utils/GETArgs';
     import { errorLogger } from '$lib/utils/log';
     import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
     import { nowUtc } from '$lib/utils/time';
@@ -80,12 +79,6 @@
     }
 
     let lastActivity = nowUtc();
-
-    $: obfuscated.set(data.settings.hideEntriesByDefault.value);
-
-    $: if (GETParamIsFalsy($page.url.searchParams.get('obfuscate'))) {
-        obfuscated.set(false);
-    }
 
     let showPasscodeModal = true;
 

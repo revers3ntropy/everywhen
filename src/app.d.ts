@@ -21,7 +21,7 @@ declare global {
         toLowerCase(): Lowercase<string>;
     }
 
-    type RawCookies = { [K in keyof typeof COOKIE_WRITEABLE_KEYS]: string };
+    type RawCookies = { [K in keyof typeof COOKIE_WRITEABLE_KEYS]?: string };
 
     // See https://kit.svelte.dev/docs/types#app
     declare namespace App {

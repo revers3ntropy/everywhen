@@ -1,13 +1,11 @@
+import type { SettingsConfig } from '$lib/controllers/settings';
 import { cookieWritable } from '$lib/cookieWritable';
 import { localStorageWritable } from '$lib/lsWritable';
 import type { SvelteComponent } from 'svelte';
 import { writable } from 'svelte/store';
-import {
-    COOKIE_WRITEABLE_DEFAULTS,
-    COOKIE_WRITEABLE_KEYS,
-    STORE_KEY,
-    type Theme
-} from './constants';
+import { COOKIE_WRITEABLE_KEYS, STORE_KEY, Theme } from './constants';
+
+export const popup = writable<typeof SvelteComponent | null | undefined>(null);
 
 export const enabledLocation = localStorageWritable<boolean, null>(
     STORE_KEY.enabledLocation,
@@ -26,13 +24,21 @@ export const eventsSortKey = localStorageWritable<EventsSortKey, null>(
 );
 export const obfuscated = localStorageWritable<boolean>(STORE_KEY.obfuscated, false, true);
 
-export const popup = writable<typeof SvelteComponent | null | undefined>(null);
+export const theme = cookieWritable<Theme>(COOKIE_WRITEABLE_KEYS.theme, Theme.light);
 
-export const theme = cookieWritable<Theme>(
-    COOKIE_WRITEABLE_KEYS.theme,
-    COOKIE_WRITEABLE_DEFAULTS.theme
-);
+/**
+ * Called in root layout, runs on both server and client.
+ * Only called when page refreshes.
+ */
+export function populateCookieWritablesWithCookies(
+    cookies: RawCookies,
+    settings: SettingsConfig | null
+) {
+    if (cookies.theme) {
+        theme.set(JSON.parse(cookies.theme) as Theme);
+    }
 
-export function populateCookieWritablesWithCookies(cookies: RawCookies) {
-    theme.set(JSON.parse(cookies.theme) as Theme);
+    if (settings?.hideEntriesByDefault?.value) {
+        obfuscated.set(true);
+    }
 }

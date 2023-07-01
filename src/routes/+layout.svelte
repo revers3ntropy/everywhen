@@ -18,14 +18,14 @@
     // and client side.
     // This means that the stores will be populated the whole time,
     // e.g. the theme will be loaded server side so no flash of light
-    populateCookieWritablesWithCookies(data.__cookieWritables);
+    populateCookieWritablesWithCookies(data.__cookieWritables, data.settings);
 
     async function checkForUpdate() {
         const currentVersion = __VERSION__;
         const versionResult = displayNotifOnErr(await api.get(null, '/version'));
 
-        newVersionAvailable = versionResult.v !== currentVersion;
         newVersion = versionResult.v;
+        newVersionAvailable = newVersion !== currentVersion;
     }
 
     onMount(() => {

@@ -10,7 +10,7 @@ import type { RequestHandler } from './$types';
 export const GET = cachedApiRoute(async auth => {
     const { err, val: settings } = await Settings.all(query, auth);
     if (err) throw error(500, err);
-    return apiResponse({ settings });
+    return { settings };
 }) satisfies RequestHandler;
 
 export const PUT = (async ({ request, cookies }) => {

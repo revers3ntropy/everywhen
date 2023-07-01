@@ -17,7 +17,8 @@
     export let description: string;
     export let unit = '';
     export let value: string | number | boolean;
-    export let created: number | null = null;
+    export let created = null as number | null;
+    export let showInSettings = true as boolean;
 
     let saving = false;
 

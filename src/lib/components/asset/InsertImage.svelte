@@ -71,7 +71,7 @@
 
             <hr />
 
-            <div style="width: 300px; height: 500px; overflow-y: scroll">
+            <div style="width: 300px; max-height: 500px; overflow-y: scroll">
                 {#if assetCount > -1 && assets.length}
                     <InfiniteScroller
                         bind:items={assets}

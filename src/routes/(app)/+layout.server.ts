@@ -1,25 +1,18 @@
-import { error, redirect } from '@sveltejs/kit';
-import { Settings, type SettingsConfig } from '$lib/controllers/settings';
-import { query } from '$lib/db/mysql';
+import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 
-export const load = (async ({ url, locals }) => {
+export const load = (async ({ url, locals, parent }) => {
+    // settings is set by root layout
+    await parent();
+
     const auth = locals.auth;
-    if (!auth) {
+    const settings = locals.settings;
+    if (!auth || !settings) {
         throw redirect(307, '/login?redirect=' + url.pathname.trim().slice(1));
     }
 
-    const { err: settingsErr, val: settings } = await Settings.allAsMap(query, auth);
-    if (settingsErr) throw error(500, settingsErr);
-
-    const settingsValues = JSON.parse(
-        JSON.stringify(Settings.fillWithDefaults(settings))
-    ) as SettingsConfig;
-
-    locals.settings = settingsValues;
-
     return {
         auth,
-        settings: settingsValues
+        settings
     };
 }) satisfies LayoutServerLoad;

@@ -1,4 +1,4 @@
-import { COOKIE_WRITEABLE_DEFAULTS, COOKIE_WRITEABLE_KEYS } from '$lib/constants';
+import { COOKIE_WRITEABLE_KEYS } from '$lib/constants';
 import { PageLoadLog } from '$lib/controllers/log';
 import type { Auth } from '$lib/controllers/user';
 import { tryGetAuthFromCookies } from '$lib/security/getAuthFromCookies';
@@ -93,7 +93,7 @@ async function logReq(
 }
 
 function getCookieWritableCookies(cookies: Cookies): App.Locals['__cookieWritables'] {
-    const result = {} as Mutable<Partial<App.Locals['__cookieWritables']>>;
+    const result = {} as Mutable<App.Locals['__cookieWritables']>;
 
     const cookieKeys = COOKIE_WRITEABLE_KEYS;
     const keyToNameMap = Object.fromEntries(
@@ -103,14 +103,6 @@ function getCookieWritableCookies(cookies: Cookies): App.Locals['__cookieWritabl
     for (const { name, value } of cookies.getAll()) {
         if (name in keyToNameMap) {
             result[keyToNameMap[name]] = value;
-        }
-    }
-
-    for (const key in COOKIE_WRITEABLE_DEFAULTS) {
-        if (!(key in result)) {
-            result[key as keyof typeof COOKIE_WRITEABLE_DEFAULTS] = JSON.stringify(
-                COOKIE_WRITEABLE_DEFAULTS[key as keyof typeof COOKIE_WRITEABLE_DEFAULTS]
-            );
         }
     }
 

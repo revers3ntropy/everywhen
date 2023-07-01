@@ -95,7 +95,9 @@
 
         <div class="settings">
             {#each settingsConfig as [key, config] (key)}
-                <Settings {...config} {...data.settings[key]} auth={data.auth} />
+                {#if SettingsController.config[key].showInSettings}
+                    <Settings {...config} {...data.settings[key]} auth={data.auth} />
+                {/if}
             {/each}
         </div>
     </section>

@@ -1,6 +1,9 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
+    import { Settings } from '$lib/controllers/settings';
+    import { populateCookieWritablesWithCookies } from '$lib/stores';
     import ChevronRight from 'svelte-material-icons/ChevronRight.svelte';
+    import Cookie from 'js-cookie';
     import { encryptionKeyFromPassword } from '$lib/security/authUtils';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
@@ -16,13 +19,23 @@
 
     async function login(): Promise<void> {
         actionPending = true;
-        displayNotifOnErr(
+        const auth = displayNotifOnErr(
             await api.get(null, '/auth', {
                 key: encryptionKeyFromPassword(password),
                 username
             }),
             () => (actionPending = false)
         );
+
+        const cookies = Cookie.get() as RawCookies;
+        const { settings: rawSettings } = displayNotifOnErr(
+            await api.get(auth, '/settings'),
+            () => (actionPending = false)
+        );
+        const settings = Settings.convertToMap(rawSettings);
+
+        populateCookieWritablesWithCookies(cookies, settings);
+
         await goto('/' + data.redirect);
     }
 </script>

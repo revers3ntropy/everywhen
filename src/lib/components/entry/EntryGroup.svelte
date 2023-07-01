@@ -127,7 +127,7 @@
     .entry-group {
         width: 100%;
         margin: 0;
-        padding: 0.5rem 0;
+        padding: 0;
 
         transition: height @transition;
 

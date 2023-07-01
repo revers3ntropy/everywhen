@@ -10,9 +10,9 @@ export const STORE_KEY = {
     enabledLocation: `${KEY_PREFIX}enabled_location`,
     sortEventsKey: `${KEY_PREFIX}events_sort_key`,
     journalingMode: `${KEY_PREFIX}journaling_mode`,
-    obfuscated: `${KEY_PREFIX}obfuscated`,
     key: `${KEY_PREFIX}key`,
-    username: `${KEY_PREFIX}username`
+    username: `${KEY_PREFIX}username`,
+    obfuscated: `${KEY_PREFIX}obfuscated`
 } as const;
 
 export enum Theme {
@@ -24,9 +24,17 @@ export const COOKIE_WRITEABLE_KEYS = {
     theme: `${KEY_PREFIX}theme`
 } as const;
 
-export const COOKIE_WRITEABLE_DEFAULTS = {
-    theme: Theme.light
-} as const;
+export const LS_TO_CLEAR_ON_LOGOUT = Object.freeze([
+    STORE_KEY.newEntryBody,
+    STORE_KEY.newEntryTitle,
+    STORE_KEY.newEntryLabel,
+    STORE_KEY.passcodeLastEntered,
+    STORE_KEY.enabledLocation,
+    STORE_KEY.sortEventsKey,
+    STORE_KEY.obfuscated
+]);
+
+export const COOKIES_TO_CLEAR_ON_LOGOUT = Object.freeze([]);
 
 // possible characters to show when the text is blurred
 export const OBFUSCATE_CHARS = 'abcdefghijklmnopqrstuvwxyz ';

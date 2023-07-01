@@ -37,9 +37,11 @@ export function cookieWritable<T>(
             }
         }
 
-        Cookie.set(cookieKey, JSON.stringify(initialValue), cookieOptions);
-    } else {
-        // get cookie from request headers
+        if (initialValue === null || initialValue === undefined) {
+            Cookie.remove(cookieKey);
+        } else {
+            Cookie.set(cookieKey, JSON.stringify(initialValue), cookieOptions);
+        }
     }
 
     const store = writable<T>(initialValue);
