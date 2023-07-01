@@ -11,7 +11,6 @@
     import type { ChangeEventHandler } from 'svelte/elements';
     import LabelSelect from '$lib/components/label/LabelSelect.svelte';
     import UtcTime from '../UtcTime.svelte';
-    import { Event as EventController } from '../../controllers/event';
     import { Event } from '$lib/controllers/event';
     import type { Label as LabelController } from '../../controllers/label';
     import type { Auth } from '$lib/controllers/user';
@@ -26,7 +25,7 @@
     export let obfuscated = true;
 
     export let bordered = true;
-    export let event: EventController & { deleted?: boolean };
+    export let event: Event & { deleted?: boolean };
     export let selectNameId = '';
     export let expanded = false;
     export let allowCollapseChange = true;
@@ -44,13 +43,13 @@
         const label = changes.label ? labels?.find(l => l.id === changes.label) : event.label;
 
         event = {
-            ...new EventController(
-                event.id,
-                changes.name || event.name,
-                changes.start || event.start,
-                changes.end || event.end,
-                event.created
-            ),
+            ...{
+                id: event.id,
+                name: changes.name || event.name,
+                start: changes.start || event.start,
+                end: changes.end || event.end,
+                created: event.created
+            },
             label
         };
         await dispatch.update('event', event);

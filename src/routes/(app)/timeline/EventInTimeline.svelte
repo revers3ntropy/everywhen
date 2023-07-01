@@ -21,7 +21,6 @@
     export let yLevel = 0;
     export let eventTextParityHeight: boolean;
     export let created: number;
-    export let decrypted: boolean;
 
     function yRenderPos(centerLineY: number) {
         const y = isInstantEvent ? 0 : yLevel;
@@ -171,7 +170,6 @@
         name = e.name;
         label = e.label || null;
         created = e.created;
-        decrypted = e.decrypted;
     });
     listen.event.onDelete(id => {
         if (id !== id) return;

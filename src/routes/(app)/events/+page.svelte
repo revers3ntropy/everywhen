@@ -43,7 +43,13 @@
             })
         );
 
-        const event = new EventController(id, EventController.NEW_EVENT_NAME, now, now, now);
+        const event = {
+            id,
+            name: EventController.NEW_EVENT_NAME,
+            start: now,
+            end: now,
+            created: now
+        };
 
         await dispatch.create('event', event);
         events = sortEvents([...events, event], $eventsSortKey || 'created');

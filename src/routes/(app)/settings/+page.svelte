@@ -12,7 +12,10 @@
     import { showPopup } from '$lib/utils/popups';
     import BackupOptions from '$lib/components/BackupOptions.svelte';
     import { Backup } from '$lib/controllers/backup.client';
-    import { settingsConfig, type SettingsKey } from '$lib/controllers/settings.client';
+    import {
+        type SettingsKey,
+        Settings as SettingsController
+    } from '$lib/controllers/settings.client';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import Settings from './Settings.svelte';
@@ -41,7 +44,7 @@
         });
     }
 
-    const settingsConfigEntries = Object.entries(settingsConfig) as [
+    const settingsConfigEntries = Object.entries(SettingsController.config) as [
         SettingsKey,
         SettingConfig<SettingValue>
     ][];

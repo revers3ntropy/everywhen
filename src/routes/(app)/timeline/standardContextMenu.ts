@@ -1,6 +1,5 @@
 import type { ContextMenuOptions } from '$lib/components/canvas/canvasState';
 import { displayNotifOnErr } from '$lib/components/notifications/notifications';
-import { Event } from '$lib/controllers/event';
 import type { Auth } from '$lib/controllers/user';
 import { dispatch } from '$lib/dataChangeEvents';
 import { api } from '$lib/utils/apiRequest';
@@ -22,16 +21,13 @@ export function makeStandardContextMenu(
             end
         };
         const { id } = displayNotifOnErr(await api.post(auth, '/events', event));
-        await dispatch.create(
-            'event',
-            new Event(
-                id,
-                event.name,
-                event.start,
-                event.end,
-                nowUtc() // not precise but fine
-            )
-        );
+        await dispatch.create('event', {
+            id,
+            name: event.name,
+            start: event.start,
+            end: event.end,
+            created: nowUtc() // not precise but fine
+        });
     }
 
     function resetCamera() {

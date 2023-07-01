@@ -4,9 +4,9 @@ import { Result } from '../utils/result';
 import { nowUtc } from '../utils/time';
 import type { Auth } from './user';
 import { UUId } from './uuid';
-import { settingsConfig, type SettingsKey } from '$lib/controllers/settings.client';
+import type { SettingsKey } from '$lib/controllers/settings.client';
 import { errorLogger } from '$lib/utils/log';
-import type { Settings as _Settings, SettingsConfig } from './settings';
+import { Settings as _Settings, type SettingsConfig } from './settings';
 export type Settings = _Settings;
 
 namespace SettingsUtils {
@@ -16,13 +16,13 @@ namespace SettingsUtils {
         key: string,
         value: unknown
     ): Promise<Result<Settings>> {
-        if (!(key in settingsConfig)) {
+        if (!(key in _Settings.config)) {
             return Result.err(`Invalid setting key`);
         }
 
         const now = nowUtc();
 
-        const expectedType = settingsConfig[key as SettingsKey].type;
+        const expectedType = _Settings.config[key as SettingsKey].type;
         if (typeof value !== expectedType) {
             return Result.err(
                 `Invalid setting value, expected ${expectedType} but got ${typeof value}`
@@ -122,11 +122,11 @@ namespace SettingsUtils {
         );
     }
 
-    export async function getValue<T extends keyof typeof settingsConfig>(
+    export async function getValue<T extends keyof typeof _Settings.config>(
         query: QueryFunc,
         auth: Auth,
         key: T
-    ): Promise<Result<(typeof settingsConfig)[T]['defaultValue']>> {
+    ): Promise<Result<(typeof _Settings.config)[T]['defaultValue']>> {
         const settings = await query<
             {
                 id: string;
@@ -142,11 +142,11 @@ namespace SettingsUtils {
         `;
 
         if (settings.length < 1) {
-            return Result.ok(settingsConfig[key].defaultValue);
+            return Result.ok(_Settings.config[key].defaultValue);
         }
         const { err, val } = decrypt(settings[0].value, auth.key);
         if (err) return Result.err(err);
-        return Result.ok(JSON.parse(val) as (typeof settingsConfig)[T]['defaultValue']);
+        return Result.ok(JSON.parse(val) as (typeof _Settings.config)[T]['defaultValue']);
     }
 
     export async function allAsMap(
