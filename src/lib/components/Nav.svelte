@@ -27,7 +27,7 @@
     import Dropdown from '$lib/components/Dropdown.svelte';
     import Streaks from '$lib/components/Streaks.svelte';
     import { STORE_KEY, Theme } from '$lib/constants';
-    import { Backup } from '$lib/controllers/backup';
+    import { Backup } from '$lib/controllers/backup.client';
     import type { Auth } from '$lib/controllers/user';
     import { Event as EventController } from '$lib/controllers/event';
     import type { SettingsConfig } from '$lib/controllers/settings';

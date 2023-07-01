@@ -7,7 +7,7 @@
     import { blur } from 'svelte/transition';
     import Cookie from 'js-cookie';
     import { ANIMATION_DURATION, STORE_KEY } from '$lib/constants';
-    import { Backup } from '$lib/controllers/backup';
+    import { Backup } from '$lib/controllers/backup.client';
     import { obfuscated, passcodeLastEntered } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { errorLogger } from '$lib/utils/log';

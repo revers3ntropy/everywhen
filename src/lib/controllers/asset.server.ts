@@ -9,7 +9,6 @@ import type { ResultSetHeader } from 'mysql2';
 import webp from 'webp-converter';
 import type { Asset as _Asset } from './asset';
 export type Asset = _Asset;
-export const Asset = { ...AssetUtils };
 
 namespace AssetUtils {
     export const fileExtToContentType: Readonly<Record<string, string>> = Object.freeze({
@@ -240,3 +239,5 @@ namespace AssetUtils {
         return Result.ok(null);
     }
 }
+
+export const Asset = { ...AssetUtils };

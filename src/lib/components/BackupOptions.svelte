@@ -2,7 +2,7 @@
     import Download from 'svelte-material-icons/Download.svelte';
     import DownloadLock from 'svelte-material-icons/DownloadLock.svelte';
     import Upload from 'svelte-material-icons/Upload.svelte';
-    import { Backup } from '../controllers/backup';
+    import { Backup } from '../controllers/backup.client';
     import type { Auth } from '../controllers/user';
     import { encryptionKeyFromPassword } from '../security/authUtils';
     import { api } from '../utils/apiRequest';

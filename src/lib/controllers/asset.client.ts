@@ -1,6 +1,5 @@
 import type { Asset as _Asset } from './asset';
 export type Asset = _Asset;
-export const Asset = { ...AssetUtils };
 
 export namespace AssetUtils {
     export function jsonIsRawAsset(json: unknown): json is Omit<Asset, 'id'> {
@@ -24,3 +23,5 @@ export namespace AssetUtils {
         return `![${fileName}](/api/assets/${publicId})`;
     }
 }
+
+export const Asset = { ...AssetUtils };

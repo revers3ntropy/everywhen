@@ -11,7 +11,7 @@
     import Skull from 'svelte-material-icons/Skull.svelte';
     import LockOutline from 'svelte-material-icons/LockOutline.svelte';
     import BackupOptions from '$lib/components/BackupOptions.svelte';
-    import { Backup } from '$lib/controllers/backup';
+    import { Backup } from '$lib/controllers/backup.client';
     import {
         type SettingConfig,
         Settings as SettingsController,
