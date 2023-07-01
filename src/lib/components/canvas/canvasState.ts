@@ -6,6 +6,8 @@ import type { Interactable } from './interactable';
 
 export const START_ZOOM = 1 / (60 * 60);
 
+const tzOffset: Seconds = new Date().getTimezoneOffset() * 60;
+
 interface Colors {
     primary: string;
     text: string;
@@ -332,7 +334,7 @@ export class CanvasState implements CanvasListeners {
     }
 
     public timeToX(t: TimestampSecs): number {
-        t -= new Date().getTimezoneOffset() * 60;
+        t -= tzOffset;
         t = nowUtc(false) - t + this.cameraOffset;
         t = this.zoomScaledPosition(t, this.zoom, this.cameraOffset);
         return this.width - t;
@@ -353,7 +355,7 @@ export class CanvasState implements CanvasListeners {
     public xToTime(pos: number): TimestampSecs {
         pos = this.width - pos;
         pos = this.zoomScaledPosition(pos, 1 / this.zoom, this.cameraOffset);
-        return nowUtc(false) - pos + this.cameraOffset + new Date().getTimezoneOffset() * 60;
+        return nowUtc(false) - pos + this.cameraOffset + tzOffset;
     }
 
     public zoomOnCenter(deltaZoom: number) {

@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { Asset } from '$lib/controllers/asset';
+import { Asset } from '$lib/controllers/asset.server';
 import { query } from '$lib/db/mysql';
 import { cachedPageRoute } from '$lib/utils/cache';
 import type { PageServerLoad } from './$types';

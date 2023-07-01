@@ -54,7 +54,7 @@
         "svelte-inview": "^4.0.0",
         "svelte-material-icons": "^3.0.4",
         "svelte-preprocess": "^5.0.4",
-        "svelte-simple-modal": "^1.6.0",
+        "svelte-simple-modal": "^1.6.1",
         "timeago.js": "^4.0.2",
         "ts-polyfill": "^3.8.2",
         "tslib": "^2.4.1",

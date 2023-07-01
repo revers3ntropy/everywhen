@@ -1,3 +1,4 @@
+import { Asset } from '$lib/controllers/asset';
 import { Location } from '$lib/controllers/location';
 import { SemVer } from '$lib/utils/semVer';
 import schemion from 'schemion';
@@ -6,7 +7,6 @@ import { decrypt, encrypt } from '../security/encryption';
 import { download as downloadFile } from '../utils/files';
 import { Result } from '../utils/result';
 import { currentTzOffset, fmtUtc, nowUtc } from '../utils/time';
-import { Asset } from './asset';
 import { Entry, EntryFlags } from './entry';
 import { Event } from './event';
 import { Label } from './label';

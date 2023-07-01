@@ -10,7 +10,7 @@
     import Upload from 'svelte-material-icons/Upload.svelte';
     import Dropdown from '$lib/components/Dropdown.svelte';
     import type { ChangeEventHandler } from 'svelte/elements';
-    import { Asset } from '$lib/controllers/asset';
+    import { Asset } from '$lib/controllers/asset.client';
 
     export let auth: Auth;
     export let size = '30';
@@ -34,7 +34,13 @@
         if (res === null) return;
         const { publicId, fileName, id } = res;
         assets = [
-            new Asset(id, publicId, undefined as unknown as string, fileName, '', nowUtc()),
+            {
+                id,
+                publicId,
+                fileName,
+                contentType: '',
+                created: nowUtc()
+            },
             ...assets
         ];
         onInput(Asset.mdLink(fileName, publicId));

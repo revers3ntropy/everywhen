@@ -3,7 +3,7 @@ import { encryptionKeyFromPassword } from '../security/authUtils.server';
 import { Result } from '../utils/result';
 import { cryptoRandomStr } from '../utils/text';
 import { nowUtc } from '../utils/time';
-import { Asset } from './asset';
+import { Asset } from './asset.server';
 import { Backup } from './backup';
 import { Entry } from './entry';
 import { Event } from './event';

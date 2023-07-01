@@ -10,7 +10,7 @@
     import { obfuscated } from '$lib/stores';
     import type { ChangeEventHandler } from 'svelte/elements';
     import Asset from './Asset.svelte';
-    import { Asset as AssetController } from '$lib/controllers/asset';
+    import type { Asset as AssetController } from '$lib/controllers/asset.client';
     import type { PageData } from './$types';
 
     export let data: PageData;
@@ -37,14 +37,13 @@
         data = {
             ...data,
             assets: [
-                new AssetController(
+                {
                     id,
                     publicId,
-                    undefined as unknown as string,
                     fileName,
-                    '',
-                    nowUtc()
-                ),
+                    contentType: '',
+                    created: nowUtc()
+                },
                 ...data.assets
             ],
             assetCount: data.assetCount + 1
