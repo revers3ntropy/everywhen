@@ -4,7 +4,7 @@ import { Result } from '../utils/result';
 import { nowUtc } from '../utils/time';
 import { Label } from './label';
 import type { Auth } from './user';
-import { UUID } from './uuid';
+import { UUId } from './uuid';
 
 // RawEvent is the raw data from the database,
 // Event is the data after decryption and links to labels
@@ -120,7 +120,7 @@ export class Event {
         label?: string,
         created?: TimestampSecs
     ): Promise<Result<Event>> {
-        const id = await UUID.generateUUId(query);
+        const id = await UUId.generateUUId(query);
         created ??= nowUtc();
 
         if (!name) {

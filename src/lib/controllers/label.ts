@@ -3,7 +3,7 @@ import { decrypt, encrypt } from '../security/encryption';
 import { Result } from '../utils/result';
 import { nowUtc } from '../utils/time';
 import type { Auth } from './user';
-import { UUID } from './uuid';
+import { UUId } from './uuid';
 
 export type LabelWithCount = Label & {
     entryCount: number;
@@ -153,7 +153,7 @@ export class Label {
         }
 
         json = { ...json };
-        json.id ??= await UUID.generateUUId(query);
+        json.id ??= await UUId.generateUUId(query);
         json.created ??= nowUtc();
 
         const { err, val: encryptedName } = encrypt(json.name, auth.key);

@@ -3,7 +3,7 @@ import type { QueryFunc } from '../db/mysql';
 import { decrypt, encrypt } from '../security/encryption';
 import { Result } from '../utils/result';
 import type { Auth } from './user';
-import { UUID } from './uuid';
+import { UUId } from './uuid';
 
 export class Location {
     public constructor(
@@ -33,7 +33,7 @@ export class Location {
             return Result.err('Name cannot be empty');
         }
 
-        const id = await UUID.generateUUId(query);
+        const id = await UUId.generateUUId(query);
 
         const { err: nameErr, val: encryptedName } = encrypt(name, auth.key);
         if (nameErr) return Result.err(nameErr);

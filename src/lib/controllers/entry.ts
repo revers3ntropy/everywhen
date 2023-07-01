@@ -5,7 +5,7 @@ import { currentTzOffset, fmtUtc, nowUtc } from '../utils/time';
 import { Label } from './label';
 import { Location } from './location';
 import type { Auth } from './user';
-import { UUID } from './uuid';
+import { UUId } from './uuid';
 
 export enum EntryFlags {
     DELETED = 0b1,
@@ -378,7 +378,7 @@ export class Entry {
     ): Promise<Result<Entry>> {
         const json: typeof json_ & { id: string } = {
             ...json_,
-            id: await UUID.generateUUId(query)
+            id: await UUId.generateUUId(query)
         };
         json.created ??= nowUtc();
 
@@ -398,7 +398,7 @@ export class Entry {
             json.edits?.map(
                 async e =>
                     new Entry(
-                        await UUID.generateUUId(query),
+                        await UUId.generateUUId(query),
                         e.title,
                         e.entry,
                         e.created,
@@ -587,7 +587,7 @@ export class Entry {
         const [encryptedNewTitle, encryptedNewEntry, encryptedEditAgentData, oldTitle, oldEntry] =
             encryptionResults;
 
-        const editId = await UUID.generateUUId(query);
+        const editId = await UUId.generateUUId(query);
 
         await query`
             INSERT INTO entryEdits

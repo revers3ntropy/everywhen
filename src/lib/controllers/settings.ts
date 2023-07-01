@@ -4,7 +4,7 @@ import { decrypt, encrypt } from '../security/encryption';
 import { Result } from '../utils/result';
 import { nowUtc } from '../utils/time';
 import type { Auth } from './user';
-import { UUID } from './uuid';
+import { UUId } from './uuid';
 
 export interface SettingConfig<T extends SettingValue> {
     type: 'string' | 'boolean' | 'number';
@@ -134,7 +134,7 @@ export class Settings<T = unknown> {
             return Result.ok(new Settings(id, now, key, value));
         }
 
-        const id = await UUID.generateUUId(query);
+        const id = await UUId.generateUUId(query);
 
         await query`
             INSERT INTO settings (id, user, created, \`key\`, value)

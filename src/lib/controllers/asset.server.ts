@@ -1,5 +1,5 @@
 import type { Auth } from '$lib/controllers/user';
-import { UUID } from '$lib/controllers/uuid';
+import { UUId } from '$lib/controllers/uuid';
 import type { QueryFunc } from '$lib/db/mysql';
 import { decrypt, encrypt } from '$lib/security/encryption';
 import { Result } from '$lib/utils/result';
@@ -26,8 +26,8 @@ namespace AssetUtils {
         created?: TimestampSecs,
         publicId?: string
     ): Promise<Result<{ publicId: string; id: string }>> {
-        publicId ??= await UUID.generateUUId(query);
-        const id = await UUID.generateUUId(query);
+        publicId ??= await UUId.generateUUId(query);
+        const id = await UUId.generateUUId(query);
         const fileExt = fileNamePlainText.split('.').pop();
         if (!fileExt) {
             return Result.err('Invalid file extension');

@@ -9,7 +9,7 @@ import { Entry } from './entry';
 import { Event } from './event';
 import { Label } from './label';
 import { Settings } from './settings';
-import { UUID } from './uuid';
+import { UUId } from './uuid';
 
 export class User {
     public constructor(public id: string, public username: string, public key: string) {}
@@ -75,7 +75,7 @@ export class User {
         if (err) return Result.err(err);
 
         const salt = await User.generateSalt(query);
-        const id = await UUID.generateUUId(query);
+        const id = await UUId.generateUUId(query);
 
         await query`
             INSERT INTO users (id, username, password, salt, created)
