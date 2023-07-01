@@ -1,4 +1,4 @@
-export const COOKIE_TIMEOUT: Seconds = 60 * 60;
+export const COOKIE_TIMEOUT: Seconds = 60 * 60 * 24 * 3;
 
 export const KEY_PREFIX = '__halcyon_land_';
 
