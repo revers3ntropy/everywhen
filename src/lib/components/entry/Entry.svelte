@@ -13,7 +13,7 @@
     import Heart from 'svelte-material-icons/Heart.svelte';
     import HeartOffOutline from 'svelte-material-icons/HeartOffOutline.svelte';
     import type { Location } from '$lib/controllers/location';
-    import { Entry, EntryFlags } from '$lib/controllers/entry';
+    import { Entry } from '$lib/controllers/entry';
     import type { Label as LabelController } from '../../controllers/label';
     import type { Auth } from '$lib/controllers/user';
     import { popup } from '$lib/stores';
@@ -62,7 +62,7 @@
     }
 
     async function deleteSelf() {
-        const deleted = EntryFlags.isDeleted(flags);
+        const deleted = Entry.Flags.isDeleted(flags);
         if (!confirm(`Are you sure you want to ${deleted ? 'restore' : 'delete'} this entry?`)) {
             return;
         }
@@ -87,21 +87,18 @@
         );
 
         notify.success(`Entry ${!pinned ? 'favorited' : 'unfavorited'}`);
-        flags = EntryFlags.setPinned(flags, !pinned);
-        await dispatch.update(
-            'entry',
-            new Entry(
-                id,
-                title,
-                entry,
-                created,
-                createdTZOffset,
-                EntryFlags.setPinned(flags, !pinned),
-                latitude,
-                longitude,
-                agentData
-            )
-        );
+        flags = Entry.Flags.setPinned(flags, !pinned);
+        await dispatch.update('entry', {
+            id,
+            title,
+            entry,
+            created,
+            createdTZOffset,
+            flags: Entry.Flags.setPinned(flags, !pinned),
+            latitude,
+            longitude,
+            agentData
+        });
     }
 
     function toggleObfuscation() {
@@ -110,8 +107,8 @@
 
     let showingMap = false;
 
-    $: deleted = EntryFlags.isDeleted(flags);
-    $: pinned = EntryFlags.isPinned(flags);
+    $: deleted = Entry.Flags.isDeleted(flags);
+    $: pinned = Entry.Flags.isPinned(flags);
     $: entryHtml = browser ? rawMdToHtml(entry, obfuscated) : '';
     // doesn't set reactively on tooltip content if in props???
     $: restoreDeleteTooltip = deleted ? 'Restore Entry' : 'Move Entry to Bin';

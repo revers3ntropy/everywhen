@@ -1,11 +1,10 @@
 <script lang="ts">
     import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
-    import { EntryFlags } from '$lib/controllers/entry';
     import { tooltip } from '@svelte-plugins/tooltips';
     import LocationToggle from '$lib/components/location/LocationToggle.svelte';
     import LabelSelect from '$lib/components/label/LabelSelect.svelte';
     import TextBoxOutline from 'svelte-material-icons/TextBoxOutline.svelte';
-    import type { Entry, RawEntry } from '$lib/controllers/entry';
+    import { Entry, type RawEntry } from '$lib/controllers/entry';
     import type { Label } from '$lib/controllers/label';
     import type { Auth } from '$lib/controllers/user';
     import { dispatch } from '$lib/dataChangeEvents';
@@ -58,7 +57,7 @@
             ...body,
             id: res.id,
             decrypted: true,
-            flags: EntryFlags.NONE
+            flags: Entry.Flags.NONE
         } as Mutable<Entry>;
 
         if (body.label && labels) {

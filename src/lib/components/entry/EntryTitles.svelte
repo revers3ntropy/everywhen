@@ -126,7 +126,7 @@
                                 <i class="text-light">
                                     {obfuscated
                                         ? obfuscate(entry.entry)
-                                        : entry.entry}{#if entry.entry.length >= Entry.TITLE_CUTOFF}...
+                                        : entry.entry}{#if entry.entry.length >= Entry.TITLE_LENGTH_CUTOFF}...
                                     {/if}
                                 </i>
                             {/if}

@@ -26,7 +26,7 @@ export const DELETE = (async ({ request, params, cookies }) => {
         restore: 'boolean'
     });
 
-    const { err: deleteErr } = await Entry.delete(query, auth, params.entryId, body.restore);
+    const { err: deleteErr } = await Entry.del(query, auth, params.entryId, body.restore);
     if (deleteErr) throw error(400, deleteErr);
 
     return apiResponse({ id: params.entryId });

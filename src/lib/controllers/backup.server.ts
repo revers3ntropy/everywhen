@@ -7,7 +7,7 @@ import { decrypt, encrypt } from '../security/encryption';
 import { download as downloadFile } from '../utils/files';
 import { Result } from '../utils/result';
 import { currentTzOffset, fmtUtc, nowUtc } from '../utils/time';
-import { Entry, EntryFlags } from './entry';
+import { Entry } from './entry';
 import { Event } from './event';
 import { Label } from './label';
 import type { Auth } from './user';
@@ -260,9 +260,9 @@ namespace BackupUtils {
             if (json.entries) {
                 for (const entry of json.entries) {
                     const e: typeof entry & { deleted?: boolean } = entry;
-                    e.flags ??= EntryFlags.NONE;
+                    e.flags ??= Entry.Flags.NONE;
                     if (e.deleted) {
-                        e.flags |= EntryFlags.DELETED;
+                        e.flags |= Entry.Flags.DELETED;
                     }
                     delete e.deleted;
                 }

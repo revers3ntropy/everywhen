@@ -1,9 +1,9 @@
+import { Entry } from '$lib/controllers/entry';
 import { SemVer } from '$lib/utils/semVer';
 import { encrypt } from '../security/encryption';
 import { download as downloadFile } from '../utils/files';
 import { Result } from '../utils/result';
 import { currentTzOffset, fmtUtc, nowUtc } from '../utils/time';
-import { EntryFlags } from './entry';
 import type { Auth } from './user';
 import type { Backup as _Backup } from './backup';
 export type Backup = _Backup;
@@ -27,9 +27,9 @@ namespace BackupUtils {
             if (json.entries) {
                 for (const entry of json.entries) {
                     const e: typeof entry & { deleted?: boolean } = entry;
-                    e.flags ??= EntryFlags.NONE;
+                    e.flags ??= Entry.Flags.NONE;
                     if (e.deleted) {
-                        e.flags |= EntryFlags.DELETED;
+                        e.flags |= Entry.Flags.DELETED;
                     }
                     delete e.deleted;
                 }
