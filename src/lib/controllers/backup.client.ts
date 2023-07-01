@@ -46,4 +46,4 @@ namespace BackupUtils {
     }
 }
 
-export const Backup = { ...BackupUtils };
+export const Backup = BackupUtils;

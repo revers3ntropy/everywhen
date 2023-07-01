@@ -24,4 +24,4 @@ export namespace AssetUtils {
     }
 }
 
-export const Asset = { ...AssetUtils };
+export const Asset = AssetUtils;

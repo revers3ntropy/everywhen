@@ -29,4 +29,4 @@ namespace UUIdUtils {
     }
 }
 
-export const UUId = { ...UUIdUtils };
+export const UUId = UUIdUtils;

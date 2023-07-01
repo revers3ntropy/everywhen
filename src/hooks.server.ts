@@ -1,5 +1,5 @@
 import { COOKIE_WRITEABLE_KEYS } from '$lib/constants';
-import { PageLoadLog } from '$lib/controllers/log';
+import { Log } from '$lib/controllers/log';
 import type { Auth } from '$lib/controllers/user';
 import { tryGetAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import { nowUtc } from '$lib/utils/time';
@@ -72,7 +72,7 @@ async function logReq(
 
     const ip = getIp(req);
 
-    await PageLoadLog.createLog(
+    await Log.PageLoadLog.createLog(
         query.unlogged,
         now,
         req.request.method,
