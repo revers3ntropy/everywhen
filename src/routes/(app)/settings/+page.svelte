@@ -1,23 +1,18 @@
 <script lang="ts">
-    import { goto } from '$app/navigation';
-    import ChangePasswordDialog from '$lib/components/dialogs/ChangePasswordDialog.svelte';
-
-    import { logOut } from '$lib/security/logOut';
-    import { showPopup } from '$lib/utils/popups';
     import { onMount } from 'svelte';
+    import { goto } from '$app/navigation';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import Cog from 'svelte-material-icons/Cog.svelte';
     import Logout from 'svelte-material-icons/Logout.svelte';
-    import Skull from 'svelte-material-icons/Skull.svelte';
     import LockOutline from 'svelte-material-icons/LockOutline.svelte';
+    import Skull from 'svelte-material-icons/Skull.svelte';
+    import ChangePasswordDialog from '$lib/components/dialogs/ChangePasswordDialog.svelte';
+    import type { SettingConfig, SettingValue } from '$lib/controllers/settings';
+    import { logOut } from '$lib/security/logOut';
+    import { showPopup } from '$lib/utils/popups';
     import BackupOptions from '$lib/components/BackupOptions.svelte';
     import { Backup } from '$lib/controllers/backup.client';
-    import {
-        type SettingConfig,
-        Settings as SettingsController,
-        type SettingsKey,
-        type SettingValue
-    } from '$lib/controllers/settings';
+    import { settingsConfig, type SettingsKey } from '$lib/controllers/settings.client';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import Settings from './Settings.svelte';
@@ -46,7 +41,7 @@
         });
     }
 
-    const settingsConfig = Object.entries(SettingsController.config) as [
+    const settingsConfigEntries = Object.entries(settingsConfig) as [
         SettingsKey,
         SettingConfig<SettingValue>
     ][];
@@ -94,8 +89,8 @@
         </div>
 
         <div class="settings">
-            {#each settingsConfig as [key, config] (key)}
-                {#if SettingsController.config[key].showInSettings}
+            {#each settingsConfigEntries as [key, config] (key)}
+                {#if config.showInSettings}
                     <Settings {...config} {...data.settings[key]} auth={data.auth} />
                 {/if}
             {/each}

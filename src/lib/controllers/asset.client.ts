@@ -1,7 +1,7 @@
 import type { Asset as _Asset } from './asset';
 export type Asset = _Asset;
 
-export namespace AssetUtils {
+namespace AssetUtils {
     export function jsonIsRawAsset(json: unknown): json is Omit<Asset, 'id'> {
         return (
             typeof json === 'object' &&
