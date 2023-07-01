@@ -1,6 +1,6 @@
 import type { ContextMenuOptions } from '$lib/components/canvas/canvasState';
 import { displayNotifOnErr } from '$lib/components/notifications/notifications';
-import type { Auth } from '$lib/controllers/user';
+import type { Auth } from '$lib/controllers/user/user';
 import { dispatch } from '$lib/dataChangeEvents';
 import { api } from '$lib/utils/apiRequest';
 import { nowUtc } from '$lib/utils/time';

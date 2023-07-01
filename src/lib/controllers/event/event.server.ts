@@ -1,11 +1,12 @@
-import type { QueryFunc } from '../db/mysql';
-import { decrypt, encrypt } from '../security/encryption';
-import { Result } from '../utils/result';
-import { nowUtc } from '../utils/time';
-import { Label } from './label';
-import type { Auth } from './user';
-import { UUId } from './uuid';
+import type { QueryFunc } from '$lib/db/mysql';
+import { decrypt, encrypt } from '$lib/security/encryption';
+import { Result } from '$lib/utils/result';
+import { nowUtc } from '$lib/utils/time';
+import { Label } from '../label/label';
+import type { Auth } from '../user/user';
+import { UUId } from '../uuid/uuid';
 import type { Event as _Event, RawEvent } from './event';
+
 export type Event = _Event;
 
 namespace EventUtils {

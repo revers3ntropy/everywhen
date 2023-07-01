@@ -4,8 +4,8 @@
     import Synced from 'svelte-material-icons/CloudCheckOutline.svelte';
     import Bin from 'svelte-material-icons/Delete.svelte';
     import type { ChangeEventHandler } from 'svelte/elements';
-    import { Location } from '$lib/controllers/location';
-    import type { Auth } from '$lib/controllers/user';
+    import { Location } from '$lib/controllers/location/location';
+    import type { Auth } from '$lib/controllers/user/user';
     import { popup } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
@@ -34,9 +34,7 @@
             })
         );
         if (onChange !== null) {
-            await onChange(
-                new Location(id, created, createdTZOffset, name, latitude, longitude, radius)
-            );
+            await onChange({ id, created, createdTZOffset, name, latitude, longitude, radius });
         }
         synced = true;
     }

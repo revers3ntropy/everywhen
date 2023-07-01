@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { Location } from '$lib/controllers/location';
+import { Location } from '$lib/controllers/location/location';
 import { query } from '$lib/db/mysql';
 import { cachedPageRoute } from '$lib/utils/cache';
 import type { PageServerLoad } from './$types';

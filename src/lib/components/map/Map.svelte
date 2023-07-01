@@ -7,7 +7,7 @@
 </script>
 
 <script lang="ts">
-    import type { EntryLocation } from '$lib/controllers/entry';
+    import type { EntryLocation } from '$lib/controllers/entry/entry';
     import { writable } from 'svelte/store';
     import { Collection } from 'ol';
     import type { CallbackObject } from 'ol-contextmenu/dist/types';
@@ -24,8 +24,8 @@
     import Overlay from 'ol/Overlay';
     import { fromLonLat, toLonLat } from 'ol/proj';
     import ContextMenu from 'ol-contextmenu';
-    import type { Auth } from '$lib/controllers/user';
-    import { Location } from '$lib/controllers/location';
+    import type { Auth } from '$lib/controllers/user/user';
+    import { Location } from '$lib/controllers/location/location';
     import { popup } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { showPopup } from '$lib/utils/popups';

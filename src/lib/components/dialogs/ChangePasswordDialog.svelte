@@ -1,7 +1,7 @@
 <script lang="ts">
     import { logOut } from '$lib/security/logOut';
     import { popup } from '$lib/stores';
-    import type { Auth } from '$lib/controllers/user';
+    import type { Auth } from '$lib/controllers/user/user';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
 

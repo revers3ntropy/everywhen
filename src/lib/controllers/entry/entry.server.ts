@@ -1,11 +1,11 @@
-import type { QueryFunc } from '../db/mysql';
-import { decrypt, encrypt, encryptMulti } from '../security/encryption';
-import { Result } from '../utils/result';
-import { currentTzOffset, fmtUtc, nowUtc } from '../utils/time';
-import { Label } from './label';
-import { Location } from './location';
-import type { Auth } from './user';
-import { UUId } from './uuid';
+import type { QueryFunc } from '$lib/db/mysql';
+import { decrypt, encrypt, encryptMulti } from '$lib/security/encryption';
+import { Result } from '$lib/utils/result';
+import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
+import { Label } from '../label/label';
+import { Location } from '../location/location';
+import type { Auth } from '../user/user';
+import { UUId } from '../uuid/uuid';
 import {
     Entry as _Entry,
     type EntryEdit,

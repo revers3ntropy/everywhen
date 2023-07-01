@@ -1,5 +1,5 @@
-import type { Auth } from '$lib/controllers/user';
-import { UUId } from '$lib/controllers/uuid';
+import type { Auth } from '$lib/controllers/user/user';
+import { UUId } from '$lib/controllers/uuid/uuid';
 import type { QueryFunc } from '$lib/db/mysql';
 import { decrypt, encrypt } from '$lib/security/encryption';
 import { Result } from '$lib/utils/result';
@@ -8,6 +8,7 @@ import fs from 'fs';
 import type { ResultSetHeader } from 'mysql2';
 import webp from 'webp-converter';
 import type { Asset as _Asset } from './asset';
+
 export type Asset = _Asset;
 
 namespace AssetUtils {

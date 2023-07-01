@@ -2,7 +2,7 @@ import { browser } from '$app/environment';
 import { PUBLIC_SVELTEKIT_PORT } from '$env/static/public';
 import { serialize } from 'cookie';
 import { KEY_COOKIE_OPTIONS, STORE_KEY, USERNAME_COOKIE_OPTIONS } from '../constants';
-import type { Auth } from '../controllers/user';
+import type { Auth } from '../controllers/user/user';
 import type { apiRes404, GenericResponse } from './apiResponse';
 import { serializeGETArgs } from './GETArgs';
 import { errorLogger } from './log';

@@ -1,5 +1,5 @@
-import { Entry } from '$lib/controllers/entry';
-import { Settings } from '$lib/controllers/settings';
+import { Entry } from '$lib/controllers/entry/entry';
+import { Settings } from '$lib/controllers/settings/settings';
 import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
 import { error } from '@sveltejs/kit';
 import { query } from '$lib/db/mysql';

@@ -27,10 +27,10 @@
     import Dropdown from '$lib/components/Dropdown.svelte';
     import Streaks from '$lib/components/Streaks.svelte';
     import { STORE_KEY, Theme } from '$lib/constants';
-    import { Backup } from '$lib/controllers/backup.client';
-    import type { Auth } from '$lib/controllers/user';
-    import { Event as EventController } from '$lib/controllers/event';
-    import type { SettingsConfig } from '$lib/controllers/settings';
+    import { Backup } from '$lib/controllers/backup/backup.client';
+    import type { Auth } from '$lib/controllers/user/user';
+    import { Event as EventController } from '$lib/controllers/event/event';
+    import type { SettingsConfig } from '$lib/controllers/settings/settings';
     import { nowUtc } from '$lib/utils/time';
     import { eventsSortKey, obfuscated, passcodeLastEntered, theme } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';

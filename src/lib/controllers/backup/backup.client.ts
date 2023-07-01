@@ -1,11 +1,12 @@
-import { Entry } from '$lib/controllers/entry';
+import { Entry } from '$lib/controllers/entry/entry';
 import { SemVer } from '$lib/utils/semVer';
-import { encrypt } from '../security/encryption';
-import { download as downloadFile } from '../utils/files';
-import { Result } from '../utils/result';
-import { currentTzOffset, fmtUtc, nowUtc } from '../utils/time';
-import type { Auth } from './user';
+import { encrypt } from '$lib/security/encryption';
+import { download as downloadFile } from '../../utils/files';
+import { Result } from '$lib/utils/result';
+import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
+import type { Auth } from '../user/user';
 import type { Backup as _Backup } from './backup';
+
 export type Backup = _Backup;
 
 namespace BackupUtils {

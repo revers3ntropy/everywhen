@@ -1,6 +1,6 @@
 import { COOKIE_WRITEABLE_KEYS } from '$lib/constants';
-import { Log } from '$lib/controllers/log';
-import type { Auth } from '$lib/controllers/user';
+import { Log } from '$lib/controllers/log/log';
+import type { Auth } from '$lib/controllers/user/user';
 import { tryGetAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import { nowUtc } from '$lib/utils/time';
 import type { Cookies, Handle, RequestEvent } from '@sveltejs/kit';

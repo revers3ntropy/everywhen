@@ -1,6 +1,6 @@
 // src: https://awik.io/determine-color-bright-dark-using-javascript/
 import type { CanvasState } from '$lib/components/canvas/canvasState';
-import { Event } from '$lib/controllers/event';
+import { Event } from '$lib/controllers/event/event';
 import { nowUtc } from '$lib/utils/time';
 import type { EntryWithWordCount } from '../stats/helpers';
 

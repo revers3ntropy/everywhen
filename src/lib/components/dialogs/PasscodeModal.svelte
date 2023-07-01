@@ -3,7 +3,7 @@
     import { slide } from 'svelte/transition';
     import { browser } from '$app/environment';
     import Close from 'svelte-material-icons/Close.svelte';
-    import type { Auth } from '$lib/controllers/user';
+    import type { Auth } from '$lib/controllers/user/user';
     import { ANIMATION_DURATION } from '$lib/constants';
     import { encryptionKeyFromPassword } from '$lib/security/authUtils';
     import { passcodeLastEntered } from '$lib/stores';

@@ -1,16 +1,17 @@
-import type { QueryFunc } from '../db/mysql';
-import { encryptionKeyFromPassword } from '../security/authUtils.server';
-import { Result } from '../utils/result';
-import { cryptoRandomStr } from '../utils/text';
-import { nowUtc } from '../utils/time';
-import { Asset } from './asset.server';
-import { Backup } from './backup';
-import { Entry } from './entry';
-import { Event } from './event';
-import { Label } from './label';
-import { Settings } from './settings';
-import { UUId } from './uuid';
+import type { QueryFunc } from '$lib/db/mysql';
+import { encryptionKeyFromPassword } from '$lib/security/authUtils.server';
+import { Result } from '$lib/utils/result';
+import { cryptoRandomStr } from '$lib/utils/text';
+import { nowUtc } from '$lib/utils/time';
+import { Asset } from '../asset/asset.server';
+import { Backup } from '../backup/backup';
+import { Entry } from '../entry/entry';
+import { Event } from '../event/event';
+import { Label } from '../label/label';
+import { Settings } from '../settings/settings';
+import { UUId } from '../uuid/uuid';
 import type { Auth, User as _User } from './user';
+
 export type User = _User;
 
 namespace UserUtils {

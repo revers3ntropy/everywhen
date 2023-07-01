@@ -3,8 +3,8 @@
     import { onMount } from 'svelte';
     import BookSpinner from '$lib/components/BookSpinner.svelte';
     import LabelSelect from '$lib/components/label/LabelSelect.svelte';
-    import type { Label } from '$lib/controllers/label';
-    import type { Auth } from '$lib/controllers/user';
+    import type { Label } from '$lib/controllers/label/label';
+    import type { Auth } from '$lib/controllers/user/user';
     import { popup } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';

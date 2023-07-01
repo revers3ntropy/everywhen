@@ -4,9 +4,9 @@
     import LocationToggle from '$lib/components/location/LocationToggle.svelte';
     import LabelSelect from '$lib/components/label/LabelSelect.svelte';
     import TextBoxOutline from 'svelte-material-icons/TextBoxOutline.svelte';
-    import { Entry, type RawEntry } from '$lib/controllers/entry';
-    import type { Label } from '$lib/controllers/label';
-    import type { Auth } from '$lib/controllers/user';
+    import { Entry, type RawEntry } from '$lib/controllers/entry/entry';
+    import type { Label } from '$lib/controllers/label/label';
+    import type { Auth } from '$lib/controllers/user/user';
     import { dispatch } from '$lib/dataChangeEvents';
     import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
     import { enabledLocation } from '$lib/stores';

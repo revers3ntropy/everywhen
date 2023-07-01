@@ -1,17 +1,18 @@
-import { Asset } from '$lib/controllers/asset';
-import { Location } from '$lib/controllers/location';
+import { Asset } from '$lib/controllers/asset/asset';
+import { Location } from '$lib/controllers/location/location';
 import { SemVer } from '$lib/utils/semVer';
 import schemion from 'schemion';
-import type { QueryFunc } from '../db/mysql';
-import { decrypt, encrypt } from '../security/encryption';
-import { download as downloadFile } from '../utils/files';
-import { Result } from '../utils/result';
-import { currentTzOffset, fmtUtc, nowUtc } from '../utils/time';
-import { Entry } from './entry';
-import { Event } from './event';
-import { Label } from './label';
-import type { Auth } from './user';
+import type { QueryFunc } from '$lib/db/mysql';
+import { decrypt, encrypt } from '$lib/security/encryption';
+import { download as downloadFile } from '../../utils/files';
+import { Result } from '$lib/utils/result';
+import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
+import { Entry } from '../entry/entry';
+import { Event } from '../event/event';
+import { Label } from '../label/label';
+import type { Auth } from '../user/user';
 import type { Backup as _Backup } from './backup';
+
 export type Backup = _Backup;
 
 namespace BackupUtils {

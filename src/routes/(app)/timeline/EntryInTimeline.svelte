@@ -3,9 +3,9 @@
     import { RectCollider } from '$lib/components/canvas/collider';
     import { interactable } from '$lib/components/canvas/interactable';
     import EntryDialog from '$lib/components/dialogs/EntryDialog.svelte';
-    import type { EntryEdit } from '$lib/controllers/entry';
-    import type { Label } from '$lib/controllers/label';
-    import type { Auth } from '$lib/controllers/user';
+    import type { EntryEdit } from '$lib/controllers/entry/entry';
+    import type { Label } from '$lib/controllers/label/label';
+    import type { Auth } from '$lib/controllers/user/user';
     import { obfuscated } from '$lib/stores';
     import { showPopup } from '$lib/utils/popups';
     import { limitStrLen } from '$lib/utils/text.js';

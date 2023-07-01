@@ -1,4 +1,5 @@
 import type { Label as _Label } from './label';
+
 export type Label = _Label;
 
 namespace LabelUtils {

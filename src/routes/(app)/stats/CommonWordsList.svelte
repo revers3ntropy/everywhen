@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { Auth } from '$lib/controllers/user';
+    import type { Auth } from '$lib/controllers/user/user';
     import { encrypt } from '$lib/security/encryption';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications.js';
 

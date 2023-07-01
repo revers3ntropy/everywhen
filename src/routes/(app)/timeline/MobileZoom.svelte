@@ -2,7 +2,7 @@
     import { canvasState } from '$lib/components/canvas/canvasState';
     import { RectCollider } from '$lib/components/canvas/collider';
     import { interactable } from '$lib/components/canvas/interactable.js';
-    import type { Auth } from '$lib/controllers/user';
+    import type { Auth } from '$lib/controllers/user/user';
     import { makeStandardContextMenu } from './standardContextMenu';
 
     export let auth: Auth;

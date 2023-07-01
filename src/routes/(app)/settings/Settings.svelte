@@ -3,7 +3,7 @@
     import { tooltip } from '@svelte-plugins/tooltips';
     import CloudCheckOutline from 'svelte-material-icons/CloudCheckOutline.svelte';
     import Sync from 'svelte-material-icons/Sync.svelte';
-    import type { Auth } from '$lib/controllers/user';
+    import type { Auth } from '$lib/controllers/user/user';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications.js';
     import { currentTzOffset, fmtDuration, fmtUtc, nowUtc } from '$lib/utils/time.js';

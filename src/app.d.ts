@@ -1,7 +1,7 @@
 import '@total-typescript/ts-reset';
 import { COOKIE_WRITEABLE_KEYS } from '$lib/constants';
-import type { SettingsConfig } from '$lib/controllers/settings';
-import type { Auth } from '$lib/controllers/user';
+import type { SettingsConfig } from '$lib/controllers/settings/settings';
+import type { Auth } from '$lib/controllers/user/user';
 
 declare module '$env/static/private' {
     export const DB_HOST: string;

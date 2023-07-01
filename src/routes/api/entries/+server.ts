@@ -1,7 +1,7 @@
 import { decrypt } from '$lib/security/encryption';
 import { error } from '@sveltejs/kit';
-import { Entry } from '$lib/controllers/entry';
-import { Label } from '$lib/controllers/label';
+import { Entry } from '$lib/controllers/entry/entry';
+import { Label } from '$lib/controllers/label/label';
 import { query } from '$lib/db/mysql';
 import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse';

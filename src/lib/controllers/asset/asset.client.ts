@@ -1,4 +1,5 @@
 import type { Asset as _Asset } from './asset';
+
 export type Asset = _Asset;
 
 namespace AssetUtils {

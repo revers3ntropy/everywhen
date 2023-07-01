@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { Label } from '$lib/controllers/label';
+    import type { Label } from '$lib/controllers/label/label';
 
     export let label = null as Label | null;
 

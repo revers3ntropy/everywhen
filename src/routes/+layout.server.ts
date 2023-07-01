@@ -1,4 +1,4 @@
-import { Settings, type SettingsConfig } from '$lib/controllers/settings';
+import { Settings, type SettingsConfig } from '$lib/controllers/settings/settings';
 import { query } from '$lib/db/mysql';
 import { error } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';

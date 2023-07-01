@@ -1,4 +1,4 @@
-import type { SettingsConfig } from '$lib/controllers/settings';
+import type { SettingsConfig } from '$lib/controllers/settings/settings';
 import { cookieWritable } from '$lib/cookieWritable';
 import { localStorageWritable } from '$lib/lsWritable';
 import type { SvelteComponent } from 'svelte';

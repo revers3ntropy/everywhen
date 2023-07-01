@@ -1,8 +1,8 @@
 <script lang="ts">
     import BookSpinner from '$lib/components/BookSpinner.svelte';
     import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
-    import type { SettingsKey } from '$lib/controllers/settings';
-    import type { Auth } from '$lib/controllers/user.js';
+    import type { SettingsKey } from '$lib/controllers/settings/settings';
+    import type { Auth } from '$lib/controllers/user/user.js';
     import { dispatch } from '$lib/dataChangeEvents';
     import { api } from '$lib/utils/apiRequest';
     import EntryForm from './EntryForm.svelte';

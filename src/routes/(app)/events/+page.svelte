@@ -5,7 +5,7 @@
     import Plus from 'svelte-material-icons/Plus.svelte';
     import Dot from '$lib/components/Dot.svelte';
     import Select from '$lib/components/Select.svelte';
-    import { Event as EventController } from '$lib/controllers/event';
+    import { Event as EventController } from '$lib/controllers/event/event';
     import { eventsSortKey, obfuscated } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';

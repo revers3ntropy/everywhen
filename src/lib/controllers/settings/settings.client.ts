@@ -1,4 +1,5 @@
 import type { SettingConfig, Settings as _Settings, SettingValue } from './settings';
+
 export type Settings<T = unknown> = _Settings<T>;
 
 namespace SettingsUtils {

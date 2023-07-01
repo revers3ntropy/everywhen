@@ -1,7 +1,7 @@
 <script lang="ts">
     import { uploadImage } from '$lib/components/asset/uploadImage';
     import InfiniteScroller from '$lib/components/InfiniteScroller.svelte';
-    import type { Auth } from '$lib/controllers/user';
+    import type { Auth } from '$lib/controllers/user/user';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import { api } from '$lib/utils/apiRequest';
     import { nowUtc } from '$lib/utils/time';
@@ -10,7 +10,7 @@
     import Upload from 'svelte-material-icons/Upload.svelte';
     import Dropdown from '$lib/components/Dropdown.svelte';
     import type { ChangeEventHandler } from 'svelte/elements';
-    import { Asset } from '$lib/controllers/asset.client';
+    import { Asset } from '$lib/controllers/asset/asset.client';
 
     export let auth: Auth;
     export let size = '30';

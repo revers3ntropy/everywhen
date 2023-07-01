@@ -3,8 +3,8 @@
     import { createEventDispatcher } from 'svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import LabelOffOutline from 'svelte-material-icons/LabelOffOutline.svelte';
-    import type { Label } from '$lib/controllers/label';
-    import type { Auth } from '$lib/controllers/user';
+    import type { Label } from '$lib/controllers/label/label';
+    import type { Auth } from '$lib/controllers/user/user';
     import { showPopup } from '$lib/utils/popups';
     import NewLabelDialog from '$lib/components/dialogs/NewLabelDialog.svelte';
 

@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { Event } from '$lib/controllers/event';
+import { Event } from '$lib/controllers/event/event';
 import { query } from '$lib/db/mysql';
 import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse';

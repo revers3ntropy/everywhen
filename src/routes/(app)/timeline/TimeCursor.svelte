@@ -2,7 +2,7 @@
     import { START_ZOOM } from '$lib/components/canvas/canvasState';
     import { RectCollider } from '$lib/components/canvas/collider';
     import { interactable } from '$lib/components/canvas/interactable';
-    import type { Auth } from '$lib/controllers/user';
+    import type { Auth } from '$lib/controllers/user/user';
     import { dispatch } from '$lib/dataChangeEvents';
     import { api } from '$lib/utils/apiRequest';
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';

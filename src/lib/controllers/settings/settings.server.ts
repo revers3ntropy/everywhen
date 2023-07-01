@@ -1,13 +1,14 @@
-import type { QueryFunc } from '../db/mysql';
-import { decrypt, encrypt } from '../security/encryption';
-import { Result } from '../utils/result';
-import { nowUtc } from '../utils/time';
-import type { Auth } from './user';
-import { UUId } from './uuid';
-import type { SettingsKey } from '$lib/controllers/settings.client';
+import type { QueryFunc } from '$lib/db/mysql';
+import { decrypt, encrypt } from '$lib/security/encryption';
+import { Result } from '$lib/utils/result';
+import { nowUtc } from '$lib/utils/time';
+import type { Auth } from '../user/user';
+import { UUId } from '../uuid/uuid';
+import type { SettingsKey } from '$lib/controllers/settings/settings.client';
 import { errorLogger } from '$lib/utils/log';
 import { Settings as _Settings, type SettingsConfig } from './settings';
-export type Settings = _Settings;
+
+export type Settings<T = unknown> = _Settings<T>;
 
 namespace SettingsUtils {
     export async function update(

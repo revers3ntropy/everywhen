@@ -2,8 +2,8 @@
     import Download from 'svelte-material-icons/Download.svelte';
     import DownloadLock from 'svelte-material-icons/DownloadLock.svelte';
     import Upload from 'svelte-material-icons/Upload.svelte';
-    import { Backup } from '../controllers/backup.client';
-    import type { Auth } from '../controllers/user';
+    import { Backup } from '../controllers/backup/backup.client';
+    import type { Auth } from '../controllers/user/user';
     import { encryptionKeyFromPassword } from '../security/authUtils';
     import { api } from '../utils/apiRequest';
     import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';

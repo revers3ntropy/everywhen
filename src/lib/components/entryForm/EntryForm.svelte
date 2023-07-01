@@ -11,9 +11,9 @@
     import Send from 'svelte-material-icons/Send.svelte';
     import LabelSelect from '$lib/components/label/LabelSelect.svelte';
     import { STORE_KEY } from '$lib/constants';
-    import type { Entry, RawEntry } from '$lib/controllers/entry';
-    import type { Label } from '$lib/controllers/label';
-    import type { Auth } from '$lib/controllers/user';
+    import type { Entry, RawEntry } from '$lib/controllers/entry/entry';
+    import type { Label } from '$lib/controllers/label/label';
+    import type { Auth } from '$lib/controllers/user/user';
     import { enabledLocation } from '$lib/stores.js';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { getLocation } from '$lib/utils/geolocation';

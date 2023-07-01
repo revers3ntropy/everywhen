@@ -1,10 +1,11 @@
-import type { QueryFunc } from '../db/mysql';
-import { decrypt, encrypt } from '../security/encryption';
-import { Result } from '../utils/result';
-import { nowUtc } from '../utils/time';
-import type { Auth } from './user';
-import { UUId } from './uuid';
+import type { QueryFunc } from '$lib/db/mysql';
+import { decrypt, encrypt } from '$lib/security/encryption';
+import { Result } from '$lib/utils/result';
+import { nowUtc } from '$lib/utils/time';
+import type { Auth } from '../user/user';
+import { UUId } from '../uuid/uuid';
 import type { Label as _Label, LabelWithCount } from './label';
+
 export type Label = _Label;
 
 namespace LabelUtils {

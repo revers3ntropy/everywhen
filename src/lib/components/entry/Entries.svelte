@@ -9,14 +9,14 @@
     import Bin from 'svelte-material-icons/Delete.svelte';
     import Search from 'svelte-material-icons/Magnify.svelte';
     import EntryGroup from '$lib/components/entry/EntryGroup.svelte';
-    import { Entry, type EntryFilter } from '$lib/controllers/entry';
-    import type { Auth } from '$lib/controllers/user';
+    import { Entry, type EntryFilter } from '$lib/controllers/entry/entry';
+    import type { Auth } from '$lib/controllers/user/user';
     import { obfuscated } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import Spinner from '../BookSpinner.svelte';
     import Sidebar from './EntriesSidebar.svelte';
-    import type { Location } from '$lib/controllers/location';
+    import type { Location } from '$lib/controllers/location/location';
 
     interface IOptions extends EntryFilter {
         readonly count?: number;

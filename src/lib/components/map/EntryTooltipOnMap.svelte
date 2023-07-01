@@ -1,8 +1,8 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     import Dot from '$lib/components/Dot.svelte';
-    import type { Entry } from '$lib/controllers/entry';
-    import type { Auth } from '$lib/controllers/user';
+    import type { Entry } from '$lib/controllers/entry/entry';
+    import type { Auth } from '$lib/controllers/user/user';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import UtcTime from '../UtcTime.svelte';
 

@@ -7,15 +7,15 @@
     import LockOutline from 'svelte-material-icons/LockOutline.svelte';
     import Skull from 'svelte-material-icons/Skull.svelte';
     import ChangePasswordDialog from '$lib/components/dialogs/ChangePasswordDialog.svelte';
-    import type { SettingConfig, SettingValue } from '$lib/controllers/settings';
+    import type { SettingConfig, SettingValue } from '$lib/controllers/settings/settings';
     import { logOut } from '$lib/security/logOut';
     import { showPopup } from '$lib/utils/popups';
     import BackupOptions from '$lib/components/BackupOptions.svelte';
-    import { Backup } from '$lib/controllers/backup.client';
+    import { Backup } from '$lib/controllers/backup/backup.client';
     import {
         type SettingsKey,
         Settings as SettingsController
-    } from '$lib/controllers/settings.client';
+    } from '$lib/controllers/settings/settings.client';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import Settings from './Settings.svelte';

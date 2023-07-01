@@ -1,4 +1,4 @@
-import { fmtUtc } from '../utils/time';
+import { fmtUtc } from '$lib/utils/time';
 import type { Entry as _Entry } from './entry';
 export type Entry = _Entry;
 

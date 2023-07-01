@@ -1,8 +1,8 @@
 import type { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
-import type { Entry } from '$lib/controllers/entry';
-import type { Label } from '$lib/controllers/label';
-import type { Event } from '$lib/controllers/event';
-import type { SettingsConfig } from '$lib/controllers/settings';
+import type { Entry } from '$lib/controllers/entry/entry';
+import type { Label } from '$lib/controllers/label/label';
+import type { Event } from '$lib/controllers/event/event';
+import type { SettingsConfig } from '$lib/controllers/settings/settings';
 import { onDestroy } from 'svelte';
 
 type Entities = 'entry' | 'label' | 'event' | 'setting';

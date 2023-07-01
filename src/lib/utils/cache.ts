@@ -2,7 +2,7 @@ import { ENABLE_CACHING } from '$lib/constants';
 import { error } from '@sveltejs/kit';
 import type { RequestEvent, ServerLoadEvent } from '@sveltejs/kit';
 import chalk from 'chalk';
-import type { Auth } from '../controllers/user';
+import type { Auth } from '../controllers/user/user';
 import type { GenericResponse } from './apiResponse';
 import { makeLogger } from './log';
 import { fmtBytes } from './text';

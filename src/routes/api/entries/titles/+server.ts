@@ -1,6 +1,6 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
-import { Entry } from '$lib/controllers/entry';
+import { Entry } from '$lib/controllers/entry/entry';
 import { query } from '$lib/db/mysql';
 import { apiRes404 } from '$lib/utils/apiResponse';
 import { cachedApiRoute } from '$lib/utils/cache';

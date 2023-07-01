@@ -6,8 +6,8 @@
     import { onMount } from 'svelte';
     import Fire from 'svelte-material-icons/Fire.svelte';
     import TimerSand from 'svelte-material-icons/TimerSand.svelte';
-    import type { Streaks } from '../controllers/entry';
-    import type { Auth } from '../controllers/user';
+    import type { Streaks } from '../controllers/entry/entry';
+    import type { Auth } from '../controllers/user/user';
     import { api } from '../utils/apiRequest';
 
     export let auth: Auth;

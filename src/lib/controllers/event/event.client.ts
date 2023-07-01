@@ -1,4 +1,5 @@
 import type { Event as _Event } from './event';
+
 export type Event = _Event;
 
 namespace EventUtils {

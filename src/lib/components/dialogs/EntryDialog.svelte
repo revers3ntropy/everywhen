@@ -1,8 +1,8 @@
 <script lang="ts">
-    import type { Location } from '$lib/controllers/location';
+    import type { Location } from '$lib/controllers/location/location';
     import { onMount } from 'svelte';
-    import type { Entry as EntryController } from '../../controllers/entry';
-    import type { Auth } from '$lib/controllers/user';
+    import type { Entry as EntryController } from '../../controllers/entry/entry';
+    import type { Auth } from '$lib/controllers/user/user';
     import { popup } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';

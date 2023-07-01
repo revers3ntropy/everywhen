@@ -1,8 +1,8 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
 import { KEY_COOKIE_OPTIONS, STORE_KEY, USERNAME_COOKIE_OPTIONS } from '$lib/constants';
-import { Backup } from '$lib/controllers/backup';
-import { User } from '$lib/controllers/user';
+import { Backup } from '$lib/controllers/backup/backup';
+import { User } from '$lib/controllers/user/user';
 import { query } from '$lib/db/mysql';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse';
 import { invalidateCache } from '$lib/utils/cache';

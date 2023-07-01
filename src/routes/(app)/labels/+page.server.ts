@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { Label } from '$lib/controllers/label';
+import { Label } from '$lib/controllers/label/label';
 import { query } from '$lib/db/mysql';
 import { cachedPageRoute } from '$lib/utils/cache';
 import type { PageServerLoad } from './$types';

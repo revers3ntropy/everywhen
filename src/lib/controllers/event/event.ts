@@ -1,6 +1,6 @@
 import * as client from './event.client';
 import * as server from './event.server';
-import type { Label } from './label';
+import type { Label } from '../label/label';
 
 // RawEvent is the raw data from the database,
 // Event is the data after decryption and links to labels

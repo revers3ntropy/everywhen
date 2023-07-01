@@ -10,7 +10,7 @@
     import { obfuscated } from '$lib/stores';
     import type { ChangeEventHandler } from 'svelte/elements';
     import Asset from './Asset.svelte';
-    import type { Asset as AssetController } from '$lib/controllers/asset.client';
+    import type { Asset as AssetController } from '$lib/controllers/asset/asset.client';
     import type { PageData } from './$types';
 
     export let data: PageData;

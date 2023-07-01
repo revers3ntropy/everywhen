@@ -1,6 +1,6 @@
 import * as client from './entry.client';
 import * as server from './entry.server';
-import type { Label } from './label';
+import type { Label } from '../label/label';
 
 export interface EntryLocation {
     id: string;

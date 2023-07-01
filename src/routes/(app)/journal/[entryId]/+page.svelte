@@ -1,9 +1,9 @@
 <script lang="ts">
-    import type { Location } from '$lib/controllers/location';
+    import type { Location } from '$lib/controllers/location/location';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import { api } from '$lib/utils/apiRequest';
     import { onMount } from 'svelte';
-    import { Entry as EntryController } from '$lib/controllers/entry';
+    import { Entry as EntryController } from '$lib/controllers/entry/entry';
     import Entry from '$lib/components/entry/Entry.svelte';
     import { obfuscated } from '$lib/stores';
     import type { PageData } from './$types';

@@ -2,9 +2,9 @@
     import { canvasState, START_ZOOM } from '$lib/components/canvas/canvasState';
     import { DurationRectCollider } from '$lib/components/canvas/collider';
     import { interactable } from '$lib/components/canvas/interactable';
-    import type { Auth } from '$lib/controllers/user';
+    import type { Auth } from '$lib/controllers/user/user';
     import Event from '$lib/components/event/Event.svelte';
-    import type { Label } from '$lib/controllers/label';
+    import type { Label } from '$lib/controllers/label/label';
     import { listen } from '$lib/dataChangeEvents';
     import { obfuscated } from '$lib/stores';
     import { showPopup } from '$lib/utils/popups';

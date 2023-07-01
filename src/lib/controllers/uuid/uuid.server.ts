@@ -1,6 +1,7 @@
 import type { QueryFunc } from '$lib/db/mysql';
 import { v4 as UUIdv4 } from 'uuid';
 import type { UUId as _UUId } from './uuid';
+
 export type UUId = _UUId;
 
 namespace UUIdUtils {

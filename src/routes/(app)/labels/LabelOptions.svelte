@@ -1,7 +1,7 @@
 <script lang="ts">
     import { dispatch } from '$lib/dataChangeEvents';
     import Delete from 'svelte-material-icons/Delete.svelte';
-    import type { Auth } from '$lib/controllers/user';
+    import type { Auth } from '$lib/controllers/user/user';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import { showPopup } from '$lib/utils/popups';

@@ -1,10 +1,10 @@
 <script lang="ts">
-    import type { Label } from '$lib/controllers/label';
+    import type { Label } from '$lib/controllers/label/label';
     import { dispatch } from '$lib/dataChangeEvents';
     import { nowUtc } from '$lib/utils/time';
     import { createEventDispatcher } from 'svelte';
-    import type { Auth } from '$lib/controllers/user';
-    import { Event } from '$lib/controllers/event';
+    import type { Auth } from '$lib/controllers/user/user';
+    import { Event } from '$lib/controllers/event/event';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
 

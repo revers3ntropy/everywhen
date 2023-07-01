@@ -13,9 +13,9 @@
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
     import Entry from '$lib/components/entry/Entry.svelte';
-    import type { Entry as EntryController } from '$lib/controllers/entry';
-    import type { Location } from '$lib/controllers/location';
-    import type { Auth } from '$lib/controllers/user';
+    import type { Entry as EntryController } from '$lib/controllers/entry/entry';
+    import type { Location } from '$lib/controllers/location/location';
+    import type { Auth } from '$lib/controllers/user/user';
     import { currentTzOffset, nowUtc, utcEq } from '$lib/utils/time';
     import Dot from '../Dot.svelte';
     import UtcTime from '../UtcTime.svelte';

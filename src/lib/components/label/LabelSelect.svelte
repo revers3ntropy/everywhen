@@ -5,8 +5,8 @@
     import LabelOffOutline from 'svelte-material-icons/LabelOffOutline.svelte';
     import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
     import Dropdown from '$lib/components/Dropdown.svelte';
-    import type { Label } from '$lib/controllers/label';
-    import type { Auth } from '$lib/controllers/user';
+    import type { Label } from '$lib/controllers/label/label';
+    import type { Auth } from '$lib/controllers/user/user';
     import { errorLogger } from '$lib/utils/log';
     import { showPopup } from '$lib/utils/popups';
     import NewLabelDialog from '$lib/components/dialogs/NewLabelDialog.svelte';

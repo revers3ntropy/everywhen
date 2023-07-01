@@ -7,8 +7,8 @@
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import UtcTime from '$lib/components/UtcTime.svelte';
-    import { Asset } from '$lib/controllers/asset.client';
-    import type { Auth } from '$lib/controllers/user';
+    import { Asset } from '$lib/controllers/asset/asset.client';
+    import type { Auth } from '$lib/controllers/user/user';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
 
