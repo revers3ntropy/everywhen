@@ -4,7 +4,7 @@
     import { populateCookieWritablesWithCookies } from '$lib/stores';
     import ChevronRight from 'svelte-material-icons/ChevronRight.svelte';
     import Cookie from 'js-cookie';
-    import { encryptionKeyFromPassword } from '$lib/security/authUtils';
+    import { encryptionKeyFromPassword } from '$lib/security/authUtils.client';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import type { PageData } from './$types';

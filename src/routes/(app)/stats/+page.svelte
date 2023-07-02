@@ -1,15 +1,15 @@
 <script lang="ts">
-    import { ANIMATION_DURATION } from '$lib/constants';
+    import type { PageData } from './$types';
     import { onMount } from 'svelte';
+    import { fade } from 'svelte/transition';
+    import { ANIMATION_DURATION } from '$lib/constants';
+    import { By } from './helpers';
     import Counter from 'svelte-material-icons/Counter.svelte';
     import CommonWordsList from './CommonWordsList.svelte';
     import EntryBarChart from './EntryBarChart.svelte';
     import EntryHeatMap from './EntryHeatMap.svelte';
-    import { By } from './helpers';
     import SearchForWord from './SearchForWord.svelte';
     import StatPill from './StatPill.svelte';
-    import { fade } from 'svelte/transition';
-    import type { PageData } from './$types';
 
     let by: By = By.Entries;
 

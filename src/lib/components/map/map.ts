@@ -1,11 +1,11 @@
+import type { EntryLocation } from '$lib/controllers/entry/entry';
+import type { Map } from 'ol';
 import Feature from 'ol/Feature';
 import { Circle } from 'ol/geom';
 import Point from 'ol/geom/Point';
 import { fromLonLat } from 'ol/proj';
 import { Style } from 'ol/style';
-import type { Map } from 'ol';
 import { Location } from '$lib/controllers/location/location.client';
-import type { EntryLocation } from '$lib/controllers/entry/entry';
 
 export interface LocationFeature extends Feature<Circle> {
     location: Location;

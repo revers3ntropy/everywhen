@@ -10,7 +10,7 @@
     import { obfuscated } from '$lib/stores';
     import { listen } from '$lib/dataChangeEvents';
     import { api } from '$lib/utils/apiRequest';
-    import { encrypt } from '$lib/security/encryption.js';
+    import { encrypt } from '$lib/security/encryption.client';
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';

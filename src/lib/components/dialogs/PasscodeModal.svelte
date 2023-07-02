@@ -5,7 +5,7 @@
     import Close from 'svelte-material-icons/Close.svelte';
     import type { Auth } from '$lib/controllers/user/user';
     import { ANIMATION_DURATION } from '$lib/constants';
-    import { encryptionKeyFromPassword } from '$lib/security/authUtils';
+    import { encryptionKeyFromPassword } from '$lib/security/authUtils.client';
     import { passcodeLastEntered } from '$lib/stores';
     import { nowUtc } from '$lib/utils/time';
     import { wheel } from '$lib/utils/toggleScrollable';

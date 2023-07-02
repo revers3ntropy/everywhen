@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { Auth } from '$lib/controllers/user/user';
-    import { encrypt } from '$lib/security/encryption';
+    import { encrypt } from '$lib/security/encryption.client';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications.js';
 
     export let auth: Auth;

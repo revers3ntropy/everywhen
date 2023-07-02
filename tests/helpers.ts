@@ -1,8 +1,8 @@
 import { type APIRequestContext, type Expect, type Page, request } from '@playwright/test';
 import { serialize } from 'cookie';
 import { STORE_KEY, KEY_COOKIE_OPTIONS, USERNAME_COOKIE_OPTIONS } from '../src/lib/constants.js';
-import type { Auth, RawAuth } from '$lib/controllers/user/user.js';
-import { encryptionKeyFromPassword } from '../src/lib/security/authUtils.js';
+import type { Auth, RawAuth } from '../src/lib/controllers/user/user.js';
+import { encryptionKeyFromPassword } from '../src/lib/security/authUtils.server.js';
 import { Result } from '../src/lib/utils/result.js';
 
 export function randStr(

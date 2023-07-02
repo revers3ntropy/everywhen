@@ -370,7 +370,7 @@ async function getRemoteVersion() {
  * @param {Version} localVersion
  */
 async function restartServer(localVersion) {
-    await runRemoteCommand(`cd ~/${remoteDir()} && pnpm i`);
+    await runRemoteCommand(`cd ~/${remoteDir()} && npm run setup`);
 
     while (true) {
         console.log('Restarting remote server...');

@@ -1,9 +1,9 @@
 <script lang="ts">
-    import { goto } from '$app/navigation';
     import type { Auth } from '$lib/controllers/user/user';
-    import { encrypt } from '$lib/security/encryption';
-    import { displayNotifOnErr } from '$lib/components/notifications/notifications.js';
     import type { ChangeEventHandler } from 'svelte/elements';
+    import { goto } from '$app/navigation';
+    import { encrypt } from '$lib/security/encryption.client';
+    import { displayNotifOnErr } from '$lib/components/notifications/notifications.js';
 
     export let auth: Auth;
     export let value = '';

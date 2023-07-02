@@ -1,7 +1,6 @@
 <script lang="ts">
     import { browser } from '$app/environment';
     import { slide } from 'svelte/transition';
-    import { dispatch } from '$lib/dataChangeEvents';
     import { tooltip } from '@svelte-plugins/tooltips';
     import Bin from 'svelte-material-icons/Delete.svelte';
     import Restore from 'svelte-material-icons/DeleteRestore.svelte';
@@ -12,9 +11,10 @@
     import Heart from 'svelte-material-icons/Heart.svelte';
     import HeartOffOutline from 'svelte-material-icons/HeartOffOutline.svelte';
     import type { Location } from '$lib/controllers/location/location';
-    import { Entry } from '$lib/controllers/entry/entry.client';
-    import type { Label as LabelController } from '../../controllers/label/label';
     import type { Auth } from '$lib/controllers/user/user';
+    import type { Label as LabelController } from '../../controllers/label/label';
+    import { dispatch } from '$lib/dataChangeEvents';
+    import { Entry } from '$lib/controllers/entry/entry.client';
     import { popup } from '$lib/stores';
     import { ANIMATION_DURATION } from '$lib/constants';
     import { api, apiPath } from '$lib/utils/apiRequest';

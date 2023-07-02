@@ -1,19 +1,13 @@
 import { Entry } from '$lib/controllers/entry/entry.client';
 import { SemVer } from '$lib/utils/semVer';
-import { encrypt } from '$lib/security/encryption';
 import { download as downloadFile } from '../../utils/files';
 import { Result } from '$lib/utils/result';
 import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
-import type { Auth } from '../user/user';
 import type { Backup as _Backup } from './backup';
 
 export type Backup = _Backup;
 
 namespace BackupUtils {
-    export function asEncryptedString(self: Backup, auth: Auth): Result<string> {
-        return encrypt(JSON.stringify(self), auth.key);
-    }
-
     export function migrate(json: Partial<Backup> & Record<string, unknown>): Result<Backup> {
         json.appVersion ||= '0.0.0';
         const { val: version, err } = SemVer.fromString(json.appVersion);

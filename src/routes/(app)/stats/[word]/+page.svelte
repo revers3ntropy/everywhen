@@ -10,7 +10,7 @@
     import EntryBarChart from '../EntryBarChart.svelte';
     import EntryHeatMap from '../EntryHeatMap.svelte';
     import type { PageData } from './$types';
-    import { encrypt } from '$lib/security/encryption';
+    import { encrypt } from '$lib/security/encryption.client';
 
     let by: By = By.Words;
 

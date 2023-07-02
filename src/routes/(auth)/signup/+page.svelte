@@ -3,7 +3,7 @@
     import Dot from '$lib/components/Dot.svelte';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications.js';
     import { api } from '$lib/utils/apiRequest.js';
-    import { encryptionKeyFromPassword } from '$lib/security/authUtils.js';
+    import { encryptionKeyFromPassword } from '$lib/security/authUtils.client.js';
     import { goto } from '$app/navigation';
     import { tooltip } from '@svelte-plugins/tooltips';
     import { onMount } from 'svelte';

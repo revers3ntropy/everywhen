@@ -7,14 +7,15 @@
 </script>
 
 <script lang="ts">
-    import type { EntryLocation } from '$lib/controllers/entry/entry';
     import { writable } from 'svelte/store';
-    import { Collection } from 'ol';
+    import type { EntryLocation } from '$lib/controllers/entry/entry';
+    import type { Auth } from '$lib/controllers/user/user';
     import type { CallbackObject } from 'ol-contextmenu/dist/types';
+    import type { MapBrowserEvent } from 'ol';
     import type { Circle } from 'ol/geom';
+    import { Collection } from 'ol';
     import { Modify } from 'ol/interaction';
     import { Style } from 'ol/style';
-    import type { MapBrowserEvent } from 'ol';
     import Map from 'ol/Map';
     import TileLayer from 'ol/layer/Tile';
     import View from 'ol/View';
@@ -24,7 +25,6 @@
     import Overlay from 'ol/Overlay';
     import { fromLonLat, toLonLat } from 'ol/proj';
     import ContextMenu from 'ol-contextmenu';
-    import type { Auth } from '$lib/controllers/user/user';
     import { Location } from '$lib/controllers/location/location.client';
     import { popup } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';

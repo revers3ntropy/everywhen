@@ -4,7 +4,7 @@
     import Upload from 'svelte-material-icons/Upload.svelte';
     import { Backup } from '../controllers/backup/backup.client';
     import type { Auth } from '../controllers/user/user';
-    import { encryptionKeyFromPassword } from '../security/authUtils';
+    import { encryptionKeyFromPassword } from '../security/authUtils.client';
     import { api } from '../utils/apiRequest';
     import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
     import { showPopup } from '../utils/popups';

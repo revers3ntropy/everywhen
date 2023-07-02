@@ -3,7 +3,7 @@ import { Location } from '$lib/controllers/location/location';
 import { SemVer } from '$lib/utils/semVer';
 import schemion from 'schemion';
 import type { QueryFunc } from '$lib/db/mysql';
-import { decrypt, encrypt } from '$lib/security/encryption';
+import { decrypt, encrypt } from '$lib/security/encryption.server';
 import { download as downloadFile } from '../../utils/files';
 import { Result } from '$lib/utils/result';
 import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
@@ -16,6 +16,10 @@ import type { Backup as _Backup } from './backup';
 export type Backup = _Backup;
 
 namespace BackupUtils {
+    export function asEncryptedString(self: Backup, auth: Auth): Result<string> {
+        return encrypt(JSON.stringify(self), auth.key);
+    }
+
     export async function generate(
         query: QueryFunc,
         auth: Auth,
@@ -241,10 +245,6 @@ namespace BackupUtils {
         }
 
         return Result.ok(null);
-    }
-
-    export function asEncryptedString(self: Backup, auth: Auth): Result<string> {
-        return encrypt(JSON.stringify(self), auth.key);
     }
 
     export function migrate(json: Partial<Backup> & Record<string, unknown>): Result<Backup> {

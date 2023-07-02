@@ -1,5 +1,5 @@
 import type { QueryFunc } from '$lib/db/mysql';
-import { decrypt, encrypt } from '$lib/security/encryption';
+import { decrypt, encrypt } from '$lib/security/encryption.server';
 import { Result } from '$lib/utils/result';
 import { nowUtc } from '$lib/utils/time';
 import { Label } from '../label/label';
