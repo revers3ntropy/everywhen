@@ -103,16 +103,19 @@
                 placeholder="No passcode"
             />
         </label>
-        <button
-            aria-label="Create Account"
-            disabled={actionPending}
-            on:click|preventDefault={create}
-            type="button"
-            class="primary with-icon icon-right"
-        >
-            Create Account
-            <ArrowRightThinCircleOutline size="25" />
-        </button>
+        <div class="flex-center" style="justify-content: space-between">
+            <a href="/login">Log In</a>
+            <button
+                aria-label="Create Account"
+                disabled={actionPending}
+                on:click|preventDefault={create}
+                type="button"
+                class="primary with-icon icon-right"
+            >
+                Create Account
+                <ArrowRightThinCircleOutline size="25" />
+            </button>
+        </div>
     </div>
 </main>
 
@@ -126,7 +129,7 @@
     }
 
     .content {
-        max-width: 94vw;
+        max-width: 90vw;
 
         button {
             margin: 0;

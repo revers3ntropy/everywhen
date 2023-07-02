@@ -1,7 +1,15 @@
 {
-    "short_name": "halcyon.land",
+    "short_name": "Halcyon.Land",
     "name": "Halcyon.Land",
-    "start_url": "/",
+    "start_url": "/home",
+    "scope": "/",
+    "background_color": "#8b8680",
+    "theme_color": "#8b8680",
+    "lang": "en-GB",
+    "description": "Journal and Life Logging App",
+    "categories": ["journal", "diary", "life log", "notes", "utilities", "productivity"],
+    "orientation": "portrait-primary",
+    "display": "standalone",
     "icons": [
         {
             "src": "favicon.png",
@@ -9,11 +17,22 @@
             "sizes": "512x512"
         }
     ],
-    "shortcuts": [],
-    "scope": "/",
-    "background_color": "#3367D6",
-    "theme_color": "#3367D6",
-    "description": "Journal and Life Log app",
-    "orientation": "portrait-primary",
-    "display": "standalone"
+    "shortcuts" : [
+        {
+            "name": "Home",
+            "url": "/home"
+        },
+        {
+            "name": "Journal",
+            "url": "/journal"
+        },
+        {
+            "name": "Analytics",
+            "url": "/stats"
+        },
+        {
+            "name": "Settings",
+            "url": "/settings"
+        }
+    ]
 }

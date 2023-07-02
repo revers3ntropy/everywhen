@@ -94,7 +94,7 @@
 
     .content,
     input {
-        max-width: 94vw;
+        width: 300px;
     }
 
     label {

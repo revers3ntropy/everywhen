@@ -252,7 +252,7 @@
             {/if}
         </button>
 
-        <Dropdown openOnHover width="170px">
+        <Dropdown openOnHover fromRight width="170px">
             <span class="create-button" slot="button">
                 <Plus size="25" />
             </span>
