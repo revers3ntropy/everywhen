@@ -6,32 +6,29 @@
     <div>
         <h1> Version History </h1>
         <i>
-            Currently {version}, working towards version 0.5
+            Currently {version}, working towards version 1.0
         </i>
         <section>
             <h2>Upcoming Features</h2>
             <ul>
-                <li>Backup to Google Drive</li>
-                <li>Resize images</li>
-                <li>Better zooming the timeline on mobile</li>
-                <li>Tags with '#' in entry or separately</li>
+                <li>Achievements/Badges</li>
                 <li>Mood attached to entries</li>
                 <li>Automatic mood tracking with Tone Analysis</li>
-                <li>'Hidden Tab' mode</li>
-                <li>Allow app to be installed on mobile (PWA)</li>
+                <li>Backup to Google Drive</li>
                 <li>Sync with Google Fit</li>
-                <li>2-Factor authentication</li>
-                <li> Opt in to allowing account to be recovered at expense of security </li>
-                <li>Achievements/Badges</li>
-                <li>Opt in to sharing stats with other users - Leaderboards</li>
-                <li>Only show differences when showing entry edits</li>
-                <li>Compare statistics about words/tags</li>
                 <li>Sync with GitHub</li>
+                <li>2-Factor authentication</li>
+                <li>Opt in to allowing account to be recovered at expense of security</li>
+                <li>Tags with '#' in entry</li>
+                <li>Opt in to sharing stats with other users - Leaderboards</li>
+                <li>'Hidden Tab' mode</li>
             </ul>
         </section>
         <section>
             <h2>0.4</h2>
             <ul>
+                <li>Allow app to be installed on mobile (PWA)</li>
+                <li>Better zooming the timeline on mobile</li>
                 <li>Easily link to already uploaded images</li>
                 <li>Filter by Label in timeline</li>
                 <li>Themes (light/dark mode)</li>
