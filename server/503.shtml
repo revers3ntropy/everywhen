@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Halcyon.Land</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        * {
+            font-family: Roboto, Oxygen, Ubuntu, 'Segoe UI', Arial, -apple-system,
+            BlinkMacSystemFont, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            height: 100vh;
+            padding: 2em;
+            font-size: 18px;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: rgb(30, 30, 30);
+                color: #fff;
+            }
+        }
+
+        main {
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        button {
+            background: rgb(100, 100, 100);
+            padding: 0.5rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+        }
+
+        button:hover {
+            background: rgba(125, 125, 125, 0.5);
+        }
+
+        p {
+            margin: 1em 0;
+        }
+    </style>
+
+    <script>
+        async function seeIfOnline() {
+            const res = await fetch('/api/version');
+            if (res.ok) {
+                console.log('Server is back online');
+                window.location.reload();
+            }
+
+            setTimeout(seeIfOnline, 500);
+        }
+        void seeIfOnline();
+    </script>
+</head>
+<body>
+    <main>
+        <h1> Halcyon.Land </h1>
+        <p>
+            Looks like the server is down for maintenance...
+        </p>
+        <button onclick="window.location.reload()">
+            Try Again
+        </button>
+    </main>
+
+</body>
+</html>
