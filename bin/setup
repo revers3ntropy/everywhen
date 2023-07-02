@@ -1,0 +1,10 @@
+#!/bin/bash
+
+(
+  npm i -f
+  mkdir node_modules/webp-converter/temp/
+) & (
+  cd ./bin || exit 1
+  npm i
+) & wait
+

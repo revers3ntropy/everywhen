@@ -10,9 +10,4 @@ rm ./package-lock.json
 rm ./bin/package-lock.json
 rm ./general.log
 
-npm i -f
-
-(
-  cd ./bin || exit 1
-  npm i
-)
+bin/setup
