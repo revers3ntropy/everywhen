@@ -39,6 +39,13 @@
                 state.moveX(this.dragStart - dragEnd);
                 this.dragStart = dragEnd;
             });
+
+            state.listen('touchend', () => {
+                this.dragging = false;
+            });
+            state.listen('mouseup', () => {
+                this.dragging = false;
+            });
         },
 
         collider(state) {
@@ -48,10 +55,6 @@
         onMouseDown(state, time) {
             this.dragStart = state.timeToX(time);
             this.dragging = true;
-        },
-
-        onMouseUp() {
-            this.dragging = false;
         },
 
         contextMenu: makeStandardContextMenu(auth, labels, canvasState)

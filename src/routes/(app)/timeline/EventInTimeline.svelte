@@ -1,14 +1,18 @@
 <script lang="ts">
-    import { canvasState, START_ZOOM } from '$lib/components/canvas/canvasState';
+    import { canvasState, type RenderProps, START_ZOOM } from '$lib/components/canvas/canvasState';
     import { DurationRectCollider } from '$lib/components/canvas/collider';
     import { interactable } from '$lib/components/canvas/interactable';
+    import { displayNotifOnErr } from '$lib/components/notifications/notifications';
+    import { Event as EventController } from '$lib/controllers/event/event.client';
     import type { Auth } from '$lib/controllers/user/user';
     import Event from '$lib/components/event/Event.svelte';
     import type { Label } from '$lib/controllers/label/label';
-    import { listen } from '$lib/dataChangeEvents';
+    import { dispatch, listen } from '$lib/dataChangeEvents';
     import { obfuscated } from '$lib/stores';
+    import { api, apiPath } from '$lib/utils/apiRequest';
     import { showPopup } from '$lib/utils/popups';
     import { limitStrLen } from '$lib/utils/text';
+    import EventDragHandle from './EventDragHandle.svelte';
 
     export let auth: Auth;
     export let labels: Label[];
@@ -22,9 +26,47 @@
     export let eventTextParityHeight: boolean;
     export let created: number;
 
-    function yRenderPos(centerLineY: number) {
+    function yRenderPos(centerLineY: number): number {
         const y = isInstantEvent ? 0 : yLevel;
         return centerLineY - (y + EVENT_BASE_Y) * (HEIGHT + Y_MARGIN);
+    }
+
+    async function updateEvent(changes: {
+        start?: TimestampSecs;
+        end?: TimestampSecs;
+    }): Promise<void> {
+        displayNotifOnErr(await api.put(auth, apiPath('/events/?', id), changes));
+        const event: EventController = {
+            id,
+            name,
+            start: changes.start || start,
+            end: changes.end || end,
+            created,
+            label: label || undefined
+        };
+        start = event.start || start;
+        end = event.end || end;
+        await dispatch.update('event', event);
+    }
+
+    function startEndWhenDragging(
+        state: RenderProps,
+        dragStartTime: TimestampSecs
+    ): {
+        start: TimestampSecs;
+        end: TimestampSecs;
+    } {
+        let dragStart = Math.floor(dragStartTime);
+        let dragEnd = Math.floor(state.mouseTime);
+        let timeChange = dragEnd - dragStart;
+        return {
+            start: start + timeChange,
+            end: end + timeChange
+        };
+    }
+
+    function getYForDragHandle(centerLnY: number): number {
+        return yRenderPos(centerLnY);
     }
 
     let thisIsDeleted = false;
@@ -49,6 +91,55 @@
     interactable({
         cursorOnHover: 'pointer',
         hovering: false,
+        dragStartTime: 0,
+        dragging: false,
+
+        whenDragReleased(state: RenderProps) {
+            this.dragging = false;
+
+            const { start: dragStart, end: dragEnd } = startEndWhenDragging(
+                state,
+                this.dragStartTime
+            );
+
+            if (Math.abs(state.timeToX(dragStart) - state.timeToX(start)) < (4 as Pixels)) {
+                // click
+                showPopup(Event, {
+                    auth,
+                    obfuscated: false,
+                    event: {
+                        id,
+                        start,
+                        end,
+                        name,
+                        label,
+                        created
+                    },
+                    labels,
+                    expanded: true,
+                    allowCollapseChange: false,
+                    bordered: false
+                });
+                return;
+            }
+
+            void updateEvent({
+                start: dragStart,
+                end: dragEnd
+            });
+        },
+
+        setup(state) {
+            state.listen('mouseup', () => {
+                if (!this.dragging) return;
+                this.whenDragReleased(state);
+            });
+            state.listen('touchend', () => {
+                if (!this.dragging) return;
+                this.whenDragReleased(state);
+            });
+        },
+
         render(state) {
             if (thisIsDeleted) return;
 
@@ -65,11 +156,24 @@
                 state.circle(x, y + HEIGHT, SINGLE_EVENT_CIRCLE_RADIUS, {
                     color: labelColor
                 });
-                const h = state.centerLnY() - (y + HEIGHT);
-                state.rect(x, y + HEIGHT, 1, h, {
+                const h = state.centerLnY() - (y + HEIGHT) - SINGLE_EVENT_CIRCLE_RADIUS;
+                state.rect(x - 1, y + HEIGHT + SINGLE_EVENT_CIRCLE_RADIUS, 2, h, {
                     radius: 0,
                     color: labelColor
                 });
+
+                if (this.dragging) {
+                    const draggedEvent = startEndWhenDragging(state, this.dragStartTime);
+                    const x = state.timeToX(draggedEvent.start);
+                    state.rect(x - 1, y + HEIGHT + SINGLE_EVENT_CIRCLE_RADIUS, 2, h, {
+                        color: state.colors.text,
+                        radius: 5
+                    });
+                    state.circle(x, y + HEIGHT, SINGLE_EVENT_CIRCLE_RADIUS, {
+                        color: labelColor,
+                        wireframe: true
+                    });
+                }
             } else {
                 state.rect(x, y, width, HEIGHT, {
                     color: this.hovering ? state.colors.lightAccent : state.colors.primary,
@@ -78,6 +182,16 @@
                 if (label) {
                     state.rect(x, y + HEIGHT - LABEL_HEIGHT, width, LABEL_HEIGHT, {
                         color: labelColor
+                    });
+                }
+                if (this.dragging) {
+                    const draggedEvent = startEndWhenDragging(state, this.dragStartTime);
+                    const x = state.timeToX(draggedEvent.start);
+                    const width = EventController.duration(draggedEvent) * state.zoom;
+                    state.rect(x, y, width, HEIGHT, {
+                        color: state.colors.text,
+                        wireframe: true,
+                        radius: 5
                     });
                 }
             }
@@ -128,24 +242,12 @@
             return new DurationRectCollider(start, yRenderPos(state.centerLnY()), duration, HEIGHT);
         },
 
-        onMouseUp() {
-            showPopup(Event, {
-                auth,
-                obfuscated: false,
-                event: {
-                    id,
-                    start,
-                    end,
-                    name,
-                    label,
-                    created
-                },
-                labels,
-                expanded: true,
-                allowCollapseChange: false,
-                bordered: false
-            });
+        onMouseDown(_state, time) {
+            if (thisIsDeleted) return;
+            this.dragStartTime = time;
+            this.dragging = true;
         },
+
         contextMenu: [
             {
                 label: 'Zoom to Event',
@@ -179,5 +281,18 @@
         thisIsDeleted = true;
     });
 </script>
+
+{#if !isInstantEvent && !thisIsDeleted}
+    <EventDragHandle
+        {auth}
+        {labels}
+        {id}
+        {start}
+        {end}
+        height={HEIGHT}
+        getY={getYForDragHandle}
+        {updateEvent}
+    />
+{/if}
 
 <slot />

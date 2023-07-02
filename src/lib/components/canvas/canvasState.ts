@@ -556,7 +556,7 @@ export class CanvasState implements CanvasListeners {
         x: number,
         y: number,
         r: number,
-        { color = this.colors.primary, zIndex = 0 } = {}
+        { color = this.colors.primary, zIndex = 0, wireframe = false } = {}
     ) {
         if (!this.ctx) throw new Error('Canvas not set');
         if (zIndex < 0) throw 'zIndex < 0';
@@ -571,6 +571,10 @@ export class CanvasState implements CanvasListeners {
         this.ctx.beginPath();
         this.ctx.fillStyle = color;
         this.ctx.arc(x, y, r, 0, 2 * Math.PI);
+        if (wireframe) {
+            this.ctx.stroke();
+            return;
+        }
         this.ctx.fill();
     }
 

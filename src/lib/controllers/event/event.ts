@@ -10,12 +10,12 @@ export type RawEvent = Omit<Event, 'label' | 'decrypted'> & {
 };
 
 export interface Event {
-    label?: Label;
     id: string;
     name: string;
     start: TimestampSecs;
     end: TimestampSecs;
     created: TimestampSecs;
+    label?: Label;
 }
 
 export const Event = {

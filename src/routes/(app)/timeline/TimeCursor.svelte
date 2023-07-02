@@ -54,7 +54,6 @@
         dragStartTime: 0,
 
         whenDragReleased(state: RenderProps, time: TimestampSecs) {
-            if (!this.dragging) return;
             this.dragging = false;
 
             let dragStart = Math.floor(this.dragStartTime);
@@ -64,7 +63,7 @@
                 [dragStart, dragEnd] = [dragEnd, dragStart];
             }
 
-            if (state.timeToX(dragEnd) - state.timeToX(dragStart) < 4) {
+            if (state.timeToX(dragEnd) - state.timeToX(dragStart) < (4 as Pixels)) {
                 dragEnd = dragStart;
             }
 
@@ -73,9 +72,11 @@
 
         setup(state) {
             state.listen('mouseup', () => {
+                if (!this.dragging) return;
                 this.whenDragReleased(state, state.mouseTime);
             });
             state.listen('touchend', () => {
+                if (!this.dragging) return;
                 this.whenDragReleased(state, state.mouseTime);
             });
         },
