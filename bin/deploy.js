@@ -455,11 +455,10 @@ async function build() {
     }
 }
 
-async function stopRemoteServer() {
-    await runRemoteCommand(
-        `cd ~/${remoteDir()} && npm run stop && cd .. && rm -rf ~/${remoteDir()}`,
-        false
-    );
+async function tearDownRemote() {
+    console.log(c.yellow(`Tearing down remote server...`));
+    await runRemoteCommand(`cd ~/${remoteDir()} && npm run stop`, false);
+    await runRemoteCommand(`rm -rf ~/${remoteDir()}`, false);
 }
 
 async function setupLibWebP() {
@@ -479,7 +478,7 @@ async function main() {
     await build();
 
     const serverDownStart = now();
-    await stopRemoteServer();
+    await tearDownRemote();
     // must do between stopping the server and deleting remote dir
     await doMigrations(migrations);
 

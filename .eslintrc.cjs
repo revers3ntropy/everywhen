@@ -13,7 +13,10 @@ module.exports = {
         ecmaVersion: 2021,
         sourceType: 'module',
         tsconfigRootDir: __dirname,
-        project: ['./tsconfig.json'],
+        project: [
+            './tsconfig.json',
+            './tsconfig.eslint.json'
+        ],
         extraFileExtensions: ['.svelte'],
     },
     overrides: [

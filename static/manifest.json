@@ -1,0 +1,19 @@
+{
+    "short_name": "halcyon.land",
+    "name": "Halcyon.Land",
+    "start_url": "/",
+    "icons": [
+        {
+            "src": "favicon.png",
+            "type": "image/png",
+            "sizes": "512x512"
+        }
+    ],
+    "shortcuts": [],
+    "scope": "/",
+    "background_color": "#3367D6",
+    "theme_color": "#3367D6",
+    "description": "Journal and Life Log app",
+    "orientation": "portrait-primary",
+    "display": "standalone"
+}

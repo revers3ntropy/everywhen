@@ -1,0 +1,27 @@
+{
+    "compilerOptions": {
+        "types": ["@types/node"],
+        "noEmit": true,
+        "allowJs": true
+    },
+    "extends": "./tsconfig.json",
+    "include": [
+        "./vite.config.ts",
+        "./tests/**/*.ts",
+        "./tests/**/*.svelte",
+        "./src/**/*.ts",
+        "./src/**/*.svelte",
+        "./playwright.config.ts",
+        "./rollup.config.ts",
+        "./svelte.config.js",
+        "./bin/deploy.js",
+        "./src/service-worker.ts",
+        "ambient.d.ts",
+        "./.svelte-kit/ambient.d.ts",
+        "./.svelte-kit/types/**/$types.d.ts",
+    ],
+    "exclude": [
+        "./node_modules/**",
+        "./.svelte-kit/[!ambient.d.ts]**"
+    ]
+}

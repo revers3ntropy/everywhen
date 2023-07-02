@@ -1,5 +1,10 @@
 import adapter from '@sveltejs/adapter-node';
 import preprocess from 'svelte-preprocess';
+import fs from 'fs';
+
+/** @type {{ version: string }} */
+const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
+const version = JSON.stringify(packageJson.version);
 
 const ignoreWarningCodes = ['css-unused-selector', 'unused-export-let'];
 
@@ -10,7 +15,10 @@ const config = {
     preprocess: preprocess(),
 
     kit: {
-        adapter: adapter()
+        adapter: adapter(),
+        version: {
+            name: version
+        }
     },
 
     compilerOptions: {

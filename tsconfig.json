@@ -23,18 +23,5 @@
         "alwaysStrict": true,
         "importHelpers": true,
         "allowUmdGlobalAccess": true
-    },
-    "include": [
-        "./.svelte-kit/ambient.d.ts",
-        "./.svelte-kit/types/**/$types.d.ts",
-        "./vite.config.ts",
-        "./src/**/*.ts",
-        "./src/**/*.svelte",
-        "./tests/**/*.ts",
-        "./tests/**/*.svelte",
-        "./playwright.config.ts",
-        "./rollup.config.ts",
-        "svelte.config.js",
-        "bin/deploy.js"
-    ]
+    }
 }
