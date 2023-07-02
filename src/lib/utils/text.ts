@@ -1,4 +1,3 @@
-import crypto from 'crypto';
 import DomPurify from 'dompurify';
 import { marked } from 'marked';
 import { OBFUSCATE_CHARS } from '../constants';
@@ -21,10 +20,6 @@ export function splitText(text: string): string[] {
 
 export function wordCount(text: string): number {
     return splitText(text).length;
-}
-
-export function cryptoRandomStr(length = 32): string {
-    return crypto.randomBytes(length).toString('base64url');
 }
 
 export function numberAsSignedStr(num: number): string {

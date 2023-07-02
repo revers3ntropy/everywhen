@@ -1,4 +1,4 @@
-import { cachedApiRoute } from '$lib/utils/cache';
+import { cachedApiRoute } from '$lib/utils/cache.server';
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
 import { Entry } from '$lib/controllers/entry/entry';

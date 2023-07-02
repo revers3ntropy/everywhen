@@ -3,7 +3,7 @@ import { Settings } from '$lib/controllers/settings/settings';
 import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
 import { error } from '@sveltejs/kit';
 import { query } from '$lib/db/mysql';
-import { cachedPageRoute } from '$lib/utils/cache';
+import { cachedPageRoute } from '$lib/utils/cache.server';
 import type { PageServerLoad } from './$types';
 
 const NUMBER_OF_RECENT_TITLES = 6;

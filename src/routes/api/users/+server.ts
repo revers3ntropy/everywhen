@@ -5,7 +5,7 @@ import { Backup } from '$lib/controllers/backup/backup';
 import { User } from '$lib/controllers/user/user';
 import { query } from '$lib/db/mysql';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse';
-import { invalidateCache } from '$lib/utils/cache';
+import { invalidateCache } from '$lib/utils/cache.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody';
 
 export const POST = (async ({ request, cookies }) => {

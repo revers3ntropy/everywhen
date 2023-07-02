@@ -3,7 +3,7 @@ import { Entry } from '$lib/controllers/entry/entry';
 import { Event } from '$lib/controllers/event/event';
 import { Label } from '$lib/controllers/label/label';
 import { query } from '$lib/db/mysql';
-import { cachedPageRoute } from '$lib/utils/cache';
+import { cachedPageRoute } from '$lib/utils/cache.server';
 import type { PageServerLoad } from './$types';
 
 export const load = cachedPageRoute(async (auth, { params }) => {

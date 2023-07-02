@@ -6,7 +6,7 @@ import { nowUtc } from '$lib/utils/time';
 import type { Cookies, Handle, RequestEvent } from '@sveltejs/kit';
 import chalk from 'chalk';
 import { connect, dbConnection, query } from '$lib/db/mysql';
-import { cleanupCache } from '$lib/utils/cache';
+import { cleanupCache } from '$lib/utils/cache.server';
 import { errorLogger, makeLogger } from '$lib/utils/log';
 
 const reqLogger = makeLogger('REQ', chalk.bgWhite.black, 'general.log');

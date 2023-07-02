@@ -4,7 +4,7 @@ import { SemVer } from '$lib/utils/semVer';
 import schemion from 'schemion';
 import type { QueryFunc } from '$lib/db/mysql';
 import { decrypt, encrypt } from '$lib/security/encryption.server';
-import { download as downloadFile } from '../../utils/files';
+import { download as downloadFile } from '../../utils/files.client';
 import { Result } from '$lib/utils/result';
 import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
 import { Entry } from '../entry/entry';

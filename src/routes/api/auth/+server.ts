@@ -1,5 +1,5 @@
 import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
-import { invalidateCache } from '$lib/utils/cache';
+import { invalidateCache } from '$lib/utils/cache.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody';
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';

@@ -3,7 +3,7 @@
     import { notify } from '$lib/components/notifications/notifications';
     import { filedrop, type FileDropOptions, type Files } from 'filedrop-svelte';
     import { popup } from '$lib/stores';
-    import { getFileContents } from '$lib/utils/files';
+    import { getFileContents } from '$lib/utils/files.client';
     import type { Result } from '$lib/utils/result';
 
     export const fileOptions: FileDropOptions = {

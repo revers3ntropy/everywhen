@@ -2,7 +2,7 @@ import { MAX_IMAGE_SIZE } from '$lib/constants';
 import type { Auth } from '$lib/controllers/user/user';
 import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
 import { api } from '$lib/utils/apiRequest';
-import { getFileContents } from '$lib/utils/files';
+import { getFileContents } from '$lib/utils/files.client';
 
 export async function uploadImage(
     auth: Auth,

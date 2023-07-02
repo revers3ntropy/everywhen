@@ -5,7 +5,7 @@ import { Label } from '$lib/controllers/label/label';
 import { query } from '$lib/db/mysql';
 import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse';
-import { cachedApiRoute, invalidateCache } from '$lib/utils/cache';
+import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody';
 import type { RequestHandler } from './$types';
 

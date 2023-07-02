@@ -1,6 +1,6 @@
 import { Entry } from '$lib/controllers/entry/entry.client';
 import { SemVer } from '$lib/utils/semVer';
-import { download as downloadFile } from '../../utils/files';
+import { download as downloadFile } from '../../utils/files.client';
 import { Result } from '$lib/utils/result';
 import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
 import type { Backup as _Backup } from './backup';

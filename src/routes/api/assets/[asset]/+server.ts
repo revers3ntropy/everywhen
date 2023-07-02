@@ -9,7 +9,7 @@ import {
     type GenericResponse,
     rawApiResponse
 } from '$lib/utils/apiResponse';
-import { cacheResponse, getCachedResponse, invalidateCache } from '$lib/utils/cache';
+import { cacheResponse, getCachedResponse, invalidateCache } from '$lib/utils/cache.server';
 
 export const GET = (async ({ params, url, cookies }) => {
     const auth = await getAuthFromCookies(cookies);

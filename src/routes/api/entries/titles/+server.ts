@@ -3,7 +3,7 @@ import { error } from '@sveltejs/kit';
 import { Entry } from '$lib/controllers/entry/entry';
 import { query } from '$lib/db/mysql';
 import { apiRes404 } from '$lib/utils/apiResponse';
-import { cachedApiRoute } from '$lib/utils/cache';
+import { cachedApiRoute } from '$lib/utils/cache.server';
 
 export const GET = cachedApiRoute(async auth => {
     const { val: entries, err } = await Entry.getTitles(query, auth);

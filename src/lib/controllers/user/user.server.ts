@@ -1,7 +1,7 @@
 import type { QueryFunc } from '$lib/db/mysql';
 import { encryptionKeyFromPassword } from '$lib/security/authUtils.server';
 import { Result } from '$lib/utils/result';
-import { cryptoRandomStr } from '$lib/utils/text';
+import { cryptoRandomStr } from '$lib/security/authUtils.server';
 import { nowUtc } from '$lib/utils/time';
 import { Asset } from '../asset/asset.server';
 import { Backup } from '../backup/backup';

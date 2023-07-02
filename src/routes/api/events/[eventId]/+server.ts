@@ -3,7 +3,7 @@ import { Event } from '$lib/controllers/event/event';
 import { query } from '$lib/db/mysql';
 import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse';
-import { invalidateCache } from '$lib/utils/cache';
+import { invalidateCache } from '$lib/utils/cache.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody';
 import type { RequestHandler } from './$types';
 

@@ -1,7 +1,7 @@
 import { error } from '@sveltejs/kit';
 import { Asset } from '$lib/controllers/asset/asset.server';
 import { query } from '$lib/db/mysql';
-import { cachedPageRoute } from '$lib/utils/cache';
+import { cachedPageRoute } from '$lib/utils/cache.server';
 import type { PageServerLoad } from './$types';
 
 export const load = cachedPageRoute(async auth => {
