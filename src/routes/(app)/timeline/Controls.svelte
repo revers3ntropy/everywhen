@@ -2,10 +2,12 @@
     import { canvasState } from '$lib/components/canvas/canvasState';
     import { RectCollider } from '$lib/components/canvas/collider';
     import { interactable } from '$lib/components/canvas/interactable.js';
+    import type { Label } from '$lib/controllers/label/label';
     import type { Auth } from '$lib/controllers/user/user';
     import { makeStandardContextMenu } from './standardContextMenu';
 
     export let auth: Auth;
+    export let labels: Label[];
 
     interactable({
         dragging: false,
@@ -52,7 +54,7 @@
             this.dragging = false;
         },
 
-        contextMenu: makeStandardContextMenu(auth, canvasState)
+        contextMenu: makeStandardContextMenu(auth, labels, canvasState)
     });
 </script>
 

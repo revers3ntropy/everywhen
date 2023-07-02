@@ -17,7 +17,6 @@
     import type { PageData } from './$types';
 
     export let data: PageData;
-    if (!('auth' in data)) throw '';
 
     let selectedLabels = [...(data.labels.map(l => l.id) || []), ''];
 
@@ -54,6 +53,24 @@
         data = {
             ...data,
             entries: [...data.entries.filter(e => e.id !== id)]
+        };
+    });
+    listen.label.onCreate(label => {
+        data = {
+            ...data,
+            labels: [...(data.labels || []), label]
+        };
+    });
+    listen.label.onUpdate(label => {
+        data = {
+            ...data,
+            labels: data.labels.map(l => (l.id === label.id ? label : l))
+        };
+    });
+    listen.label.onDelete(id => {
+        data = {
+            ...data,
+            labels: data.labels.filter(l => l.id !== id)
         };
     });
 </script>
@@ -108,8 +125,8 @@
 
 <main>
     <Canvas>
-        <Controls auth={data.auth} />
-        <MobileZoom auth={data.auth} />
+        <Controls auth={data.auth} labels={data.labels} />
+        <MobileZoom auth={data.auth} labels={data.labels} />
         <Background />
 
         <TimeMarkers startYear={data.settings.yearOfBirth.value} />
@@ -150,7 +167,7 @@
         {/key}
 
         <CenterLine />
-        <TimeCursor auth={data.auth} />
+        <TimeCursor auth={data.auth} labels={data.labels} />
     </Canvas>
 
     <Filters auth={data.auth} labels={data.labels} bind:selectedLabels />

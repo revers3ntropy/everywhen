@@ -29,7 +29,10 @@
 
     let thisIsDeleted = false;
 
-    if (!start || !end) throw 'Missing required props';
+    if (typeof start !== 'number' || typeof end !== 'number') {
+        console.error(start, end);
+        throw 'Missing required props';
+    }
 
     $: duration = end - start;
     $: isInstantEvent = duration < 60;
