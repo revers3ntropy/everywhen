@@ -18,6 +18,10 @@ const config = {
         adapter: adapter(),
         version: {
             name: version
+        },
+        inlineStyleThreshold: 250, // 250 characters
+        prerender: {
+            concurrency: 4
         }
     },
 
