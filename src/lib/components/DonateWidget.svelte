@@ -1,17 +1,18 @@
 <script>
     import OpenInNew from 'svelte-material-icons/OpenInNew.svelte';
+    export let iconSize = 30;
 </script>
 
 <a
     href="https://www.paypal.com/donate/?hosted_button_id=9ASS89B25RWM2"
     target="_blank"
     aria-label="Donate with PayPal"
-    class="icon-gradient-on-hover"
+    class="with-icon icon-gradient-on-hover"
 >
     <svg
         xmlns="http://www.w3.org/2000/svg"
-        width="20"
-        height="20"
+        width={iconSize}
+        height={iconSize}
         preserveAspectRatio="xMidYMid"
         viewBox="0 0 256 302"
         id="paypal"

@@ -1,8 +1,12 @@
 <script lang="ts">
+    import Logo from '$lib/components/Logo.svelte';
     import ArrowRightThinCircleOutline from 'svelte-material-icons/ArrowRightThinCircleOutline.svelte';
 </script>
 
 <main class="flex-center">
+    <div>
+        <Logo />
+    </div>
     <div>
         <h1> Halcyon.Land <span class="beta"> beta </span> </h1>
         <p> YOUR JOURNAL AND LIFE LOG </p>

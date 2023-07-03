@@ -7,14 +7,39 @@
     "theme_color": "#8b8680",
     "lang": "en-GB",
     "description": "Journal and Life Logging App",
-    "categories": ["journal", "diary", "life log", "notes", "utilities", "productivity"],
+    "categories": ["journal", "diary", "log" ,"notes", "utilities", "productivity"],
     "orientation": "portrait-primary",
     "display": "standalone",
     "icons": [
         {
             "src": "favicon.png",
             "type": "image/png",
-            "sizes": "512x512"
+            "sizes": "459x672"
+        },
+        {
+            "src": "favicon.ico",
+            "type": "image/x-icon",
+            "sizes": "64x64"
+        },
+        {
+            "src": "favicon-32x32.ico",
+            "type": "image/x-icon",
+            "sizes": "32x32"
+        },
+        {
+            "src": "favicon-128x128.ico",
+            "type": "image/x-icon",
+            "sizes": "128x128"
+        },
+        {
+            "src": "logodark.png",
+            "type": "image/png",
+            "sizes": "459x672"
+        },
+        {
+            "src": "logolight.png",
+            "type": "image/png",
+            "sizes": "459x672"
         }
     ],
     "shortcuts" : [
