@@ -19,7 +19,8 @@
         {
             "src": "favicon.ico",
             "type": "image/x-icon",
-            "sizes": "64x64"
+            "sizes": "64x64",
+            "purpose": "any maskable"
         },
         {
             "src": "favicon-32x32.ico",
@@ -44,7 +45,8 @@
         {
             "src": "iconsquare.png",
             "type": "image/png",
-            "sizes": "650x650"
+            "sizes": "650x650",
+            "purpose": "any maskable"
         }
     ],
     "shortcuts" : [
