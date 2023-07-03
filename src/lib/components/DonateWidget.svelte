@@ -1,6 +1,6 @@
 <script>
     import OpenInNew from 'svelte-material-icons/OpenInNew.svelte';
-    export let iconSize = 30;
+    export let iconSize = 25;
 </script>
 
 <a

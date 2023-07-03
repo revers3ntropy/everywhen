@@ -19,12 +19,18 @@ node_modules
 /secrets/**/sshpass.txt
 !/secrets/example/*
 !/secrets/**/*.package.json
+/twa/key.txt
+/twa/android.keystore
 
 # Build files
 .output
 /build
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+/twa/gradle/
+/twa/app/
+/twa/.gradle/
+/twa/app-release*
 
 # Testing
 /test-results/

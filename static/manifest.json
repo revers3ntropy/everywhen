@@ -12,48 +12,44 @@
     "display": "standalone",
     "icons": [
         {
-            "src": "favicon.png",
+            "src": "/favicon.png",
             "type": "image/png",
             "sizes": "459x672"
         },
         {
-            "src": "favicon.ico",
+            "src": "/favicon.ico",
             "type": "image/x-icon",
             "sizes": "64x64",
             "purpose": "any maskable"
         },
         {
-            "src": "favicon-32x32.ico",
+            "src": "/favicon-32x32.ico",
             "type": "image/x-icon",
             "sizes": "32x32"
         },
         {
-            "src": "favicon-128x128.ico",
+            "src": "/favicon-128x128.ico",
             "type": "image/x-icon",
             "sizes": "128x128"
         },
         {
-            "src": "logodark.png",
+            "src": "/logodark.png",
             "type": "image/png",
             "sizes": "459x672"
         },
         {
-            "src": "logolight.png",
+            "src": "/logolight.png",
             "type": "image/png",
             "sizes": "459x672"
         },
         {
-            "src": "iconsquare.png",
+            "src": "/iconsquare.png",
             "type": "image/png",
             "sizes": "650x650",
             "purpose": "any maskable"
         }
     ],
     "shortcuts" : [
-        {
-            "name": "Home",
-            "url": "/home"
-        },
         {
             "name": "Journal",
             "url": "/journal"

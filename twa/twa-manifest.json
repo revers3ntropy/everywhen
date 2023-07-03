@@ -1,0 +1,47 @@
+{
+  "packageId": "land.halcyon.twa",
+  "host": "halcyon.land",
+  "name": "Halcyon.Land",
+  "launcherName": "Halcyon.Land",
+  "display": "standalone",
+  "themeColor": "#8B8680",
+  "navigationColor": "#000000",
+  "navigationColorDark": "#000000",
+  "navigationDividerColor": "#000000",
+  "navigationDividerColorDark": "#000000",
+  "backgroundColor": "#8B8680",
+  "enableNotifications": true,
+  "startUrl": "/home",
+  "iconUrl": "https://halcyon.land/iconsquare.png",
+  "maskableIconUrl": "https://halcyon.land/iconsquare.png",
+  "monochromeIconUrl": "https://halcyon.land/iconsquare.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "/home/joseph/dev/misc_3/twa/android.keystore",
+    "alias": "android"
+  },
+  "appVersionName": "3",
+  "appVersionCode": 3,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://halcyon.land/manifest.json",
+  "fallbackType": "customtabs",
+  "features": {
+    "locationDelegation": {
+      "enabled": true
+    }
+  },
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://halcyon.land/",
+  "minSdkVersion": 19,
+  "orientation": "portrait-primary",
+  "fingerprints": [],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "appVersion": "3"
+}

@@ -57,7 +57,7 @@ test.describe('/signup', () => {
         await page.goto('/settings', { waitUntil: 'networkidle' });
         await expect(page).toHaveURL('/settings');
 
-        expect(await page.isVisible('button[aria-label="Delete Account"]')).toBe(true);
+        expect(await page.isVisible('a[aria-label="Delete Account"]')).toBe(true);
 
         const api = await generateApiCtx({
             username: auth.username,

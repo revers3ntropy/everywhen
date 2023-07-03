@@ -1,6 +1,5 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { goto } from '$app/navigation';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import Cog from 'svelte-material-icons/Cog.svelte';
     import Logout from 'svelte-material-icons/Logout.svelte';
@@ -11,32 +10,14 @@
     import { logOut } from '$lib/security/logOut';
     import { showPopup } from '$lib/utils/popups';
     import BackupOptions from '$lib/components/BackupOptions.svelte';
-    import { Backup } from '$lib/controllers/backup/backup.client';
     import {
         type SettingsKey,
         Settings as SettingsController
     } from '$lib/controllers/settings/settings.client';
-    import { api } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import Settings from './Settings.svelte';
     import type { PageData } from './$types';
 
     export let data: PageData;
-
-    async function deleteAccount() {
-        if (
-            !confirm(
-                'Are you sure you want to delete your account?' +
-                    ' A backup of your data will be downloaded.'
-            )
-        ) {
-            return;
-        }
-
-        const { backup: backupData } = displayNotifOnErr(await api.delete(data.auth, '/users'));
-        Backup.download(backupData, data.auth.username, true);
-        void goto('/');
-    }
 
     function changePassword() {
         showPopup(ChangePasswordDialog, {
@@ -61,7 +42,7 @@
     <section>
         <h1>
             <AccountCircleOutline size="40" />
-            <span>My Data and Account</span>
+            <span> My Data and Account </span>
         </h1>
 
         <div class="buttons">
@@ -76,10 +57,10 @@
                 <Logout size="30" />
                 Log Out
             </button>
-            <button aria-label="Delete Account" class="danger" on:click={deleteAccount}>
+            <a aria-label="Delete Account" class="danger" href="/settings/delete">
                 <Skull size="30" />
-                Delete Account and Erase Data
-            </button>
+                Delete Account
+            </a>
         </div>
     </section>
     <section>

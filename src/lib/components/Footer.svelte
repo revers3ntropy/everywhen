@@ -2,6 +2,7 @@
     import InformationOutline from 'svelte-material-icons/InformationOutline.svelte';
     import BugOutline from 'svelte-material-icons/BugOutline.svelte';
     import Github from 'svelte-material-icons/Github.svelte';
+    import Security from 'svelte-material-icons/Security.svelte';
     import History from 'svelte-material-icons/History.svelte';
     import OpenInNew from 'svelte-material-icons/OpenInNew.svelte';
     import DonateWidget from '$lib/components/DonateWidget.svelte';
@@ -17,9 +18,17 @@
         </div>
         <div class="info">
             <div>
-                <span />
                 <a aria-label="about" href="/about" class="with-icon icon-gradient-on-hover">
-                    <InformationOutline size="30" /> About Halcyon.Land
+                    <InformationOutline size="25" /> About Halcyon.Land
+                </a>
+            </div>
+            <div>
+                <a
+                    aria-label="about"
+                    href="/about/privacy"
+                    class="with-icon icon-gradient-on-hover"
+                >
+                    <Security size="25" /> Privacy Policy
                 </a>
             </div>
             <div>
@@ -28,7 +37,7 @@
                     href="/about/history"
                     class="with-icon icon-gradient-on-hover"
                 >
-                    <History size="30" /> Version History
+                    <History size="25" /> Version History
                 </a>
             </div>
             <div>
@@ -39,10 +48,10 @@
                     target="_blank"
                     class="with-icon icon-gradient-on-hover"
                 >
-                    <BugOutline size="30" />
+                    <BugOutline size="25" />
                     <span>
                         Report Bugs / Request Features
-                        <OpenInNew size="15" />
+                        <OpenInNew size="12" />
                     </span>
                 </a>
             </div>
@@ -54,8 +63,8 @@
                     rel="noreferrer"
                     target="_blank"
                 >
-                    <Github size="30" />
-                    <span> Source Code <OpenInNew size="15" /> </span>
+                    <Github size="25" />
+                    <span> Source Code <OpenInNew size="12" /> </span>
                 </a>
             </div>
 
@@ -92,7 +101,7 @@
             display: block;
 
             & > * {
-                margin: 20px;
+                margin: 15px;
             }
         }
 
