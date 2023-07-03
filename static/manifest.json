@@ -40,6 +40,11 @@
             "src": "logolight.png",
             "type": "image/png",
             "sizes": "459x672"
+        },
+        {
+            "src": "iconsquare.png",
+            "type": "image/png",
+            "sizes": "650x650"
         }
     ],
     "shortcuts" : [

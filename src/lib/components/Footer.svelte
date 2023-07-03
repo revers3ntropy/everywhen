@@ -74,10 +74,6 @@
         padding: 5rem 0 5rem 0;
         border-top: 1px solid var(--border-color);
 
-        @media @mobile {
-            margin-bottom: 10rem;
-        }
-
         .logo {
             display: flex;
             align-items: center;
@@ -88,7 +84,17 @@
             display: block;
 
             & > * {
-                margin: 20px 0;
+                margin: 20px;
+            }
+        }
+
+        @media @mobile {
+            margin-bottom: 10rem;
+            grid-template-columns: 1fr;
+
+            .logo,
+            .info {
+                justify-content: center;
             }
         }
     }

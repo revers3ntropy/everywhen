@@ -4,7 +4,7 @@
 </script>
 
 <main class="flex-center">
-    <div>
+    <div class="flex-center">
         <Logo />
     </div>
     <div>
@@ -18,22 +18,27 @@
 </main>
 
 <style lang="less">
+    @import '../styles/variables';
+
     main {
         width: 100vw;
         height: 100vh;
         padding: 1rem;
+
+        @media @mobile {
+            display: grid;
+            text-align: center;
+            align-items: start;
+            justify-content: center;
+            grid-template-columns: 1fr;
+            grid-template-rows: auto 1fr;
+        }
     }
 
     h1 {
         font-size: 3rem;
         padding: 0;
-
-        @media (max-width: 400px) {
-            font-size: 2.5rem;
-        }
-        @media (max-width: 350px) {
-            font-size: 2rem;
-        }
+        margin: 0;
 
         .beta {
             font-size: 1.2rem;
