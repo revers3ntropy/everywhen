@@ -1,4 +1,5 @@
 <script lang="ts">
+    import AllowCookies from '$lib/components/AllowCookies.svelte';
     import type { LayoutData } from './$types';
     import { logOut } from '$lib/security/logOut';
     import { onDestroy } from 'svelte';
@@ -8,7 +9,7 @@
     import Cookie from 'js-cookie';
     import { ANIMATION_DURATION, STORE_KEY } from '$lib/constants';
     import { Backup } from '$lib/controllers/backup/backup.client';
-    import { obfuscated, passcodeLastEntered } from '$lib/stores';
+    import { allowedCookies, obfuscated, passcodeLastEntered } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { errorLogger } from '$lib/utils/log';
     import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
@@ -119,6 +120,10 @@
         passcode={data.settings.passcode.value}
         auth={data.auth}
     />
+{/if}
+
+{#if !$allowedCookies}
+    <AllowCookies />
 {/if}
 
 {#key $page.url.href}

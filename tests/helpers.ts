@@ -67,6 +67,7 @@ export async function generateUserAndSignIn(page: Page): Promise<{
     api: APIRequestContext;
 }> {
     await page.goto('/login', { waitUntil: 'networkidle' });
+    await page.getByLabel('Accept Cookies').click();
     const { auth, api } = await generateUser();
 
     await page.getByLabel('Username').click();

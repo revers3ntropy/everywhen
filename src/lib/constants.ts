@@ -21,7 +21,8 @@ export enum Theme {
 }
 
 export const COOKIE_WRITEABLE_KEYS = {
-    theme: `${KEY_PREFIX}theme`
+    theme: `${KEY_PREFIX}theme`,
+    allowedCookies: `${KEY_PREFIX}allowed_cookies`
 } as const;
 
 export const LS_TO_CLEAR_ON_LOGOUT = Object.freeze([

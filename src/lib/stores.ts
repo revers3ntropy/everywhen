@@ -26,6 +26,8 @@ export const obfuscated = localStorageWritable<boolean>(STORE_KEY.obfuscated, fa
 
 export const theme = cookieWritable<Theme>(COOKIE_WRITEABLE_KEYS.theme, Theme.light);
 
+export const allowedCookies = cookieWritable<boolean>(COOKIE_WRITEABLE_KEYS.allowedCookies, false);
+
 /**
  * Called in root layout, runs on both server and client.
  * Only called when page refreshes.
@@ -34,8 +36,23 @@ export function populateCookieWritablesWithCookies(
     cookies: RawCookies,
     settings: SettingsConfig | null
 ) {
+    function tryParse<T>(value: string | undefined, defaultValue: T): T {
+        if (value) {
+            try {
+                return JSON.parse(value) as T;
+            } catch (e) {
+                return defaultValue;
+            }
+        }
+        return defaultValue;
+    }
+
     if (cookies.theme) {
-        theme.set(JSON.parse(cookies.theme) as Theme);
+        theme.set(tryParse<Theme>(cookies.theme, Theme.light));
+    }
+
+    if (cookies.allowedCookies) {
+        allowedCookies.set(tryParse<boolean>(cookies.allowedCookies, false));
     }
 
     if (settings?.hideEntriesByDefault?.value) {
