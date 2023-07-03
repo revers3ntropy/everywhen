@@ -25,7 +25,8 @@ console.log('Reading SSL');
 
 const credentials = {
     key: fs.readFileSync('./key.pem', 'utf8'),
-    cert: fs.readFileSync('./cert.pem', 'utf8')
+    cert: fs.readFileSync('./cert.pem', 'utf8'),
+    ca: fs.readFileSync('./ca.pem', 'utf8')
 };
 
 console.log('Setting up express');
