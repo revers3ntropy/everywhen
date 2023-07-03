@@ -17,10 +17,11 @@
     @import '../styles/layout';
 
     main {
+        .flex-center();
         font-size: 2em;
+        height: 100vh;
 
         & > div {
-            .page-center();
             width: fit-content;
             display: grid;
             grid-template-columns: 3em 1fr;
