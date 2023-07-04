@@ -8,12 +8,7 @@ import * as dotenv from 'dotenv';
 import prompts from 'prompts';
 import fs from 'fs';
 import fetch from 'node-fetch';
-import https from 'https';
 import prompt from 'prompt-sync';
-
-const noSslAgent = new https.Agent({
-    rejectUnauthorized: false
-});
 
 /** @type {(options: *[]) => *} */
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -342,9 +337,7 @@ async function getMigrations(remoteVersion, localVersion) {
  */
 async function getRemoteVersion() {
     console.log(`Getting remote version from '${remoteAddress()}/api/version'...`);
-    const rawVersion = await fetch(`https://${remoteAddress()}/api/version`, {
-        agent: noSslAgent
-    });
+    const rawVersion = await fetch(`https://${remoteAddress()}/api/version`);
 
     let apiVersion;
     try {
