@@ -4,12 +4,12 @@
   "name": "Halcyon.Land",
   "launcherName": "Halcyon.Land",
   "display": "standalone",
-  "themeColor": "#8B8680",
-  "navigationColor": "#000000",
-  "navigationColorDark": "#000000",
-  "navigationDividerColor": "#000000",
-  "navigationDividerColorDark": "#000000",
-  "backgroundColor": "#8B8680",
+  "themeColor": "#E6E6E6",
+  "navigationColor": "#E6E6E6",
+  "navigationColorDark": "#FFFFFF",
+  "navigationDividerColor": "#A0A0A0",
+  "navigationDividerColorDark": "#828282",
+  "backgroundColor": "#E6E6E6",
   "enableNotifications": true,
   "startUrl": "/home",
   "iconUrl": "https://halcyon.land/iconsquare.png",
@@ -20,8 +20,8 @@
     "path": "/home/joseph/dev/misc_3/twa/android.keystore",
     "alias": "android"
   },
-  "appVersionName": "3",
-  "appVersionCode": 3,
+  "appVersionName": "4",
+  "appVersionCode": 4,
   "shortcuts": [],
   "generatorApp": "bubblewrap-cli",
   "webManifestUrl": "https://halcyon.land/manifest.json",
@@ -39,9 +39,13 @@
   "isMetaQuest": false,
   "fullScopeUrl": "https://halcyon.land/",
   "minSdkVersion": 19,
-  "orientation": "portrait-primary",
-  "fingerprints": [],
+  "orientation": "portrait",
+  "fingerprints": [
+    {
+      "value": "24:52:DC:B7:3D:6F:7F:32:71:C7:74:6B:63:F1:87:6B:11:AB:94:AC:32:86:6D:09:F0:C0:91:DE:A0:1F:F8:81"
+    }
+  ],
   "additionalTrustedOrigins": [],
   "retainedBundles": [],
-  "appVersion": "3"
+  "appVersion": "4"
 }
