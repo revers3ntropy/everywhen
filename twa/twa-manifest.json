@@ -11,7 +11,11 @@
   "navigationDividerColorDark": "#828282",
   "backgroundColor": "#E6E6E6",
   "enableNotifications": true,
+  "scope": "/",
   "startUrl": "/home",
+  "lang": "en-GB",
+  "description": "Journal and Life Logging App",
+  "categories": ["journal", "diary", "log" ,"notes", "utilities", "productivity"],
   "iconUrl": "https://halcyon.land/iconsquare.png",
   "maskableIconUrl": "https://halcyon.land/iconsquare.png",
   "monochromeIconUrl": "https://halcyon.land/iconsquare.png",
@@ -22,7 +26,6 @@
   },
   "appVersionName": "4",
   "appVersionCode": 4,
-  "shortcuts": [],
   "generatorApp": "bubblewrap-cli",
   "webManifestUrl": "https://halcyon.land/manifest.json",
   "fallbackType": "customtabs",
@@ -47,5 +50,67 @@
   ],
   "additionalTrustedOrigins": [],
   "retainedBundles": [],
-  "appVersion": "4"
+  "appVersion": "4",
+  "shortcuts" : [
+    {
+      "name": "Journal",
+      "url": "https://halcyon.land/journal",
+      "chosenIconUrl": "https://halcyon.land/logosquare_small.png"
+    },
+    {
+      "name": "Analytics",
+      "url": "https://halcyon.land/stats",
+      "chosenIconUrl":  "https://halcyon.land/logosquare_small.png"
+    },
+    {
+      "name": "Settings",
+      "url": "https://halcyon.land/settings",
+      "chosenIconUrl": "https://halcyon.land/logosquare_small.png"
+    }
+  ],
+  "icons": [
+    {
+      "src": "https://halcyon.land/favicon.png",
+      "type": "image/png",
+      "sizes": "459x672"
+    },
+    {
+      "src": "https://halcyon.land/favicon.ico",
+      "type": "image/x-icon",
+      "sizes": "64x64",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://halcyon.land/favicon-32x32.ico",
+      "type": "image/x-icon",
+      "sizes": "32x32"
+    },
+    {
+      "src": "https://halcyon.land/favicon-128x128.ico",
+      "type": "image/x-icon",
+      "sizes": "128x128"
+    },
+    {
+      "src": "https://halcyon.land/logodark.png",
+      "type": "image/png",
+      "sizes": "459x672"
+    },
+    {
+      "src": "https://halcyon.land/logolight.png",
+      "type": "image/png",
+      "sizes": "459x672"
+    },
+    {
+      "src": "https://halcyon.land/iconsquare_small.png",
+      "type": "image/png",
+      "sizes": "750x750",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://halcyon.land/iconsquare.png",
+      "type": "image/png",
+      "sizes": "650x650",
+      "purpose": "any maskable"
+    }
+  ]
 }
