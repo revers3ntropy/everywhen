@@ -1,6 +1,10 @@
 <main class="flex-center">
     <div>
         <h1> Privacy Policy </h1>
+        <i> Last updated: 4th July 2023 </i>
+        <p class="text-light">
+            Responsible for Data Protection (DPO): Joseph Coppin (josephcoppin@gmail.com)
+        </p>
         <p>
             This privacy policy applies between you, the User of this Website, and Halcyon.Land, the
             owner and provider of this Website. Halcyon.Land takes the privacy of your information
@@ -85,9 +89,9 @@
         <h2> Data collected </h2>
         <p> We may collect the following Data, which includes personal Data, from you: </p>
         <ol>
-            <li> a.IP address (automatically collected); </li>
-            <li> b.web browser type and version (automatically collected); </li>
-            <li> c.operating system (automatically collected); </li>
+            <li> IP address (automatically collected); </li>
+            <li> web browser type and version (automatically collected); </li>
+            <li> operating system (automatically collected); </li>
         </ol>
         <p> in each case, in accordance with this privacy policy. </p>
 
@@ -98,13 +102,13 @@
             <li> data is collected automatically. </li>
         </ol>
 
-        <h2> Data that is given to us by you </h2>
+        <h3> Data that is given to us by you </h3>
         <p>
             Halcyon.Land will collect your Data in a number of ways, for example when you contact us
             through the Website, by telephone, post, e-mail or through any other means, in
             accordance with this privacy policy.
         </p>
-        <p> Data that is collected automatically </p>
+        <h3> Data that is collected automatically </h3>
         <p>
             To the extent that you access the Website, we will collect your Data automatically, for
             example:
@@ -143,7 +147,7 @@
             in certain circumstances (see the section headed "Your rights" below).
         </p>
 
-        <h3>Keeping Data secure</h3>
+        <h3> Keeping Data secure </h3>
         <p>
             We will use technical and organisational measures to safeguard your Data, for example:
         </p>
@@ -294,6 +298,12 @@
             computer.
         </p>
 
+        <h2> LocalStorage </h2>
+        <p>
+            In addition to cookies, this website and our app use your browser's localstorage to
+            store certain settings locally on your device to improve the user experience.
+        </p>
+
         <h2> General </h2>
         <p>
             You may not transfer any of your rights under this privacy policy to any other person.
@@ -367,9 +377,11 @@
         font-weight: normal;
     }
 
-    p {
+    p,
+    li {
         font-size: 1rem;
         margin-bottom: 1rem;
+        line-height: 1.3rem;
     }
 
     main {

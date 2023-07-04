@@ -9,7 +9,6 @@ export const STORE_KEY = {
     passcodeLastEntered: `${KEY_PREFIX}passcode_last_entered`,
     enabledLocation: `${KEY_PREFIX}enabled_location`,
     sortEventsKey: `${KEY_PREFIX}events_sort_key`,
-    journalingMode: `${KEY_PREFIX}journaling_mode`,
     key: `${KEY_PREFIX}key`,
     username: `${KEY_PREFIX}username`,
     obfuscated: `${KEY_PREFIX}obfuscated`
