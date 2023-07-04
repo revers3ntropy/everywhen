@@ -21,10 +21,17 @@
     populateCookieWritablesWithCookies(data.__cookieWritables, data.settings);
 
     async function checkForUpdate() {
-        const currentVersion = __VERSION__;
-        const versionResult = displayNotifOnErr(await api.get(null, '/version'));
+        // if another update comes out, the new version will be wrong
+        // but the version the user switches too will be correct
+        // so don't bother checking for updates if there is already one
+        if (newVersionAvailable) return;
 
-        newVersion = versionResult.v;
+        // only check for updates if the user is actually on this tab
+        if (document.visibilityState !== 'visible') return;
+
+        const currentVersion = __VERSION__;
+        const { v: newVersion } = displayNotifOnErr(await api.get(null, '/version'));
+
         newVersionAvailable = newVersion !== currentVersion;
     }
 
@@ -32,6 +39,8 @@
         setInterval(() => {
             void checkForUpdate();
         }, POLL_FOR_UPDATE_INTERVAL);
+
+        document.onvisibilitychange = () => void checkForUpdate();
     });
 
     let newVersionAvailable = false;

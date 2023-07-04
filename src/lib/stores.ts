@@ -58,4 +58,8 @@ export function populateCookieWritablesWithCookies(
     if (settings?.hideEntriesByDefault?.value) {
         obfuscated.set(true);
     }
+
+    if (settings?.preferLocationOn?.value) {
+        enabledLocation.set(true);
+    }
 }

@@ -65,6 +65,13 @@ namespace SettingsUtils {
             name: 'Show "On this Day" Entries',
             description: `Show entries which happened on this day some number of years ago on the home page.`,
             showInSettings: true
+        } as SettingConfig<boolean>,
+        preferLocationOn: {
+            type: 'boolean',
+            defaultValue: false,
+            name: 'Prefer Location',
+            description: `Prefer location to be on by default.`,
+            showInSettings: true
         } as SettingConfig<boolean>
     } satisfies Record<string, SettingConfig<SettingValue>>;
 
