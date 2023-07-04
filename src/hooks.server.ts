@@ -5,11 +5,11 @@ import { tryGetAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import { nowUtc } from '$lib/utils/time';
 import type { Cookies, Handle, RequestEvent } from '@sveltejs/kit';
 import chalk from 'chalk';
-import { connect, dbConnection, query } from '$lib/db/mysql';
+import { connect, dbConnection, query } from '$lib/db/mysql.server';
 import { cleanupCache } from '$lib/utils/cache.server';
-import { errorLogger, makeLogger } from '$lib/utils/log';
+import { errorLogger, FileLogger } from '$lib/utils/log.server';
 
-const reqLogger = makeLogger('REQ', chalk.bgWhite.black, 'general.log');
+const reqLogger = new FileLogger('REQ', chalk.bgWhite.black);
 
 // keep connection to database alive
 // so it's not re-connected on API request
@@ -24,7 +24,7 @@ setInterval(() => {
 setInterval(cleanupCache, 1000 * 60);
 
 function exitHandler(...args: unknown[]) {
-    void errorLogger.logToFile(`Exited!`, ...args).then(() => {
+    void errorLogger.log(`Exited!`, ...args).then(() => {
         process.exit();
     });
 }
@@ -66,7 +66,13 @@ async function logReq(
 ): Promise<void> {
     const path = req.route.id || '[unknown]';
 
-    void reqLogger.logToFile(req.request.method, req.url.href);
+    void reqLogger.log(
+        req.request.method,
+        req.url.href,
+        '=>',
+        res.status,
+        ` ${duration.toPrecision(3)}ms`
+    );
 
     const userId = (auth?.id || '').toString();
 
@@ -131,14 +137,14 @@ export const handle = (async ({ event, resolve }) => {
     try {
         result = await resolve(event);
     } catch (e) {
-        void errorLogger.logToFile(e);
+        void errorLogger.error(e);
         result = new Response('An Error has Occurred', {
             status: 500
         });
     }
 
     void logReq(performance.now() - start, now, eventClone, result.clone(), auth).catch(
-        errorLogger.error
+        (...args: unknown[]) => void errorLogger.error(...args)
     );
 
     return result;

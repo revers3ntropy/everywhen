@@ -1,5 +1,5 @@
 import { browser } from '$app/environment';
-import { errorLogger } from '$lib/utils/log';
+import { clientLogger } from '$lib/utils/log';
 import { type Writable, writable } from 'svelte/store';
 import Cookie from 'js-cookie';
 
@@ -33,7 +33,7 @@ export function cookieWritable<T>(
             try {
                 initialValue = JSON.parse(lsVal) as T;
             } catch (e) {
-                errorLogger.error('Error parsing cookie value', e);
+                clientLogger.error('Error parsing cookie value', e);
             }
         }
 

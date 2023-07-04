@@ -1,5 +1,5 @@
 import { browser } from '$app/environment';
-import { errorLogger } from '$lib/utils/log';
+import { clientLogger } from '$lib/utils/log';
 import { type Writable, writable } from 'svelte/store';
 
 /**
@@ -23,7 +23,7 @@ export function localStorageWritable<T, S = T>(
             try {
                 initialValue = JSON.parse(lsVal) as T;
             } catch (e) {
-                errorLogger.error('Error parsing localStorage value', e);
+                clientLogger.error('Error parsing localStorage value', e);
             }
         }
 

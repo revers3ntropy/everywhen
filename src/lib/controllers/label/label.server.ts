@@ -1,4 +1,4 @@
-import type { QueryFunc } from '$lib/db/mysql';
+import type { QueryFunc } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/security/encryption.server';
 import { Result } from '$lib/utils/result';
 import { nowUtc } from '$lib/utils/time';

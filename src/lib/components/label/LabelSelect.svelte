@@ -7,7 +7,7 @@
     import Dropdown from '$lib/components/Dropdown.svelte';
     import type { Label } from '$lib/controllers/label/label';
     import type { Auth } from '$lib/controllers/user/user';
-    import { errorLogger } from '$lib/utils/log';
+    import { clientLogger } from '$lib/utils/log';
     import { showPopup } from '$lib/utils/popups';
     import NewLabelDialog from '$lib/components/dialogs/NewLabelDialog.svelte';
     import MenuDown from 'svelte-material-icons/MenuDown.svelte';
@@ -29,7 +29,7 @@
     let closeDropDown: () => void;
 
     $: if (labels && value && !labels.find(l => l.id === value)) {
-        errorLogger.error(`Label ${value} not found`);
+        clientLogger.error(`Label ${value} not found`);
         value = '';
     }
 

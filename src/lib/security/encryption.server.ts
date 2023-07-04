@@ -1,6 +1,6 @@
 import { PUBLIC_INIT_VECTOR } from '$env/static/public';
 import * as crypto from 'crypto';
-import { errorLogger } from '../utils/log';
+import { errorLogger } from '../utils/log.server';
 import { Result } from '../utils/result';
 
 const ALGORITHM = 'aes-256-cbc';
@@ -16,7 +16,7 @@ export function encrypt(plainText: string, key: string): Result<string> {
         encryptedData = cipher.update(plainText, 'utf-8', 'hex');
         encryptedData += cipher.final('hex');
     } catch (e) {
-        void errorLogger.logToFile(
+        void errorLogger.log(
             `Error encrypting ${typeof plainText} of length ${plainText.length} with key len ${
                 key.length
             }:`,
@@ -38,7 +38,7 @@ export function decrypt(cypherText: string, key: string): Result<string> {
         decryptedData = decipher.update(cypherText, 'hex', 'utf-8');
         decryptedData += decipher.final('utf8');
     } catch (e) {
-        void errorLogger.logToFile(
+        void errorLogger.log(
             'Error decrypting ',
             typeof cypherText,
             'of length',

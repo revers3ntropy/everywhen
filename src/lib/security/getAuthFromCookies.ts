@@ -1,7 +1,7 @@
 import { STORE_KEY } from '$lib/constants';
 import { type Cookies, error } from '@sveltejs/kit';
 import { User } from '../controllers/user/user';
-import { query } from '../db/mysql';
+import { query } from '../db/mysql.server';
 
 export async function tryGetAuthFromCookies(cookie: Cookies): Promise<User | null> {
     const key = cookie.get(STORE_KEY.key);

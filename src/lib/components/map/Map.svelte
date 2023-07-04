@@ -32,7 +32,7 @@
     import EditLocation from '../location/EditLocation.svelte';
     import EntryDialog from '$lib/components/dialogs/EntryDialog.svelte';
     import EntryTooltipOnMap from './EntryTooltipOnMap.svelte';
-    import { errorLogger } from '$lib/utils/log';
+    import { clientLogger } from '$lib/utils/log';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import {
         type EntryFeature,
@@ -147,7 +147,7 @@
                         const ctx = state.context;
 
                         if (typeof x !== 'number' || typeof y !== 'number') {
-                            errorLogger.error('x or y is not a number', x, y);
+                            clientLogger.error('x or y is not a number', x, y);
                             return;
                         }
 

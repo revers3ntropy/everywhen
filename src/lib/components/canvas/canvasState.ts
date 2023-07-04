@@ -1,6 +1,6 @@
 import { browser } from '$app/environment';
 import { writable } from 'svelte/store';
-import { errorLogger } from '$lib/utils/log';
+import { clientLogger } from '$lib/utils/log';
 import { nowUtc } from '$lib/utils/time';
 import type { Interactable } from './interactable';
 
@@ -580,7 +580,7 @@ export class CanvasState implements CanvasListeners {
 
     public asRenderProps(): RenderProps {
         if (!this.ctx) {
-            errorLogger.error('Canvas not set');
+            clientLogger.error('Canvas not set');
             throw new Error('Canvas not set');
         }
         return this as unknown as RenderProps;

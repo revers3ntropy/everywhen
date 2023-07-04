@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 import { Event } from '$lib/controllers/event/event';
-import { query } from '$lib/db/mysql';
+import { query } from '$lib/db/mysql.server';
 import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse';
 import { invalidateCache } from '$lib/utils/cache.server';

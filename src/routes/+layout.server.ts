@@ -1,5 +1,5 @@
 import { Settings, type SettingsConfig } from '$lib/controllers/settings/settings';
-import { query } from '$lib/db/mysql';
+import { query } from '$lib/db/mysql.server';
 import { error } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 

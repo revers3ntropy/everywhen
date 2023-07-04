@@ -1,7 +1,7 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
 import { Asset } from '$lib/controllers/asset/asset';
-import { query } from '$lib/db/mysql';
+import { query } from '$lib/db/mysql.server';
 import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse';
 import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';

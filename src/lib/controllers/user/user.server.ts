@@ -1,4 +1,4 @@
-import type { QueryFunc } from '$lib/db/mysql';
+import type { QueryFunc } from '$lib/db/mysql.server';
 import { encryptionKeyFromPassword } from '$lib/security/authUtils.server';
 import { Result } from '$lib/utils/result';
 import { cryptoRandomStr } from '$lib/security/authUtils.server';

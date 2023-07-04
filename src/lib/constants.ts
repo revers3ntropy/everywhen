@@ -70,3 +70,5 @@ export const DEBUG_RENDER_COLLIDERS = false;
 export const ENABLE_CACHING = true;
 
 export const POLL_FOR_UPDATE_INTERVAL: Milliseconds = 1000 * 15;
+
+export const LOG_FILE_NAME = 'general.log';

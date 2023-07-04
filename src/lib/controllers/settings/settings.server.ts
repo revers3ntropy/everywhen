@@ -1,11 +1,11 @@
-import type { QueryFunc } from '$lib/db/mysql';
+import type { QueryFunc } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/security/encryption.server';
 import { Result } from '$lib/utils/result';
 import { nowUtc } from '$lib/utils/time';
 import type { Auth } from '../user/user';
 import { UUId } from '../uuid/uuid';
 import type { SettingsKey } from '$lib/controllers/settings/settings.client';
-import { errorLogger } from '$lib/utils/log';
+import { errorLogger } from '$lib/utils/log.server';
 import { Settings as _Settings, type SettingsConfig } from './settings';
 
 export type Settings<T = unknown> = _Settings<T>;
@@ -70,7 +70,7 @@ namespace SettingsUtils {
         auth: Auth,
         duplicated: Set<string>
     ): Promise<void> {
-        errorLogger.error('Clearing duplicate settings keys: ', [...duplicated]);
+        void errorLogger.error('Clearing duplicate settings keys: ', [...duplicated]);
         for (const key of duplicated) {
             await query`
                 DELETE FROM settings

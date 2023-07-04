@@ -5,7 +5,7 @@ import { KEY_COOKIE_OPTIONS, STORE_KEY, USERNAME_COOKIE_OPTIONS } from '../const
 import type { Auth } from '../controllers/user/user';
 import type { apiRes404, GenericResponse } from './apiResponse';
 import { serializeGETArgs } from './GETArgs';
-import { errorLogger } from './log';
+import { clientLogger } from './log';
 import { Result } from './result';
 import { nowUtc } from './time';
 
@@ -133,7 +133,7 @@ export async function makeApiReq<
     if (response.ok) {
         const res = await response.json();
         if (typeof res !== 'object' || res === null) {
-            errorLogger.error(
+            clientLogger.error(
                 `Error on api fetch (${browser ? 'client' : 'server'} side)`,
                 method,
                 url,
@@ -148,7 +148,7 @@ export async function makeApiReq<
     if (response.status === 503) {
         return Result.err('Server is down for maintenance');
     }
-    errorLogger.error(
+    clientLogger.error(
         `Error on api fetch (${browser ? 'client' : 'server'} side)`,
         method,
         url,

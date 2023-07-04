@@ -2,7 +2,7 @@ import { Asset } from '$lib/controllers/asset/asset';
 import { Location } from '$lib/controllers/location/location';
 import { SemVer } from '$lib/utils/semVer';
 import schemion from 'schemion';
-import type { QueryFunc } from '$lib/db/mysql';
+import type { QueryFunc } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/security/encryption.server';
 import { download as downloadFile } from '../../utils/files.client';
 import { Result } from '$lib/utils/result';

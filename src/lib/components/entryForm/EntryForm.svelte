@@ -17,7 +17,7 @@
     import { enabledLocation } from '$lib/stores.js';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { getLocation } from '$lib/utils/geolocation';
-    import { errorLogger } from '$lib/utils/log';
+    import { clientLogger } from '$lib/utils/log';
     import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
     import { obfuscate } from '$lib/utils/text';
     import { currentTzOffset, nowUtc } from '$lib/utils/time';
@@ -118,7 +118,7 @@
             // make really sure it's saved before resetting
             resetEntryForm();
         } else {
-            errorLogger.error(res);
+            clientLogger.error(res);
             notify.error(`Failed to create entry: ${JSON.stringify(res)}`);
         }
 
@@ -133,7 +133,7 @@
             entry.label = labels.find(l => l.id === body.label);
             if (!entry.label) {
                 notify.error('label not found');
-                errorLogger.log('label not found');
+                clientLogger.log('label not found');
             }
         }
 
@@ -145,7 +145,7 @@
 
     async function onEntryEdit(body: RawEntry) {
         if (!entry) {
-            errorLogger.error('entry must be set when action is edit');
+            clientLogger.error('entry must be set when action is edit');
             return;
         }
         if (!areUnsavedChanges()) {
@@ -261,14 +261,14 @@
     });
     listen.label.onUpdate(label => {
         if (labels === null) {
-            errorLogger.error('labels should not be null');
+            clientLogger.error('labels should not be null');
             return;
         }
         labels = labels.map(l => (l.id === label.id ? label : l));
     });
     listen.label.onDelete(id => {
         if (labels === null) {
-            errorLogger.error('labels should not be null');
+            clientLogger.error('labels should not be null');
             return;
         }
         labels = labels.filter(l => l.id !== id);

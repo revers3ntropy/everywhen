@@ -1,6 +1,6 @@
 <script lang="ts">
     import { listen } from '$lib/dataChangeEvents';
-    import { errorLogger } from '$lib/utils/log';
+    import { clientLogger } from '$lib/utils/log';
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
     import { tooltip } from '@svelte-plugins/tooltips';
     import { onMount } from 'svelte';
@@ -44,7 +44,7 @@
             x: fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD')
         });
         if (err) {
-            errorLogger.error('Failed to get streaks', err);
+            clientLogger.error('Failed to get streaks', err);
             error = err;
         } else {
             streaks = val;

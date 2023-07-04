@@ -1,7 +1,7 @@
 import { decrypt } from '$lib/security/encryption.server';
 import { error } from '@sveltejs/kit';
 import { Entry } from '$lib/controllers/entry/entry';
-import { query } from '$lib/db/mysql';
+import { query } from '$lib/db/mysql.server';
 import { cachedPageRoute } from '$lib/utils/cache.server';
 import { splitText } from '$lib/utils/text';
 import type { EntryWithWordCount } from '../helpers';

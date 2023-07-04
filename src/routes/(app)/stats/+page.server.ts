@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 import { Entry } from '$lib/controllers/entry/entry';
-import { query } from '$lib/db/mysql';
+import { query } from '$lib/db/mysql.server';
 import { cachedPageRoute } from '$lib/utils/cache.server';
 import { wordCount as txtWordCount } from '$lib/utils/text';
 import { daysSince, nowUtc } from '$lib/utils/time';

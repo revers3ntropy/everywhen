@@ -1,4 +1,4 @@
-import type { QueryFunc } from '$lib/db/mysql';
+import type { QueryFunc } from '$lib/db/mysql.server';
 import { roundNDP } from '$lib/utils/text';
 
 namespace PageLoadLogUtils {

@@ -2,7 +2,7 @@ import { cachedApiRoute } from '$lib/utils/cache.server';
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
 import { Entry } from '$lib/controllers/entry/entry';
-import { query } from '$lib/db/mysql';
+import { query } from '$lib/db/mysql.server';
 import { apiRes404 } from '$lib/utils/apiResponse';
 
 export const GET = cachedApiRoute(async auth => {

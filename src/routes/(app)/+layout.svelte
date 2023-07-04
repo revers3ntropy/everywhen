@@ -1,5 +1,6 @@
 <script lang="ts">
     import AllowCookies from '$lib/components/AllowCookies.svelte';
+    import { clientLogger } from '$lib/utils/log';
     import type { LayoutData } from './$types';
     import { logOut } from '$lib/security/logOut';
     import { onDestroy } from 'svelte';
@@ -11,7 +12,6 @@
     import { Backup } from '$lib/controllers/backup/backup.client';
     import { allowedCookies, obfuscated, passcodeLastEntered } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
-    import { errorLogger } from '$lib/utils/log';
     import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
     import { nowUtc } from '$lib/utils/time';
     import Nav from '$lib/components/Nav.svelte';
@@ -36,7 +36,7 @@
         // the key cookie is HttpOnly, so we can't read it from JS
         // https://owasp.org/www-community/HttpOnly
         if (!Cookie.get(STORE_KEY.username)) {
-            errorLogger.error('Cookies have expired');
+            clientLogger.error('Cookies have expired');
             await logOut(true);
         }
     }

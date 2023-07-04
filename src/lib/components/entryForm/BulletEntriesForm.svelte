@@ -13,7 +13,7 @@
     import { enabledLocation } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { getLocation } from '$lib/utils/geolocation';
-    import { errorLogger } from '$lib/utils/log';
+    import { clientLogger } from '$lib/utils/log';
     import { currentTzOffset, nowUtc } from '$lib/utils/time';
     import { serializedAgentData } from '$lib/utils/userAgent';
     import { onMount } from 'svelte';
@@ -49,7 +49,7 @@
         const res = displayNotifOnErr(await api.post(auth, '/entries', { ...body }));
 
         if (!res.id) {
-            errorLogger.error(res);
+            clientLogger.error(res);
             notify.error(`Failed to create entry`);
             return;
         }
@@ -65,7 +65,7 @@
             newEntry.label = labels.find(l => l.id === body.label);
             if (!newEntry.label) {
                 notify.error(`Failed to find label`);
-                errorLogger.error(
+                clientLogger.error(
                     `Failed to find label ${body.label} in ${JSON.stringify(labels)}`
                 );
             }

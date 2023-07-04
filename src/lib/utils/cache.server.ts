@@ -4,11 +4,11 @@ import type { RequestEvent, ServerLoadEvent } from '@sveltejs/kit';
 import chalk from 'chalk';
 import type { Auth } from '../controllers/user/user';
 import type { GenericResponse } from './apiResponse';
-import { makeLogger } from './log';
+import { FileLogger } from './log.server';
 import { fmtBytes } from './text';
 import { nowUtc } from './time';
 
-const cacheLogger = makeLogger('CACHE', chalk.magentaBright, 'general.log');
+const cacheLogger = new FileLogger('CACHE', chalk.magentaBright);
 
 const cache: Record<string, Record<string, unknown> | undefined> = {};
 const cacheLastUsed: Record<string, number> = {};
@@ -39,7 +39,7 @@ function roughSizeOfObject(object: unknown): number {
 }
 
 function logCacheReq(hit: boolean, url: URL) {
-    void cacheLogger.logToFile(hit ? chalk.green('HIT ') : chalk.red('MISS'), url.pathname);
+    void cacheLogger.log(hit ? chalk.green('HIT ') : chalk.red('MISS'), url.pathname);
 }
 
 export function cacheResponse<T>(url: string, userId: string, response: T): void {
@@ -92,7 +92,7 @@ export function cleanupCache(): number {
 
     const cacheSizeAfter = roughSizeOfObject(cache);
     const changeFmt = chalk.yellow(fmtBytes(cacheSizeAfter - cacheSize));
-    void cacheLogger.logToFile(
+    void cacheLogger.log(
         chalk.yellow('CLEANUP'),
         `size=${bytesFmt}`,
         `timeout=${timeout}s`,

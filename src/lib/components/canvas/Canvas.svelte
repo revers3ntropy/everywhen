@@ -1,7 +1,7 @@
 <script lang="ts">
     import { beforeNavigate } from '$app/navigation';
     import { onMount, setContext } from 'svelte';
-    import { errorLogger } from '$lib/utils/log';
+    import { clientLogger } from '$lib/utils/log';
     import {
         type CanvasContext,
         CanvasState,
@@ -87,7 +87,7 @@
                     void entity.render($canvasState.asRenderProps(), dt);
                 }
             } catch (err) {
-                errorLogger.error(err);
+                clientLogger.error(err);
                 if (killLoopOnError) {
                     cancelAnimationFrame(frame);
                     console.warn('Animation loop stopped due to an error');
@@ -130,7 +130,7 @@
         if (!Array.isArray(listeners)) throw `Listeners for ${fn} is not an array`;
         for (const listener of listeners) {
             if (!listener || typeof listener !== 'function') {
-                errorLogger.error(`Invalid listener for ${fn}`, listener);
+                clientLogger.error(`Invalid listener for ${fn}`, listener);
                 throw new Error();
             }
             listener(event as MouseEvent & TouchEvent & WheelEvent);

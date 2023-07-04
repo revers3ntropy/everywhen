@@ -3,7 +3,7 @@ import { DB, DB_HOST, DB_PASS, DB_PORT, DB_USER } from '$env/static/private';
 import chalk from 'chalk';
 import mysql from 'mysql2/promise';
 import '../require';
-import { makeLogger } from '../utils/log';
+import { FileLogger } from '../utils/log.server';
 
 export type QueryResult =
     | mysql.RowDataPacket[][]
@@ -14,18 +14,18 @@ export type QueryResult =
     | Record<string, unknown>[]
     | object[];
 
-const dbLogger = makeLogger('DB', chalk.yellow, 'general.log');
+const dbLogger = new FileLogger('DB', chalk.yellow);
 
 export let dbConnection: mysql.Connection | null = null;
 
 export async function connect() {
     const config = getConfig();
     dbConnection = await mysql.createConnection(config).catch((e: unknown) => {
-        void dbLogger.logToFile(`Error connecting to mysql db '${config.database || '?'}'`);
-        void dbLogger.logToFile(e);
+        void dbLogger.log(`Error connecting to mysql db '${config.database || '?'}'`);
+        void dbLogger.log(e);
         throw e;
     });
-    void dbLogger.logToFile(`Connected`);
+    void dbLogger.log(`Connected`);
 }
 
 export function getConfig(): mysql.ConnectionOptions {
@@ -64,7 +64,7 @@ function logQuery(query: string, params: unknown[], result: unknown, time: Milli
 
     const queryStr = query.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
 
-    void dbLogger.logToFile(
+    void dbLogger.log(
         `\`${queryStr}\`` +
             `\n     [${params.join(', ')}]` +
             `\n     (${time.toPrecision(3)}ms) => ${resultStr}`
@@ -124,8 +124,8 @@ export const query = (async <Res extends QueryResult = never>(
     const result = ((await dbConnection?.query(query, queryParams).catch((e: unknown) => {
         const end = performance.now();
         logQuery(query, queryParams, null, end - start);
-        void dbLogger.logToFile(`Error querying mysql db '${DB}'`);
-        void dbLogger.logToFile(e);
+        void dbLogger.log(`Error querying mysql db '${DB}'`);
+        void dbLogger.log(e);
     })) || [])[0] as Res extends (infer A)[] ? NonFunctionProperties<A>[] : Res;
 
     const end = performance.now();
@@ -145,8 +145,8 @@ query.unlogged = (async <Res extends QueryResult = never>(
     const [query, queryParams] = buildQuery(queryParts, params);
 
     return ((await dbConnection?.query(query, queryParams).catch((e: unknown) => {
-        void dbLogger.logToFile(`Error querying mysql db '${DB}'`);
-        void dbLogger.logToFile(e);
+        void dbLogger.log(`Error querying mysql db '${DB}'`);
+        void dbLogger.log(e);
     })) || [])[0] as Res extends (infer A)[] ? NonFunctionProperties<A>[] : Res;
 }) as QueryFunc;
 
