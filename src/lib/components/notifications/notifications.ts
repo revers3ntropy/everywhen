@@ -59,7 +59,7 @@ notify.error = (text: string, timeout: Milliseconds = 5000) => {
 export function displayNotifOnErr<T extends NonNullable<unknown>>(
     { err, val }: Result<T>,
     onErr: (err: string | null) => unknown = () => 0
-): T {
+): T | never {
     if (err) {
         try {
             err = (JSON.parse(err) as Record<string, string>)?.message || err;
