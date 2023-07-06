@@ -364,23 +364,36 @@ async function getRemoteVersion() {
  * @param {Version} localVersion
  */
 async function restartServer(localVersion) {
+    /**
+     * @returns {Promise<boolean>}
+     */
+    async function checkServerUp() {
+        await sleep(500);
+
+        try {
+            const remoteVersion = await getRemoteVersion().catch(console.error);
+            if (remoteVersion && remoteVersion.isEqual(localVersion)) {
+                console.log(c.green(`Complete: v${localVersion.str()} is live on ${env}`));
+                return true;
+            } else {
+                console.log(c.red(`Hmm, ${remoteVersion.str()} !== ${localVersion.str()}`));
+            }
+        } catch (e) {
+            console.error(e);
+        }
+        return false;
+    }
+
     await runRemoteCommand(`cd ~/${remoteDir()} && npm run setup`);
 
     while (true) {
         console.log('Restarting remote server...');
         await runRemoteCommand(`cd ~/${remoteDir()} && npm run start`);
 
-        await sleep(1000);
-
-        try {
-            const remoteVersion = await getRemoteVersion().catch(console.error);
-            if (remoteVersion && remoteVersion.isEqual(localVersion)) {
-                console.log(c.green(`Complete: v${localVersion.str()} is live on ${env}`));
-                return;
-            }
-        } catch (e) {
-            console.error(e);
+        for (let _ = 0; _ < 6; _++) {
+            if (await checkServerUp()) return;
         }
+
         console.log(c.red('Server restart seemed to fail...'));
 
         /**@type {{ value: boolean }} */
