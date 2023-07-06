@@ -376,7 +376,9 @@ async function restartServer(localVersion) {
                 console.log(c.green(`Complete: v${localVersion.str()} is live on ${env}`));
                 return true;
             } else {
-                console.log(c.red(`Hmm, ${remoteVersion.str()} !== ${localVersion.str()}`));
+                console.log(
+                    c.red(`Hmm, ${remoteVersion?.str?.() || 'null'} !== ${localVersion.str()}`)
+                );
             }
         } catch (e) {
             console.error(e);
