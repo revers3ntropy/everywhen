@@ -1,24 +1,20 @@
 <script lang="ts">
     import { theme } from '$lib/stores.js';
-    import { Theme } from '$lib/constants.js';
+
+    // logo dimensions
+    const WIDTH = 459;
+    const HEIGHT = 672;
 
     export let scale = 1 / 4;
+
+    // use much more compressed version of logo when scale is small
+    $: useMin = scale < 0.9;
 </script>
 
-{#if $theme === Theme.dark}
-    <img
-        src="/logodark.png"
-        alt="Logo"
-        height={672 * scale}
-        width={459 * scale}
-        style="margin-right: 1rem"
-    />
-{:else}
-    <img
-        src="/logolight.png"
-        alt="Logo"
-        height={672 * scale}
-        width={459 * scale}
-        style="margin-right: 1rem"
-    />
-{/if}
+<img
+    src="/logo{$theme}{useMin ? '-min' : ''}.png"
+    alt="Logo"
+    height={HEIGHT * scale}
+    width={WIDTH * scale}
+    style="margin-right: 1rem"
+/>
