@@ -73,8 +73,7 @@ namespace BackupUtils {
                 publicId: asset.publicId,
                 fileName: asset.fileName,
                 content: asset.content,
-                created: asset.created,
-                contentType: asset.contentType
+                created: asset.created
             })),
             events: events.map(event => ({
                 name: event.name,

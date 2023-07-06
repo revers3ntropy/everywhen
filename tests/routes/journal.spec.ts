@@ -65,7 +65,7 @@ test.describe('/journal', () => {
         const { id } = await makeEntryRes.json();
         expect(typeof id === 'string').toBe(true);
         if (typeof id !== 'string') throw id;
-        expect(id).toHaveLength(36);
+        expect(id).toHaveLength(32);
 
         await page.goto('/journal');
         // must scroll entries into view to load them

@@ -5,11 +5,24 @@ import type { UUId as _UUId } from './uuid';
 export type UUId = _UUId;
 
 namespace UUIdUtils {
-    export async function generateUUId(query: QueryFunc): Promise<string> {
-        let id = UUIdv4();
+    function getUUId(): string {
+        return UUIdv4().replace(/-/g, '');
+    }
+
+    async function uuidExists(query: QueryFunc, id: UUId) {
+        const res = await query.unlogged<{ id: string }[]>`
+            SELECT id
+            FROM ids
+            WHERE id = ${id}
+        `;
+        return res.length > 0;
+    }
+
+    export async function generateUniqueUUId(query: QueryFunc): Promise<string> {
+        let id = getUUId();
 
         while (await uuidExists(query, id)) {
-            id = UUIdv4();
+            id = getUUId();
         }
 
         await query.unlogged`
@@ -18,15 +31,6 @@ namespace UUIdUtils {
         `;
 
         return id;
-    }
-
-    export async function uuidExists(query: QueryFunc, id: UUId) {
-        const res = await query.unlogged<{ id: string }[]>`
-            SELECT id
-            FROM ids
-            WHERE id = ${id}
-        `;
-        return res.length > 0;
     }
 }
 

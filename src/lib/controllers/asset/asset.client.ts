@@ -13,8 +13,6 @@ namespace AssetUtils {
             typeof json.content === 'string' &&
             'fileName' in json &&
             typeof json.fileName === 'string' &&
-            'contentType' in json &&
-            typeof json.contentType === 'string' &&
             'created' in json &&
             typeof json.created === 'number'
         );

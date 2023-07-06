@@ -7,18 +7,11 @@ import { nowUtc } from '$lib/utils/time';
 import fs from 'fs';
 import type { ResultSetHeader } from 'mysql2';
 import webp from 'webp-converter';
-import type { Asset as _Asset } from './asset';
+import type { Asset as _Asset, AssetMetadata } from './asset';
 
 export type Asset = _Asset;
 
 namespace AssetUtils {
-    export const fileExtToContentType: Readonly<Record<string, string>> = Object.freeze({
-        png: 'image/png',
-        jpg: 'image/jpeg',
-        jpeg: 'image/jpeg',
-        webp: 'image/webp'
-    });
-
     export async function create(
         query: QueryFunc,
         auth: Auth,
@@ -27,19 +20,11 @@ namespace AssetUtils {
         created?: TimestampSecs,
         publicId?: string
     ): Promise<Result<{ publicId: string; id: string }>> {
-        publicId ??= await UUId.generateUUId(query);
-        const id = await UUId.generateUUId(query);
+        publicId ??= await UUId.generateUniqueUUId(query);
+        const id = await UUId.generateUniqueUUId(query);
         const fileExt = fileNamePlainText.split('.').pop();
         if (!fileExt) {
             return Result.err('Invalid file extension');
-        }
-        const contentType = fileExtToContentType[fileExt.toLowerCase()];
-        if (!contentType) {
-            return Result.err(
-                'Unsupported file type. Supported are ' +
-                    Object.keys(fileExtToContentType).join(', ') +
-                    '.'
-            );
         }
 
         const { err: contentsErr, val: encryptedContents } = encrypt(contentsPlainText, auth.key);
@@ -49,14 +34,12 @@ namespace AssetUtils {
         if (fileNameErr) return Result.err(fileNameErr);
 
         await query`
-            INSERT INTO assets (id, publicId, user, created, fileName,
-                                contentType, content)
+            INSERT INTO assets (id, publicId, user, created, fileName, content)
             VALUES (${id},
                     ${publicId},
                     ${auth.id},
                     ${created ?? nowUtc()},
                     ${encryptedFileName},
-                    ${contentType},
                     ${encryptedContents})
         `;
 
@@ -73,8 +56,7 @@ namespace AssetUtils {
                    publicId,
                    content,
                    created,
-                   fileName,
-                   contentType
+                   fileName
             FROM assets
             WHERE publicId = ${publicId}
               AND user = ${auth.id}
@@ -97,7 +79,6 @@ namespace AssetUtils {
             publicId: row.publicId,
             content,
             fileName,
-            contentType: row.contentType,
             created: row.created
         });
     }
@@ -108,8 +89,7 @@ namespace AssetUtils {
                    publicId,
                    content,
                    created,
-                   fileName,
-                   contentType
+                   fileName
             FROM assets
             WHERE user = ${auth.id}
         `;
@@ -127,7 +107,6 @@ namespace AssetUtils {
                     publicId: row.publicId,
                     content,
                     fileName,
-                    contentType: row.contentType,
                     created: row.created
                 });
             })
@@ -139,17 +118,16 @@ namespace AssetUtils {
         auth: Auth,
         offset: number,
         count: number
-    ): Promise<Result<[Omit<Asset, 'content'>[], number]>> {
+    ): Promise<Result<[AssetMetadata[], number]>> {
         if (count < 1) {
             return Result.err('Count must be positive');
         }
 
-        const res = await query<Omit<Asset, 'content'>[]>`
+        const res = await query<AssetMetadata[]>`
             SELECT id,
                    publicId,
                    created,
-                   fileName,
-                   contentType
+                   fileName
             FROM assets
             WHERE user = ${auth.id}
             ORDER BY created DESC
@@ -167,7 +145,6 @@ namespace AssetUtils {
                     publicId: row.publicId,
                     content: undefined as unknown as string,
                     fileName,
-                    contentType: row.contentType,
                     created: row.created
                 });
             })

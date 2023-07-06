@@ -41,7 +41,6 @@
                     id,
                     publicId,
                     fileName,
-                    contentType: '',
                     created: nowUtc()
                 },
                 ...data.assets

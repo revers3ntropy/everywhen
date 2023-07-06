@@ -1,6 +1,6 @@
 CREATE TABLE users
 (
-    id       char(128)    NOT NULL,
+    id       char(32)     NOT NULL,
     username varchar(255) NOT NULL,
     password varchar(255) NOT NULL,
     salt     varchar(255) NOT NULL,
@@ -14,15 +14,15 @@ CREATE TABLE users
 
 CREATE TABLE entries
 (
-    id              char(128)    NOT NULL,
-    user            char(128)    NOT NULL,
+    id              char(32)     NOT NULL,
+    user            char(32)     NOT NULL,
     created         int(64)      NOT NULL,
     createdTZOffset double       NOT NULL,
     latitude        double       DEFAULT NULL,
     longitude       double       DEFAULT NULL,
     title           text         NULL,
     entry           longtext     NOT NULL,
-    label           varchar(128) DEFAULT NULL,
+    label           char(32)     DEFAULT NULL,
     flags           int(8)       DEFAULT 0,
     agentData       longtext     NOT NULL,
     PRIMARY KEY (id)
@@ -33,15 +33,15 @@ CREATE TABLE entries
 
 CREATE TABLE entryEdits
 (
-    id              char(128)    NOT NULL,
-    entryId         char(128)    NOT NULL,
+    id              char(32)    NOT NULL,
+    entryId         char(32)    NOT NULL,
     created         int(64)      NOT NULL,
     createdTZOffset double       NOT NULL,
     latitude        double       DEFAULT NULL,
     longitude       double       DEFAULT NULL,
     title           text         NULL,
     entry           longtext     NOT NULL,
-    label           varchar(128) DEFAULT NULL,
+    label           char(32)     DEFAULT NULL,
     agentData       longtext     NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
@@ -51,12 +51,12 @@ CREATE TABLE entryEdits
 
 CREATE TABLE events
 (
-    id      char(128) NOT NULL,
-    user    char(128) NOT NULL,
+    id      char(32)     NOT NULL,
+    user    char(32)     NOT NULL,
     name    varchar(256) NOT NULL,
     start   int(64)      NOT NULL,
     end     int(64)      NOT NULL,
-    label   varchar(128) DEFAULT NULL,
+    label   char(32)     DEFAULT NULL,
     created int(64)      NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
@@ -66,8 +66,8 @@ CREATE TABLE events
 
 CREATE TABLE labels
 (
-    id      char(128)    NOT NULL,
-    user    char(128)    NOT NULL,
+    id      char(32)     NOT NULL,
+    user    char(32)     NOT NULL,
     name    varchar(256) NOT NULL,
     color   varchar(64)  NOT NULL,
     created int(64)      NOT NULL,
@@ -79,16 +79,17 @@ CREATE TABLE labels
 
 CREATE TABLE assets
 (
-    id          char(128)    NOT NULL,
+    id          char(32)     NOT NULL,
     # publicId is unique per user and allows same
     # public id to be used for different users
     # (for instance when importing a backup into a different
     # account, which will duplicate IDs)
-    publicId    char(128)    NOT NULL,
-    user        char(128)    NOT NULL,
+    # Length 36 to support old UUID formats (pre 0.5.15)
+    # which included dashes
+    publicId    char(36)     NOT NULL,
+    user        char(32)     NOT NULL,
     created     int(64)      NOT NULL,
     fileName    varchar(256) NOT NULL,
-    contentType varchar(128) NOT NULL,
     content     longtext     NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
@@ -98,8 +99,8 @@ CREATE TABLE assets
 
 CREATE TABLE settings
 (
-    id      char(128)    NOT NULL,
-    user    char(128)    NOT NULL,
+    id      char(32)     NOT NULL,
+    user    char(32)     NOT NULL,
     created int(64)      NOT NULL,
     `key`   varchar(256) NOT NULL,
     value   longtext     NOT NULL,
@@ -111,8 +112,8 @@ CREATE TABLE settings
 
 CREATE TABLE locations
 (
-    id              char(128) NOT NULL,
-    user            char(128) NOT NULL,
+    id              char(32)  NOT NULL,
+    user            char(32)  NOT NULL,
     created         int(64)      NOT NULL,
     createdTZOffset double       NOT NULL,
     name            varchar(256) NOT NULL,
@@ -127,7 +128,7 @@ CREATE TABLE locations
 
 CREATE TABLE pageLoads
 (
-    user         char(128)    DEFAULT NULL,
+    user         char(32)     DEFAULT NULL,
     created      int(64)      NOT NULL,
     method       varchar(64)  NOT NULL,
     url          varchar(512) NOT NULL,
@@ -145,7 +146,7 @@ CREATE TABLE pageLoads
 
 CREATE TABLE ids
 (
-    id varchar(128) NOT NULL,
+    id char(32) NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;

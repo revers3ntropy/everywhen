@@ -146,7 +146,7 @@ namespace LabelUtils {
         }
 
         json = { ...json };
-        json.id ??= await UUId.generateUUId(query);
+        json.id ??= await UUId.generateUniqueUUId(query);
         json.created ??= nowUtc();
 
         const { err, val: encryptedName } = encrypt(json.name, auth.key);

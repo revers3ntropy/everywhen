@@ -17,7 +17,6 @@
     export let id: string;
     export let publicId: string;
     export let fileName: string;
-    export let contentType: string;
     export let created: TimestampSecs;
     export let obfuscated = true;
     export let auth: Auth;

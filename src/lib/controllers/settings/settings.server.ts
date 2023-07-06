@@ -51,7 +51,7 @@ namespace SettingsUtils {
             return Result.ok({ id, created: now, key, value });
         }
 
-        const id = await UUId.generateUUId(query);
+        const id = await UUId.generateUniqueUUId(query);
 
         await query`
             INSERT INTO settings (id, user, created, \`key\`, value)

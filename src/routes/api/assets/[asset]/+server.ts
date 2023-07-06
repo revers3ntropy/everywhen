@@ -11,6 +11,13 @@ import {
 } from '$lib/utils/apiResponse';
 import { cacheResponse, getCachedResponse, invalidateCache } from '$lib/utils/cache.server';
 
+const fileExtToContentType: Readonly<Record<string, string>> = Object.freeze({
+    png: 'image/png',
+    jpg: 'image/jpeg',
+    jpeg: 'image/jpeg',
+    webp: 'image/webp'
+});
+
 export const GET = (async ({ params, url, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
 
@@ -24,7 +31,10 @@ export const GET = (async ({ params, url, cookies }) => {
     // backwards compatibility with old image formats
     if (/^data:image\/((jpeg)|(jpg)|(png));base64,/i.test(asset.content)) {
         console.log('\n\n   !! Converting image to webp\n\n');
-        const webP = await Asset.base64ToWebP(asset.content, asset.contentType.split('/')[1], 100);
+        const fileExt = asset.fileName.split('.').pop();
+        if (!fileExt) throw error(400, 'No file extension on image');
+        const contentType = fileExtToContentType[fileExt];
+        const webP = await Asset.base64ToWebP(asset.content, contentType, 100);
         img = Buffer.from(webP, 'base64');
         // update the asset in the database to use webp
         void Asset.updateAssetContentToWebP(query, auth, asset.publicId, webP);

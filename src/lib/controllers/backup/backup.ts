@@ -32,7 +32,6 @@ export interface Backup {
         publicId: string;
         fileName: string;
         content: string;
-        contentType: string;
         created: number;
     }[];
     events: {

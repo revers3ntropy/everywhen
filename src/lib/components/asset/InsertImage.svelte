@@ -38,7 +38,6 @@
                 id,
                 publicId,
                 fileName,
-                contentType: '',
                 created: nowUtc()
             },
             ...assets

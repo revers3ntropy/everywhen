@@ -26,7 +26,7 @@ namespace LocationUtils {
             return Result.err('Name cannot be empty');
         }
 
-        const id = await UUId.generateUUId(query);
+        const id = await UUId.generateUniqueUUId(query);
 
         const { err: nameErr, val: encryptedName } = encrypt(name, auth.key);
         if (nameErr) return Result.err(nameErr);

@@ -240,7 +240,7 @@ namespace EntryUtils {
     ): Promise<Result<Entry>> {
         const json: typeof json_ & { id: string } = {
             ...json_,
-            id: await UUId.generateUUId(query)
+            id: await UUId.generateUniqueUUId(query)
         };
         json.created ??= nowUtc();
 
@@ -259,7 +259,7 @@ namespace EntryUtils {
         entry.edits = await Promise.all(
             json.edits?.map(
                 async (e): Promise<Entry> => ({
-                    id: await UUId.generateUUId(query),
+                    id: await UUId.generateUniqueUUId(query),
                     title: e.title,
                     entry: e.entry,
                     created: e.created,
@@ -429,7 +429,7 @@ namespace EntryUtils {
         const [encryptedNewTitle, encryptedNewEntry, encryptedEditAgentData, oldTitle, oldEntry] =
             encryptionResults;
 
-        const editId = await UUId.generateUUId(query);
+        const editId = await UUId.generateUniqueUUId(query);
 
         await query`
             INSERT INTO entryEdits

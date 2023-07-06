@@ -76,7 +76,7 @@ namespace UserUtils {
         if (err) return Result.err(err);
 
         const salt = await generateSalt(query);
-        const id = await UUId.generateUUId(query);
+        const id = await UUId.generateUniqueUUId(query);
 
         await query`
             INSERT INTO users (id, username, password, salt, created)

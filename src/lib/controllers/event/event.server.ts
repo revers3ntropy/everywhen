@@ -102,7 +102,7 @@ namespace EventUtils {
         label?: string,
         created?: TimestampSecs
     ): Promise<Result<Event>> {
-        const id = await UUId.generateUUId(query);
+        const id = await UUId.generateUniqueUUId(query);
         created ??= nowUtc();
 
         if (!name) {

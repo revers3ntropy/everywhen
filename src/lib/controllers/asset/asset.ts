@@ -6,9 +6,10 @@ export interface Asset {
     publicId: string;
     content: string;
     fileName: string;
-    contentType: string;
     created: number;
 }
+
+export type AssetMetadata = Omit<Asset, 'content'>;
 
 export const Asset = {
     ...server.Asset,
