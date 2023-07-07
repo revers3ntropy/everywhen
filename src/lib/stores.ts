@@ -22,6 +22,7 @@ export const eventsSortKey = localStorageWritable<EventsSortKey, null>(
     'created',
     null
 );
+export const lastTipNumber = localStorageWritable<number, null>(STORE_KEY.lastTipNumber, 0, null);
 export const obfuscated = localStorageWritable<boolean>(STORE_KEY.obfuscated, false, true);
 
 export const theme = cookieWritable<Theme>(COOKIE_WRITEABLE_KEYS.theme, Theme.light);

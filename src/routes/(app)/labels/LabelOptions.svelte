@@ -1,6 +1,7 @@
 <script lang="ts">
     import { dispatch } from '$lib/dataChangeEvents';
     import Delete from 'svelte-material-icons/Delete.svelte';
+    import OpenInNew from 'svelte-material-icons/OpenInNew.svelte';
     import type { Auth } from '$lib/controllers/user/user';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
@@ -69,6 +70,7 @@
             {eventCount}
             {eventCount === 1 ? 'event' : 'events'}
         {/if}
+        <OpenInNew />
     </a>
     <div>
         <button on:click={deleteLabel} class="icon-button">

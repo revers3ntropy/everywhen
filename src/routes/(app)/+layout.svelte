@@ -6,9 +6,8 @@
     import { onDestroy } from 'svelte';
     import { browser } from '$app/environment';
     import { page } from '$app/stores';
-    import { blur } from 'svelte/transition';
     import Cookie from 'js-cookie';
-    import { ANIMATION_DURATION, STORE_KEY } from '$lib/constants';
+    import { STORE_KEY } from '$lib/constants';
     import { Backup } from '$lib/controllers/backup/backup.client';
     import { allowedCookies, obfuscated, passcodeLastEntered } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
@@ -64,6 +63,13 @@
 
     function keydown(e: KeyboardEvent) {
         lastActivity = nowUtc();
+
+        if (e.key === 'Pause') {
+            obfuscated.set(!$obfuscated);
+            e.preventDefault();
+            return;
+        }
+
         if (e.ctrlKey || e.metaKey) {
             if (e.key === 'Escape') {
                 obfuscated.set(!$obfuscated);
@@ -126,11 +132,9 @@
     <AllowCookies />
 {/if}
 
-{#key $page.url.href}
-    <div class="page-content" in:blur={{ duration: ANIMATION_DURATION }}>
-        <slot />
-    </div>
-{/key}
+<div class="page-content">
+    <slot />
+</div>
 
 <style lang="less">
     @import '../../styles/variables';

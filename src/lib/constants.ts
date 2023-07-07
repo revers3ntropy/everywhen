@@ -11,7 +11,8 @@ export const STORE_KEY = {
     sortEventsKey: `${KEY_PREFIX}events_sort_key`,
     key: `${KEY_PREFIX}key`,
     username: `${KEY_PREFIX}username`,
-    obfuscated: `${KEY_PREFIX}obfuscated`
+    obfuscated: `${KEY_PREFIX}obfuscated`,
+    lastTipNumber: `${KEY_PREFIX}last_tip_number`
 } as const;
 
 export enum Theme {

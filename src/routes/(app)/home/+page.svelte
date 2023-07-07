@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Tips from '$lib/components/Tips.svelte';
     import { onMount } from 'svelte';
     import Cog from 'svelte-material-icons/Cog.svelte';
     import ImageOutline from 'svelte-material-icons/ImageOutline.svelte';
@@ -63,6 +64,10 @@
                 Settings
             </a>
         </div>
+    </section>
+
+    <section>
+        <Tips />
     </section>
 
     <div style="width: 100%; max-width: 800px;">

@@ -1,0 +1,70 @@
+<script lang="ts">
+    import { lastTipNumber } from '$lib/stores';
+    import { onMount } from 'svelte';
+    import ArrowRight from 'svelte-material-icons/ArrowRight.svelte';
+
+    type Tip = string;
+
+    const tips: Tip[] = [
+        `Right click on the <a href="/map">map</a> and 'Add Named Location' to group entries by their location`,
+        `Drag the three dots on the right side of events in the <a href="/timeline">timeline</a> to change their duration`,
+        `Drag the right side of the screen in the <a href="/timeline">timeline</a> to zoom in and out on mobile`,
+        `'Favourite' an entry under the <code>⋮</code> on an entry, and it will appear right here on the <a href="/home">home</a> page`,
+        `Set a passcode in the <a href="/settings">settings</a> as an additional layer of security`,
+        `All your data is encrypted, and only you have the key: no matter what, no-one can read your data without knowing your password`,
+        `Learn more about Halcyon.Land on the <a href="/about">about</a> page`,
+        `You can view all the images you have uploaded in the <a href="/assets">gallery</a> page`,
+        `Scroll to zoom the <a href="/timeline">timeline</a> in and out`,
+        `You can view what words you use the most on the <a href="/stats">analytics</a> page`,
+        `Press <code>Ctrl + Esc</code> (or <code>Pause</code> if your keyboard has it) to quickly blur / un-blur the entire page`,
+        `You can download a backup of all of your data from <a href="/settings">settings</a>`,
+        `When you edit an entry, all previous versions are stored`
+    ];
+
+    function incrementLastTipNumber() {
+        lastTipNumber.update(n => {
+            if (n === null || n >= tips.length - 1) {
+                return 0;
+            }
+            return n + 1;
+        });
+    }
+
+    onMount(incrementLastTipNumber);
+</script>
+
+<div class="container">
+    <div>
+        {#if $lastTipNumber === null}
+            <h3> Did you know? </h3>
+            <p> ... </p>
+        {:else}
+            <h3> Did you know? #{($lastTipNumber || 0) + 1} </h3>
+            <p> {@html tips[$lastTipNumber]} </p>
+        {/if}
+    </div>
+    <div class="flex-center">
+        <button on:click={incrementLastTipNumber}>
+            <ArrowRight size="30" />
+        </button>
+    </div>
+</div>
+
+<style lang="less">
+    .container {
+        padding: 1rem;
+        max-width: 800px;
+        display: grid;
+        grid-template-columns: 1fr auto;
+
+        h3 {
+            margin: 0 0 0.5rem 0;
+        }
+
+        p {
+            // constant height: very important
+            // stops layout shifts when the tip changes
+            height: 3rem;
+        }
+    }
+</style>
