@@ -1,6 +1,6 @@
 <script lang="ts">
+    import LabelDot from '$lib/components/label/LabelDot.svelte';
     import { listen } from '$lib/dataChangeEvents';
-    import { tooltip } from '@svelte-plugins/tooltips';
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import type { Auth } from '$lib/controllers/user/user';
@@ -111,15 +111,8 @@
                                 tooltipPosition="right"
                             />
                         </span>
-                        {#if entry.label}
-                            <span
-                                class="entry-label-color"
-                                style="background: {entry.label?.color || 'transparent'}"
-                                use:tooltip={{ content: entry.label?.name }}
-                            />
-                        {:else}
-                            <span class="entry-label-color" />
-                        {/if}
+
+                        <LabelDot name={entry.label?.name} color={entry.label?.color || null} />
 
                         <span class="title {obfuscated ? 'obfuscated' : ''}">
                             {#if entry.title}

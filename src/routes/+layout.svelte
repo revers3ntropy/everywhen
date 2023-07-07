@@ -68,6 +68,21 @@
     />
 </svelte:head>
 
+<noscript>
+    <style>
+        .root {
+            display: none;
+        }
+    </style>
+    <div class="root">
+        <h1>Enable JavaScript</h1>
+        <p>
+            Halcyon.Land requires JavaScript to be enabled to function. Please enable JavaScript and
+            refresh the page.
+        </p>
+    </div>
+</noscript>
+
 <div data-sveltekit-preload-data="hover" data-theme={$theme} class="root" bind:this={root}>
     <svg class="accent-gradient-svg" height={0} width={0}>
         <linearGradient id="accent-gradient" x1={1} x2={1} y1={0} y2={1}>

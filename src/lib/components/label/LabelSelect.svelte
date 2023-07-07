@@ -1,4 +1,5 @@
 <script lang="ts">
+    import LabelDot from '$lib/components/label/LabelDot.svelte';
     import { listen } from '$lib/dataChangeEvents';
     import { createEventDispatcher } from 'svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
@@ -66,11 +67,8 @@
         <span slot="button" class="select-button">
             {#if labels}
                 {#if selectedLabel}
-                    <span
-                        class="entry-label-color"
-                        style="background: {(labels ?? []).find(l => l.id === value)?.color ||
-                            'transparent'}"
-                    />
+                    <LabelDot big color={(labels ?? []).find(l => l.id === value)?.color || null} />
+
                     {#if !condensed}
                         <span class="label-name">
                             {selectedLabel.name}
@@ -154,6 +152,9 @@
         width: 20px;
         height: 20px;
         border: 4px solid var(--label-color);
+        background: var(--background);
+        display: inline-block;
+        border-radius: 50%;
 
         &.selected {
             background: var(--label-color);

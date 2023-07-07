@@ -64,7 +64,7 @@
                 data-lpignore="true"
                 class="password-input"
             />
-            <button on:click={() => (input = '')}>
+            <button on:click={() => (input = '')} aria-label="Clear passcode">
                 <Close />
             </button>
 

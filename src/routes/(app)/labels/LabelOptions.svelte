@@ -1,4 +1,5 @@
 <script lang="ts">
+    import LabelDot from '$lib/components/label/LabelDot.svelte';
     import { dispatch } from '$lib/dataChangeEvents';
     import Delete from 'svelte-material-icons/Delete.svelte';
     import OpenInNew from 'svelte-material-icons/OpenInNew.svelte';
@@ -60,7 +61,7 @@
             on:change={() => updateLabel({ name })}
         />
     {:else}
-        <div class="entry-label-color" style="background: {color}" />
+        <LabelDot {color} />
         <div>{name}</div>
     {/if}
     <a href="/labels/{id}">
