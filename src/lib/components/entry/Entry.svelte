@@ -1,5 +1,6 @@
 <script lang="ts">
     import { browser } from '$app/environment';
+    import Lazy from '$lib/components/Lazy.svelte';
     import { slide } from 'svelte/transition';
     import { tooltip } from '@svelte-plugins/tooltips';
     import Bin from 'svelte-material-icons/Delete.svelte';
@@ -22,7 +23,6 @@
     import { obfuscate, rawMdToHtml } from '$lib/utils/text';
     import UtcTime from '$lib/components/UtcTime.svelte';
     import Dropdown from '$lib/components/Dropdown.svelte';
-    import Map from '$lib/components/map/Map.svelte';
     import AgentWidget from './AgentWidget.svelte';
     import Dot from '../Dot.svelte';
     import Label from '$lib/components/label/Label.svelte';
@@ -37,7 +37,6 @@
     export let latitude = null as number | null;
     export let longitude = null as number | null;
     export let flags: number;
-    export let decrypted = true;
     export let agentData = '';
     export let edits = [] as Entry[];
     export let isEdit = false;
@@ -249,21 +248,26 @@
             Created at lat {latitude}, lng {longitude}
         </i>
         <div transition:slide={{ duration: ANIMATION_DURATION, axis: 'y' }} class="map-container">
-            <Map
-                entriesInteractable={false}
-                {auth}
-                width="100%"
-                height="300px"
-                mobileHeight="200px"
-                entries={[
-                    {
-                        id,
-                        created,
-                        latitude,
-                        longitude
-                    }
-                ]}
-                {hideAgentWidget}
+            <Lazy
+                shouldLoad={showingMap}
+                key="$lib/components/map/Map.svelte"
+                component={() => import('$lib/components/map/Map.svelte')}
+                props={{
+                    entriesInteractable: false,
+                    auth,
+                    width: '100%',
+                    height: '300px',
+                    mobileHeight: '200px',
+                    entries: [
+                        {
+                            id,
+                            created,
+                            latitude,
+                            longitude
+                        }
+                    ],
+                    hideAgentWidget
+                }}
             />
         </div>
     {/if}

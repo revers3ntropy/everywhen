@@ -1,6 +1,6 @@
 {
     "name": "halcyon.land",
-    "version": "0.5.17",
+    "version": "0.5.18",
     "type": "module",
     "private": true,
     "scripts": {

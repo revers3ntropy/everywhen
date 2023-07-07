@@ -7,13 +7,16 @@ export interface Collider {
 }
 
 export class DurationRectCollider implements Collider {
+    public readonly zIndex: number = 0;
     constructor(
         public readonly time: TimestampSecs,
         public readonly y: Pixels,
         public readonly duration: Seconds,
         public readonly height: Pixels,
-        public readonly zIndex: number = 0
-    ) {}
+        { zIndex = 0 } = {}
+    ) {
+        this.zIndex = zIndex;
+    }
 
     colliding(_state: RenderProps, time: TimestampSecs, y: number): boolean {
         return (

@@ -76,7 +76,7 @@
             );
         },
 
-        onMouseUp() {
+        onMouseDown() {
             showPopup(EntryDialog, {
                 id,
                 auth,
