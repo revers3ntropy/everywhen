@@ -1,4 +1,5 @@
 <script lang="ts">
+    import BulletEntriesForm from '$lib/components/entryForm/BulletEntriesForm.svelte';
     import Tips from '$lib/components/Tips.svelte';
     import { onMount } from 'svelte';
     import Cog from 'svelte-material-icons/Cog.svelte';
@@ -70,6 +71,16 @@
         <Tips />
     </section>
 
+    <section>
+        <BulletEntriesForm
+            showLocationToggle={false}
+            submitIsPrimaryButton={false}
+            setEntryFormMode={null}
+            auth={data.auth}
+            obfuscated={$obfuscated}
+        />
+    </section>
+
     <div style="width: 100%; max-width: 800px;">
         {#if Object.keys(data.recentTitles).length}
             <section>
@@ -108,6 +119,7 @@
                         titles={pinnedEntries}
                         obfuscated={$obfuscated}
                         hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
+                        onCreateFilter={Entry.isPinned}
                     />
                     {#if areHiddenPinnedEntries}
                         <button
@@ -141,6 +153,7 @@
                     showTimeAgo={false}
                     auth={data.auth}
                     hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
+                    onCreateFilter={() => false}
                 />
             </section>
         {/each}
@@ -151,11 +164,15 @@
     @import '../../../styles/variables';
     @import '../../../styles/layout';
 
+    section {
+        max-width: 800px;
+    }
+
     .buttons {
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
-        margin: 1rem;
+        margin: 1rem 0;
 
         @media @mobile {
             margin: 0;
@@ -186,9 +203,5 @@
         &.recent-entries {
             margin: 1rem;
         }
-    }
-
-    .recent-entries-text {
-        margin: 0.5rem;
     }
 </style>

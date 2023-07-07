@@ -1,11 +1,14 @@
 <script lang="ts">
+    import { ANIMATION_DURATION } from '$lib/constants';
     import { lastTipNumber } from '$lib/stores';
     import { onMount } from 'svelte';
     import ArrowRight from 'svelte-material-icons/ArrowRight.svelte';
+    import { slide } from 'svelte/transition';
 
     type Tip = string;
 
     const tips: Tip[] = [
+        `You can submit a bullet entry by pressing <code>Enter</code>`,
         `Right click on the <a href="/map">map</a> and 'Add Named Location' to group entries by their location`,
         `Drag the three dots on the right side of events in the <a href="/timeline">timeline</a> to change their duration`,
         `Drag the right side of the screen in the <a href="/timeline">timeline</a> to zoom in and out on mobile`,
@@ -39,32 +42,37 @@
             <h3> Did you know? </h3>
             <p> ... </p>
         {:else}
-            <h3> Did you know? #{($lastTipNumber || 0) + 1} </h3>
-            <p> {@html tips[$lastTipNumber]} </p>
+            <div class="flex-center" style="justify-content: space-between">
+                <h3> Did you know? #{($lastTipNumber || 0) + 1} </h3>
+                <button on:click={incrementLastTipNumber}>
+                    <ArrowRight size="30" />
+                </button>
+            </div>
+            {#key $lastTipNumber}
+                <p transition:slide={{ duration: ANIMATION_DURATION, axis: 'y' }}>
+                    {@html tips[$lastTipNumber]}
+                </p>
+            {/key}
         {/if}
-    </div>
-    <div class="flex-center">
-        <button on:click={incrementLastTipNumber}>
-            <ArrowRight size="30" />
-        </button>
     </div>
 </div>
 
 <style lang="less">
+    @import '../../styles/variables';
+
     .container {
         padding: 1rem;
-        max-width: 800px;
-        display: grid;
-        grid-template-columns: 1fr auto;
 
         h3 {
             margin: 0 0 0.5rem 0;
         }
 
         p {
-            // constant height: very important
-            // stops layout shifts when the tip changes
-            height: 3rem;
+            @media @not-mobile {
+                // constant height: very important
+                // stops layout shifts when the tip changes
+                height: 3rem;
+            }
         }
     }
 </style>

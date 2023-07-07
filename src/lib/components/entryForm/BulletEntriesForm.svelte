@@ -21,8 +21,9 @@
 
     export let auth: Auth;
     export let obfuscated = true;
-
     export let setEntryFormMode = null as null | ((mode: EntryFormMode) => Promise<void>);
+    export let showLocationToggle = true;
+    export let submitIsPrimaryButton = true;
 
     function resetEntryForm() {
         entry.value = '';
@@ -74,6 +75,8 @@
             entry: newEntry,
             entryMode: EntryFormMode.Bullet
         });
+
+        entry.focus();
     }
 
     function onInput(e: KeyboardEvent) {
@@ -94,31 +97,36 @@
 
 <div class="wrapper">
     <div class="flex-center" style="justify-content: start; width: 100%; gap: 3px;">
-        <button
-            aria-label="Switch to bullet journaling"
-            class="with-circled-icon"
-            on:click={() => setEntryFormMode?.(EntryFormMode.Standard)}
-            style="margin: 0"
-            use:tooltip={{
-                position: 'right',
-                content: 'Switch to normal journaling'
-            }}
-        >
-            <TextBoxOutline size="30" />
-        </button>
-        <LocationToggle tooltipPosition="right" />
+        {#if setEntryFormMode}
+            <button
+                aria-label="Switch to bullet journaling"
+                class="with-circled-icon"
+                on:click={() => setEntryFormMode?.(EntryFormMode.Standard)}
+                style="margin: 0"
+                use:tooltip={{
+                    position: 'right',
+                    content: 'Switch to normal journaling'
+                }}
+            >
+                <TextBoxOutline size="30" />
+            </button>
+        {/if}
+        {#if showLocationToggle}
+            <LocationToggle tooltipPosition="right" />
+        {/if}
     </div>
     <div class="line">
         <div class="entry-input">
             <LabelSelect {labels} {auth} condensed bind:value={label} />
-            <input
-                on:keyup={onInput}
-                bind:this={entry}
-                placeholder="Write a bullet... (Enter to submit)"
-            />
+            <input on:keyup={onInput} bind:this={entry} placeholder="Write a bullet..." />
         </div>
         <div class="flex-center" style="justify-content: end">
-            <button class="primary with-icon" on:click={submit} style="padding: 2px 5px; margin: 0">
+            <button
+                class="submit-button with-icon icon-gradient-on-hover"
+                class:primary={submitIsPrimaryButton}
+                on:click={submit}
+                style="padding: 2px 5px; margin: 0"
+            >
                 Submit
                 <Send size="26" />
             </button>
@@ -128,6 +136,7 @@
 
 <style lang="less">
     @import '../../../styles/variables';
+
     .wrapper {
         margin: 1rem 1rem;
         width: calc(100% - 2rem);
@@ -178,6 +187,13 @@
                 width: 100%;
                 font-size: 18px;
             }
+        }
+    }
+
+    .submit-button {
+        border-radius: @border-radius;
+        &:hover {
+            background: var(--light-accent);
         }
     }
 </style>

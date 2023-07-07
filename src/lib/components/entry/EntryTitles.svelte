@@ -12,13 +12,14 @@
     import Dot from '../Dot.svelte';
     import UtcTime from '../UtcTime.svelte';
 
-    export let titles: Record<string, Entry[]> | null = null;
+    export let auth: Auth;
+    export let titles = null as Record<string, Entry[]> | null;
     export let obfuscated = true;
     export let showTimeAgo = true;
-    export let auth: Auth;
     export let blurToggleOnLeft = false;
     export let hideBlurToggle = false;
     export let hideAgentWidget: boolean;
+    export let onCreateFilter: (entry: Entry) => boolean = () => true;
 
     function showEntryPopup(entryId: string) {
         showPopup(EntryDialog, {
@@ -30,6 +31,7 @@
     }
 
     listen.entry.onCreate(({ entry }) => {
+        if (!onCreateFilter(entry)) return;
         if (!titles) titles = {};
 
         const localDate = fmtUtc(entry.created, entry.createdTZOffset, 'YYYY-MM-DD');
@@ -174,14 +176,15 @@
 
         .entry {
             display: grid;
-            grid-template-columns: 65px 18px 1fr;
+            grid-template-columns: auto auto 1fr;
+            gap: 5px;
             align-items: center;
             color: var(--text-color);
             padding: 2px 2px;
             border-radius: 4px;
             width: 100%;
             text-align: left;
-            height: calc(1rem + 4px);
+            height: calc(1rem + 6px);
 
             &:after {
                 display: none;
