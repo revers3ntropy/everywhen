@@ -1,15 +1,21 @@
 <script context="module" lang="ts">
     import type { SvelteComponent } from 'svelte';
 
-    const moduleCache = new Map<string, { default: typeof SvelteComponent }>();
+    type Component = {
+        default: typeof SvelteComponent<
+            Record<string, unknown>,
+            Record<string, unknown>,
+            Record<string, unknown>
+        >;
+    };
+
+    const moduleCache = new Map<string, Component>();
 </script>
 
 <script lang="ts">
-    import type { SvelteComponent } from 'svelte';
-
     export let shouldLoad = false;
     export let key: string;
-    export let component: () => Promise<{ default: typeof SvelteComponent }>;
+    export let component: () => Promise<Component>;
     export let props: Record<string, unknown> = {};
 
     async function load() {
@@ -25,9 +31,9 @@
         moduleCache.set(key, loadedComponent);
     }
 
-    let loadedComponent = null as null | { default: typeof SvelteComponent };
+    let loadedComponent = null as null | Component;
 
-    $: if (shouldLoad) load();
+    $: if (shouldLoad) void load();
 </script>
 
 {#if shouldLoad && loadedComponent}
