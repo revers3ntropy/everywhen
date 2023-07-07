@@ -1,4 +1,4 @@
-import { apiRes404, type GenericResponse } from '$lib/utils/apiResponse';
+import { apiRes404, type GenericResponse } from '$lib/utils/apiResponse.server';
 import type { RequestHandler } from './$types';
 
 // Use 'v' over 'version' to save bytes,

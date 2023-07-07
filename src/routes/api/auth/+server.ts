@@ -1,12 +1,12 @@
 import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import { invalidateCache } from '$lib/utils/cache.server';
-import { getUnwrappedReqBody } from '$lib/utils/requestBody';
+import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
 import { KEY_COOKIE_OPTIONS, STORE_KEY, USERNAME_COOKIE_OPTIONS } from '$lib/constants';
 import { User } from '$lib/controllers/user/user';
 import { query } from '$lib/db/mysql.server';
-import { apiRes404, apiResponse } from '$lib/utils/apiResponse';
+import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 
 export const GET = (async ({ url, cookies }) => {
     let key: string | undefined | null = url.searchParams.get('key');

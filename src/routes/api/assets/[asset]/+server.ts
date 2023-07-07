@@ -8,7 +8,7 @@ import {
     apiResponse,
     type GenericResponse,
     rawApiResponse
-} from '$lib/utils/apiResponse';
+} from '$lib/utils/apiResponse.server';
 import { cacheResponse, getCachedResponse, invalidateCache } from '$lib/utils/cache.server';
 
 const fileExtToContentType: Readonly<Record<string, string>> = Object.freeze({

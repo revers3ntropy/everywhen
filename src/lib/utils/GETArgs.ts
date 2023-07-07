@@ -3,10 +3,8 @@ export function serializeGETArgs(
 ): string {
     const keys = Object.keys(args).filter(key => args[key] !== undefined);
     if (!keys.length) return '';
-    return (
-        '?' +
-        keys.map(key => `${key}=${(args[key] as string | number | boolean).toString()}`).join('&')
-    );
+    const parts = keys.map(key => `${key}=${encodeURIComponent(args[key]?.toString() || '')}`);
+    return '?' + parts.join('&');
 }
 
 export function GETParamIsTruthy(val: string | null = null): boolean {

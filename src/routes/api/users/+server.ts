@@ -4,9 +4,9 @@ import { KEY_COOKIE_OPTIONS, STORE_KEY, USERNAME_COOKIE_OPTIONS } from '$lib/con
 import { Backup } from '$lib/controllers/backup/backup';
 import { User } from '$lib/controllers/user/user';
 import { query } from '$lib/db/mysql.server';
-import { apiRes404, apiResponse } from '$lib/utils/apiResponse';
+import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 import { invalidateCache } from '$lib/utils/cache.server';
-import { getUnwrappedReqBody } from '$lib/utils/requestBody';
+import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 
 export const POST = (async ({ request, cookies }) => {
     const body = await getUnwrappedReqBody(request, {

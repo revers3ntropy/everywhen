@@ -3,9 +3,9 @@ import { error } from '@sveltejs/kit';
 import { Asset } from '$lib/controllers/asset/asset';
 import { query } from '$lib/db/mysql.server';
 import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
-import { apiRes404, apiResponse } from '$lib/utils/apiResponse';
+import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
-import { getUnwrappedReqBody } from '$lib/utils/requestBody';
+import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 
 const IMG_QUALITY = 100;
 

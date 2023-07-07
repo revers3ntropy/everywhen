@@ -9,11 +9,13 @@ declare module '$env/static/private' {
     export const DB_PASS: string;
     export const DB: string;
     export const DB_PORT: string;
+    export const GITHUB_AUTH_CLIENT_SECRET: string;
 }
 
 declare module '$env/static/public' {
     export const PUBLIC_SVELTEKIT_PORT: string;
     export const PUBLIC_INIT_VECTOR: string;
+    export const PUBLIC_GITHUB_AUTH_CLIENT_ID: string;
 }
 
 declare global {

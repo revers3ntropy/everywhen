@@ -15,6 +15,10 @@ export const STORE_KEY = {
     lastTipNumber: `${KEY_PREFIX}last_tip_number`
 } as const;
 
+export const SESSION_KEYS = {
+    GH_CB: `${KEY_PREFIX}github_callback_state`
+};
+
 export enum Theme {
     light = 'light',
     dark = 'dark'

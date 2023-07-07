@@ -4,9 +4,9 @@ import { Event } from '$lib/controllers/event/event';
 import { Label } from '$lib/controllers/label/label';
 import { query } from '$lib/db/mysql.server';
 import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
-import { apiRes404, apiResponse } from '$lib/utils/apiResponse';
+import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
-import { getUnwrappedReqBody } from '$lib/utils/requestBody';
+import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import type { RequestHandler } from './$types';
 
 export const GET = cachedApiRoute(async (auth, { params }) => {

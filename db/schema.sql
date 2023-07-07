@@ -1,16 +1,17 @@
+START TRANSACTION;
+
 CREATE TABLE users
 (
-    id       char(32)     NOT NULL,
-    username varchar(255) NOT NULL,
-    password varchar(255) NOT NULL,
-    salt     varchar(255) NOT NULL,
-    created  int(64)      NOT NULL,
+    id              char(32)     NOT NULL,
+    username        varchar(255) NOT NULL,
+    password        varchar(255) NOT NULL,
+    salt            varchar(255) NOT NULL,
+    created         int(64)      NOT NULL,
+    ghAccessToken varchar(255) DEFAULT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY username (username)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
-
--- --------------------------------------------------------
 
 CREATE TABLE entries
 (
@@ -29,8 +30,6 @@ CREATE TABLE entries
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
 
--- --------------------------------------------------------
-
 CREATE TABLE entryEdits
 (
     id              char(32)    NOT NULL,
@@ -47,8 +46,6 @@ CREATE TABLE entryEdits
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
 
--- --------------------------------------------------------
-
 CREATE TABLE events
 (
     id      char(32)     NOT NULL,
@@ -62,8 +59,6 @@ CREATE TABLE events
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
 
--- --------------------------------------------------------
-
 CREATE TABLE labels
 (
     id      char(32)     NOT NULL,
@@ -74,8 +69,6 @@ CREATE TABLE labels
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
-
--- --------------------------------------------------------
 
 CREATE TABLE assets
 (
@@ -95,8 +88,6 @@ CREATE TABLE assets
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
 
--- --------------------------------------------------------
-
 CREATE TABLE settings
 (
     id      char(32)     NOT NULL,
@@ -107,8 +98,6 @@ CREATE TABLE settings
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
-
--- --------------------------------------------------------
 
 CREATE TABLE locations
 (
@@ -123,8 +112,6 @@ CREATE TABLE locations
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
-
--- --------------------------------------------------------
 
 CREATE TABLE pageLoads
 (
@@ -142,11 +129,11 @@ CREATE TABLE pageLoads
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
 
--- --------------------------------------------------------
-
 CREATE TABLE ids
 (
     id char(32) NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = latin1;
+
+COMMIT;

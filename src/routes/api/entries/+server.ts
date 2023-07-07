@@ -4,10 +4,10 @@ import { Entry } from '$lib/controllers/entry/entry';
 import { Label } from '$lib/controllers/label/label';
 import { query } from '$lib/db/mysql.server';
 import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
-import { apiRes404, apiResponse } from '$lib/utils/apiResponse';
+import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
 import { GETParamIsTruthy } from '$lib/utils/GETArgs';
-import { getUnwrappedReqBody } from '$lib/utils/requestBody';
+import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import { nowUtc } from '$lib/utils/time';
 import type { RequestHandler } from './$types';
 

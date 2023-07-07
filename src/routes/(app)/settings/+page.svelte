@@ -1,4 +1,5 @@
 <script lang="ts">
+    import GitHubOauthWidget from '$lib/components/GitHubOAuthWidget.svelte';
     import { onMount } from 'svelte';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import Cog from 'svelte-material-icons/Cog.svelte';
@@ -41,7 +42,7 @@
 <main>
     <section>
         <h1>
-            <AccountCircleOutline size="40" />
+            <AccountCircleOutline size="30" />
             <span> My Data and Account </span>
         </h1>
 
@@ -62,10 +63,13 @@
                 Delete Account
             </a>
         </div>
+        <div class="buttons">
+            <GitHubOauthWidget />
+        </div>
     </section>
     <section>
         <h1>
-            <Cog size="40" />
+            <Cog size="30" />
             <span>General Settings</span>
         </h1>
         <div style="padding: 1rem 0 2rem 0">
@@ -87,8 +91,9 @@
 
     h1 {
         .flex-center();
+        justify-content: start;
         margin: 1rem 0 0 0;
-        font-size: 38px;
+        font-size: 24px;
 
         span {
             margin-left: 0.2em;

@@ -3,7 +3,7 @@ import { PUBLIC_SVELTEKIT_PORT } from '$env/static/public';
 import { serialize } from 'cookie';
 import { KEY_COOKIE_OPTIONS, STORE_KEY, USERNAME_COOKIE_OPTIONS } from '../constants';
 import type { Auth } from '../controllers/user/user';
-import type { apiRes404, GenericResponse } from './apiResponse';
+import type { apiRes404, GenericResponse } from './apiResponse.server';
 import { serializeGETArgs } from './GETArgs';
 import { clientLogger } from './log';
 import { Result } from './result';
@@ -56,6 +56,7 @@ interface ApiResponse {
         '/backups': POST<typeof import('../../routes/api/backups/+server')>;
         '/assets': POST<typeof import('../../routes/api/assets/+server')>;
         '/locations': POST<typeof import('../../routes/api/locations/+server')>;
+        '/oauth/gh': POST<typeof import('../../routes/api/oauth/gh/+server')>;
     };
     DELETE: {
         '/users': DELETE<typeof import('../../routes/api/users/+server')>;

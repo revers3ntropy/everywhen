@@ -1,8 +1,11 @@
+import { PUBLIC_GITHUB_AUTH_CLIENT_ID } from '$env/static/public';
 import type { QueryFunc } from '$lib/db/mysql.server';
 import { encryptionKeyFromPassword } from '$lib/security/authUtils.server';
+import { errorLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 import { cryptoRandomStr } from '$lib/security/authUtils.server';
 import { nowUtc } from '$lib/utils/time';
+import { GITHUB_AUTH_CLIENT_SECRET } from '$env/static/private';
 import { Asset } from '../asset/asset.server';
 import { Backup } from '../backup/backup';
 import { Entry } from '../entry/entry';
@@ -165,6 +168,75 @@ namespace UserUtils {
         if (err) return Result.err(err);
 
         return await Settings.changeEncryptionKeyInDB(query, auth, newKey);
+    }
+
+    export async function getGitHubOAuthAccessToken(
+        code: string,
+        state: string
+    ): Promise<Result<string>> {
+        if (!state || !code) {
+            console.log(state, code);
+            return Result.err('Invalid state or code');
+        }
+
+        let accessTokenRes: Response;
+        try {
+            accessTokenRes = await fetch('https://github.com/login/oauth/access_token', {
+                method: 'POST',
+                body: JSON.stringify({
+                    client_id: PUBLIC_GITHUB_AUTH_CLIENT_ID,
+                    client_secret: GITHUB_AUTH_CLIENT_SECRET,
+                    code,
+                    state
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                    Accept: 'application/json'
+                }
+            });
+        } catch (e) {
+            await errorLogger.error(e);
+            return Result.err('Error connecting to GitHub');
+        }
+        console.log(accessTokenRes);
+
+        let accessTokenData: unknown;
+        try {
+            accessTokenData = await accessTokenRes.json();
+            console.log(accessTokenData);
+        } catch (e) {
+            await errorLogger.error(e);
+            await errorLogger.error(await accessTokenRes.text());
+            return Result.err('Invalid response from gitHub');
+        }
+
+        if (typeof accessTokenData !== 'object' || !accessTokenData) {
+            await errorLogger.error(`Invalid response from github`, accessTokenData);
+            return Result.err('Invalid response from gitHub');
+        }
+
+        if ('error' in accessTokenData && accessTokenData.error) {
+            return Result.err(accessTokenData.error.toString());
+        }
+        if (
+            !('token_type' in accessTokenData) ||
+            typeof accessTokenData.token_type !== 'string' ||
+            accessTokenData.token_type.toLowerCase() !== 'bearer'
+        ) {
+            await errorLogger.error(`Invalid token type from github`, accessTokenData);
+            return Result.err('Invalid response from gitHub');
+        }
+
+        if (
+            !('access_token' in accessTokenData) ||
+            typeof accessTokenData.access_token !== 'string' ||
+            accessTokenData.access_token.toLowerCase() !== 'bearer'
+        ) {
+            await errorLogger.error(`No access token from github`, accessTokenData);
+            return Result.err('Invalid response from GitHub');
+        }
+
+        return Result.ok(accessTokenData.access_token);
     }
 }
 

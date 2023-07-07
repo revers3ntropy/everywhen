@@ -3,7 +3,7 @@ import { error } from '@sveltejs/kit';
 import type { RequestEvent, ServerLoadEvent } from '@sveltejs/kit';
 import chalk from 'chalk';
 import type { Auth } from '../controllers/user/user';
-import type { GenericResponse } from './apiResponse';
+import type { GenericResponse } from './apiResponse.server';
 import { FileLogger } from './log.server';
 import { fmtBytes } from './text';
 import { nowUtc } from './time';
