@@ -299,7 +299,6 @@
 
         &,
         * {
-            .font-dosis();
             font-size: 1.05rem;
         }
 

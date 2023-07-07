@@ -12,7 +12,7 @@
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import Lock from 'svelte-material-icons/Lock.svelte';
-    import Home from 'svelte-material-icons/Home.svelte';
+    import HomeOutline from 'svelte-material-icons/HomeOutline.svelte';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
     import Lightbulb from 'svelte-material-icons/Lightbulb.svelte';
     import Logout from 'svelte-material-icons/Logout.svelte';
@@ -194,7 +194,7 @@
             class="icon {$page.url.pathname === '/home' ? 'current' : ''}"
             href="/home"
         >
-            <Home size="35" />
+            <HomeOutline size="35" />
         </a>
         <a
             aria-label="journal"

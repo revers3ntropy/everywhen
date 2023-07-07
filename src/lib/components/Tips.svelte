@@ -19,7 +19,7 @@
         `You can view all the images you have uploaded in the <a href="/assets">gallery</a> page`,
         `Scroll to zoom the <a href="/timeline">timeline</a> in and out`,
         `You can view what words you use the most on the <a href="/stats">analytics</a> page`,
-        `Press <code>Ctrl + Esc</code> (or <code>Pause</code> if your keyboard has it) to quickly blur / un-blur the entire page`,
+        `Press <code>Ctrl/Cmd</code> + <code>Esc</code> (or <code>Pause</code> if your keyboard has it) to quickly blur / un-blur the entire page`,
         `You can download a backup of all of your data from <a href="/settings">settings</a>`,
         `When you edit an entry, all previous versions are stored`
     ];
