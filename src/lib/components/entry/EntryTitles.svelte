@@ -176,7 +176,7 @@
 
         .entry {
             display: grid;
-            grid-template-columns: auto auto 1fr;
+            grid-template-columns: 50px 10px 1fr;
             gap: 5px;
             align-items: center;
             color: var(--text-color);

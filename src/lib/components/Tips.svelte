@@ -44,7 +44,7 @@
         {:else}
             <div class="flex-center" style="justify-content: space-between">
                 <h3> Did you know? #{($lastTipNumber || 0) + 1} </h3>
-                <button on:click={incrementLastTipNumber}>
+                <button on:click={incrementLastTipNumber} aria-label="Next tip">
                     <ArrowRight size="30" />
                 </button>
             </div>
