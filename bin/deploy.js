@@ -339,6 +339,8 @@ async function getRemoteVersion() {
     console.log(`Getting remote version from '${remoteAddress()}/api/version'...`);
     const rawVersion = await fetch(`https://${remoteAddress()}/api/version`);
 
+    if (!rawVersion.ok) return null;
+
     let apiVersion;
     try {
         apiVersion = await rawVersion.json();
