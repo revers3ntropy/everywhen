@@ -7,6 +7,7 @@
     import OpenInNew from 'svelte-material-icons/OpenInNew.svelte';
     import DonateWidget from '$lib/components/DonateWidget.svelte';
     import Logo from '$lib/components/Logo.svelte';
+    import { PUBLIC_ENV } from '$env/static/public';
 
     const version = __VERSION__;
 </script>
@@ -73,7 +74,7 @@
     </div>
 
     <div class="flex-center text-light" style="padding-top: 2rem">
-        Halcyon.Land version {version}
+        Halcyon.Land version {version} ({PUBLIC_ENV})
     </div>
 </footer>
 

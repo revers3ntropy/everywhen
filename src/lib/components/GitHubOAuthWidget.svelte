@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { PUBLIC_GITHUB_AUTH_CLIENT_ID } from '$env/static/public';
-    import { displayNotifOnErr } from '$lib/components/notifications/notifications.js';
+    import { PUBLIC_GITHUB_AUTH_CLIENT_ID, PUBLIC_ENV } from '$env/static/public';
+    import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications.js';
     import type { GitHubUser } from '$lib/controllers/ghAPI/ghAPI.server';
     import type { User } from '$lib/controllers/user/user';
     import { api } from '$lib/utils/apiRequest';
@@ -26,6 +26,10 @@
     }
 
     function doOauth() {
+        if (PUBLIC_ENV !== 'prod') {
+            notify.error('Not in prod!');
+            return;
+        }
         const state = randomString(randomInt(10, 20));
         sessionStorage.setItem(SESSION_KEYS.GH_CB, state);
         window.location.assign(authorizeUrl(state));
@@ -47,9 +51,11 @@
 </script>
 
 {#if user.ghAccessToken}
-    <button on:click={unlink}>
+    <button on:click={unlink} class="danger">
         <GitHub {size} /> Unlink GitHub ({gitHubUser?.username || '...'})
     </button>
 {:else}
-    <button on:click={doOauth}> <GitHub {size} /> Link With GitHub </button>
+    <button on:click={doOauth} class="icon-gradient-on-hover">
+        <GitHub {size} /> Link With GitHub
+    </button>
 {/if}

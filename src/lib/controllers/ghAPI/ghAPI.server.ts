@@ -7,7 +7,7 @@ import { errorLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 
 export interface GitHubUser {
-    id: string;
+    id: number;
     username: string;
 }
 
@@ -97,13 +97,14 @@ export namespace ghAPI {
         if (!accessTokenEncrypted) {
             return Result.err('No GitHub account is linked');
         }
+        if (path[0] !== '/') throw new Error('Path must start with /');
 
         const { err, val: accessToken } = decrypt(accessTokenEncrypted, user.key);
         if (err) return Result.err(err);
 
         let res;
         try {
-            res = await fetch(`https://api.github.com/${path}`, {
+            res = await fetch(`https://api.github.com${path}`, {
                 method,
                 headers: {
                     Authorization: `Bearer ${accessToken}`,
@@ -144,7 +145,7 @@ export namespace ghAPI {
             !('login' in val) ||
             typeof val.login !== 'string' ||
             !('id' in val) ||
-            typeof val.id !== 'string'
+            typeof val.id !== 'number'
         ) {
             await errorLogger.error(`Invalid response from github`, val);
             return Result.err('Invalid response from GitHub');
