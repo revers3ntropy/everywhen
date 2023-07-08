@@ -8,7 +8,8 @@ export const load = (async ({ url, locals, parent }) => {
     const auth = locals.auth;
     const settings = locals.settings;
     if (!auth || !settings) {
-        throw redirect(307, '/login?redirect=' + url.pathname.trim().slice(1));
+        const cb = encodeURIComponent((url.pathname + url.search).slice(1));
+        throw redirect(307, `/login?redirect=${cb}`);
     }
 
     return {

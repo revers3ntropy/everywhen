@@ -29,6 +29,5 @@ export const POST = (async ({ request, cookies }) => {
     return apiResponse({ accessToken });
 }) satisfies RequestHandler;
 
-export const GET = apiRes404;
 export const PUT = apiRes404;
 export const DELETE = apiRes404;
