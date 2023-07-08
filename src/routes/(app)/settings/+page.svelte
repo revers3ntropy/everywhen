@@ -64,7 +64,7 @@
             </a>
         </div>
         <div class="buttons">
-            <GitHubOauthWidget />
+            <GitHubOauthWidget user={data.auth} />
         </div>
     </section>
     <section>

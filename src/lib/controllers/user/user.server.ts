@@ -1,12 +1,9 @@
-import { PUBLIC_GITHUB_AUTH_CLIENT_ID } from '$env/static/public';
 import type { QueryFunc } from '$lib/db/mysql.server';
 import { encryptionKeyFromPassword } from '$lib/security/authUtils.server';
 import { encrypt } from '$lib/security/encryption.server';
-import { errorLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 import { cryptoRandomStr } from '$lib/security/authUtils.server';
 import { nowUtc } from '$lib/utils/time';
-import { GITHUB_AUTH_CLIENT_SECRET } from '$env/static/private';
 import { Asset } from '../asset/asset.server';
 import { Backup } from '../backup/backup';
 import { Entry } from '../entry/entry';
@@ -24,8 +21,8 @@ namespace UserUtils {
         username: string,
         key: string
     ): Promise<Result<User>> {
-        const res = await query<{ id: string }[]>`
-            SELECT id
+        const res = await query<{ id: string; ghAccessToken: string | null }[]>`
+            SELECT id, ghAccessToken
             FROM users
             WHERE username = ${username}
               AND password = SHA2(CONCAT(${key}, salt), 256)
@@ -33,7 +30,7 @@ namespace UserUtils {
         if (res.length !== 1) {
             return Result.err('Invalid login');
         }
-        return Result.ok({ id: res[0].id, username, key });
+        return Result.ok({ id: res[0].id, username, key, ghAccessToken: res[0].ghAccessToken });
     }
 
     export async function userExistsWithUsername(
@@ -91,7 +88,7 @@ namespace UserUtils {
                     ${nowUtc()});
         `;
 
-        return Result.ok({ id, username, key: password });
+        return Result.ok({ id, username, key: password, ghAccessToken: null });
     }
 
     export async function purge(query: QueryFunc, auth: Auth): Promise<void> {
@@ -171,69 +168,7 @@ namespace UserUtils {
         return await Settings.changeEncryptionKeyInDB(query, auth, newKey);
     }
 
-    async function getGitHubOAuthAccessToken(code: string, state: string): Promise<Result<string>> {
-        if (!state || !code) {
-            return Result.err('Invalid state or code');
-        }
-
-        let accessTokenRes: Response;
-        try {
-            accessTokenRes = await fetch('https://github.com/login/oauth/access_token', {
-                method: 'POST',
-                body: JSON.stringify({
-                    client_id: PUBLIC_GITHUB_AUTH_CLIENT_ID,
-                    client_secret: GITHUB_AUTH_CLIENT_SECRET,
-                    code,
-                    state
-                }),
-                headers: {
-                    'Content-Type': 'application/json',
-                    Accept: 'application/json'
-                }
-            });
-        } catch (e) {
-            await errorLogger.error(e);
-            return Result.err('Error connecting to GitHub');
-        }
-
-        let accessTokenData: unknown;
-        try {
-            accessTokenData = await accessTokenRes.json();
-        } catch (e) {
-            await errorLogger.error(e);
-            await errorLogger.error(await accessTokenRes.text());
-            return Result.err('Invalid response from gitHub');
-        }
-
-        if (typeof accessTokenData !== 'object' || !accessTokenData) {
-            await errorLogger.error(`Invalid response from github`, accessTokenData);
-            return Result.err('Invalid response from gitHub');
-        }
-
-        if ('error' in accessTokenData && accessTokenData.error) {
-            return Result.err(accessTokenData.error.toString());
-        }
-        if (
-            !('token_type' in accessTokenData) ||
-            typeof accessTokenData.token_type !== 'string' ||
-            accessTokenData.token_type.toLowerCase() !== 'bearer'
-        ) {
-            await errorLogger.error(`Invalid token type from github`, accessTokenData);
-            return Result.err('Invalid response from gitHub');
-        }
-
-        if (
-            !('access_token' in accessTokenData) ||
-            typeof accessTokenData.access_token !== 'string'
-        ) {
-            await errorLogger.error(`No access token from github`, accessTokenData);
-            return Result.err('Invalid response from GitHub');
-        }
-
-        return Result.ok(accessTokenData.access_token);
-    }
-
-    async function saveGitHubOAuthAccessToken(
+    export async function saveGitHubOAuthAccessToken(
         query: QueryFunc,
         auth: Auth,
         accessToken: string
@@ -252,19 +187,13 @@ namespace UserUtils {
         return Result.ok(null);
     }
 
-    export async function linkToGitHubOAuth(
-        query: QueryFunc,
-        auth: Auth,
-        code: string,
-        state: string
-    ): Promise<Result<string>> {
-        const { err, val: accessToken } = await getGitHubOAuthAccessToken(code, state);
-        if (err) return Result.err(err);
-
-        const { err: saveErr } = await saveGitHubOAuthAccessToken(query, auth, accessToken);
-        if (saveErr) return Result.err(saveErr);
-
-        return Result.ok(accessToken);
+    export async function unlinkGitHubOAuth(query: QueryFunc, auth: Auth): Promise<Result> {
+        await query`
+            UPDATE users
+            SET ghAccessToken = NULL
+            WHERE id = ${auth.id}
+        `;
+        return Result.ok(null);
     }
 }
 

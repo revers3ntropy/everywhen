@@ -46,6 +46,8 @@ module.exports = {
         'no-undef': 'off',
         // doesn't like namespaces for some reason
         // (see this: https://stackoverflow.com/questions/58270901)
-        "@typescript-eslint/no-namespace": "off"
+        "@typescript-eslint/no-namespace": "off",
+        // just kinda useful sometimes
+        "@typescript-eslint/no-empty-function": "off",
     },
 };

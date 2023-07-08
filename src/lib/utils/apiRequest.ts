@@ -47,6 +47,7 @@ interface ApiResponse {
         '/version': GET<typeof import('../../routes/api/version/+server')>;
         '/locations': GET<typeof import('../../routes/api/locations/+server')>;
         '/assets': GET<typeof import('../../routes/api/assets/+server')>;
+        '/oauth/gh/user': GET<typeof import('../../routes/api/oauth/gh/user/+server')>;
     };
     POST: {
         '/users': POST<typeof import('../../routes/api/users/+server')>;
@@ -66,6 +67,7 @@ interface ApiResponse {
         '/assets/?': DELETE<typeof import('../../routes/api/assets/[asset]/+server')>;
         '/locations/?': DELETE<typeof import('../../routes/api/locations/[locationId]/+server')>;
         '/auth': DELETE<typeof import('../../routes/api/auth/+server')>;
+        '/oauth/gh': DELETE<typeof import('../../routes/api/oauth/gh/+server')>;
     };
     PUT: {
         '/labels/?': PUT<typeof import('../../routes/api/labels/[labelId]/+server')>;
