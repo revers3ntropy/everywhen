@@ -16,8 +16,6 @@ export const POST = (async ({ request, cookies }) => {
         code: 'string'
     });
 
-    console.log(body);
-
     const { val: accessToken, err } = await User.getGitHubOAuthAccessToken(body.code, body.state);
     if (err) {
         await errorLogger.error(err);

@@ -229,8 +229,7 @@ namespace UserUtils {
 
         if (
             !('access_token' in accessTokenData) ||
-            typeof accessTokenData.access_token !== 'string' ||
-            accessTokenData.access_token.toLowerCase() !== 'bearer'
+            typeof accessTokenData.access_token !== 'string'
         ) {
             await errorLogger.error(`No access token from github`, accessTokenData);
             return Result.err('Invalid response from GitHub');
