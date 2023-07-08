@@ -2,6 +2,7 @@ import { GITHUB_AUTH_CLIENT_SECRET } from '$env/static/private';
 import { PUBLIC_GITHUB_AUTH_CLIENT_ID } from '$env/static/public';
 import { type Auth, User } from '$lib/controllers/user/user';
 import type { QueryFunc } from '$lib/db/mysql.server';
+import { decrypt } from '$lib/security/encryption.server';
 import { errorLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 
@@ -91,11 +92,15 @@ export namespace ghAPI {
         return Result.ok(accessToken);
     }
 
-    async function makeGhApiReq(
-        accessToken: string,
-        path: string,
-        method = 'GET'
-    ): Promise<Result<object>> {
+    async function makeGhApiReq(user: User, path: string, method = 'GET'): Promise<Result<object>> {
+        const accessTokenEncrypted = user.ghAccessToken;
+        if (!accessTokenEncrypted) {
+            return Result.err('No GitHub account is linked');
+        }
+
+        const { err, val: accessToken } = decrypt(accessTokenEncrypted, user.key);
+        if (err) return Result.err(err);
+
         let res;
         try {
             res = await fetch(`https://api.github.com/${path}`, {
@@ -131,16 +136,20 @@ export namespace ghAPI {
         return Result.ok(data);
     }
 
-    export async function getGhUserInfo(auth: User): Promise<Result<GitHubUser>> {
-        if (!auth.ghAccessToken) return Result.err('No GitHub account is linked');
-        const { err, val } = await makeGhApiReq(auth.ghAccessToken, '/user');
+    export async function getGhUserInfo(user: User): Promise<Result<GitHubUser>> {
+        const { err, val } = await makeGhApiReq(user, '/user');
         if (err) return Result.err(err);
-        if (!('login' in val) || typeof val.login !== 'string') {
+
+        if (
+            !('login' in val) ||
+            typeof val.login !== 'string' ||
+            !('id' in val) ||
+            typeof val.id !== 'string'
+        ) {
+            await errorLogger.error(`Invalid response from github`, val);
             return Result.err('Invalid response from GitHub');
         }
-        if (!('id' in val) || typeof val.id !== 'string') {
-            return Result.err('Invalid response from GitHub');
-        }
+
         return Result.ok({ username: val.login, id: val.id });
     }
 }
