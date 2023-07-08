@@ -15,24 +15,20 @@
         const code = $page.url.searchParams.get('code');
         const stateFromGH = $page.url.searchParams.get('state');
 
-        console.log('code, stateFromGH: ', code, stateFromGH);
-
         const stateTemp = sessionStorage.getItem(SESSION_KEYS.GH_CB);
         sessionStorage.removeItem(SESSION_KEYS.GH_CB);
 
         if (stateFromGH !== stateTemp) {
-            console.log(stateFromGH, stateTemp);
             error = true;
             return;
         }
 
-        const res = displayNotifOnErr(
+        displayNotifOnErr(
             await api.post(data.auth, '/oauth/gh', {
                 code,
                 state: stateFromGH
             })
         );
-        console.log(res);
 
         await goto('/home');
     });

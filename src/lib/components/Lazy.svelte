@@ -25,7 +25,6 @@
             return;
         }
 
-        console.log(`Loading component ${key}...`);
         loadedComponent = await component();
 
         moduleCache.set(key, loadedComponent);

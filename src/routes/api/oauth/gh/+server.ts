@@ -1,4 +1,5 @@
 import { User } from '$lib/controllers/user/user.server';
+import { query } from '$lib/db/mysql.server';
 import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 import { invalidateCache } from '$lib/utils/cache.server';
@@ -16,13 +17,16 @@ export const POST = (async ({ request, cookies }) => {
         code: 'string'
     });
 
-    const { val: accessToken, err } = await User.getGitHubOAuthAccessToken(body.code, body.state);
+    const { val: accessToken, err } = await User.linkToGitHubOAuth(
+        query,
+        auth,
+        body.code,
+        body.state
+    );
     if (err) {
         await errorLogger.error(err);
         throw error(500, 'Internal server error');
     }
-
-    console.log(accessToken);
 
     return apiResponse({ accessToken });
 }) satisfies RequestHandler;

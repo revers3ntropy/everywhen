@@ -21,9 +21,7 @@
 
     function doOauth() {
         const state = randomString(randomInt(10, 20));
-        console.log(state);
         sessionStorage.setItem(SESSION_KEYS.GH_CB, state);
-        console.log(authorizeUrl(state));
         window.location.assign(authorizeUrl(state));
     }
 </script>

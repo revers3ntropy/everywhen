@@ -1,6 +1,7 @@
 import { PUBLIC_GITHUB_AUTH_CLIENT_ID } from '$env/static/public';
 import type { QueryFunc } from '$lib/db/mysql.server';
 import { encryptionKeyFromPassword } from '$lib/security/authUtils.server';
+import { encrypt } from '$lib/security/encryption.server';
 import { errorLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 import { cryptoRandomStr } from '$lib/security/authUtils.server';
@@ -170,12 +171,8 @@ namespace UserUtils {
         return await Settings.changeEncryptionKeyInDB(query, auth, newKey);
     }
 
-    export async function getGitHubOAuthAccessToken(
-        code: string,
-        state: string
-    ): Promise<Result<string>> {
+    async function getGitHubOAuthAccessToken(code: string, state: string): Promise<Result<string>> {
         if (!state || !code) {
-            console.log(state, code);
             return Result.err('Invalid state or code');
         }
 
@@ -198,12 +195,10 @@ namespace UserUtils {
             await errorLogger.error(e);
             return Result.err('Error connecting to GitHub');
         }
-        console.log(accessTokenRes);
 
         let accessTokenData: unknown;
         try {
             accessTokenData = await accessTokenRes.json();
-            console.log(accessTokenData);
         } catch (e) {
             await errorLogger.error(e);
             await errorLogger.error(await accessTokenRes.text());
@@ -236,6 +231,40 @@ namespace UserUtils {
         }
 
         return Result.ok(accessTokenData.access_token);
+    }
+
+    async function saveGitHubOAuthAccessToken(
+        query: QueryFunc,
+        auth: Auth,
+        accessToken: string
+    ): Promise<Result> {
+        if (!accessToken) {
+            return Result.err('Invalid access token');
+        }
+        const { err, val } = encrypt(accessToken, auth.key);
+        if (err) return Result.err(err);
+
+        await query`
+            UPDATE users
+            SET ghAccessToken = ${val}
+            WHERE id = ${auth.id}
+        `;
+        return Result.ok(null);
+    }
+
+    export async function linkToGitHubOAuth(
+        query: QueryFunc,
+        auth: Auth,
+        code: string,
+        state: string
+    ): Promise<Result<string>> {
+        const { err, val: accessToken } = await getGitHubOAuthAccessToken(code, state);
+        if (err) return Result.err(err);
+
+        const { err: saveErr } = await saveGitHubOAuthAccessToken(query, auth, accessToken);
+        if (saveErr) return Result.err(saveErr);
+
+        return Result.ok(accessToken);
     }
 }
 
