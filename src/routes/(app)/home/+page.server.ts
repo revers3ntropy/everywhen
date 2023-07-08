@@ -34,7 +34,7 @@ export const load = cachedPageRoute(async auth => {
     const { val: titles, err } = await Entry.getTitles(query, auth);
     if (err) throw error(400, err);
 
-    const firstNTitles = Entry.groupEntriesByDay(
+    const firstNTitles = Entry.groupEntriesByDay<Entry>(
         titles.sort((a, b) => b.created - a.created).slice(0, NUMBER_OF_RECENT_TITLES)
     );
 

@@ -2,9 +2,14 @@
 @import 'layout';
 
 .popup-background.window {
-    .container();
-    background: var(--background-color) !important;
+    padding: 0.3em 0;
     border-radius: @border-radius;
+    background: var(--v-light-accent) !important;
+
+    @media @mobile {
+        margin: 0.2em;
+        padding: 0.2rem;
+    }
 
     @media @not-mobile {
         & > button.close {

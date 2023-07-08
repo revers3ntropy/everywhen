@@ -1,6 +1,7 @@
 <script lang="ts">
     import BulletEntriesForm from '$lib/components/entryForm/BulletEntriesForm.svelte';
     import Tips from '$lib/components/Tips.svelte';
+    import { listen } from '$lib/dataChangeEvents';
     import { onMount } from 'svelte';
     import Cog from 'svelte-material-icons/Cog.svelte';
     import ImageOutline from 'svelte-material-icons/ImageOutline.svelte';
@@ -35,6 +36,17 @@
     );
     $: areHiddenPinnedEntries =
         data.pinnedEntriesList.length > showLimitPinnedEntries && !showingAllPinned;
+
+    listen.entry.onCreate(({ entry }) => {
+        // if no recent entries,
+        // create a new group with the new entry
+        if (Object.keys(data.recentTitles).length < 1) {
+            data = {
+                ...data,
+                recentTitles: Entry.groupEntriesByDay([entry])
+            };
+        }
+    });
 </script>
 
 <main>
