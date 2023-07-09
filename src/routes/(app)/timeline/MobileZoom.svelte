@@ -70,10 +70,11 @@
         },
 
         collider(state) {
-            return new RectCollider(state.width - WIDTH, 0, WIDTH, state.height, { zIndex: -3 });
+            return new RectCollider(state.width - WIDTH, 0, WIDTH, state.height, { zIndex: 1 });
         },
 
-        onMouseDown(_state, _time, y) {
+        onMouseDown(_state, _time, y, isTouch) {
+            if (!isTouch) return;
             this.dragStart = y;
             this.dragging = true;
         },
