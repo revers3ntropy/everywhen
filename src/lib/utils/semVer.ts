@@ -1,7 +1,11 @@
 import { Result } from '$lib/utils/result';
 
 export class SemVer {
-    constructor(public major = 0, public minor = 0, public patch = 0) {}
+    constructor(
+        public major = 0,
+        public minor = 0,
+        public patch = 0
+    ) {}
 
     static fromString(version: string): Result<SemVer> {
         const v = new SemVer();

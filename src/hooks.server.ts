@@ -88,12 +88,8 @@ async function logReq(
         res.status,
         userId,
         req.request.headers.get('user-agent') || '',
-        (
-            await req.request.text()
-        ).length,
-        (
-            await res.text()
-        ).length,
+        (await req.request.text()).length,
+        (await res.text()).length,
         ip
     );
 }

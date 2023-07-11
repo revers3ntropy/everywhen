@@ -158,10 +158,13 @@ const generateDataset: Record<
     ): Record<string | number, number> => {
         // Entries at 3pm on different days go in the same bucket
 
-        const buckets = osGroups.reduce((acc, group) => {
-            acc[group] = 0;
-            return acc;
-        }, {} as Record<OsGroup, number>);
+        const buckets = osGroups.reduce(
+            (acc, group) => {
+                acc[group] = 0;
+                return acc;
+            },
+            {} as Record<OsGroup, number>
+        );
 
         for (const entry of sortedEntries) {
             const bucket = osGroupFromEntry(entry);

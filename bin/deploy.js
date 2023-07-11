@@ -455,10 +455,19 @@ async function build() {
     await $`mv .env tmp.env`;
     await $`mv ./secrets/${env}/remote.env .env`;
 
-    await $`bin/build`;
+    async function cleanup() {
+        await $`mv .env ./secrets/${env}/remote.env`;
+        await $`mv tmp.env .env`;
+    }
 
-    await $`mv .env ./secrets/${env}/remote.env`;
-    await $`mv tmp.env .env`;
+    try {
+        await $`bin/build`;
+    } catch (e) {
+        await cleanup();
+        throw e;
+    }
+
+    await cleanup();
 
     if (!fs.existsSync('./build')) {
         console.error('Build failed: no build directory');

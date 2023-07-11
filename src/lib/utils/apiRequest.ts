@@ -1,7 +1,7 @@
 import { browser } from '$app/environment';
 import { PUBLIC_SVELTEKIT_PORT } from '$env/static/public';
 import { serialize } from 'cookie';
-import { KEY_COOKIE_OPTIONS, STORE_KEY, USERNAME_COOKIE_OPTIONS } from '../constants';
+import { cookieOptions, STORE_KEY } from '../constants';
 import type { Auth } from '../controllers/user/user';
 import type { apiRes404, GenericResponse } from './apiResponse.server';
 import { serializeGETArgs } from './GETArgs';
@@ -113,9 +113,9 @@ export async function makeApiReq<
     let cookie = '';
     if (auth) {
         cookie =
-            serialize(STORE_KEY.key, auth.key, KEY_COOKIE_OPTIONS) +
+            serialize(STORE_KEY.key, auth.key, cookieOptions(false, false)) +
             ' ; ' +
-            serialize(STORE_KEY.username, auth.username, USERNAME_COOKIE_OPTIONS);
+            serialize(STORE_KEY.username, auth.username, cookieOptions(true, false));
     }
 
     const init: RequestInit = {

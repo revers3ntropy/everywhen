@@ -6,5 +6,6 @@
 ) & (
   cd ./bin || exit 1
   npm i
+) & (
+  npx playwright install
 ) & wait
-

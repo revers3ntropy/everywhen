@@ -1,9 +1,10 @@
 import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import { invalidateCache } from '$lib/utils/cache.server';
+import { GETParamIsTruthy } from '$lib/utils/GETArgs';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
-import { KEY_COOKIE_OPTIONS, STORE_KEY, USERNAME_COOKIE_OPTIONS } from '$lib/constants';
+import { cookieOptions, STORE_KEY } from '$lib/constants';
 import { User } from '$lib/controllers/user/user';
 import { query } from '$lib/db/mysql.server';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
@@ -11,6 +12,7 @@ import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 export const GET = (async ({ url, cookies }) => {
     let key: string | undefined | null = url.searchParams.get('key');
     const username: string | undefined | null = url.searchParams.get('username');
+    const rememberMe = GETParamIsTruthy(url.searchParams.get('rememberMe'));
 
     if (!key) {
         key = cookies.get(STORE_KEY.key);
@@ -24,8 +26,8 @@ export const GET = (async ({ url, cookies }) => {
 
     if (err) throw error(401, err);
 
-    cookies.set(STORE_KEY.key, key, KEY_COOKIE_OPTIONS);
-    cookies.set(STORE_KEY.username, username, USERNAME_COOKIE_OPTIONS);
+    cookies.set(STORE_KEY.key, key, cookieOptions(false, rememberMe));
+    cookies.set(STORE_KEY.username, username, cookieOptions(true, rememberMe));
 
     return apiResponse({
         key,
@@ -50,8 +52,8 @@ export const PUT = (async ({ request, cookies }) => {
 }) satisfies RequestHandler;
 
 export const DELETE = (({ cookies }) => {
-    cookies.delete(STORE_KEY.key, KEY_COOKIE_OPTIONS);
-    cookies.delete(STORE_KEY.username, USERNAME_COOKIE_OPTIONS);
+    cookies.delete(STORE_KEY.key, cookieOptions(false, false));
+    cookies.delete(STORE_KEY.username, cookieOptions(true, false));
     return apiResponse({});
 }) satisfies RequestHandler;
 

@@ -1,6 +1,6 @@
 import { type APIRequestContext, type Expect, type Page, request } from '@playwright/test';
 import { serialize } from 'cookie';
-import { STORE_KEY, KEY_COOKIE_OPTIONS, USERNAME_COOKIE_OPTIONS } from '../src/lib/constants.js';
+import { cookieOptions, STORE_KEY } from '../src/lib/constants.js';
 import type { Auth, RawAuth } from '../src/lib/controllers/user/user.js';
 import { encryptionKeyFromPassword } from '../src/lib/security/authUtils.server.js';
 import { Result } from '../src/lib/utils/result.js';
@@ -103,9 +103,9 @@ export async function generateApiCtx(auth: RawAuth | null = null): Promise<APIRe
             'Content-Type': 'application/json',
             Accept: 'application/json',
             Cookie: auth
-                ? serialize(STORE_KEY.key, auth.key, KEY_COOKIE_OPTIONS) +
+                ? serialize(STORE_KEY.key, auth.key, cookieOptions(false, false)) +
                   ' ; ' +
-                  serialize(STORE_KEY.username, auth.username, USERNAME_COOKIE_OPTIONS)
+                  serialize(STORE_KEY.username, auth.username, cookieOptions(true, false))
                 : ''
         }
     });

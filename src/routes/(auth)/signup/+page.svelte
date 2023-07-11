@@ -1,14 +1,14 @@
 <script lang="ts">
-    import type { PageData } from './$types';
-    import Dot from '$lib/components/Dot.svelte';
-    import { displayNotifOnErr } from '$lib/components/notifications/notifications.js';
-    import { api } from '$lib/utils/apiRequest.js';
-    import { encryptionKeyFromPassword } from '$lib/security/authUtils.client.js';
+    import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
     import { tooltip } from '@svelte-plugins/tooltips';
-    import { onMount } from 'svelte';
     import ArrowRightThinCircleOutline from 'svelte-material-icons/ArrowRightThinCircleOutline.svelte';
     import InformationOutline from 'svelte-material-icons/InformationOutline.svelte';
+    import type { PageData } from './$types';
+    import { api } from '$lib/utils/apiRequest.js';
+    import { encryptionKeyFromPassword } from '$lib/security/authUtils.client.js';
+    import { displayNotifOnErr } from '$lib/components/notifications/notifications.js';
+    import Dot from '$lib/components/Dot.svelte';
 
     export let data: PageData;
 

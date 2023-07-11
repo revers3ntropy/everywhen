@@ -1,4 +1,7 @@
-export const COOKIE_TIMEOUT: Seconds = 60 * 60 * 24 * 3;
+import type { CookieSerializeOptions } from 'cookie';
+
+export const NORMAL_COOKIE_TIMEOUT_DAYS = 3;
+export const REMEMBER_ME_COOKIE_TIMEOUT_DAYS = 365;
 
 export const KEY_PREFIX = '__halcyon_land_';
 
@@ -44,21 +47,23 @@ export const COOKIES_TO_CLEAR_ON_LOGOUT = Object.freeze([]);
 // possible characters to show when the text is blurred
 export const OBFUSCATE_CHARS = 'abcdefghijklmnopqrstuvwxyz ';
 
-export const KEY_COOKIE_OPTIONS = Object.freeze({
-    path: '/',
-    maxAge: COOKIE_TIMEOUT,
-    sameSite: 'strict',
-    httpOnly: true
-});
-
-// allow the username cookie to be read by the client
-// so that it can check the auth is still valid
-// but keep the key cookie httpOnly, to prevent XSS
-// https://owasp.org/www-community/HttpOnly
-export const USERNAME_COOKIE_OPTIONS = Object.freeze({
-    ...KEY_COOKIE_OPTIONS,
-    httpOnly: false
-});
+export function cookieOptions(
+    isUsername: boolean,
+    rememberMe: boolean
+): Readonly<CookieSerializeOptions> {
+    const maxAgeDays = rememberMe ? REMEMBER_ME_COOKIE_TIMEOUT_DAYS : NORMAL_COOKIE_TIMEOUT_DAYS;
+    const maxAgeMs = maxAgeDays * 24 * 60 * 60 * 1000;
+    return Object.freeze({
+        path: '/',
+        sameSite: 'strict',
+        // allow the username cookie to be read by the client
+        // so that it can check the auth is still valid
+        // but keep the key cookie httpOnly, to prevent XSS
+        // https://owasp.org/www-community/HttpOnly
+        httpOnly: !isUsername,
+        expires: new Date(Math.floor(Date.now() / 1000) * 1000 + maxAgeMs)
+    });
+}
 
 export const MAX_IMAGE_SIZE: Bytes = 1024 * 1024 * 8; // 8MiB
 

@@ -87,8 +87,8 @@ namespace EntryUtils {
                    agentData
             FROM entries
             WHERE ((flags & ${_Entry.Flags.DELETED}) = ${
-            filter.deleted ? _Entry.Flags.DELETED : 0
-        } OR ${filter.deleted === 'both'})
+                filter.deleted ? _Entry.Flags.DELETED : 0
+            } OR ${filter.deleted === 'both'})
                   AND (label = ${filter.labelId || ''} OR ${filter.labelId === undefined})
               AND (${location === undefined} OR (
                     latitude IS NOT NULL

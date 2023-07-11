@@ -1,5 +1,6 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
+    import { NORMAL_COOKIE_TIMEOUT_DAYS, REMEMBER_ME_COOKIE_TIMEOUT_DAYS } from '$lib/constants';
     import { Settings } from '$lib/controllers/settings/settings.client';
     import { populateCookieWritablesWithCookies } from '$lib/stores';
     import ChevronRight from 'svelte-material-icons/ChevronRight.svelte';
@@ -7,22 +8,19 @@
     import { encryptionKeyFromPassword } from '$lib/security/authUtils.client';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
+    import InformationOutline from 'svelte-material-icons/InformationOutline.svelte';
     import type { PageData } from './$types';
+    import { tooltip } from '@svelte-plugins/tooltips';
 
     export let data: PageData;
-
-    // user log in / create account form values
-    let password = '';
-    let username = '';
-
-    let actionPending = false;
 
     async function login(): Promise<void> {
         actionPending = true;
         const auth = displayNotifOnErr(
             await api.get(null, '/auth', {
                 key: encryptionKeyFromPassword(password),
-                username
+                username,
+                rememberMe: rememberMeInput.checked
             }),
             () => (actionPending = false)
         );
@@ -38,6 +36,12 @@
 
         await goto('/' + data.redirect);
     }
+
+    // user log in / create account form values
+    let password = '';
+    let username = '';
+    let rememberMeInput: HTMLInputElement;
+    let actionPending = false;
 </script>
 
 <main class="flex-center">
@@ -63,6 +67,23 @@
                 type="password"
             />
         </label>
+        <div style="text-align: right; margin-bottom: 1rem">
+            <input type="checkbox" bind:this={rememberMeInput}>
+            <button
+                class="flex-center oneline text-light"
+                style="display: inline-flex; gap: 4px"
+                use:tooltip={{
+                    content: `You will have to re-enter your login details after ${REMEMBER_ME_COOKIE_TIMEOUT_DAYS} `+
+                             `days instead of ${NORMAL_COOKIE_TIMEOUT_DAYS} days.`
+                }}
+                on:click={() => rememberMeInput.checked = !rememberMeInput.checked}
+            >
+                Remember me
+                <span class="flex-center" style="display: inline-flex">
+                    <InformationOutline size="20" />
+                </span>
+            </button>
+        </div>
         <div class="flex-center" style="justify-content: space-between">
             <a
                 aria-label="Create Account"
@@ -93,7 +114,7 @@
     }
 
     .content,
-    input {
+    input[type=text] {
         width: 300px;
     }
 

@@ -3,7 +3,9 @@
 /// <reference lib="esnext" />
 /// <reference lib="webworker" />
 
-import { build, files, version } from '$service-worker';
+import { build, files } from '$service-worker';
+
+const version = __VERSION__;
 
 const sw = self as unknown as ServiceWorkerGlobalScope;
 
@@ -47,19 +49,10 @@ sw.addEventListener('fetch', event => {
         if (ASSETS.includes(url.pathname)) {
             return cache.match(url.pathname);
         }
-
-        // for everything else, try the network first, but
-        // fall back to the cache if we're offline
         try {
-            const response = await fetch(event.request);
-
-            if (response.status === 200) {
-                void cache.put(event.request, response.clone());
-            }
-
-            return response;
+            return await fetch(event.request);
         } catch {
-            return cache.match(event.request);
+            return undefined;
         }
     }
 
