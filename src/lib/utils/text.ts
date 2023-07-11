@@ -10,16 +10,29 @@ export function obfuscate(str: string, alphabet = OBFUSCATE_CHARS): string {
         return alphabet[Math.floor(Math.random() * alphabet.length)];
     });
 }
-
 /**
- * Split into 'words' as best as possible
+ * Split into 'words'
+ * @src https://stackoverflow.com/questions/18473326/javascript-break-sentence-by-words
  */
-export function splitText(text: string): string[] {
-    return text.split(/[\s,.\-:;!"*()=+[\]{}?|]+/).filter(Boolean);
+export function wordsFromText(text: string, locales = 'en'): string[] {
+    if (typeof Intl === 'undefined' || typeof Intl.Segmenter === 'undefined') {
+        return (text.match(/\b(\w+)'?(\w+)?\b/g) || []).filter(Boolean);
+    }
+
+    const wordSplitter = new Intl.Segmenter(locales, {
+        granularity: 'word'
+    });
+
+    return Array.from(wordSplitter.segment(text), segment => {
+        if (!segment.isWordLike) {
+            return null;
+        }
+        return segment.segment;
+    }).filter(Boolean);
 }
 
 export function wordCount(text: string): number {
-    return splitText(text).length;
+    return wordsFromText(text).length;
 }
 
 export function numberAsSignedStr(num: number): string {
