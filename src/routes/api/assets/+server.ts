@@ -10,8 +10,17 @@ import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 const IMG_QUALITY = 100;
 
 export const GET = cachedApiRoute(async (auth, { url }) => {
-    const count = parseInt(url.searchParams.get('count') || '4');
-    const offset = parseInt(url.searchParams.get('offset') || '0');
+    let offset: number, count: number;
+    try {
+        count = parseInt(url.searchParams.get('count') || '4');
+    } catch (e) {
+        throw error(400, 'Invalid count');
+    }
+    try {
+        offset = parseInt(url.searchParams.get('offset') || '0');
+    } catch (e) {
+        throw error(400, 'Invalid offset');
+    }
 
     const { err, val } = await Asset.pageOfMetaData(query, auth, offset, count);
     if (err) throw error(400, err);

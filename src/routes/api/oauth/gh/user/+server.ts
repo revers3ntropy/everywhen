@@ -8,13 +8,11 @@ import type { RequestHandler } from './$types';
 // as it could change externally
 export const GET = cachedApiRoute(async auth => {
     if (!auth.ghAccessToken) {
-        throw error(404, JSON.stringify({ error: 'No GitHub account is linked' }));
+        throw error(404, 'No GitHub account is linked');
     }
 
     const { val: userInfo, err } = await ghAPI.getGhUserInfo(auth);
-    if (err) {
-        throw error(500, JSON.stringify({ error: err }));
-    }
+    if (err) throw error(500, err);
 
     return userInfo;
 }) satisfies RequestHandler;

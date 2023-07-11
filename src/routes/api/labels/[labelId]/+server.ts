@@ -106,7 +106,7 @@ export const DELETE = (async ({ cookies, params, request }) => {
         return apiResponse({});
     }
 
-    throw error(400, 'Invalid strategy');
+    throw error(400, 'Invalid deletion strategy');
 }) satisfies RequestHandler;
 
 export const POST = apiRes404;

@@ -9,16 +9,25 @@ import { nowUtc } from '$lib/utils/time';
 import type { RequestHandler } from './$types';
 
 export const GET = cachedApiRoute(async (auth, { url }) => {
-    const lat = parseFloat(url.searchParams.get('lat') || '');
-    const lon = parseFloat(url.searchParams.get('lon') || '');
+    let lat: number, lng: number;
+    try {
+        lat = parseFloat(url.searchParams.get('lat') || '');
+    } catch (e) {
+        lat = 0;
+    }
+    try {
+        lng = parseFloat(url.searchParams.get('lon') || '');
+    } catch (e) {
+        lng = 0;
+    }
 
-    if (!lat || !lon) {
+    if (!lat || !lng) {
         const { err, val: locations } = await Location.all(query, auth);
         if (err) throw error(500, err);
         return { locations };
     }
 
-    const { err, val: locations } = await Location.search(query, auth, lat, lon);
+    const { err, val: locations } = await Location.search(query, auth, lat, lng);
     if (err) throw error(500, err);
     return { ...locations };
 }) satisfies RequestHandler;
