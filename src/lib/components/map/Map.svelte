@@ -124,7 +124,8 @@
         const map = new Map({
             target: node.id,
             layers: [osmLayer],
-            view: new View({ center, zoom })
+            view: new View({ center, zoom }),
+            pixelRatio: 1,
         });
 
         const locationFeatures = locations.map(l => {
