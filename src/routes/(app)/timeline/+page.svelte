@@ -10,6 +10,7 @@
     import EventInTimeline from './EventInTimeline.svelte';
     import Filters from './Filters.svelte';
     import MobileZoom from './MobileZoom.svelte';
+    import NewEventButton from './NewEventButton.svelte';
     import NowLine from './NowLine.svelte';
     import TimeCursor from './TimeCursor.svelte';
     import TimeMarkers from './TimeMarkers.svelte';
@@ -171,4 +172,5 @@
     </Canvas>
 
     <Filters auth={data.auth} labels={data.labels} bind:selectedLabels />
+    <NewEventButton auth={data.auth} labels={data.labels} />
 </main>

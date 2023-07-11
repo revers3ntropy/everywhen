@@ -3,7 +3,7 @@ import { error } from '@sveltejs/kit';
 import { Entry } from '$lib/controllers/entry/entry';
 import { query } from '$lib/db/mysql.server';
 import { cachedPageRoute } from '$lib/utils/cache.server';
-import { splitText } from '$lib/utils/text';
+import { wordsFromText } from '$lib/utils/text';
 import type { EntryWithWordCount } from '../helpers';
 import type { PageServerLoad } from './$types';
 
@@ -25,7 +25,7 @@ export const load = cachedPageRoute(async (auth, { params }) => {
     const totalEntries = entries.length;
 
     for (const entry of entries) {
-        const entryAsWords = [...splitText(entry.title), ...splitText(entry.entry)];
+        const entryAsWords = [...wordsFromText(entry.title), ...wordsFromText(entry.entry)];
 
         let instancesInEntry = 0;
         for (const word of entryAsWords) {

@@ -1,5 +1,5 @@
 import type { Entry } from '$lib/controllers/entry/entry';
-import { splitText } from '$lib/utils/text';
+import { wordsFromText } from '$lib/utils/text';
 
 export type EntryWithWordCount = PickOptionalAndMutable<Entry, 'entry' | 'title'> & {
     wordCount: number;
@@ -45,7 +45,7 @@ export function commonWordsFromText(
     txt: string,
     words: Record<string, number> = {}
 ): Record<string, number> {
-    for (let word of splitText(txt)) {
+    for (let word of wordsFromText(txt)) {
         word = word.toLowerCase();
         words[word] ??= 0;
         words[word]++;

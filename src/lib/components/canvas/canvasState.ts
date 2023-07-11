@@ -1,4 +1,5 @@
 import { browser } from '$app/environment';
+import { theme } from '$lib/stores';
 import { writable } from 'svelte/store';
 import { clientLogger } from '$lib/utils/log';
 import { nowUtc } from '$lib/utils/time';
@@ -207,6 +208,13 @@ export class CanvasState implements CanvasListeners {
                 this.showContextMenu(interactable.contextMenu, evt);
                 return;
             }
+        });
+
+        theme.subscribe(() => {
+            // wait for variables to be changed
+            setTimeout(() => {
+                this.updateColors();
+            }, 0);
         });
     }
 
