@@ -7,6 +7,7 @@
 </script>
 
 <script lang="ts">
+    import type { FeatureLike } from 'ol/Feature';
     import { writable } from 'svelte/store';
     import type { EntryLocation } from '$lib/controllers/entry/entry';
     import type { Auth } from '$lib/controllers/user/user';
@@ -90,6 +91,34 @@
         await reloadLocations();
     }
 
+    function sortFeatures(features: (LocationFeature | EntryFeature | FeatureLike)[]) {
+        return features
+            .filter((feature): feature is LocationFeature | EntryFeature => {
+                // only locations and entries are clickable
+                if ('entry' in feature) {
+                    return entriesInteractable;
+                }
+                return 'location' in feature;
+            })
+            .sort((a, b) => {
+                // pick entries over locations
+                if ('entry' in a && 'entry' in b) {
+                    return 0;
+                }
+                if ('entry' in a) {
+                    return -1;
+                }
+                return 1;
+            })
+            .sort((a, b) => {
+                if (!('location' in a) || !('location' in b)) {
+                    return 0;
+                }
+                // pick smaller locations over larger ones
+                return a.location.radius - b.location.radius;
+            });
+    }
+
     function setupMap(
         node: HTMLElement,
         {
@@ -125,7 +154,6 @@
             target: node.id,
             layers: [osmLayer],
             view: new View({ center, zoom }),
-            pixelRatio: 1,
         });
 
         const locationFeatures = locations.map(l => {
@@ -153,7 +181,7 @@
                         }
 
                         ctx.beginPath();
-                        ctx.arc(x, y, 5, 0, 2 * Math.PI);
+                        ctx.arc(x, y, 5 * devicePixelRatio, 0, 2 * Math.PI);
                         ctx.strokeStyle = 'rgba(74,74,74,0.6)';
                         ctx.stroke();
                     }
@@ -180,7 +208,7 @@
                     // resolution,
                     // mPerUnit,
                     // lat
-                );
+                ) * devicePixelRatio;
 
                 const id = feature.location.id;
 
@@ -210,36 +238,12 @@
 
             let features = map.getFeaturesAtPixel(event.pixel);
 
-            if (!features.length) {
+            if (features.length < 1) {
                 popup.set(null);
                 return;
             }
 
-            features = features
-                .filter((feature): feature is LocationFeature | EntryFeature => {
-                    // only locations and entries are clickable
-                    if ('entry' in feature) {
-                        return entriesInteractable;
-                    }
-                    return 'location' in feature;
-                })
-                .sort((a, b) => {
-                    // pick entries over locations
-                    if ('entry' in a && 'entry' in b) {
-                        return 0;
-                    }
-                    if ('entry' in a) {
-                        return -1;
-                    }
-                    return 1;
-                })
-                .sort((a, b) => {
-                    if (!('location' in a) || !('location' in b)) {
-                        return 0;
-                    }
-                    // pick smaller locations over larger ones
-                    return a.location.radius - b.location.radius;
-                });
+            features = sortFeatures(features);
 
             if (features.length < 1) {
                 return;
@@ -290,7 +294,7 @@
         map.on('pointermove', (event: MapBrowserEvent<UIEvent>) => {
             if (!map) return;
 
-            const features = map.getFeaturesAtPixel(event.pixel);
+            const features = sortFeatures(map.getFeaturesAtPixel(event.pixel));
 
             if (!features.length) {
                 hoveringEntryId = null;
@@ -298,9 +302,11 @@
                 return;
             }
 
-            const hovering = features[0] as EntryFeature | LocationFeature;
+            const hovering = features[0] ;
 
             if (!entriesInteractable && 'entry' in hovering) {
+                hoveringEntryId = null;
+                hoveringSomething = false;
                 return;
             }
 

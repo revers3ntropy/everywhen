@@ -69,12 +69,13 @@ export function olFeatureFromLocation(location: Location, map: Map): LocationFea
                     throw new Error('resolution is null');
                 }
 
-                const radius = Location.degreesToMetersPrecise(
-                    location.radius,
-                    resolution,
-                    mPerUnit,
-                    location.latitude
-                );
+                const radius =
+                    Location.degreesToMetersPrecise(
+                        location.radius,
+                        resolution,
+                        mPerUnit,
+                        location.latitude
+                    ) * devicePixelRatio;
 
                 const innerRadius = 0;
                 const outerRadius = radius * 1.4;
@@ -104,7 +105,7 @@ export function olFeatureFromLocation(location: Location, map: Map): LocationFea
                 if (radius > state.context.canvas.clientWidth / 32) {
                     ctx.beginPath();
                     ctx.fillStyle = 'black';
-                    ctx.font = '12px sans-serif';
+                    ctx.font = `${12 * devicePixelRatio}px sans-serif`;
                     ctx.fillText(location.name, x, y - 5);
                     ctx.closePath();
                 }
