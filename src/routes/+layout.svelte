@@ -7,9 +7,8 @@
     import Notifications from '$lib/components/notifications/Notifications.svelte';
     import { POLL_FOR_UPDATE_INTERVAL } from '$lib/constants';
     import { populateCookieWritablesWithCookies, popup, theme } from '$lib/stores';
-    import { displayNotifOnErr } from '$lib/components/notifications/notifications';
+    import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
     import { api } from '$lib/utils/apiRequest';
-    import NewVersionAvailable from '$lib/components/NewVersionAvailable.svelte';
     import Footer from '$lib/components/Footer.svelte';
 
     export let data: PageData;
@@ -21,17 +20,15 @@
     populateCookieWritablesWithCookies(data.__cookieWritables, data.settings);
 
     async function checkForUpdate() {
-        // if another update comes out, the new version will be wrong
-        // but the version the user switches too will be correct
-        // so don't bother checking for updates if there is already one
-        if (newVersionAvailable) return;
-
         // only check for updates if the user is actually on this tab
         if (document.visibilityState !== 'visible') return;
 
         const currentVersion = __VERSION__;
-        newVersion = displayNotifOnErr(await api.get(null, '/version')).v;
-        newVersionAvailable = newVersion !== currentVersion;
+        const newVersion = displayNotifOnErr(await api.get(null, '/version')).v;
+        if (newVersion !== currentVersion) {
+            notify.info(`New version (${newVersion}) available, reloading...`);
+            location.reload();
+        }
     }
 
     onMount(() => {
@@ -42,8 +39,6 @@
         document.onvisibilitychange = () => void checkForUpdate();
     });
 
-    let newVersionAvailable = false;
-    let newVersion = '<error>';
     let root: HTMLDivElement;
 
     $: if ($navigating) {
@@ -85,10 +80,6 @@
     </svg>
 
     <Notifications />
-
-    {#if newVersionAvailable}
-        <NewVersionAvailable {newVersion} />
-    {/if}
 
     <Modal classContent="popup-background" classWindow="popup-background" show={$popup} />
 

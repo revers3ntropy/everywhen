@@ -106,13 +106,10 @@ namespace EntryUtils {
     }
 
     function stringToShortTitle(str: string): string {
-        return str
-            .replace(/[^0-9a-zA-Z#_\-!?:| ]/gi, ' ')
-            .replace(/ +/gi, ' ')
-            .substring(0, TITLE_LENGTH_CUTOFF);
+        return str.replace(/\s+/gi, ' ').substring(0, TITLE_LENGTH_CUTOFF);
     }
 
-    export function entryToTitleEntry(this: void, entry: Entry): Entry {
+    export function entryToTitleEntry(entry: Entry): Entry {
         return {
             ...entry,
             title: stringToShortTitle(entry.title),

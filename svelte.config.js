@@ -4,7 +4,7 @@ import fs from 'fs';
 
 /** @type {{ version: string }} */
 const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
-const version = JSON.stringify(packageJson.version);
+const version = packageJson.version;
 
 const ignoreWarningCodes = ['css-unused-selector', 'unused-export-let'];
 
@@ -16,9 +16,6 @@ const config = {
 
     kit: {
         adapter: adapter(),
-        version: {
-            name: version
-        },
         inlineStyleThreshold: 250, // 250 characters
         prerender: {
             concurrency: 4
