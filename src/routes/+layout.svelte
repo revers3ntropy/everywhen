@@ -21,12 +21,14 @@
     populateCookieWritablesWithCookies(data.__cookieWritables, data.settings);
 
     async function checkForUpdate() {
+        if (isNewVersionAvailable) return;
         // only check for updates if the user is actually on this tab
         if (document.visibilityState !== 'visible') return;
 
         const currentVersion = __VERSION__;
         const newVersion = displayNotifOnErr(await api.get(null, '/version')).v;
         if (newVersion !== currentVersion) {
+            isNewVersionAvailable = true;
             notify.info(`New version (${newVersion}) available, reloading...`);
             location.reload();
         }
@@ -40,6 +42,7 @@
         document.onvisibilitychange = () => void checkForUpdate();
     });
 
+    let isNewVersionAvailable = false;
     let root: HTMLDivElement;
 
     if (browser) {

@@ -5,7 +5,7 @@
     type Item = NonNullable<unknown>;
 
     export let showSpinner = true;
-    export let margin = 300;
+    export let margin = '300px';
     export let items = [] as Item[];
     export let batchSize = 10;
     export let numItems: number;
@@ -46,7 +46,7 @@
     }
 </script>
 
-<slot />
+<slot {items} />
 
 {#if numItems !== 0}
     {#if showSpinner && ((loadingAt !== null && loadingAt < numItems) || !loadedAny)}
@@ -54,7 +54,7 @@
     {/if}
     <div
         style="height: 1px"
-        use:inview={{ rootMargin: `${margin}px` }}
+        use:inview={{ rootMargin: margin }}
         on:inview_enter={load}
         on:inview_leave={() => (pageEndInView = false)}
     />

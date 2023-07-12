@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { browser } from '$app/environment';
     import { uploadImage } from '$lib/components/asset/uploadImage';
     import InfiniteScroller from '$lib/components/InfiniteScroller.svelte';
     import { api } from '$lib/utils/apiRequest';
@@ -88,7 +89,7 @@
             batchSize={4}
             numItems={data.assetCount}
             loadItems={loadMoreAssets}
-            margin={1000}
+            margin="{browser ? innerHeight : 1000}px"
         >
             <div class="assets">
                 {#each data.assets as asset}
