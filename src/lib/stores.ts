@@ -1,32 +1,19 @@
 import type { SettingsConfig } from '$lib/controllers/settings/settings';
 import { cookieWritable } from '$lib/cookieWritable';
-import { localStorageWritable } from '$lib/lsWritable';
 import type { SvelteComponent } from 'svelte';
 import { writable } from 'svelte/store';
 import { COOKIE_WRITEABLE_KEYS, STORE_KEY, Theme } from './constants';
+import { persisted } from 'svelte-local-storage-store';
 
 export const popup = writable<typeof SvelteComponent | null | undefined>(null);
 
-export const enabledLocation = localStorageWritable<boolean, null>(
-    STORE_KEY.enabledLocation,
-    false,
-    null
-);
-export const passcodeLastEntered = localStorageWritable<number>(
-    STORE_KEY.passcodeLastEntered,
-    0,
-    0
-);
-export const eventsSortKey = localStorageWritable<EventsSortKey, null>(
-    STORE_KEY.sortEventsKey,
-    'created',
-    null
-);
-export const lastTipNumber = localStorageWritable<number, null>(STORE_KEY.lastTipNumber, 0, null);
-export const obfuscated = localStorageWritable<boolean>(STORE_KEY.obfuscated, false, true);
+export const enabledLocation = persisted<boolean>(STORE_KEY.enabledLocation, false);
+export const passcodeLastEntered = persisted<number>(STORE_KEY.passcodeLastEntered, 0);
+export const eventsSortKey = persisted<EventsSortKey>(STORE_KEY.sortEventsKey, 'created');
+export const lastTipNumber = persisted<number>(STORE_KEY.lastTipNumber, 0);
+export const obfuscated = persisted<boolean>(STORE_KEY.obfuscated, false);
 
 export const theme = cookieWritable<Theme>(COOKIE_WRITEABLE_KEYS.theme, Theme.light);
-
 export const allowedCookies = cookieWritable<boolean>(COOKIE_WRITEABLE_KEYS.allowedCookies, false);
 
 /**

@@ -1,5 +1,7 @@
 import type { CookieSerializeOptions } from 'cookie';
 
+export const version = __VERSION__;
+
 export const NORMAL_COOKIE_TIMEOUT_DAYS = 3;
 export const REMEMBER_ME_COOKIE_TIMEOUT_DAYS = 365;
 
