@@ -52,16 +52,20 @@ export function cookieOptions(
     rememberMe: boolean
 ): Readonly<CookieSerializeOptions> {
     const maxAgeDays = rememberMe ? REMEMBER_ME_COOKIE_TIMEOUT_DAYS : NORMAL_COOKIE_TIMEOUT_DAYS;
-    const maxAgeMs = maxAgeDays * 24 * 60 * 60 * 1000;
+    const maxAgeS = maxAgeDays * 24 * 60 * 60;
+    const maxAgeMs = maxAgeS * 1000;
     return Object.freeze({
         path: '/',
-        sameSite: 'strict',
+        // Kinda needed for GitHub OAuth callback to work smoothly,
+        // if set to 'strict' then the cookie is not sent to the callback page
+        sameSite: 'lax',
         // allow the username cookie to be read by the client
         // so that it can check the auth is still valid
         // but keep the key cookie httpOnly, to prevent XSS
         // https://owasp.org/www-community/HttpOnly
         httpOnly: !isUsername,
-        expires: new Date(Math.floor(Date.now() / 1000) * 1000 + maxAgeMs)
+        expires: new Date(Math.floor(Date.now() / 1000) * 1000 + maxAgeMs),
+        maxAge: maxAgeS
     });
 }
 

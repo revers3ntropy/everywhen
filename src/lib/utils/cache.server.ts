@@ -1,3 +1,4 @@
+import { PUBLIC_ENV } from '$env/static/public';
 import { ENABLE_CACHING } from '$lib/constants';
 import { error } from '@sveltejs/kit';
 import type { RequestEvent, ServerLoadEvent } from '@sveltejs/kit';
@@ -12,6 +13,8 @@ const cacheLogger = new FileLogger('CACHE', chalk.magentaBright);
 
 const cache: Record<string, Record<string, unknown> | undefined> = {};
 const cacheLastUsed: Record<string, number> = {};
+
+const doCache = ENABLE_CACHING && PUBLIC_ENV !== 'dev';
 
 function roughSizeOfObject(object: unknown): number {
     const objectList: unknown[] = [];
@@ -43,7 +46,7 @@ function logCacheReq(hit: boolean, url: URL) {
 }
 
 export function cacheResponse<T>(url: string, userId: string, response: T): void {
-    if (!ENABLE_CACHING) return;
+    if (!doCache) return;
 
     cacheLastUsed[userId] = nowUtc(false);
     if (!(userId in cache)) {
@@ -53,7 +56,7 @@ export function cacheResponse<T>(url: string, userId: string, response: T): void
 }
 
 export function getCachedResponse<T>(url: string, userId: string): T | undefined {
-    if (!ENABLE_CACHING) return;
+    if (!doCache) return;
 
     cacheLastUsed[userId] = nowUtc();
     const userCache = cache[userId] || {};
@@ -66,14 +69,14 @@ export function getCachedResponse<T>(url: string, userId: string): T | undefined
 }
 
 export function invalidateCache(userId: string): void {
-    if (!ENABLE_CACHING) return;
+    if (!doCache) return;
 
     delete cache[userId];
     delete cacheLastUsed[userId];
 }
 
 export function cleanupCache(): number {
-    if (!ENABLE_CACHING) return 0;
+    if (!doCache) return 0;
 
     const now = nowUtc();
     const cacheSize = roughSizeOfObject(cache);
