@@ -22,9 +22,27 @@
             <div class="right" />
         </div>
         <ul>
-            {#each { length: 17 } as _}
-                <li />
-            {/each}
+            <!-- <li /> x17 -->
+            <li />
+            <li />
+            <li />
+            <li />
+            <li />
+
+            <li />
+            <li />
+            <li />
+            <li />
+            <li />
+
+            <li />
+            <li />
+            <li />
+            <li />
+            <li />
+
+            <li />
+            <li />
         </ul>
     </div>
 </div>

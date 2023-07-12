@@ -55,7 +55,7 @@ export namespace ghAPI {
         }
 
         if ('error' in accessTokenData && accessTokenData.error) {
-            return Result.err(accessTokenData.error.toString());
+            return Result.err(JSON.stringify(accessTokenData.error));
         }
         if (
             !('token_type' in accessTokenData) ||
@@ -131,7 +131,7 @@ export namespace ghAPI {
         }
 
         if ('error' in data && data.error) {
-            return Result.err(data.error.toString());
+            return Result.err(JSON.stringify(data.error));
         }
 
         return Result.ok(data);

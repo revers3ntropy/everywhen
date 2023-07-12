@@ -1,6 +1,6 @@
 <script lang="ts">
     import { ANIMATION_DURATION } from '$lib/constants';
-    import { notifications, removeNotification } from '$lib/components/notifications/notifications';
+    import { notifications, NotificationType, removeNotification } from '$lib/components/notifications/notifications';
     import { fly } from 'svelte/transition';
     import Close from 'svelte-material-icons/Close.svelte';
     import ExclamationThick from 'svelte-material-icons/ExclamationThick.svelte';
@@ -22,9 +22,9 @@
             }}
         >
             <span class="icon">
-                {#if notif.type === 'error'}
+                {#if notif.type === NotificationType.ERROR}
                     <ExclamationThick />
-                {:else if notif.type === 'info'}
+                {:else if notif.type === NotificationType.INFO}
                     <span class="info-symbol">i</span>
                 {:else}
                     <CheckThick />

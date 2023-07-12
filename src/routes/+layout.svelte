@@ -1,5 +1,6 @@
 <script lang="ts">
     import '../app.less';
+    import { browser } from '$app/environment';
     import type { PageData } from './$types';
     import { onMount } from 'svelte';
     import { navigating } from '$app/stores';
@@ -41,13 +42,16 @@
 
     let root: HTMLDivElement;
 
-    $: if ($navigating) {
-        // when the page changes, close the popup
-        // and scroll to the top
-        popup.set(null);
-        if (root) {
-            root.scrollTop = 0;
-        }
+    if (browser) {
+        navigating.subscribe(navigating => {
+            if (!navigating) return;
+            // when the page changes, close the popup
+            // and scroll to the top
+            popup.set(null);
+            if (root) {
+                root.scrollTop = 0;
+            }
+        });
     }
 </script>
 
