@@ -88,7 +88,7 @@
             batchSize={4}
             numItems={data.assetCount}
             loadItems={loadMoreAssets}
-            margin={500}
+            margin={1000}
         >
             <div class="assets">
                 {#each data.assets as asset}

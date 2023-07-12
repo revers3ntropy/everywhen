@@ -180,7 +180,7 @@
         <div>
             <i>'{event.name}' has been deleted</i>
         </div>
-        <button class="with-icon bordered" on:click={restoreEvent}>
+        <button class="with-icon bordered" on:click={restoreEvent} aria-label="Restore Event">
             <Restore />
             Undo Deletion
         </button>
@@ -222,6 +222,7 @@
                         class="editable-text event-name-inp"
                         on:change={updateName}
                         placeholder="Event Name"
+                        aria-label="Event Name"
                         value={event.name}
                     />
                 {/if}
@@ -236,6 +237,7 @@
                                 content: expanded ? 'Collapse' : 'Expand',
                                 position: 'left'
                             }}
+                            aria-label="Toggle event info"
                         >
                             {#if expanded}
                                 <ChevronUp size="30" />
