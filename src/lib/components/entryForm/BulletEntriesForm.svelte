@@ -58,7 +58,6 @@
         const newEntry = {
             ...body,
             id: res.id,
-            decrypted: true,
             flags: Entry.Flags.NONE
         } as Mutable<Entry>;
 

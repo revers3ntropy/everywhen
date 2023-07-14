@@ -126,7 +126,6 @@
             ...body,
             id: res.id,
             flags: 0,
-            decrypted: true
         } as Mutable<Entry>;
 
         if (body.label && labels) {

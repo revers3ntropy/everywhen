@@ -60,7 +60,7 @@
                         <ChevronUp size="25" />
                     {/if}
 
-                    <UtcTime fmt="ddd, Do MMMM YYYY" noTooltip timestamp={day} />
+                    <UtcTime fmt="ddd, Do MMMM YYYY" noTooltip timestamp={day} tzOffset={0} />
 
                     <Dot light marginX={10} />
 
@@ -70,7 +70,7 @@
                         {:else if utcEq(nowUtc() - 60 * 60 * 24, day, currentTzOffset(), 0, 'YYYY-MM-DD')}
                             <span>Yesterday</span>
                         {:else}
-                            <UtcTime relative timestamp={day} />
+                            <UtcTime relative timestamp={day} tzOffset={0} />
                         {/if}
                     </span>
 
