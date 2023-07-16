@@ -1,5 +1,5 @@
 import { capitalise } from '$lib/utils/text';
-import { currentTzOffset, dayUtcFromTimestamp, fmtUtc, nowUtc } from '$lib/utils/time';
+import { dayUtcFromTimestamp, fmtUtc, nowUtc } from '$lib/utils/time';
 import { type OsGroup, osGroupFromEntry, osGroups } from '$lib/utils/userAgent';
 import moment from 'moment/moment';
 import { Bucket, By, type EntryWithWordCount } from './helpers';
@@ -16,15 +16,15 @@ export interface ChartData {
 }
 
 const generateLabelsDayAndWeek = (start: TimestampSecs, buckets: string[]): string[] => {
-    let year = parseInt(fmtUtc(start, currentTzOffset(), 'YYYY'));
+    let year = parseInt(fmtUtc(start, 0, 'YYYY'));
     return buckets.map(bucket => {
         const bucketTime = parseInt(bucket);
-        const thisYear = parseInt(fmtUtc(bucketTime, currentTzOffset(), 'YYYY'));
+        const thisYear = parseInt(fmtUtc(bucketTime, 0, 'YYYY'));
         if (thisYear !== year) {
             year = thisYear;
-            return fmtUtc(bucketTime, currentTzOffset(), 'Do MMM YYYY');
+            return fmtUtc(bucketTime, 0, 'Do MMM YYYY');
         }
-        return fmtUtc(bucketTime, currentTzOffset(), 'Do MMM');
+        return fmtUtc(bucketTime,0, 'Do MMM');
     });
 };
 
@@ -40,25 +40,25 @@ const generateLabels: Record<
                 const hour = i % 24;
                 const day = Math.floor(i / 24);
                 const date = today + day * 24 * 60 * 60;
-                return fmtUtc(date + hour * 60 * 60, currentTzOffset(), 'ha');
+                return fmtUtc(date + hour * 60 * 60, 0, 'ha');
             });
     },
     [Bucket.Day]: generateLabelsDayAndWeek,
     [Bucket.Week]: generateLabelsDayAndWeek,
     [Bucket.Month]: (start: TimestampSecs, buckets: string[]): string[] => {
-        let year = parseInt(fmtUtc(start, currentTzOffset(), 'YY'));
+        let year = parseInt(fmtUtc(start, 0, 'YY'));
         return buckets.map((bucket, i) => {
             const bucketTime = parseInt(bucket);
-            const thisYear = parseInt(fmtUtc(bucketTime, currentTzOffset(), 'YY'));
+            const thisYear = parseInt(fmtUtc(bucketTime, 0, 'YY'));
             if (thisYear !== year || i === 0) {
                 year = thisYear;
-                return fmtUtc(bucketTime, currentTzOffset(), `MMM 'YY`);
+                return fmtUtc(bucketTime, 0, `MMM 'YY`);
             }
-            return fmtUtc(bucketTime, currentTzOffset(), 'MMM');
+            return fmtUtc(bucketTime, 0, 'MMM');
         });
     },
     [Bucket.Year]: (_start: TimestampSecs, buckets: string[]): string[] => {
-        return buckets.map(k => fmtUtc(parseInt(k), currentTzOffset(), 'YYYY'));
+        return buckets.map(k => fmtUtc(parseInt(k), 0, 'YYYY'));
     },
     [Bucket.OperatingSystem]: () => osGroups.map(capitalise)
 };

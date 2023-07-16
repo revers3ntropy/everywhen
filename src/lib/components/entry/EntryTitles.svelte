@@ -7,7 +7,7 @@
     import { Entry } from '$lib/controllers/entry/entry.client';
     import { showPopup } from '$lib/utils/popups';
     import { obfuscate } from '$lib/utils/text';
-    import { fmtUtc, nowUtc, utcEq } from '$lib/utils/time';
+    import { currentTzOffset, fmtUtc, nowUtc, utcEq } from '$lib/utils/time';
     import EntryDialog from '$lib/components/dialogs/EntryDialog.svelte';
     import Dot from '../Dot.svelte';
     import UtcTime from '../UtcTime.svelte';
@@ -82,16 +82,16 @@
         {#each sortedTitles as [day, date]}
             <div class="day">
                 <h2>
-                    <UtcTime timestamp={day} fmt="dddd DD/MM/YY" noTooltip={true} />
+                    <UtcTime timestamp={day} fmt="dddd DD/MM/YY" noTooltip={true} tzOffset={0} />
                     {#if showTimeAgo}
                         <Dot />
                         <span class="text-light">
-                            {#if utcEq(nowUtc(), day)}
+                            {#if utcEq(nowUtc(), day, currentTzOffset(), 0, 'YYYY-MM-DD')}
                                 <span>Today</span>
-                            {:else if utcEq(nowUtc() - 60 * 60 * 24, day)}
+                            {:else if utcEq(nowUtc() - 60 * 60 * 24, day, currentTzOffset(), 0, 'YYYY-MM-DD')}
                                 <span>Yesterday</span>
                             {:else}
-                                <UtcTime relative timestamp={day} noTooltip={true} />
+                                <UtcTime relative timestamp={day} noTooltip={true} tzOffset={0} />
                             {/if}
                         </span>
                     {/if}
