@@ -116,6 +116,10 @@ namespace EntryUtils {
             entry: stringToShortTitle(entry.entry)
         };
     }
+
+    export function localTime(entry: { created: TimestampSecs, createdTZOffset: Hours }): TimestampSecs {
+        return entry.created + entry.createdTZOffset * 60 * 60;
+    }
 }
 
 export const Entry = EntryUtils;

@@ -3,6 +3,7 @@ import { dayUtcFromTimestamp, fmtUtc, nowUtc } from '$lib/utils/time';
 import { type OsGroup, osGroupFromEntry, osGroups } from '$lib/utils/userAgent';
 import moment from 'moment/moment';
 import { Bucket, By, type EntryWithWordCount } from './helpers';
+import { Entry } from "$lib/controllers/entry/entry.client";
 
 export interface ChartData {
     datasets: {
@@ -33,15 +34,9 @@ const generateLabels: Record<
     (start: TimestampSecs, buckets: string[], selectedBucket: Bucket) => string[]
 > = {
     [Bucket.Hour]: (): string[] => {
-        const today = moment().startOf('day').unix();
         return Array(24)
             .fill(0)
-            .map((_, i) => {
-                const hour = i % 24;
-                const day = Math.floor(i / 24);
-                const date = today + day * 24 * 60 * 60;
-                return fmtUtc(date + hour * 60 * 60, 0, 'ha');
-            });
+            .map((_, i) => fmtUtc((i % 24) * 60 * 60, 0, 'ha'));
     },
     [Bucket.Day]: generateLabelsDayAndWeek,
     [Bucket.Week]: generateLabelsDayAndWeek,
@@ -96,7 +91,7 @@ function datasetFactoryForStandardBuckets(
     }
 
     return (sortedEntries: EntryWithWordCount[], by: By): Record<string | number, number> => {
-        const start = sortedEntries[0].created + sortedEntries[0].createdTZOffset * 60 * 60;
+        const start = Entry.localTime(sortedEntries[0]);
 
         const buckets: Record<string, number> = {};
         const end = nowUtc() + bucketSize(selectedBucket);
@@ -108,7 +103,7 @@ function datasetFactoryForStandardBuckets(
         }
 
         for (const entry of sortedEntries) {
-            const bucket = bucketiseTime(entry.created, selectedBucket).toString();
+            const bucket = bucketiseTime(Entry.localTime(entry), selectedBucket).toString();
             buckets[bucket] += by === By.Entries ? 1 : entry.wordCount;
         }
 

@@ -1,4 +1,6 @@
 import moment from 'moment';
+import { PUBLIC_ENV } from "$env/static/public";
+import { DEV_USE_TZ_OFFSET_0 } from "$lib/constants";
 
 /**
  * Get the UTC timestamp of now in seconds
@@ -10,6 +12,7 @@ export function nowUtc(rounded = true): TimestampSecs {
 }
 
 export function currentTzOffset(): Hours {
+    if (PUBLIC_ENV === 'dev' && DEV_USE_TZ_OFFSET_0) return 0;
     return -(new Date().getTimezoneOffset() / 60);
 }
 

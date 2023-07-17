@@ -7,7 +7,7 @@ import type { apiRes404, GenericResponse } from './apiResponse.server';
 import { serializeGETArgs } from './GETArgs';
 import { clientLogger } from './log';
 import { Result } from './result';
-import { nowUtc } from './time';
+import { currentTzOffset, nowUtc } from './time';
 
 export type ReqBody = {
     timezoneUtcOffset?: number;
@@ -105,7 +105,7 @@ export async function makeApiReq<
 
         // supply default timezone to all requests
         if (browser) {
-            body.timezoneUtcOffset ??= -(new Date().getTimezoneOffset() / 60);
+            body.timezoneUtcOffset ??= currentTzOffset();
         }
         body.utcTimeS ??= nowUtc();
     }

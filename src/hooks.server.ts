@@ -14,20 +14,26 @@ const reqLogger = new FileLogger('REQ', chalk.bgWhite.black);
 // keep connection to database alive
 // so it's not re-connected on API request
 setInterval(() => {
-    if (!dbConnection) {
-        void connect();
-        return;
+    try {
+        cleanupCache();
+        if (!dbConnection) {
+            void connect();
+            return;
+        }
+        void dbConnection?.ping().catch(errorLogger.error);
+    } catch (e) {
+        void errorLogger.log('Failed to ping db', e);
     }
-    void dbConnection?.ping();
 }, 1000 * 60);
 
-setInterval(cleanupCache, 1000 * 60);
+setInterval(() => {
+    try {
+        cleanupCache();
+    } catch (e) {
+        void errorLogger.log('Failed to cleanup cache', e);
+    }
+}, 1000 * 60);
 
-function exitHandler(...args: unknown[]) {
-    void errorLogger.log(`Exited!`, ...args).then(() => {
-        process.exit();
-    });
-}
 
 process.on('exit', exitHandler);
 process.on('SIGINT', exitHandler);
@@ -35,6 +41,12 @@ process.on('SIGTERM', exitHandler);
 process.on('SIGUSR1', exitHandler);
 process.on('SIGUSR2', exitHandler);
 process.on('uncaughtException', exitHandler);
+
+function exitHandler(...args: unknown[]) {
+    void errorLogger.log(`Exited!`, ...args).then(() => {
+        process.exit();
+    });
+}
 
 function getIp(req: RequestEvent): string {
     let ip = '';

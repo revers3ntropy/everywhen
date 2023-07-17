@@ -8,8 +8,6 @@ import { FileLogger } from '../utils/log.server';
 export type QueryResult =
     | mysql.RowDataPacket[][]
     | mysql.RowDataPacket[]
-    | mysql.OkPacket
-    | mysql.OkPacket[]
     | mysql.ResultSetHeader
     | Record<string, unknown>[]
     | object[];
@@ -21,6 +19,7 @@ export let dbConnection: mysql.Connection | null = null;
 export async function connect() {
     const config = getConfig();
     dbConnection = await mysql.createConnection(config).catch((e: unknown) => {
+        dbConnection = null;
         void dbLogger.log(`Error connecting to mysql db '${config.database || '?'}'`);
         void dbLogger.log(e);
         throw e;
