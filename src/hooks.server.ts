@@ -20,7 +20,7 @@ setInterval(() => {
             void connect();
             return;
         }
-        void dbConnection?.ping().catch(errorLogger.error);
+        void dbConnection?.ping().catch((e) => errorLogger.error(e));
     } catch (e) {
         void errorLogger.log('Failed to ping db', e);
     }
