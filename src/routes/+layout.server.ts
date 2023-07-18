@@ -7,7 +7,9 @@ export const prerender = false;
 export const ssr = true;
 export const csr = true;
 
-export const load = (async ({ locals }) => {
+export const load = (async ({ locals, parent }) => {
+    await parent();
+
     if (locals.auth && !locals.settings) {
         const { err: settingsErr, val: settings } = await Settings.allAsMap(query, locals.auth);
         if (settingsErr) throw error(500, settingsErr);

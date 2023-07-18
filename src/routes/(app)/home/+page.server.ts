@@ -30,13 +30,16 @@ function entriesYearsAgoToday(entries: Entry[]): Record<string, Entry[]> {
     return res;
 }
 
-export const load = cachedPageRoute(async (auth, {locals}) => {
+export const load = cachedPageRoute(async (auth, {parent, locals}) => {
     const { val: titles, err } = await Entry.getTitles(query, auth);
     if (err) throw error(400, err);
 
     const firstNTitles = Entry.groupEntriesByDay<Entry>(
         titles.sort((a, b) => b.created - a.created).slice(0, NUMBER_OF_RECENT_TITLES)
     );
+
+    // settings set by root layout
+    await parent();
 
     const settings = locals.settings;
     if (!settings) throw error(400, 'Settings not found');

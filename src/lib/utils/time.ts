@@ -13,10 +13,7 @@ export function nowUtc(rounded = true): TimestampSecs {
 }
 
 export function currentTzOffset(): Hours {
-    if (!browser) {
-        console.trace('currentTzOffset() should only be called in the browser');
-        return 0;
-    }
+    if (!browser) return 0;
     if (PUBLIC_ENV === 'dev' && DEV_USE_TZ_OFFSET_0) return 0;
     return -(new Date().getTimezoneOffset() / 60);
 }
