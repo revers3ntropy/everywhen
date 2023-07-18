@@ -13,18 +13,17 @@
     export let auth: Auth;
     export let show = true;
     export let passcode: string;
-
     export let showingForgotPassword = false;
 
     let input: string;
     let passwordInput: string;
-
+    let lastYScroll = 0;
+    let scrollElement: Element | undefined;
     let loaded = false;
     onMount(() => {
         loaded = true;
+        scrollElement = document.getElementsByClassName('root')[0];
     });
-
-    let lastYScroll = 0;
 
     $: if (browser) {
         let valid = (input || '') === passcode;
@@ -37,14 +36,15 @@
             passcodeLastEntered.set(nowUtc());
             show = false;
             setTimeout(() => {
-                window.scrollTo(0, lastYScroll);
+                if (!scrollElement) return;
+                scrollElement.scrollTop = lastYScroll;
                 lastYScroll = 0;
             }, 0);
         }
     }
 
     $: if (show && !lastYScroll && browser) {
-        lastYScroll = window.scrollY;
+        lastYScroll = scrollElement?.scrollTop || 0;
     }
 </script>
 
