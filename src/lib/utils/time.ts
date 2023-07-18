@@ -1,6 +1,7 @@
 import moment from 'moment';
 import { PUBLIC_ENV } from "$env/static/public";
 import { DEV_USE_TZ_OFFSET_0 } from "$lib/constants";
+import { browser } from "$app/environment";
 
 /**
  * Get the UTC timestamp of now in seconds
@@ -12,6 +13,10 @@ export function nowUtc(rounded = true): TimestampSecs {
 }
 
 export function currentTzOffset(): Hours {
+    if (!browser) {
+        console.trace('currentTzOffset() should only be called in the browser');
+        return 0;
+    }
     if (PUBLIC_ENV === 'dev' && DEV_USE_TZ_OFFSET_0) return 0;
     return -(new Date().getTimezoneOffset() / 60);
 }
@@ -28,7 +33,7 @@ export function fmtDuration(time: Seconds): string {
 
 export function fmtTimestampForInput(
     timestamp: TimestampSecs,
-    timezoneOffset: Hours = currentTzOffset(),
+    timezoneOffset: Hours,
     roundToMinute = true
 ): string {
     if (roundToMinute) {
@@ -44,7 +49,7 @@ export function parseTimestampFromInputUtc(timestamp: string): TimestampSecs {
 
 export function dayUtcFromTimestamp(
     timestamp: TimestampSecs,
-    tzOffset: Hours = currentTzOffset()
+    tzOffset: Hours
 ): TimestampSecs {
     const day = fmtUtc(timestamp, tzOffset, 'YYYY-MM-DD');
     return new Date(`${day}T12:00:00Z`).getTime() / 1000;
@@ -53,9 +58,9 @@ export function dayUtcFromTimestamp(
 export function utcEq(
     a: TimestampSecs,
     b: TimestampSecs,
-    aTzOffset: Hours = currentTzOffset(),
-    bTzOffset: Hours = currentTzOffset(),
-    fmt = 'YYYY-MM-DD'
+    aTzOffset: Hours,
+    bTzOffset: Hours,
+    fmt: string
 ): boolean {
     return fmtUtc(a, aTzOffset, fmt) === fmtUtc(b, bTzOffset, fmt);
 }
@@ -64,9 +69,9 @@ export function utcEq(
  * Get the number of days since the given timestamp
  * Always returns at least 1
  */
-export function daysSince(timestamp: TimestampSecs): number {
-    const today = dayUtcFromTimestamp(nowUtc());
-    const then = dayUtcFromTimestamp(timestamp);
+export function daysSince(timestamp: TimestampSecs, tzOffset: Hours): number {
+    const today = dayUtcFromTimestamp(nowUtc(), tzOffset);
+    const then = dayUtcFromTimestamp(timestamp, tzOffset);
     if (then > today) {
         return 1;
     }

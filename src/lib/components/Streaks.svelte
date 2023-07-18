@@ -40,6 +40,7 @@
         loaded = false;
 
         const { err, val } = await api.get(auth, '/entries/streaks', {
+            tz: currentTzOffset(),
             // cache busting - otherwise streaks are static through day changes
             x: fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD')
         });

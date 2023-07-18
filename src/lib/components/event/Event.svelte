@@ -17,7 +17,7 @@
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import { obfuscate } from '$lib/utils/text';
-    import { fmtDuration, fmtTimestampForInput, parseTimestampFromInputUtc } from '$lib/utils/time';
+    import { currentTzOffset, fmtDuration, fmtTimestampForInput, parseTimestampFromInputUtc } from '$lib/utils/time';
     import { slide, fly } from 'svelte/transition';
 
     export let auth: Auth;
@@ -282,7 +282,7 @@
                             on:change={updateStartAndEnd}
                             placeholder="Start"
                             type="datetime-local"
-                            value={fmtTimestampForInput(event.start)}
+                            value={fmtTimestampForInput(event.start, currentTzOffset())}
                         />
                     {:else}
                         <input
@@ -290,7 +290,7 @@
                             on:change={updateStart}
                             placeholder="Start"
                             type="datetime-local"
-                            value={fmtTimestampForInput(event.start)}
+                            value={fmtTimestampForInput(event.start, currentTzOffset())}
                         />
                         to
                         <input
@@ -298,7 +298,7 @@
                             on:change={updateEnd}
                             placeholder="End"
                             type="datetime-local"
-                            value={fmtTimestampForInput(event.end)}
+                            value={fmtTimestampForInput(event.end, currentTzOffset())}
                         />
                         <i>
                             ({fmtDuration(event.end - event.start)})

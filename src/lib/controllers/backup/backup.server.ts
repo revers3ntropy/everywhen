@@ -6,7 +6,7 @@ import type { QueryFunc } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/security/encryption.server';
 import { download as downloadFile } from '../../utils/files.client';
 import { Result } from '$lib/utils/result';
-import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
+import { fmtUtc, nowUtc } from '$lib/utils/time';
 import { Entry } from '../entry/entry';
 import { Event } from '../event/event';
 import { Label } from '../label/label';
@@ -273,7 +273,7 @@ namespace BackupUtils {
     }
 
     export function download(data: string, username: string, encrypted: boolean): void {
-        const dateFmt = fmtUtc(nowUtc(), currentTzOffset(), 'yyyyMMDD-HHmm');
+        const dateFmt = fmtUtc(nowUtc(), 0, 'yyyyMMDD-HHmm');
         const encryptedExt = encrypted ? '.encrypted' : '';
         downloadFile(`${dateFmt}-${username}.backup${encryptedExt}.json`, data);
     }

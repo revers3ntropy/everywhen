@@ -1,7 +1,7 @@
 import type { QueryFunc } from '$lib/db/mysql.server';
 import { decrypt, encrypt, encryptMulti } from '$lib/security/encryption.server';
 import { Result } from '$lib/utils/result';
-import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
+import { fmtUtc, nowUtc } from '$lib/utils/time';
 import { Label } from '../label/label';
 import { Location } from '../location/location';
 import type { Auth } from '../user/user';
@@ -515,7 +515,7 @@ namespace EntryUtils {
         return Result.ok(null);
     }
 
-    export async function getStreaks(query: QueryFunc, auth: Auth): Promise<Result<Streaks>> {
+    export async function getStreaks(query: QueryFunc, auth: Auth, clientTzOffset: Hours): Promise<Result<Streaks>> {
         const entries = await query<{ created: number; createdTZOffset: number }[]>`
             SELECT created, createdTZOffset
             FROM entries
@@ -532,8 +532,8 @@ namespace EntryUtils {
             });
         }
 
-        const today = fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD');
-        const yesterday = fmtUtc(nowUtc() - 86400, currentTzOffset(), 'YYYY-MM-DD');
+        const today = fmtUtc(nowUtc(), clientTzOffset, 'YYYY-MM-DD');
+        const yesterday = fmtUtc(nowUtc() - 86400, clientTzOffset, 'YYYY-MM-DD');
 
         let current = 0;
 

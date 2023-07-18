@@ -1,6 +1,5 @@
 import { Entry } from '$lib/controllers/entry/entry';
-import { Settings } from '$lib/controllers/settings/settings';
-import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
+import { fmtUtc, nowUtc } from '$lib/utils/time';
 import { error } from '@sveltejs/kit';
 import { query } from '$lib/db/mysql.server';
 import { cachedPageRoute } from '$lib/utils/cache.server';
@@ -10,8 +9,9 @@ const NUMBER_OF_RECENT_TITLES = 6;
 
 function entriesYearsAgoToday(entries: Entry[]): Record<string, Entry[]> {
     const res: Record<string, Entry[]> = {};
-    const nowDate = fmtUtc(nowUtc(), currentTzOffset(), 'MM-DD');
-    const nowYear = fmtUtc(nowUtc(), currentTzOffset(), 'YYYY');
+    // TODO use client time zone
+    const nowDate = fmtUtc(nowUtc(), 0, 'MM-DD');
+    const nowYear = fmtUtc(nowUtc(), 0, 'YYYY');
 
     for (const entry of entries) {
         const entryDate = fmtUtc(entry.created, entry.createdTZOffset, 'MM-DD');
@@ -30,7 +30,7 @@ function entriesYearsAgoToday(entries: Entry[]): Record<string, Entry[]> {
     return res;
 }
 
-export const load = cachedPageRoute(async auth => {
+export const load = cachedPageRoute(async (auth, {locals}) => {
     const { val: titles, err } = await Entry.getTitles(query, auth);
     if (err) throw error(400, err);
 
@@ -38,14 +38,11 @@ export const load = cachedPageRoute(async auth => {
         titles.sort((a, b) => b.created - a.created).slice(0, NUMBER_OF_RECENT_TITLES)
     );
 
+    const settings = locals.settings;
+    if (!settings) throw error(400, 'Settings not found');
+
     let nYearsAgo = {} as Record<string, Entry[]>;
-    const { err: showSettingErr, val: shouldShow } = await Settings.getValue(
-        query,
-        auth,
-        'showNYearsAgoEntryTitles'
-    );
-    if (showSettingErr) throw error(400, showSettingErr);
-    if (shouldShow) {
+    if (settings.showNYearsAgoEntryTitles.value) {
         nYearsAgo = entriesYearsAgoToday(titles);
     }
 
