@@ -15,7 +15,8 @@ export const STORE_KEY = {
     key: `${KEY_PREFIX}key`,
     username: `${KEY_PREFIX}username`,
     obfuscated: `${KEY_PREFIX}obfuscated`,
-    lastTipNumber: `${KEY_PREFIX}last_tip_number`
+    lastTipNumber: `${KEY_PREFIX}last_tip_number`,
+    doesNotWantToEnableLocation: `${KEY_PREFIX}does_not_want_to_enable_location`
 } as const;
 
 export const SESSION_KEYS = {
@@ -39,7 +40,8 @@ export const LS_TO_CLEAR_ON_LOGOUT = Object.freeze([
     STORE_KEY.passcodeLastEntered,
     STORE_KEY.enabledLocation,
     STORE_KEY.sortEventsKey,
-    STORE_KEY.obfuscated
+    STORE_KEY.obfuscated,
+    STORE_KEY.doesNotWantToEnableLocation
 ]);
 
 export const COOKIES_TO_CLEAR_ON_LOGOUT = Object.freeze([]);
