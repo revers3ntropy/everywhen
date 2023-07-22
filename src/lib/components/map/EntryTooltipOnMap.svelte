@@ -4,7 +4,9 @@
     import type { Entry } from '$lib/controllers/entry/entry';
     import type { Auth } from '$lib/controllers/user/user';
     import { api, apiPath } from '$lib/utils/apiRequest';
+    import { obfuscated } from "$lib/stores";
     import UtcTime from '../UtcTime.svelte';
+    import { obfuscate } from "$lib/utils/text.js";
 
     export let id: string;
     export let auth: Auth;
@@ -28,15 +30,23 @@
 <div class="wrapper">
     {#if entry}
         <div class="datetime">
-            <UtcTime timestamp={entry.created} fmt="ddd Do MMMM YYYY, h:mm a" noTooltip={true} />
+            <UtcTime timestamp={entry.created} fmt="ddd Do MMMM YYYY, h:mm a" noTooltip={true} tzOffset={entry.createdTZOffset} />
             <Dot />
-            <UtcTime timestamp={entry.created} relative={true} noTooltip={true} />
+            <UtcTime timestamp={entry.created} relative={true} noTooltip={true} tzOffset={entry.createdTZOffset} />
         </div>
-        {#if entry.title}
-            <h1 class="ellipsis">{entry.title}</h1>
+        {#if !$obfuscated}
+            {#if entry.title}
+                <h1 class="ellipsis">{entry.title}</h1>
+            {/if}
+            <p>{entry.entry}</p>
+        {:else}
+            {#if entry.title}
+                <h1 class="ellipsis obfuscated">{obfuscate(entry.title)}</h1>
+            {/if}
+            <p class="obfuscated">{obfuscate(entry.entry)}</p>
         {/if}
-        <p>{entry.entry}</p>
     {:else if error}
+        <h1 class="text-warning">Error</h1>
         <p>{error}</p>
     {:else}
         <p>Loading...</p>
