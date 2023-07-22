@@ -84,41 +84,33 @@
     </section>
 
     <section>
-        <BulletEntriesForm
-            showLocationToggle={false}
-            submitIsPrimaryButton={false}
-            setEntryFormMode={null}
-            auth={data.auth}
-            obfuscated={$obfuscated}
-        />
+        <div class="container">
+            <BulletEntriesForm
+                auth={data.auth}
+                obfuscated={$obfuscated}
+                showLocationToggle={false}
+                submitIsPrimaryButton={false}
+                setEntryFormMode={null}
+            />
+            <div style="margin: 1rem">
+                {#if Object.keys(data.recentTitles).length}
+                    <EntryTitles
+                        auth={data.auth}
+                        titles={data.recentTitles}
+                        obfuscated={$obfuscated}
+                        hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
+                        hideBlurToggle
+                    />
+                {:else}
+                    <p class="recent-entries-text">
+                        No recent entries
+                    </p>
+                {/if}
+            </div>
+        </div>
     </section>
 
-    <div style="width: 100%; max-width: 800px;">
-        {#if Object.keys(data.recentTitles).length}
-            <section>
-                <h1 class="flex-center" style="justify-content: start; gap: 8px;">
-                    <History size="25" />
-                    Recent Entries
-                </h1>
-                <EntryTitles
-                    auth={data.auth}
-                    titles={data.recentTitles}
-                    obfuscated={$obfuscated}
-                    hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
-                />
-            </section>
-        {:else}
-            <section>
-                <h1 class="recent-entries"> Recent Entries </h1>
-                <p class="recent-entries-text">
-                    Doesn't look like you have any entries yet, why not <a
-                        href="/journal?obfuscate=0"
-                    >
-                        write one</a
-                    >?
-                </p>
-            </section>
-        {/if}
+    <div>
         {#key [data.pinnedEntriesList, showingAllPinned]}
             {#if Object.keys(pinnedEntries).length}
                 <section>

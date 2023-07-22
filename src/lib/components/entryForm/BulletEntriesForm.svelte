@@ -95,25 +95,27 @@
 </script>
 
 <div class="wrapper">
-    <div class="flex-center" style="justify-content: start; width: 100%; gap: 3px;">
-        {#if setEntryFormMode}
-            <button
-                aria-label="Switch to bullet journaling"
-                class="with-circled-icon"
-                on:click={() => setEntryFormMode?.(EntryFormMode.Standard)}
-                style="margin: 0"
-                use:tooltip={{
-                    position: 'right',
-                    content: 'Switch to normal journaling'
-                }}
-            >
-                <TextBoxOutline size="30" />
-            </button>
-        {/if}
-        {#if showLocationToggle}
-            <LocationToggle tooltipPosition="right" />
-        {/if}
-    </div>
+    {#if setEntryFormMode || showLocationToggle}
+        <div class="flex-center" style="justify-content: start; width: 100%; gap: 3px; margin: 0 0 1rem 0">
+            {#if setEntryFormMode}
+                <button
+                    aria-label="Switch to bullet journaling"
+                    class="with-circled-icon"
+                    on:click={() => setEntryFormMode?.(EntryFormMode.Standard)}
+                    style="margin: 0"
+                    use:tooltip={{
+                        position: 'right',
+                        content: 'Switch to normal journaling'
+                    }}
+                >
+                    <TextBoxOutline size="30" />
+                </button>
+            {/if}
+            {#if showLocationToggle}
+                <LocationToggle tooltipPosition="right" />
+            {/if}
+        </div>
+    {/if}
     <div class="line">
         <div class="entry-input">
             <LabelSelect {labels} {auth} condensed bind:value={label} />
@@ -149,7 +151,7 @@
             width: 100%;
             display: grid;
             grid-template-columns: 1fr auto;
-            margin: 1rem 0;
+            margin: 0;
 
             @media @mobile {
                 gap: 0.5rem;
