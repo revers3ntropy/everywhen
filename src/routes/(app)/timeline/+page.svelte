@@ -16,7 +16,6 @@
     import TimeMarkers from './TimeMarkers.svelte';
     import { addYToEvents, type EventWithYLevel, getInitialZoomAndPos } from './utils';
     import type { PageData } from './$types';
-    import { renderable } from "$lib/components/canvas/renderable";
 
     export let data: PageData;
 

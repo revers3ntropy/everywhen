@@ -10,7 +10,6 @@
     import Bin from 'svelte-material-icons/Delete.svelte';
     import Heart from 'svelte-material-icons/Heart.svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
-    import History from 'svelte-material-icons/History.svelte';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
     import { Entry } from '$lib/controllers/entry/entry.client';
     import { obfuscated } from '$lib/stores.js';
