@@ -82,13 +82,13 @@
         </section>
 
         <section class="charts">
-            <div class="container" style="margin: 0;">
+            <div class="container" style="margin: 0; padding: 1rem;">
                 <EntryHeatMap {by} entries={data.entries} />
             </div>
             {#if data.entryCount > 4}
                 <div
                     class="container"
-                    style="margin: 1rem 0;"
+                    style="margin: 1rem 0; padding: 1rem;"
                     in:fade={{
                         // stop weird animation when changing buckets
                         duration: ANIMATION_DURATION,
@@ -168,21 +168,6 @@
 
         @media @mobile {
             padding: 0;
-        }
-
-        .entry-bar-chart-wrapper {
-            padding: 5rem 0;
-        }
-    }
-
-    .container {
-        padding: 1em;
-        margin: 1em;
-
-        @media @mobile {
-            padding: 0 0.6rem;
-            margin: 1em 0;
-            border: none;
         }
     }
 </style>
