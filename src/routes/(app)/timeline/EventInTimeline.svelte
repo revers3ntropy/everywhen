@@ -134,8 +134,9 @@
                 if (!this.dragging) return;
                 this.whenDragReleased(state);
             });
-            state.listen('touchend', () => {
+            state.listen('touchend', event => {
                 if (!this.dragging) return;
+                event.preventDefault();
                 this.whenDragReleased(state);
             });
         },

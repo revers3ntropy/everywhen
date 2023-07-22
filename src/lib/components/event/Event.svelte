@@ -141,7 +141,7 @@
         });
     }
 
-    function selectIfSelected(selectNameId: string, eventId: string) {
+    function selectIfSelected(selectNameId: string, eventId: string): undefined {
         if (selectNameId !== eventId) return;
         obfuscated = false;
         if (nameInput) {
@@ -172,7 +172,7 @@
         event.deleted = true;
     });
 
-    $: selectIfSelected(selectNameId, event.id), obfuscated || nameInput;
+    $: [ selectIfSelected(selectNameId, event.id), obfuscated, nameInput ];
 </script>
 
 {#if event.deleted}
