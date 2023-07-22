@@ -2,12 +2,10 @@ import { browser } from '$app/environment';
 import { theme } from '$lib/stores';
 import { writable } from 'svelte/store';
 import { clientLogger } from '$lib/utils/log';
-import { nowUtc } from '$lib/utils/time';
+import { currentTzOffset, nowUtc } from '$lib/utils/time';
 import type { Interactable } from './interactable';
 
 export const START_ZOOM = 1 / (60 * 60);
-
-const tzOffset: Seconds = new Date().getTimezoneOffset() * 60;
 
 interface Colors {
     primary: string;
@@ -342,7 +340,7 @@ export class CanvasState implements CanvasListeners {
     }
 
     public timeToX(t: TimestampSecs): number {
-        t -= tzOffset;
+        t -= currentTzOffset();
         t = nowUtc(false) - t + this.cameraOffset;
         t = this.zoomScaledPosition(t, this.zoom, this.cameraOffset);
         return this.width - t;
@@ -363,7 +361,7 @@ export class CanvasState implements CanvasListeners {
     public xToTime(pos: number): TimestampSecs {
         pos = this.width - pos;
         pos = this.zoomScaledPosition(pos, 1 / this.zoom, this.cameraOffset);
-        return nowUtc(false) - pos + this.cameraOffset + tzOffset;
+        return nowUtc(false) - pos + this.cameraOffset + currentTzOffset();
     }
 
     public zoomOnCenter(deltaZoom: number) {

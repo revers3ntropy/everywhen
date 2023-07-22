@@ -3,11 +3,11 @@
 
     export let color: string | null = null;
 
-    renderable(({ ctx, width, height }) => {
-        ctx.clearRect(0, 0, width, height);
+    renderable(state => {
+        state.ctx.clearRect(0, 0, state.width, state.height);
         if (color) {
-            ctx.fillStyle = color;
-            ctx.fillRect(0, 0, width, height);
+            state.ctx.fillStyle = color;
+            state.ctx.fillRect(0, 0, state.width, state.height);
         }
     });
 </script>

@@ -169,8 +169,6 @@ export function drawHours(state: RenderProps, startYear: number) {
     }
 
     let hour = Math.floor(leftMost / (60 * 60)) * (60 * 60);
-    // deal with timezones
-    hour -= currentTzOffset() * 60 * 60;
 
     const showHourText = state.zoom >= 1.2e-2;
 
