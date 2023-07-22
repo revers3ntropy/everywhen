@@ -82,9 +82,9 @@
         {#each sortedTitles as [day, date]}
             <div class="day">
                 <h2>
-                    <UtcTime timestamp={day} fmt="dddd DD/MM/YY" noTooltip={true} tzOffset={0} />
+                    <UtcTime timestamp={day} fmt="dddd DD/MM/YYYY" noTooltip={true} tzOffset={0} />
                     {#if showTimeAgo}
-                        <Dot />
+                        <Dot marginX={2} />
                         <span class="text-light">
                             {#if utcEq(nowUtc(), day, currentTzOffset(), 0, 'YYYY-MM-DD')}
                                 <span>Today</span>

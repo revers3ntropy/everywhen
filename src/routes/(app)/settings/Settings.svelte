@@ -70,7 +70,7 @@
     }
 </script>
 
-<div class="wrapper">
+<div class="wrapper" id={key}>
     <div class="left">
         <div class="header">
             <div>
@@ -136,10 +136,16 @@
     .wrapper {
         display: grid;
         grid-template-columns: 1fr 25rem;
-        padding: 1em 0.5em;
+        padding: 0.8rem;
 
         @media @mobile {
             display: block;
+        }
+
+        border: 1px solid transparent;
+        &:target {
+            border: 1px solid var(--border-light);
+            border-radius: @border-radius;
         }
 
         .left,
