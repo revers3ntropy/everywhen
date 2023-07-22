@@ -162,12 +162,4 @@
         justify-content: center;
         flex-wrap: wrap;
     }
-
-    .charts {
-        padding: 1rem;
-
-        @media @mobile {
-            padding: 0;
-        }
-    }
 </style>

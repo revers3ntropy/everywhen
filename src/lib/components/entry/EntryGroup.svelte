@@ -20,6 +20,7 @@
     import Dot from '../Dot.svelte';
     import UtcTime from '../UtcTime.svelte';
     import { fly, slide } from 'svelte/transition';
+    import { page } from "$app/stores";
 
     export let locations: Location[] | null;
     export let obfuscated = true;
@@ -44,9 +45,18 @@
         formMode = entryFormMode as EntryFormMode;
     }
 
+    $: isToday = utcEq(nowUtc(), day, currentTzOffset(), 0, 'YYYY-MM-DD');
+    $: if (entries.length < 1 && (!isToday || !showEntryForm)) {
+        $collapsed[day] = true;
+    }
+
     listen.entry.onDelete(id => {
         entries = entries.filter(e => e.id !== id);
     });
+
+    page.subscribe(() => {
+        collapsed.set({});
+    })
 </script>
 
 <div class="entry-group">
@@ -65,7 +75,7 @@
                     <Dot light marginX={10} />
 
                     <span class="text-light">
-                        {#if utcEq(nowUtc(), day, currentTzOffset(), 0, 'YYYY-MM-DD')}
+                        {#if isToday}
                             <span>Today</span>
                         {:else if utcEq(nowUtc() - 60 * 60 * 24, day, currentTzOffset(), 0, 'YYYY-MM-DD')}
                             <span>Yesterday</span>
@@ -95,7 +105,7 @@
         </div>
     </div>
     {#if !$collapsed[day]}
-        {#if showEntryForm && utcEq(nowUtc(), day, currentTzOffset(), 0, 'YYYY-MM-DD')}
+        {#if showEntryForm && isToday}
             <ModedEntryForm {auth} {obfuscated} entryFormMode={formMode} />
         {/if}
         <div

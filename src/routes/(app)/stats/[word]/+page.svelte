@@ -73,10 +73,10 @@
         </section>
 
         <section class="charts">
-            <div class="entry-heatmap-wrapper">
+            <div class="container" style="margin: 0; padding: 1rem;">
                 <EntryHeatMap {by} entries={data.entries} />
             </div>
-            <div class="entry-bar-chart-wrapper">
+            <div class="container" style="margin: 1rem 0; padding: 1rem;">
                 <EntryBarChart {by} entries={data.entries} />
             </div>
         </section>
@@ -140,27 +140,6 @@
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
-    }
-
-    .charts {
-        & > * {
-            margin: 0.5em 0;
-        }
-
-        .entry-bar-chart-wrapper {
-            padding: 5rem 0 0 0;
-        }
-    }
-
-    .container {
-        padding: 1em;
-        margin: 1em;
-
-        @media @mobile {
-            padding: 0 0.6rem;
-            margin: 1em 0;
-            border: none;
-        }
     }
 
     .the-word-with-quotes {

@@ -114,51 +114,58 @@
         {#key [data.pinnedEntriesList, showingAllPinned]}
             {#if Object.keys(pinnedEntries).length}
                 <section>
-                    <h1 class="gradient-icon flex-center" style="justify-content: start; gap: 8px;">
-                        <Heart size="25" />
-                        Favourited Entries
-                    </h1>
-                    <EntryTitles
-                        auth={data.auth}
-                        titles={pinnedEntries}
-                        obfuscated={$obfuscated}
-                        hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
-                        onCreateFilter={Entry.isPinned}
-                    />
-                    {#if areHiddenPinnedEntries}
-                        <button
-                            class="text-light"
-                            on:click={() => {
-                                showingAllPinned = !showingAllPinned;
-                            }}
-                        >
-                            <ChevronDown />
-                            Show all favourited entries ({data.pinnedEntriesList.length -
-                                showLimitPinnedEntries})
-                        </button>
-                    {/if}
+                    <div class="container">
+                        <h1 class="gradient-icon flex-center" style="justify-content: start; gap: 8px;">
+                            <Heart size="25" />
+                            Favourited
+                        </h1>
+                        <div style="margin: 1rem">
+                            <EntryTitles
+                                auth={data.auth}
+                                titles={pinnedEntries}
+                                obfuscated={$obfuscated}
+                                hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
+                                onCreateFilter={Entry.isPinned}
+                                hideBlurToggle
+                            />
+                            {#if areHiddenPinnedEntries}
+                                <button
+                                    class="text-light"
+                                    on:click={() => {
+                                        showingAllPinned = !showingAllPinned;
+                                    }}
+                                >
+                                    <ChevronDown />
+                                    Show all favourited entries
+                                    ({data.pinnedEntriesList.length - showLimitPinnedEntries})
+                                </button>
+                            {/if}
+                        </div>
+                    </div>
                 </section>
             {/if}
         {/key}
         {#each Object.entries(data.nYearsAgo) as [yearsAgo, entries] (yearsAgo)}
             <section>
-                <h1>
-                    {yearsAgo === '1' ? `A Year` : `${yearsAgo} Years`} Ago Today
-                </h1>
-                <EntryTitles
-                    titles={{
+                <div class="container">
+                    <h1>
+                        {yearsAgo === '1' ? `A Year` : `${yearsAgo} Years`} Ago Today
+                    </h1>
+                    <EntryTitles
+                            titles={{
                         [fmtUtc(
                             dayUtcFromTimestamp(entries[0].created, entries[0].createdTZOffset),
                             0,
                             'YYYY-MM-DD'
                         )]: entries
                     }}
-                    obfuscated={$obfuscated}
-                    showTimeAgo={false}
-                    auth={data.auth}
-                    hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
-                    onCreateFilter={() => false}
-                />
+                            obfuscated={$obfuscated}
+                            showTimeAgo={false}
+                            auth={data.auth}
+                            hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
+                            onCreateFilter={() => false}
+                    />
+                </div>
             </section>
         {/each}
     </div>
@@ -192,12 +199,9 @@
     }
 
     h1 {
-        font-size: 1.5rem;
-        // negative on the bottom to put in line with the titles due
-        // to the visibility toggle being inline
-        margin: 1em 1em -22px 1em;
+        font-size: 1.3rem;
+        margin: 1rem;
         padding: 0.5em;
-        border-bottom: 1px solid var(--border-color);
         text-align: start;
 
         @media @mobile {
