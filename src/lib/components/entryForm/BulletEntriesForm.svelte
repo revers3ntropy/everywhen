@@ -34,6 +34,25 @@
 
         resetEntryForm();
 
+        const agentData = serializedAgentData();
+        const createdTZOffset = currentTzOffset();
+
+        const loadingId = `loading-${nowUtc(false)}`;
+        await dispatch.create('entry', {
+            entry: {
+                id: loadingId,
+                title: 'loading...',
+                entry: '',
+                latitude: null,
+                longitude: null,
+                created: nowUtc(),
+                flags: Entry.Flags.NONE,
+                agentData,
+                createdTZOffset
+            },
+            entryMode: EntryFormMode.Bullet
+        });
+
         const currentLocation = $enabledLocation ? await getLocation() : [null, null];
 
         const body = {
@@ -43,8 +62,8 @@
             latitude: currentLocation[0],
             longitude: currentLocation[1],
             created: nowUtc(),
-            agentData: serializedAgentData(),
-            createdTZOffset: currentTzOffset()
+            agentData,
+            createdTZOffset
         } as RawEntry;
 
         const res = displayNotifOnErr(await api.post(auth, '/entries', { ...body }));
@@ -70,6 +89,7 @@
                 );
             }
         }
+        await dispatch.delete('entry', loadingId);
         await dispatch.create('entry', {
             entry: newEntry,
             entryMode: EntryFormMode.Bullet
@@ -96,7 +116,10 @@
 
 <div class="wrapper">
     {#if setEntryFormMode || showLocationToggle}
-        <div class="flex-center" style="justify-content: start; width: 100%; gap: 3px; margin: 0 0 1rem 0">
+        <div
+            class="flex-center"
+            style="justify-content: start; width: 100%; gap: 3px; margin: 0 0 1rem 0"
+        >
             {#if setEntryFormMode}
                 <button
                     aria-label="Switch to bullet journaling"

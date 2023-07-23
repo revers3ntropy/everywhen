@@ -1,6 +1,10 @@
 <script lang="ts">
     import { ANIMATION_DURATION } from '$lib/constants';
-    import { notifications, NotificationType, removeNotification } from '$lib/components/notifications/notifications';
+    import {
+        notifications,
+        NotificationType,
+        removeNotification
+    } from '$lib/components/notifications/notifications';
     import { fly } from 'svelte/transition';
     import Close from 'svelte-material-icons/Close.svelte';
     import ExclamationThick from 'svelte-material-icons/ExclamationThick.svelte';

@@ -2,7 +2,8 @@
     let id = 20;
 
     export function getId(): string {
-        return (id++).toString();
+        id++;
+        return `${id}`;
     }
 </script>
 
@@ -13,16 +14,10 @@
     import type { Auth } from '$lib/controllers/user/user';
     import type { CallbackObject } from 'ol-contextmenu/dist/types';
     import type { MapBrowserEvent } from 'ol';
-    import type { Circle } from 'ol/geom';
-    import { Collection } from 'ol';
-    import { Modify } from 'ol/interaction';
-    import { Style } from 'ol/style';
     import Map from 'ol/Map';
     import TileLayer from 'ol/layer/Tile';
     import View from 'ol/View';
     import OSM from 'ol/source/OSM';
-    import SourceVector from 'ol/source/Vector';
-    import LayerVector from 'ol/layer/Vector';
     import Overlay from 'ol/Overlay';
     import { fromLonLat, toLonLat } from 'ol/proj';
     import ContextMenu from 'ol-contextmenu';
@@ -33,14 +28,13 @@
     import EditLocation from '../location/EditLocation.svelte';
     import EntryDialog from '$lib/components/dialogs/EntryDialog.svelte';
     import EntryTooltipOnMap from './EntryTooltipOnMap.svelte';
-    import { clientLogger } from '$lib/utils/log';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import {
         type EntryFeature,
         lastEntry,
         type LocationFeature,
-        olFeatureFromEntry,
-        olFeatureFromLocation
+        olLayerFromEntries,
+        olLayerFromLocations
     } from './map';
 
     // https://openlayers.org/
@@ -49,6 +43,7 @@
     export let entries = [] as EntryLocation[];
     export let locations = [] as Location[];
     export let hideAgentWidget: boolean;
+    export let showArrowsBetweenEntriesOnMap: boolean;
     export let entriesInteractable = true;
     export let width = 'calc(100vw - 2rem)';
     export let height = 'calc(100vh - var(--nav-height) - 1rem)';
@@ -119,6 +114,20 @@
             });
     }
 
+    function pushToLocationChangeQueue(
+        id: string,
+        latitude: Degrees,
+        longitude: Degrees,
+        radius: Meters
+    ): void {
+        locationChangeQueue[id] ??= [];
+        locationChangeQueue[id].push({
+            latitude,
+            longitude,
+            radius
+        });
+    }
+
     function setupMap(
         node: HTMLElement,
         {
@@ -153,85 +162,18 @@
         const map = new Map({
             target: node.id,
             layers: [osmLayer],
-            view: new View({ center, zoom }),
+            view: new View({ center, zoom })
         });
 
-        const locationFeatures = locations.map(l => {
-            return olFeatureFromLocation(l, map);
-        });
-
-        map.addLayer(
-            new LayerVector({
-                source: new SourceVector({
-                    features: locationFeatures
-                })
-            })
+        const { layer, interactions } = olLayerFromLocations(
+            locations,
+            map.getView(),
+            pushToLocationChangeQueue
         );
+        map.addLayer(layer);
+        interactions.map(i => map.addInteraction(i));
 
-        for (const feature of locationFeatures) {
-            const dragInteraction = new Modify({
-                features: new Collection([feature]),
-                style: new Style({
-                    renderer([x, y], state) {
-                        const ctx = state.context;
-
-                        if (typeof x !== 'number' || typeof y !== 'number') {
-                            clientLogger.error('x or y is not a number', x, y);
-                            return;
-                        }
-
-                        ctx.beginPath();
-                        ctx.arc(x, y, 5 * devicePixelRatio, 0, 2 * Math.PI);
-                        ctx.strokeStyle = 'rgba(74,74,74,0.6)';
-                        ctx.stroke();
-                    }
-                })
-            });
-            map.addInteraction(dragInteraction);
-
-            feature.on('change', evt => {
-                const target = evt.target as LocationFeature;
-                const geometry = target.getGeometry() as Circle;
-                const center = geometry.getCenter();
-                const [lon, lat] = toLonLat(center);
-
-                const resolution = map.getView().getResolution();
-                if (!resolution) return;
-
-                const mPerUnit = map.getView().getProjection().getMetersPerUnit();
-                if (!mPerUnit) {
-                    throw new Error('mPerUnit is null');
-                }
-
-                const radius = Location.metersToDegrees(
-                    geometry.getRadius()
-                    // resolution,
-                    // mPerUnit,
-                    // lat
-                ) * devicePixelRatio;
-
-                const id = feature.location.id;
-
-                locationChangeQueue[id] ??= [];
-                locationChangeQueue[id].push({
-                    latitude: lat,
-                    longitude: lon,
-                    radius
-                });
-
-                target.location.latitude = lat;
-                target.location.longitude = lon;
-                target.location.radius = radius;
-            });
-        }
-
-        map.addLayer(
-            new LayerVector({
-                source: new SourceVector({
-                    features: entries.map(olFeatureFromEntry).filter(Boolean)
-                })
-            })
-        );
+        map.addLayer(olLayerFromEntries(entries));
 
         map.on('singleclick', (event: MapBrowserEvent<UIEvent>) => {
             if (!map) return;
@@ -302,7 +244,7 @@
                 return;
             }
 
-            const hovering = features[0] ;
+            const hovering = features[0];
 
             if (!entriesInteractable && 'entry' in hovering) {
                 hoveringEntryId = null;

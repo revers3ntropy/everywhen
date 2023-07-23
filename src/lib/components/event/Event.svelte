@@ -17,7 +17,12 @@
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import { obfuscate } from '$lib/utils/text';
-    import { currentTzOffset, fmtDuration, fmtTimestampForInput, parseTimestampFromInputUtc } from '$lib/utils/time';
+    import {
+        currentTzOffset,
+        fmtDuration,
+        fmtTimestampForInput,
+        parseTimestampFromInputUtc
+    } from '$lib/utils/time';
     import { slide, fly } from 'svelte/transition';
 
     export let auth: Auth;
@@ -172,7 +177,7 @@
         event.deleted = true;
     });
 
-    $: [ selectIfSelected(selectNameId, event.id), obfuscated, nameInput ];
+    $: [selectIfSelected(selectNameId, event.id), obfuscated, nameInput];
 </script>
 
 {#if event.deleted}

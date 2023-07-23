@@ -15,11 +15,10 @@
     export let labels: Label[];
 
     async function newEvent() {
-
         const start = nowUtc(true);
-        const end = nowUtc(true) + 60*60;
+        const end = nowUtc(true) + 60 * 60;
 
-        const zoomMargin = 15*60;
+        const zoomMargin = 15 * 60;
         $canvasState.zoomTo(start - zoomMargin, end + zoomMargin);
 
         const { id } = displayNotifOnErr(
@@ -52,10 +51,8 @@
 
 <div class="content">
     <button class="primary" on:click={newEvent} aria-label="New Event">
-        <span class="button-label">
-            New Event
-        </span>
-        <Plus size="30"/>
+        <span class="button-label"> New Event </span>
+        <Plus size="30" />
     </button>
 </div>
 

@@ -7,7 +7,10 @@ import { persisted } from 'svelte-local-storage-store';
 
 export const popup = writable<typeof SvelteComponent | null | undefined>(null);
 
-export const doesNotWantToEnableLocation = persisted<boolean>(STORE_KEY.doesNotWantToEnableLocation, false);
+export const doesNotWantToEnableLocation = persisted<boolean>(
+    STORE_KEY.doesNotWantToEnableLocation,
+    false
+);
 export const enabledLocation = persisted<boolean>(STORE_KEY.enabledLocation, false);
 export const passcodeLastEntered = persisted<number>(STORE_KEY.passcodeLastEntered, 0);
 export const eventsSortKey = persisted<EventsSortKey>(STORE_KEY.sortEventsKey, 'created');

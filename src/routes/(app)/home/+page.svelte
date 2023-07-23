@@ -101,9 +101,7 @@
                         hideBlurToggle
                     />
                 {:else}
-                    <p class="recent-entries-text">
-                        No recent entries
-                    </p>
+                    <p class="text-light"> No recent entries </p>
                 {/if}
             </div>
         </div>
@@ -114,7 +112,10 @@
             {#if Object.keys(pinnedEntries).length}
                 <section>
                     <div class="container">
-                        <h1 class="gradient-icon flex-center" style="justify-content: start; gap: 8px;">
+                        <h1
+                            class="gradient-icon flex-center"
+                            style="justify-content: start; gap: 8px;"
+                        >
                             <Heart size="25" />
                             Favourited
                         </h1>
@@ -135,8 +136,8 @@
                                     }}
                                 >
                                     <ChevronDown />
-                                    Show all favourited entries
-                                    ({data.pinnedEntriesList.length - showLimitPinnedEntries})
+                                    Show all favourited entries ({data.pinnedEntriesList.length -
+                                        showLimitPinnedEntries})
                                 </button>
                             {/if}
                         </div>
@@ -154,7 +155,10 @@
                         <EntryTitles
                             titles={{
                                 [fmtUtc(
-                                    dayUtcFromTimestamp(entries[0].created, entries[0].createdTZOffset),
+                                    dayUtcFromTimestamp(
+                                        entries[0].created,
+                                        entries[0].createdTZOffset
+                                    ),
                                     0,
                                     'YYYY-MM-DD'
                                 )]: entries

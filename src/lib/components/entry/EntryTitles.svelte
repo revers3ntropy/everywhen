@@ -133,7 +133,7 @@
 
         {#if Object.keys(titles || {}).length === 0}
             <div class="day">
-                <h2> No entries yet </h2>
+                <i class="text-light"> No entries yet </i>
             </div>
         {/if}
     {/if}

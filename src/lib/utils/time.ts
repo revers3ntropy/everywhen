@@ -1,7 +1,7 @@
 import moment from 'moment';
-import { PUBLIC_ENV } from "$env/static/public";
-import { DEV_USE_TZ_OFFSET_0 } from "$lib/constants";
-import { browser } from "$app/environment";
+import { PUBLIC_ENV } from '$env/static/public';
+import { DEV_USE_TZ_OFFSET_0 } from '$lib/constants';
+import { browser } from '$app/environment';
 
 /**
  * Get the UTC timestamp of now in seconds
@@ -44,10 +44,7 @@ export function parseTimestampFromInputUtc(timestamp: string): TimestampSecs {
     return Math.floor(Date.parse(timestamp) / 1000);
 }
 
-export function dayUtcFromTimestamp(
-    timestamp: TimestampSecs,
-    tzOffset: Hours
-): TimestampSecs {
+export function dayUtcFromTimestamp(timestamp: TimestampSecs, tzOffset: Hours): TimestampSecs {
     const day = fmtUtc(timestamp, tzOffset, 'YYYY-MM-DD');
     return new Date(`${day}T12:00:00Z`).getTime() / 1000;
 }

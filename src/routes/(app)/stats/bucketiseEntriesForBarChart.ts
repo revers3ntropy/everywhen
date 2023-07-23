@@ -3,7 +3,7 @@ import { dayUtcFromTimestamp, fmtUtc, nowUtc } from '$lib/utils/time';
 import { type OsGroup, osGroupFromEntry, osGroups } from '$lib/utils/userAgent';
 import moment from 'moment/moment';
 import { Bucket, By, type EntryWithWordCount } from './helpers';
-import { Entry } from "$lib/controllers/entry/entry.client";
+import { Entry } from '$lib/controllers/entry/entry.client';
 
 export interface ChartData {
     datasets: {
@@ -25,7 +25,7 @@ const generateLabelsDayAndWeek = (start: TimestampSecs, buckets: string[]): stri
             year = thisYear;
             return fmtUtc(bucketTime, 0, 'Do MMM YYYY');
         }
-        return fmtUtc(bucketTime,0, 'Do MMM');
+        return fmtUtc(bucketTime, 0, 'Do MMM');
     });
 };
 

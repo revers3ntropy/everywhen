@@ -1,15 +1,15 @@
 <script lang="ts">
     import Info from 'svelte-material-icons/InformationOutline.svelte';
-    import { tooltip } from "@svelte-plugins/tooltips";
+    import { tooltip } from '@svelte-plugins/tooltips';
     import Close from 'svelte-material-icons/Close.svelte';
-    import type { Auth } from "$lib/controllers/user/user";
-    import { doesNotWantToEnableLocation, enabledLocation } from "$lib/stores";
-    import { api } from "$lib/utils/apiRequest";
+    import type { Auth } from '$lib/controllers/user/user';
+    import { doesNotWantToEnableLocation, enabledLocation } from '$lib/stores';
+    import { api } from '$lib/utils/apiRequest';
 
     export let auth: Auth;
     export let preferOn: boolean;
 
-    async function enable () {
+    async function enable() {
         const wasEnabled = $enabledLocation;
         $enabledLocation = true;
 
@@ -18,7 +18,11 @@
         // otherwise, the button asks to enable by default,
         // so don't check with user in that case.
         if (!wasEnabled) {
-            if (!confirm('Also enable location by default? This can be changed at any time in settings.'))
+            if (
+                !confirm(
+                    'Also enable location by default? This can be changed at any time in settings.'
+                )
+            )
                 return;
         }
         await api.put(auth, '/settings', {
@@ -28,7 +32,7 @@
         preferOn = true;
     }
 
-    function close () {
+    function close() {
         $doesNotWantToEnableLocation = true;
     }
 </script>
@@ -38,11 +42,11 @@
         <Info />
         <span>
             {#if !$enabledLocation}
-                Location is not enabled -
-                click to enable location, so that future entries show up on this map
+                Location is not enabled - click to enable location, so that future entries show up
+                on this map
             {:else}
-                Location is not enabled by default -
-                click to enable by default (this can be changed any time in settings)
+                Location is not enabled by default - click to enable by default (this can be changed
+                any time in settings)
             {/if}
         </span>
 

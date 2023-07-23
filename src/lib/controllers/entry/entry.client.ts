@@ -117,7 +117,10 @@ namespace EntryUtils {
         };
     }
 
-    export function localTime(entry: { created: TimestampSecs, createdTZOffset: Hours }): TimestampSecs {
+    export function localTime(entry: {
+        created: TimestampSecs;
+        createdTZOffset: Hours;
+    }): TimestampSecs {
         return entry.created + entry.createdTZOffset * 60 * 60;
     }
 }

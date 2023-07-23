@@ -266,7 +266,8 @@
                             longitude
                         }
                     ],
-                    hideAgentWidget
+                    hideAgentWidget,
+                    showArrowsBetweenEntriesOnMap: false
                 }}
             />
         </div>

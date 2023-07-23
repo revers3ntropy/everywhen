@@ -68,15 +68,16 @@
             />
         </label>
         <div style="text-align: right; margin-bottom: 1rem">
-            <input type="checkbox" bind:this={rememberMeInput}>
+            <input type="checkbox" bind:this={rememberMeInput} />
             <button
                 class="flex-center oneline text-light"
                 style="display: inline-flex; gap: 4px"
                 use:tooltip={{
-                    content: `You will have to re-enter your login details after ${REMEMBER_ME_COOKIE_TIMEOUT_DAYS} `+
-                             `days instead of ${NORMAL_COOKIE_TIMEOUT_DAYS} days.`
+                    content:
+                        `You will have to re-enter your login details after ${REMEMBER_ME_COOKIE_TIMEOUT_DAYS} ` +
+                        `days instead of ${NORMAL_COOKIE_TIMEOUT_DAYS} days.`
                 }}
-                on:click={() => rememberMeInput.checked = !rememberMeInput.checked}
+                on:click={() => (rememberMeInput.checked = !rememberMeInput.checked)}
             >
                 Remember me
                 <span class="flex-center" style="display: inline-flex">

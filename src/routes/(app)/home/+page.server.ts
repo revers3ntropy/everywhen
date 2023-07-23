@@ -30,7 +30,7 @@ function entriesYearsAgoToday(entries: Entry[]): Record<string, Entry[]> {
     return res;
 }
 
-export const load = cachedPageRoute(async (auth, {parent, locals}) => {
+export const load = cachedPageRoute(async (auth, { parent, locals }) => {
     const { val: titles, err } = await Entry.getTitles(query, auth);
     if (err) throw error(400, err);
 

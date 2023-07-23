@@ -20,7 +20,7 @@ setInterval(() => {
             void connect();
             return;
         }
-        void dbConnection?.ping().catch((e) => errorLogger.error(e));
+        void dbConnection?.ping().catch(e => errorLogger.error(e));
     } catch (e) {
         void errorLogger.log('Failed to ping db', e);
     }
@@ -33,7 +33,6 @@ setInterval(() => {
         void errorLogger.log('Failed to cleanup cache', e);
     }
 }, 1000 * 60);
-
 
 process.on('exit', exitHandler);
 process.on('SIGINT', exitHandler);

@@ -72,7 +72,14 @@ namespace SettingsUtils {
             name: 'Prefer Location',
             description: `Prefer location to be on by default.`,
             showInSettings: true
-        } as SettingConfig<boolean>
+        } as SettingConfig<boolean>,
+        showArrowsBetweenEntriesOnMap: {
+            type: 'boolean',
+            defaultValue: false,
+            name: 'Show Arrows Between Entries',
+            description: `Show arrows between chronologically adjacent entries on the map.`,
+            showInSettings: true
+        }
     } satisfies Record<string, SettingConfig<SettingValue>>;
 
     export function convertToMap(settings: Settings[]): SettingsConfig {

@@ -20,7 +20,7 @@
     import Dot from '../Dot.svelte';
     import UtcTime from '../UtcTime.svelte';
     import { fly, slide } from 'svelte/transition';
-    import { page } from "$app/stores";
+    import { page } from '$app/stores';
 
     export let locations: Location[] | null;
     export let obfuscated = true;
@@ -56,7 +56,7 @@
 
     page.subscribe(() => {
         collapsed.set({});
-    })
+    });
 </script>
 
 <div class="entry-group">

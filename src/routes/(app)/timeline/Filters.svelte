@@ -10,17 +10,17 @@
     export let selectedLabels = [] as string[];
 </script>
 
-    <div class="content">
-        <Dropdown fromTop fromRight width="200px" stayOpenWhenClicked>
-            <span slot="button" class="filter-button">
-                <span class="button-label"> Filter </span>
-                <FilterVariant size="30" />
-            </span>
-            <div>
-                <MultiLabelSelect {auth} {labels} bind:value={selectedLabels} />
-            </div>
-        </Dropdown>
-    </div>
+<div class="content">
+    <Dropdown fromTop fromRight width="200px" stayOpenWhenClicked>
+        <span slot="button" class="filter-button">
+            <span class="button-label"> Filter </span>
+            <FilterVariant size="30" />
+        </span>
+        <div>
+            <MultiLabelSelect {auth} {labels} bind:value={selectedLabels} />
+        </div>
+    </Dropdown>
+</div>
 
 <style lang="less">
     @import '../../../styles/layout';

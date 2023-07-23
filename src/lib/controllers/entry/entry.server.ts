@@ -515,7 +515,11 @@ namespace EntryUtils {
         return Result.ok(null);
     }
 
-    export async function getStreaks(query: QueryFunc, auth: Auth, clientTzOffset: Hours): Promise<Result<Streaks>> {
+    export async function getStreaks(
+        query: QueryFunc,
+        auth: Auth,
+        clientTzOffset: Hours
+    ): Promise<Result<Streaks>> {
         const entries = await query<{ created: number; createdTZOffset: number }[]>`
             SELECT created, createdTZOffset
             FROM entries

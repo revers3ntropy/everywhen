@@ -125,7 +125,7 @@
         const entry = {
             ...body,
             id: res.id,
-            flags: 0,
+            flags: 0
         } as Mutable<Entry>;
 
         if (body.label && labels) {
