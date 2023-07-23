@@ -150,20 +150,23 @@
                     <h1>
                         {yearsAgo === '1' ? `A Year` : `${yearsAgo} Years`} Ago Today
                     </h1>
-                    <EntryTitles
+                    <div style="margin: 1rem">
+                        <EntryTitles
                             titles={{
-                        [fmtUtc(
-                            dayUtcFromTimestamp(entries[0].created, entries[0].createdTZOffset),
-                            0,
-                            'YYYY-MM-DD'
-                        )]: entries
-                    }}
+                                [fmtUtc(
+                                    dayUtcFromTimestamp(entries[0].created, entries[0].createdTZOffset),
+                                    0,
+                                    'YYYY-MM-DD'
+                                )]: entries
+                            }}
                             obfuscated={$obfuscated}
                             showTimeAgo={false}
                             auth={data.auth}
                             hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
                             onCreateFilter={() => false}
-                    />
+                            hideBlurToggle
+                        />
+                    </div>
                 </div>
             </section>
         {/each}
