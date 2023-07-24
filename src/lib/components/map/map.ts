@@ -1,6 +1,6 @@
 import type { EntryLocation } from '$lib/controllers/entry/entry';
 import Feature from 'ol/Feature';
-import { Circle, Geometry } from 'ol/geom';
+import { Circle, type Geometry } from 'ol/geom';
 import Point from 'ol/geom/Point';
 import { fromLonLat, toLonLat } from 'ol/proj';
 import { Style } from 'ol/style';
