@@ -2,7 +2,7 @@
 
 svelte-kit sync
 
-vitest run
+npx vitest run
 
 bin/build
 
