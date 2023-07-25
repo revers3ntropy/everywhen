@@ -175,7 +175,9 @@
         interactions.map(i => map.addInteraction(i));
 
         map.addLayer(olLayerFromEntries(entries));
-        map.addLayer(olEntryBezierArrows(entries, map.getView()));
+        if (showArrowsBetweenEntriesOnMap) {
+            map.addLayer(olEntryBezierArrows(entries, map.getView()));
+        }
 
         map.on('singleclick', (event: MapBrowserEvent<UIEvent>) => {
             if (!map) return;

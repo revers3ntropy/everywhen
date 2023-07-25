@@ -20,7 +20,7 @@
             entries={data.entries}
             locations={data.locations}
             hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
-            showArrowsBetweenEntriesOnMap={!data.settings.showArrowsBetweenEntriesOnMap.value}
+            showArrowsBetweenEntriesOnMap={data.settings.showArrowsBetweenEntriesOnMap.value}
         />
     </section>
 </main>

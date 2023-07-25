@@ -76,7 +76,7 @@ namespace SettingsUtils {
         showArrowsBetweenEntriesOnMap: {
             type: 'boolean',
             defaultValue: false,
-            name: 'Show Arrows Between Entries',
+            name: 'Arrows Between Entries',
             description: `Show arrows between chronologically adjacent entries on the map.`,
             showInSettings: true
         }
