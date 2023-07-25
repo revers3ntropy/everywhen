@@ -231,9 +231,10 @@ export function olEntryBezierArrows(
         throw new Error('resolution is null');
     }
 
+    // sorted in chronological order, [0] is oldest/earliest
     const points = entries
         .filter(e => e.latitude && e.longitude)
-        .sort((a, b) => b.created - a.created)
+        .sort((a, b) => a.created - b.created)
         .map(e => fromLonLat([e.longitude as number, e.latitude as number]));
 
     const geometry = new Polygon([points]);
@@ -243,64 +244,55 @@ export function olEntryBezierArrows(
     feature.setStyle(
         new Style({
             renderer([coordinates], state) {
-                const f = 0.1;
-                const t = 0;
-
-                function gradient(a: [number, number], b: [number, number]): number {
-                    return (b[1] - a[1]) / (b[0] - a[0]);
-                }
-
                 const coords = (coordinates as [number, number][]).map(
                     ([x, y]) => [Math.round(x), Math.round(y)] as [number, number]
                 );
 
-                // draw Bézier curve along all points
                 const ctx = state.context;
-                ctx.beginPath();
                 const lineColor = 'rgba(0,0,0,0.4)';
                 const arrowColor = 'rgba(0,0,0,0.6)';
-                ctx.strokeStyle = lineColor;
+
+                // circle at start point
+                ctx.beginPath();
+                ctx.arc(coords[coords.length - 1][0], coords[coords.length - 1][1], 3 * devicePixelRatio, 0, 2 * Math.PI);
+                ctx.fillStyle = arrowColor;
+                ctx.fill();
+                ctx.closePath();
+
+                // square at end point
+                ctx.beginPath();
+                ctx.rect(
+                    coords[0][0] - 3 * devicePixelRatio,
+                    coords[0][1] - 3 * devicePixelRatio,
+                    6 * devicePixelRatio,
+                    6 * devicePixelRatio
+                );
+                ctx.fillStyle = arrowColor;
+                ctx.fill();
+                ctx.closePath();
+
+                // draw lines between points
+                ctx.beginPath();
                 ctx.moveTo(coords[0][0], coords[0][1]);
+                ctx.strokeStyle = lineColor;
 
-                let m = 0;
-                let dx1 = 0;
-                let dy1 = 0;
-                let preP = coords[0];
-                for (let i = 1; i < coords.length; i++) {
-                    const curP = coords[i];
-                    const nexP = coords[i + 1];
-
-                    let dx2, dy2;
-                    if (nexP) {
-                        m = gradient(preP, nexP);
-                        dx2 = (nexP[0] - curP[0]) * -f;
-                        dy2 = dx2 * m * t;
-                    } else {
-                        dx2 = 0;
-                        dy2 = 0;
-                    }
-
-                    ctx.bezierCurveTo(
-                        preP[0] - dx1,
-                        preP[1] - dy1,
-                        curP[0] + dx2,
-                        curP[1] + dy2,
-                        curP[0],
-                        curP[1]
-                    );
-
-                    dx1 = dx2;
-                    dy1 = dy2;
-                    preP = curP;
+                for (const [x, y] of coords.slice(1)) {
+                    ctx.lineTo(x, y);
                 }
+
                 ctx.stroke();
+                ctx.closePath();
 
                 // draw arrow head
-                const arrowHeadSize = 10 * devicePixelRatio;
+                const arrowHeadSize = 7 * devicePixelRatio;
 
                 for (let i = 1; i < coords.length; i++) {
                     const p1 = coords[i];
                     const p2 = coords[i - 1];
+
+                    const dist = Math.sqrt(Math.pow(p2[0] - p1[0], 2) + Math.pow(p2[1] - p1[1], 2));
+                    if (dist < arrowHeadSize * 2) continue;
+
                     const angle = Math.atan2(p2[1] - p1[1], p2[0] - p1[0]);
 
                     const arrowHeadPoint1 = [

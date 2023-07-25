@@ -4,7 +4,7 @@ import { writable } from 'svelte/store';
 import { clientLogger } from '$lib/utils/log';
 import { currentTzOffset, nowUtc } from '$lib/utils/time';
 import type { Interactable } from './interactable';
-import { cssVaValue } from "$lib/utils/getCssVar";
+import { cssVaValue } from '$lib/utils/getCssVar';
 
 export const START_ZOOM = 1 / (60 * 60);
 
