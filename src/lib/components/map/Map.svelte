@@ -33,6 +33,7 @@
         type EntryFeature,
         lastEntry,
         type LocationFeature,
+        olEntryBezierArrows,
         olLayerFromEntries,
         olLayerFromLocations
     } from './map';
@@ -174,6 +175,7 @@
         interactions.map(i => map.addInteraction(i));
 
         map.addLayer(olLayerFromEntries(entries));
+        map.addLayer(olEntryBezierArrows(entries, map.getView()));
 
         map.on('singleclick', (event: MapBrowserEvent<UIEvent>) => {
             if (!map) return;

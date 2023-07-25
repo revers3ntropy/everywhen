@@ -1,7 +1,6 @@
 import type { EntryLocation } from '$lib/controllers/entry/entry';
 import Feature from 'ol/Feature';
-import { Circle, type Geometry } from 'ol/geom';
-import Point from 'ol/geom/Point';
+import { Circle, type Geometry, Polygon, Point } from 'ol/geom';
 import { fromLonLat, toLonLat } from 'ol/proj';
 import { Style } from 'ol/style';
 import { Location } from '$lib/controllers/location/location.client';
@@ -217,4 +216,118 @@ export function olFeatureFromEntry(entry: EntryLocation): EntryFeature | null {
     feature.entry = entry;
 
     return feature;
+}
+
+export function olEntryBezierArrows(
+    entries: EntryLocation[],
+    view: View
+): VectorLayer<VectorSource<Geometry>> {
+    const mPerUnit = view.getProjection().getMetersPerUnit();
+    if (!mPerUnit) {
+        throw new Error('mPerUnit is null');
+    }
+    const resolution = view.getResolution();
+    if (!resolution) {
+        throw new Error('resolution is null');
+    }
+
+    const points = entries
+        .filter(e => e.latitude && e.longitude)
+        .sort((a, b) => b.created - a.created)
+        .map(e => fromLonLat([e.longitude as number, e.latitude as number]));
+
+    const geometry = new Polygon([points]);
+
+    const feature = new Feature({ geometry });
+
+    feature.setStyle(
+        new Style({
+            renderer([coordinates], state) {
+                const f = 0.1;
+                const t = 0;
+
+                function gradient(a: [number, number], b: [number, number]): number {
+                    return (b[1] - a[1]) / (b[0] - a[0]);
+                }
+
+                const coords = (coordinates as [number, number][]).map(
+                    ([x, y]) => [Math.round(x), Math.round(y)] as [number, number]
+                );
+
+                // draw Bézier curve along all points
+                const ctx = state.context;
+                ctx.beginPath();
+                const lineColor = 'rgba(0,0,0,0.4)';
+                const arrowColor = 'rgba(0,0,0,0.6)';
+                ctx.strokeStyle = lineColor;
+                ctx.moveTo(coords[0][0], coords[0][1]);
+
+                let m = 0;
+                let dx1 = 0;
+                let dy1 = 0;
+                let preP = coords[0];
+                for (let i = 1; i < coords.length; i++) {
+                    const curP = coords[i];
+                    const nexP = coords[i + 1];
+
+                    let dx2, dy2;
+                    if (nexP) {
+                        m = gradient(preP, nexP);
+                        dx2 = (nexP[0] - curP[0]) * -f;
+                        dy2 = dx2 * m * t;
+                    } else {
+                        dx2 = 0;
+                        dy2 = 0;
+                    }
+
+                    ctx.bezierCurveTo(
+                        preP[0] - dx1,
+                        preP[1] - dy1,
+                        curP[0] + dx2,
+                        curP[1] + dy2,
+                        curP[0],
+                        curP[1]
+                    );
+
+                    dx1 = dx2;
+                    dy1 = dy2;
+                    preP = curP;
+                }
+                ctx.stroke();
+
+                // draw arrow head
+                const arrowHeadSize = 10 * devicePixelRatio;
+
+                for (let i = 1; i < coords.length; i++) {
+                    const p1 = coords[i];
+                    const p2 = coords[i - 1];
+                    const angle = Math.atan2(p2[1] - p1[1], p2[0] - p1[0]);
+
+                    const arrowHeadPoint1 = [
+                        p2[0] - arrowHeadSize * Math.cos(angle - Math.PI / 6),
+                        p2[1] - arrowHeadSize * Math.sin(angle - Math.PI / 6)
+                    ];
+                    const arrowHeadPoint2 = [
+                        p2[0] - arrowHeadSize * Math.cos(angle + Math.PI / 6),
+                        p2[1] - arrowHeadSize * Math.sin(angle + Math.PI / 6)
+                    ];
+
+                    ctx.beginPath();
+                    ctx.moveTo(p2[0], p2[1]);
+                    ctx.fillStyle = arrowColor;
+                    ctx.lineTo(arrowHeadPoint1[0], arrowHeadPoint1[1]);
+                    ctx.lineTo(arrowHeadPoint2[0], arrowHeadPoint2[1]);
+                    ctx.lineTo(p2[0], p2[1]);
+                    ctx.fill();
+                    ctx.closePath();
+                }
+            }
+        })
+    );
+
+    return new LayerVector({
+        source: new SourceVector({
+            features: [feature]
+        })
+    });
 }
