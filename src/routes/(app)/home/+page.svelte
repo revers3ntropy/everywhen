@@ -145,9 +145,9 @@
                 </section>
             {/if}
         {/key}
-        {#each Object.entries(data.nYearsAgo) as [yearsAgo, entries] (yearsAgo)}
-            <section>
-                <div class="container">
+        <section>
+            <div class="container">
+                {#each Object.entries(data.nYearsAgo) as [yearsAgo, entries] (yearsAgo)}
                     <h1>
                         {yearsAgo === '1' ? `A Year` : `${yearsAgo} Years`} Ago Today
                     </h1>
@@ -171,9 +171,9 @@
                             hideBlurToggle
                         />
                     </div>
-                </div>
-            </section>
-        {/each}
+                {/each}
+            </div>
+        </section>
     </div>
 </main>
 
