@@ -28,6 +28,7 @@
         const currentVersion = __VERSION__;
         const newVersion = displayNotifOnErr(await api.get(null, '/version')).v;
         if (newVersion !== currentVersion) {
+            if (isNewVersionAvailable) return;
             isNewVersionAvailable = true;
             notify.info(`New version (${newVersion}) available, reloading...`);
             location.reload();
