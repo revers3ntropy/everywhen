@@ -1,6 +1,5 @@
 <script lang="ts">
     import { displayNotifOnErr } from '$lib/components/notifications/notifications.js';
-    import { onMount } from 'svelte';
     import ArrowLeft from 'svelte-material-icons/ArrowLeft.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
     import Entries from '$lib/components/entry/Entries.svelte';
@@ -15,13 +14,10 @@
     let by: By = By.Words;
 
     export let data: PageData;
-
-    onMount(() => (document.title = 'Insights'));
 </script>
 
 <svelte:head>
-    <title>Insights</title>
-    <meta content="Insights" name="description" />
+    <title> Insights </title>
 </svelte:head>
 
 <main>

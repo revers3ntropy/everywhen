@@ -1,6 +1,5 @@
 <script lang="ts">
     import GitHubOauthWidget from '$lib/components/GitHubOAuthWidget.svelte';
-    import { onMount } from 'svelte';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import Cog from 'svelte-material-icons/Cog.svelte';
     import Logout from 'svelte-material-icons/Logout.svelte';
@@ -30,13 +29,10 @@
         SettingsKey,
         SettingConfig<SettingValue>
     ][];
-
-    onMount(() => (document.title = 'Settings'));
 </script>
 
 <svelte:head>
-    <title>Settings</title>
-    <meta content="Settings" name="description" />
+    <title> Settings </title>
 </svelte:head>
 
 <main>

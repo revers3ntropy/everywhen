@@ -60,8 +60,8 @@
 </script>
 
 <svelte:head>
-    <title>Halcyon.Land</title>
-    <meta content="Journal and Life Logging app" name="description" />
+    <title> Halcyon.Land </title>
+    <meta content="Journaling and Life Logging App" name="description" />
 </svelte:head>
 
 <noscript>

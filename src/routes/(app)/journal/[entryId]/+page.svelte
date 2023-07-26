@@ -18,13 +18,11 @@
 
     onMount(() => {
         void loadLocations();
-        document.title = `View Entry`;
     });
 </script>
 
 <svelte:head>
-    <title>View Entry</title>
-    <meta content="View Entry" name="description" />
+    <title> View Entry </title>
 </svelte:head>
 
 <main>

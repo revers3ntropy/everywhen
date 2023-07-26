@@ -1,6 +1,5 @@
 <script lang="ts">
     import { dispatch } from '$lib/dataChangeEvents';
-    import { onMount } from 'svelte';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import Dot from '$lib/components/Dot.svelte';
@@ -74,13 +73,10 @@
         end: 'end',
         name: 'name'
     };
-
-    onMount(() => (document.title = `Events`));
 </script>
 
 <svelte:head>
-    <title>Events</title>
-    <meta content="Events" name="description" />
+    <title> Events </title>
 </svelte:head>
 
 <main>

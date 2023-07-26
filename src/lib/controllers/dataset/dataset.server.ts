@@ -25,20 +25,41 @@ namespace DatasetUtils {
         }
     };
 
+    const thirdPartyDatasetMetadataProviders: {
+        [k in ThirdPartyDatasetIds]: (query: QueryFunc, user: User) => DatasetMetadata | null;
+    } = {
+        githubCommits(_query, user) {
+            if (!user.ghAccessToken) return null;
+            return {
+                id: 'githubCommits',
+                created: 0,
+                name: thirdPartyDatasetIdsToNames.githubCommits,
+                columns: []
+            }
+        },
+        githubLoC(_query, user) {
+            if (!user.ghAccessToken) return null;
+            return {
+                id: 'githubLoC',
+                created: 0,
+                name: thirdPartyDatasetIdsToNames.githubLoC,
+                columns: []
+            }
+        }
+    }
+
     export async function allMetaData(
         _query: QueryFunc,
         _user: User
     ): Promise<Result<DatasetMetadata[]>> {
-        const metadata = [] as DatasetMetadata[];
+        const metadatas = [] as DatasetMetadata[];
         for (const dataset of Object.keys(thirdPartyDatasetProviders)) {
-            metadata.push({
-                id: dataset,
-                created: 0,
-                name: thirdPartyDatasetIdsToNames[dataset as ThirdPartyDatasetIds],
-                columns: []
-            });
+            const metadata = thirdPartyDatasetMetadataProviders[dataset as ThirdPartyDatasetIds](_query, _user);
+            if (metadata) {
+                metadatas.push(metadata);
+            }
         }
-        return Result.ok(metadata);
+        return Result.ok(metadatas);
     }
 
     export async function fetchWholeDataset(

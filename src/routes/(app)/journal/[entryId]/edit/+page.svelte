@@ -1,18 +1,14 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
+    import type { PageData } from './$types';
     import Close from 'svelte-material-icons/Close.svelte';
     import { obfuscated } from '$lib/stores';
     import EntryForm from '$lib/components/entryForm/EntryForm.svelte';
-    import type { PageData } from './$types';
 
     export let data: PageData;
-
-    onMount(() => (document.title = `Edit Entry`));
 </script>
 
 <svelte:head>
-    <title>Edit Entry</title>
-    <meta content="Edit Entry" name="description" />
+    <title> Edit Entry </title>
 </svelte:head>
 
 <main>
@@ -22,7 +18,7 @@
                 <Close size="30" />
             </a>
         </div>
-        <h1>Edit Entry</h1>
+        <h1> Edit Entry </h1>
         <div />
     </div>
     <EntryForm

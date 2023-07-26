@@ -1,7 +1,6 @@
 <script lang="ts">
     import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
     import { listen } from '$lib/dataChangeEvents';
-    import { onMount } from 'svelte';
     import Entries from '$lib/components/entry/Entries.svelte';
     import type { PageData } from './$types';
 
@@ -16,13 +15,10 @@
             entryFormMode = value ? EntryFormMode.Bullet : EntryFormMode.Standard;
         }
     });
-
-    onMount(() => (document.title = `Journal`));
 </script>
 
 <svelte:head>
-    <title>Journal</title>
-    <meta content="Journal" name="description" />
+    <title> Journal </title>
 </svelte:head>
 
 <main>

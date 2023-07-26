@@ -1,7 +1,6 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import { listen } from '$lib/dataChangeEvents';
-    import { onMount } from 'svelte';
     import Delete from 'svelte-material-icons/Delete.svelte';
     import Entries from '$lib/components/entry/Entries.svelte';
     import { obfuscated } from '$lib/stores';
@@ -56,7 +55,6 @@
         );
     }
 
-    onMount(() => (document.title = `${data.label.name} - Label`));
     let eventCount = data.events.length;
 
     listen.event.onDelete(id => {
@@ -80,8 +78,7 @@
 </script>
 
 <svelte:head>
-    <title>{data.label.name} - Label</title>
-    <meta content="Label" name="description" />
+    <title>{data.label.name} | Label</title>
 </svelte:head>
 
 <main>

@@ -14,6 +14,10 @@
     }
 </script>
 
+<svelte:head>
+    <title> {data.location.name} | Location </title>
+</svelte:head>
+
 <section class="edit">
     <div>
         <EditLocation {...data.location} auth={data.auth} {onChange} />

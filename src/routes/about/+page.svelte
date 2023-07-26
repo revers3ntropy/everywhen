@@ -6,6 +6,10 @@
     import { API_DOCS_LINK } from '$lib/constants';
 </script>
 
+<svelte:head>
+    <title> About | Halcyon.Land </title>
+</svelte:head>
+
 <h1> About </h1>
 
 <section>

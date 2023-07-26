@@ -7,6 +7,10 @@
     export let data: PageData;
 </script>
 
+<svelte:head>
+    <title> Map </title>
+</svelte:head>
+
 <main>
     <section>
         {#if !data.settings.preferLocationOn.value || !$enabledLocation}

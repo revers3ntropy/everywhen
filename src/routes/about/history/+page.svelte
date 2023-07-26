@@ -2,6 +2,10 @@
     const version = __VERSION__;
 </script>
 
+<svelte:head>
+    <title> Version History | Halcyon.Land </title>
+</svelte:head>
+
 <main class="flex-center">
     <div>
         <h1> Version History </h1>

@@ -3,7 +3,7 @@ import { ENABLE_CACHING } from '$lib/constants';
 import { error } from '@sveltejs/kit';
 import type { RequestEvent, ServerLoadEvent } from '@sveltejs/kit';
 import chalk from 'chalk';
-import type { Auth, User } from '../controllers/user/user';
+import type { User } from '../controllers/user/user';
 import type { GenericResponse } from './apiResponse.server';
 import { FileLogger } from './log.server';
 import { fmtBytes } from './text';
@@ -160,7 +160,7 @@ export function cachedPageRoute<
     MustHaveAuth extends boolean = true
 >(
     handler: (
-        auth: Auth | (MustHaveAuth extends true ? Auth : undefined),
+        auth: User | (MustHaveAuth extends true ? User : undefined),
         event: ServerLoadEvent<Params, ParentData, RouteId>
     ) => MaybePromise<OutputData>,
     requireAuth?: MustHaveAuth

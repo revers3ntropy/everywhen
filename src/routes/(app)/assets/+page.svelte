@@ -53,6 +53,10 @@
     let fileDropInput: HTMLInputElement;
 </script>
 
+<svelte:head>
+    <title> Assets </title>
+</svelte:head>
+
 <main>
     <div class="head">
         <div class="flex-center" style="justify-content: start">

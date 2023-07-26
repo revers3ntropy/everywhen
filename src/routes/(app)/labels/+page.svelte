@@ -1,6 +1,5 @@
 <script lang="ts">
     import type { PageData } from './$types';
-    import { onMount } from 'svelte';
     import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import { api } from '$lib/utils/apiRequest';
@@ -41,8 +40,6 @@
         };
     }
 
-    onMount(() => (document.title = 'Labels'));
-
     listen.label.onDelete(id => {
         data = {
             ...data,
@@ -52,8 +49,7 @@
 </script>
 
 <svelte:head>
-    <title>Labels</title>
-    <meta content="Labels" name="description" />
+    <title> Labels </title>
 </svelte:head>
 
 <main>

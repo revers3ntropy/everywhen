@@ -28,8 +28,6 @@
     );
 
     onMount(() => {
-        document.title = 'Timeline';
-
         const [zoom, offset] = getInitialZoomAndPos($canvasState, data.entries, data.events);
         $canvasState.zoom = zoom;
         $canvasState.cameraOffset = offset;
@@ -78,7 +76,6 @@
 
 <svelte:head>
     <title>Timeline</title>
-    <meta content="Timeline" name="description" />
 
     <style lang="less">
         /*

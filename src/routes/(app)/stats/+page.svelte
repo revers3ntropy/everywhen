@@ -1,6 +1,5 @@
 <script lang="ts">
     import type { PageData } from './$types';
-    import { onMount } from 'svelte';
     import { fade } from 'svelte/transition';
     import { ANIMATION_DURATION } from '$lib/constants';
     import { By } from './helpers';
@@ -14,13 +13,10 @@
     let by: By = By.Entries;
 
     export let data: PageData;
-
-    onMount(() => (document.title = 'Insights'));
 </script>
 
 <svelte:head>
-    <title>Insights</title>
-    <meta content="Insights" name="description" />
+    <title> Insights </title>
 </svelte:head>
 
 <main>

@@ -1,6 +1,5 @@
 <script lang="ts">
     import { logOut } from '$lib/security/logOut';
-    import { onMount } from 'svelte';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import Skull from 'svelte-material-icons/Skull.svelte';
     import { Backup } from '$lib/controllers/backup/backup.client';
@@ -23,12 +22,10 @@
 
     let badUsername = false;
     let usernameInput: HTMLInputElement;
-
-    onMount(() => (document.title = 'Delete Account'));
 </script>
 
 <svelte:head>
-    <title>Delete Account</title>
+    <title> Delete Account </title>
     <meta content="Delete halcyon.Land account" name="description" />
 </svelte:head>
 

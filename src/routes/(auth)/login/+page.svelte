@@ -44,6 +44,11 @@
     let actionPending = false;
 </script>
 
+<svelte:head>
+    <title> Log In </title>
+    <meta content="Log in to halcyon.land" name="description" />
+</svelte:head>
+
 <main class="flex-center">
     <div class="content">
         <label>

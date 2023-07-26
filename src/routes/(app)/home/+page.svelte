@@ -2,7 +2,6 @@
     import BulletEntriesForm from '$lib/components/entryForm/BulletEntriesForm.svelte';
     import Tips from '$lib/components/Tips.svelte';
     import { listen } from '$lib/dataChangeEvents';
-    import { onMount } from 'svelte';
     import Cog from 'svelte-material-icons/Cog.svelte';
     import ImageOutline from 'svelte-material-icons/ImageOutline.svelte';
     import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
@@ -21,10 +20,6 @@
 
     const showLimitPinnedEntries = 10;
     let showingAllPinned = false;
-
-    onMount(() => {
-        document.title = `Home`;
-    });
 
     $: pinnedEntries = Entry.groupEntriesByDay(
         showingAllPinned
@@ -47,6 +42,10 @@
         }
     });
 </script>
+
+<svelte:head>
+    <title> Home </title>
+</svelte:head>
 
 <main>
     <section>

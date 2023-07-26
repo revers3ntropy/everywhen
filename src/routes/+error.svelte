@@ -2,6 +2,10 @@
     import { page } from '$app/stores';
 </script>
 
+<svelte:head>
+    <title> Error | Halcyon.Land </title>
+</svelte:head>
+
 <main>
     <div>
         <div>

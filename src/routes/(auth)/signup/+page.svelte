@@ -39,12 +39,10 @@
         }
         await goto('/' + data.redirect);
     }
-
-    onMount(() => (document.title = 'Sign Up'));
 </script>
 
 <svelte:head>
-    <title>Sign Up</title>
+    <title> Sign Up </title>
     <meta content="Sign up to halcyon.land" name="description" />
 </svelte:head>
 
