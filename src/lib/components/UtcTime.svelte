@@ -17,10 +17,10 @@
         use:tooltip={{
             content:
                 `<span class="oneline">${fmtUtc(timestamp, tzOffset, 'hh:mma')} (GMT` +
-                `${numberAsSignedStr(tzOffset)}h)</span><br>` +
+                `${numberAsSignedStr(tzOffset)})</span><br>` +
                 `<span class="oneline">${fmtUtc(timestamp, 0, 'hh:mma')} GMT </span><br>` +
                 `<span class="oneline">${fmtUtc(timestamp, currentTzOffset(), 'hh:mma')} local ` +
-                `(GMT${numberAsSignedStr(currentTzOffset())}h)</span>`,
+                `(GMT${numberAsSignedStr(currentTzOffset())})</span>`,
             autoPosition: true,
             position: tooltipPosition
         }}
