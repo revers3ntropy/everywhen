@@ -59,7 +59,13 @@
         <section class="container invisible">
             <div class="stats">
                 <StatPill primary beforeLabel="appears" value={data.wordInstances} label="times" />
-                <StatPill beforeLabel="in" value={data.entries.length} label="({((data.entries.length / data.totalEntries) * 100).toFixed(1)}%) entries" />
+                <StatPill
+                    beforeLabel="in"
+                    value={data.entries.length}
+                    label="({((data.entries.length / data.totalEntries) * 100).toFixed(
+                        1
+                    )}%) entries"
+                />
                 <StatPill
                     value={(data.wordInstances / data.totalEntries).toFixed(1)}
                     label="times / entry"

@@ -254,7 +254,13 @@ export function olEntryBezierArrows(
 
                 // circle at start point
                 ctx.beginPath();
-                ctx.arc(coords[coords.length - 1][0], coords[coords.length - 1][1], 3 * devicePixelRatio, 0, 2 * Math.PI);
+                ctx.arc(
+                    coords[coords.length - 1][0],
+                    coords[coords.length - 1][1],
+                    3 * devicePixelRatio,
+                    0,
+                    2 * Math.PI
+                );
                 ctx.fillStyle = arrowColor;
                 ctx.fill();
                 ctx.closePath();

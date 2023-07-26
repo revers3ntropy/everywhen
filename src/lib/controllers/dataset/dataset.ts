@@ -12,7 +12,7 @@ export type ThirdPartyDatasetIds = 'githubCommits' | 'githubLoC';
 export const thirdPartyDatasetIdsToNames: Record<ThirdPartyDatasetIds, string> = {
     githubCommits: 'GitHub Commits',
     githubLoC: 'GitHub LoC'
-}
+};
 
 export type DatasetData = DatasetRow[];
 

@@ -115,7 +115,7 @@
     }
 
     .content,
-    input[type=text] {
+    input[type='text'] {
         width: 300px;
     }
 
