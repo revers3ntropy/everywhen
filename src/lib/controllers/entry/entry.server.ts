@@ -1,10 +1,10 @@
 import type { QueryFunc } from '$lib/db/mysql.server';
+import type { Auth } from '../user/user';
 import { decrypt, encrypt, encryptMulti } from '$lib/security/encryption.server';
 import { Result } from '$lib/utils/result';
 import { fmtUtc, nowUtc } from '$lib/utils/time';
 import { Label } from '../label/label';
 import { Location } from '../location/location';
-import type { Auth } from '../user/user';
 import { UUId } from '../uuid/uuid';
 import {
     Entry as _Entry,
@@ -13,6 +13,7 @@ import {
     type RawEntry,
     type Streaks
 } from './entry';
+
 export type Entry = _Entry;
 
 namespace EntryUtils {

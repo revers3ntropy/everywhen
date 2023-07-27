@@ -3,7 +3,7 @@
 </script>
 
 <svelte:head>
-    <title> Version History | Halcyon.Land </title>
+    <title>Version History | Halcyon.Land</title>
 </svelte:head>
 
 <main class="flex-center">

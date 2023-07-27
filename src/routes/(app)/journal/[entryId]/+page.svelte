@@ -22,7 +22,7 @@
 </script>
 
 <svelte:head>
-    <title> View Entry </title>
+    <title>View Entry</title>
 </svelte:head>
 
 <main>

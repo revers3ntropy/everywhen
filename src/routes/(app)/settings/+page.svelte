@@ -32,7 +32,7 @@
 </script>
 
 <svelte:head>
-    <title> Settings </title>
+    <title>Settings</title>
 </svelte:head>
 
 <main>

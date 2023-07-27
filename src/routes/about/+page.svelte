@@ -7,7 +7,7 @@
 </script>
 
 <svelte:head>
-    <title> About | Halcyon.Land </title>
+    <title>About | Halcyon.Land</title>
 </svelte:head>
 
 <h1> About </h1>

@@ -45,7 +45,7 @@
 </script>
 
 <svelte:head>
-    <title> Log In </title>
+    <title>Log In</title>
     <meta content="Log in to halcyon.land" name="description" />
 </svelte:head>
 

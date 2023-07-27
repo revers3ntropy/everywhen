@@ -76,7 +76,7 @@
 </script>
 
 <svelte:head>
-    <title> Events </title>
+    <title>Events</title>
 </svelte:head>
 
 <main>

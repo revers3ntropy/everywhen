@@ -8,7 +8,7 @@
 </script>
 
 <svelte:head>
-    <title> Map </title>
+    <title>Map</title>
 </svelte:head>
 
 <main>

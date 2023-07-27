@@ -15,7 +15,7 @@
 </script>
 
 <svelte:head>
-    <title> {data.location.name} | Location </title>
+    <title>{data.location.name} | Location</title>
 </svelte:head>
 
 <section class="edit">

@@ -49,7 +49,7 @@
 </script>
 
 <svelte:head>
-    <title> Labels </title>
+    <title>Labels</title>
 </svelte:head>
 
 <main>

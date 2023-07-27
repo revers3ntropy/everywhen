@@ -8,7 +8,7 @@
 </script>
 
 <svelte:head>
-    <title> Edit Entry </title>
+    <title>Edit Entry</title>
 </svelte:head>
 
 <main>

@@ -1,5 +1,5 @@
-import * as server from './dataset.server';
 import * as client from './dataset.client';
+import * as server from './dataset.server';
 
 export interface Dataset {
     id: string;
@@ -9,22 +9,18 @@ export interface Dataset {
 
 export type ThirdPartyDatasetIds = 'githubCommits' | 'githubLoC';
 
-export const thirdPartyDatasetIdsToNames: Record<ThirdPartyDatasetIds, string> = {
-    githubCommits: 'GitHub Commits',
-    githubLoC: 'GitHub LoC'
-};
-
 export type DatasetData = DatasetRow[];
 
 export interface DatasetColumnType {
     id: string;
-    created: TimestampSecs;
+    created: TimestampSecs | null;
     name: string;
     unit: string;
 }
 
 export interface DatasetColumn {
     id: string;
+    dataset: string; // dataset Id
     created: TimestampSecs;
     name: string;
     type: DatasetColumnType;

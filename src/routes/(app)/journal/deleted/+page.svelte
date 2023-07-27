@@ -9,7 +9,7 @@
 </script>
 
 <svelte:head>
-    <title> Deleted Entries </title>
+    <title>Deleted Entries</title>
 </svelte:head>
 
 <main>

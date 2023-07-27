@@ -25,7 +25,7 @@
 </script>
 
 <svelte:head>
-    <title> Delete Account </title>
+    <title>Delete Account</title>
     <meta content="Delete halcyon.Land account" name="description" />
 </svelte:head>
 

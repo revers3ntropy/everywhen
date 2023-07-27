@@ -3,7 +3,7 @@
 </script>
 
 <svelte:head>
-    <title> Error | Halcyon.Land </title>
+    <title>Error | Halcyon.Land</title>
 </svelte:head>
 
 <main>

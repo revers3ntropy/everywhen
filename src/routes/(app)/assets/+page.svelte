@@ -54,7 +54,7 @@
 </script>
 
 <svelte:head>
-    <title> Assets </title>
+    <title>Assets</title>
 </svelte:head>
 
 <main>

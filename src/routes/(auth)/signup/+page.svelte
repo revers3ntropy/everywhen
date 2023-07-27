@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
     import { tooltip } from '@svelte-plugins/tooltips';
     import ArrowRightThinCircleOutline from 'svelte-material-icons/ArrowRightThinCircleOutline.svelte';
@@ -42,7 +41,7 @@
 </script>
 
 <svelte:head>
-    <title> Sign Up </title>
+    <title>Sign Up</title>
     <meta content="Sign up to halcyon.land" name="description" />
 </svelte:head>
 

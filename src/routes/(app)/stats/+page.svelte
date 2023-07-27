@@ -16,7 +16,7 @@
 </script>
 
 <svelte:head>
-    <title> Insights </title>
+    <title>Insights</title>
 </svelte:head>
 
 <main>

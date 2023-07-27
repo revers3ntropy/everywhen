@@ -1,5 +1,5 @@
 <svelte:head>
-    <title> Privacy | Halcyon.Land </title>
+    <title>Privacy | Halcyon.Land</title>
 </svelte:head>
 
 <main class="flex-center">
