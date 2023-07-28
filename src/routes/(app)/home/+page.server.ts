@@ -4,6 +4,7 @@ import { error } from '@sveltejs/kit';
 import { query } from '$lib/db/mysql.server';
 import { cachedPageRoute } from '$lib/utils/cache.server';
 import type { PageServerLoad } from './$types';
+import { Dataset } from '$lib/controllers/dataset/dataset.server';
 
 const NUMBER_OF_RECENT_TITLES = 6;
 
@@ -51,9 +52,13 @@ export const load = cachedPageRoute(async (auth, { parent, locals }) => {
 
     const pinned = titles.filter(Entry.isPinned);
 
+    const { val: datasets, err: datasetsErr } = await Dataset.allMetaData(query, auth);
+    if (datasetsErr) throw error(400, datasetsErr);
+
     return {
         recentTitles: firstNTitles,
         nYearsAgo,
-        pinnedEntriesList: pinned
+        pinnedEntriesList: pinned,
+        datasets
     };
 }) satisfies PageServerLoad;

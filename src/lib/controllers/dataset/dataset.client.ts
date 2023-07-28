@@ -1,8 +1,4 @@
-import type {
-    Dataset as _Dataset,
-    ThirdPartyDatasetIds,
-    DatasetColumnType
-} from './dataset';
+import type { Dataset as _Dataset, ThirdPartyDatasetIds, DatasetColumnType } from './dataset';
 
 export type Dataset = _Dataset;
 

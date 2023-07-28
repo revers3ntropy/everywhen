@@ -15,6 +15,7 @@
     import { dayUtcFromTimestamp, fmtUtc } from '$lib/utils/time';
     import type { PageData } from './$types';
     import EntryTitles from '$lib/components/entry/EntryTitles.svelte';
+    import DatasetShortcutWidgets from '$lib/components/dataset/DatasetShortcutWidgets.svelte';
 
     export let data: PageData;
 
@@ -75,6 +76,10 @@
                 Settings
             </a>
         </div>
+    </section>
+
+    <section>
+        <DatasetShortcutWidgets user={data.auth} datasets={data.datasets} />
     </section>
 
     <section>
@@ -144,35 +149,37 @@
                 </section>
             {/if}
         {/key}
-        <section>
-            <div class="container">
-                {#each Object.entries(data.nYearsAgo) as [yearsAgo, entries] (yearsAgo)}
-                    <h1>
-                        {yearsAgo === '1' ? `A Year` : `${yearsAgo} Years`} Ago Today
-                    </h1>
-                    <div style="margin: 1rem">
-                        <EntryTitles
-                            titles={{
-                                [fmtUtc(
-                                    dayUtcFromTimestamp(
-                                        entries[0].created,
-                                        entries[0].createdTZOffset
-                                    ),
-                                    0,
-                                    'YYYY-MM-DD'
-                                )]: entries
-                            }}
-                            obfuscated={$obfuscated}
-                            showTimeAgo={false}
-                            auth={data.auth}
-                            hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
-                            onCreateFilter={() => false}
-                            hideBlurToggle
-                        />
-                    </div>
-                {/each}
-            </div>
-        </section>
+        {#if Object.entries(data.nYearsAgo).length}
+            <section>
+                <div class="container">
+                    {#each Object.entries(data.nYearsAgo) as [yearsAgo, entries] (yearsAgo)}
+                        <h1>
+                            {yearsAgo === '1' ? `A Year` : `${yearsAgo} Years`} Ago Today
+                        </h1>
+                        <div style="margin: 1rem">
+                            <EntryTitles
+                                titles={{
+                                    [fmtUtc(
+                                        dayUtcFromTimestamp(
+                                            entries[0].created,
+                                            entries[0].createdTZOffset
+                                        ),
+                                        0,
+                                        'YYYY-MM-DD'
+                                    )]: entries
+                                }}
+                                obfuscated={$obfuscated}
+                                showTimeAgo={false}
+                                auth={data.auth}
+                                hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
+                                onCreateFilter={() => false}
+                                hideBlurToggle
+                            />
+                        </div>
+                    {/each}
+                </div>
+            </section>
+        {/if}
     </div>
 </main>
 

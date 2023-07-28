@@ -65,7 +65,7 @@ input {
     &:focus {
         border-radius: @border-radius;
         color: var(--text-color);
-        background: var(--v-light-accent);
+        background: var(--light-accent);
         border-bottom-color: transparent;
     }
 
@@ -105,7 +105,7 @@ input {
         outline: none;
         cursor: text;
         color: var(--text-color);
-        background: var(--v-light-accent);
+        background: var(--light-accent);
     }
 
     &[type='checkbox'] {
@@ -189,12 +189,22 @@ button {
             margin: 0 0.4em 0 0.2rem;
             width: fit-content;
         }
+
+        &.no-text {
+            display: inline;
+            margin: 0;
+
+            svg {
+                margin: 0;
+            }
+        }
     }
 
     &.not-link {
         color: var(--text-color);
         &:hover {
-            color: var(--text-color);            text-decoration: none;
+            color: var(--text-color);
+            text-decoration: none;
         }
     }
 
@@ -247,5 +257,18 @@ button {
     svg, svg * {
         color: var(--accent-danger);
         fill: var(--accent-danger) !important;
+    }
+}
+
+input[type=number].num-no-arrows {
+    /* Chrome, Safari, Edge, Opera */
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    /* Firefox */
+    & {
+        -moz-appearance: textfield;
     }
 }

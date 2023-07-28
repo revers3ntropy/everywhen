@@ -40,7 +40,7 @@ CREATE TABLE datasetRows
 
 CREATE TABLE datasetElements
 (
-    dataset  char(32)     NOT NULL,
+    dataset  char(32)      NOT NULL,
     `column` char(32)      NOT NULL,
     `row`    char(32)      NOT NULL,
     data     varchar(2048) NOT NULL

@@ -16,7 +16,10 @@ export type Dataset = _Dataset;
 
 namespace DatasetUtils {
     const thirdPartyDatasetProviders: {
-        [k in ThirdPartyDatasetIds]: (query: QueryFunc, user: User) => MaybePromise<DatasetData | null>;
+        [k in ThirdPartyDatasetIds]: (
+            query: QueryFunc,
+            user: User
+        ) => MaybePromise<DatasetData | null>;
     } = {
         githubCommits(_query, user) {
             if (!user.ghAccessToken) return null;
