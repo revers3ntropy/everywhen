@@ -30,14 +30,18 @@
     import { Backup } from '$lib/controllers/backup/backup.client';
     import type { Auth } from '$lib/controllers/user/user';
     import { Event as EventController } from '$lib/controllers/event/event.client';
-    import type { SettingsConfig } from '$lib/controllers/settings/settings';
     import { nowUtc } from '$lib/utils/time';
-    import { eventsSortKey, obfuscated, passcodeLastEntered, theme } from '$lib/stores';
+    import {
+        eventsSortKey,
+        obfuscated,
+        passcodeLastEntered,
+        settingsStore,
+        theme
+    } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
 
     export let auth: Auth;
-    export let settings: SettingsConfig;
 
     async function downloadBackup() {
         if (isDownloadingBackup) return;
@@ -227,7 +231,7 @@
     </div>
 
     <div class="right-options">
-        {#if settings.passcode.value}
+        {#if $settingsStore.passcode.value}
             <button
                 on:click={lock}
                 class="danger lock-button"

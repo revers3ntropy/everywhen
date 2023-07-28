@@ -7,6 +7,8 @@
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications.js';
     import { currentTzOffset, fmtDuration, fmtUtc, nowUtc } from '$lib/utils/time.js';
+    import type { SettingsConfig } from '$lib/controllers/settings/settings';
+    import { settingsStore } from '$lib/stores';
 
     export let id: string;
     export let auth: Auth;
@@ -46,12 +48,16 @@
         value = newValue;
         created = nowUtc();
 
-        displayNotifOnErr(
-            await api.put(auth, '/settings', {
-                key,
-                value: newValue
-            })
-        );
+        let k = key as keyof SettingsConfig;
+        const changes = {
+            key: k,
+            value: newValue
+        };
+
+        displayNotifOnErr(await api.put(auth, '/settings', changes));
+
+        $settingsStore[k].value = newValue;
+        $settingsStore[k].created = nowUtc();
 
         saving = false;
     }

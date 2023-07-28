@@ -3,17 +3,17 @@
     import { tooltip } from '@svelte-plugins/tooltips';
     import Close from 'svelte-material-icons/Close.svelte';
     import type { Auth } from '$lib/controllers/user/user';
-    import { doesNotWantToEnableLocation, enabledLocation } from '$lib/stores';
+    import { doesNotWantToEnableLocation, enabledLocation, settingsStore } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
+    import { nowUtc } from '$lib/utils/time';
 
     export let auth: Auth;
-    export let preferOn: boolean;
 
     async function enable() {
         const wasEnabled = $enabledLocation;
         $enabledLocation = true;
 
-        if (preferOn) return;
+        if ($settingsStore.preferLocationOn.value) return;
         // only ask this if showing the 'location not enabled' option
         // otherwise, the button asks to enable by default,
         // so don't check with user in that case.
@@ -29,7 +29,8 @@
             key: 'preferLocationOn',
             value: true
         });
-        preferOn = true;
+        $settingsStore.preferLocationOn.value = true;
+        $settingsStore.preferLocationOn.created = nowUtc();
     }
 
     function close() {
@@ -37,7 +38,7 @@
     }
 </script>
 
-{#if (!$enabledLocation || !preferOn) && !$doesNotWantToEnableLocation}
+{#if (!$enabledLocation || !$settingsStore.preferLocationOn.value) && !$doesNotWantToEnableLocation}
     <button on:click={enable} class="outer">
         <Info />
         <span>

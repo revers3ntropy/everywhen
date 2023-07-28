@@ -108,12 +108,7 @@
 
     <section>
         <h1>{data.entryCount} Entr{data.entryCount === 1 ? 'y' : 'ies'}</h1>
-        <Entries
-            auth={data.auth}
-            options={{ labelId: data.label.id }}
-            showLabels={false}
-            hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
-        />
+        <Entries auth={data.auth} options={{ labelId: data.label.id }} showLabels={false} />
     </section>
 </main>
 

@@ -16,7 +16,7 @@
     import type { Label as LabelController } from '../../controllers/label/label';
     import { dispatch } from '$lib/dataChangeEvents';
     import { Entry } from '$lib/controllers/entry/entry.client';
-    import { popup } from '$lib/stores';
+    import { popup, settingsStore } from '$lib/stores';
     import { ANIMATION_DURATION } from '$lib/constants';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
@@ -45,7 +45,6 @@
     export let obfuscated = true;
     export let showLabels = true;
     export let showLocations = true;
-    export let hideAgentWidget = false;
     export let isInDialog = false;
 
     export let auth: Auth;
@@ -147,7 +146,7 @@
                 </span>
             {/if}
 
-            {#if !hideAgentWidget}
+            {#if $settingsStore.showAgentWidgetOnEntries.value}
                 <AgentWidget data={agentData} />
             {/if}
 
@@ -165,7 +164,7 @@
             {/if}
 
             {#if !obfuscated && !isEdit && edits?.length}
-                {#if (latitude && longitude && showLocations) || (hideAgentWidget && !showFullDate)}
+                {#if (latitude && longitude && showLocations) || ($settingsStore.showAgentWidgetOnEntries.value && !showFullDate)}
                     <Dot />
                 {/if}
                 <a href="/journal/{id}?history=on&obfuscate=0" class="edits-link link">
@@ -266,7 +265,6 @@
                             longitude
                         }
                     ],
-                    hideAgentWidget,
                     showArrowsBetweenEntriesOnMap: false
                 }}
             />

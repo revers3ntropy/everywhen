@@ -253,7 +253,9 @@ namespace DatasetUtils {
                 const column = columns[i];
                 const value = row.elements[i];
                 if (!column.type.validate(value)) {
-                    return Result.err(`Invalid value for column ${column.name}: ${value}`);
+                    return Result.err(
+                        `Invalid value for column ${column.name}: ${JSON.stringify(value)}`
+                    );
                 }
             }
 

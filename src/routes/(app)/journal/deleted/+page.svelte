@@ -22,7 +22,6 @@
     </h2>
     <Entries
         auth={data.auth}
-        hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
         options={{
             deleted: true
         }}

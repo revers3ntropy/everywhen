@@ -16,6 +16,7 @@
     } from '$lib/controllers/settings/settings.client';
     import Settings from './Settings.svelte';
     import type { PageData } from './$types';
+    import { settingsStore } from '$lib/stores';
 
     export let data: PageData;
 
@@ -68,14 +69,11 @@
             <Cog size="30" />
             <span>General Settings</span>
         </h1>
-        <div style="padding: 1rem 0 2rem 0">
-            <i> Please note you will have to reload the page for changes to take effect </i>
-        </div>
 
         <div class="settings">
             {#each settingsConfigEntries as [key, config] (key)}
                 {#if config.showInSettings}
-                    <Settings {...config} {...data.settings[key]} auth={data.auth} />
+                    <Settings {...config} {...$settingsStore[key]} auth={data.auth} />
                 {/if}
             {/each}
         </div>

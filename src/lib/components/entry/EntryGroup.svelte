@@ -29,7 +29,6 @@
     export let showLocations = true;
     export let showEntryForm = false;
     export let entryFormMode = null as null | EntryFormMode;
-    export let hideAgentWidget = false;
     export let auth: Auth;
     export let day: number;
 
@@ -116,15 +115,7 @@
             }}
         >
             {#each entries as entry}
-                <Entry
-                    {...entry}
-                    {obfuscated}
-                    {showLabels}
-                    {showLocations}
-                    {hideAgentWidget}
-                    {auth}
-                    {locations}
-                />
+                <Entry {...entry} {obfuscated} {showLabels} {showLocations} {auth} {locations} />
             {/each}
         </div>
     {/if}

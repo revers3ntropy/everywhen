@@ -34,7 +34,6 @@
     export let showLabels = true;
     export let showLocations = true;
     export let showEntryForm = false;
-    export let hideAgentWidget: boolean;
 
     export let numberOfEntries = Infinity;
 
@@ -229,12 +228,7 @@
         <div class:sidebar-and-entries={showSidebar}>
             {#if showSidebar}
                 <div>
-                    <Sidebar
-                        titles={entryTitles}
-                        {auth}
-                        {hideAgentWidget}
-                        obfuscated={$obfuscated}
-                    />
+                    <Sidebar titles={entryTitles} {auth} obfuscated={$obfuscated} />
                 </div>
             {/if}
 
@@ -248,7 +242,6 @@
                             {showLocations}
                             {auth}
                             day={new Date(day).getTime() / 1000}
-                            {hideAgentWidget}
                             {locations}
                             {showEntryForm}
                             {entryFormMode}

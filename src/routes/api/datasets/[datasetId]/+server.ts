@@ -6,7 +6,7 @@ import { query } from '$lib/db/mysql.server';
 import { error } from '@sveltejs/kit';
 import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
-import { z } from "zod";
+import { z } from 'zod';
 
 export const GET = cachedApiRoute(async (auth, { params }) => {
     const datasetId = params.datasetId;
@@ -25,12 +25,14 @@ export const POST = (async ({ cookies, request, params }) => {
         rows: 'object'
     });
 
-    const rowsValidator = z.array(z.object({
-        created: z.number().optional(),
-        timestamp: z.number().optional(),
-        timestampTzOffset: z.number().optional(),
-        elements: z.array(z.any())
-    }));
+    const rowsValidator = z.array(
+        z.object({
+            created: z.number().optional(),
+            timestamp: z.number().optional(),
+            timestampTzOffset: z.number().optional(),
+            elements: z.array(z.any())
+        })
+    );
 
     const res = rowsValidator.safeParse(body.rows);
     if (!res.success) throw error(400, res.error);

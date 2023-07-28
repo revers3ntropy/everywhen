@@ -38,7 +38,6 @@
         obfuscated={$obfuscated}
         on:updated={() => location.reload()}
         showFullDate={true}
-        hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
         {locations}
     />
 
@@ -67,7 +66,6 @@
                     obfuscated={$obfuscated}
                     isEdit={true}
                     showFullDate={true}
-                    hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
                     {locations}
                 />
             {/each}

@@ -85,7 +85,6 @@
                     search: displayNotifOnErr(encrypt(data.theWord, data.auth.key))
                 }}
                 showSearch={false}
-                hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
             />
         </section>
     {/if}

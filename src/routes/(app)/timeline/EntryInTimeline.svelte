@@ -24,7 +24,6 @@
     export let agentData = '';
     export let latitude = null as number | null;
     export let longitude = null as number | null;
-    export let hideAgentWidget: boolean;
 
     const WIDTH = 4;
     const height = 0.2 * wordCount + 20;
@@ -80,8 +79,7 @@
             showPopup(EntryDialog, {
                 id,
                 auth,
-                obfuscated: false,
-                hideAgentWidget
+                obfuscated: false
             });
         }
     });

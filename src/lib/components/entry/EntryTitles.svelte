@@ -18,15 +18,13 @@
     export let showTimeAgo = true;
     export let blurToggleOnLeft = false;
     export let hideBlurToggle = false;
-    export let hideAgentWidget: boolean;
     export let onCreateFilter: (entry: Entry) => boolean = () => true;
 
     function showEntryPopup(entryId: string) {
         showPopup(EntryDialog, {
             id: entryId,
             auth,
-            obfuscated,
-            hideAgentWidget
+            obfuscated
         });
     }
 

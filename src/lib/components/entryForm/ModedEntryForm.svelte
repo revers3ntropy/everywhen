@@ -3,10 +3,10 @@
     import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
     import type { SettingsKey } from '$lib/controllers/settings/settings';
     import type { Auth } from '$lib/controllers/user/user';
-    import { dispatch } from '$lib/dataChangeEvents';
     import { api } from '$lib/utils/apiRequest';
     import EntryForm from './EntryForm.svelte';
     import BulletEntriesForm from '$lib/components/entryForm/BulletEntriesForm.svelte';
+    import { settingsStore } from '$lib/stores';
 
     export let auth: Auth;
     export let obfuscated = true;
@@ -17,10 +17,11 @@
             key: 'entryFormMode' as SettingsKey,
             value: mode !== EntryFormMode.Standard
         };
-        await Promise.all([
-            dispatch.update('setting', newSetting),
-            api.put(auth, '/settings', newSetting)
-        ]);
+        $settingsStore.entryFormMode = {
+            ...$settingsStore.entryFormMode,
+            value: newSetting.value
+        };
+        await api.put(auth, '/settings', newSetting);
     }
 </script>
 

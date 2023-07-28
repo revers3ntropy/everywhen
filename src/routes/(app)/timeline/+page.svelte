@@ -16,6 +16,7 @@
     import TimeMarkers from './TimeMarkers.svelte';
     import { addYToEvents, type EventWithYLevel, getInitialZoomAndPos } from './utils';
     import type { PageData } from './$types';
+    import { settingsStore } from '$lib/stores';
 
     export let data: PageData;
 
@@ -127,18 +128,13 @@
         <MobileZoom auth={data.auth} labels={data.labels} />
         <Background />
 
-        <TimeMarkers startYear={data.settings.yearOfBirth.value} />
+        <TimeMarkers startYear={$settingsStore.yearOfBirth.value} />
 
         <NowLine />
 
         {#each data.entries as entry, i}
             {#if selectedLabels.includes(entry.label?.id || '')}
-                <EntryInTimeline
-                    {...entry}
-                    entryTextParityHeight={i % 2 === 0}
-                    auth={data.auth}
-                    hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
-                />
+                <EntryInTimeline {...entry} entryTextParityHeight={i % 2 === 0} auth={data.auth} />
             {/if}
         {/each}
 

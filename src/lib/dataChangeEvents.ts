@@ -2,10 +2,9 @@ import type { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
 import type { Entry } from '$lib/controllers/entry/entry';
 import type { Label } from '$lib/controllers/label/label';
 import type { Event } from '$lib/controllers/event/event';
-import type { SettingsConfig } from '$lib/controllers/settings/settings';
 import { onDestroy } from 'svelte';
 
-type Entities = 'entry' | 'label' | 'event' | 'setting';
+type Entities = 'entry' | 'label' | 'event';
 
 type Create = {
     entry: {
@@ -14,22 +13,16 @@ type Create = {
     };
     label: Label;
     event: Event;
-    setting: never;
 };
 type Delete = {
     entry: string;
     label: string;
     event: string;
-    setting: never;
 };
 type Update = {
     entry: Entry;
     label: Label;
     event: Event;
-    setting: {
-        key: keyof SettingsConfig;
-        value: SettingsConfig[keyof SettingsConfig]['value'];
-    };
 };
 
 type UpdateListener<T> = (newValue: T) => MaybePromise<void>;
@@ -52,8 +45,7 @@ function emptyListeners(): Readonly<{
 const listeners = {
     entry: emptyListeners(),
     label: emptyListeners(),
-    event: emptyListeners(),
-    setting: emptyListeners()
+    event: emptyListeners()
 } as {
     [K in Entities]: Readonly<{
         onUpdate: UpdateListener<Update[K]>[];

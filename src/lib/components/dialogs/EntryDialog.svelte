@@ -12,7 +12,6 @@
     export let id: string;
     export let auth: Auth;
     export let obfuscated = false;
-    export let hideAgentWidget: boolean;
 
     let entry: EntryController | null = null;
     let locations = null as Location[] | null;
@@ -35,15 +34,7 @@
 
 <div>
     {#if entry}
-        <Entry
-            {...entry}
-            isInDialog={true}
-            {auth}
-            {obfuscated}
-            showFullDate={true}
-            {hideAgentWidget}
-            {locations}
-        />
+        <Entry {...entry} isInDialog={true} {auth} {obfuscated} showFullDate={true} {locations} />
     {:else}
         <BookSpinner />
     {/if}

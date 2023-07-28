@@ -10,7 +10,6 @@
     export let titles: Record<string, Entry[]> | null;
     export let auth: Auth;
     export let obfuscated = false;
-    export let hideAgentWidget: boolean;
 
     let showing = false;
 </script>
@@ -42,7 +41,7 @@
         </button>
     </div>
     <div class="content">
-        <EntryTitles {auth} {obfuscated} {titles} hideBlurToggle {hideAgentWidget} />
+        <EntryTitles {auth} {obfuscated} {titles} hideBlurToggle />
     </div>
 </div>
 

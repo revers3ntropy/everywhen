@@ -6,7 +6,7 @@
     import { ANIMATION_DURATION } from '$lib/constants';
     import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
     import { api, apiPath } from '$lib/utils/apiRequest';
-    import { currentTzOffset, nowUtc } from "$lib/utils/time";
+    import { currentTzOffset, nowUtc } from '$lib/utils/time';
 
     export let auth: Auth;
     export let dataset: Dataset | null;
@@ -42,7 +42,7 @@
 
     function onKeyUp(evt: KeyboardEvent) {
         if (evt.key === 'Enter') {
-            submit();
+            void submit();
         }
     }
 

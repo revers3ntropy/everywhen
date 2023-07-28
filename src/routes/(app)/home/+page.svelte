@@ -101,7 +101,6 @@
                         auth={data.auth}
                         titles={data.recentTitles}
                         obfuscated={$obfuscated}
-                        hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
                         hideBlurToggle
                     />
                 {:else}
@@ -128,7 +127,6 @@
                                 auth={data.auth}
                                 titles={pinnedEntries}
                                 obfuscated={$obfuscated}
-                                hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
                                 onCreateFilter={Entry.isPinned}
                                 hideBlurToggle
                             />
@@ -171,7 +169,6 @@
                                 obfuscated={$obfuscated}
                                 showTimeAgo={false}
                                 auth={data.auth}
-                                hideAgentWidget={!data.settings.showAgentWidgetOnEntries.value}
                                 onCreateFilter={() => false}
                                 hideBlurToggle
                             />

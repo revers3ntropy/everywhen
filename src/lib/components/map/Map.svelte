@@ -22,7 +22,7 @@
     import { fromLonLat, toLonLat } from 'ol/proj';
     import ContextMenu from 'ol-contextmenu';
     import { Location } from '$lib/controllers/location/location.client';
-    import { popup } from '$lib/stores';
+    import { popup, settingsStore } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { showPopup } from '$lib/utils/popups';
     import EditLocation from '../location/EditLocation.svelte';
@@ -43,8 +43,6 @@
     export let auth: Auth;
     export let entries = [] as EntryLocation[];
     export let locations = [] as Location[];
-    export let hideAgentWidget: boolean;
-    export let showArrowsBetweenEntriesOnMap: boolean;
     export let entriesInteractable = true;
     export let width = 'calc(100vw - 2rem)';
     export let height = 'calc(100vh - var(--nav-height) - 1rem)';
@@ -175,7 +173,7 @@
         interactions.map(i => map.addInteraction(i));
 
         map.addLayer(olLayerFromEntries(entries));
-        if (showArrowsBetweenEntriesOnMap) {
+        if ($settingsStore.showArrowsBetweenEntriesOnMap.value) {
             map.addLayer(olEntryBezierArrows(entries, map.getView()));
         }
 
@@ -201,8 +199,7 @@
                 showPopup(EntryDialog, {
                     id: hovering.entry.id,
                     auth,
-                    obfuscated: false,
-                    hideAgentWidget
+                    obfuscated: false
                 });
                 return;
             }

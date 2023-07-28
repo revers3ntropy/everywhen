@@ -6,6 +6,7 @@ import { COOKIE_WRITEABLE_KEYS, STORE_KEY, Theme } from './constants';
 import { persisted } from 'svelte-local-storage-store';
 
 export const popup = writable<typeof SvelteComponent | null | undefined>(null);
+export const settingsStore = writable<SettingsConfig>();
 
 export const doesNotWantToEnableLocation = persisted<boolean>(
     STORE_KEY.doesNotWantToEnableLocation,
@@ -47,11 +48,15 @@ export function populateCookieWritablesWithCookies(
         allowedCookies.set(tryParse<boolean>(cookies.allowedCookies, false));
     }
 
-    if (settings?.hideEntriesByDefault?.value) {
-        obfuscated.set(true);
-    }
+    if (settings) {
+        settingsStore.set(settings);
 
-    if (settings?.preferLocationOn?.value) {
-        enabledLocation.set(true);
+        if (settings.hideEntriesByDefault?.value) {
+            obfuscated.set(true);
+        }
+
+        if (settings.preferLocationOn?.value) {
+            enabledLocation.set(true);
+        }
     }
 }

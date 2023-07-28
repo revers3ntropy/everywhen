@@ -9,7 +9,7 @@
     import Cookie from 'js-cookie';
     import { STORE_KEY } from '$lib/constants';
     import { Backup } from '$lib/controllers/backup/backup.client';
-    import { allowedCookies, obfuscated, passcodeLastEntered } from '$lib/stores';
+    import { allowedCookies, obfuscated, passcodeLastEntered, settingsStore } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
     import { nowUtc } from '$lib/utils/time';
@@ -22,7 +22,7 @@
         // === true to get around a weird TS + Svelte bug
         if ($obfuscated === true) return;
 
-        const hideAfter = data.settings.autoHideEntriesDelay.value;
+        const hideAfter = $settingsStore.autoHideEntriesDelay.value;
         if (hideAfter < 1) return;
 
         if (nowUtc() - lastActivity >= hideAfter) {
@@ -44,7 +44,7 @@
         if (lastEntered === null) return;
 
         const secondsSinceLastEntered = nowUtc() - lastEntered;
-        showPasscodeModal = secondsSinceLastEntered > data.settings.passcodeTimeout.value;
+        showPasscodeModal = secondsSinceLastEntered > $settingsStore.passcodeTimeout.value;
     }
 
     function activity() {
@@ -110,6 +110,12 @@
     });
 
     passcodeLastEntered.subscribe(v => void checkPasscode(v));
+
+    $: currentlyShowPasscodeModal =
+        $settingsStore.passcode.value &&
+        nowUtc() - ($passcodeLastEntered || 0) > $settingsStore.passcodeTimeout.value &&
+        showPasscodeModal &&
+        ($settingsStore.passcodeTimeout.value > 0 || !$passcodeLastEntered || !browser);
 </script>
 
 <svelte:window
@@ -118,12 +124,12 @@
     on:scroll|passive={activity}
 />
 
-<Nav auth={data.auth} settings={data.settings} />
+<Nav auth={data.auth} />
 
-{#if data.settings.passcode.value && nowUtc() - ($passcodeLastEntered || 0) > data.settings.passcodeTimeout.value && showPasscodeModal && (data.settings.passcodeTimeout.value > 0 || !$passcodeLastEntered || !browser)}
+{#if currentlyShowPasscodeModal}
     <PasscodeModal
         bind:show={showPasscodeModal}
-        passcode={data.settings.passcode.value}
+        passcode={$settingsStore.passcode.value}
         auth={data.auth}
     />
 {/if}
