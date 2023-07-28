@@ -8,25 +8,37 @@ namespace DatasetUtils {
             id: 'number',
             created: null,
             name: 'Number',
-            unit: ''
+            unit: '',
+            validate: (value: unknown) => typeof value === 'number',
+            serialize: JSON.stringify,
+            deserialize: JSON.parse
         },
         {
             id: 'weight_kg',
             created: null,
             name: 'Weight (KG)',
-            unit: 'kg'
+            unit: 'kg',
+            validate: (value: unknown) => typeof value === 'number',
+            serialize: JSON.stringify,
+            deserialize: JSON.parse
         },
         {
             id: 'text',
             created: null,
             name: 'Text',
-            unit: ''
+            unit: '',
+            validate: (value: unknown) => typeof value === 'string',
+            serialize: t => t as string,
+            deserialize: t => t
         },
         {
             id: 'boolean',
             created: null,
             name: 'Boolean',
-            unit: ''
+            unit: '',
+            validate: (value: unknown) => typeof value === 'boolean',
+            serialize: (value: unknown) => (value ? '1' : '0'),
+            deserialize: (value: string) => value === '1'
         }
     ];
 

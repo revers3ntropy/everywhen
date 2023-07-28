@@ -20,7 +20,7 @@ CREATE TABLE datasetColumnTypes
 
 CREATE TABLE datasetColumns
 (
-    id      char(32)     NOT NULL,
+    id      int(32)      NOT NULL,
     dataset char(32)     NOT NULL,
     created int(64)      NOT NULL,
     name    varchar(256) NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE datasetColumns
 
 CREATE TABLE datasetRows
 (
-    id                char(32)     NOT NULL,
+    id                int(32)     NOT NULL,
     dataset           char(32)     NOT NULL,
     created           int(64)      NOT NULL,
     timestamp         int(64)      NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE datasetRows
 CREATE TABLE datasetElements
 (
     dataset  char(32)      NOT NULL,
-    `column` char(32)      NOT NULL,
-    `row`    char(32)      NOT NULL,
+    `column` int(32)       NOT NULL,
+    `row`    int(32)       NOT NULL,
     data     varchar(2048) NOT NULL
 ) ENGINE = InnoDB DEFAULT CHARSET = latin1;

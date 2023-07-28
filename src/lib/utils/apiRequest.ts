@@ -61,6 +61,7 @@ interface ApiResponse {
         '/locations': POST<typeof import('../../routes/api/locations/+server')>;
         '/oauth/gh': POST<typeof import('../../routes/api/oauth/gh/+server')>;
         '/datasets': POST<typeof import('../../routes/api/datasets/+server')>;
+        '/datasets/?': POST<typeof import('../../routes/api/datasets/[datasetId]/+server')>;
     };
     DELETE: {
         '/users': DELETE<typeof import('../../routes/api/users/+server')>;

@@ -1,9 +1,12 @@
-import { apiRes404 } from '$lib/utils/apiResponse.server';
-import { cachedApiRoute } from '$lib/utils/cache.server';
+import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
+import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
 import type { RequestHandler } from './$types';
 import { Dataset } from '$lib/controllers/dataset/dataset';
 import { query } from '$lib/db/mysql.server';
 import { error } from '@sveltejs/kit';
+import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
+import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
+import { z } from "zod";
 
 export const GET = cachedApiRoute(async (auth, { params }) => {
     const datasetId = params.datasetId;
@@ -14,6 +17,29 @@ export const GET = cachedApiRoute(async (auth, { params }) => {
     };
 }) satisfies RequestHandler;
 
-export const POST = apiRes404;
+export const POST = (async ({ cookies, request, params }) => {
+    const auth = await getAuthFromCookies(cookies);
+    invalidateCache(auth.id);
+
+    const body = await getUnwrappedReqBody(request, {
+        rows: 'object'
+    });
+
+    const rowsValidator = z.array(z.object({
+        created: z.number().optional(),
+        timestamp: z.number().optional(),
+        timestampTzOffset: z.number().optional(),
+        elements: z.array(z.any())
+    }));
+
+    const res = rowsValidator.safeParse(body.rows);
+    if (!res.success) throw error(400, res.error);
+
+    const { err } = await Dataset.appendRows(query, auth, params.datasetId, res.data);
+    if (err) throw error(400, err);
+
+    return apiResponse({});
+}) satisfies RequestHandler;
+
 export const DELETE = apiRes404;
 export const PUT = apiRes404;

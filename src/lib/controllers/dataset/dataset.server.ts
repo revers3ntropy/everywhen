@@ -11,6 +11,7 @@ import type {
     DatasetMetadata,
     ThirdPartyDatasetIds
 } from './dataset';
+import { nowUtc } from '$lib/utils/time';
 
 export type Dataset = _Dataset;
 
@@ -63,15 +64,27 @@ namespace DatasetUtils {
             WHERE user = ${auth.id}
         `;
 
-        return Result.ok([...types, ...DatasetClient.builtInTypes]);
+        return Result.ok([
+            ...types.map(t => ({
+                ...t,
+                validate: () => true,
+                serialize: JSON.stringify,
+                deserialize: JSON.parse
+            })),
+            ...DatasetClient.builtInTypes
+        ]);
     }
 
-    async function allColumns(query: QueryFunc, auth: Auth): Promise<Result<DatasetColumn[]>> {
+    async function allColumns(
+        query: QueryFunc,
+        auth: Auth,
+        datasetId?: string
+    ): Promise<Result<DatasetColumn[]>> {
         const { val: types, err: typesErr } = await allTypes(query, auth);
         if (typesErr) return Result.err(typesErr);
 
         const columns = await query<
-            { id: string; name: string; dataset: string; created: TimestampSecs; type: string }[]
+            { id: number; name: string; dataset: string; created: TimestampSecs; type: string }[]
         >`
             SELECT datasetColumns.id,
                    datasetColumns.dataset,
@@ -81,6 +94,7 @@ namespace DatasetUtils {
             FROM   datasetColumns, datasets
             WHERE  datasets.user = ${auth.id}
                AND datasets.id = datasetColumns.dataset
+               AND ((datasets.id = ${datasetId || ''}) OR ${!datasetId})
         `;
 
         return Result.collect(
@@ -160,7 +174,8 @@ namespace DatasetUtils {
         const existingWithName = await query<{ name: string }[]>`
             SELECT name
             FROM datasets
-            WHERE name = ${name} AND user = ${auth.id}
+            WHERE name = ${name} 
+              AND datasets.user = ${auth.id}
         `;
 
         if (existingWithName.length > 0) {
@@ -177,15 +192,14 @@ namespace DatasetUtils {
         const { val: types, err: getTypesErr } = await allTypes(query, auth);
         if (getTypesErr) return Result.err(getTypesErr);
 
-        for (const column of columns) {
+        for (let i = 0; i < columns.length; i++) {
+            const column = columns[i];
             const type = types.find(type => type.id === column.type);
             if (!type) return Result.err('Invalid column type');
 
-            const columnId = await UUId.generateUniqueUUId(query);
-
             await query`
-                INSERT INTO datasetColumns (id, user, dataset, name, created, type)
-                VALUES (${columnId}, ${auth.id}, ${id}, ${column.name}, ${created}, ${type.id})
+                INSERT INTO datasetColumns (id, dataset, name, created, type)
+                VALUES (${i}, ${id}, ${column.name}, ${created}, ${type.id})
             `;
         }
 
@@ -194,6 +208,94 @@ namespace DatasetUtils {
             name,
             created
         });
+    }
+
+    export async function appendRows(
+        query: QueryFunc,
+        auth: Auth,
+        datasetId: string,
+        rows: {
+            elements: unknown[];
+            created?: TimestampSecs;
+            timestamp?: TimestampSecs;
+            timestampTzOffset?: Hours;
+        }[]
+    ): Promise<Result> {
+        const { val: columns, err: getColumnsErr } = await allColumns(query, auth);
+        if (getColumnsErr) return Result.err(getColumnsErr);
+
+        const newRows = [] as {
+            id: number;
+            created: TimestampSecs;
+            timestamp: TimestampSecs;
+            timestampTzOffset: Hours;
+        }[];
+        const newElements = [] as { row: number; column: number; data: string }[];
+
+        const maxRowId = await query<{ id: number }[]>`
+            SELECT MAX(datasetRows.id) AS id
+            FROM datasetRows, datasets
+            WHERE datasetRows.dataset = ${datasetId} 
+                AND datasets.user = ${auth.id}
+                AND datasets.id = datasetRows.dataset
+        `;
+
+        let nextRowId = maxRowId.length > 0 ? maxRowId[0].id + 1 : 0;
+
+        for (const row of rows) {
+            if (columns.length !== row.elements.length) {
+                return Result.err(
+                    `Invalid number of values in row: expected ${columns.length} but found ${row.elements.length}`
+                );
+            }
+
+            for (let i = 0; i < columns.length; i++) {
+                const column = columns[i];
+                const value = row.elements[i];
+                if (!column.type.validate(value)) {
+                    return Result.err(`Invalid value for column ${column.name}: ${value}`);
+                }
+            }
+
+            const rowId = nextRowId;
+            nextRowId++;
+
+            newRows.push({
+                id: rowId,
+                created: row.created || nowUtc(),
+                timestamp: row.timestamp || nowUtc(),
+                timestampTzOffset: row.timestampTzOffset || 0
+            });
+
+            for (let i = 0; i < columns.length; i++) {
+                const column = columns[i];
+                const value = row.elements[i];
+                const data = columns[i].type.serialize(value);
+                if (data.length > 1000) {
+                    return Result.err(`Value for column ${column.name} is too long`);
+                }
+                newElements.push({
+                    row: rowId,
+                    column: column.id,
+                    data
+                });
+            }
+        }
+
+        for (const row of newRows) {
+            await query`
+                INSERT INTO datasetRows (id, dataset, created, timestamp, timestampTzOffset)
+                VALUES (${row.id}, ${datasetId}, ${row.created}, ${row.timestamp}, ${row.timestampTzOffset})
+            `;
+        }
+        for (const element of newElements) {
+            await query`
+                INSERT INTO datasetElements (dataset, \`row\`, \`column\`, data)
+                VALUES (${datasetId}, ${element.row}, ${element.column}, ${element.data})
+            `;
+        }
+
+        return Result.ok(null);
     }
 }
 

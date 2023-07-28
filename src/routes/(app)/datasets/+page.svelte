@@ -30,11 +30,12 @@
 
     {#each unusedPresetNames as presetName}
         <button on:click={() => makeFromPreset(presetName)}>
-            {presetName}
+            Start Recording {presetName}
         </button>
     {/each}
+
     {#each data.datasets as dataset}
-        <div>
+        <div class="dataset">
             {dataset.name}
         </div>
     {/each}
@@ -43,4 +44,10 @@
 <style lang="less">
     @import '../../../styles/variables';
     @import '../../../styles/layout';
+
+    .dataset {
+        .container();
+        width: 100px;
+        padding: 1rem;
+    }
 </style>

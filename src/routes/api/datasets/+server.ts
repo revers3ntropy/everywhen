@@ -51,8 +51,6 @@ export const POST = (async ({ request, cookies }) => {
         };
     });
 
-    console.log(Dataset);
-
     const { val: dataset, err } = await Dataset.create(
         query,
         auth,

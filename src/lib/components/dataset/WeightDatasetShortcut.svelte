@@ -4,18 +4,38 @@
     import type { Dataset } from '$lib/controllers/dataset/dataset';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import { ANIMATION_DURATION } from '$lib/constants';
-    import { notify } from '$lib/components/notifications/notifications';
+    import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
+    import { api, apiPath } from '$lib/utils/apiRequest';
+    import { currentTzOffset, nowUtc } from "$lib/utils/time";
 
     export let auth: Auth;
     export let dataset: Dataset | null;
 
-    function submit() {
+    async function submit() {
+        if (!dataset) return;
+        if (submitting) return;
         if (!value || value < 0 || typeof value !== 'number') {
             showInvalidMsg = true;
             return;
         }
 
+        submitting = true;
+
+        displayNotifOnErr(
+            await api.post(auth, apiPath('/datasets/?', dataset.id), {
+                rows: [
+                    {
+                        elements: [value],
+                        timestamp: nowUtc(),
+                        created: nowUtc(),
+                        timestampTzOffset: currentTzOffset()
+                    }
+                ]
+            })
+        );
+
         showInvalidMsg = false;
+        submitting = false;
         value = '' as unknown as number;
         notify.success('Weight entered');
     }
@@ -26,6 +46,7 @@
         }
     }
 
+    let submitting = false;
     let showInvalidMsg = false;
     let value: number;
 </script>
@@ -42,9 +63,10 @@
                 on:keyup={onKeyUp}
                 bind:value
                 min="0"
+                disabled={submitting}
             />
             kg
-            <button on:click={submit} class="with-circled-icon no-text">
+            <button on:click={submit} class="with-circled-icon no-text" disabled={submitting}>
                 <Plus size="25" />
             </button>
         </div>

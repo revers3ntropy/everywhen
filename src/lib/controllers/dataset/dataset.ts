@@ -16,10 +16,13 @@ export interface DatasetColumnType {
     created: TimestampSecs | null;
     name: string;
     unit: string;
+    validate: (value: unknown) => boolean;
+    serialize: (value: unknown) => string;
+    deserialize: (value: string) => unknown;
 }
 
 export interface DatasetColumn {
-    id: string;
+    id: number;
     dataset: string; // dataset Id
     created: TimestampSecs;
     name: string;
@@ -27,12 +30,11 @@ export interface DatasetColumn {
 }
 
 export interface DatasetRow {
-    id: string;
+    id: number;
     created: TimestampSecs;
     timestamp: TimestampSecs;
     timestampTzOffset: Hours;
-    // DatasetColumn.id -> serialized value
-    elements: Record<string, string>;
+    elements: string[];
 }
 
 export interface DatasetMetadata extends Dataset {
