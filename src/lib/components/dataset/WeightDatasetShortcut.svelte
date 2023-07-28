@@ -1,15 +1,15 @@
 <script lang="ts">
-    import { slide } from "svelte/transition";
+    import { slide } from 'svelte/transition';
     import type { Auth } from '$lib/controllers/user/user';
     import type { Dataset } from '$lib/controllers/dataset/dataset';
     import Plus from 'svelte-material-icons/Plus.svelte';
-    import { ANIMATION_DURATION } from "$lib/constants";
-    import { notify } from "$lib/components/notifications/notifications";
+    import { ANIMATION_DURATION } from '$lib/constants';
+    import { notify } from '$lib/components/notifications/notifications';
 
     export let auth: Auth;
     export let dataset: Dataset | null;
 
-    function submit () {
+    function submit() {
         if (!value || value < 0 || typeof value !== 'number') {
             showInvalidMsg = true;
             return;
@@ -36,16 +36,26 @@
             <a href="/datasets/{dataset.id}">Weight</a>
         </div>
         <div class="flex-center" style="margin: 0.5rem 0; gap: 4px">
-            <input type="number" class=num-no-arrows on:keyup={onKeyUp} bind:value min="0" step="1" />
+            <input
+                type="number"
+                class="num-no-arrows"
+                on:keyup={onKeyUp}
+                bind:value
+                min="0"
+            />
             kg
             <button on:click={submit} class="with-circled-icon no-text">
-                <Plus size="25"/>
+                <Plus size="25" />
             </button>
         </div>
         {#if showInvalidMsg}
-            <div class="text-warning" transition:slide={{
-				duration: ANIMATION_DURATION, axis: 'y'
-			}}>
+            <div
+                class="text-warning"
+                transition:slide={{
+                    duration: ANIMATION_DURATION,
+                    axis: 'y'
+                }}
+            >
                 Invalid weight
             </div>
         {/if}
