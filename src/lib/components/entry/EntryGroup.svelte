@@ -6,21 +6,21 @@
 </script>
 
 <script lang="ts">
-    import type { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
+    import { page } from '$app/stores';
+    import { fly, slide } from 'svelte/transition';
+    import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
+    import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import ModedEntryForm from '$lib/components/entryForm/ModedEntryForm.svelte';
     import { ANIMATION_DURATION } from '$lib/constants';
     import { listen } from '$lib/dataChangeEvents';
-    import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
-    import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
     import Entry from '$lib/components/entry/Entry.svelte';
     import type { Entry as EntryController } from '$lib/controllers/entry/entry';
     import type { Location } from '$lib/controllers/location/location';
     import type { Auth } from '$lib/controllers/user/user';
+    import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
     import { currentTzOffset, nowUtc, utcEq } from '$lib/utils/time';
     import Dot from '../Dot.svelte';
     import UtcTime from '../UtcTime.svelte';
-    import { fly, slide } from 'svelte/transition';
-    import { page } from '$app/stores';
 
     export let locations: Location[] | null;
     export let obfuscated = true;
@@ -36,6 +36,18 @@
         $collapsed[day] = !$collapsed[day];
     }
 
+    function scrollToEntry(id: string) {
+        setTimeout(() => {
+            const el = document.getElementById(id);
+            if (!el) {
+                console.error('Could not find new entry element');
+                return;
+            }
+            el.tabIndex = -1;
+            el.focus({ preventScroll: false });
+        }, 10);
+    }
+
     if (entryFormMode === null && showEntryForm) {
         throw new Error('entryFormMode must be set if showEntryForm is true');
     }
@@ -48,6 +60,14 @@
     $: if (entries.length < 1 && (!isToday || !showEntryForm)) {
         $collapsed[day] = true;
     }
+
+    listen.entry.onCreate(({ entry, entryMode }: { entry: EntryController; entryMode: EntryFormMode }) => {
+        if (!isToday) return;
+        entries = [...entries, entry].sort((a, b) => b.created - a.created);
+        if (entryMode === EntryFormMode.Standard) {
+            scrollToEntry(entry.id);
+        }
+    });
 
     listen.entry.onDelete(id => {
         entries = entries.filter(e => e.id !== id);

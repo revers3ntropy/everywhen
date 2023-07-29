@@ -125,18 +125,6 @@
         };
     }
 
-    function scrollToEntry(id: string) {
-        setTimeout(() => {
-            const el = document.getElementById(id);
-            if (!el) {
-                console.error('Could not find new entry element');
-                return;
-            }
-            el.tabIndex = -1;
-            el.focus({ preventScroll: false });
-        }, 10);
-    }
-
     async function loadLocations() {
         locations = displayNotifOnErr(await api.get(auth, '/locations')).locations;
     }
@@ -163,15 +151,6 @@
         void loadLocations();
     });
 
-    listen.entry.onCreate(({ entry, entryMode }: { entry: Entry; entryMode: EntryFormMode }) => {
-        const localDate = fmtUtc(entry.created, entry.createdTZOffset, 'YYYY-MM-DD');
-        entries[localDate] = [entry, ...(entries?.[localDate] || [])];
-        entries = { ...entries };
-
-        if (entryMode === EntryFormMode.Standard) {
-            scrollToEntry(entry.id);
-        }
-    });
     listen.entry.onDelete(id => {
         for (const day in entries) {
             entries[day] = entries[day].filter(entry => entry.id !== id);
