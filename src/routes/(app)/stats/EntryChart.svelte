@@ -54,6 +54,8 @@
     // no data fetching so top level
     $: if (entries || by || selectedBucket) {
         mainGraphData = getGraphData(entries, selectedBucket, by);
+    }
+    $: if (entries || by) {
         smallGraph1Data = getGraphData(entries, Bucket.Hour, by);
         smallGraph2Data = getGraphData(entries, Bucket.OperatingSystem, by, {
             borderColor: 'transparent',
