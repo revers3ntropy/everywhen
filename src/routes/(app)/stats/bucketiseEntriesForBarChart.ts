@@ -174,12 +174,11 @@ export function getGraphData(
     selectedBucket: Bucket,
     by: By,
     style: {
-        backgroundColor: string;
-        borderColor: string;
-    } = {
-        backgroundColor: cssVarValue('--secondary'),
-        borderColor: cssVarValue('--primary')
-    }
+        backgroundColor?: string;
+        borderColor?: string;
+        borderWidth?: number;
+        borderRadius?: number;
+    } = {}
 ): ChartData {
     const sortedEntries = entries.sort((a, b) => a.created - b.created);
     const start = sortedEntries[0].created;
@@ -190,12 +189,15 @@ export function getGraphData(
         labels,
         datasets: [
             {
-                ...style,
+                backgroundColor: cssVarValue('--secondary'),
+                borderColor: cssVarValue('--primary'),
+                borderWidth: 1,
+                borderRadius: 0,
                 data: Object.values(bucketsMap),
                 label: by === By.Entries ? 'Entries' : 'Words',
-                borderWidth: 1,
                 cubicInterpolationMode: 'monotone',
-                tension: 0.4
+                tension: 0.4,
+                ...style,
             }
         ]
     };

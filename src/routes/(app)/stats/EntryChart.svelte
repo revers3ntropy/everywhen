@@ -52,35 +52,32 @@
 
     // no data fetching so top level
     $: if (entries || by || selectedBucket) {
-        console.log(selectedBucket);
         mainGraphData = getGraphData(entries, selectedBucket, by);
         smallGraph1Data = getGraphData(entries, Bucket.Hour, by);
         smallGraph2Data = getGraphData(entries, Bucket.OperatingSystem, by, {
             backgroundColor: cssVarValue('--primary'),
-            borderColor: 'transparent'
+            borderColor: 'transparent',
+            borderRadius: 4
         });
     }
 
-    $: axisLabelTextColor = cssVarValue('--text-color-light');
-    $: borderLight = cssVarValue('--border-light');
-
-    const options = {
+    const options = () => ({
         responsive: true,
         maintainAspectRatio: false,
         scales: {
             y: {
-                border: { display: false },
-                ticks: { color: axisLabelTextColor },
+                border: { color: cssVarValue('--border-light') },
+                ticks: { color: cssVarValue('--text-color-light') },
                 grid: { display: false },
                 suggestedMin: 0
             },
             x: {
-                border: { color: borderLight },
-                ticks: { color: axisLabelTextColor },
+                border: { color: cssVarValue('--border-light') },
+                ticks: { color: cssVarValue('--text-color-light') },
                 grid: { display: false },
             }
         }
-    };
+    });
 
     let optionsForMainChart: Record<string, string>;
     $: {
@@ -89,7 +86,6 @@
             'Operating System': undefined,
             'Hour': undefined
         } as unknown as Record<string, string>;
-        console.log(optionsForMainChart);
     }
 </script>
 
@@ -108,7 +104,7 @@
 <div style="height: 350px">
     <Line
         data={mainGraphData}
-        {options}
+        options={options()}
     />
 </div>
 
@@ -128,10 +124,10 @@
 
 <div class="smaller-charts" style="height: 250px;">
     <div>
-        <Line data={smallGraph1Data} {options} />
+        <Line data={smallGraph1Data} options={options()} />
     </div>
     <div>
-        <Bar data={smallGraph2Data} {options} />
+        <Bar data={smallGraph2Data} options={options()} />
     </div>
 </div>
 
