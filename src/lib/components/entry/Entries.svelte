@@ -213,7 +213,7 @@
 
             <div>
                 <div class="entries">
-                    {#each sortedEntryKeys as day (entries[day])}
+                    {#each sortedEntryKeys as day (day)}
                         <EntryGroup
                             entries={entries[day]}
                             obfuscated={$obfuscated}

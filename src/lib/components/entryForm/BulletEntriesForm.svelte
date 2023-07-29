@@ -92,6 +92,8 @@
             entry: newEntry,
             entryMode: EntryFormMode.Bullet
         });
+
+        entry?.focus();
     }
 
     function onInput(e: KeyboardEvent) {

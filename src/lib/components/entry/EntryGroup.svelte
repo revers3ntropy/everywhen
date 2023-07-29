@@ -134,7 +134,7 @@
                 duration: ANIMATION_DURATION
             }}
         >
-            {#each entries as entry}
+            {#each entries as entry (entry.id)}
                 <Entry {...entry} {obfuscated} {showLabels} {showLocations} {auth} {locations} />
             {/each}
         </div>
