@@ -74,7 +74,7 @@
             x: {
                 border: { color: cssVarValue('--border-light') },
                 ticks: { color: cssVarValue('--text-color-light') },
-                grid: { display: false },
+                grid: { display: false }
             }
         }
     });
@@ -84,7 +84,7 @@
         optionsForMainChart = {
             ...bucketNames,
             'Operating System': undefined,
-            'Hour': undefined
+            Hour: undefined
         } as unknown as Record<string, string>;
     }
 </script>
@@ -102,24 +102,24 @@
 </div>
 
 <div style="height: 350px">
-    <Line
-        data={mainGraphData}
-        options={options()}
-    />
+    <Line data={mainGraphData} options={options()} />
 </div>
 
 <div>
     <span class="text-light" style="margin: 0.3rem"> Group by </span>
-    <Select bind:value={selectedBucket} key={initialBucketName(days)} options={optionsForMainChart} />
+    <Select
+        bind:value={selectedBucket}
+        key={initialBucketName(days)}
+        options={optionsForMainChart}
+    />
 </div>
 
-<div class="smaller-charts" style="font-weight: bold; margin: 1rem 0 0 0; padding: 1rem 0; border-top: 1px solid var(--border-color)">
-    <div>
-        Time of Day
-    </div>
-    <div>
-        Device
-    </div>
+<div
+    class="smaller-charts"
+    style="font-weight: bold; margin: 1rem 0 0 0; padding: 1rem 0; border-top: 1px solid var(--border-color)"
+>
+    <div> Time of Day </div>
+    <div> Device </div>
 </div>
 
 <div class="smaller-charts" style="height: 250px;">

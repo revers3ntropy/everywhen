@@ -197,7 +197,7 @@ export function getGraphData(
                 label: by === By.Entries ? 'Entries' : 'Words',
                 cubicInterpolationMode: 'monotone',
                 tension: 0.4,
-                ...style,
+                ...style
             }
         ]
     };
