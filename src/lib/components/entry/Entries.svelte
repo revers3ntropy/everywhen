@@ -13,7 +13,7 @@
     import { encrypt } from '$lib/security/encryption.client';
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
-    import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
+    import type { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
     import { Entry } from '$lib/controllers/entry/entry.client';
     import Spinner from '../BookSpinner.svelte';
     import EntryGroup from '$lib/components/entry/EntryGroup.svelte';
@@ -201,10 +201,10 @@
                             <div>
                                 {#if showSearch}
                                     <input
-                                            bind:this={searchInput}
-                                            on:change={updateSearch}
-                                            placeholder="Search for entry..."
-                                            type="text"
+                                        bind:this={searchInput}
+                                        on:change={updateSearch}
+                                        placeholder="Search for entry..."
+                                        type="text"
                                     />
                                     <button on:click={updateSearch} aria-label="search">
                                         <Search />
