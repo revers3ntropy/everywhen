@@ -55,11 +55,11 @@
         mainGraphData = getGraphData(entries, selectedBucket, by);
         smallGraph1Data = getGraphData(entries, Bucket.Hour, by);
         smallGraph2Data = getGraphData(entries, Bucket.OperatingSystem, by, {
-            backgroundColor: cssVarValue('--primary'),
             borderColor: 'transparent',
             borderRadius: 4
         });
     }
+    $: shouldShowMainGraph = mainGraphData.datasets[0].data.length > 1;
 
     const options = () => ({
         responsive: true,
@@ -100,26 +100,29 @@
         By Entries
     </button>
 </div>
+{#if shouldShowMainGraph}
+    <div style="height: 350px">
+        <Line data={mainGraphData} options={options()} />
+    </div>
 
-<div style="height: 350px">
-    <Line data={mainGraphData} options={options()} />
-</div>
-
-<div>
-    <span class="text-light" style="margin: 0.3rem"> Group by </span>
-    <Select
-        bind:value={selectedBucket}
-        key={initialBucketName(days)}
-        options={optionsForMainChart}
-    />
-</div>
+    <div>
+        <span class="text-light" style="margin: 0.3rem"> Group by </span>
+        <Select
+            bind:value={selectedBucket}
+            key={initialBucketName(days)}
+            options={optionsForMainChart}
+        />
+    </div>
+{/if}
 
 <div
     class="smaller-charts"
-    style="font-weight: bold; margin: 1rem 0 0 0; padding: 1rem 0; border-top: 1px solid var(--border-color)"
+    style="margin: 1rem 0 0 0; padding: 1rem 0; {shouldShowMainGraph
+        ? 'border-top: 1px solid var(--border-color)'
+        : ''}"
 >
-    <div> Time of Day </div>
-    <div> Device </div>
+    <h3 style="margin: 0 0 -1rem 1rem"> Time of Day </h3>
+    <h3 style="margin: 0 0 -1rem 1rem"> Device </h3>
 </div>
 
 <div class="smaller-charts" style="height: 250px;">

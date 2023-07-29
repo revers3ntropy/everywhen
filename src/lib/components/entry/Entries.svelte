@@ -176,34 +176,6 @@
 
 <div class="flex-center">
     <div style="width: 100%; max-width: {showSidebar ? 1400 : 800}px">
-        <div>
-            <div class="entries-menu">
-                <div class="hide-mobile">
-                    {#if showBin}
-                        <a class="with-circled-icon" href="/journal/deleted">
-                            <Bin size="30" />
-                            Bin
-                        </a>
-                    {/if}
-                </div>
-
-                <div />
-
-                <div>
-                    {#if showSearch}
-                        <input
-                            bind:this={searchInput}
-                            on:change={updateSearch}
-                            placeholder="Search for entry..."
-                            type="text"
-                        />
-                        <button on:click={updateSearch} aria-label="search">
-                            <Search />
-                        </button>
-                    {/if}
-                </div>
-            </div>
-        </div>
         <div class:sidebar-and-entries={showSidebar}>
             {#if showSidebar}
                 <div>
@@ -212,6 +184,37 @@
             {/if}
 
             <div>
+                <div>
+                    {#if showBin || showSearch}
+                        <div class="entries-menu">
+                            <div class="hide-mobile">
+                                {#if showBin}
+                                    <a class="with-circled-icon" href="/journal/deleted">
+                                        <Bin size="30" />
+                                        Bin
+                                    </a>
+                                {/if}
+                            </div>
+
+                            <div />
+
+                            <div>
+                                {#if showSearch}
+                                    <input
+                                            bind:this={searchInput}
+                                            on:change={updateSearch}
+                                            placeholder="Search for entry..."
+                                            type="text"
+                                    />
+                                    <button on:click={updateSearch} aria-label="search">
+                                        <Search />
+                                    </button>
+                                {/if}
+                            </div>
+                        </div>
+                    {/if}
+                </div>
+
                 <div class="entries">
                     {#each sortedEntryKeys as day (day)}
                         <EntryGroup

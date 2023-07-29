@@ -189,7 +189,7 @@ export function getGraphData(
         labels,
         datasets: [
             {
-                backgroundColor: cssVarValue('--secondary'),
+                backgroundColor: cssVarValue('--primary'),
                 borderColor: cssVarValue('--primary'),
                 borderWidth: 1,
                 borderRadius: 0,

@@ -12,7 +12,7 @@ import type {
     ThirdPartyDatasetIds
 } from './dataset';
 import { nowUtc } from '$lib/utils/time';
-import { decrypt, encrypt } from "$lib/security/encryption.server";
+import { decrypt, encrypt } from '$lib/security/encryption.server';
 
 export type Dataset = _Dataset;
 
@@ -189,7 +189,7 @@ namespace DatasetUtils {
         if (name.length < 1) return Result.err('Name must be at least 1 character long');
         if (name.length > 100) return Result.err('Name must be at most 100 characters long');
 
-        const { val: encryptedName, err: encryptErr} = encrypt(name, auth.key);
+        const { val: encryptedName, err: encryptErr } = encrypt(name, auth.key);
         if (encryptErr) return Result.err(encryptErr);
 
         const existingWithName = await query<{ name: string }[]>`

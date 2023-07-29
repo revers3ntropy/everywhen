@@ -142,12 +142,4 @@
         .ellipsis();
         max-width: calc(100vw - 400px);
     }
-
-    .entries {
-        padding: 1rem;
-
-        @media @mobile {
-            padding: 0;
-        }
-    }
 </style>

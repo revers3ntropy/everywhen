@@ -57,17 +57,17 @@
     }
 
     $: isToday = utcEq(nowUtc(), day, currentTzOffset(), 0, 'YYYY-MM-DD');
-    $: if (entries.length < 1 && (!isToday || !showEntryForm)) {
-        $collapsed[day] = true;
-    }
+    $: $collapsed[day] = entries.length < 1 && (!isToday || !showEntryForm);
 
-    listen.entry.onCreate(({ entry, entryMode }: { entry: EntryController; entryMode: EntryFormMode }) => {
-        if (!isToday) return;
-        entries = [...entries, entry].sort((a, b) => b.created - a.created);
-        if (entryMode === EntryFormMode.Standard) {
-            scrollToEntry(entry.id);
+    listen.entry.onCreate(
+        ({ entry, entryMode }: { entry: EntryController; entryMode: EntryFormMode }) => {
+            if (!isToday) return;
+            entries = [...entries, entry].sort((a, b) => b.created - a.created);
+            if (entryMode === EntryFormMode.Standard) {
+                scrollToEntry(entry.id);
+            }
         }
-    });
+    );
 
     listen.entry.onDelete(id => {
         entries = entries.filter(e => e.id !== id);

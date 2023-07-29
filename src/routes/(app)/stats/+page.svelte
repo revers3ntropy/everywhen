@@ -97,7 +97,7 @@
         </section>
 
         <section class="container" style="margin: 0; padding: 1rem 1rem 3rem 1rem;">
-            <h2> Common Words </h2>
+            <h3 style="padding: 0 0 2rem 0"> Common Words </h3>
             <CommonWordsList
                 entryCount={data.entryCount}
                 words={data.commonWords}
@@ -110,10 +110,6 @@
 <style lang="less">
     @import '../../../styles/layout';
     @import '../../../styles/variables';
-
-    h2 {
-        padding: 0 0 2rem 0;
-    }
 
     .title-line {
         display: grid;
