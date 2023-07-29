@@ -59,11 +59,6 @@
     }
 </script>
 
-<svelte:head>
-    <title>Halcyon.Land</title>
-    <meta content="Journaling and Life Logging App" name="description" />
-</svelte:head>
-
 <noscript>
     <style>
         .root {

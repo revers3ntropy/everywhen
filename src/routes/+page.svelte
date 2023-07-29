@@ -3,6 +3,11 @@
     import ArrowRightThinCircleOutline from 'svelte-material-icons/ArrowRightThinCircleOutline.svelte';
 </script>
 
+<svelte:head>
+    <title>Halcyon.Land</title>
+    <meta content="Journaling and Life Logging App" name="description" />
+</svelte:head>
+
 <main class="flex-center">
     <div class="flex-center">
         <Logo />

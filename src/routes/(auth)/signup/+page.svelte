@@ -42,7 +42,7 @@
 
 <svelte:head>
     <title>Sign Up</title>
-    <meta content="Sign up to halcyon.land" name="description" />
+    <meta content="Sign up to Halcyon.Land" name="description" />
 </svelte:head>
 
 <main class="flex-center">

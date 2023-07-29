@@ -6,4 +6,5 @@
 {#if !$allowedCookies}
     <AllowCookies />
 {/if}
+
 <slot />

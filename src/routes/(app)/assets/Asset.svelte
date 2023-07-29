@@ -1,6 +1,6 @@
 <script lang="ts">
     import { tooltip } from '@svelte-plugins/tooltips';
-    import { createEventDispatcher, onMount } from 'svelte';
+    import { createEventDispatcher } from 'svelte';
     import Check from 'svelte-material-icons/Check.svelte';
     import ContentCopy from 'svelte-material-icons/ContentCopy.svelte';
     import Delete from 'svelte-material-icons/Delete.svelte';
@@ -48,8 +48,6 @@
 
         setTimeout(() => (recentlyCopied = false), 3000);
     }
-
-    onMount(() => (document.title = 'Assets'));
 </script>
 
 <div class="img-wrapper {deleted ? 'deleted' : ''}">
