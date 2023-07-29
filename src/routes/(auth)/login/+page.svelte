@@ -1,7 +1,6 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import { NORMAL_COOKIE_TIMEOUT_DAYS, REMEMBER_ME_COOKIE_TIMEOUT_DAYS } from '$lib/constants';
-    import { Settings } from '$lib/controllers/settings/settings.client';
     import { populateCookieWritablesWithCookies } from '$lib/stores';
     import ChevronRight from 'svelte-material-icons/ChevronRight.svelte';
     import Cookie from 'js-cookie';
