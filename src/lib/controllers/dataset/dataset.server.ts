@@ -12,6 +12,7 @@ import type {
     ThirdPartyDatasetIds
 } from './dataset';
 import { nowUtc } from '$lib/utils/time';
+import { decrypt, encrypt } from "$lib/security/encryption.server";
 
 export type Dataset = _Dataset;
 
@@ -64,6 +65,16 @@ namespace DatasetUtils {
             WHERE user = ${auth.id}
         `;
 
+        for (const type of types) {
+            const { val: decryptedName, err: decryptedNameErr } = decrypt(type.name, auth.key);
+            if (decryptedNameErr) return Result.err(decryptedNameErr);
+            type.name = decryptedName;
+
+            const { val: decryptedUnit, err: decryptedUnitErr } = decrypt(type.unit, auth.key);
+            if (decryptedUnitErr) return Result.err(decryptedUnitErr);
+            type.unit = decryptedUnit;
+        }
+
         return Result.ok([
             ...types.map(t => ({
                 ...t,
@@ -101,8 +112,13 @@ namespace DatasetUtils {
             columns.map(column => {
                 const type = types.find(type => type.id === column.type);
                 if (!type) return Result.err('Invalid column type found');
+
+                const { val: name, err: decryptNameErr } = decrypt(column.name, auth.key);
+                if (decryptNameErr) return Result.err(decryptNameErr);
+
                 return Result.ok({
                     ...column,
+                    name,
                     type
                 });
             })
@@ -134,9 +150,11 @@ namespace DatasetUtils {
         if (columnsRes) return Result.err(columnsRes);
 
         for (const dataset of datasets) {
+            const { val: decryptedName, err: decryptedNameErr } = decrypt(dataset.name, user.key);
+            if (decryptedNameErr) return Result.err(decryptedNameErr);
             metadatas.push({
                 id: dataset.id,
-                name: dataset.name,
+                name: decryptedName,
                 created: dataset.created,
                 columns: columns.filter(column => column.dataset === dataset.id)
             });
@@ -171,10 +189,13 @@ namespace DatasetUtils {
         if (name.length < 1) return Result.err('Name must be at least 1 character long');
         if (name.length > 100) return Result.err('Name must be at most 100 characters long');
 
+        const { val: encryptedName, err: encryptErr} = encrypt(name, auth.key);
+        if (encryptErr) return Result.err(encryptErr);
+
         const existingWithName = await query<{ name: string }[]>`
             SELECT name
             FROM datasets
-            WHERE name = ${name} 
+            WHERE name = ${encryptedName}
               AND datasets.user = ${auth.id}
         `;
 
@@ -186,7 +207,7 @@ namespace DatasetUtils {
 
         await query`
             INSERT INTO datasets (id, user, name, created)
-            VALUES (${id}, ${auth.id}, ${name}, ${created})
+            VALUES (${id}, ${auth.id}, ${encryptedName}, ${created})
         `;
 
         const { val: types, err: getTypesErr } = await allTypes(query, auth);
@@ -197,9 +218,12 @@ namespace DatasetUtils {
             const type = types.find(type => type.id === column.type);
             if (!type) return Result.err('Invalid column type');
 
+            const { val: nameEncrypted, err: encryptErr } = encrypt(column.name, auth.key);
+            if (encryptErr) return Result.err(encryptErr);
+
             await query`
                 INSERT INTO datasetColumns (id, dataset, name, created, type)
-                VALUES (${i}, ${id}, ${column.name}, ${created}, ${type.id})
+                VALUES (${i}, ${id}, ${nameEncrypted}, ${created}, ${type.id})
             `;
         }
 
@@ -291,9 +315,12 @@ namespace DatasetUtils {
             `;
         }
         for (const element of newElements) {
+            const { val: dataEncrypted, err: encryptErr } = encrypt(element.data, auth.key);
+            if (encryptErr) return Result.err(encryptErr);
+
             await query`
                 INSERT INTO datasetElements (dataset, \`row\`, \`column\`, data)
-                VALUES (${datasetId}, ${element.row}, ${element.column}, ${element.data})
+                VALUES (${datasetId}, ${element.row}, ${element.column}, ${dataEncrypted})
             `;
         }
 

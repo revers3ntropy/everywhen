@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { expectDeleteUser, generateUserAndSignIn } from '../helpers.js';
+import { expectDeleteUser, generateUserAndSignIn } from './helpers.js';
 
 test.describe('/events', () => {
     test('Cannot visit page without authentication', async ({ page }) => {

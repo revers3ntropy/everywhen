@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
-import { STORE_KEY } from '../../src/lib/constants.js';
-import { encryptionKeyFromPassword } from '../../src/lib/security/authUtils.client.js';
-import { deleteUser, expectDeleteUser, generateApiCtx, generateUser, randStr } from '../helpers.js';
+import { STORE_KEY } from '$lib/constants.js';
+import { encryptionKeyFromPassword } from '$lib/security/authUtils.client.js';
+import { deleteUser, expectDeleteUser, generateApiCtx, generateUser, randStr } from './helpers.js';
 
 test.describe('/signup', () => {
     test('Has title', async ({ page }) => {

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { expectDeleteUser, generateUserAndSignIn } from '../helpers.js';
+import { expectDeleteUser, generateUserAndSignIn } from './helpers.js';
 
 const LONG_TEXT =
     'The very long body of the entry which is too long' +
