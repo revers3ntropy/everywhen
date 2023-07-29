@@ -5,7 +5,7 @@
     import { By } from './helpers';
     import Counter from 'svelte-material-icons/Counter.svelte';
     import CommonWordsList from './CommonWordsList.svelte';
-    import EntryBarChart from './EntryBarChart.svelte';
+    import EntryBarChart from './EntryChart.svelte';
     import EntryHeatMap from './EntryHeatMap.svelte';
     import SearchForWord from './SearchForWord.svelte';
     import StatPill from './StatPill.svelte';
@@ -96,16 +96,13 @@
             {/if}
         </section>
 
-        <section class="flex-center" style="flex-direction: column">
-            <div style="max-width: 500px; width: 100%">
-                <h2 style="text-align: left"> Common Words </h2>
-
-                <CommonWordsList
-                    entryCount={data.entryCount}
-                    words={data.commonWords}
-                    auth={data.auth}
-                />
-            </div>
+        <section class="container" style="margin: 0; padding: 1rem 1rem 3rem 1rem;">
+            <h2> Common Words </h2>
+            <CommonWordsList
+                entryCount={data.entryCount}
+                words={data.commonWords}
+                auth={data.auth}
+            />
         </section>
     {/if}
 </main>
@@ -115,7 +112,7 @@
     @import '../../../styles/variables';
 
     h2 {
-        padding: 2rem 0;
+        padding: 0 0 2rem 0;
     }
 
     .title-line {

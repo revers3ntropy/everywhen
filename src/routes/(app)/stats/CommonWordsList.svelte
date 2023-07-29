@@ -44,7 +44,7 @@
         display: grid;
         grid-template-columns: 3rem 1fr 4rem 8rem;
         grid-row-gap: 0.3rem;
-        max-width: 900px;
+        max-width: 750px;
 
         @media @mobile {
             margin: 10px 0;

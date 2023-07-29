@@ -4,14 +4,13 @@ import { type OsGroup, osGroupFromEntry, osGroups } from '$lib/utils/userAgent';
 import moment from 'moment/moment';
 import { Bucket, By, type EntryWithWordCount } from './helpers';
 import { Entry } from '$lib/controllers/entry/entry.client';
+import { cssVarValue } from '$lib/utils/getCssVar';
 
 export interface ChartData {
     datasets: {
         data: number[];
         label: string;
-        backgroundColor?: string | string[];
-        borderWidth?: number;
-        borderColor?: string | string[];
+        [key: string]: unknown;
     }[];
     labels: string[];
 }
@@ -173,7 +172,14 @@ const generateDataset: Record<
 export function getGraphData(
     entries: EntryWithWordCount[],
     selectedBucket: Bucket,
-    by: By
+    by: By,
+    style: {
+        backgroundColor: string;
+        borderColor: string;
+    } = {
+        backgroundColor: cssVarValue('--secondary'),
+        borderColor: cssVarValue('--primary')
+    }
 ): ChartData {
     const sortedEntries = entries.sort((a, b) => a.created - b.created);
     const start = sortedEntries[0].created;
@@ -184,9 +190,12 @@ export function getGraphData(
         labels,
         datasets: [
             {
+                ...style,
                 data: Object.values(bucketsMap),
                 label: by === By.Entries ? 'Entries' : 'Words',
-                backgroundColor: 'rgba(189, 176, 255, 0.7)'
+                borderWidth: 1,
+                cubicInterpolationMode: 'monotone',
+                tension: 0.4
             }
         ]
     };

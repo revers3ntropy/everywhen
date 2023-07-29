@@ -25,14 +25,9 @@
     export let showLocationToggle = true;
     export let submitIsPrimaryButton = true;
 
-    function resetEntryForm() {
-        entry.value = '';
-    }
-
     async function submit() {
         const entryVal = entry.value;
-
-        resetEntryForm();
+        entry.value = '';
 
         const agentData = serializedAgentData();
         const createdTZOffset = currentTzOffset();
@@ -52,6 +47,8 @@
             },
             entryMode: EntryFormMode.Bullet
         });
+
+        entry?.focus();
 
         const currentLocation = $enabledLocation ? await getLocation() : [null, null];
 
@@ -89,13 +86,12 @@
                 );
             }
         }
+
         await dispatch.delete('entry', loadingId);
         await dispatch.create('entry', {
             entry: newEntry,
             entryMode: EntryFormMode.Bullet
         });
-
-        entry.focus();
     }
 
     function onInput(e: KeyboardEvent) {

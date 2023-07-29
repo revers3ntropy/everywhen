@@ -6,7 +6,7 @@
     import { By } from '../helpers';
     import SearchForWord from '../SearchForWord.svelte';
     import StatPill from '../StatPill.svelte';
-    import EntryBarChart from '../EntryBarChart.svelte';
+    import EntryBarChart from '../EntryChart.svelte';
     import EntryHeatMap from '../EntryHeatMap.svelte';
     import type { PageData } from './$types';
     import { encrypt } from '$lib/security/encryption.client';

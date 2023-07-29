@@ -4,7 +4,7 @@ import { writable } from 'svelte/store';
 import { clientLogger } from '$lib/utils/log';
 import { currentTzOffset, nowUtc } from '$lib/utils/time';
 import type { Interactable } from './interactable';
-import { cssVaValue } from '$lib/utils/getCssVar';
+import { cssVarValue } from '$lib/utils/getCssVar';
 
 export const START_ZOOM = 1 / (60 * 60);
 
@@ -231,11 +231,11 @@ export class CanvasState implements CanvasListeners {
 
         if (this.canvas && browser) {
             this.colors = {
-                primary: cssVaValue(this.canvas, '--light-accent'),
-                text: cssVaValue(this.canvas, '--text-color'),
-                accent: cssVaValue(this.canvas, '--timeline-accent'),
-                lightAccent: cssVaValue(this.canvas, '--border-light'),
-                vLightAccent: cssVaValue(this.canvas, '--v-light-accent')
+                primary: cssVarValue(this.canvas, '--light-accent'),
+                text: cssVarValue(this.canvas, '--text-color'),
+                accent: cssVarValue(this.canvas, '--timeline-accent'),
+                lightAccent: cssVarValue(this.canvas, '--border-light'),
+                vLightAccent: cssVarValue(this.canvas, '--v-light-accent')
             };
         } else {
             this.colors = EMPTY_COLORS;
