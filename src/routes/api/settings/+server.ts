@@ -8,9 +8,11 @@ import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import type { RequestHandler } from './$types';
 
 export const GET = cachedApiRoute(async auth => {
-    const { err, val: settings } = await Settings.all(query, auth);
+    const { err, val: settings } = await Settings.allAsMap(query, auth);
     if (err) throw error(500, err);
-    return { settings };
+    return {
+        settings: Settings.fillWithDefaults(settings)
+    };
 }) satisfies RequestHandler;
 
 export const PUT = (async ({ request, cookies }) => {

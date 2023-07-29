@@ -26,12 +26,10 @@
         );
 
         const cookies = Cookie.get() as RawCookies;
-        const { settings: rawSettings } = displayNotifOnErr(
+        const { settings } = displayNotifOnErr(
             await api.get(auth, '/settings'),
             () => (actionPending = false)
         );
-        const settings = Settings.convertToMap(rawSettings);
-
         populateCookieWritablesWithCookies(cookies, settings);
 
         await goto('/' + data.redirect);

@@ -24,6 +24,7 @@
         initialBucketName
     } from './helpers';
     import { cssVarValue } from '$lib/utils/getCssVar';
+    import { Entry } from '$lib/controllers/entry/entry';
 
     Chart.register(
         Title,
@@ -59,7 +60,7 @@
             borderRadius: 4
         });
     }
-    $: shouldShowMainGraph = mainGraphData.datasets[0].data.length > 1;
+    $: shouldShowMainGraph = Object.keys(Entry.groupEntriesByDay(entries)).length > 1;
 
     const options = () => ({
         responsive: true,

@@ -1,4 +1,4 @@
-import { Settings, type SettingsConfig } from '$lib/controllers/settings/settings';
+import { Settings } from '$lib/controllers/settings/settings';
 import { query } from '$lib/db/mysql.server';
 import { error } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
@@ -13,10 +13,7 @@ export const load = (async ({ locals, parent }) => {
     if (locals.auth && !locals.settings) {
         const { err: settingsErr, val: settings } = await Settings.allAsMap(query, locals.auth);
         if (settingsErr) throw error(500, settingsErr);
-
-        locals.settings = JSON.parse(
-            JSON.stringify(Settings.fillWithDefaults(settings))
-        ) as SettingsConfig;
+        locals.settings = Settings.fillWithDefaults(settings);
     }
 
     return {

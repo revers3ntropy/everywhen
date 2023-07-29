@@ -1,7 +1,7 @@
 import { goto } from '$app/navigation';
+import Cookie from 'js-cookie';
 import { COOKIES_TO_CLEAR_ON_LOGOUT, LS_TO_CLEAR_ON_LOGOUT } from '$lib/constants';
 import { api } from '$lib/utils/apiRequest';
-import Cookie from 'js-cookie';
 
 export async function logOut(wantsToStay = false) {
     for (const key of LS_TO_CLEAR_ON_LOGOUT) {
