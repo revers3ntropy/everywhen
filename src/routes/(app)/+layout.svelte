@@ -12,7 +12,7 @@
     import { allowedCookies, obfuscated, passcodeLastEntered, settingsStore } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
-    import { nowUtc } from '$lib/utils/time';
+    import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
     import Nav from '$lib/components/Nav.svelte';
     import PasscodeModal from '$lib/components/dialogs/PasscodeModal.svelte';
 
@@ -85,6 +85,14 @@
         }
     }
 
+    const day = fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD');
+
+    function checkDayDifferent() {
+        if (day !== fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD')) {
+            window.location.reload();
+        }
+    }
+
     let lastActivity = nowUtc();
 
     let showPasscodeModal = true;
@@ -100,6 +108,7 @@
             void checkCookies();
             checkObfuscatedTimeout();
             checkPasscode($passcodeLastEntered);
+            checkDayDifferent();
         }, 1000);
     }
 
