@@ -80,14 +80,9 @@
         }
     });
 
-    let optionsForMainChart: Record<string, string>;
-    $: {
-        optionsForMainChart = {
-            ...bucketNames,
-            'Operating System': undefined,
-            Hour: undefined
-        } as unknown as Record<string, string>;
-    }
+    const optionsForMainChart = { ...bucketNames };
+    delete optionsForMainChart['Operating System'];
+    delete optionsForMainChart['Hour'];
 </script>
 
 <div>
