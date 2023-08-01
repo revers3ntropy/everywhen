@@ -3,6 +3,7 @@
     import { tooltip } from '@svelte-plugins/tooltips';
     import ArrowRightThinCircleOutline from 'svelte-material-icons/ArrowRightThinCircleOutline.svelte';
     import InformationOutline from 'svelte-material-icons/InformationOutline.svelte';
+    import { populateCookiesAndSettingsAfterAuth } from '../actions.client';
     import type { PageData } from './$types';
     import { api } from '$lib/utils/apiRequest.js';
     import { encryptionKeyFromPassword } from '$lib/security/authUtils.client.js';
@@ -36,6 +37,9 @@
                 () => (actionPending = false)
             );
         }
+
+        await populateCookiesAndSettingsAfterAuth(auth, () => (actionPending = false));
+
         await goto('/' + data.redirect);
     }
 </script>

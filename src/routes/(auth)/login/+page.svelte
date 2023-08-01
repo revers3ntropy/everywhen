@@ -1,13 +1,12 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import { NORMAL_COOKIE_TIMEOUT_DAYS, REMEMBER_ME_COOKIE_TIMEOUT_DAYS } from '$lib/constants';
-    import { populateCookieWritablesWithCookies } from '$lib/stores';
     import ChevronRight from 'svelte-material-icons/ChevronRight.svelte';
-    import Cookie from 'js-cookie';
     import { encryptionKeyFromPassword } from '$lib/security/authUtils.client';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import InformationOutline from 'svelte-material-icons/InformationOutline.svelte';
+    import { populateCookiesAndSettingsAfterAuth } from '../actions.client';
     import type { PageData } from './$types';
     import { tooltip } from '@svelte-plugins/tooltips';
 
@@ -24,12 +23,7 @@
             () => (actionPending = false)
         );
 
-        const cookies = Cookie.get() as RawCookies;
-        const { settings } = displayNotifOnErr(
-            await api.get(auth, '/settings'),
-            () => (actionPending = false)
-        );
-        populateCookieWritablesWithCookies(cookies, settings);
+        await populateCookiesAndSettingsAfterAuth(auth, () => (actionPending = false));
 
         await goto('/' + data.redirect);
     }
