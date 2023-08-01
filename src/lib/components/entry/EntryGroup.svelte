@@ -68,9 +68,14 @@
             }
         }
     );
-
     listen.entry.onDelete(id => {
-        entries = entries.filter(e => e.id !== id);
+        entries = entries.filter(entry => entry.id !== id);
+    });
+    listen.entry.onUpdate(entry => {
+        const i = entries.findIndex(e => e.id === entry.id);
+        if (i !== -1) {
+            entries[i] = entry;
+        }
     });
 
     page.subscribe(() => {

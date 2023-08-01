@@ -32,12 +32,12 @@
         const agentData = serializedAgentData();
         const createdTZOffset = currentTzOffset();
 
-        const loadingId = `loading-${nowUtc(false)}`;
+        const loadingId = `loading-${nowUtc(false).toString().replace('.', '_')}`;
         await dispatch.create('entry', {
             entry: {
                 id: loadingId,
-                title: 'loading...',
-                entry: '',
+                title: '',
+                entry: '...',
                 latitude: null,
                 longitude: null,
                 created: nowUtc(),

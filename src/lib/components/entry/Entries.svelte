@@ -8,7 +8,6 @@
     import type { EntryFilter } from '$lib/controllers/entry/entry';
     import type { Auth } from '$lib/controllers/user/user';
     import { obfuscated } from '$lib/stores';
-    import { listen } from '$lib/dataChangeEvents';
     import { api } from '$lib/utils/apiRequest';
     import { encrypt } from '$lib/security/encryption.client';
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
@@ -149,20 +148,6 @@
     onMount(() => {
         void loadTitles();
         void loadLocations();
-    });
-
-    listen.entry.onDelete(id => {
-        for (const day in entries) {
-            entries[day] = entries[day].filter(entry => entry.id !== id);
-        }
-    });
-    listen.entry.onUpdate(entry => {
-        for (const day in entries) {
-            const i = entries[day].findIndex(e => e.id === entry.id);
-            if (i !== -1) {
-                entries[day][i] = entry;
-            }
-        }
     });
 
     $: if (options.search !== undefined && browser) void reloadEntries();
