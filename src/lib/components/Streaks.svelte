@@ -76,35 +76,47 @@
         {#if error}
             ???
         {:else if streaks}
-            <span
-                class="flex-center"
-                class:full={!condensed}
-                use:tooltip={condensed
-                    ? { content: '' }
-                    : {
-                          content: tooltipContent,
-                          position: tooltipPosition
-                      }}
-            >
-                {#if streaks.runningOut}
-                    <TimerSand size="25" />
-                {:else if streaks.current > 0}
-                    <Fire size="25" class="gradient-icon" />
-                {:else}
-                    <Fire size="25" />
-                {/if}
-                <span>
-                    {#if !condensed}
-                        Streak:
+            {#if condensed}
+                <span class="flex-center">
+                    {#if streaks.runningOut}
+                        <TimerSand size="25" />
+                    {:else if streaks.current > 0}
+                        <Fire size="25" class="gradient-icon" />
+                    {:else}
+                        <Fire size="25" />
                     {/if}
-                    <b>
-                        {streaks.current}
-                    </b>
-                    {#if !condensed}
-                        days
-                    {/if}
+                    <span class="flex-center" style="height: 100%;">
+                        <b>
+                            {streaks.current}
+                        </b>
+                    </span>
                 </span>
-            </span>
+            {:else}
+                <span
+                    class="flex-center full"
+                    use:tooltip={{
+                        content: tooltipContent,
+                        position: tooltipPosition
+                    }}
+                >
+                    {#if streaks.runningOut}
+                        <TimerSand size="25" />
+                    {:else if streaks.current > 0}
+                        <Fire size="25" class="gradient-icon" />
+                    {:else}
+                        <Fire size="25" />
+                    {/if}
+                    <span class="flex-center" style="justify-content: start">
+                        <span style="height: 100%;">
+                            Streak:
+                            <b>
+                                {streaks.current}
+                            </b>
+                            days
+                        </span>
+                    </span>
+                </span>
+            {/if}
         {/if}
     {:else}
         <span

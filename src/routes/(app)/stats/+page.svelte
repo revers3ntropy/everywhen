@@ -23,7 +23,7 @@
     {#if data.entries.length === 0}
         <section class="container invisible">
             <h1> No Entries </h1>
-            <div class="flex-center">
+            <div class="flex-center" style="padding-top: 1rem">
                 <p>
                     You need to create some entries before you can see insights,
                     <a href="/journal"> why not create one? </a>
