@@ -20,7 +20,7 @@
     import { ANIMATION_DURATION } from '$lib/constants';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
-    import { obfuscate, rawMdToHtml } from '$lib/utils/text';
+    import { obfuscate, rawMdToHtml, wordCount } from '$lib/utils/text';
     import UtcTime from '$lib/components/UtcTime.svelte';
     import Dropdown from '$lib/components/Dropdown.svelte';
     import AgentWidget from './AgentWidget.svelte';
@@ -187,43 +187,51 @@
                     <div slot="button" class="options-dropdown-button">
                         <DotsVertical size="22" />
                     </div>
-                    <div class="options-dropdown">
-                        <button
-                            on:click={pinSelf}
-                            class="with-icon icon-gradient-on-hover"
-                            aria-label={pinTooltip}
-                        >
-                            {#if pinned}
-                                <HeartOffOutline size="25" />
-                                Un-favourite
-                            {:else}
-                                <Heart size="25" />
-                                Favourite
-                            {/if}
-                        </button>
-                        {#if !deleted}
-                            <a
-                                href="/journal/{id}/edit?obfuscate=0"
-                                class="with-icon"
-                                aria-label="edit entry"
+                    <div>
+                        <div class="text-light flex-center" style="padding: 6px">
+                            {wordCount(entry)} words
+                        </div>
+
+                        <hr />
+
+                        <div class="options-dropdown">
+                            <button
+                                on:click={pinSelf}
+                                class="with-icon icon-gradient-on-hover"
+                                aria-label={pinTooltip}
                             >
-                                <NoteEditOutline size="25" />
-                                Edit
-                            </a>
-                        {/if}
-                        <button
-                            on:click={deleteSelf}
-                            class="with-icon danger"
-                            aria-label={restoreDeleteTooltip}
-                        >
-                            {#if deleted}
-                                <Restore size="25" />
-                                Remove from Bin
-                            {:else}
-                                <Bin size="25" />
-                                Move to Bin
+                                {#if pinned}
+                                    <HeartOffOutline size="25" />
+                                    Un-favourite
+                                {:else}
+                                    <Heart size="25" />
+                                    Favourite
+                                {/if}
+                            </button>
+                            {#if !deleted}
+                                <a
+                                    href="/journal/{id}/edit?obfuscate=0"
+                                    class="with-icon"
+                                    aria-label="edit entry"
+                                >
+                                    <NoteEditOutline size="25" />
+                                    Edit
+                                </a>
                             {/if}
-                        </button>
+                            <button
+                                on:click={deleteSelf}
+                                class="with-icon danger"
+                                aria-label={restoreDeleteTooltip}
+                            >
+                                {#if deleted}
+                                    <Restore size="25" />
+                                    Remove from Bin
+                                {:else}
+                                    <Bin size="25" />
+                                    Move to Bin
+                                {/if}
+                            </button>
+                        </div>
                     </div>
                 </Dropdown>
             {/if}

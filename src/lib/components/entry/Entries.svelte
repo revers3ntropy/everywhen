@@ -163,7 +163,7 @@
     <div style="width: 100%; max-width: {showSidebar ? 1400 : 800}px">
         <div class:sidebar-and-entries={showSidebar}>
             {#if showSidebar}
-                <div>
+                <div style="margin-top: 85px">
                     <Sidebar titles={entryTitles} {auth} obfuscated={$obfuscated} />
                 </div>
             {/if}
@@ -188,7 +188,7 @@
                                     <input
                                         bind:this={searchInput}
                                         on:change={updateSearch}
-                                        placeholder="Search for entry..."
+                                        placeholder="Search in entries..."
                                         type="text"
                                     />
                                     <button on:click={updateSearch} aria-label="search">

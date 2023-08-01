@@ -60,7 +60,7 @@
             // for the scroll bar
             border-radius: @border-radius 0 0 @border-radius;
             background: none;
-            //border: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
         }
 
         @media @mobile {

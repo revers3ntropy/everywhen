@@ -69,7 +69,7 @@
             grid-column: 1 / 5;
             margin: 0.5rem 0;
             height: 0;
-            border: 1px solid var(--border-light);
+            border-top: 1px solid var(--border-light);
         }
     }
 </style>
