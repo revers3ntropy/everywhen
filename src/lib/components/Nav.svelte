@@ -106,6 +106,7 @@
             key: 'entryFormMode',
             value: false
         });
+        $settingsStore.entryFormMode.value = false;
         localStorage.removeItem(STORE_KEY.newEntryLabel);
         await gotoIfNotAt('/journal');
     }
@@ -115,6 +116,7 @@
             key: 'entryFormMode',
             value: true
         });
+        $settingsStore.entryFormMode.value = true;
         if ($page.url.pathname !== '/journal') {
             await goto('/journal');
         } else {
