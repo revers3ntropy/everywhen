@@ -213,6 +213,12 @@
         labels = displayNotifOnErr(await api.get(auth, '/labels')).labels;
     }
 
+    function resizeTextAreaToFitContent(self: HTMLTextAreaElement | null = newEntryInputElement) {
+        if (!self) return;
+        self.style.height = '';
+        self.style.height = Math.max(self.scrollHeight + 5, 100) + 'px';
+    }
+
     function handleEntryInputKeydown(event: KeyboardEvent) {
         if (event.key !== 'Tab') return;
         event.preventDefault();
@@ -245,6 +251,8 @@
                 obfuscated = false;
             }
         }
+        resizeTextAreaToFitContent();
+
         mounted = true;
 
         void stopSpaceAndEnterBeingInterceptedByFileDrop();
@@ -275,10 +283,14 @@
 
     let submitted = false;
 
-    $: if (mounted && browser && loadFromLS) {
-        // be reactive on these
-        [newEntryTitle, newEntryBody, newEntryLabel];
+    $: if (mounted && browser && loadFromLS && [newEntryTitle, newEntryBody, newEntryLabel]) {
         saveToLS();
+    }
+    $: if (browser && newEntryInputElement) {
+        newEntryBody;
+        setTimeout(() => {
+            resizeTextAreaToFitContent();
+        }, 0);
     }
 </script>
 
@@ -489,7 +501,7 @@
         }
 
         textarea {
-            resize: both;
+            resize: none;
             padding: 1rem;
             margin: 0;
             width: 100%;
@@ -498,18 +510,10 @@
             font-size: 20px;
             background: var(--light-accent);
             border-radius: 0 0 @border-radius @border-radius;
-
-            // fills page
-            height: min(calc(100vh - 12rem), 300px);
+            overflow: hidden;
 
             @media @mobile {
-                // annoying on mobile to resize horizontally
-                resize: vertical;
-
-                // puts submit button at bottom of screen nicely
-                height: calc(100vh - 19rem);
                 width: calc(100% - 0.8em);
-                overflow-y: scroll;
                 margin: 0;
                 background: none;
                 padding: 0.8rem 0.5rem;
