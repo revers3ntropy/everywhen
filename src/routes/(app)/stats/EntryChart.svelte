@@ -102,7 +102,6 @@
     <div style="height: 350px">
         <Line data={mainGraphData} options={options()} />
     </div>
-
     <div>
         <span class="text-light" style="margin: 0.3rem"> Group by </span>
         <Select
@@ -113,32 +112,23 @@
     </div>
 {/if}
 
-<div
-    class="smaller-charts"
-    style="margin: 1rem 0 0 0; padding: 1rem 0; {shouldShowMainGraph
-        ? 'border-top: 1px solid var(--border-color)'
-        : ''}"
->
-    <h3 style="margin: 0 0 -1rem 1rem"> Time of Day </h3>
-    <h3 style="margin: 0 0 -1rem 1rem"> Device </h3>
-</div>
-
-<div class="smaller-charts" style="height: 250px;">
+<div class="smaller-charts" class:showing-main-graph={shouldShowMainGraph}>
     <div>
-        <Line data={smallGraph1Data} options={options()} />
+        <h3> Time of Day </h3>
+        <div style="height: 250px; width: calc(100% - 1rem)">
+            <Line data={smallGraph1Data} options={options()} />
+        </div>
     </div>
     <div>
-        <Bar data={smallGraph2Data} options={options()} />
+        <h3> Device </h3>
+        <div style="height: 250px; width: calc(100% - 1rem)">
+            <Bar data={smallGraph2Data} options={options()} />
+        </div>
     </div>
 </div>
 
 <style lang="less">
     @import '../../../styles/variables';
-
-    .container {
-        margin: 0;
-        padding: 0.3em;
-    }
 
     .toggle-by-button {
         display: flex;
@@ -154,9 +144,15 @@
         display: grid;
         grid-template-columns: 1fr 1fr;
         grid-gap: 1rem;
+        margin: 1rem 0 0 0;
 
         @media @mobile {
             grid-template-columns: 1fr;
+        }
+
+        &.showing-main-graph {
+            border-top: 1px solid var(--border-color);
+            padding-top: 1rem;
         }
     }
 </style>

@@ -1,7 +1,7 @@
+import moment from 'moment/moment';
 import { capitalise } from '$lib/utils/text';
 import { dayUtcFromTimestamp, fmtUtc, nowUtc } from '$lib/utils/time';
 import { type OsGroup, osGroupFromEntry, osGroups } from '$lib/utils/userAgent';
-import moment from 'moment/moment';
 import { Bucket, By, type EntryWithWordCount } from './helpers';
 import { Entry } from '$lib/controllers/entry/entry.client';
 import { cssVarValue } from '$lib/utils/getCssVar';
@@ -197,6 +197,8 @@ export function getGraphData(
                 label: by === By.Entries ? 'Entries' : 'Words',
                 cubicInterpolationMode: 'monotone',
                 tension: 0.4,
+                pointRadius: 1,
+                pointHoverRadius: 3,
                 ...style
             }
         ]
