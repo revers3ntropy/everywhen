@@ -1,5 +1,4 @@
 import { ghAPI } from '$lib/controllers/ghAPI/ghAPI.server';
-import { User } from '$lib/controllers/user/user.server';
 import { query } from '$lib/db/mysql.server';
 import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
@@ -36,7 +35,7 @@ export const DELETE = (async ({ cookies }) => {
     const auth = await getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
-    await User.unlinkGitHubOAuth(query, auth);
+    await ghAPI.unlinkToGitHubOAuth(query, auth);
 
     return apiResponse({});
 }) satisfies RequestHandler;

@@ -7,7 +7,6 @@ CREATE TABLE users
     password        varchar(255) NOT NULL,
     salt            varchar(255) NOT NULL,
     created         int(64)      NOT NULL,
-    ghAccessToken varchar(255) DEFAULT NULL,
     PRIMARY KEY (id),
     UNIQUE KEY username (username)
 ) ENGINE = InnoDB

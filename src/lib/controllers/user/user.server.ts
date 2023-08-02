@@ -1,6 +1,5 @@
 import type { QueryFunc } from '$lib/db/mysql.server';
 import { encryptionKeyFromPassword } from '$lib/security/authUtils.server';
-import { encrypt } from '$lib/security/encryption.server';
 import { Result } from '$lib/utils/result';
 import { cryptoRandomStr } from '$lib/security/authUtils.server';
 import { nowUtc } from '$lib/utils/time';
@@ -21,8 +20,8 @@ namespace UserUtils {
         username: string,
         key: string
     ): Promise<Result<User>> {
-        const res = await query<{ id: string; ghAccessToken: string | null }[]>`
-            SELECT id, ghAccessToken
+        const res = await query<{ id: string }[]>`
+            SELECT id
             FROM users
             WHERE username = ${username}
               AND password = SHA2(CONCAT(${key}, salt), 256)
@@ -30,7 +29,7 @@ namespace UserUtils {
         if (res.length !== 1) {
             return Result.err('Invalid login');
         }
-        return Result.ok({ id: res[0].id, username, key, ghAccessToken: res[0].ghAccessToken });
+        return Result.ok({ id: res[0].id, username, key });
     }
 
     export async function userExistsWithUsername(
@@ -166,34 +165,6 @@ namespace UserUtils {
         if (err) return Result.err(err);
 
         return await Settings.changeEncryptionKeyInDB(query, auth, newKey);
-    }
-
-    export async function saveGitHubOAuthAccessToken(
-        query: QueryFunc,
-        auth: Auth,
-        accessToken: string
-    ): Promise<Result> {
-        if (!accessToken) {
-            return Result.err('Invalid access token');
-        }
-        const { err, val } = encrypt(accessToken, auth.key);
-        if (err) return Result.err(err);
-
-        await query`
-            UPDATE users
-            SET ghAccessToken = ${val}
-            WHERE id = ${auth.id}
-        `;
-        return Result.ok(null);
-    }
-
-    export async function unlinkGitHubOAuth(query: QueryFunc, auth: Auth): Promise<Result> {
-        await query`
-            UPDATE users
-            SET ghAccessToken = NULL
-            WHERE id = ${auth.id}
-        `;
-        return Result.ok(null);
     }
 }
 

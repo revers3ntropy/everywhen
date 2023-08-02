@@ -79,7 +79,7 @@
     </section>
 
     <section>
-        <DatasetShortcutWidgets user={data.auth} datasets={data.datasets} />
+        <DatasetShortcutWidgets auth={data.auth} datasets={data.datasets} />
     </section>
 
     <section>

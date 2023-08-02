@@ -1,8 +1,8 @@
 import { GITHUB_AUTH_CLIENT_SECRET } from '$env/static/private';
 import { PUBLIC_GITHUB_AUTH_CLIENT_ID } from '$env/static/public';
-import { type Auth, User } from '$lib/controllers/user/user';
+import { Settings } from '$lib/controllers/settings/settings';
+import type { Auth } from '$lib/controllers/user/user';
 import type { QueryFunc } from '$lib/db/mysql.server';
-import { decrypt } from '$lib/security/encryption.server';
 import { errorLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 
@@ -86,28 +86,39 @@ export namespace ghAPI {
         const { err, val: accessToken } = await getGitHubOAuthAccessToken(code, state);
         if (err) return Result.err(err);
 
-        const { err: saveErr } = await User.saveGitHubOAuthAccessToken(query, auth, accessToken);
+        const { err: saveErr } = await Settings.update(
+            query,
+            auth,
+            'gitHubAccessToken',
+            accessToken
+        );
         if (saveErr) return Result.err(saveErr);
 
         return Result.ok(accessToken);
     }
 
-    async function makeGhApiReq(user: User, path: string, method = 'GET'): Promise<Result<object>> {
-        const accessTokenEncrypted = user.ghAccessToken;
-        if (!accessTokenEncrypted) {
+    export async function unlinkToGitHubOAuth(query: QueryFunc, auth: Auth): Promise<Result> {
+        const { err: saveErr } = await Settings.update(query, auth, 'gitHubAccessToken', '');
+        if (saveErr) return Result.err(saveErr);
+        return Result.ok(null);
+    }
+
+    async function makeGhApiReq(
+        gitHubAccessToken: string | undefined,
+        path: string,
+        method = 'GET'
+    ): Promise<Result<object>> {
+        if (!gitHubAccessToken) {
             return Result.err('No GitHub account is linked');
         }
         if (path[0] !== '/') throw new Error('Path must start with /');
-
-        const { err, val: accessToken } = decrypt(accessTokenEncrypted, user.key);
-        if (err) return Result.err(err);
 
         let res;
         try {
             res = await fetch(`https://api.github.com${path}`, {
                 method,
                 headers: {
-                    Authorization: `Bearer ${accessToken}`,
+                    Authorization: `Bearer ${gitHubAccessToken}`,
                     Accept: 'application/json'
                 }
             });
@@ -137,8 +148,8 @@ export namespace ghAPI {
         return Result.ok(data);
     }
 
-    export async function getGhUserInfo(user: User): Promise<Result<GitHubUser>> {
-        const { err, val } = await makeGhApiReq(user, '/user');
+    export async function getGhUserInfo(gitHubAccessToken?: string): Promise<Result<GitHubUser>> {
+        const { err, val } = await makeGhApiReq(gitHubAccessToken, '/user');
         if (err) return Result.err(err);
 
         if (

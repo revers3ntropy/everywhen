@@ -1,4 +1,5 @@
-import type { Auth, User } from '$lib/controllers/user/user';
+import type { SettingsConfig } from '$lib/controllers/settings/settings';
+import type { Auth } from '$lib/controllers/user/user';
 import type { QueryFunc } from '$lib/db/mysql.server';
 import { Result } from '$lib/utils/result';
 import { UUId } from '$lib/controllers/uuid/uuid.server';
@@ -20,24 +21,29 @@ namespace DatasetUtils {
     const thirdPartyDatasetProviders: {
         [k in ThirdPartyDatasetIds]: (
             query: QueryFunc,
-            user: User
+            auth: Auth,
+            settings: SettingsConfig
         ) => MaybePromise<DatasetData | null>;
     } = {
-        githubCommits(_query, user) {
-            if (!user.ghAccessToken) return null;
+        githubCommits(_query, _user, settings) {
+            if (!settings.gitHubAccessToken.value) return null;
             return [];
         },
-        githubLoC(_query, user) {
-            if (!user.ghAccessToken) return null;
+        githubLoC(_query, _user, settings) {
+            if (!settings.gitHubAccessToken.value) return null;
             return [];
         }
     };
 
     const thirdPartyDatasetMetadataProviders: {
-        [k in ThirdPartyDatasetIds]: (query: QueryFunc, user: User) => DatasetMetadata | null;
+        [k in ThirdPartyDatasetIds]: (
+            query: QueryFunc,
+            auth: Auth,
+            settings: SettingsConfig
+        ) => DatasetMetadata | null;
     } = {
-        githubCommits(_query, user) {
-            if (!user.ghAccessToken) return null;
+        githubCommits(_query, _user, settings) {
+            if (!settings.gitHubAccessToken.value) return null;
             return {
                 id: 'githubCommits',
                 created: 0,
@@ -45,8 +51,8 @@ namespace DatasetUtils {
                 columns: []
             };
         },
-        githubLoC(_query, user) {
-            if (!user.ghAccessToken) return null;
+        githubLoC(_query, _user, settings) {
+            if (!settings.gitHubAccessToken.value) return null;
             return {
                 id: 'githubLoC',
                 created: 0,
@@ -127,13 +133,15 @@ namespace DatasetUtils {
 
     export async function allMetaData(
         query: QueryFunc,
-        user: User
+        auth: Auth,
+        settings: SettingsConfig
     ): Promise<Result<DatasetMetadata[]>> {
         const metadatas = [] as DatasetMetadata[];
         for (const dataset of Object.keys(thirdPartyDatasetProviders)) {
             const metadata = thirdPartyDatasetMetadataProviders[dataset as ThirdPartyDatasetIds](
                 query,
-                user
+                auth,
+                settings
             );
             if (metadata) {
                 metadatas.push(metadata);
@@ -143,14 +151,14 @@ namespace DatasetUtils {
         const datasets = await query<{ id: string; name: string; created: TimestampSecs }[]>`
             SELECT id, name, created
             FROM datasets
-            WHERE user = ${user.id}
+            WHERE user = ${auth.id}
         `;
 
-        const { err: columnsRes, val: columns } = await allColumns(query, user);
+        const { err: columnsRes, val: columns } = await allColumns(query, auth);
         if (columnsRes) return Result.err(columnsRes);
 
         for (const dataset of datasets) {
-            const { val: decryptedName, err: decryptedNameErr } = decrypt(dataset.name, user.key);
+            const { val: decryptedName, err: decryptedNameErr } = decrypt(dataset.name, auth.key);
             if (decryptedNameErr) return Result.err(decryptedNameErr);
             metadatas.push({
                 id: dataset.id,
@@ -165,14 +173,15 @@ namespace DatasetUtils {
 
     export async function fetchWholeDataset(
         query: QueryFunc,
-        user: User,
+        auth: Auth,
+        settings: SettingsConfig,
         datasetId: string
     ): Promise<Result<DatasetData>> {
-        const getter = thirdPartyDatasetProviders[datasetId as ThirdPartyDatasetIds];
-        if (!getter) {
+        const provider = thirdPartyDatasetProviders[datasetId as ThirdPartyDatasetIds];
+        if (!provider) {
             return Result.err('Invalid dataset ID');
         }
-        const res = await getter(query, user);
+        const res = await provider(query, auth, settings);
         if (res === null) {
             return Result.err('User has not connected to this dataset');
         }

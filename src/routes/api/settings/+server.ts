@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { Settings } from '$lib/controllers/settings/settings';
+import { Settings, type SettingsKey } from '$lib/controllers/settings/settings';
 import { query } from '$lib/db/mysql.server';
 import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
@@ -24,7 +24,19 @@ export const PUT = (async ({ request, cookies }) => {
         value: 'any'
     });
 
-    const { val: setting, err } = await Settings.update(query, auth, body.key, body.value);
+    const key = body.key;
+
+    const possibleKeys = Object.keys(Settings.config);
+    if (!possibleKeys.includes(key)) {
+        throw error(400, 'Invalid key');
+    }
+
+    const { val: setting, err } = await Settings.update(
+        query,
+        auth,
+        key as SettingsKey,
+        body.value
+    );
     if (err) throw error(400, err);
 
     return apiResponse({ id: setting.id });

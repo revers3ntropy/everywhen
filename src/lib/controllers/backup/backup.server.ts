@@ -102,7 +102,6 @@ namespace BackupUtils {
         key: string
     ): Promise<Result> {
         let decryptedData: unknown;
-
         try {
             decryptedData = JSON.parse(backupEncrypted);
         } catch (e) {

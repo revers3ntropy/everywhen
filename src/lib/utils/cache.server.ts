@@ -3,7 +3,7 @@ import { ENABLE_CACHING } from '$lib/constants';
 import { error } from '@sveltejs/kit';
 import type { RequestEvent, ServerLoadEvent } from '@sveltejs/kit';
 import chalk from 'chalk';
-import type { User } from '../controllers/user/user';
+import type { Auth } from '../controllers/user/user';
 import type { GenericResponse } from './apiResponse.server';
 import { FileLogger } from './log.server';
 import { fmtBytes } from './text';
@@ -121,7 +121,7 @@ export function cachedApiRoute<
     RouteId extends string | null,
     Res extends NonNullable<unknown>
 >(
-    handler: (user: User, event: RequestEvent<Params, RouteId>) => Promise<Res>
+    handler: (auth: Auth, event: RequestEvent<Params, RouteId>) => Promise<Res>
 ): (event: RequestEvent<Params, RouteId>) => Promise<GenericResponse<Res>> {
     return (async (props: RequestEvent<Params, RouteId>): Promise<GenericResponse<Res>> => {
         const url = props.url.href;
@@ -160,7 +160,7 @@ export function cachedPageRoute<
     MustHaveAuth extends boolean = true
 >(
     handler: (
-        auth: User | (MustHaveAuth extends true ? User : undefined),
+        auth: Auth | (MustHaveAuth extends true ? Auth : undefined),
         event: ServerLoadEvent<Params, ParentData, RouteId>
     ) => MaybePromise<OutputData>,
     requireAuth?: MustHaveAuth
@@ -173,11 +173,11 @@ export function cachedPageRoute<
         }
 
         const url = props.url.href;
-        let auth = props.locals.auth as User | MustHaveAuth extends true ? User : undefined;
+        let auth = props.locals.auth as Auth | MustHaveAuth extends true ? Auth : undefined;
         if (requireAuth) {
             if (!auth) throw error(401, 'Unauthorized');
         } else {
-            auth = undefined as MustHaveAuth extends true ? User : undefined;
+            auth = undefined as MustHaveAuth extends true ? Auth : undefined;
         }
 
         const cached = getCachedResponse(url, auth?.id || '');

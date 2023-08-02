@@ -14,7 +14,7 @@ namespace SettingsUtils {
     export async function update(
         query: QueryFunc,
         auth: Auth,
-        key: string,
+        key: SettingsKey,
         value: unknown
     ): Promise<Result<Settings>> {
         if (!(key in _Settings.config)) {
@@ -23,7 +23,7 @@ namespace SettingsUtils {
 
         const now = nowUtc();
 
-        const expectedType = _Settings.config[key as SettingsKey].type;
+        const expectedType = _Settings.config[key ].type;
         if (typeof value !== expectedType) {
             return Result.err(
                 `Invalid setting value, expected ${expectedType} but got ${typeof value}`
@@ -161,6 +161,20 @@ namespace SettingsUtils {
         return Result.ok(
             Object.fromEntries(res.val.map(s => [s.key, s])) as Partial<SettingsConfig>
         );
+    }
+
+    export async function allAsMapWithDefaults(
+        query: QueryFunc,
+        auth: Auth
+    ): Promise<Result<SettingsConfig>> {
+        const res = await all(query, auth);
+        if (res.err) {
+            return Result.err(res.err);
+        }
+        const settings = Object.fromEntries(
+            res.val.map(s => [s.key, s])
+        ) as Partial<SettingsConfig>;
+        return Result.ok(_Settings.fillWithDefaults(settings));
     }
 
     export async function purgeAll(query: QueryFunc, auth: Auth): Promise<Result> {

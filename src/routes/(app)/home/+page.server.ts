@@ -52,7 +52,7 @@ export const load = cachedPageRoute(async (auth, { parent, locals }) => {
 
     const pinned = titles.filter(Entry.isPinned);
 
-    const { val: datasets, err: datasetsErr } = await Dataset.allMetaData(query, auth);
+    const { val: datasets, err: datasetsErr } = await Dataset.allMetaData(query, auth, settings);
     if (datasetsErr) throw error(400, datasetsErr);
 
     return {

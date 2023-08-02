@@ -1,9 +1,9 @@
 <script lang="ts">
-    import type { User } from '$lib/controllers/user/user';
+    import type { Auth } from '$lib/controllers/user/user';
     import type { Dataset } from '$lib/controllers/dataset/dataset';
     import WeightDatasetShortcut from './WeightDatasetShortcut.svelte';
 
-    export let user: User;
+    export let auth: Auth;
     export let datasets: Dataset[];
 
     $: datasetsByName = datasets.reduce(
@@ -16,7 +16,7 @@
 </script>
 
 <div class="wrapper">
-    <WeightDatasetShortcut auth={user} dataset={datasetsByName['Weight'] || null} />
+    <WeightDatasetShortcut {auth} dataset={datasetsByName['Weight'] || null} />
 </div>
 
 <style lang="less">

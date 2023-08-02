@@ -1,3 +1,4 @@
+import { Settings } from '$lib/controllers/settings/settings.server';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
 import type { RequestHandler } from './$types';
@@ -9,7 +10,9 @@ import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import { nowUtc } from '$lib/utils/time';
 
 export const GET = cachedApiRoute(async auth => {
-    const { val, err } = await Dataset.allMetaData(query, auth);
+    const { val: settings, err: getSettingsErr } = await Settings.allAsMapWithDefaults(query, auth);
+    if (getSettingsErr) throw error(500, getSettingsErr);
+    const { val, err } = await Dataset.allMetaData(query, auth, settings);
     if (err) throw error(400, err);
     return {
         datasets: val

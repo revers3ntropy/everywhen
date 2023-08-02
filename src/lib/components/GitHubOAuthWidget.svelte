@@ -2,7 +2,8 @@
     import { PUBLIC_GITHUB_AUTH_CLIENT_ID, PUBLIC_ENV } from '$env/static/public';
     import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications.js';
     import type { GitHubUser } from '$lib/controllers/ghAPI/ghAPI.server';
-    import type { User } from '$lib/controllers/user/user';
+    import type { Auth } from '$lib/controllers/user/user';
+    import { settingsStore } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { serializeGETArgs } from '$lib/utils/GETArgs';
     import { onMount } from 'svelte';
@@ -11,7 +12,7 @@
     import { randomInt, randomString } from '$lib/security/authUtils.client.js';
 
     export let size = 30;
-    export let user: User;
+    export let auth: Auth;
 
     function authorizeUrl(state: string) {
         return (
@@ -36,7 +37,7 @@
     }
 
     async function unlink() {
-        await api.delete(user, '/oauth/gh');
+        await api.delete(auth, '/oauth/gh');
         location.reload();
         return await new Promise(() => {});
     }
@@ -44,13 +45,13 @@
     let gitHubUser: GitHubUser | null;
 
     onMount(async () => {
-        if (user.ghAccessToken) {
-            gitHubUser = displayNotifOnErr(await api.get(user, '/oauth/gh/user'));
+        if ($settingsStore.gitHubAccessToken.value) {
+            gitHubUser = displayNotifOnErr(await api.get(auth, '/oauth/gh/user'));
         }
     });
 </script>
 
-{#if user.ghAccessToken}
+{#if $settingsStore.gitHubAccessToken.value}
     <button on:click={unlink} class="danger">
         <GitHub {size} /> Unlink GitHub ({gitHubUser?.username || '...'})
     </button>

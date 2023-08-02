@@ -79,7 +79,14 @@ namespace SettingsUtils {
             name: 'Arrows Between Entries',
             description: `Show arrows between chronologically adjacent entries on the map.`,
             showInSettings: true
-        }
+        } as SettingConfig<boolean>,
+        gitHubAccessToken: {
+            type: 'string',
+            defaultValue: '',
+            name: 'GitHub Access Token',
+            description: `Access token for GitHub API. Used to fetch your GitHub activity.`,
+            showInSettings: false
+        } as SettingConfig<string>
     } satisfies Record<string, SettingConfig<SettingValue>>;
 
     export function convertToMap(settings: Settings[]): SettingsConfig {
