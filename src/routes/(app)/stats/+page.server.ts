@@ -23,10 +23,14 @@ export const load = cachedPageRoute(async auth => {
         if (entry.created < earliestEntryTimeStamp) {
             earliestEntryTimeStamp = entry.created;
         }
+
         const entryWordCount = txtWordCount(entry.entry) + txtWordCount(entry.title);
+
         wordCount += entryWordCount;
         charCount += entry.entry.length + entry.title.length;
+
         commonWords = commonWordsFromText(entry.entry, commonWords);
+
         commonWords = commonWordsFromText(entry.title, commonWords);
 
         const e: EntryWithWordCount = entry as EntryWithWordCount;
@@ -36,12 +40,14 @@ export const load = cachedPageRoute(async auth => {
         entriesWithWordCount.push(e);
     }
 
+    const commonWordsArray = Object.entries(commonWords)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 100);
+
     return {
         entries: entriesWithWordCount,
         entryCount: entries.length,
-        commonWords: Object.entries(commonWords)
-            .sort(([, a], [, b]) => b - a)
-            .slice(0, 100),
+        commonWords: commonWordsArray,
         days: daysSince(earliestEntryTimeStamp, 0),
         wordCount,
         charCount

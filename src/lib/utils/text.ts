@@ -10,19 +10,18 @@ export function obfuscate(str: string, alphabet = OBFUSCATE_CHARS): string {
         return alphabet[Math.floor(Math.random() * alphabet.length)];
     });
 }
-/**
- * Split into 'words'
- * @src https://stackoverflow.com/questions/18473326/javascript-break-sentence-by-words
- */
-export function wordsFromText(text: string, locales = 'en'): string[] {
-    if (typeof Intl === 'undefined' || typeof Intl.Segmenter === 'undefined') {
-        return (text.match(/\b(\w+)'?(\w+)?\b/g) || []).filter(Boolean);
-    }
 
-    const wordSplitter = new Intl.Segmenter(locales, {
-        granularity: 'word'
-    });
+function intlSegmenterSupported() {
+    return typeof Intl !== 'undefined' && typeof Intl.Segmenter !== 'undefined';
+}
 
+const wordSplitter = intlSegmenterSupported()
+    ? new Intl.Segmenter('en', {
+          granularity: 'word'
+      })
+    : (null as unknown as Intl.Segmenter);
+
+function wordsFromTextWithIntl(text: string): string[] {
     return Array.from(wordSplitter.segment(text), segment => {
         if (!segment.isWordLike) {
             return null;
@@ -30,6 +29,17 @@ export function wordsFromText(text: string, locales = 'en'): string[] {
         return segment.segment;
     }).filter(Boolean);
 }
+
+/**
+ * @src https://stackoverflow.com/questions/18473326/javascript-break-sentence-by-words
+ */
+function wordsFromTextWithoutIntl(text: string): string[] {
+    return (text.match(/\b(\w+)'?(\w+)?\b/g) || []).filter(Boolean);
+}
+
+export const wordsFromText = intlSegmenterSupported()
+    ? wordsFromTextWithIntl
+    : wordsFromTextWithoutIntl;
 
 export function wordCount(text: string): number {
     return wordsFromText(text).length;
