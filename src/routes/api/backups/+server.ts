@@ -1,5 +1,5 @@
+import { BackupControllerServer } from '$lib/controllers/backup/backup.server';
 import { error } from '@sveltejs/kit';
-import { Backup } from '$lib/controllers/backup/backup';
 import { query } from '$lib/db/mysql.server';
 import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
@@ -11,7 +11,7 @@ import type { RequestHandler } from './$types';
 export const GET = cachedApiRoute(async (auth, { url }) => {
     const encrypt = GETParamIsTruthy(url.searchParams.get('encrypted'));
 
-    const { err, val: backup } = await Backup.generate(query, auth);
+    const { err, val: backup } = await BackupControllerServer.generate(query, auth);
     if (err) throw error(400, err);
 
     if (!encrypt) {
@@ -20,7 +20,10 @@ export const GET = cachedApiRoute(async (auth, { url }) => {
         };
     }
 
-    const { err: encryptErr, val: encryptedResponse } = Backup.asEncryptedString(backup, auth);
+    const { err: encryptErr, val: encryptedResponse } = BackupControllerServer.asEncryptedString(
+        backup,
+        auth
+    );
     if (encryptErr) throw error(400, encryptErr);
 
     return { data: encryptedResponse };
@@ -43,7 +46,7 @@ export const POST = (async ({ request, cookies }) => {
         }
     );
 
-    const { err } = await Backup.restore(query, auth, body.data, body.key);
+    const { err } = await BackupControllerServer.restore(query, auth, body.data, body.key);
     if (err) throw error(400, err);
 
     return apiResponse({});

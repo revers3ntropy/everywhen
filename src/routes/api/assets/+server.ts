@@ -1,6 +1,6 @@
+import { AssetControllerServer } from '$lib/controllers/asset/asset.server';
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
-import { Asset } from '$lib/controllers/asset/asset';
 import { query } from '$lib/db/mysql.server';
 import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
@@ -22,7 +22,7 @@ export const GET = cachedApiRoute(async (auth, { url }) => {
         throw error(400, 'Invalid offset');
     }
 
-    const { err, val } = await Asset.pageOfMetaData(query, auth, offset, count);
+    const { err, val } = await AssetControllerServer.pageOfMetaData(query, auth, offset, count);
     if (err) throw error(400, err);
 
     return {
@@ -47,10 +47,10 @@ export const POST = (async ({ request, cookies }) => {
     if (fileExt.toLowerCase() === 'webp') {
         img = body.content.replace(/^data:image\/webp;base64,/, '');
     } else {
-        img = await Asset.base64ToWebP(body.content, fileExt, IMG_QUALITY);
+        img = await AssetControllerServer.base64ToWebP(body.content, fileExt, IMG_QUALITY);
     }
 
-    const { err, val } = await Asset.create(query, auth, body.fileName, img);
+    const { err, val } = await AssetControllerServer.create(query, auth, body.fileName, img);
     if (err) throw error(400, err);
 
     return apiResponse(val);

@@ -39,7 +39,7 @@ sw.addEventListener('activate', event => {
 sw.addEventListener('fetch', event => {
     if (event.request.method !== 'GET') return;
 
-    async function respond() {
+    async function respond(): Promise<Response | undefined> {
         const url = new URL(event.request.url);
         const cache = await caches.open(CACHE);
 
@@ -54,5 +54,5 @@ sw.addEventListener('fetch', event => {
         }
     }
 
-    event.respondWith(respond());
+    event.respondWith(respond() as unknown as Response);
 });

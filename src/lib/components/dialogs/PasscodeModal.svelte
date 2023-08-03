@@ -15,15 +15,16 @@
     export let passcode: string;
     export let showingForgotPassword = false;
 
+    onMount(() => {
+        loaded = true;
+        scrollElement = document.getElementsByClassName('root')[0];
+    });
+
     let input: string;
     let passwordInput: string;
     let lastYScroll = 0;
     let scrollElement: Element | undefined;
     let loaded = false;
-    onMount(() => {
-        loaded = true;
-        scrollElement = document.getElementsByClassName('root')[0];
-    });
 
     $: if (browser) {
         let valid = (input || '') === passcode;

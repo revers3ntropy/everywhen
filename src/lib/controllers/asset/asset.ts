@@ -1,7 +1,4 @@
-import * as server from './asset.server';
-import * as client from './asset.client';
-
-export interface Asset {
+export interface IAsset {
     id: string;
     publicId: string;
     content: string;
@@ -9,9 +6,10 @@ export interface Asset {
     created: number;
 }
 
-export type AssetMetadata = Omit<Asset, 'content'>;
+export type AssetMetadata = Omit<IAsset, 'content'>;
 
-export const Asset = {
-    ...server.Asset,
-    ...client.Asset
-};
+export namespace AssetControllerClient {
+    export function generateMarkdownLink(fileName: string, publicId: string): string {
+        return `![${fileName}](/api/assets/${publicId})`;
+    }
+}

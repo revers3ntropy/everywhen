@@ -1,8 +1,8 @@
 <script lang="ts">
+    import { BackupControllerClient } from '$lib/controllers/backup/backup';
     import { logOut } from '$lib/security/logOut';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import Skull from 'svelte-material-icons/Skull.svelte';
-    import { Backup } from '$lib/controllers/backup/backup.client';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import type { PageData } from './$types';
@@ -16,7 +16,7 @@
         }
 
         const { backup: backupData } = displayNotifOnErr(await api.delete(data.auth, '/users'));
-        Backup.download(backupData, data.auth.username, true);
+        BackupControllerClient.download(backupData, data.auth.username, true);
         await logOut(false);
     }
 

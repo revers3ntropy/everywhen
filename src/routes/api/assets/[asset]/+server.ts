@@ -1,6 +1,6 @@
+import { AssetControllerServer } from '$lib/controllers/asset/asset.server';
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
-import { Asset } from '$lib/controllers/asset/asset';
 import { query } from '$lib/db/mysql.server';
 import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import {
@@ -24,7 +24,11 @@ export const GET = (async ({ params, url, cookies }) => {
     const cached = getCachedResponse<Response>(url.href, auth.id);
     if (cached) return cached.clone() as GenericResponse<Buffer>;
 
-    const { err, val: asset } = await Asset.fromPublicId(query, auth, params.asset || '');
+    const { err, val: asset } = await AssetControllerServer.fromPublicId(
+        query,
+        auth,
+        params.asset || ''
+    );
     if (err) throw error(404, err);
 
     let img;
@@ -34,10 +38,10 @@ export const GET = (async ({ params, url, cookies }) => {
         const fileExt = asset.fileName.split('.').pop();
         if (!fileExt) throw error(400, 'No file extension on image');
         const contentType = fileExtToContentType[fileExt];
-        const webP = await Asset.base64ToWebP(asset.content, contentType, 100);
+        const webP = await AssetControllerServer.base64ToWebP(asset.content, contentType, 100);
         img = Buffer.from(webP, 'base64');
         // update the asset in the database to use webp
-        void Asset.updateAssetContentToWebP(query, auth, asset.publicId, webP);
+        void AssetControllerServer.updateAssetContentToWebP(query, auth, asset.publicId, webP);
     } else {
         img = Buffer.from(asset.content, 'base64');
     }
@@ -59,7 +63,7 @@ export const DELETE = (async ({ params, cookies }) => {
     const auth = await getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
-    const { err } = await Asset.purgeWithPublicId(query, auth, params.asset || '');
+    const { err } = await AssetControllerServer.purgeWithPublicId(query, auth, params.asset || '');
     if (err) throw error(404, err);
 
     return apiResponse({});

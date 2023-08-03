@@ -1,6 +1,7 @@
 <script lang="ts">
     import { afterNavigate, beforeNavigate, goto } from '$app/navigation';
     import { page } from '$app/stores';
+    import { BackupControllerClient } from '$lib/controllers/backup/backup';
     import { logOut } from '$lib/security/logOut';
     import { tooltip } from '@svelte-plugins/tooltips';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
@@ -27,7 +28,6 @@
     import Dropdown from '$lib/components/Dropdown.svelte';
     import Streaks from '$lib/components/Streaks.svelte';
     import { STORE_KEY, Theme } from '$lib/constants';
-    import { Backup } from '$lib/controllers/backup/backup.client';
     import type { Auth } from '$lib/controllers/user/user';
     import { Event as EventController } from '$lib/controllers/event/event.client';
     import { nowUtc } from '$lib/utils/time';
@@ -49,7 +49,7 @@
         const { data: backupData } = displayNotifOnErr(
             await api.get(auth, '/backups', { encrypted: 1 })
         );
-        Backup.download(backupData, auth.username, true);
+        BackupControllerClient.download(backupData, auth.username, true);
         isDownloadingBackup = false;
     }
 

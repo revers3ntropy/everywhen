@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { AssetControllerClient } from '$lib/controllers/asset/asset';
     import { tooltip } from '@svelte-plugins/tooltips';
     import { createEventDispatcher } from 'svelte';
     import Check from 'svelte-material-icons/Check.svelte';
@@ -7,7 +8,6 @@
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import UtcTime from '$lib/components/UtcTime.svelte';
-    import { Asset } from '$lib/controllers/asset/asset.client';
     import type { Auth } from '$lib/controllers/user/user';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
@@ -24,15 +24,13 @@
     let recentlyCopied = false;
     let deleted = false;
 
+    const confirmDeleteMessage =
+        'Are you sure you want to delete this image? ' +
+        'This action cannot be undone and will leave' +
+        ' broken links in your entries.';
+
     async function deleteImg() {
-        if (
-            !confirm(
-                'Are you sure you want to delete this image? ' +
-                    'This action cannot be undone and will leave' +
-                    ' broken links in your entries.'
-            )
-        )
-            return;
+        if (!confirm(confirmDeleteMessage)) return;
         displayNotifOnErr(await api.delete(auth, apiPath(`/assets/?`, publicId)));
         notify.success('Deleted asset');
         deleted = true;
@@ -42,7 +40,9 @@
     async function copyToClipBoard() {
         recentlyCopied = true;
 
-        await navigator.clipboard.writeText(Asset.mdLink(fileName, publicId));
+        await navigator.clipboard.writeText(
+            AssetControllerClient.generateMarkdownLink(fileName, publicId)
+        );
 
         notify.success('Copied to clipboard');
 

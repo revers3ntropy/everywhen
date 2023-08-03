@@ -1,5 +1,6 @@
 <script lang="ts">
     import AllowCookies from '$lib/components/AllowCookies.svelte';
+    import { BackupControllerClient } from '$lib/controllers/backup/backup';
     import { clientLogger } from '$lib/utils/log';
     import type { LayoutData } from './$types';
     import { logOut } from '$lib/security/logOut';
@@ -8,7 +9,6 @@
     import { page } from '$app/stores';
     import Cookie from 'js-cookie';
     import { STORE_KEY } from '$lib/constants';
-    import { Backup } from '$lib/controllers/backup/backup.client';
     import { allowedCookies, obfuscated, passcodeLastEntered, settingsStore } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
@@ -57,7 +57,7 @@
         const { data: backupData } = displayNotifOnErr(
             await api.get(data.auth, '/backups', { encrypted: 1 })
         );
-        Backup.download(backupData, data.auth.username, true);
+        BackupControllerClient.download(backupData, data.auth.username, true);
         downloadingBackup = false;
     }
 

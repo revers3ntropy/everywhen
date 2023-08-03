@@ -1,10 +1,10 @@
+import { AssetControllerServer } from '$lib/controllers/asset/asset.server';
+import { BackupControllerServer } from '$lib/controllers/backup/backup.server';
 import type { QueryFunc } from '$lib/db/mysql.server';
 import { encryptionKeyFromPassword } from '$lib/security/authUtils.server';
 import { Result } from '$lib/utils/result';
 import { cryptoRandomStr } from '$lib/security/authUtils.server';
 import { nowUtc } from '$lib/utils/time';
-import { Asset } from '../asset/asset.server';
-import { Backup } from '../backup/backup';
 import { Entry } from '../entry/entry';
 import { Event } from '../event/event';
 import { Label } from '../label/label';
@@ -93,7 +93,7 @@ namespace UserUtils {
     export async function purge(query: QueryFunc, auth: Auth): Promise<void> {
         await Label.purgeAll(query, auth);
         await Entry.purgeAll(query, auth);
-        await Asset.purgeAll(query, auth);
+        await AssetControllerServer.purgeAll(query, auth);
         await Event.purgeAll(query, auth);
         await Settings.purgeAll(query, auth);
 
@@ -148,10 +148,16 @@ namespace UserUtils {
             key: newKey
         };
 
-        const { val: backup, err: generateErr } = await Backup.generate(query, auth);
+        const { val: backup, err: generateErr } = await BackupControllerServer.generate(
+            query,
+            auth
+        );
         if (generateErr) return Result.err(generateErr);
 
-        const { err: encryptErr, val: encryptedBackup } = Backup.asEncryptedString(backup, auth);
+        const { err: encryptErr, val: encryptedBackup } = BackupControllerServer.asEncryptedString(
+            backup,
+            auth
+        );
 
         if (encryptErr) return Result.err(encryptErr);
 
@@ -161,7 +167,12 @@ namespace UserUtils {
             WHERE id = ${auth.id}
         `;
 
-        const { err } = await Backup.restore(query, newAuth, encryptedBackup, auth.key);
+        const { err } = await BackupControllerServer.restore(
+            query,
+            newAuth,
+            encryptedBackup,
+            auth.key
+        );
         if (err) return Result.err(err);
 
         return await Settings.changeEncryptionKeyInDB(query, auth, newKey);

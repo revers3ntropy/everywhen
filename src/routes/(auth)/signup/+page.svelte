@@ -1,5 +1,7 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
+    import { passcodeLastEntered } from '$lib/stores';
+    import { nowUtc } from '$lib/utils/time';
     import { tooltip } from '@svelte-plugins/tooltips';
     import ArrowRightThinCircleOutline from 'svelte-material-icons/ArrowRightThinCircleOutline.svelte';
     import InformationOutline from 'svelte-material-icons/InformationOutline.svelte';
@@ -11,13 +13,6 @@
     import Dot from '$lib/components/Dot.svelte';
 
     export let data: PageData;
-
-    // user log in / create account form values
-    let password = '';
-    let username = '';
-    let passcode = '';
-
-    let actionPending = false;
 
     async function create(): Promise<void> {
         actionPending = true;
@@ -36,12 +31,20 @@
                 }),
                 () => (actionPending = false)
             );
+            passcodeLastEntered.set(nowUtc());
         }
 
         await populateCookiesAndSettingsAfterAuth(auth, () => (actionPending = false));
 
         await goto('/' + data.redirect);
     }
+
+    // user log in / create account form values
+    let password = '';
+    let username = '';
+    let passcode = '';
+
+    let actionPending = false;
 </script>
 
 <svelte:head>

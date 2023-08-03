@@ -7,11 +7,10 @@ import { nowUtc } from '$lib/utils/time';
 import fs from 'fs';
 import type { ResultSetHeader } from 'mysql2';
 import webp from 'webp-converter';
-import type { Asset as _Asset, AssetMetadata } from './asset';
+import { z } from 'zod';
+import type { IAsset, AssetMetadata } from './asset';
 
-export type Asset = _Asset;
-
-namespace AssetUtils {
+export namespace AssetControllerServer {
     export async function create(
         query: QueryFunc,
         auth: Auth,
@@ -50,8 +49,8 @@ namespace AssetUtils {
         query: QueryFunc,
         auth: Auth,
         publicId: string
-    ): Promise<Result<Asset>> {
-        const res = await query<Asset[]>`
+    ): Promise<Result<IAsset>> {
+        const res = await query<IAsset[]>`
             SELECT id,
                    publicId,
                    content,
@@ -83,8 +82,8 @@ namespace AssetUtils {
         });
     }
 
-    export async function all(query: QueryFunc, auth: Auth): Promise<Result<Asset[]>> {
-        const res = await query<Asset[]>`
+    export async function all(query: QueryFunc, auth: Auth): Promise<Result<IAsset[]>> {
+        const res = await query<IAsset[]>`
             SELECT id,
                    publicId,
                    content,
@@ -136,7 +135,7 @@ namespace AssetUtils {
         `;
 
         const { err, val: metadata } = Result.collect(
-            res.map((row): Result<Asset> => {
+            res.map((row): Result<IAsset> => {
                 const { err: fileNameErr, val: fileName } = decrypt(row.fileName, auth.key);
                 if (fileNameErr) return Result.err(fileNameErr);
 
@@ -216,6 +215,14 @@ namespace AssetUtils {
         `;
         return Result.ok(null);
     }
-}
 
-export const Asset = AssetUtils;
+    export function jsonIsRawAsset(json: unknown): json is Omit<IAsset, 'id'> {
+        const schema = z.object({
+            publicId: z.string(),
+            content: z.string(),
+            fileName: z.string(),
+            created: z.number()
+        });
+        return schema.safeParse(json).success;
+    }
+}

@@ -1,7 +1,7 @@
-import * as server from './backup.server';
-import * as client from './backup.client';
+import { download as downloadFile } from '$lib/utils/files.client';
+import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
 
-export interface Backup {
+export interface IBackup {
     entries: {
         title: string;
         label?: string; // label's name
@@ -53,7 +53,10 @@ export interface Backup {
     appVersion: string;
 }
 
-export const Backup = {
-    ...server.Backup,
-    ...client.Backup
-};
+export namespace BackupControllerClient {
+    export function download(data: string, username: string, encrypted: boolean): void {
+        const dateFmt = fmtUtc(nowUtc(), currentTzOffset(), 'yyyyMMDD-HHmm');
+        const encryptedExt = encrypted ? '.encrypted' : '';
+        downloadFile(`${dateFmt}-${username}.backup${encryptedExt}.json`, data);
+    }
+}

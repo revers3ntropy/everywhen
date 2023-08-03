@@ -1,22 +1,19 @@
-import { Asset } from '$lib/controllers/asset/asset';
+import { AssetControllerServer } from '$lib/controllers/asset/asset.server';
 import { Location } from '$lib/controllers/location/location';
 import { SemVer } from '$lib/utils/semVer';
 import schemion from 'schemion';
 import type { QueryFunc } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/security/encryption.server';
-import { download as downloadFile } from '../../utils/files.client';
 import { Result } from '$lib/utils/result';
-import { fmtUtc, nowUtc } from '$lib/utils/time';
+import { nowUtc } from '$lib/utils/time';
 import { Entry } from '../entry/entry';
 import { Event } from '../event/event';
 import { Label } from '../label/label';
 import type { Auth } from '../user/user';
-import type { Backup as _Backup } from './backup';
+import type { IBackup } from './backup';
 
-export type Backup = _Backup;
-
-namespace BackupUtils {
-    export function asEncryptedString(self: Backup, auth: Auth): Result<string> {
+export namespace BackupControllerServer {
+    export function asEncryptedString(self: IBackup, auth: Auth): Result<string> {
         return encrypt(JSON.stringify(self), auth.key);
     }
 
@@ -24,7 +21,7 @@ namespace BackupUtils {
         query: QueryFunc,
         auth: Auth,
         created?: number
-    ): Promise<Result<Backup>> {
+    ): Promise<Result<IBackup>> {
         const { err: entryErr, val: entries } = await Entry.all(query, auth, {
             deleted: 'both'
         });
@@ -33,7 +30,7 @@ namespace BackupUtils {
         if (eventsErr) return Result.err(eventsErr);
         const { err: labelsErr, val: labels } = await Label.all(query, auth);
         if (labelsErr) return Result.err(labelsErr);
-        const { err: assetsErr, val: assets } = await Asset.all(query, auth);
+        const { err: assetsErr, val: assets } = await AssetControllerServer.all(query, auth);
         if (assetsErr) return Result.err(assetsErr);
         const { err: locationsErr, val: locations } = await Location.all(query, auth);
         if (locationsErr) return Result.err(locationsErr);
@@ -118,7 +115,7 @@ namespace BackupUtils {
             return Result.err('data must be a non-null object');
         }
 
-        const { err: migrateErr, val: migratedData } = Backup.migrate(
+        const { err: migrateErr, val: migratedData } = migrate(
             decryptedData as Record<string, unknown>
         );
         if (migrateErr) return Result.err(migrateErr);
@@ -202,14 +199,14 @@ namespace BackupUtils {
             if (err) return Result.err(err);
         }
 
-        await Asset.purgeAll(query, auth);
+        await AssetControllerServer.purgeAll(query, auth);
 
         for (const asset of assets) {
-            if (!Asset.jsonIsRawAsset(asset)) {
+            if (!AssetControllerServer.jsonIsRawAsset(asset)) {
                 return Result.err('Invalid asset format in JSON');
             }
 
-            const { err } = await Asset.create(
+            const { err } = await AssetControllerServer.create(
                 query,
                 auth,
                 asset.fileName,
@@ -245,7 +242,7 @@ namespace BackupUtils {
         return Result.ok(null);
     }
 
-    export function migrate(json: Partial<Backup> & Record<string, unknown>): Result<Backup> {
+    export function migrate(json: Partial<IBackup> & Record<string, unknown>): Result<IBackup> {
         json.appVersion ||= '0.0.0';
         const { val: version, err } = SemVer.fromString(json.appVersion);
         if (err) return Result.err(err);
@@ -268,14 +265,6 @@ namespace BackupUtils {
             }
         }
 
-        return Result.ok(json as Backup);
-    }
-
-    export function download(data: string, username: string, encrypted: boolean): void {
-        const dateFmt = fmtUtc(nowUtc(), 0, 'yyyyMMDD-HHmm');
-        const encryptedExt = encrypted ? '.encrypted' : '';
-        downloadFile(`${dateFmt}-${username}.backup${encryptedExt}.json`, data);
+        return Result.ok(json as IBackup);
     }
 }
-
-export const Backup = BackupUtils;
