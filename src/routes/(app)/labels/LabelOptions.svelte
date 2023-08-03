@@ -1,8 +1,7 @@
 <script lang="ts">
     import LabelDot from '$lib/components/label/LabelDot.svelte';
     import { dispatch } from '$lib/dataChangeEvents';
-    import Delete from 'svelte-material-icons/Delete.svelte';
-    import OpenInNew from 'svelte-material-icons/OpenInNew.svelte';
+    import Delete from 'svelte-material-icons/DeleteOutline.svelte';
     import type { Auth } from '$lib/controllers/user/user';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
@@ -66,15 +65,13 @@
     {/if}
     <a href="/labels/{id}">
         {entryCount}
-        {entryCount === 1 ? 'entry' : 'entries'}
-        {#if eventCount > 0},
+        {entryCount === 1 ? 'entry' : 'entries'}{#if eventCount > 0},
             {eventCount}
             {eventCount === 1 ? 'event' : 'events'}
         {/if}
-        <OpenInNew />
     </a>
     <div>
-        <button on:click={deleteLabel} class="icon-button">
+        <button on:click={deleteLabel} class="icon-button danger">
             <Delete size="30" />
         </button>
     </div>
@@ -82,8 +79,10 @@
 
 <style lang="less">
     @import '../../../styles/variables';
+    @import '../../../styles/layout';
 
     .label {
+        .container();
         margin: 0.5em;
         display: grid;
         grid-template-columns: 25px 1fr 1fr 35px;

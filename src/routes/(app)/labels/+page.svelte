@@ -70,7 +70,7 @@
             <div class="flex-center">
                 <button class="primary with-icon" on:click={newLabel}>
                     <Plus size="30" />
-                    Create Label
+                    New Label
                 </button>
             </div>
         </div>
