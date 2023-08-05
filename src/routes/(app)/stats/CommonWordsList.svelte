@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { encrypt } from '$lib/security/encryption.client';
+    import { encrypt } from '$lib/utils/encryption/encryption.client';
     import { encryptionKey } from '$lib/stores';
 
     export let words: [string, number][];

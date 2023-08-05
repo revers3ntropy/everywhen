@@ -10,7 +10,7 @@ import { defineConfig, devices } from '@playwright/test';
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-    testDir: './tests',
+    testDir: './e2e',
     /* Maximum time one test can run for. */
     timeout: 10 * 1000,
     expect: {
@@ -21,7 +21,7 @@ export default defineConfig({
         timeout: 5 * 1000
     },
     /* Run tests in files in parallel */
-    fullyParallel: true,
+    fullyParallel: false,
     /* Fail the build on CI if you accidentally left test.only in the source code. */
     forbidOnly: !!process.env.CI,
     retries: process.env.CI ? 2 : 3,
@@ -37,9 +37,9 @@ export default defineConfig({
         baseURL: 'http://localhost:5173',
 
         /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-        trace: 'on-first-retry'
+        trace: 'on-first-retry',
 
-        //headless: false,
+        headless: true
     },
 
     projects: [

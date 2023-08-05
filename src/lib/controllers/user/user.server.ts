@@ -1,19 +1,20 @@
 import { BackupControllerServer } from '$lib/controllers/backup/backup.server';
 import type { QueryFunc } from '$lib/db/mysql.server';
-import { encryptionKeyFromPassword } from '$lib/security/authUtils.server';
 import { Result } from '$lib/utils/result';
-import { cryptoRandomStr } from '$lib/security/authUtils.server';
 import { nowUtc } from '$lib/utils/time';
+import crypto from 'crypto';
 import { Entry } from '../entry/entry';
 import { Event } from '../event/event';
 import { Label } from '../label/label';
 import { Settings } from '../settings/settings';
 import type { IUser } from './user';
 import { UUIdControllerServer } from '$lib/controllers/uuid/uuid.server';
-import type { Auth } from '$lib/controllers/auth/auth.server';
+import { Auth } from '$lib/controllers/auth/auth.server';
 import { Asset } from '$lib/controllers/asset/asset.server';
 
 export namespace UserControllerServer {
+    const SALT_LENGTH = 10;
+
     export async function userExistsWithUsername(
         query: QueryFunc,
         username: string
@@ -90,7 +91,7 @@ export namespace UserControllerServer {
         let salt = '';
         let existingSalts: { salt: string }[];
         do {
-            salt = cryptoRandomStr(10);
+            salt = crypto.randomBytes(SALT_LENGTH).toString('base64url');
             existingSalts = await query<{ salt: string }[]>`
                 SELECT salt
                 FROM users
@@ -113,7 +114,7 @@ export namespace UserControllerServer {
             return Result.err('New password is too short');
         }
 
-        const oldKey = encryptionKeyFromPassword(oldPassword);
+        const oldKey = Auth.encryptionKeyFromPassword(oldPassword);
 
         if (oldKey !== auth.key) {
             return Result.err('Current password is invalid');
@@ -123,7 +124,7 @@ export namespace UserControllerServer {
             return Result.err('New password is same as current password');
         }
 
-        const newKey = encryptionKeyFromPassword(newPassword);
+        const newKey = Auth.encryptionKeyFromPassword(newPassword);
 
         const newAuth = {
             ...auth,

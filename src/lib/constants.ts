@@ -3,6 +3,8 @@ import type { CookieSerializeOptions } from 'cookie';
 export const NORMAL_COOKIE_TIMEOUT_DAYS = 1;
 export const REMEMBER_ME_COOKIE_TIMEOUT_DAYS = 365;
 
+export const UUID_LEN = 32;
+
 const KEY_PREFIX = '__halcyon_land_';
 
 export const LS_KEYS = {
@@ -63,6 +65,7 @@ export function cookieOptions({
     const maxAgeS = maxAgeDays * 24 * 60 * 60;
     const maxAgeMs = maxAgeS * 1000;
     return Object.freeze({
+        secure: true,
         path: '/',
         // Kinda needed for GitHub OAuth callback to work smoothly,
         // if set to 'strict' then the cookie is not sent to the callback page

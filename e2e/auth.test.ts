@@ -1,7 +1,6 @@
 import { expect, test } from '@playwright/test';
-import { COOKIE_KEYS } from '../src/lib/constants.js';
-import { deleteUser, expectDeleteUser, generateApiCtx, generateUser, randStr } from './helpers.js';
-import { Auth } from '../src/lib/controllers/auth/auth';
+import { COOKIE_KEYS } from '../src/lib/constants';
+import { deleteUser, expectDeleteUser, generateApiCtx, generateUser, randStr } from './helpers';
 
 test.describe('/signup', () => {
     test('Has title', async ({ page }) => {
@@ -59,12 +58,9 @@ test.describe('/signup', () => {
 
         expect(await page.isVisible('a[aria-label="Delete Account"]')).toBe(true);
 
-        const api = await generateApiCtx({
-            username: auth.username,
-            key: Auth.encryptionKeyFromPassword(auth.password)
-        });
+        const api = await generateApiCtx((await page.context().cookies())[sessionCookieIdx].value);
 
-        await expectDeleteUser(api, expect);
+        await expectDeleteUser(api);
 
         await page.waitForLoadState();
         await page.goto('/login', { waitUntil: 'networkidle' });
@@ -81,7 +77,7 @@ test.describe('/signup', () => {
     });
 
     test('Can log into account', async ({ page }) => {
-        const { auth, api } = await generateUser();
+        const { auth, api } = await generateUser(page);
         await page.goto('/login', { waitUntil: 'networkidle' });
 
         await page.getByLabel('Username').fill(auth.username);

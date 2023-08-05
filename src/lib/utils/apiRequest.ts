@@ -1,5 +1,5 @@
 import { browser } from '$app/environment';
-import { decrypt } from '$lib/security/encryption.client';
+import { decrypt } from '$lib/utils/encryption/encryption.client';
 import { encryptionKey } from '$lib/stores';
 import type { apiRes404, GenericResponse } from './apiResponse.server';
 import { serializeGETArgs } from './GETArgs';

@@ -1,4 +1,4 @@
-import { encrypt } from '$lib/security/encryption.server';
+import { encrypt } from '$lib/utils/encryption/encryption.server';
 import { Auth } from '$lib/controllers/auth/auth.server';
 import type { RequestHandler } from '@sveltejs/kit';
 

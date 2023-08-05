@@ -1,7 +1,7 @@
 import { PUBLIC_INIT_VECTOR } from '$env/static/public';
 import * as crypto from 'crypto';
-import { errorLogger } from '../utils/log.server';
-import { Result } from '../utils/result';
+import { errorLogger } from '../log.server';
+import { Result } from '../result';
 
 const ALGORITHM = 'aes-256-cbc';
 

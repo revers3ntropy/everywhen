@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { expectDeleteUser, generateUserAndSignIn } from './helpers.js';
+import { expectDeleteUser, generateUserAndSignIn } from './helpers';
 
 test.describe('/timeline', () => {
     test('Cannot visit page without authentication', async ({ page }) => {
@@ -11,7 +11,7 @@ test.describe('/timeline', () => {
         const { api } = await generateUserAndSignIn(page);
         await page.goto('/timeline', { waitUntil: 'networkidle' });
         await expect(page).toHaveURL('/timeline');
-        await expectDeleteUser(api, expect);
+        await expectDeleteUser(api);
     });
 
     test('Can create event from button', async ({ page }) => {
@@ -27,6 +27,6 @@ test.describe('/timeline', () => {
             'xyz'
         );
 
-        await expectDeleteUser(api, expect);
+        await expectDeleteUser(api);
     });
 });

@@ -9,5 +9,6 @@ rm -r ./build
 rm ./package-lock.json
 rm ./bin/package-lock.json
 rm ./general.log
+rm ./testBackup.json
 
 bin/setup

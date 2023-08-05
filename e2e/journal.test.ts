@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { expectDeleteUser, generateUserAndSignIn } from './helpers.js';
+import { expectDeleteUser, generateUserAndSignIn } from './helpers';
 
 const LONG_TEXT =
     'The very long body of the entry which is too long' +
@@ -30,7 +30,7 @@ test.describe('/journal', () => {
         // mobile title, entry title, and title in list of titles
         expect(await page.getByText(entryTitle).all()).toHaveLength(3);
 
-        await expectDeleteUser(api, expect);
+        await expectDeleteUser(api);
     });
 
     test('Can create entry with newly created label', async ({ page }) => {
@@ -51,7 +51,7 @@ test.describe('/journal', () => {
         ).toBeAttached();
         await expect(page.getByText(LONG_TEXT)).toBeAttached();
 
-        await expectDeleteUser(api, expect);
+        await expectDeleteUser(api);
     });
 
     test('Can mark entry as favourite and unfavourite', async ({ page }) => {

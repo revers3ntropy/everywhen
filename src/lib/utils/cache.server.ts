@@ -8,7 +8,7 @@ import { FileLogger } from './log.server';
 import { fmtBytes } from './text';
 import { nowUtc } from './time';
 import type { Auth } from '$lib/controllers/auth/auth';
-import { encrypt } from '$lib/security/encryption.server';
+import { encrypt } from '$lib/utils/encryption/encryption.server';
 
 const cacheLogger = new FileLogger('CACHE', chalk.magentaBright);
 

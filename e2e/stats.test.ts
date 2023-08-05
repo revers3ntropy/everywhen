@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { expectDeleteUser, generateUserAndSignIn } from './helpers.js';
+import { expectDeleteUser, generateUserAndSignIn } from './helpers';
 
 test.describe('/stats', () => {
     test('Cannot visit page without authentication', async ({ page }) => {
@@ -12,6 +12,6 @@ test.describe('/stats', () => {
         await page.goto('/stats', { waitUntil: 'networkidle' });
         await expect(page).toHaveURL('/stats');
         await expect(page.getByText('No Entries')).toBeAttached();
-        await expectDeleteUser(api, expect);
+        await expectDeleteUser(api);
     });
 });

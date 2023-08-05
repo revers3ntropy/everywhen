@@ -1,4 +1,4 @@
-import { decrypt } from '$lib/security/encryption.server';
+import { decrypt } from '$lib/utils/encryption/encryption.server';
 import { error } from '@sveltejs/kit';
 import { Entry } from '$lib/controllers/entry/entry';
 import { Label } from '$lib/controllers/label/label';

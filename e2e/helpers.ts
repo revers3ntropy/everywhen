@@ -1,8 +1,13 @@
-import { type APIRequestContext, type Expect, type Page, request } from '@playwright/test';
+import { type APIRequestContext, expect, type Page, request } from '@playwright/test';
 import { serialize } from 'cookie';
-import { COOKIE_KEYS, sessionCookieOptions } from '../src/lib/constants.js';
-import { encryptionKeyFromPassword } from '../src/lib/security/authUtils.server.js';
-import { Result } from '../src/lib/utils/result.js';
+import { sha256 } from 'js-sha256';
+import { COOKIE_KEYS, sessionCookieOptions, UUID_LEN } from '../src/lib/constants';
+import { Result } from '../src/lib/utils/result';
+import cookie from 'cookie';
+
+export function encryptionKeyFromPassword(pass: string): string {
+    return sha256(pass).substring(0, 32);
+}
 
 export function randStr(
     length = 10,
@@ -55,16 +60,21 @@ export async function generateUser(): Promise<{
         throw await authRes.text();
     }
 
+    const resCookies = cookie.parse(authRes.headers()['set-cookie']);
+    const sessionId = resCookies[COOKIE_KEYS.sessionId];
+    expect(typeof sessionId).toBe('string');
+    expect(sessionId.length).toBe(UUID_LEN);
+
     const auth: SessionAuth = {
         key,
         username,
         password,
-        sessionId: ((await authRes.json()) as { username: string; sessionId: string }).sessionId
+        sessionId
     };
 
     return {
         auth,
-        api: await generateApiCtx(auth.sessionId)
+        api: await generateApiCtx(sessionId)
     };
 }
 
@@ -97,7 +107,7 @@ export async function deleteUser(api: APIRequestContext): Promise<Result> {
     }
 }
 
-export async function expectDeleteUser(api: APIRequestContext, expect: Expect): Promise<void> {
+export async function expectDeleteUser(api: APIRequestContext): Promise<void> {
     const { err } = await deleteUser(api);
     expect(err).toBe(null);
 }

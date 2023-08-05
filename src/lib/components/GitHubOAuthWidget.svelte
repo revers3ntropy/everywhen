@@ -1,6 +1,7 @@
 <script lang="ts">
     import { PUBLIC_GITHUB_AUTH_CLIENT_ID, PUBLIC_ENV } from '$env/static/public';
     import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications.js';
+    import { Auth } from '$lib/controllers/auth/auth';
     import type { GitHubUser } from '$lib/controllers/ghAPI/ghAPI.server';
     import { settingsStore } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
@@ -8,7 +9,6 @@
     import { onMount } from 'svelte';
     import GitHub from 'svelte-material-icons/Github.svelte';
     import { SESSION_KEYS } from '$lib/constants.js';
-    import { randomInt, randomString } from '$lib/security/authUtils.client.js';
 
     export let size = 30;
 
@@ -29,7 +29,7 @@
             notify.error('Not in prod!');
             return;
         }
-        const state = randomString(randomInt(10, 20));
+        const state = Auth.randomString(Auth.randomInt(10, 20));
         sessionStorage.setItem(SESSION_KEYS.GH_CB, state);
         window.location.assign(authorizeUrl(state));
     }
