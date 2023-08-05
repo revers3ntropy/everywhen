@@ -1,6 +1,6 @@
 import type { CookieSerializeOptions } from 'cookie';
 
-export const NORMAL_COOKIE_TIMEOUT_DAYS = 3;
+export const NORMAL_COOKIE_TIMEOUT_DAYS = 1;
 export const REMEMBER_ME_COOKIE_TIMEOUT_DAYS = 365;
 
 const KEY_PREFIX = '__halcyon_land_';

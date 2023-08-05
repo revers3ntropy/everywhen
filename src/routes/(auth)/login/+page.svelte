@@ -78,7 +78,7 @@
                 use:tooltip={{
                     content:
                         `You will have to re-enter your login details after ${REMEMBER_ME_COOKIE_TIMEOUT_DAYS} ` +
-                        `days instead of ${NORMAL_COOKIE_TIMEOUT_DAYS} days.`
+                        `days instead of ${NORMAL_COOKIE_TIMEOUT_DAYS * 24} hours.`
                 }}
                 on:click={() => (rememberMeInput.checked = !rememberMeInput.checked)}
             >
