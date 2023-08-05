@@ -7,6 +7,11 @@ import { clientLogger } from './log';
 import { Result } from './result';
 import { currentTzOffset, nowUtc } from './time';
 
+let latestEncryptionKey: string | null = null;
+encryptionKey.subscribe(key => {
+    latestEncryptionKey = key;
+});
+
 export type ReqBody = {
     timezoneUtcOffset?: number;
     utcTimeS?: number;
@@ -94,7 +99,7 @@ async function handleOkResponse(
     try {
         textResult = await response.text();
     } catch (e) {
-        clientLogger.error(`Error on api fetch (${method} ${url})`, response);
+        clientLogger.error(`Error getting text from fetch (${method} ${url})`, response);
         return Result.err('Invalid response from server');
     }
 
@@ -102,28 +107,31 @@ async function handleOkResponse(
     try {
         jsonRes = JSON.parse(textResult);
     } catch (e) {
-        if (!key) return Result.err('Invalid response from server');
+        if (!key) {
+            clientLogger.error(
+                `Can't parse response and no encryptionKey (${method} ${url})`,
+                textResult
+            );
+            return Result.err('Invalid response from server');
+        }
         const { err, val: decryptedRes } = decrypt(textResult, key);
         if (err) return Result.err(err);
+
         try {
             jsonRes = JSON.parse(decryptedRes);
         } catch (e) {
-            clientLogger.error(`Error on api fetch (${method} ${url})`, response);
+            clientLogger.log({ key, textResult, decryptedRes });
+            clientLogger.error(`Can't parse response (${method} ${url})`);
             return Result.err('Invalid response from server');
         }
     }
 
     if (typeof jsonRes !== 'object' || jsonRes === null) {
-        clientLogger.error(`Error on api fetch (${method} ${url})`, response);
+        clientLogger.error(`non-object returned (${method} ${url})`, jsonRes);
         return Result.err('Invalid response from server');
     }
     return Result.ok(jsonRes);
 }
-
-let latestEncryptionKey: string | null = null;
-encryptionKey.subscribe(key => {
-    latestEncryptionKey = key;
-});
 
 export async function makeApiReq<
     Verb extends keyof ApiResponse,

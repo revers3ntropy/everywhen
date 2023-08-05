@@ -27,12 +27,18 @@ export function decrypt(ciphertext: string, key: string | null): Result<string> 
         return Result.err('Failed to decrypt data');
     }
     try {
-        const decrypted = crypto.AES.decrypt(ciphertext, crypto.enc.Utf8.parse(key), {
-            iv: crypto.enc.Utf8.parse(PUBLIC_INIT_VECTOR)
-        });
-        return Result.ok(decrypted.toString(crypto.enc.Utf8));
+        const decrypted = crypto.AES.decrypt(
+            crypto.enc.Hex.parse(ciphertext).toString(crypto.enc.Base64),
+            crypto.enc.Utf8.parse(key),
+            {
+                iv: crypto.enc.Utf8.parse(PUBLIC_INIT_VECTOR)
+            }
+        );
+        const plaintext = decrypted.toString(crypto.enc.Utf8);
+        return Result.ok(plaintext);
     } catch (e) {
         notify.error('Failed to decrypt data');
+        clientLogger.log({ ciphertext, key, keyLen: key.length });
         clientLogger.error(e);
         return Result.err('Failed to decrypt data');
     }

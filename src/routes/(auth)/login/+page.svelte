@@ -9,7 +9,7 @@
     import { populateCookiesAndSettingsAfterAuth } from '../actions.client';
     import type { PageData } from './$types';
     import { tooltip } from '@svelte-plugins/tooltips';
-    import { encryptionKey, sessionId, username as usernameStore } from '$lib/stores';
+    import { encryptionKey, username as usernameStore } from '$lib/stores';
 
     export let data: PageData;
 
@@ -30,8 +30,6 @@
         );
 
         $usernameStore = auth.username;
-        $sessionId = auth.sessionId;
-
         await populateCookiesAndSettingsAfterAuth(() => (actionPending = false));
 
         await goto('/' + data.redirect);

@@ -26,7 +26,7 @@ export const POST = (async ({ request, cookies }) => {
 
     cookies.set(COOKIE_KEYS.sessionId, sessionId, sessionCookieOptions(false));
 
-    return apiResponse(sessionId, { sessionId });
+    return apiResponse(body.password, { sessionId });
 }) satisfies RequestHandler;
 
 export const DELETE = (async ({ cookies, locals: { auth } }) => {

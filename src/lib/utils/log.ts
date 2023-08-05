@@ -14,8 +14,6 @@ export class Logger {
         }
         this.coloredName = color(name);
         this.nameLength = name.length;
-
-        this.log('(created)');
     }
 
     protected fmt(useUTC: boolean, ...args: unknown[]): string {
@@ -40,7 +38,7 @@ export class Logger {
     }
 
     public log(...args: unknown[]): void {
-        this.logger.log(this.fmt(false, ...args));
+        this.logger.info(this.fmt(false, ...args));
     }
 
     public warn(...args: unknown[]): void {
@@ -53,3 +51,5 @@ export class Logger {
 }
 
 export const clientLogger = new Logger('CLIENT', chalk.blue);
+
+new Logger('INIT', chalk.blueBright.bgBlack).log('');

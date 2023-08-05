@@ -18,10 +18,6 @@ namespace AuthServer {
 
     const sessions = new Map<string, Session>();
 
-    export function hasSession(id: string): boolean {
-        return sessions.has(id);
-    }
-
     export function getSession(id: string): Session | undefined {
         return sessions.get(id);
     }

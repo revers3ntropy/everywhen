@@ -24,14 +24,13 @@ export const obfuscated = persisted<boolean>(LS_KEYS.obfuscated, false);
 export const username = persisted<string | null>(SESSION_KEYS.username, null, {
     storage: 'session'
 });
-export const encryptionKey = persisted<string | null>(SESSION_KEYS.username, null, {
+export const encryptionKey = persisted<string | null>(SESSION_KEYS.encryptionKey, null, {
     storage: 'session'
 });
 
 // cookie
 export const theme = cookieWritable<Theme>(COOKIE_KEYS.theme, Theme.light);
 export const allowedCookies = cookieWritable<boolean>(COOKIE_KEYS.allowedCookies, false);
-export const sessionId = cookieWritable<string | null>(COOKIE_KEYS.sessionId, null);
 
 /**
  * Called in root layout, runs on both server and client.

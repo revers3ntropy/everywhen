@@ -1,4 +1,4 @@
-import { COOKIE_KEYS } from '$lib/constants';
+import { COOKIE_KEYS, sessionCookieOptions } from '$lib/constants';
 import { Log } from '$lib/controllers/log/log';
 import { nowUtc } from '$lib/utils/time';
 import type { Cookies, Handle, RequestEvent } from '@sveltejs/kit';
@@ -130,6 +130,9 @@ export const handle = (async ({ event, resolve }) => {
         event.locals.auth = { ...auth };
     } else {
         event.locals.auth = null;
+
+        // unset session cookie if invalid session
+        event.cookies.delete(COOKIE_KEYS.sessionId, sessionCookieOptions(false));
     }
 
     event.locals.__cookieWritables = getCookieWritableCookies(event.cookies);

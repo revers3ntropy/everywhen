@@ -1,7 +1,7 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import { Auth } from '$lib/controllers/auth/auth';
-    import { passcodeLastEntered, sessionId, username as usernameStore } from '$lib/stores';
+    import { encryptionKey, passcodeLastEntered, username as usernameStore } from '$lib/stores';
     import { nowUtc } from '$lib/utils/time';
     import { tooltip } from '@svelte-plugins/tooltips';
     import ArrowRightThinCircleOutline from 'svelte-material-icons/ArrowRightThinCircleOutline.svelte';
@@ -16,16 +16,19 @@
 
     async function create(): Promise<void> {
         actionPending = true;
-        const auth = displayNotifOnErr(
+
+        const key = Auth.encryptionKeyFromPassword(password);
+        $encryptionKey = key;
+
+        displayNotifOnErr(
             await api.post(`/users`, {
-                password: Auth.encryptionKeyFromPassword(password),
+                password: key,
                 username
             }),
             () => (actionPending = false)
         );
 
         $usernameStore = username;
-        $sessionId = auth.sessionId;
 
         if (passcode) {
             displayNotifOnErr(

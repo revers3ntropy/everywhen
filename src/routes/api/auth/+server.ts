@@ -24,8 +24,7 @@ export const GET = (async ({ url, cookies }) => {
     cookies.set(COOKIE_KEYS.sessionId, sessionId, sessionCookieOptions(rememberMe));
 
     return apiResponse(key, {
-        username,
-        sessionId
+        username
     });
 }) satisfies RequestHandler;
 

@@ -22,3 +22,5 @@ declare module 'webp-converter' {
 }
 
 declare module 'svelte-heatmap';
+
+declare module 'crypto-browserify';
