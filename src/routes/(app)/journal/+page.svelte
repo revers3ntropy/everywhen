@@ -16,13 +16,5 @@
 </svelte:head>
 
 <main>
-    <Entries
-        auth={data.auth}
-        showBin
-        showLabels
-        showSearch
-        showSidebar
-        showEntryForm
-        {entryFormMode}
-    />
+    <Entries showBin showLabels showSearch showSidebar showEntryForm {entryFormMode} />
 </main>

@@ -1,8 +1,5 @@
-import { AssetControllerServer } from '$lib/controllers/asset/asset.server';
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
-import { query } from '$lib/db/mysql.server';
-import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import {
     apiRes404,
     apiResponse,
@@ -10,6 +7,8 @@ import {
     rawApiResponse
 } from '$lib/utils/apiResponse.server';
 import { cacheResponse, getCachedResponse, invalidateCache } from '$lib/utils/cache.server';
+import { Auth } from '$lib/controllers/auth/auth.server';
+import { Asset } from '$lib/controllers/asset/asset.server';
 
 const fileExtToContentType: Readonly<Record<string, string>> = Object.freeze({
     png: 'image/png',
@@ -19,16 +18,12 @@ const fileExtToContentType: Readonly<Record<string, string>> = Object.freeze({
 });
 
 export const GET = (async ({ params, url, cookies }) => {
-    const auth = await getAuthFromCookies(cookies);
+    const auth = Auth.Server.getAuthFromCookies(cookies);
 
     const cached = getCachedResponse<Response>(url.href, auth.id);
     if (cached) return cached.clone() as GenericResponse<Buffer>;
 
-    const { err, val: asset } = await AssetControllerServer.fromPublicId(
-        query,
-        auth,
-        params.asset || ''
-    );
+    const { err, val: asset } = await Asset.Server.fromPublicId(auth, params.asset || '');
     if (err) throw error(404, err);
 
     let img;
@@ -38,10 +33,10 @@ export const GET = (async ({ params, url, cookies }) => {
         const fileExt = asset.fileName.split('.').pop();
         if (!fileExt) throw error(400, 'No file extension on image');
         const contentType = fileExtToContentType[fileExt];
-        const webP = await AssetControllerServer.base64ToWebP(asset.content, contentType, 100);
+        const webP = await Asset.Server.base64ToWebP(asset.content, contentType, 100);
         img = Buffer.from(webP, 'base64');
         // update the asset in the database to use webp
-        void AssetControllerServer.updateAssetContentToWebP(query, auth, asset.publicId, webP);
+        void Asset.Server.updateAssetContentToWebP(auth, asset.publicId, webP);
     } else {
         img = Buffer.from(asset.content, 'base64');
     }
@@ -60,13 +55,13 @@ export const GET = (async ({ params, url, cookies }) => {
 }) satisfies RequestHandler;
 
 export const DELETE = (async ({ params, cookies }) => {
-    const auth = await getAuthFromCookies(cookies);
+    const auth = Auth.Server.getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
-    const { err } = await AssetControllerServer.purgeWithPublicId(query, auth, params.asset || '');
+    const { err } = await Asset.Server.purgeWithPublicId(auth, params.asset || '');
     if (err) throw error(404, err);
 
-    return apiResponse({});
+    return apiResponse(auth, {});
 }) satisfies RequestHandler;
 
 export const POST = apiRes404 satisfies RequestHandler;

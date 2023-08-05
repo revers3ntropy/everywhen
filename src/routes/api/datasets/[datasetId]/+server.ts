@@ -5,9 +5,9 @@ import type { RequestHandler } from './$types';
 import { Dataset } from '$lib/controllers/dataset/dataset';
 import { query } from '$lib/db/mysql.server';
 import { error } from '@sveltejs/kit';
-import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import { z } from 'zod';
+import { Auth } from '$lib/controllers/auth/auth.server';
 
 export const GET = cachedApiRoute(async (auth, { params }) => {
     const datasetId = params.datasetId;
@@ -21,7 +21,7 @@ export const GET = cachedApiRoute(async (auth, { params }) => {
 }) satisfies RequestHandler;
 
 export const POST = (async ({ cookies, request, params }) => {
-    const auth = await getAuthFromCookies(cookies);
+    const auth = Auth.Server.getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
     const body = await getUnwrappedReqBody(request, {
@@ -43,7 +43,7 @@ export const POST = (async ({ cookies, request, params }) => {
     const { err } = await Dataset.appendRows(query, auth, params.datasetId, res.data);
     if (err) throw error(400, err);
 
-    return apiResponse({});
+    return apiResponse(auth, {});
 }) satisfies RequestHandler;
 
 export const DELETE = apiRes404;

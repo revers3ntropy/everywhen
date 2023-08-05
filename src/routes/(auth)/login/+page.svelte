@@ -1,29 +1,38 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import { NORMAL_COOKIE_TIMEOUT_DAYS, REMEMBER_ME_COOKIE_TIMEOUT_DAYS } from '$lib/constants';
+    import { Auth } from '$lib/controllers/auth/auth';
     import ChevronRight from 'svelte-material-icons/ChevronRight.svelte';
-    import { encryptionKeyFromPassword } from '$lib/security/authUtils.client';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import InformationOutline from 'svelte-material-icons/InformationOutline.svelte';
     import { populateCookiesAndSettingsAfterAuth } from '../actions.client';
     import type { PageData } from './$types';
     import { tooltip } from '@svelte-plugins/tooltips';
+    import { encryptionKey, sessionId, username as usernameStore } from '$lib/stores';
 
     export let data: PageData;
 
     async function login(): Promise<void> {
         actionPending = true;
+
+        const key = Auth.encryptionKeyFromPassword(password);
+
+        $encryptionKey = key;
+
         const auth = displayNotifOnErr(
-            await api.get(null, '/auth', {
-                key: encryptionKeyFromPassword(password),
+            await api.get('/auth', {
+                key,
                 username,
                 rememberMe: rememberMeInput.checked
             }),
             () => (actionPending = false)
         );
 
-        await populateCookiesAndSettingsAfterAuth(auth, () => (actionPending = false));
+        $usernameStore = auth.username;
+        $sessionId = auth.sessionId;
+
+        await populateCookiesAndSettingsAfterAuth(() => (actionPending = false));
 
         await goto('/' + data.redirect);
     }

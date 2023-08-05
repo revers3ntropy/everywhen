@@ -7,7 +7,6 @@
     import TextBoxOutline from 'svelte-material-icons/TextBoxOutline.svelte';
     import { Entry } from '$lib/controllers/entry/entry.client';
     import type { Label } from '$lib/controllers/label/label';
-    import type { Auth } from '$lib/controllers/user/user';
     import { dispatch } from '$lib/dataChangeEvents';
     import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
     import { enabledLocation } from '$lib/stores';
@@ -19,7 +18,6 @@
     import { onMount } from 'svelte';
     import Send from 'svelte-material-icons/Send.svelte';
 
-    export let auth: Auth;
     export let obfuscated = true;
     export let setEntryFormMode = null as null | ((mode: EntryFormMode) => Promise<void>);
     export let showLocationToggle = true;
@@ -63,7 +61,7 @@
             createdTZOffset
         } as RawEntry;
 
-        const res = displayNotifOnErr(await api.post(auth, '/entries', { ...body }));
+        const res = displayNotifOnErr(await api.post('/entries', { ...body }));
 
         if (!res.id) {
             clientLogger.error(res);
@@ -108,7 +106,7 @@
     let labels = null as Label[] | null;
 
     onMount(async () => {
-        labels = displayNotifOnErr(await api.get(auth, '/labels')).labels;
+        labels = displayNotifOnErr(await api.get('/labels')).labels;
     });
 </script>
 
@@ -139,7 +137,7 @@
     {/if}
     <div class="line">
         <div class="entry-input">
-            <LabelSelect {labels} {auth} condensed bind:value={label} />
+            <LabelSelect {labels} condensed bind:value={label} />
             <input on:keyup={onInput} bind:this={entry} placeholder="Write a bullet..." />
         </div>
         <div class="flex-center" style="justify-content: end">

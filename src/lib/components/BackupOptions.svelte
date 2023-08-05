@@ -1,29 +1,29 @@
 <script lang="ts">
+    import { Auth } from '$lib/controllers/auth/auth';
     import { BackupControllerClient } from '$lib/controllers/backup/backup';
     import Download from 'svelte-material-icons/Download.svelte';
     import DownloadLock from 'svelte-material-icons/DownloadLock.svelte';
     import Upload from 'svelte-material-icons/Upload.svelte';
-    import type { Auth } from '../controllers/user/user';
-    import { encryptionKeyFromPassword } from '../security/authUtils.client';
     import { api } from '../utils/apiRequest';
     import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
     import { showPopup } from '../utils/popups';
     import type { Result } from '../utils/result';
     import FileDropDialog from '$lib/components/dialogs/FileDropDialog.svelte';
-
-    export let auth: Auth;
+    import { encryptionKey, username } from '$lib/stores';
 
     let downloading = false;
 
     async function download(encrypted: boolean) {
         if (downloading) return;
         downloading = true;
-        const { data: backupData } = displayNotifOnErr(
-            await api.get(auth, '/backups', { encrypted })
-        );
-        BackupControllerClient.download(backupData, auth.username, encrypted);
+        const { data: backupData } = displayNotifOnErr(await api.get('/backups', { encrypted }));
+        BackupControllerClient.download(backupData, $username, encrypted);
         downloading = false;
     }
+
+    const confirmRestoreMessage =
+        'Are you sure you want to restore from this backup?' +
+        ' This will overwrite all your existing data.';
 
     function upload() {
         showPopup(FileDropDialog, {
@@ -35,25 +35,24 @@
             withContents: async (res: Result<string>, password?: string) => {
                 let contents = displayNotifOnErr(res);
 
-                if (
-                    !confirm(
-                        'Are you sure you want to restore from this backup?' +
-                            ' This will overwrite all your existing data.'
-                    )
-                ) {
-                    return;
-                }
+                if (!confirm(confirmRestoreMessage)) return;
 
+                let key: string;
                 if (!password) {
-                    password = auth.key;
+                    if ($encryptionKey) {
+                        key = $encryptionKey;
+                    } else {
+                        notify.error('No encryption key found');
+                        return;
+                    }
                 } else {
-                    password = encryptionKeyFromPassword(password);
+                    key = Auth.encryptionKeyFromPassword(password);
                 }
 
                 displayNotifOnErr(
-                    await api.post(auth, '/backups', {
+                    await api.post('/backups', {
                         data: contents,
-                        key: password
+                        key: key
                     })
                 );
                 notify.success('File uploaded successfully');

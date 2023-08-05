@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { logOut } from '$lib/security/logOut';
     import { allowedCookies } from '$lib/stores';
+    import { Auth } from '$lib/controllers/auth/auth';
 </script>
 
 <div class="wrapper">
@@ -19,7 +19,7 @@
         >
             Accept
         </button>
-        <button class="secondary" on:click={() => void logOut()} aria-label="Deny Cookies">
+        <button class="secondary" on:click={() => void Auth.logOut()} aria-label="Deny Cookies">
             Deny
         </button>
     </div>

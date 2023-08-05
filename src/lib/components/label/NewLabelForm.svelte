@@ -3,7 +3,6 @@
     import { dispatch } from '$lib/dataChangeEvents';
     import { nowUtc } from '$lib/utils/time';
     import { createEventDispatcher } from 'svelte';
-    import type { Auth } from '$lib/controllers/user/user';
     import { Event } from '$lib/controllers/event/event.client';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
@@ -13,8 +12,6 @@
     let labelName = '';
     let labelColor = Event.DEFAULT_COLOR;
 
-    export let auth: Auth;
-
     async function closeHandler() {
         if (!labelName) {
             notify.error('Invalid Name');
@@ -22,7 +19,7 @@
         }
 
         const { id } = displayNotifOnErr(
-            await api.post(auth, '/labels', {
+            await api.post('/labels', {
                 name: labelName,
                 color: labelColor
             })

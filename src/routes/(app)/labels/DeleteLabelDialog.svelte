@@ -4,12 +4,10 @@
     import BookSpinner from '$lib/components/BookSpinner.svelte';
     import LabelSelect from '$lib/components/label/LabelSelect.svelte';
     import type { Label } from '$lib/controllers/label/label';
-    import type { Auth } from '$lib/controllers/user/user';
     import { popup } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
 
-    export let auth: Auth;
     export let id: string;
     export let color: string;
     export let name: string;
@@ -25,13 +23,13 @@
     async function reloadEntries() {
         loaded = false;
 
-        const entriesRes = displayNotifOnErr(await api.get(auth, `/entries`, { labelId: id }));
+        const entriesRes = displayNotifOnErr(await api.get(`/entries`, { labelId: id }));
         entryCount = entriesRes.totalEntries;
 
-        const eventsRes = displayNotifOnErr(await api.get(auth, `/events`, { labelId: id }));
+        const eventsRes = displayNotifOnErr(await api.get(`/events`, { labelId: id }));
         eventCount = eventsRes.events.filter(e => e.label?.id === id).length;
 
-        const labelsRes = displayNotifOnErr(await api.get(auth, '/labels'));
+        const labelsRes = displayNotifOnErr(await api.get('/labels'));
         labels = labelsRes.labels;
 
         loaded = true;
@@ -39,7 +37,7 @@
 
     async function rmLabel() {
         displayNotifOnErr(
-            await api.delete(auth, apiPath(`/labels/?`, id), {
+            await api.delete(apiPath(`/labels/?`, id), {
                 strategy: 'remove'
             })
         );
@@ -53,7 +51,7 @@
 
     async function reassign() {
         displayNotifOnErr(
-            await api.delete(auth, apiPath(`/labels/?`, id), {
+            await api.delete(apiPath(`/labels/?`, id), {
                 strategy: 'reassign',
                 newLabelId: changeLabelId
             })
@@ -89,7 +87,7 @@
         <div class="options">
             <div>
                 {#if labels}
-                    <LabelSelect {auth} bind:value={changeLabelId} {filter} {labels} />
+                    <LabelSelect bind:value={changeLabelId} {filter} {labels} />
                 {:else}
                     Loading...
                 {/if}

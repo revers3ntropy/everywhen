@@ -40,7 +40,7 @@
                 </h1>
             </div>
             <div class="search-for-word">
-                <SearchForWord auth={data.auth} />
+                <SearchForWord />
             </div>
         </div>
 
@@ -98,11 +98,7 @@
 
         <section class="container" style="margin: 0; padding: 1rem 1rem 3rem 1rem;">
             <h3 style="padding: 0 0 2rem 0"> Common Words </h3>
-            <CommonWordsList
-                entryCount={data.entryCount}
-                words={data.commonWords}
-                auth={data.auth}
-            />
+            <CommonWordsList entryCount={data.entryCount} words={data.commonWords} />
         </section>
     {/if}
 </main>

@@ -7,7 +7,6 @@
     import Skull from 'svelte-material-icons/Skull.svelte';
     import ChangePasswordDialog from '$lib/components/dialogs/ChangePasswordDialog.svelte';
     import type { SettingConfig, SettingValue } from '$lib/controllers/settings/settings';
-    import { logOut } from '$lib/security/logOut';
     import { showPopup } from '$lib/utils/popups';
     import BackupOptions from '$lib/components/BackupOptions.svelte';
     import {
@@ -17,13 +16,16 @@
     import Settings from './Settings.svelte';
     import type { PageData } from './$types';
     import { settingsStore } from '$lib/stores';
+    import { Auth } from '$lib/controllers/auth/auth';
 
     export let data: PageData;
 
     function changePassword() {
-        showPopup(ChangePasswordDialog, {
-            auth: data.auth
-        });
+        showPopup(ChangePasswordDialog, {});
+    }
+
+    function logOut() {
+        void Auth.logOut();
     }
 
     const settingsConfigEntries = Object.entries(SettingsController.config) as [
@@ -44,14 +46,14 @@
         </h1>
 
         <div class="buttons">
-            <BackupOptions auth={data.auth} />
+            <BackupOptions />
         </div>
         <div class="buttons">
             <button aria-label="Change password" on:click={changePassword}>
                 <LockOutline size="30" />
                 Change Password
             </button>
-            <button aria-label="Log Out" class="danger" on:click={() => logOut()}>
+            <button aria-label="Log Out" class="danger" on:click={logOut}>
                 <Logout size="30" />
                 Log Out
             </button>
@@ -61,7 +63,7 @@
             </a>
         </div>
         <div class="buttons">
-            <GitHubOauthWidget auth={data.auth} />
+            <GitHubOauthWidget />
         </div>
     </section>
     <section>
@@ -73,7 +75,7 @@
         <div class="settings">
             {#each settingsConfigEntries as [key, config] (key)}
                 {#if config.showInSettings}
-                    <Settings {...config} {...$settingsStore[key]} auth={data.auth} />
+                    <Settings {...config} {...$settingsStore[key]} />
                 {/if}
             {/each}
         </div>

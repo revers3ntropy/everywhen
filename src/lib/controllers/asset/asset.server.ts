@@ -1,6 +1,3 @@
-import type { Auth } from '$lib/controllers/user/user';
-import { UUId } from '$lib/controllers/uuid/uuid';
-import type { QueryFunc } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/security/encryption.server';
 import { Result } from '$lib/utils/result';
 import { nowUtc } from '$lib/utils/time';
@@ -8,29 +5,31 @@ import fs from 'fs';
 import type { ResultSetHeader } from 'mysql2';
 import webp from 'webp-converter';
 import { z } from 'zod';
-import type { IAsset, AssetMetadata } from './asset';
+import { Asset as _Asset, type AssetMetadata } from './asset';
+import { UUIdControllerServer } from '$lib/controllers/uuid/uuid.server';
+import type { Auth } from '$lib/controllers/auth/auth';
+import { query } from '$lib/db/mysql.server';
 
-export namespace AssetControllerServer {
+namespace AssetServer {
+    type Asset = _Asset;
+
     export async function create(
-        query: QueryFunc,
         auth: Auth,
         fileNamePlainText: string,
         contentsPlainText: string,
         created?: TimestampSecs,
         publicId?: string
     ): Promise<Result<{ publicId: string; id: string }>> {
-        publicId ??= await UUId.generateUniqueUUId(query);
-        const id = await UUId.generateUniqueUUId(query);
+        publicId ??= await UUIdControllerServer.generate();
+        const id = await UUIdControllerServer.generate();
         const fileExt = fileNamePlainText.split('.').pop();
         if (!fileExt) {
             return Result.err('Invalid file extension');
         }
 
-        const { err: contentsErr, val: encryptedContents } = encrypt(contentsPlainText, auth.key);
-        if (contentsErr) return Result.err(contentsErr);
+        const encryptedContents = encrypt(contentsPlainText, auth.key);
 
-        const { err: fileNameErr, val: encryptedFileName } = encrypt(fileNamePlainText, auth.key);
-        if (fileNameErr) return Result.err(fileNameErr);
+        const encryptedFileName = encrypt(fileNamePlainText, auth.key);
 
         await query`
             INSERT INTO assets (id, publicId, user, created, fileName, content)
@@ -45,12 +44,8 @@ export namespace AssetControllerServer {
         return Result.ok({ publicId, id });
     }
 
-    export async function fromPublicId(
-        query: QueryFunc,
-        auth: Auth,
-        publicId: string
-    ): Promise<Result<IAsset>> {
-        const res = await query<IAsset[]>`
+    export async function fromPublicId(auth: Auth, publicId: string): Promise<Result<Asset>> {
+        const res = await query<Asset[]>`
             SELECT id,
                    publicId,
                    content,
@@ -82,8 +77,8 @@ export namespace AssetControllerServer {
         });
     }
 
-    export async function all(query: QueryFunc, auth: Auth): Promise<Result<IAsset[]>> {
-        const res = await query<IAsset[]>`
+    export async function all(auth: Auth): Promise<Result<Asset[]>> {
+        const res = await query<Asset[]>`
             SELECT id,
                    publicId,
                    content,
@@ -113,7 +108,6 @@ export namespace AssetControllerServer {
     }
 
     export async function pageOfMetaData(
-        query: QueryFunc,
         auth: Auth,
         offset: number,
         count: number
@@ -135,7 +129,7 @@ export namespace AssetControllerServer {
         `;
 
         const { err, val: metadata } = Result.collect(
-            res.map((row): Result<IAsset> => {
+            res.map((row): Result<Asset> => {
                 const { err: fileNameErr, val: fileName } = decrypt(row.fileName, auth.key);
                 if (fileNameErr) return Result.err(fileNameErr);
 
@@ -159,7 +153,7 @@ export namespace AssetControllerServer {
         return Result.ok([metadata, assetCount.count]);
     }
 
-    export async function purgeAll(query: QueryFunc, auth: Auth): Promise<void> {
+    export async function purgeAll(auth: Auth): Promise<void> {
         await query`
             DELETE
             FROM assets
@@ -167,11 +161,7 @@ export namespace AssetControllerServer {
         `;
     }
 
-    export async function purgeWithPublicId(
-        query: QueryFunc,
-        auth: Auth,
-        publicId: string
-    ): Promise<Result> {
+    export async function purgeWithPublicId(auth: Auth, publicId: string): Promise<Result> {
         const res = await query<ResultSetHeader>`
             DELETE
             FROM assets
@@ -199,13 +189,11 @@ export namespace AssetControllerServer {
     }
 
     export async function updateAssetContentToWebP(
-        query: QueryFunc,
         auth: Auth,
         publicId: string,
         webp: string
     ): Promise<Result> {
-        const { err: contentsErr, val: encryptedContents } = encrypt(webp, auth.key);
-        if (contentsErr) return Result.err(contentsErr);
+        const encryptedContents = encrypt(webp, auth.key);
 
         await query`
             UPDATE assets
@@ -216,7 +204,7 @@ export namespace AssetControllerServer {
         return Result.ok(null);
     }
 
-    export function jsonIsRawAsset(json: unknown): json is Omit<IAsset, 'id'> {
+    export function jsonIsRawAsset(json: unknown): json is Omit<Asset, 'id'> {
         const schema = z.object({
             publicId: z.string(),
             content: z.string(),
@@ -226,3 +214,9 @@ export namespace AssetControllerServer {
         return schema.safeParse(json).success;
     }
 }
+
+export const Asset = {
+    ..._Asset,
+    Server: AssetServer
+};
+export type Asset = _Asset;

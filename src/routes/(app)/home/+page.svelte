@@ -79,7 +79,7 @@
     </section>
 
     <section>
-        <DatasetShortcutWidgets auth={data.auth} datasets={data.datasets} />
+        <DatasetShortcutWidgets datasets={data.datasets} />
     </section>
 
     <section>
@@ -89,7 +89,6 @@
     <section>
         <div class="container">
             <BulletEntriesForm
-                auth={data.auth}
                 obfuscated={$obfuscated}
                 showLocationToggle={false}
                 submitIsPrimaryButton={false}
@@ -98,7 +97,6 @@
             <div style="margin: 1rem">
                 {#if Object.keys(data.recentTitles).length}
                     <EntryTitles
-                        auth={data.auth}
                         titles={data.recentTitles}
                         obfuscated={$obfuscated}
                         hideBlurToggle
@@ -124,7 +122,6 @@
                         </h1>
                         <div style="margin: 1rem">
                             <EntryTitles
-                                auth={data.auth}
                                 titles={pinnedEntries}
                                 obfuscated={$obfuscated}
                                 onCreateFilter={Entry.isPinned}
@@ -168,7 +165,6 @@
                                 }}
                                 obfuscated={$obfuscated}
                                 showTimeAgo={false}
-                                auth={data.auth}
                                 onCreateFilter={() => false}
                                 hideBlurToggle
                             />

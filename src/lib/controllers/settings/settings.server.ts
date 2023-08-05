@@ -2,11 +2,11 @@ import type { QueryFunc } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/security/encryption.server';
 import { Result } from '$lib/utils/result';
 import { nowUtc } from '$lib/utils/time';
-import type { Auth } from '../user/user';
-import { UUId } from '../uuid/uuid';
 import type { SettingsKey } from '$lib/controllers/settings/settings.client';
 import { errorLogger } from '$lib/utils/log.server';
 import { Settings as _Settings, type SettingsConfig } from './settings';
+import { UUIdControllerServer } from '$lib/controllers/uuid/uuid.server';
+import type { Auth } from '$lib/controllers/auth/auth';
 
 export type Settings<T = unknown> = _Settings<T>;
 
@@ -23,15 +23,14 @@ namespace SettingsUtils {
 
         const now = nowUtc();
 
-        const expectedType = _Settings.config[key ].type;
+        const expectedType = _Settings.config[key].type;
         if (typeof value !== expectedType) {
             return Result.err(
                 `Invalid setting value, expected ${expectedType} but got ${typeof value}`
             );
         }
 
-        const { err, val: valEncrypted } = encrypt(JSON.stringify(value), auth.key);
-        if (err) return Result.err(err);
+        const valEncrypted = encrypt(JSON.stringify(value), auth.key);
 
         const alreadyInDb = await query<{ id: string }[]>`
             SELECT id from settings
@@ -51,7 +50,7 @@ namespace SettingsUtils {
             return Result.ok({ id, created: now, key, value });
         }
 
-        const id = await UUId.generateUniqueUUId(query);
+        const id = await UUIdControllerServer.generate();
 
         await query`
             INSERT INTO settings (id, user, created, \`key\`, value)
@@ -194,8 +193,7 @@ namespace SettingsUtils {
         const { val: unencryptedSettings, err } = await all(query, auth);
         if (err) return Result.err(err);
         for (const setting of unencryptedSettings) {
-            const { err, val: newValue } = encrypt(JSON.stringify(setting.value), newKey);
-            if (err) return Result.err(err);
+            const newValue = encrypt(JSON.stringify(setting.value), newKey);
 
             await query`
                 UPDATE settings

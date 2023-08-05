@@ -7,10 +7,8 @@
     import Fire from 'svelte-material-icons/Fire.svelte';
     import TimerSand from 'svelte-material-icons/TimerSand.svelte';
     import type { Streaks } from '../controllers/entry/entry';
-    import type { Auth } from '../controllers/user/user';
     import { api } from '../utils/apiRequest';
 
-    export let auth: Auth;
     export let tooltipPosition: 'top' | 'bottom' | 'left' | 'right' = 'bottom';
     export let condensed = false;
 
@@ -39,7 +37,7 @@
     async function loadStreaks() {
         loaded = false;
 
-        const { err, val } = await api.get(auth, '/entries/streaks', {
+        const { err, val } = await api.get('/entries/streaks', {
             tz: currentTzOffset(),
             // cache busting - otherwise streaks are static through day changes
             x: fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD')

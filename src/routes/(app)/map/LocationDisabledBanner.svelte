@@ -2,12 +2,9 @@
     import Info from 'svelte-material-icons/InformationOutline.svelte';
     import { tooltip } from '@svelte-plugins/tooltips';
     import Close from 'svelte-material-icons/Close.svelte';
-    import type { Auth } from '$lib/controllers/user/user';
     import { doesNotWantToEnableLocation, enabledLocation, settingsStore } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { nowUtc } from '$lib/utils/time';
-
-    export let auth: Auth;
 
     async function enable() {
         const wasEnabled = $enabledLocation;
@@ -25,7 +22,7 @@
             )
                 return;
         }
-        await api.put(auth, '/settings', {
+        await api.put('/settings', {
             key: 'preferLocationOn',
             value: true
         });

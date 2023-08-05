@@ -1,16 +1,16 @@
 import { error } from '@sveltejs/kit';
 import { Location } from '$lib/controllers/location/location';
 import { query } from '$lib/db/mysql.server';
-import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 import { invalidateCache } from '$lib/utils/cache.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import type { RequestHandler } from './$types';
+import { Auth } from '$lib/controllers/auth/auth.server';
 
 export const GET = apiRes404;
 
 export const PUT = (async ({ cookies, request, params }) => {
-    const auth = await getAuthFromCookies(cookies);
+    const auth = Auth.Server.getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
     const body = await getUnwrappedReqBody(
@@ -56,18 +56,18 @@ export const PUT = (async ({ cookies, request, params }) => {
         if (err) throw error(400, err);
     }
 
-    return apiResponse({});
+    return apiResponse(auth, {});
 }) satisfies RequestHandler;
 
 export const DELETE = (async ({ params, cookies }) => {
-    const auth = await getAuthFromCookies(cookies);
+    const auth = Auth.Server.getAuthFromCookies(cookies);
     if (!params.locationId) throw error(400, 'invalid location id');
     invalidateCache(auth.id);
 
     const { err: deleteErr } = await Location.purge(query, auth, params.locationId);
     if (deleteErr) throw error(400, deleteErr);
 
-    return apiResponse({});
+    return apiResponse(auth, {});
 }) satisfies RequestHandler;
 
 export const POST = apiRes404;

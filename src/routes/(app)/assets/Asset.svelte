@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { AssetControllerClient } from '$lib/controllers/asset/asset';
     import { tooltip } from '@svelte-plugins/tooltips';
     import { createEventDispatcher } from 'svelte';
     import Check from 'svelte-material-icons/Check.svelte';
@@ -8,9 +7,9 @@
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import UtcTime from '$lib/components/UtcTime.svelte';
-    import type { Auth } from '$lib/controllers/user/user';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
+    import { Asset } from '$lib/controllers/asset/asset';
 
     const dispatch = createEventDispatcher();
 
@@ -19,7 +18,6 @@
     export let fileName: string;
     export let created: TimestampSecs;
     export let obfuscated = true;
-    export let auth: Auth;
 
     let recentlyCopied = false;
     let deleted = false;
@@ -31,7 +29,7 @@
 
     async function deleteImg() {
         if (!confirm(confirmDeleteMessage)) return;
-        displayNotifOnErr(await api.delete(auth, apiPath(`/assets/?`, publicId)));
+        displayNotifOnErr(await api.delete(apiPath(`/assets/?`, publicId)));
         notify.success('Deleted asset');
         deleted = true;
         dispatch('delete');
@@ -40,9 +38,7 @@
     async function copyToClipBoard() {
         recentlyCopied = true;
 
-        await navigator.clipboard.writeText(
-            AssetControllerClient.generateMarkdownLink(fileName, publicId)
-        );
+        await navigator.clipboard.writeText(Asset.generateMarkdownLink(fileName, publicId));
 
         notify.success('Copied to clipboard');
 

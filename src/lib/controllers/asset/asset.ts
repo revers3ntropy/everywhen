@@ -1,4 +1,4 @@
-export interface IAsset {
+export interface Asset {
     id: string;
     publicId: string;
     content: string;
@@ -6,9 +6,9 @@ export interface IAsset {
     created: number;
 }
 
-export type AssetMetadata = Omit<IAsset, 'content'>;
+export type AssetMetadata = Omit<Asset, 'content'>;
 
-export namespace AssetControllerClient {
+export namespace Asset {
     export function generateMarkdownLink(fileName: string, publicId: string): string {
         return `![${fileName}](/api/assets/${publicId})`;
     }

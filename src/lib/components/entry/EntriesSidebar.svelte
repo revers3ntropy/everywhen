@@ -4,11 +4,9 @@
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import Menu from 'svelte-material-icons/Menu.svelte';
     import type { Entry } from '$lib/controllers/entry/entry';
-    import type { Auth } from '$lib/controllers/user/user';
     import EntryTitles from './EntryTitles.svelte';
 
     export let titles: Record<string, Entry[]> | null;
-    export let auth: Auth;
     export let obfuscated = false;
 
     let showing = false;
@@ -41,7 +39,7 @@
         </button>
     </div>
     <div class="content">
-        <EntryTitles {auth} {obfuscated} {titles} hideBlurToggle />
+        <EntryTitles {obfuscated} {titles} hideBlurToggle />
     </div>
 </div>
 

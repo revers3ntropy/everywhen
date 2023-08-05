@@ -16,6 +16,6 @@ export default defineConfig({
         __VERSION__
     },
     test: {
-        include: ['src/**/*.{test,spec}.ts']
+        include: ['src/**/*.spec.ts']
     }
 });

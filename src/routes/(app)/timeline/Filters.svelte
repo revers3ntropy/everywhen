@@ -1,11 +1,9 @@
 <script lang="ts">
     import FilterVariant from 'svelte-material-icons/FilterVariant.svelte';
     import type { Label } from '$lib/controllers/label/label';
-    import type { Auth } from '$lib/controllers/user/user';
     import Dropdown from '$lib/components/Dropdown.svelte';
     import MultiLabelSelect from '$lib/components/label/MultiLabelSelect.svelte';
 
-    export let auth: Auth;
     export let labels = null as null | Label[];
     export let selectedLabels = [] as string[];
 </script>
@@ -17,7 +15,7 @@
             <FilterVariant size="30" />
         </span>
         <div>
-            <MultiLabelSelect {auth} {labels} bind:value={selectedLabels} />
+            <MultiLabelSelect {labels} bind:value={selectedLabels} />
         </div>
     </Dropdown>
 </div>

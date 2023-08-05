@@ -4,11 +4,9 @@
     import { interactable } from '$lib/components/canvas/interactable';
     import { Event as EventController } from '$lib/controllers/event/event.client';
     import type { Label } from '$lib/controllers/label/label';
-    import type { Auth } from '$lib/controllers/user/user';
 
     const WIDTH = 8;
 
-    export let auth: Auth;
     export let labels: Label[];
 
     export let id: string;

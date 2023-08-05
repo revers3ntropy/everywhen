@@ -3,7 +3,6 @@
     import { listen } from '$lib/dataChangeEvents';
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
-    import type { Auth } from '$lib/controllers/user/user';
     import { Entry } from '$lib/controllers/entry/entry.client';
     import { showPopup } from '$lib/utils/popups';
     import { obfuscate } from '$lib/utils/text';
@@ -12,7 +11,6 @@
     import Dot from '../Dot.svelte';
     import UtcTime from '../UtcTime.svelte';
 
-    export let auth: Auth;
     export let titles = null as Record<string, Entry[]> | null;
     export let obfuscated = true;
     export let showTimeAgo = true;
@@ -23,7 +21,7 @@
     function showEntryPopup(entryId: string) {
         showPopup(EntryDialog, {
             id: entryId,
-            auth,
+
             obfuscated
         });
     }

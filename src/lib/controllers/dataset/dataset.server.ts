@@ -1,8 +1,6 @@
 import type { SettingsConfig } from '$lib/controllers/settings/settings';
-import type { Auth } from '$lib/controllers/user/user';
 import type { QueryFunc } from '$lib/db/mysql.server';
 import { Result } from '$lib/utils/result';
-import { UUId } from '$lib/controllers/uuid/uuid.server';
 import { Dataset as DatasetClient } from './dataset.client';
 import type {
     Dataset as _Dataset,
@@ -14,6 +12,8 @@ import type {
 } from './dataset';
 import { nowUtc } from '$lib/utils/time';
 import { decrypt, encrypt } from '$lib/security/encryption.server';
+import type { Auth } from '$lib/controllers/auth/auth';
+import { UUIdControllerServer } from '$lib/controllers/uuid/uuid.server';
 
 export type Dataset = _Dataset;
 
@@ -198,8 +198,7 @@ namespace DatasetUtils {
         if (name.length < 1) return Result.err('Name must be at least 1 character long');
         if (name.length > 100) return Result.err('Name must be at most 100 characters long');
 
-        const { val: encryptedName, err: encryptErr } = encrypt(name, auth.key);
-        if (encryptErr) return Result.err(encryptErr);
+        const encryptedName = encrypt(name, auth.key);
 
         const existingWithName = await query<{ name: string }[]>`
             SELECT name
@@ -212,7 +211,7 @@ namespace DatasetUtils {
             return Result.err('Dataset with that name already exists');
         }
 
-        const id = await UUId.generateUniqueUUId(query);
+        const id = await UUIdControllerServer.generate();
 
         await query`
             INSERT INTO datasets (id, user, name, created)
@@ -227,8 +226,7 @@ namespace DatasetUtils {
             const type = types.find(type => type.id === column.type);
             if (!type) return Result.err('Invalid column type');
 
-            const { val: nameEncrypted, err: encryptErr } = encrypt(column.name, auth.key);
-            if (encryptErr) return Result.err(encryptErr);
+            const nameEncrypted = encrypt(column.name, auth.key);
 
             await query`
                 INSERT INTO datasetColumns (id, dataset, name, created, type)
@@ -324,8 +322,7 @@ namespace DatasetUtils {
             `;
         }
         for (const element of newElements) {
-            const { val: dataEncrypted, err: encryptErr } = encrypt(element.data, auth.key);
-            if (encryptErr) return Result.err(encryptErr);
+            const dataEncrypted = encrypt(element.data, auth.key);
 
             await query`
                 INSERT INTO datasetElements (dataset, \`row\`, \`column\`, data)

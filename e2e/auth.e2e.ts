@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
-import { STORE_KEY } from '../src/lib/constants.js';
-import { encryptionKeyFromPassword } from '../src/lib/security/authUtils.client.js';
+import { COOKIE_KEYS } from '../src/lib/constants.js';
 import { deleteUser, expectDeleteUser, generateApiCtx, generateUser, randStr } from './helpers.js';
+import { Auth } from '../src/lib/controllers/auth/auth';
 
 test.describe('/signup', () => {
     test('Has title', async ({ page }) => {
@@ -47,10 +47,10 @@ test.describe('/signup', () => {
 
         await page.waitForURL('/home');
 
-        const usernameCookieIdx = (await page.context().cookies()).findIndex(
-            c => c.name === STORE_KEY.username
+        const sessionCookieIdx = (await page.context().cookies()).findIndex(
+            c => c.name === COOKIE_KEYS.sessionId
         );
-        expect(usernameCookieIdx).toBeGreaterThan(-1);
+        expect(sessionCookieIdx).toBeGreaterThan(-1);
 
         await expect(page).toHaveURL('/home');
 
@@ -61,7 +61,7 @@ test.describe('/signup', () => {
 
         const api = await generateApiCtx({
             username: auth.username,
-            key: encryptionKeyFromPassword(auth.password)
+            key: Auth.encryptionKeyFromPassword(auth.password)
         });
 
         await expectDeleteUser(api, expect);

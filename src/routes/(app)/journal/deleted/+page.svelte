@@ -21,7 +21,6 @@
         {/if}
     </h2>
     <Entries
-        auth={data.auth}
         options={{
             deleted: true
         }}

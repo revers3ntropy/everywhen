@@ -1,14 +1,14 @@
 import { error } from '@sveltejs/kit';
 import { Event } from '$lib/controllers/event/event';
 import { query } from '$lib/db/mysql.server';
-import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 import { invalidateCache } from '$lib/utils/cache.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import type { RequestHandler } from './$types';
+import { Auth } from '$lib/controllers/auth/auth.server';
 
 export const PUT = (async ({ request, params, cookies }) => {
-    const auth = await getAuthFromCookies(cookies);
+    const auth = Auth.Server.getAuthFromCookies(cookies);
     if (!params.eventId) throw error(400, 'invalid event id');
     invalidateCache(auth.id);
 
@@ -61,11 +61,11 @@ export const PUT = (async ({ request, params, cookies }) => {
         if (err) throw error(400, err);
     }
 
-    return apiResponse({ event });
+    return apiResponse(auth, { event });
 }) satisfies RequestHandler;
 
 export const DELETE = (async ({ params, cookies }) => {
-    const auth = await getAuthFromCookies(cookies);
+    const auth = Auth.Server.getAuthFromCookies(cookies);
     if (!params.eventId) throw error(400, 'invalid event id');
     invalidateCache(auth.id);
 
@@ -74,7 +74,7 @@ export const DELETE = (async ({ params, cookies }) => {
     const { err: deleteErr } = await Event.purge(query, auth, event);
     if (deleteErr) throw error(400, deleteErr);
 
-    return apiResponse({});
+    return apiResponse(auth, {});
 }) satisfies RequestHandler;
 
 export const GET = apiRes404;

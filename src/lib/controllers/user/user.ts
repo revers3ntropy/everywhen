@@ -1,14 +1,7 @@
-import * as server from './user.server';
-
-export interface User {
+export interface IUser {
     id: string;
     username: string;
     key: string;
 }
 
-export type RawAuth = Omit<User, 'id'>;
-export type Auth = User;
-
-export const User = {
-    ...server.User
-};
+export namespace UserControllerClient {}

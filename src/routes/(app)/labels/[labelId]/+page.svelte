@@ -15,7 +15,7 @@
 
     async function updateName() {
         displayNotifOnErr(
-            await api.put(data.auth, apiPath('/labels/?', data.label.id), {
+            await api.put(apiPath('/labels/?', data.label.id), {
                 name: data.label.name
             })
         );
@@ -23,7 +23,7 @@
 
     async function updateColor() {
         displayNotifOnErr(
-            await api.put(data.auth, apiPath('/labels/?', data.label.id), {
+            await api.put(apiPath('/labels/?', data.label.id), {
                 color: data.label.color
             })
         );
@@ -35,7 +35,7 @@
         // a more complex approach is required to clear the
         // label from the entries and events
         if (data.entryCount + eventCount < 1) {
-            displayNotifOnErr(await api.delete(data.auth, apiPath(`/labels/?`, data.label.id)));
+            displayNotifOnErr(await api.delete(apiPath(`/labels/?`, data.label.id)));
             await goto('../');
             return;
         }
@@ -101,14 +101,14 @@
         </h1>
         <div class="events">
             {#each data.events as event}
-                <Event auth={data.auth} {event} labels={data.labels} obfuscated={$obfuscated} />
+                <Event {event} labels={data.labels} obfuscated={$obfuscated} />
             {/each}
         </div>
     </section>
 
     <section>
         <h1>{data.entryCount} Entr{data.entryCount === 1 ? 'y' : 'ies'}</h1>
-        <Entries auth={data.auth} options={{ labelId: data.label.id }} showLabels={false} />
+        <Entries options={{ labelId: data.label.id }} showLabels={false} />
     </section>
 </main>
 

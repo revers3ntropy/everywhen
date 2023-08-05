@@ -3,24 +3,24 @@ import type { CookieSerializeOptions } from 'cookie';
 export const NORMAL_COOKIE_TIMEOUT_DAYS = 3;
 export const REMEMBER_ME_COOKIE_TIMEOUT_DAYS = 365;
 
-export const KEY_PREFIX = '__halcyon_land_';
+const KEY_PREFIX = '__halcyon_land_';
 
-export const STORE_KEY = {
+export const LS_KEYS = {
     newEntryBody: `${KEY_PREFIX}new_entry_body`,
     newEntryTitle: `${KEY_PREFIX}new_entry_title`,
     newEntryLabel: `${KEY_PREFIX}new_entry_label`,
     passcodeLastEntered: `${KEY_PREFIX}passcode_last_entered`,
     enabledLocation: `${KEY_PREFIX}enabled_location`,
     sortEventsKey: `${KEY_PREFIX}events_sort_key`,
-    key: `${KEY_PREFIX}key`,
-    username: `${KEY_PREFIX}username`,
     obfuscated: `${KEY_PREFIX}obfuscated`,
     lastTipNumber: `${KEY_PREFIX}last_tip_number`,
     doesNotWantToEnableLocation: `${KEY_PREFIX}does_not_want_to_enable_location`
 } as const;
 
 export const SESSION_KEYS = {
-    GH_CB: `${KEY_PREFIX}github_callback_state`
+    GH_CB: `${KEY_PREFIX}github_callback_state`,
+    username: `${KEY_PREFIX}username`,
+    encryptionKey: `${KEY_PREFIX}key`
 };
 
 export enum Theme {
@@ -28,20 +28,21 @@ export enum Theme {
     dark = 'dark'
 }
 
-export const COOKIE_WRITEABLE_KEYS = {
+export const COOKIE_KEYS = {
     theme: `${KEY_PREFIX}theme`,
-    allowedCookies: `${KEY_PREFIX}allowed_cookies`
+    allowedCookies: `${KEY_PREFIX}allowed_cookies`,
+    sessionId: `${KEY_PREFIX}session_id`
 } as const;
 
 export const LS_TO_CLEAR_ON_LOGOUT = Object.freeze([
-    STORE_KEY.newEntryBody,
-    STORE_KEY.newEntryTitle,
-    STORE_KEY.newEntryLabel,
-    STORE_KEY.passcodeLastEntered,
-    STORE_KEY.enabledLocation,
-    STORE_KEY.sortEventsKey,
-    STORE_KEY.obfuscated,
-    STORE_KEY.doesNotWantToEnableLocation
+    LS_KEYS.newEntryBody,
+    LS_KEYS.newEntryTitle,
+    LS_KEYS.newEntryLabel,
+    LS_KEYS.passcodeLastEntered,
+    LS_KEYS.enabledLocation,
+    LS_KEYS.sortEventsKey,
+    LS_KEYS.obfuscated,
+    LS_KEYS.doesNotWantToEnableLocation
 ]);
 
 export const COOKIES_TO_CLEAR_ON_LOGOUT = Object.freeze([]);
@@ -49,10 +50,15 @@ export const COOKIES_TO_CLEAR_ON_LOGOUT = Object.freeze([]);
 // possible characters to show when the text is blurred
 export const OBFUSCATE_CHARS = 'abcdefghijklmnopqrstuvwxyz ';
 
-export function cookieOptions(
-    isUsername: boolean,
-    rememberMe: boolean
-): Readonly<CookieSerializeOptions> {
+interface ICookieOptions {
+    rememberMe?: boolean;
+    httpOnly?: boolean;
+}
+
+export function cookieOptions({
+    rememberMe,
+    httpOnly
+}: ICookieOptions = {}): Readonly<CookieSerializeOptions> {
     const maxAgeDays = rememberMe ? REMEMBER_ME_COOKIE_TIMEOUT_DAYS : NORMAL_COOKIE_TIMEOUT_DAYS;
     const maxAgeS = maxAgeDays * 24 * 60 * 60;
     const maxAgeMs = maxAgeS * 1000;
@@ -65,10 +71,14 @@ export function cookieOptions(
         // so that it can check the auth is still valid
         // but keep the key cookie httpOnly, to prevent XSS
         // https://owasp.org/www-community/HttpOnly
-        httpOnly: !isUsername,
+        httpOnly,
         expires: new Date(Math.floor(Date.now() / 1000) * 1000 + maxAgeMs),
         maxAge: maxAgeS
     });
+}
+
+export function sessionCookieOptions(rememberMe: boolean): Readonly<CookieSerializeOptions> {
+    return cookieOptions({ httpOnly: true, rememberMe });
 }
 
 export const MAX_IMAGE_SIZE: Bytes = 1024 * 1024 * 8; // 8MiB

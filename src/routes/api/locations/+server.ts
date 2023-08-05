@@ -1,12 +1,12 @@
 import { error } from '@sveltejs/kit';
 import { Location } from '$lib/controllers/location/location';
 import { query } from '$lib/db/mysql.server';
-import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import { nowUtc } from '$lib/utils/time';
 import type { RequestHandler } from './$types';
+import { Auth } from '$lib/controllers/auth/auth.server';
 
 export const GET = cachedApiRoute(async (auth, { url }) => {
     let lat: number, lng: number;
@@ -33,7 +33,7 @@ export const GET = cachedApiRoute(async (auth, { url }) => {
 }) satisfies RequestHandler;
 
 export const POST = (async ({ request, cookies }) => {
-    const auth = await getAuthFromCookies(cookies);
+    const auth = Auth.Server.getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
     const body = await getUnwrappedReqBody(
@@ -65,7 +65,7 @@ export const POST = (async ({ request, cookies }) => {
     );
     if (err) throw error(400, err);
 
-    return apiResponse({ ...val });
+    return apiResponse(auth, { ...val });
 }) satisfies RequestHandler;
 
 export const PUT = apiRes404;

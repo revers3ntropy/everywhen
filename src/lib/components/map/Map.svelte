@@ -11,7 +11,6 @@
     import type { FeatureLike } from 'ol/Feature';
     import { writable } from 'svelte/store';
     import type { EntryLocation } from '$lib/controllers/entry/entry';
-    import type { Auth } from '$lib/controllers/user/user';
     import type { CallbackObject } from 'ol-contextmenu/dist/types';
     import type { MapBrowserEvent } from 'ol';
     import Map from 'ol/Map';
@@ -40,7 +39,6 @@
 
     // https://openlayers.org/
 
-    export let auth: Auth;
     export let entries = [] as EntryLocation[];
     export let locations = [] as Location[];
     export let entriesInteractable = true;
@@ -50,7 +48,7 @@
     export let mobileHeight = 'calc(100vh - var(--nav-height) - 5rem)';
 
     async function reloadLocations() {
-        const res = displayNotifOnErr(await api.get(auth, '/locations'));
+        const res = displayNotifOnErr(await api.get('/locations'));
         locations = res.locations;
     }
 
@@ -61,7 +59,7 @@
         radius: number
     ): Promise<void> {
         displayNotifOnErr(
-            await api.put(auth, apiPath('/locations/?', id), {
+            await api.put(apiPath('/locations/?', id), {
                 latitude,
                 longitude,
                 radius
@@ -74,7 +72,7 @@
         const [long, lat] = toLonLat(coordinate);
 
         displayNotifOnErr(
-            await api.post(auth, '/locations', {
+            await api.post('/locations', {
                 latitude: lat,
                 longitude: long,
                 name: 'New Location',
@@ -198,7 +196,6 @@
             if ('entry' in hovering) {
                 showPopup(EntryDialog, {
                     id: hovering.entry.id,
-                    auth,
                     obfuscated: false
                 });
                 return;
@@ -207,7 +204,6 @@
             if ('location' in hovering) {
                 showPopup(EditLocation, {
                     ...hovering.location,
-                    auth,
                     onChange: reloadLocations,
                     isInDialog: true
                 });
@@ -327,7 +323,7 @@
 >
     {#if hoveringEntryId !== null}
         <div bind:this={tooltip} class="ol-popup {popupOnRight ? 'right' : ''}">
-            <EntryTooltipOnMap {auth} id={hoveringEntryId} />
+            <EntryTooltipOnMap id={hoveringEntryId} />
         </div>
     {/if}
 </div>

@@ -1,43 +1,36 @@
-import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import { invalidateCache } from '$lib/utils/cache.server';
 import { GETParamIsTruthy } from '$lib/utils/GETArgs';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
-import { cookieOptions, STORE_KEY } from '$lib/constants';
-import { User } from '$lib/controllers/user/user';
+import { COOKIE_KEYS, sessionCookieOptions } from '$lib/constants';
 import { query } from '$lib/db/mysql.server';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
+import { UserControllerServer } from '$lib/controllers/user/user.server';
+import { Auth } from '$lib/controllers/auth/auth.server';
 
 export const GET = (async ({ url, cookies }) => {
-    let key: string | undefined | null = url.searchParams.get('key');
-    const username: string | undefined | null = url.searchParams.get('username');
+    const key: string | null = url.searchParams.get('key');
+    const username: string | null = url.searchParams.get('username');
     const rememberMe = GETParamIsTruthy(url.searchParams.get('rememberMe'));
-
-    if (!key) {
-        key = cookies.get(STORE_KEY.key);
-    }
 
     if (!key || !username) {
         throw error(401, 'Invalid login');
     }
 
-    const { err, val: user } = await User.authenticate(query, username, key);
-
+    const { err, val: sessionId } = await Auth.Server.authenticateUserFromLogIn(username, key);
     if (err) throw error(401, err);
 
-    cookies.set(STORE_KEY.key, key, cookieOptions(false, rememberMe));
-    cookies.set(STORE_KEY.username, username, cookieOptions(true, rememberMe));
+    cookies.set(COOKIE_KEYS.sessionId, sessionId, sessionCookieOptions(rememberMe));
 
-    return apiResponse({
-        key,
+    return apiResponse(key, {
         username,
-        id: user.id
+        sessionId
     });
 }) satisfies RequestHandler;
 
 export const PUT = (async ({ request, cookies }) => {
-    const auth = await getAuthFromCookies(cookies);
+    const auth = Auth.Server.getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
     const { newPassword, currentPassword } = await getUnwrappedReqBody(request, {
@@ -45,16 +38,24 @@ export const PUT = (async ({ request, cookies }) => {
         newPassword: 'string'
     });
 
-    const { err } = await User.changePassword(query, auth, currentPassword, newPassword);
+    const { err } = await UserControllerServer.changePassword(
+        query,
+        auth,
+        currentPassword,
+        newPassword
+    );
     if (err) throw error(400, err);
 
-    return apiResponse({});
+    return apiResponse(auth, {});
 }) satisfies RequestHandler;
 
 export const DELETE = (({ cookies }) => {
-    cookies.delete(STORE_KEY.key, cookieOptions(false, false));
-    cookies.delete(STORE_KEY.username, cookieOptions(true, false));
-    return apiResponse({});
+    const auth = Auth.Server.getAuthFromCookies(cookies);
+    invalidateCache(auth.id);
+
+    cookies.delete(COOKIE_KEYS.sessionId, sessionCookieOptions(false));
+
+    return apiResponse(auth, {});
 }) satisfies RequestHandler;
 
 export const POST = apiRes404;

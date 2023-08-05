@@ -1,11 +1,8 @@
 <script lang="ts">
-    import { logOut } from '$lib/security/logOut';
     import { popup } from '$lib/stores';
-    import type { Auth } from '$lib/controllers/user/user';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
-
-    export let auth: Auth;
+    import { Auth } from '$lib/controllers/auth/auth';
 
     let currentPassword = '';
     let newPassword = '';
@@ -24,14 +21,14 @@
 
         submitted = true;
         displayNotifOnErr(
-            await api.put(auth, '/auth', {
+            await api.put('/auth', {
                 currentPassword,
                 newPassword
             }),
             () => (submitted = false)
         );
 
-        await logOut();
+        await Auth.logOut();
     }
 </script>
 

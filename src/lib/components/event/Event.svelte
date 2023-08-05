@@ -13,7 +13,6 @@
     import UtcTime from '../UtcTime.svelte';
     import { Event } from '$lib/controllers/event/event.client';
     import type { Label as LabelController } from '../../controllers/label/label';
-    import type { Auth } from '$lib/controllers/user/user';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import { obfuscate } from '$lib/utils/text';
@@ -25,7 +24,6 @@
     } from '$lib/utils/time';
     import { slide, fly } from 'svelte/transition';
 
-    export let auth: Auth;
     export let labels: LabelController[];
     export let obfuscated = true;
 
@@ -43,7 +41,7 @@
         end?: TimestampSecs;
         label?: LabelController['id'];
     }) {
-        displayNotifOnErr(await api.put(auth, apiPath('/events/?', event.id), changes));
+        displayNotifOnErr(await api.put(apiPath('/events/?', event.id), changes));
 
         const label = changes.label ? labels?.find(l => l.id === changes.label) : event.label;
 
@@ -99,13 +97,13 @@
 
     async function deleteEvent() {
         event.deleted = true;
-        displayNotifOnErr(await api.delete(auth, apiPath('/events/?', event.id)));
+        displayNotifOnErr(await api.delete(apiPath('/events/?', event.id)));
         await dispatch.delete('event', event.id);
     }
 
     async function restoreEvent() {
         const { id } = displayNotifOnErr(
-            await api.post(auth, `/events`, {
+            await api.post(`/events`, {
                 name: event.name,
                 start: event.start,
                 end: event.end,
@@ -210,7 +208,6 @@
                             on:change={updateLabel}
                             value={event.label?.id || ''}
                             {labels}
-                            {auth}
                             condensed
                         />
                     </div>
@@ -276,7 +273,6 @@
                             on:change={updateLabel}
                             value={event.label?.id || ''}
                             {labels}
-                            {auth}
                         />
                     </div>
                 </div>

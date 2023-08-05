@@ -3,11 +3,11 @@ import { Entry } from '$lib/controllers/entry/entry';
 import { Event } from '$lib/controllers/event/event';
 import { Label } from '$lib/controllers/label/label';
 import { query } from '$lib/db/mysql.server';
-import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import type { RequestHandler } from './$types';
+import { Auth } from '$lib/controllers/auth/auth.server';
 
 export const GET = cachedApiRoute(async (auth, { params }) => {
     const { val: label, err } = await Label.fromId(query, auth, params.labelId);
@@ -16,7 +16,7 @@ export const GET = cachedApiRoute(async (auth, { params }) => {
 }) satisfies RequestHandler;
 
 export const PUT = (async ({ cookies, request, params }) => {
-    const auth = await getAuthFromCookies(cookies);
+    const auth = Auth.Server.getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
     const body = await getUnwrappedReqBody(
@@ -46,11 +46,11 @@ export const PUT = (async ({ cookies, request, params }) => {
         if (err) throw error(400, err);
     }
 
-    return apiResponse({});
+    return apiResponse(auth, {});
 }) satisfies RequestHandler;
 
 export const DELETE = (async ({ cookies, params, request }) => {
-    const auth = await getAuthFromCookies(cookies);
+    const auth = Auth.Server.getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
     if (!(await Label.userHasLabelWithId(query, auth, params.labelId))) {
@@ -73,7 +73,7 @@ export const DELETE = (async ({ cookies, params, request }) => {
     const [, entriesWithLabel] = val;
     if (entriesWithLabel < 1 && eventsWithLabel.length < 1) {
         await Label.purgeWithId(query, auth, params.labelId);
-        return apiResponse({});
+        return apiResponse(auth, {});
     }
 
     const { strategy, newLabelId } = await getUnwrappedReqBody(
@@ -96,14 +96,14 @@ export const DELETE = (async ({ cookies, params, request }) => {
         await Entry.reassignAllLabels(query, auth, params.labelId, newLabelId);
         await Event.reassignAllLabels(query, auth, params.labelId, newLabelId);
         await Label.purgeWithId(query, auth, params.labelId);
-        return apiResponse({});
+        return apiResponse(auth, {});
     }
 
     if (strategy === 'remove') {
         await Entry.removeAllLabel(query, auth, params.labelId);
         await Event.removeAllLabel(query, auth, params.labelId);
         await Label.purgeWithId(query, auth, params.labelId);
-        return apiResponse({});
+        return apiResponse(auth, {});
     }
 
     throw error(400, 'Invalid deletion strategy');

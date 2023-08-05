@@ -124,8 +124,8 @@
 
 <main>
     <Canvas>
-        <Controls auth={data.auth} labels={data.labels} />
-        <MobileZoom auth={data.auth} labels={data.labels} />
+        <Controls labels={data.labels} />
+        <MobileZoom labels={data.labels} />
         <Background />
 
         <TimeMarkers startYear={$settingsStore.yearOfBirth.value} />
@@ -134,7 +134,7 @@
 
         {#each data.entries as entry, i}
             {#if selectedLabels.includes(entry.label?.id || '')}
-                <EntryInTimeline {...entry} entryTextParityHeight={i % 2 === 0} auth={data.auth} />
+                <EntryInTimeline {...entry} entryTextParityHeight={i % 2 === 0} />
             {/if}
         {/each}
 
@@ -142,7 +142,6 @@
             {#key durationEvents}
                 {#each durationEvents as event (event.id)}
                     <EventInTimeline
-                        auth={data.auth}
                         labels={data.labels}
                         {...event}
                         yLevel={1 + event.yLevel}
@@ -151,7 +150,6 @@
                 {/each}
                 {#each instantEvents as event, i (event.id)}
                     <EventInTimeline
-                        auth={data.auth}
                         labels={data.labels}
                         {...event}
                         eventTextParityHeight={i % 2 === 0}
@@ -161,9 +159,9 @@
         {/key}
 
         <CenterLine />
-        <TimeCursor auth={data.auth} labels={data.labels} />
+        <TimeCursor labels={data.labels} />
     </Canvas>
 
-    <Filters auth={data.auth} labels={data.labels} bind:selectedLabels />
-    <NewEventButton auth={data.auth} labels={data.labels} />
+    <Filters labels={data.labels} bind:selectedLabels />
+    <NewEventButton labels={data.labels} />
 </main>

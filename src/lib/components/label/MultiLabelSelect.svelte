@@ -4,17 +4,15 @@
     import Plus from 'svelte-material-icons/Plus.svelte';
     import LabelOffOutline from 'svelte-material-icons/LabelOffOutline.svelte';
     import type { Label } from '$lib/controllers/label/label';
-    import type { Auth } from '$lib/controllers/user/user';
     import { showPopup } from '$lib/utils/popups';
     import NewLabelDialog from '$lib/components/dialogs/NewLabelDialog.svelte';
 
     export let labels = null as Label[] | null;
     export let value = [] as string[];
-    export let auth: Auth;
     export let showAddButton = true;
 
     function showNewLabelPopup() {
-        showPopup(NewLabelDialog, { auth });
+        showPopup(NewLabelDialog, {});
     }
 
     function toggleLabel(id: string) {

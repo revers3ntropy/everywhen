@@ -3,7 +3,6 @@
     import { RectCollider } from '$lib/components/canvas/collider';
     import { interactable } from '$lib/components/canvas/interactable';
     import type { Label } from '$lib/controllers/label/label';
-    import type { Auth } from '$lib/controllers/user/user';
     import Event from '$lib/components/event/Event.svelte';
     import { Event as EventController } from '$lib/controllers/event/event.client';
     import { dispatch } from '$lib/dataChangeEvents';
@@ -13,12 +12,11 @@
     import { displayNotifOnErr } from '$lib/components/notifications/notifications.js';
     import { makeStandardContextMenu } from './standardContextMenu';
 
-    export let auth: Auth;
     export let labels: Label[];
 
     async function newEvent(start: TimestampSecs, end: TimestampSecs) {
         const { id } = displayNotifOnErr(
-            await api.post(auth, '/events', {
+            await api.post('/events', {
                 name: EventController.NEW_EVENT_NAME,
                 start,
                 end
@@ -34,7 +32,6 @@
         await dispatch.create('event', event);
 
         showPopup(Event, {
-            auth,
             obfuscated: false,
             event,
             labels,
@@ -134,7 +131,7 @@
             this.dragging = true;
         },
 
-        contextMenu: makeStandardContextMenu(auth, labels, canvasState)
+        contextMenu: makeStandardContextMenu(labels, canvasState)
     });
 </script>
 

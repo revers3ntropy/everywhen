@@ -24,7 +24,7 @@
         }
 
         displayNotifOnErr(
-            await api.post(data.auth, '/oauth/gh', {
+            await api.post('/oauth/gh', {
                 code,
                 state: stateFromGH
             })

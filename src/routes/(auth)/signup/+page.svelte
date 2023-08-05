@@ -1,6 +1,7 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
-    import { passcodeLastEntered } from '$lib/stores';
+    import { Auth } from '$lib/controllers/auth/auth';
+    import { passcodeLastEntered, sessionId, username as usernameStore } from '$lib/stores';
     import { nowUtc } from '$lib/utils/time';
     import { tooltip } from '@svelte-plugins/tooltips';
     import ArrowRightThinCircleOutline from 'svelte-material-icons/ArrowRightThinCircleOutline.svelte';
@@ -8,7 +9,6 @@
     import { populateCookiesAndSettingsAfterAuth } from '../actions.client';
     import type { PageData } from './$types';
     import { api } from '$lib/utils/apiRequest.js';
-    import { encryptionKeyFromPassword } from '$lib/security/authUtils.client.js';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications.js';
     import Dot from '$lib/components/Dot.svelte';
 
@@ -17,15 +17,19 @@
     async function create(): Promise<void> {
         actionPending = true;
         const auth = displayNotifOnErr(
-            await api.post(null, `/users`, {
-                password: encryptionKeyFromPassword(password),
+            await api.post(`/users`, {
+                password: Auth.encryptionKeyFromPassword(password),
                 username
             }),
             () => (actionPending = false)
         );
+
+        $usernameStore = username;
+        $sessionId = auth.sessionId;
+
         if (passcode) {
             displayNotifOnErr(
-                await api.put(auth, `/settings`, {
+                await api.put(`/settings`, {
                     key: 'passcode',
                     value: passcode
                 }),
@@ -34,7 +38,7 @@
             passcodeLastEntered.set(nowUtc());
         }
 
-        await populateCookiesAndSettingsAfterAuth(auth, () => (actionPending = false));
+        await populateCookiesAndSettingsAfterAuth(() => (actionPending = false));
 
         await goto('/' + data.redirect);
     }

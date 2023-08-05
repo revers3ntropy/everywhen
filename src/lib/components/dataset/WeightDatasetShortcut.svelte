@@ -1,6 +1,5 @@
 <script lang="ts">
     import { slide } from 'svelte/transition';
-    import type { Auth } from '$lib/controllers/user/user';
     import type { Dataset } from '$lib/controllers/dataset/dataset';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import { ANIMATION_DURATION } from '$lib/constants';
@@ -8,7 +7,6 @@
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { currentTzOffset, nowUtc } from '$lib/utils/time';
 
-    export let auth: Auth;
     export let dataset: Dataset | null;
 
     async function submit() {
@@ -22,7 +20,7 @@
         submitting = true;
 
         displayNotifOnErr(
-            await api.post(auth, apiPath('/datasets/?', dataset.id), {
+            await api.post(apiPath('/datasets/?', dataset.id), {
                 rows: [
                     {
                         elements: [value],

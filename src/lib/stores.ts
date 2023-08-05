@@ -2,24 +2,36 @@ import type { SettingsConfig } from '$lib/controllers/settings/settings';
 import { cookieWritable } from '$lib/cookieWritable';
 import type { SvelteComponent } from 'svelte';
 import { writable } from 'svelte/store';
-import { COOKIE_WRITEABLE_KEYS, STORE_KEY, Theme } from './constants';
+import { COOKIE_KEYS, LS_KEYS, SESSION_KEYS, Theme } from './constants';
 import { persisted } from 'svelte-local-storage-store';
 
+// ephemeral
 export const popup = writable<typeof SvelteComponent | null | undefined>(null);
 export const settingsStore = writable<SettingsConfig>();
 
+// local storage
 export const doesNotWantToEnableLocation = persisted<boolean>(
-    STORE_KEY.doesNotWantToEnableLocation,
+    LS_KEYS.doesNotWantToEnableLocation,
     false
 );
-export const enabledLocation = persisted<boolean>(STORE_KEY.enabledLocation, false);
-export const passcodeLastEntered = persisted<number>(STORE_KEY.passcodeLastEntered, 0);
-export const eventsSortKey = persisted<EventsSortKey>(STORE_KEY.sortEventsKey, 'created');
-export const lastTipNumber = persisted<number>(STORE_KEY.lastTipNumber, 0);
-export const obfuscated = persisted<boolean>(STORE_KEY.obfuscated, false);
+export const enabledLocation = persisted<boolean>(LS_KEYS.enabledLocation, false);
+export const passcodeLastEntered = persisted<number>(LS_KEYS.passcodeLastEntered, 0);
+export const eventsSortKey = persisted<EventsSortKey>(LS_KEYS.sortEventsKey, 'created');
+export const lastTipNumber = persisted<number>(LS_KEYS.lastTipNumber, 0);
+export const obfuscated = persisted<boolean>(LS_KEYS.obfuscated, false);
 
-export const theme = cookieWritable<Theme>(COOKIE_WRITEABLE_KEYS.theme, Theme.light);
-export const allowedCookies = cookieWritable<boolean>(COOKIE_WRITEABLE_KEYS.allowedCookies, false);
+// session storage
+export const username = persisted<string | null>(SESSION_KEYS.username, null, {
+    storage: 'session'
+});
+export const encryptionKey = persisted<string | null>(SESSION_KEYS.username, null, {
+    storage: 'session'
+});
+
+// cookie
+export const theme = cookieWritable<Theme>(COOKIE_KEYS.theme, Theme.light);
+export const allowedCookies = cookieWritable<boolean>(COOKIE_KEYS.allowedCookies, false);
+export const sessionId = cookieWritable<string | null>(COOKIE_KEYS.sessionId, null);
 
 /**
  * Called in root layout, runs on both server and client.

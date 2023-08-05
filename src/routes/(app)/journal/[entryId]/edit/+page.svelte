@@ -23,7 +23,6 @@
     </div>
     <EntryForm
         action="edit"
-        auth={data.auth}
         entry={data.entry}
         loadFromLS={false}
         newEntryBody={data.entry.entry}

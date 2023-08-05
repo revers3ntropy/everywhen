@@ -5,30 +5,18 @@ import { Result } from '../utils/result';
 
 const ALGORITHM = 'aes-256-cbc';
 
-export function encrypt(plainText: string, key: string): Result<string> {
-    if (plainText.length < 1) return Result.ok('');
+export function encrypt(plainText: string, key: string): string {
+    if (plainText.length < 1) return '';
+    if (key.length !== 32) throw new Error('Invalid key length');
 
-    let encryptedData = '';
-
-    try {
-        const cipher = crypto.createCipheriv(ALGORITHM, key, PUBLIC_INIT_VECTOR);
-
-        encryptedData = cipher.update(plainText, 'utf-8', 'hex');
-        encryptedData += cipher.final('hex');
-    } catch (e) {
-        void errorLogger.log(
-            `Error encrypting ${typeof plainText} of length ${plainText.length} with key len ${
-                key.length
-            }:`,
-            e
-        );
-        return Result.err('Error encrypting');
-    }
-    return Result.ok(encryptedData);
+    const cipher = crypto.createCipheriv(ALGORITHM, key, PUBLIC_INIT_VECTOR);
+    return cipher.update(plainText, 'utf-8', 'hex') + cipher.final('hex');
 }
 
-export function decrypt(cypherText: string, key: string): Result<string> {
+export function decrypt(cypherText: string, key: string | null): Result<string> {
     if (cypherText.length < 1) return Result.ok('');
+    if (!key) return Result.err('No encryption key found');
+    if (key.length !== 32) return Result.err('Invalid key length');
 
     let decryptedData = '';
 
@@ -52,8 +40,4 @@ export function decrypt(cypherText: string, key: string): Result<string> {
     }
 
     return Result.ok(decryptedData);
-}
-
-export function encryptMulti<T extends string[]>(key: string, ...plainTexts: T): Result<T> {
-    return Result.collect(plainTexts.map(text => encrypt(text, key))) as Result<T>;
 }

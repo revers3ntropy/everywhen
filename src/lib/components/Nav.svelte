@@ -2,7 +2,6 @@
     import { afterNavigate, beforeNavigate, goto } from '$app/navigation';
     import { page } from '$app/stores';
     import { BackupControllerClient } from '$lib/controllers/backup/backup';
-    import { logOut } from '$lib/security/logOut';
     import { tooltip } from '@svelte-plugins/tooltips';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import Brain from 'svelte-material-icons/Brain.svelte';
@@ -27,8 +26,7 @@
     import Plus from 'svelte-material-icons/Plus.svelte';
     import Dropdown from '$lib/components/Dropdown.svelte';
     import Streaks from '$lib/components/Streaks.svelte';
-    import { STORE_KEY, Theme } from '$lib/constants';
-    import type { Auth } from '$lib/controllers/user/user';
+    import { LS_KEYS, Theme } from '$lib/constants';
     import { Event as EventController } from '$lib/controllers/event/event.client';
     import { nowUtc } from '$lib/utils/time';
     import {
@@ -36,20 +34,18 @@
         obfuscated,
         passcodeLastEntered,
         settingsStore,
-        theme
+        theme,
+        username
     } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
-
-    export let auth: Auth;
+    import { Auth } from '$lib/controllers/auth/auth';
 
     async function downloadBackup() {
         if (isDownloadingBackup) return;
         isDownloadingBackup = true;
-        const { data: backupData } = displayNotifOnErr(
-            await api.get(auth, '/backups', { encrypted: 1 })
-        );
-        BackupControllerClient.download(backupData, auth.username, true);
+        const { data: backupData } = displayNotifOnErr(await api.get('/backups', { encrypted: 1 }));
+        BackupControllerClient.download(backupData, $username, true);
         isDownloadingBackup = false;
     }
 
@@ -57,13 +53,13 @@
         name: string,
         defaultColor: string
     ): Promise<string> {
-        const { labels } = displayNotifOnErr(await api.get(auth, '/labels'));
+        const { labels } = displayNotifOnErr(await api.get('/labels'));
         const label = labels.find(label => label.name === name);
         if (label) {
             return label.id;
         }
         const res = displayNotifOnErr(
-            await api.post(auth, '/labels', {
+            await api.post('/labels', {
                 name,
                 color: defaultColor
             })
@@ -80,12 +76,12 @@
     }
 
     async function goToEntryFormWithLabel(name: string, defaultColor: string) {
-        await api.put(auth, '/settings', {
+        await api.put('/settings', {
             key: 'entryFormMode',
             value: false
         });
         const labelId = await makeLabelFromNameIfDoesntExist(name, defaultColor);
-        localStorage.setItem(STORE_KEY.newEntryLabel, labelId);
+        localStorage.setItem(LS_KEYS.newEntryLabel, labelId);
         await gotoIfNotAt('/journal');
     }
 
@@ -102,17 +98,17 @@
     }
 
     async function makeEntry() {
-        await api.put(auth, '/settings', {
+        await api.put('/settings', {
             key: 'entryFormMode',
             value: false
         });
         $settingsStore.entryFormMode.value = false;
-        localStorage.removeItem(STORE_KEY.newEntryLabel);
+        localStorage.removeItem(LS_KEYS.newEntryLabel);
         await gotoIfNotAt('/journal');
     }
 
     async function makeBullet() {
-        await api.put(auth, '/settings', {
+        await api.put('/settings', {
             key: 'entryFormMode',
             value: true
         });
@@ -130,7 +126,7 @@
 
         const now = nowUtc();
         displayNotifOnErr(
-            await api.post(auth, '/events', {
+            await api.post('/events', {
                 name: EventController.NEW_EVENT_NAME,
                 start: now,
                 end: now
@@ -299,10 +295,10 @@
             <span class="account-button" slot="button">
                 <span class="username-span">
                     <span class="streaks">
-                        <Streaks {auth} condensed />
+                        <Streaks condensed />
                     </span>
                     <span class="username">
-                        {auth.username}
+                        {$username}
                     </span>
                 </span>
                 <span class="hide-mobile flex-center">
@@ -311,7 +307,7 @@
             </span>
 
             <div class="account-dropdown-options">
-                <Streaks {auth} tooltipPosition="left" />
+                <Streaks tooltipPosition="left" />
 
                 <hr />
 
@@ -347,7 +343,7 @@
                 <button
                     aria-label="log out"
                     class="account-dropdown-button danger"
-                    on:click={() => logOut()}
+                    on:click={() => void Auth.logOut()}
                 >
                     <Logout size="30" />
                     Log Out

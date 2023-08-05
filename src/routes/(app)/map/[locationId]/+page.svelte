@@ -20,13 +20,12 @@
 
 <section class="edit">
     <div>
-        <EditLocation {...data.location} auth={data.auth} {onChange} />
+        <EditLocation {...data.location} {onChange} />
     </div>
 </section>
 
 <section class="entries">
     <Entries
-        auth={data.auth}
         options={{
             locationId: data.location.id
         }}

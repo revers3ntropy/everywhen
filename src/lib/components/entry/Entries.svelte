@@ -6,8 +6,7 @@
     import Search from 'svelte-material-icons/Magnify.svelte';
     import type { Location } from '$lib/controllers/location/location';
     import type { EntryFilter } from '$lib/controllers/entry/entry';
-    import type { Auth } from '$lib/controllers/user/user';
-    import { obfuscated } from '$lib/stores';
+    import { encryptionKey, obfuscated } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { encrypt } from '$lib/security/encryption.client';
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
@@ -22,8 +21,6 @@
         readonly count?: number;
         readonly offset?: number;
     }
-
-    export let auth: Auth;
 
     export let entryFormMode = null as null | EntryFormMode;
 
@@ -53,7 +50,7 @@
     }
 
     async function loadTitles() {
-        const res = displayNotifOnErr(await api.get(auth, '/entries/titles'));
+        const res = displayNotifOnErr(await api.get('/entries/titles'));
         entryTitles = Entry.groupEntriesByDay(res.entries);
     }
 
@@ -82,7 +79,6 @@
 
         const res = displayNotifOnErr(
             await api.get(
-                auth,
                 `/entries`,
                 entriesOptions as Record<string, number | string | boolean | undefined>
             )
@@ -116,7 +112,7 @@
     }
 
     function updateSearch() {
-        const searchEncrypted = displayNotifOnErr(encrypt(searchInput.value, auth.key));
+        const searchEncrypted = encrypt(searchInput.value, $encryptionKey);
 
         options = {
             ...options,
@@ -125,7 +121,7 @@
     }
 
     async function loadLocations() {
-        locations = displayNotifOnErr(await api.get(auth, '/locations')).locations;
+        locations = displayNotifOnErr(await api.get('/locations')).locations;
     }
 
     function emptyEntries(): Record<string, Entry[]> {
@@ -164,7 +160,7 @@
         <div class:sidebar-and-entries={showSidebar}>
             {#if showSidebar}
                 <div style="margin-top: 85px">
-                    <Sidebar titles={entryTitles} {auth} obfuscated={$obfuscated} />
+                    <Sidebar titles={entryTitles} obfuscated={$obfuscated} />
                 </div>
             {/if}
 
@@ -207,7 +203,6 @@
                             obfuscated={$obfuscated}
                             {showLabels}
                             {showLocations}
-                            {auth}
                             day={new Date(day).getTime() / 1000}
                             {locations}
                             {showEntryForm}

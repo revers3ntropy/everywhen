@@ -35,7 +35,7 @@
         const now = nowUtc();
 
         const { id } = displayNotifOnErr(
-            await api.post(data.auth, '/events', {
+            await api.post('/events', {
                 name: EventController.NEW_EVENT_NAME,
                 start: now,
                 end: now
@@ -113,13 +113,7 @@
     <ul>
         {#each events as event}
             <li>
-                <Event
-                    {event}
-                    auth={data.auth}
-                    {selectNameId}
-                    labels={data.labels}
-                    obfuscated={$obfuscated}
-                />
+                <Event {event} {selectNameId} labels={data.labels} obfuscated={$obfuscated} />
             </li>
         {/each}
     </ul>

@@ -2,7 +2,6 @@
     import { PUBLIC_GITHUB_AUTH_CLIENT_ID, PUBLIC_ENV } from '$env/static/public';
     import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications.js';
     import type { GitHubUser } from '$lib/controllers/ghAPI/ghAPI.server';
-    import type { Auth } from '$lib/controllers/user/user';
     import { settingsStore } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { serializeGETArgs } from '$lib/utils/GETArgs';
@@ -12,7 +11,6 @@
     import { randomInt, randomString } from '$lib/security/authUtils.client.js';
 
     export let size = 30;
-    export let auth: Auth;
 
     function authorizeUrl(state: string) {
         return (
@@ -37,7 +35,7 @@
     }
 
     async function unlink() {
-        await api.delete(auth, '/oauth/gh');
+        await api.delete('/oauth/gh');
         location.reload();
         return await new Promise(() => {});
     }
@@ -46,7 +44,7 @@
 
     onMount(async () => {
         if ($settingsStore.gitHubAccessToken.value) {
-            gitHubUser = displayNotifOnErr(await api.get(auth, '/oauth/gh/user'));
+            gitHubUser = displayNotifOnErr(await api.get('/oauth/gh/user'));
         }
     });
 </script>

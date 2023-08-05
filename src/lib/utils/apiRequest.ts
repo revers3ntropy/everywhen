@@ -1,8 +1,6 @@
 import { browser } from '$app/environment';
-import { PUBLIC_SVELTEKIT_PORT } from '$env/static/public';
-import { serialize } from 'cookie';
-import { cookieOptions, STORE_KEY } from '../constants';
-import type { Auth } from '../controllers/user/user';
+import { decrypt } from '$lib/security/encryption.client';
+import { encryptionKey } from '$lib/stores';
 import type { apiRes404, GenericResponse } from './apiResponse.server';
 import { serializeGETArgs } from './GETArgs';
 import { clientLogger } from './log';
@@ -86,20 +84,55 @@ interface ApiResponse {
     };
 }
 
+async function handleOkResponse(
+    response: Response,
+    method: string,
+    url: string,
+    key: string | null
+): Promise<Result<unknown>> {
+    let textResult: string;
+    try {
+        textResult = await response.text();
+    } catch (e) {
+        clientLogger.error(`Error on api fetch (${method} ${url})`, response);
+        return Result.err('Invalid response from server');
+    }
+
+    let jsonRes: unknown;
+    try {
+        jsonRes = JSON.parse(textResult);
+    } catch (e) {
+        if (!key) return Result.err('Invalid response from server');
+        const { err, val: decryptedRes } = decrypt(textResult, key);
+        if (err) return Result.err(err);
+        try {
+            jsonRes = JSON.parse(decryptedRes);
+        } catch (e) {
+            clientLogger.error(`Error on api fetch (${method} ${url})`, response);
+            return Result.err('Invalid response from server');
+        }
+    }
+
+    if (typeof jsonRes !== 'object' || jsonRes === null) {
+        clientLogger.error(`Error on api fetch (${method} ${url})`, response);
+        return Result.err('Invalid response from server');
+    }
+    return Result.ok(jsonRes);
+}
+
+let latestEncryptionKey: string | null = null;
+encryptionKey.subscribe(key => {
+    latestEncryptionKey = key;
+});
+
 export async function makeApiReq<
     Verb extends keyof ApiResponse,
     Path extends keyof ApiResponse[Verb],
     Body extends ReqBody
->(
-    auth: Auth | null,
-    method: Verb,
-    path: string,
-    body: Body | null = null
-): Promise<Result<ApiResponse[Verb][Path]>> {
-    let url = `/api${path}`;
+>(method: Verb, path: string, body: Body | null = null): Promise<Result<ApiResponse[Verb][Path]>> {
+    const url = `/api${path}`;
     if (!browser) {
-        console.trace('fetch from backend');
-        url = `http://localhost:${PUBLIC_SVELTEKIT_PORT}${url}`;
+        return Result.err(`Cannot make API request on server`);
     }
 
     if (method !== 'GET') {
@@ -114,20 +147,11 @@ export async function makeApiReq<
         body.utcTimeS ??= nowUtc();
     }
 
-    let cookie = '';
-    if (auth) {
-        cookie =
-            serialize(STORE_KEY.key, auth.key, cookieOptions(false, false)) +
-            ' ; ' +
-            serialize(STORE_KEY.username, auth.username, cookieOptions(true, false));
-    }
-
     const init: RequestInit = {
         method,
         headers: {
             'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Cookie: cookie
+            Accept: 'application/json'
         }
     };
 
@@ -138,30 +162,15 @@ export async function makeApiReq<
     const response = await fetch(url, init);
 
     if (response.ok) {
-        const res = await response.json();
-        if (typeof res !== 'object' || res === null) {
-            clientLogger.error(
-                `Error on api fetch (${browser ? 'client' : 'server'} side)`,
-                method,
-                url,
-                'Gave non-object response:',
-                response
-            );
-            return Result.err(`Invalid response from server`);
-        }
-        return Result.ok(res as ApiResponse[Verb][Path]);
+        const { err, val } = await handleOkResponse(response, method, url, latestEncryptionKey);
+        if (err) return Result.err(err);
+        return Result.ok(val as ApiResponse[Verb][Path]);
     }
 
     if (response.status === 503) {
         return Result.err('Server is down for maintenance');
     }
-    clientLogger.error(
-        `Error on api fetch (${browser ? 'client' : 'server'} side)`,
-        method,
-        url,
-        'Gave erroneous response:',
-        response
-    );
+    clientLogger.error(`Error on api fetch  (${method} ${url})`, response);
 
     try {
         const resTxt = await response.text();
@@ -190,28 +199,24 @@ export async function makeApiReq<
 
 export const api = {
     get: async <Path extends keyof ApiResponse['GET'], Body extends ReqBody>(
-        auth: Auth | null,
         path: Path,
         args: Record<string, string | number | boolean | undefined> = {}
-    ) => await makeApiReq<'GET', Path, Body>(auth, 'GET', path + serializeGETArgs(args)),
+    ) => await makeApiReq<'GET', Path, Body>('GET', path + serializeGETArgs(args)),
 
     post: async <Path extends keyof ApiResponse['POST'], Body extends ReqBody>(
-        auth: Auth | null,
         path: Path,
         body: Body = {} as Body
-    ) => await makeApiReq<'POST', Path, Body>(auth, 'POST', path, body),
+    ) => await makeApiReq<'POST', Path, Body>('POST', path, body),
 
     put: async <Path extends keyof ApiResponse['PUT'], Body extends ReqBody>(
-        auth: Auth | null,
         path: Path,
         body: Body = {} as Body
-    ) => await makeApiReq<'PUT', Path, Body>(auth, 'PUT', path, body),
+    ) => await makeApiReq<'PUT', Path, Body>('PUT', path, body),
 
     delete: async <Path extends keyof ApiResponse['DELETE'], Body extends ReqBody>(
-        auth: Auth | null,
         path: Path,
         body: Body = {} as Body
-    ) => await makeApiReq<'DELETE', Path, Body>(auth, 'DELETE', path, body)
+    ) => await makeApiReq<'DELETE', Path, Body>('DELETE', path, body)
 };
 
 // eg '/labels/?', '1' ==> '/labels/1' but returns '/labels/?' as type

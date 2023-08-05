@@ -1,10 +1,10 @@
 import { GITHUB_AUTH_CLIENT_SECRET } from '$env/static/private';
 import { PUBLIC_GITHUB_AUTH_CLIENT_ID } from '$env/static/public';
 import { Settings } from '$lib/controllers/settings/settings';
-import type { Auth } from '$lib/controllers/user/user';
 import type { QueryFunc } from '$lib/db/mysql.server';
 import { errorLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
+import type { Auth } from '$lib/controllers/auth/auth';
 
 export interface GitHubUser {
     id: number;

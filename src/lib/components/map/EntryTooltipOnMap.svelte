@@ -2,21 +2,19 @@
     import { onMount } from 'svelte';
     import Dot from '$lib/components/Dot.svelte';
     import type { Entry } from '$lib/controllers/entry/entry';
-    import type { Auth } from '$lib/controllers/user/user';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { obfuscated } from '$lib/stores';
     import UtcTime from '../UtcTime.svelte';
     import { obfuscate } from '$lib/utils/text.js';
 
     export let id: string;
-    export let auth: Auth;
     export let entry: Entry | null = null;
     let error: string | null = null;
 
     async function getEntry() {
         if (entry) return;
 
-        const { err, val } = await api.get(auth, apiPath('/entries/?', id));
+        const { err, val } = await api.get(apiPath('/entries/?', id));
         if (err) {
             error = err;
             return;

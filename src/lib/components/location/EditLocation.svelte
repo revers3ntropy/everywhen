@@ -5,14 +5,12 @@
     import Bin from 'svelte-material-icons/Delete.svelte';
     import type { ChangeEventHandler } from 'svelte/elements';
     import { Location } from '$lib/controllers/location/location.client';
-    import type { Auth } from '$lib/controllers/user/user';
     import { popup } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import { round1DP } from '$lib/utils/text';
 
     export let isInDialog = false;
-    export let auth: Auth;
     export let id: string;
     export let name: string;
     export let radius: number;
@@ -28,7 +26,7 @@
     async function syncWithServer() {
         synced = false;
         displayNotifOnErr(
-            await api.put(auth, apiPath('/locations/?', id), {
+            await api.put(apiPath('/locations/?', id), {
                 name,
                 radius
             })
@@ -51,7 +49,7 @@
         if (!confirm(`Are you sure you want to delete the location '${name}'?`)) {
             return;
         }
-        displayNotifOnErr(await api.delete(auth, apiPath('/locations/?', id)));
+        displayNotifOnErr(await api.delete(apiPath('/locations/?', id)));
         popup.set(null);
         if (onChange !== null) {
             await onChange(null);

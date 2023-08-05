@@ -10,10 +10,9 @@
     import FormatListBulleted from 'svelte-material-icons/FormatListBulleted.svelte';
     import Send from 'svelte-material-icons/Send.svelte';
     import LabelSelect from '$lib/components/label/LabelSelect.svelte';
-    import { STORE_KEY } from '$lib/constants';
+    import { LS_KEYS } from '$lib/constants';
     import type { Entry, RawEntry } from '$lib/controllers/entry/entry';
     import type { Label } from '$lib/controllers/label/label';
-    import type { Auth } from '$lib/controllers/user/user';
     import { enabledLocation } from '$lib/stores.js';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { getLocation } from '$lib/utils/geolocation';
@@ -38,7 +37,6 @@
     export let newEntryBody = '';
     export let newEntryLabel = '';
 
-    export let auth: Auth;
     export let obfuscated = true;
     export let setEntryFormMode = null as null | ((mode: EntryFormMode) => Promise<void>);
 
@@ -50,9 +48,9 @@
 
     function saveToLS() {
         if (loadFromLS) {
-            localStorage.setItem(STORE_KEY.newEntryTitle, newEntryTitle);
-            localStorage.setItem(STORE_KEY.newEntryBody, newEntryBody);
-            localStorage.setItem(STORE_KEY.newEntryLabel, newEntryLabel);
+            localStorage.setItem(LS_KEYS.newEntryTitle, newEntryTitle);
+            localStorage.setItem(LS_KEYS.newEntryBody, newEntryBody);
+            localStorage.setItem(LS_KEYS.newEntryLabel, newEntryLabel);
         }
     }
 
@@ -112,7 +110,7 @@
     }
 
     async function onEntryCreation(body: RawEntry) {
-        const res = displayNotifOnErr(await api.post(auth, '/entries', { ...body }));
+        const res = displayNotifOnErr(await api.post('/entries', { ...body }));
         submitted = false;
         if (res.id) {
             // make really sure it's saved before resetting
@@ -152,7 +150,7 @@
                 return;
             }
         }
-        displayNotifOnErr(await api.put(auth, apiPath('/entries/?', entry.id), body));
+        displayNotifOnErr(await api.put(apiPath('/entries/?', entry.id), body));
         await goto(`/journal/${entry.id}?obfuscate=0`);
     }
 
@@ -210,7 +208,7 @@
     }
 
     async function loadLabels() {
-        labels = displayNotifOnErr(await api.get(auth, '/labels')).labels;
+        labels = displayNotifOnErr(await api.get('/labels')).labels;
     }
 
     function resizeTextAreaToFitContent(self: HTMLTextAreaElement | null = newEntryInputElement) {
@@ -243,9 +241,9 @@
         void loadLabels();
 
         if (loadFromLS) {
-            newEntryTitle = localStorage.getItem(STORE_KEY.newEntryTitle) || '';
-            newEntryBody = localStorage.getItem(STORE_KEY.newEntryBody) || '';
-            newEntryLabel = localStorage.getItem(STORE_KEY.newEntryLabel) || '';
+            newEntryTitle = localStorage.getItem(LS_KEYS.newEntryTitle) || '';
+            newEntryBody = localStorage.getItem(LS_KEYS.newEntryBody) || '';
+            newEntryLabel = localStorage.getItem(LS_KEYS.newEntryLabel) || '';
 
             if (!newEntryBody && !newEntryTitle) {
                 obfuscated = false;
@@ -316,11 +314,11 @@
 
             <FormatOptions {makeWrapper} />
 
-            <InsertImage {auth} onInput={onNewImage} />
+            <InsertImage onInput={onNewImage} />
         </div>
         <div class="right-options {obfuscated ? 'blur' : ''}">
             <div class="label-select-container">
-                <LabelSelect {auth} bind:value={newEntryLabel} {labels} fromRight />
+                <LabelSelect bind:value={newEntryLabel} {labels} fromRight />
             </div>
 
             <button

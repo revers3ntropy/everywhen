@@ -2,10 +2,10 @@ import type { QueryFunc } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/security/encryption.server';
 import { Result } from '$lib/utils/result';
 import { nowUtc } from '$lib/utils/time';
+import type { Auth } from '../auth/auth.server';
 import { Label } from '../label/label';
-import type { Auth } from '../user/user';
-import { UUId } from '../uuid/uuid';
 import type { Event as _Event, RawEvent } from './event';
+import { UUIdControllerServer } from '$lib/controllers/uuid/uuid.server';
 
 export type Event = _Event;
 
@@ -102,7 +102,7 @@ namespace EventUtils {
         label?: string,
         created?: TimestampSecs
     ): Promise<Result<Event>> {
-        const id = await UUId.generateUniqueUUId(query);
+        const id = await UUIdControllerServer.generate();
         created ??= nowUtc();
 
         if (!name) {
@@ -116,8 +116,7 @@ namespace EventUtils {
             if (err) return Result.err(err);
         }
 
-        const { err: nameErr, val: nameEncrypted } = encrypt(name, auth.key);
-        if (nameErr) return Result.err(nameErr);
+        const nameEncrypted = encrypt(name, auth.key);
 
         if (nameEncrypted.length > 256) {
             return Result.err('Name too long');
@@ -157,8 +156,7 @@ namespace EventUtils {
         }
         self.name = namePlaintext;
 
-        const { err, val: nameEncrypted } = encrypt(namePlaintext, auth.key);
-        if (err) return Result.err(err);
+        const nameEncrypted = encrypt(namePlaintext, auth.key);
 
         if (nameEncrypted.length > 256) {
             return Result.err('Name too long');

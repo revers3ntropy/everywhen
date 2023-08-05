@@ -26,7 +26,7 @@
         if (document.visibilityState !== 'visible') return;
 
         const currentVersion = __VERSION__;
-        const newVersion = displayNotifOnErr(await api.get(null, '/version')).v;
+        const newVersion = displayNotifOnErr(await api.get('/version')).v;
         if (newVersion !== currentVersion) {
             if (isNewVersionAvailable) return;
             isNewVersionAvailable = true;

@@ -1,13 +1,12 @@
-import { COOKIE_WRITEABLE_KEYS } from '$lib/constants';
+import { COOKIE_KEYS } from '$lib/constants';
 import { Log } from '$lib/controllers/log/log';
-import type { Auth } from '$lib/controllers/user/user';
-import { tryGetAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import { nowUtc } from '$lib/utils/time';
 import type { Cookies, Handle, RequestEvent } from '@sveltejs/kit';
 import chalk from 'chalk';
 import { connect, dbConnection, query } from '$lib/db/mysql.server';
 import { cleanupCache } from '$lib/utils/cache.server';
 import { errorLogger, FileLogger } from '$lib/utils/log.server';
+import { Auth } from '$lib/controllers/auth/auth.server';
 
 const reqLogger = new FileLogger('REQ', chalk.bgWhite.black);
 
@@ -108,7 +107,7 @@ async function logReq(
 function getCookieWritableCookies(cookies: Cookies): App.Locals['__cookieWritables'] {
     const result = {} as Mutable<App.Locals['__cookieWritables']>;
 
-    const cookieKeys = COOKIE_WRITEABLE_KEYS;
+    const cookieKeys = COOKIE_KEYS;
     const keyToNameMap = Object.fromEntries(
         (Object.keys(cookieKeys) as (keyof typeof cookieKeys)[]).map(key => [cookieKeys[key], key])
     );
@@ -126,7 +125,7 @@ export const handle = (async ({ event, resolve }) => {
     const start = performance.now();
     const now = nowUtc();
 
-    const auth = await tryGetAuthFromCookies(event.cookies);
+    const auth = Auth.Server.tryGetAuthFromCookies(event.cookies);
     if (auth) {
         event.locals.auth = { ...auth };
     } else {

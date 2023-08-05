@@ -13,7 +13,7 @@
     let locations = null as Location[] | null;
 
     async function loadLocations() {
-        locations = displayNotifOnErr(await api.get(data.auth, '/locations')).locations;
+        locations = displayNotifOnErr(await api.get('/locations')).locations;
     }
 
     onMount(() => {
@@ -34,7 +34,6 @@
 
     <Entry
         {...data.entry}
-        auth={data.auth}
         obfuscated={$obfuscated}
         on:updated={() => location.reload()}
         showFullDate={true}
@@ -62,7 +61,6 @@
             {#each (data.entry.edits || []).sort((a, b) => b.created - a.created) as edit}
                 <Entry
                     {...edit}
-                    auth={data.auth}
                     obfuscated={$obfuscated}
                     isEdit={true}
                     showFullDate={true}

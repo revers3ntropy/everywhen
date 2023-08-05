@@ -1,9 +1,7 @@
 <script lang="ts">
-    import type { Auth } from '$lib/controllers/user/user';
     import { encrypt } from '$lib/security/encryption.client';
-    import { displayNotifOnErr } from '$lib/components/notifications/notifications.js';
+    import { encryptionKey } from '$lib/stores';
 
-    export let auth: Auth;
     export let words: [string, number][];
     export let entryCount: number;
 </script>
@@ -12,7 +10,7 @@
     {#each words as [word, count], i}
         <div>#{i + 1}</div>
         <a
-            href="/stats/{displayNotifOnErr(encrypt(word, auth.key))}"
+            href="/stats/{encrypt(word, $encryptionKey)}"
             class="word"
             data-sveltekit-preload-data="tap"
         >

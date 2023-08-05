@@ -1,11 +1,9 @@
 import { MAX_IMAGE_SIZE } from '$lib/constants';
-import type { Auth } from '$lib/controllers/user/user';
 import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
 import { api } from '$lib/utils/apiRequest';
 import { getFileContents } from '$lib/utils/files.client';
 
 export async function uploadImage(
-    auth: Auth,
     files: FileList
 ): Promise<{ publicId: string; id: string; fileName: string } | null> {
     if (files.length < 1) {
@@ -29,7 +27,7 @@ export async function uploadImage(
     }
 
     const { publicId, id } = displayNotifOnErr(
-        await api.post(auth, '/assets', {
+        await api.post('/assets', {
             fileName: file.name,
             content
         })

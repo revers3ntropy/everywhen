@@ -1,11 +1,10 @@
 import type { QueryFunc } from '$lib/db/mysql.server';
-import type { Auth } from '../user/user';
-import { decrypt, encrypt, encryptMulti } from '$lib/security/encryption.server';
+import { decrypt, encrypt } from '$lib/security/encryption.server';
 import { Result } from '$lib/utils/result';
 import { fmtUtc, nowUtc } from '$lib/utils/time';
+import type { Auth } from '../auth/auth.server';
 import { Label } from '../label/label';
 import { Location } from '../location/location';
-import { UUId } from '../uuid/uuid';
 import {
     Entry as _Entry,
     type EntryEdit,
@@ -13,6 +12,7 @@ import {
     type RawEntry,
     type Streaks
 } from './entry';
+import { UUIdControllerServer } from '$lib/controllers/uuid/uuid.server';
 
 export type Entry = _Entry;
 
@@ -241,7 +241,7 @@ namespace EntryUtils {
     ): Promise<Result<Entry>> {
         const json: typeof json_ & { id: string } = {
             ...json_,
-            id: await UUId.generateUniqueUUId(query)
+            id: await UUIdControllerServer.generate()
         };
         json.created ??= nowUtc();
 
@@ -260,7 +260,7 @@ namespace EntryUtils {
         entry.edits = await Promise.all(
             json.edits?.map(
                 async (e): Promise<Entry> => ({
-                    id: await UUId.generateUniqueUUId(query),
+                    id: await UUIdControllerServer.generate(),
                     title: e.title,
                     entry: e.entry,
                     created: e.created,
@@ -278,14 +278,9 @@ namespace EntryUtils {
             if (err) return Result.err(err);
         }
 
-        const { err: titleErr, val: encryptedTitle } = encrypt(entry.title, auth.key);
-        if (titleErr) return Result.err(titleErr);
-
-        const { err: entryErr, val: encryptedEntry } = encrypt(entry.entry, auth.key);
-        if (entryErr) return Result.err(entryErr);
-
-        const { err: agentErr, val: encryptedAgent } = encrypt(entry.agentData || '', auth.key);
-        if (agentErr) return Result.err(agentErr);
+        const encryptedTitle = encrypt(entry.title, auth.key);
+        const encryptedEntry = encrypt(entry.entry, auth.key);
+        const encryptedAgent = encrypt(entry.agentData || '', auth.key);
 
         await query`
             INSERT INTO entries
@@ -305,17 +300,9 @@ namespace EntryUtils {
         `;
 
         for (const edit of entry.edits) {
-            const { err: editTitleErr, val: encryptedEditTitle } = encrypt(edit.title, auth.key);
-            if (editTitleErr) return Result.err(editTitleErr);
-
-            const { err: editEntryErr, val: encryptedEditEntry } = encrypt(edit.entry, auth.key);
-            if (editEntryErr) return Result.err(editEntryErr);
-
-            const { err: editAgentErr, val: encryptedAgentData } = encrypt(
-                edit.agentData || '',
-                auth.key
-            );
-            if (editAgentErr) return Result.err(editAgentErr);
+            const encryptedEditTitle = encrypt(edit.title, auth.key);
+            const encryptedEditEntry = encrypt(edit.entry, auth.key);
+            const encryptedAgentData = encrypt(edit.agentData || '', auth.key);
 
             await query`
                 INSERT INTO entryEdits
@@ -418,19 +405,13 @@ namespace EntryUtils {
         tzOffset: number,
         agentData: string
     ): Promise<Result> {
-        const { err, val: encryptionResults } = encryptMulti(
-            auth.key,
-            newTitle,
-            newEntry,
-            agentData,
-            entry.title,
-            entry.entry
-        );
-        if (err) return Result.err(err);
-        const [encryptedNewTitle, encryptedNewEntry, encryptedEditAgentData, oldTitle, oldEntry] =
-            encryptionResults;
+        const encryptedNewTitle = encrypt(newTitle, auth.key);
+        const encryptedNewEntry = encrypt(newEntry, auth.key);
+        const encryptedEditAgentData = encrypt(agentData, auth.key);
+        const encryptedOldTitle = encrypt(entry.title, auth.key);
+        const encryptedOldEntry = encrypt(entry.entry, auth.key);
 
-        const editId = await UUId.generateUniqueUUId(query);
+        const editId = await UUIdControllerServer.generate();
 
         await query`
             INSERT INTO entryEdits
@@ -442,8 +423,8 @@ namespace EntryUtils {
                     ${tzOffset},
                     ${newLatitude ?? null},
                     ${newLongitude ?? null},
-                    ${oldTitle},
-                    ${oldEntry},
+                    ${encryptedOldTitle},
+                    ${encryptedOldEntry},
                     ${entry.label?.id ?? null},
                     ${encryptedEditAgentData || ''})
         `;

@@ -54,9 +54,10 @@ export interface IBackup {
 }
 
 export namespace BackupControllerClient {
-    export function download(data: string, username: string, encrypted: boolean): void {
+    export function download(data: string, username: string | null, encrypted: boolean): void {
         const dateFmt = fmtUtc(nowUtc(), currentTzOffset(), 'yyyyMMDD-HHmm');
         const encryptedExt = encrypted ? '.encrypted' : '';
-        downloadFile(`${dateFmt}-${username}.backup${encryptedExt}.json`, data);
+        const usernameExt = username ? `-${username}` : '';
+        downloadFile(`${dateFmt}${usernameExt}.backup${encryptedExt}.json`, data);
     }
 }

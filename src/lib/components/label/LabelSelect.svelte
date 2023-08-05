@@ -7,7 +7,6 @@
     import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
     import Dropdown from '$lib/components/Dropdown.svelte';
     import type { Label } from '$lib/controllers/label/label';
-    import type { Auth } from '$lib/controllers/user/user';
     import { clientLogger } from '$lib/utils/log';
     import { showPopup } from '$lib/utils/popups';
     import NewLabelDialog from '$lib/components/dialogs/NewLabelDialog.svelte';
@@ -16,13 +15,12 @@
     export let fromRight = false;
     export let labels = null as Label[] | null;
     export let value = '';
-    export let auth: Auth;
     export let showAddButton = true;
     export let filter: (l: Label, i: number, arr: Label[]) => boolean = () => true;
     export let condensed = false;
 
     function showNewLabelPopup() {
-        showPopup(NewLabelDialog, { auth });
+        showPopup(NewLabelDialog, {});
     }
 
     const dispatchEvent = createEventDispatcher();

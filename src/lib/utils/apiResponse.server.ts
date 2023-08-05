@@ -1,3 +1,7 @@
+import { encrypt } from '$lib/security/encryption.server';
+import { Auth } from '$lib/controllers/auth/auth.server';
+import type { RequestHandler } from '@sveltejs/kit';
+
 export class GenericResponse<T> extends Response {
     constructor(val: string, init: ResponseInit) {
         super(val, init);
@@ -9,6 +13,7 @@ export class GenericResponse<T> extends Response {
 }
 
 export function apiResponse<T extends Record<string, unknown>>(
+    encryptionKey: string | Auth | null,
     body: T,
     init: ResponseInit = {}
 ): GenericResponse<T> {
@@ -18,7 +23,23 @@ export function apiResponse<T extends Record<string, unknown>>(
     if (Array.isArray(body)) {
         throw new Error('Body must not be an array');
     }
-    return new Response(JSON.stringify(body), {
+
+    let key: string;
+    if (encryptionKey === null) {
+        key = '';
+    } else if (typeof encryptionKey === 'string') {
+        key = encryptionKey;
+    } else {
+        key = encryptionKey.key;
+    }
+
+    let resBody: string;
+    if (key) {
+        resBody = encrypt(JSON.stringify(body), key);
+    } else {
+        resBody = JSON.stringify(body);
+    }
+    return new Response(resBody, {
         status: 200,
         ...init
     }) as GenericResponse<T>;
@@ -34,8 +55,9 @@ export function rawApiResponse<T extends BodyInit | null>(
     }) as GenericResponse<T>;
 }
 
-export function apiRes404() {
-    return apiResponse({ status: 404 }, { status: 404 });
-}
+export const apiRes404: RequestHandler & { isApi404: true } = ({ cookies }) => {
+    const auth = Auth.Server.tryGetAuthFromCookies(cookies);
+    return apiResponse(auth, { status: 404 }, { status: 404 });
+};
 
 apiRes404.isApi404 = true;

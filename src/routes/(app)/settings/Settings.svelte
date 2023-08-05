@@ -3,7 +3,6 @@
     import { tooltip } from '@svelte-plugins/tooltips';
     import CloudCheckOutline from 'svelte-material-icons/CloudCheckOutline.svelte';
     import Sync from 'svelte-material-icons/Sync.svelte';
-    import type { Auth } from '$lib/controllers/user/user';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications.js';
     import { currentTzOffset, fmtDuration, fmtUtc, nowUtc } from '$lib/utils/time.js';
@@ -11,7 +10,6 @@
     import { settingsStore } from '$lib/stores';
 
     export let id: string;
-    export let auth: Auth;
     export let key: string;
     export let defaultValue: string | number | boolean;
     export let name: string;
@@ -54,7 +52,7 @@
             value: newValue
         };
 
-        displayNotifOnErr(await api.put(auth, '/settings', changes));
+        displayNotifOnErr(await api.put('/settings', changes));
 
         $settingsStore[k].value = newValue;
         $settingsStore[k].created = nowUtc();

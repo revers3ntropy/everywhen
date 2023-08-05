@@ -1,7 +1,7 @@
 import '@total-typescript/ts-reset';
-import { COOKIE_WRITEABLE_KEYS } from '$lib/constants';
+import { COOKIE_KEYS } from '$lib/constants';
 import type { SettingsConfig } from '$lib/controllers/settings/settings';
-import type { Auth } from '$lib/controllers/user/user';
+import type { Auth } from '$lib/controllers/auth/auth';
 
 declare module '$env/static/private' {
     export const DB_HOST: string;
@@ -23,7 +23,7 @@ declare global {
         toLowerCase(): Lowercase<string>;
     }
 
-    type RawCookies = { [K in keyof typeof COOKIE_WRITEABLE_KEYS]?: string };
+    type RawCookies = { [K in keyof typeof COOKIE_KEYS]?: string };
 
     // See https://kit.svelte.dev/docs/types#app
     declare namespace App {

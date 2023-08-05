@@ -1,5 +1,5 @@
-import { obfuscate, wordCount } from './text';
 import { describe, it, expect } from 'vitest';
+import { obfuscate, wordCount } from './text';
 
 describe('obfuscate', () => {
     it('changes the string', () => {

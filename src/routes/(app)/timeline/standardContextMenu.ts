@@ -3,7 +3,6 @@ import Event from '$lib/components/event/Event.svelte';
 import { displayNotifOnErr } from '$lib/components/notifications/notifications';
 import { Event as EventController } from '$lib/controllers/event/event.client';
 import type { Label } from '$lib/controllers/label/label.client';
-import type { Auth } from '$lib/controllers/user/user';
 import { dispatch } from '$lib/dataChangeEvents';
 import { api } from '$lib/utils/apiRequest';
 import { showPopup } from '$lib/utils/popups';
@@ -12,7 +11,6 @@ import type { CanvasState } from '$lib/components/canvas/canvasState';
 import type { Writable } from 'svelte/store';
 
 export function makeStandardContextMenu(
-    auth: Auth,
     labels: Label[],
     canvasState: Writable<CanvasState>
 ): ContextMenuOptions {
@@ -21,7 +19,7 @@ export function makeStandardContextMenu(
 
     async function newEvent(start: TimestampSecs, end: TimestampSecs) {
         const { id } = displayNotifOnErr(
-            await api.post(auth, '/events', {
+            await api.post('/events', {
                 name: EventController.NEW_EVENT_NAME,
                 start,
                 end
@@ -37,7 +35,6 @@ export function makeStandardContextMenu(
         await dispatch.create('event', event);
 
         showPopup(Event, {
-            auth,
             obfuscated: false,
             event,
             labels,

@@ -12,7 +12,6 @@
     import Heart from 'svelte-material-icons/Heart.svelte';
     import HeartOffOutline from 'svelte-material-icons/HeartOffOutline.svelte';
     import type { Location } from '$lib/controllers/location/location';
-    import type { Auth } from '$lib/controllers/user/user';
     import type { Label as LabelController } from '../../controllers/label/label';
     import { dispatch } from '$lib/dataChangeEvents';
     import { Entry } from '$lib/controllers/entry/entry.client';
@@ -47,7 +46,6 @@
     export let showLocations = true;
     export let isInDialog = false;
 
-    export let auth: Auth;
     export let locations: Location[] | null;
 
     // show random string instead of text content if obfuscated
@@ -66,7 +64,7 @@
         }
 
         displayNotifOnErr(
-            await api.delete(auth, apiPath('/entries/?', id), {
+            await api.delete(apiPath('/entries/?', id), {
                 restore: !!deleted
             })
         );
@@ -79,7 +77,7 @@
 
     async function pinSelf() {
         displayNotifOnErr(
-            await api.put(auth, apiPath('/entries/?/pinned', id), {
+            await api.put(apiPath('/entries/?/pinned', id), {
                 pinned: !pinned
             })
         );
@@ -152,14 +150,7 @@
 
             {#if latitude && longitude && showLocations}
                 <button on:click={() => (showingMap = !showingMap)} aria-label="Expand map">
-                    <LocationWidget
-                        {locations}
-                        {auth}
-                        entryId={id}
-                        {latitude}
-                        {longitude}
-                        {obfuscated}
-                    />
+                    <LocationWidget {locations} entryId={id} {latitude} {longitude} {obfuscated} />
                 </button>
             {/if}
 
@@ -261,7 +252,7 @@
                 component={() => import('$lib/components/map/Map.svelte')}
                 props={{
                     entriesInteractable: false,
-                    auth,
+
                     width: '100%',
                     height: '300px',
                     mobileHeight: '200px',

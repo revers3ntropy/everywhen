@@ -12,7 +12,7 @@
     import type { ChangeEventHandler } from 'svelte/elements';
     import Asset from './Asset.svelte';
     import type { PageData } from './$types';
-    import type { IAsset } from '$lib/controllers/asset/asset';
+    import type { Asset as IAsset } from '$lib/controllers/asset/asset';
 
     export let data: PageData;
 
@@ -20,7 +20,7 @@
         offset: number,
         count: number
     ): Promise<Omit<IAsset, 'content'>[]> {
-        const res = displayNotifOnErr(await api.get(data.auth, `/assets`, { offset, count }));
+        const res = displayNotifOnErr(await api.get(`/assets`, { offset, count }));
         return res.assets;
     }
 
@@ -29,7 +29,7 @@
             return;
         }
         const files = e.target.files as FileList;
-        const res = await uploadImage(data.auth, files);
+        const res = await uploadImage(files);
         if (res === null) {
             return;
         }
@@ -99,7 +99,6 @@
                 {#each data.assets as asset}
                     <Asset
                         {...asset}
-                        auth={data.auth}
                         on:delete={() => data.assetCount--}
                         obfuscated={$obfuscated}
                     />

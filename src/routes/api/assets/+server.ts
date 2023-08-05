@@ -1,11 +1,10 @@
-import { AssetControllerServer } from '$lib/controllers/asset/asset.server';
+import { Asset } from '$lib/controllers/asset/asset.server';
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
-import { query } from '$lib/db/mysql.server';
-import { getAuthFromCookies } from '$lib/security/getAuthFromCookies';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
+import { Auth } from '$lib/controllers/auth/auth.server';
 
 const IMG_QUALITY = 100;
 
@@ -22,7 +21,7 @@ export const GET = cachedApiRoute(async (auth, { url }) => {
         throw error(400, 'Invalid offset');
     }
 
-    const { err, val } = await AssetControllerServer.pageOfMetaData(query, auth, offset, count);
+    const { err, val } = await Asset.Server.pageOfMetaData(auth, offset, count);
     if (err) throw error(400, err);
 
     return {
@@ -32,7 +31,7 @@ export const GET = cachedApiRoute(async (auth, { url }) => {
 }) satisfies RequestHandler;
 
 export const POST = (async ({ request, cookies }) => {
-    const auth = await getAuthFromCookies(cookies);
+    const auth = Auth.Server.getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
     const body = await getUnwrappedReqBody(request, {
@@ -47,13 +46,13 @@ export const POST = (async ({ request, cookies }) => {
     if (fileExt.toLowerCase() === 'webp') {
         img = body.content.replace(/^data:image\/webp;base64,/, '');
     } else {
-        img = await AssetControllerServer.base64ToWebP(body.content, fileExt, IMG_QUALITY);
+        img = await Asset.Server.base64ToWebP(body.content, fileExt, IMG_QUALITY);
     }
 
-    const { err, val } = await AssetControllerServer.create(query, auth, body.fileName, img);
+    const { err, val } = await Asset.Server.create(auth, body.fileName, img);
     if (err) throw error(400, err);
 
-    return apiResponse(val);
+    return apiResponse(auth, val);
 }) satisfies RequestHandler;
 
 export const DELETE = apiRes404;

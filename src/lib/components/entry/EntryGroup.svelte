@@ -16,7 +16,6 @@
     import Entry from '$lib/components/entry/Entry.svelte';
     import type { Entry as EntryController } from '$lib/controllers/entry/entry';
     import type { Location } from '$lib/controllers/location/location';
-    import type { Auth } from '$lib/controllers/user/user';
     import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
     import { currentTzOffset, nowUtc, utcEq } from '$lib/utils/time';
     import Dot from '../Dot.svelte';
@@ -29,7 +28,6 @@
     export let showLocations = true;
     export let showEntryForm = false;
     export let entryFormMode = null as null | EntryFormMode;
-    export let auth: Auth;
     export let day: number;
 
     function toggleCollapse() {
@@ -130,7 +128,7 @@
     </div>
     {#if !$collapsed[day]}
         {#if showEntryForm && isToday}
-            <ModedEntryForm {auth} {obfuscated} entryFormMode={formMode} />
+            <ModedEntryForm {obfuscated} entryFormMode={formMode} />
         {/if}
         <div
             class="contents"
@@ -140,7 +138,7 @@
             }}
         >
             {#each entries as entry (entry.id)}
-                <Entry {...entry} {obfuscated} {showLabels} {showLocations} {auth} {locations} />
+                <Entry {...entry} {obfuscated} {showLabels} {showLocations} {locations} />
             {/each}
         </div>
     {/if}

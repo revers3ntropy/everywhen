@@ -2,9 +2,9 @@ import type { QueryFunc } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/security/encryption.server';
 import { Result } from '$lib/utils/result';
 import { nowUtc } from '$lib/utils/time';
-import type { Auth } from '../user/user';
-import { UUId } from '../uuid/uuid';
+import type { Auth } from '../auth/auth.server';
 import type { Label as _Label, LabelWithCount } from './label';
+import { UUIdControllerServer } from '$lib/controllers/uuid/uuid.server';
 
 export type Label = _Label;
 
@@ -37,8 +37,7 @@ namespace LabelUtils {
         auth: Auth,
         nameDecrypted: string
     ): Promise<Result<string>> {
-        const { err, val: encryptedName } = encrypt(nameDecrypted, auth.key);
-        if (err) return Result.err(err);
+        const encryptedName = encrypt(nameDecrypted, auth.key);
 
         const res = await query<Required<Label>[]>`
             SELECT id
@@ -59,8 +58,7 @@ namespace LabelUtils {
         auth: Auth,
         nameDecrypted: string
     ): Promise<Result<Label>> {
-        const { err, val: encryptedName } = encrypt(nameDecrypted, auth.key);
-        if (err) return Result.err(err);
+        const encryptedName = encrypt(nameDecrypted, auth.key);
 
         const res = await query<Required<Label>[]>`
             SELECT id, color, name, created
@@ -146,11 +144,10 @@ namespace LabelUtils {
         }
 
         json = { ...json };
-        json.id ??= await UUId.generateUniqueUUId(query);
+        json.id ??= await UUIdControllerServer.generate();
         json.created ??= nowUtc();
 
-        const { err, val: encryptedName } = encrypt(json.name, auth.key);
-        if (err) return Result.err(err);
+        const encryptedName = encrypt(json.name, auth.key);
 
         if (encryptedName.length > 256) {
             return Result.err('Name too long');
@@ -183,8 +180,7 @@ namespace LabelUtils {
             return Result.err('Label with that name already exists');
         }
 
-        const { err, val: encryptedName } = encrypt(name, auth.key);
-        if (err) return Result.err(err);
+        const encryptedName = encrypt(name, auth.key);
 
         if (encryptedName.length > 256) {
             return Result.err('Name too long');

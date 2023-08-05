@@ -9,9 +9,7 @@
     import { showPopup } from '$lib/utils/popups';
     import { nowUtc } from '$lib/utils/time';
     import Plus from 'svelte-material-icons/Plus.svelte';
-    import type { Auth } from '$lib/controllers/user/user';
 
-    export let auth: Auth;
     export let labels: Label[];
 
     async function newEvent() {
@@ -22,7 +20,7 @@
         $canvasState.zoomTo(start - zoomMargin, end + zoomMargin);
 
         const { id } = displayNotifOnErr(
-            await api.post(auth, '/events', {
+            await api.post('/events', {
                 name: EventController.NEW_EVENT_NAME,
                 start,
                 end
@@ -38,7 +36,6 @@
         await dispatch.create('event', event);
 
         showPopup(Event, {
-            auth,
             obfuscated: false,
             event,
             labels,

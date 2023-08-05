@@ -3,7 +3,6 @@
     import ImageArea from 'svelte-material-icons/ImageArea.svelte';
     import NoteEditOutline from 'svelte-material-icons/NoteEditOutline.svelte';
     import OpenInNew from 'svelte-material-icons/OpenInNew.svelte';
-    import { API_DOCS_LINK } from '$lib/constants';
 </script>
 
 <svelte:head>
@@ -174,17 +173,6 @@
         Create a Named Location by right clicking on the map on the Map page. This will create an
         area in which entries are considered to be at that location. Click the location to change
         the name or delete, and drag to resize and move.
-    </p>
-
-    <h2>API</h2>
-
-    <p>
-        The docs to the public API can be found on
-        <a aria-label="Link to API docs" href={API_DOCS_LINK} rel="noreferrer" target="_blank"
-            >this</a
-        >
-        <OpenInNew size="12" />
-        Google Sheets.
     </p>
 </section>
 

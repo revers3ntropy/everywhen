@@ -1,12 +1,13 @@
 import { BackupControllerServer } from '$lib/controllers/backup/backup.server';
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
-import { cookieOptions, STORE_KEY } from '$lib/constants';
-import { User } from '$lib/controllers/user/user';
+import { COOKIE_KEYS, cookieOptions, sessionCookieOptions } from '$lib/constants';
 import { query } from '$lib/db/mysql.server';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 import { invalidateCache } from '$lib/utils/cache.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
+import { UserControllerServer } from '$lib/controllers/user/user.server';
+import { Auth } from '$lib/controllers/auth/auth.server';
 
 export const POST = (async ({ request, cookies }) => {
     const body = await getUnwrappedReqBody(request, {
@@ -14,13 +15,18 @@ export const POST = (async ({ request, cookies }) => {
         password: 'string'
     });
 
-    const { err, val } = await User.create(query, body.username, body.password);
+    const { err } = await UserControllerServer.create(query, body.username, body.password);
     if (err) throw error(400, err);
 
-    cookies.set(STORE_KEY.key, body.password, cookieOptions(false, false));
-    cookies.set(STORE_KEY.username, body.username, cookieOptions(true, false));
+    const { err: authErr, val: sessionId } = await Auth.Server.authenticateUserFromLogIn(
+        body.username,
+        body.password
+    );
+    if (authErr) throw error(401, authErr);
 
-    return apiResponse({ ...val });
+    cookies.set(COOKIE_KEYS.sessionId, sessionId, sessionCookieOptions(false));
+
+    return apiResponse(sessionId, { sessionId });
 }) satisfies RequestHandler;
 
 export const DELETE = (async ({ cookies, locals: { auth } }) => {
@@ -30,18 +36,19 @@ export const DELETE = (async ({ cookies, locals: { auth } }) => {
     const { err, val: backup } = await BackupControllerServer.generate(query, auth);
     if (err) throw error(400, err);
 
-    await User.purge(query, auth);
+    await UserControllerServer.purge(query, auth);
 
-    cookies.delete(STORE_KEY.key, cookieOptions(false, false));
-    cookies.delete(STORE_KEY.username, cookieOptions(true, false));
-
-    const { err: backupErr, val: backupEncrypted } = BackupControllerServer.asEncryptedString(
-        backup,
-        auth
+    cookies.delete(
+        COOKIE_KEYS.sessionId,
+        cookieOptions({
+            httpOnly: true,
+            rememberMe: false
+        })
     );
-    if (backupErr) throw error(400, backupErr);
 
-    return apiResponse({
+    const backupEncrypted = BackupControllerServer.asEncryptedString(backup, auth.key);
+
+    return apiResponse(auth, {
         backup: backupEncrypted
     });
 }) satisfies RequestHandler;

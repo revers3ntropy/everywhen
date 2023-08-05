@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { displayNotifOnErr } from '$lib/components/notifications/notifications.js';
     import ArrowLeft from 'svelte-material-icons/ArrowLeft.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
     import Entries from '$lib/components/entry/Entries.svelte';
@@ -10,6 +9,7 @@
     import EntryHeatMap from '../EntryHeatMap.svelte';
     import type { PageData } from './$types';
     import { encrypt } from '$lib/security/encryption.client';
+    import { encryptionKey } from '$lib/stores';
 
     let by: By = By.Words;
 
@@ -39,7 +39,7 @@
             </h1>
         </div>
         <div class="search-for-word">
-            <SearchForWord value={data.theWord} auth={data.auth} />
+            <SearchForWord value={data.theWord} />
         </div>
     </div>
     {#if data.wordInstances === 0}
@@ -80,9 +80,8 @@
 
         <section class="entries">
             <Entries
-                auth={data.auth}
                 options={{
-                    search: displayNotifOnErr(encrypt(data.theWord, data.auth.key))
+                    search: encrypt(data.theWord, $encryptionKey)
                 }}
                 showSearch={false}
             />

@@ -12,7 +12,7 @@
 
     async function makeFromPreset(presetName: DatasetPresetName) {
         displayNotifOnErr(
-            await api.post(data.auth, '/datasets', {
+            await api.post('/datasets', {
                 name: presetName,
                 columns: Dataset.dataSetPresets[presetName].columns
             })

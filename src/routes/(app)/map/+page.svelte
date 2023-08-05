@@ -14,8 +14,8 @@
 <main>
     <section>
         {#if !$settingsStore.preferLocationOn.value || !$enabledLocation}
-            <LocationDisabledBanner auth={data.auth} />
+            <LocationDisabledBanner />
         {/if}
-        <Map auth={data.auth} entries={data.entries} locations={data.locations} />
+        <Map entries={data.entries} locations={data.locations} />
     </section>
 </main>

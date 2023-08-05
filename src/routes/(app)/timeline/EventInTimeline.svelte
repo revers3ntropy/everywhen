@@ -4,7 +4,6 @@
     import { interactable } from '$lib/components/canvas/interactable';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import { Event as EventController } from '$lib/controllers/event/event.client';
-    import type { Auth } from '$lib/controllers/user/user';
     import Event from '$lib/components/event/Event.svelte';
     import type { Label } from '$lib/controllers/label/label';
     import { dispatch, listen } from '$lib/dataChangeEvents';
@@ -14,7 +13,6 @@
     import { limitStrLen } from '$lib/utils/text';
     import EventDragHandle from './EventDragHandle.svelte';
 
-    export let auth: Auth;
     export let labels: Label[];
 
     export let id: string;
@@ -35,7 +33,7 @@
         start?: TimestampSecs;
         end?: TimestampSecs;
     }): Promise<void> {
-        displayNotifOnErr(await api.put(auth, apiPath('/events/?', id), changes));
+        displayNotifOnErr(await api.put(apiPath('/events/?', id), changes));
         const event: EventController = {
             id,
             name,
@@ -105,7 +103,6 @@
             if (Math.abs(state.timeToX(dragStart) - state.timeToX(start)) < (4 as Pixels)) {
                 // click
                 showPopup(Event, {
-                    auth,
                     obfuscated: false,
                     event: {
                         id,
@@ -285,7 +282,6 @@
 
 {#if !isInstantEvent && !thisIsDeleted}
     <EventDragHandle
-        {auth}
         {labels}
         {id}
         {start}

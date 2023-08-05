@@ -1,16 +1,14 @@
 <script lang="ts">
+    import { Auth } from '$lib/controllers/auth/auth';
     import { onMount } from 'svelte';
     import { slide } from 'svelte/transition';
     import { browser } from '$app/environment';
     import Close from 'svelte-material-icons/Close.svelte';
-    import type { Auth } from '$lib/controllers/user/user';
     import { ANIMATION_DURATION } from '$lib/constants';
-    import { encryptionKeyFromPassword } from '$lib/security/authUtils.client';
-    import { passcodeLastEntered } from '$lib/stores';
+    import { encryptionKey, passcodeLastEntered } from '$lib/stores';
     import { nowUtc } from '$lib/utils/time';
     import { wheel } from '$lib/utils/toggleScrollable';
 
-    export let auth: Auth;
     export let show = true;
     export let passcode: string;
     export let showingForgotPassword = false;
@@ -29,7 +27,8 @@
     $: if (browser) {
         let valid = (input || '') === passcode;
         if (showingForgotPassword) {
-            const passwordIsValid = encryptionKeyFromPassword(passwordInput || '') === auth.key;
+            const passwordIsValid =
+                Auth.encryptionKeyFromPassword(passwordInput || '') === $encryptionKey;
             valid ||= passwordIsValid;
         }
         if (valid) {

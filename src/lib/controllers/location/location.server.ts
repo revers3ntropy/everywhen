@@ -2,9 +2,9 @@ import type { ResultSetHeader } from 'mysql2';
 import type { QueryFunc } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/security/encryption.server';
 import { Result } from '$lib/utils/result';
-import type { Auth } from '../user/user';
-import { UUId } from '../uuid/uuid';
 import { Location as _Location } from './location';
+import type { Auth } from '$lib/controllers/auth/auth.server';
+import { UUIdControllerServer } from '$lib/controllers/uuid/uuid.server';
 
 export type Location = _Location;
 
@@ -26,11 +26,9 @@ namespace LocationUtils {
             return Result.err('Name cannot be empty');
         }
 
-        const id = await UUId.generateUniqueUUId(query);
+        const id = await UUIdControllerServer.generate();
 
-        const { err: nameErr, val: encryptedName } = encrypt(name, auth.key);
-        if (nameErr) return Result.err(nameErr);
-
+        const encryptedName = encrypt(name, auth.key);
         if (encryptedName.length > 256) {
             return Result.err('Name too long');
         }
@@ -148,8 +146,7 @@ namespace LocationUtils {
     ): Promise<Result<Location>> {
         if (!newName) return Result.err('Name must not be empty');
 
-        const { err, val: encryptedName } = encrypt(newName, auth.key);
-        if (err) return Result.err(err);
+        const encryptedName = encrypt(newName, auth.key);
 
         if (encryptedName.length > 256) {
             return Result.err('Name too long');

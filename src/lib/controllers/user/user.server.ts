@@ -1,4 +1,3 @@
-import { AssetControllerServer } from '$lib/controllers/asset/asset.server';
 import { BackupControllerServer } from '$lib/controllers/backup/backup.server';
 import type { QueryFunc } from '$lib/db/mysql.server';
 import { encryptionKeyFromPassword } from '$lib/security/authUtils.server';
@@ -9,29 +8,12 @@ import { Entry } from '../entry/entry';
 import { Event } from '../event/event';
 import { Label } from '../label/label';
 import { Settings } from '../settings/settings';
-import { UUId } from '../uuid/uuid';
-import type { Auth, User as _User } from './user';
+import type { IUser } from './user';
+import { UUIdControllerServer } from '$lib/controllers/uuid/uuid.server';
+import type { Auth } from '$lib/controllers/auth/auth.server';
+import { Asset } from '$lib/controllers/asset/asset.server';
 
-export type User = _User;
-
-namespace UserUtils {
-    export async function authenticate(
-        query: QueryFunc,
-        username: string,
-        key: string
-    ): Promise<Result<User>> {
-        const res = await query<{ id: string }[]>`
-            SELECT id
-            FROM users
-            WHERE username = ${username}
-              AND password = SHA2(CONCAT(${key}, salt), 256)
-        `;
-        if (res.length !== 1) {
-            return Result.err('Invalid login');
-        }
-        return Result.ok({ id: res[0].id, username, key });
-    }
-
+export namespace UserControllerServer {
     export async function userExistsWithUsername(
         query: QueryFunc,
         username: string
@@ -71,12 +53,12 @@ namespace UserUtils {
         query: QueryFunc,
         username: string,
         password: string
-    ): Promise<Result<User>> {
+    ): Promise<Result<IUser>> {
         const { err } = await newUserIsValid(query, username, password);
         if (err) return Result.err(err);
 
         const salt = await generateSalt(query);
-        const id = await UUId.generateUniqueUUId(query);
+        const id = await UUIdControllerServer.generate();
 
         await query`
             INSERT INTO users (id, username, password, salt, created)
@@ -93,7 +75,7 @@ namespace UserUtils {
     export async function purge(query: QueryFunc, auth: Auth): Promise<void> {
         await Label.purgeAll(query, auth);
         await Entry.purgeAll(query, auth);
-        await AssetControllerServer.purgeAll(query, auth);
+        await Asset.Server.purgeAll(auth);
         await Event.purgeAll(query, auth);
         await Settings.purgeAll(query, auth);
 
@@ -154,12 +136,7 @@ namespace UserUtils {
         );
         if (generateErr) return Result.err(generateErr);
 
-        const { err: encryptErr, val: encryptedBackup } = BackupControllerServer.asEncryptedString(
-            backup,
-            auth
-        );
-
-        if (encryptErr) return Result.err(encryptErr);
+        const encryptedBackup = BackupControllerServer.asEncryptedString(backup, auth.key);
 
         await query`
             UPDATE users
@@ -178,5 +155,3 @@ namespace UserUtils {
         return await Settings.changeEncryptionKeyInDB(query, auth, newKey);
     }
 }
-
-export const User = UserUtils;

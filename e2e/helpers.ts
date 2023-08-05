@@ -1,7 +1,6 @@
 import { type APIRequestContext, type Expect, type Page, request } from '@playwright/test';
 import { serialize } from 'cookie';
-import { cookieOptions, STORE_KEY } from '../src/lib/constants.js';
-import type { Auth, RawAuth } from '../src/lib/controllers/user/user.js';
+import { COOKIE_KEYS, sessionCookieOptions } from '../src/lib/constants.js';
 import { encryptionKeyFromPassword } from '../src/lib/security/authUtils.server.js';
 import { Result } from '../src/lib/utils/result.js';
 
@@ -18,8 +17,15 @@ export function randStr(
     return result;
 }
 
+export interface SessionAuth {
+    sessionId: string;
+    key: string;
+    username: string;
+    password: string;
+}
+
 export async function generateUser(): Promise<{
-    auth: Auth & { password: string };
+    auth: SessionAuth;
     api: APIRequestContext;
 }> {
     const username = randStr();
@@ -49,21 +55,21 @@ export async function generateUser(): Promise<{
         throw await authRes.text();
     }
 
-    const auth = {
+    const auth: SessionAuth = {
         key,
         username,
         password,
-        id: ((await authRes.json()) as { id: string }).id
+        sessionId: ((await authRes.json()) as { username: string; sessionId: string }).sessionId
     };
 
     return {
         auth,
-        api: await generateApiCtx(auth)
+        api: await generateApiCtx(auth.sessionId)
     };
 }
 
 export async function generateUserAndSignIn(page: Page): Promise<{
-    auth: Auth & { password: string };
+    auth: SessionAuth;
     api: APIRequestContext;
 }> {
     await page.goto('/login', { waitUntil: 'networkidle' });
@@ -96,16 +102,14 @@ export async function expectDeleteUser(api: APIRequestContext, expect: Expect): 
     expect(err).toBe(null);
 }
 
-export async function generateApiCtx(auth: RawAuth | null = null): Promise<APIRequestContext> {
+export async function generateApiCtx(session: string | null = null): Promise<APIRequestContext> {
     return await request.newContext({
         baseURL: 'http://localhost:5173/api/',
         extraHTTPHeaders: {
             'Content-Type': 'application/json',
             Accept: 'application/json',
-            Cookie: auth
-                ? serialize(STORE_KEY.key, auth.key, cookieOptions(false, false)) +
-                  ' ; ' +
-                  serialize(STORE_KEY.username, auth.username, cookieOptions(true, false))
+            Cookie: session
+                ? serialize(COOKIE_KEYS.sessionId, session, sessionCookieOptions(false))
                 : ''
         }
     });

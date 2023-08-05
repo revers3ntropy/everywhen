@@ -3,27 +3,23 @@
     import { popup } from '$lib/stores';
     import type { Location } from '$lib/controllers/location/location';
     import type { Entry as EntryController } from '../../controllers/entry/entry';
-    import type { Auth } from '$lib/controllers/user/user';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import BookSpinner from '../BookSpinner.svelte';
     import Entry from '$lib/components/entry/Entry.svelte';
 
     export let id: string;
-    export let auth: Auth;
     export let obfuscated = false;
 
     let entry: EntryController | null = null;
     let locations = null as Location[] | null;
 
     async function loadEntry() {
-        entry = displayNotifOnErr(await api.get(auth, apiPath('/entries/?', id)), () =>
-            popup.set(null)
-        );
+        entry = displayNotifOnErr(await api.get(apiPath('/entries/?', id)), () => popup.set(null));
     }
 
     async function loadLocations() {
-        locations = displayNotifOnErr(await api.get(auth, '/locations')).locations;
+        locations = displayNotifOnErr(await api.get('/locations')).locations;
     }
 
     onMount(() => {
@@ -34,7 +30,7 @@
 
 <div>
     {#if entry}
-        <Entry {...entry} isInDialog={true} {auth} {obfuscated} showFullDate={true} {locations} />
+        <Entry {...entry} isInDialog={true} {obfuscated} showFullDate={true} {locations} />
     {:else}
         <BookSpinner />
     {/if}

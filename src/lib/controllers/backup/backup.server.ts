@@ -1,4 +1,3 @@
-import { AssetControllerServer } from '$lib/controllers/asset/asset.server';
 import { Location } from '$lib/controllers/location/location';
 import { SemVer } from '$lib/utils/semVer';
 import schemion from 'schemion';
@@ -9,12 +8,13 @@ import { nowUtc } from '$lib/utils/time';
 import { Entry } from '../entry/entry';
 import { Event } from '../event/event';
 import { Label } from '../label/label';
-import type { Auth } from '../user/user';
 import type { IBackup } from './backup';
+import type { Auth } from '$lib/controllers/auth/auth';
+import { Asset } from '$lib/controllers/asset/asset.server';
 
 export namespace BackupControllerServer {
-    export function asEncryptedString(self: IBackup, auth: Auth): Result<string> {
-        return encrypt(JSON.stringify(self), auth.key);
+    export function asEncryptedString(self: IBackup, key: string): string {
+        return encrypt(JSON.stringify(self), key);
     }
 
     export async function generate(
@@ -30,7 +30,7 @@ export namespace BackupControllerServer {
         if (eventsErr) return Result.err(eventsErr);
         const { err: labelsErr, val: labels } = await Label.all(query, auth);
         if (labelsErr) return Result.err(labelsErr);
-        const { err: assetsErr, val: assets } = await AssetControllerServer.all(query, auth);
+        const { err: assetsErr, val: assets } = await Asset.Server.all(auth);
         if (assetsErr) return Result.err(assetsErr);
         const { err: locationsErr, val: locations } = await Location.all(query, auth);
         if (locationsErr) return Result.err(locationsErr);
@@ -199,15 +199,14 @@ export namespace BackupControllerServer {
             if (err) return Result.err(err);
         }
 
-        await AssetControllerServer.purgeAll(query, auth);
+        await Asset.Server.purgeAll(auth);
 
         for (const asset of assets) {
-            if (!AssetControllerServer.jsonIsRawAsset(asset)) {
+            if (!Asset.Server.jsonIsRawAsset(asset)) {
                 return Result.err('Invalid asset format in JSON');
             }
 
-            const { err } = await AssetControllerServer.create(
-                query,
+            const { err } = await Asset.Server.create(
                 auth,
                 asset.fileName,
                 asset.content,

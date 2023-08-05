@@ -5,12 +5,9 @@
     import EntryDialog from '$lib/components/dialogs/EntryDialog.svelte';
     import type { EntryEdit } from '$lib/controllers/entry/entry';
     import type { Label } from '$lib/controllers/label/label';
-    import type { Auth } from '$lib/controllers/user/user';
     import { obfuscated } from '$lib/stores';
     import { showPopup } from '$lib/utils/popups';
     import { limitStrLen } from '$lib/utils/text.js';
-
-    export let auth: Auth;
 
     export let id: string;
     export let created: number;
@@ -78,7 +75,6 @@
         onMouseDown() {
             showPopup(EntryDialog, {
                 id,
-                auth,
                 obfuscated: false
             });
         }

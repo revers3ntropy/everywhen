@@ -1,23 +1,24 @@
 <script lang="ts">
     import { BackupControllerClient } from '$lib/controllers/backup/backup';
-    import { logOut } from '$lib/security/logOut';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import Skull from 'svelte-material-icons/Skull.svelte';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import type { PageData } from './$types';
+    import { username } from '$lib/stores';
+    import { Auth } from '$lib/controllers/auth/auth';
 
     export let data: PageData;
 
     async function deleteAccount() {
-        if (usernameInput.value !== data.auth.username) {
+        if (usernameInput.value !== $username) {
             badUsername = true;
             return;
         }
 
-        const { backup: backupData } = displayNotifOnErr(await api.delete(data.auth, '/users'));
-        BackupControllerClient.download(backupData, data.auth.username, true);
-        await logOut(false);
+        const { backup: backupData } = displayNotifOnErr(await api.delete('/users'));
+        BackupControllerClient.download(backupData, $username, true);
+        await Auth.logOut(false);
     }
 
     let badUsername = false;
