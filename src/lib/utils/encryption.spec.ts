@@ -26,7 +26,23 @@ describe('encryption', () => {
         const plaintext = 'plaintext';
         const ciphertext = encrypt(plaintext, key1);
         const { err, val } = decrypt(ciphertext, key2);
+        console.log('ERR:', err, val);
+        expect(val).toBeUndefined();
         expect(typeof err).toBe('string');
-        expect(!!val).toBe(false);
+    });
+
+    it('fails to decrypt random string', () => {
+        const key1 = 'k'.repeat(32);
+        const ciphertext = 'this is not a valid ciphertext';
+        const { err, val } = decrypt(ciphertext, key1);
+        expect(val).toBeUndefined();
+        expect(typeof err).toBe('string');
+    });
+
+    it('decrypts empty ciphertext as empty plaintext', () => {
+        const key = 'k'.repeat(32);
+        const { err, val } = decrypt('', key);
+        expect(err).toBe(null);
+        expect(val).toBe('');
     });
 });
