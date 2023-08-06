@@ -15,7 +15,6 @@ const reqLogger = new FileLogger('REQ', chalk.bgWhite.black);
 // so it's not re-connected on API request
 setInterval(() => {
     try {
-        cleanupCache();
         if (!dbConnection) {
             void connect();
             return;
