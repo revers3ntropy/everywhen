@@ -26,7 +26,6 @@ describe('encryption', () => {
         const plaintext = 'plaintext';
         const ciphertext = encrypt(plaintext, key1);
         const { err, val } = decrypt(ciphertext, key2);
-        console.log('ERR:', err, val);
         expect(val).toBeUndefined();
         expect(typeof err).toBe('string');
     });
