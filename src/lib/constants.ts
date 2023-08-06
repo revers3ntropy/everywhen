@@ -53,30 +53,32 @@ export const COOKIES_TO_CLEAR_ON_LOGOUT = Object.freeze([]);
 export const OBFUSCATE_CHARS = 'abcdefghijklmnopqrstuvwxyz ';
 
 interface ICookieOptions {
-    rememberMe?: boolean;
-    httpOnly?: boolean;
+    rememberMe: boolean;
+    httpOnly: boolean;
+}
+
+export function maxAgeFromShouldRememberMe(rememberMe: boolean): Seconds {
+    const maxAgeDays = rememberMe ? REMEMBER_ME_COOKIE_TIMEOUT_DAYS : NORMAL_COOKIE_TIMEOUT_DAYS;
+    return maxAgeDays * 24 * 60 * 60;
 }
 
 export function cookieOptions({
     rememberMe,
     httpOnly
-}: ICookieOptions = {}): Readonly<CookieSerializeOptions> {
-    const maxAgeDays = rememberMe ? REMEMBER_ME_COOKIE_TIMEOUT_DAYS : NORMAL_COOKIE_TIMEOUT_DAYS;
-    const maxAgeS = maxAgeDays * 24 * 60 * 60;
-    const maxAgeMs = maxAgeS * 1000;
+}: ICookieOptions): Readonly<CookieSerializeOptions> {
+    const maxAge = maxAgeFromShouldRememberMe(rememberMe);
+    const expires = new Date(Math.floor(Date.now() / 1000) * 1000 + maxAge * 1000);
     return Object.freeze({
         secure: true,
         path: '/',
-        // Kinda needed for GitHub OAuth callback to work smoothly,
-        // if set to 'strict' then the cookie is not sent to the callback page
+        // Needed for GitHub OAuth callback to work smoothly,
+        // if set to 'strict' then no cookies are sent to the callback page
         sameSite: 'lax',
-        // allow the username cookie to be read by the client
-        // so that it can check the auth is still valid
-        // but keep the key cookie httpOnly, to prevent XSS
+        // if true, not readable by client JS
         // https://owasp.org/www-community/HttpOnly
         httpOnly,
-        expires: new Date(Math.floor(Date.now() / 1000) * 1000 + maxAgeMs),
-        maxAge: maxAgeS
+        expires,
+        maxAge
     });
 }
 

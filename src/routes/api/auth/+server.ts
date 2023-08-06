@@ -3,7 +3,7 @@ import { GETParamIsTruthy } from '$lib/utils/GETArgs';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
-import { COOKIE_KEYS, sessionCookieOptions } from '$lib/constants';
+import { COOKIE_KEYS, maxAgeFromShouldRememberMe, sessionCookieOptions } from '$lib/constants';
 import { query } from '$lib/db/mysql.server';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 import { UserControllerServer } from '$lib/controllers/user/user.server';
@@ -18,7 +18,11 @@ export const GET = (async ({ url, cookies }) => {
         throw error(401, 'Invalid login');
     }
 
-    const { err, val: sessionId } = await Auth.Server.authenticateUserFromLogIn(username, key);
+    const { err, val: sessionId } = await Auth.Server.authenticateUserFromLogIn(
+        username,
+        key,
+        maxAgeFromShouldRememberMe(rememberMe)
+    );
     if (err) throw error(401, err);
 
     cookies.set(COOKIE_KEYS.sessionId, sessionId, sessionCookieOptions(rememberMe));
@@ -53,6 +57,7 @@ export const DELETE = (({ cookies }) => {
     invalidateCache(auth.id);
 
     cookies.delete(COOKIE_KEYS.sessionId, sessionCookieOptions(false));
+    Auth.Server.invalidateAllSessionsForUser(auth.id);
 
     return apiResponse(auth, {});
 }) satisfies RequestHandler;

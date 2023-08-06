@@ -14,18 +14,33 @@ namespace AuthServer {
         username: string;
         key: string;
         created: TimestampSecs;
+        expires: TimestampSecs;
     }
 
     const sessions = new Map<string, Session>();
 
+    export function invalidateAllSessionsForUser(userId: string): void {
+        for (const [sessionId, { id }] of sessions.entries()) {
+            if (id === userId) {
+                sessions.delete(sessionId);
+            }
+        }
+    }
+
     export function getSession(id: string): Session | undefined {
-        return sessions.get(id);
+        const session = sessions.get(id);
+        if (!session) return undefined;
+        if (session.expires < nowUtc()) {
+            sessions.delete(id);
+            return undefined;
+        }
+        return session;
     }
 
     export function tryGetAuthFromCookies(cookie: Cookies): Auth | null {
         const session = cookie.get(COOKIE_KEYS.sessionId);
         if (!session) return null;
-        return Auth.Server.getSession(session) ?? null;
+        return getSession(session) ?? null;
     }
 
     export function getAuthFromCookies(cookie: Cookies): Auth {
@@ -36,7 +51,8 @@ namespace AuthServer {
 
     export async function authenticateUserFromLogIn(
         username: string,
-        key: string
+        key: string,
+        expireAfter: Seconds
     ): Promise<Result<string>> {
         const res = await query<{ id: string }[]>`
             SELECT id
@@ -53,7 +69,8 @@ namespace AuthServer {
             id: res[0].id,
             username,
             key,
-            created: nowUtc()
+            created: nowUtc(),
+            expires: nowUtc() + expireAfter
         };
 
         sessions.set(sessionId, session);

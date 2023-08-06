@@ -1,7 +1,7 @@
 import { BackupControllerServer } from '$lib/controllers/backup/backup.server';
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
-import { COOKIE_KEYS, cookieOptions, sessionCookieOptions } from '$lib/constants';
+import { COOKIE_KEYS, maxAgeFromShouldRememberMe, sessionCookieOptions } from '$lib/constants';
 import { query } from '$lib/db/mysql.server';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 import { invalidateCache } from '$lib/utils/cache.server';
@@ -9,7 +9,9 @@ import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import { UserControllerServer } from '$lib/controllers/user/user.server';
 import { Auth } from '$lib/controllers/auth/auth.server';
 
-export const POST = (async ({ request, cookies }) => {
+export const POST = (async ({ request, cookies, locals: { auth } }) => {
+    if (auth && auth.key) throw error(401, 'Invalid authentication');
+
     const body = await getUnwrappedReqBody(null, request, {
         username: 'string',
         password: 'string'
@@ -20,7 +22,8 @@ export const POST = (async ({ request, cookies }) => {
 
     const { err: authErr, val: sessionId } = await Auth.Server.authenticateUserFromLogIn(
         body.username,
-        body.password
+        body.password,
+        maxAgeFromShouldRememberMe(false)
     );
     if (authErr) throw error(401, authErr);
 
@@ -38,18 +41,10 @@ export const DELETE = (async ({ cookies, locals: { auth } }) => {
 
     await UserControllerServer.purge(query, auth);
 
-    cookies.delete(
-        COOKIE_KEYS.sessionId,
-        cookieOptions({
-            httpOnly: true,
-            rememberMe: false
-        })
-    );
+    cookies.delete(COOKIE_KEYS.sessionId, sessionCookieOptions(false));
 
-    const backupEncrypted = BackupControllerServer.asEncryptedString(backup, auth.key);
-
-    return apiResponse(auth, {
-        backup: backupEncrypted
+    return apiResponse(null, {
+        backup: JSON.stringify(backup)
     });
 }) satisfies RequestHandler;
 

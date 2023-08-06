@@ -28,7 +28,7 @@ export class Logger {
                         if (arg instanceof Error) {
                             return arg.stack;
                         }
-                        return JSON.stringify(arg);
+                        return JSON.stringify(arg, null, 4);
                     } else {
                         return arg;
                     }

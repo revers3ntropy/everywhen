@@ -43,6 +43,36 @@ export interface SessionAuth {
     password: string;
 }
 
+export async function genAuthFromUsernameAndPassword(
+    username: string,
+    password: string
+): Promise<SessionAuth> {
+    const api = await generateApiCtx();
+    const key = encryptionKeyFromPassword(password);
+
+    const authRes = await api.get('./auth', {
+        params: {
+            username,
+            key
+        }
+    });
+    if (!authRes.ok()) {
+        throw await authRes.text();
+    }
+
+    const resCookies = cookie.parse(authRes.headers()['set-cookie']);
+    const sessionId = resCookies[COOKIE_KEYS.sessionId];
+    expect(typeof sessionId).toBe('string');
+    expect(sessionId.length).toBe(UUID_LEN);
+
+    return {
+        key,
+        username,
+        password,
+        sessionId
+    };
+}
+
 export async function generateUser(): Promise<{
     auth: SessionAuth;
     api: APIRequestContext;
@@ -64,31 +94,11 @@ export async function generateUser(): Promise<{
         throw await makeRes.text();
     }
 
-    const authRes = await api.get('./auth', {
-        params: {
-            username,
-            key
-        }
-    });
-    if (!authRes.ok()) {
-        throw await authRes.text();
-    }
-
-    const resCookies = cookie.parse(authRes.headers()['set-cookie']);
-    const sessionId = resCookies[COOKIE_KEYS.sessionId];
-    expect(typeof sessionId).toBe('string');
-    expect(sessionId.length).toBe(UUID_LEN);
-
-    const auth: SessionAuth = {
-        key,
-        username,
-        password,
-        sessionId
-    };
+    const auth = await genAuthFromUsernameAndPassword(username, password);
 
     return {
         auth,
-        api: await generateApiCtx(sessionId)
+        api: await generateApiCtx(auth.sessionId)
     };
 }
 
@@ -112,7 +122,13 @@ export async function generateUserAndSignIn(page: Page): Promise<{
 
 export async function deleteUser(api: APIRequestContext): Promise<Result> {
     const res = await api.delete('./users');
-    if (res.ok()) return Result.ok(null);
+    if (res.ok()) {
+        const result = await res.json();
+        if (typeof result?.backup === 'string') {
+            return Result.ok(null);
+        }
+        return Result.err('Failed to delete user: no backup');
+    }
     const body = await res.text();
     try {
         return Result.err(String((JSON.parse(body) as Record<string, unknown>)?.message || body));

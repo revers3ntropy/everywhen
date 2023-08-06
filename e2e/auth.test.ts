@@ -77,7 +77,7 @@ test.describe('/signup', () => {
     });
 
     test('Can log into account', async ({ page }) => {
-        const { auth, api } = await generateUser(page);
+        const { auth, api } = await generateUser();
         await page.goto('/login', { waitUntil: 'networkidle' });
 
         await page.getByLabel('Username').fill(auth.username);

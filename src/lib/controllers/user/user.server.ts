@@ -70,7 +70,7 @@ export namespace UserControllerServer {
                     ${nowUtc()});
         `;
 
-        return Result.ok({ id, username, key: password, ghAccessToken: null });
+        return Result.ok({ id, username, key: password });
     }
 
     export async function purge(query: QueryFunc, auth: Auth): Promise<void> {
@@ -79,6 +79,7 @@ export namespace UserControllerServer {
         await Asset.Server.purgeAll(auth);
         await Event.purgeAll(query, auth);
         await Settings.purgeAll(query, auth);
+        Auth.Server.invalidateAllSessionsForUser(auth.id);
 
         await query`
             DELETE
@@ -138,6 +139,8 @@ export namespace UserControllerServer {
         if (generateErr) return Result.err(generateErr);
 
         const encryptedBackup = BackupControllerServer.asEncryptedString(backup, auth.key);
+
+        Auth.Server.invalidateAllSessionsForUser(auth.id);
 
         await query`
             UPDATE users
