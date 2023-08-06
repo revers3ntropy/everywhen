@@ -1,5 +1,5 @@
 import type { QueryFunc } from '$lib/db/mysql.server';
-import { decrypt, encrypt } from '$lib/utils/encryption/encryption.server';
+import { decrypt, encrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
 import { fmtUtc, nowUtc } from '$lib/utils/time';
 import type { Auth } from '../auth/auth.server';

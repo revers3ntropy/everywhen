@@ -1,9 +1,23 @@
 import { type APIRequestContext, expect, type Page, request } from '@playwright/test';
+import crypto from 'crypto-js';
 import { serialize } from 'cookie';
 import { sha256 } from 'js-sha256';
-import { COOKIE_KEYS, sessionCookieOptions, UUID_LEN } from '../src/lib/constants';
-import { Result } from '../src/lib/utils/result';
 import cookie from 'cookie';
+import dotenv from 'dotenv';
+import { Result } from '../src/lib/utils/result';
+import { COOKIE_KEYS, sessionCookieOptions, UUID_LEN } from '../src/lib/constants';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+global.__filename = __filename;
+global.__dirname = __dirname;
+
+dotenv.config({ path: `${__dirname}/../.env` });
+
+const { PUBLIC_INIT_VECTOR } = process.env as Record<string, string>;
+if (!PUBLIC_INIT_VECTOR) throw new Error('Missing PUBLIC_INIT_VECTOR');
 
 export function encryptionKeyFromPassword(pass: string): string {
     return sha256(pass).substring(0, 32);
@@ -123,4 +137,31 @@ export async function generateApiCtx(session: string | null = null): Promise<API
                 : ''
         }
     });
+}
+
+export function encrypt(plaintext: string, key: string | null): string {
+    if (!key) throw new Error();
+    const encrypted = crypto.AES.encrypt(plaintext, crypto.enc.Utf8.parse(key), {
+        iv: crypto.enc.Utf8.parse(PUBLIC_INIT_VECTOR)
+    });
+    return crypto.enc.Hex.stringify(encrypted.ciphertext);
+}
+
+export function decrypt(ciphertext: string, key: string | null): Result<string> {
+    if (!key) {
+        return Result.err('Failed to decrypt data');
+    }
+    try {
+        const decrypted = crypto.AES.decrypt(
+            crypto.enc.Hex.parse(ciphertext).toString(crypto.enc.Base64),
+            crypto.enc.Utf8.parse(key),
+            {
+                iv: crypto.enc.Utf8.parse(PUBLIC_INIT_VECTOR)
+            }
+        );
+        const plaintext = decrypted.toString(crypto.enc.Utf8);
+        return Result.ok(plaintext);
+    } catch (e) {
+        return Result.err('Failed to decrypt data');
+    }
 }

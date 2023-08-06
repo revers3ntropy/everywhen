@@ -14,6 +14,7 @@ export const PUT = (async ({ cookies, request, params }) => {
     invalidateCache(auth.id);
 
     const body = await getUnwrappedReqBody(
+        auth,
         request,
         {
             name: 'string',

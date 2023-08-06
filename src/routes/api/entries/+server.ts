@@ -1,4 +1,4 @@
-import { decrypt } from '$lib/utils/encryption/encryption.server';
+import { decrypt } from '$lib/utils/encryption';
 import { error } from '@sveltejs/kit';
 import { Entry } from '$lib/controllers/entry/entry';
 import { Label } from '$lib/controllers/label/label';
@@ -47,6 +47,7 @@ export const POST = (async ({ request, cookies }) => {
     invalidateCache(auth.id);
 
     const body = await getUnwrappedReqBody(
+        auth,
         request,
         {
             created: 'number',

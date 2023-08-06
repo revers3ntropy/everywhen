@@ -11,7 +11,7 @@ import type {
     ThirdPartyDatasetIds
 } from './dataset';
 import { nowUtc } from '$lib/utils/time';
-import { decrypt, encrypt } from '$lib/utils/encryption/encryption.server';
+import { decrypt, encrypt } from '$lib/utils/encryption';
 import type { Auth } from '$lib/controllers/auth/auth';
 import { UUIdControllerServer } from '$lib/controllers/uuid/uuid.server';
 

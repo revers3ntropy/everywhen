@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
-import { expectDeleteUser, generateUserAndSignIn } from './helpers';
+import { UUID_LEN } from '../src/lib/constants';
+import { decrypt, expectDeleteUser, generateUserAndSignIn } from './helpers';
 
 const LONG_TEXT =
     'The very long body of the entry which is too long' +
@@ -55,21 +56,22 @@ test.describe('/journal', () => {
     });
 
     test('Can mark entry as favourite and unfavourite', async ({ page }) => {
-        const { api } = await generateUserAndSignIn(page);
+        const { api, auth } = await generateUserAndSignIn(page);
 
         const entry = LONG_TEXT;
-        const makeEntryRes = await api.post('./entries', {
-            data: { entry }
-        });
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const { id } = await makeEntryRes.json();
+        const makeEntryRes = await (
+            await api.post('./entries', {
+                data: JSON.stringify({ entry })
+            })
+        ).text();
+        const { id } = JSON.parse(decrypt(makeEntryRes, auth.key).val);
         expect(typeof id === 'string').toBe(true);
         if (typeof id !== 'string') throw id;
-        expect(id).toHaveLength(32);
+        expect(id).toHaveLength(UUID_LEN);
 
         await page.goto('/journal');
         // must scroll entries into view to load them
-        await page.mouse.wheel(0, 10000);
+        await page.mouse.wheel(0, 1000);
         await expect(page.getByText(entry)).toBeAttached();
 
         // can pin entry
@@ -82,7 +84,7 @@ test.describe('/journal', () => {
 
         await page.reload();
         // force entries to load
-        await page.mouse.wheel(0, 10000);
+        await page.mouse.wheel(0, 1000);
 
         // can pin entry
         await page.locator(`[id="${id}"]`).getByRole('button', { name: 'Open popup' }).click();

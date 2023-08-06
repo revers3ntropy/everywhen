@@ -32,7 +32,7 @@ export const PUT = (async ({ request, cookies }) => {
     const auth = Auth.Server.getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
-    const { newPassword, currentPassword } = await getUnwrappedReqBody(request, {
+    const { newPassword, currentPassword } = await getUnwrappedReqBody(auth, request, {
         currentPassword: 'string',
         newPassword: 'string'
     });

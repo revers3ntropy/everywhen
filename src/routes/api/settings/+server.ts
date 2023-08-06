@@ -19,7 +19,7 @@ export const PUT = (async ({ request, cookies }) => {
     const auth = Auth.Server.getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
-    const body = await getUnwrappedReqBody(request, {
+    const body = await getUnwrappedReqBody(auth, request, {
         key: 'string',
         value: 'any'
     });

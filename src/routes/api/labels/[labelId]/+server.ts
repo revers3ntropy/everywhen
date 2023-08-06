@@ -20,6 +20,7 @@ export const PUT = (async ({ cookies, request, params }) => {
     invalidateCache(auth.id);
 
     const body = await getUnwrappedReqBody(
+        auth,
         request,
         {
             name: 'string',
@@ -77,6 +78,7 @@ export const DELETE = (async ({ cookies, params, request }) => {
     }
 
     const { strategy, newLabelId } = await getUnwrappedReqBody(
+        auth,
         request,
         {
             strategy: 'string',

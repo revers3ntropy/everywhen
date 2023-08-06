@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { ChangeEventHandler } from 'svelte/elements';
     import { goto } from '$app/navigation';
-    import { encrypt } from '$lib/utils/encryption/encryption.client';
+    import { encrypt } from '$lib/utils/encryption';
     import { encryptionKey } from '$lib/stores';
 
     export let value = '';

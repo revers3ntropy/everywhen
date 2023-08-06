@@ -1,8 +1,8 @@
 import { PUBLIC_INIT_VECTOR } from '$env/static/public';
 import crypto from 'crypto-js';
 import { notify } from '$lib/components/notifications/notifications';
-import { clientLogger } from '$lib/utils/log';
-import { Result } from '$lib/utils/result';
+import { clientLogger } from './log';
+import { Result } from './result';
 
 export function encrypt(plaintext: string, key: string | null): string {
     if (!key) {

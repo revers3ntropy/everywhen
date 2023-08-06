@@ -24,7 +24,7 @@ export const POST = (async ({ cookies, request, params }) => {
     const auth = Auth.Server.getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
-    const body = await getUnwrappedReqBody(request, {
+    const body = await getUnwrappedReqBody(auth, request, {
         rows: 'object'
     });
 

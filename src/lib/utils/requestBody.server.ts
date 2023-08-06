@@ -1,9 +1,12 @@
+import type { Auth } from '$lib/controllers/auth/auth';
+import { decrypt } from '$lib/utils/encryption';
 import { error } from '@sveltejs/kit';
 import schemion, { type Schema, type SchemaResult } from 'schemion';
 import { errorLogger } from './log.server';
 import { Result } from './result';
 
-export async function bodyFromReq<T extends Schema & object>(
+export async function bodyFromReq<T extends Schema & Record<string, unknown>>(
+    key: Auth | string | null,
     request: Request,
     schema: T,
     defaults: { [P in keyof T]?: SchemaResult<T[P]> | undefined } = {}
@@ -18,9 +21,30 @@ export async function bodyFromReq<T extends Schema & object>(
         return Result.err('Invalid content type on body');
     }
 
-    const body = (await request.json()) as Record<string, unknown> | null;
+    if (typeof key === 'object' && key !== null) {
+        key = key.key;
+    }
+
+    const bodyText = await request.text();
+    let body: unknown;
+    try {
+        body = JSON.parse(bodyText);
+    } catch (e) {
+        if (!key) {
+            return Result.err('Invalid request body');
+        }
+        const { err, val: decryptedRes } = decrypt(bodyText, key);
+        if (err) return Result.err(err);
+
+        try {
+            body = JSON.parse(decryptedRes);
+        } catch (e) {
+            return Result.err('Invalid request body');
+        }
+    }
+
     if (typeof body !== 'object' || body === null) {
-        return Result.err('Invalid body: not JSON');
+        return Result.err('Invalid request body');
     }
 
     if (
@@ -40,16 +64,17 @@ export async function bodyFromReq<T extends Schema & object>(
 
 export async function getUnwrappedReqBody<
     T extends Schema &
-        object & {
+        Record<string, unknown> & {
             timezoneUtcOffset?: 'number';
             utcTimeS?: 'number';
         }
 >(
+    key: Auth | string | null,
     request: Request,
     valueType: T,
     defaults: { [P in keyof T]?: SchemaResult<T[P]> } = {}
 ): Promise<Readonly<SchemaResult<T>>> {
-    const res = await bodyFromReq(request, valueType, defaults);
+    const res = await bodyFromReq(key, request, valueType, defaults);
     if (res.err) {
         throw error(400, res.err);
     }

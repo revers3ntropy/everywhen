@@ -22,7 +22,7 @@ export const DELETE = (async ({ request, params, cookies }) => {
     if (!params.entryId) throw error(400, 'invalid id');
     invalidateCache(auth.id);
 
-    const body = await getUnwrappedReqBody(request, {
+    const body = await getUnwrappedReqBody(auth, request, {
         restore: 'boolean'
     });
 
@@ -38,6 +38,7 @@ export const PUT = (async ({ request, params, cookies }) => {
     invalidateCache(auth.id);
 
     const body = await getUnwrappedReqBody(
+        auth,
         request,
         {
             title: 'string',

@@ -40,13 +40,7 @@ export function getConfig(): mysql.ConnectionOptions {
 }
 
 function logQuery(query: string, params: unknown[], result: unknown, time: Milliseconds) {
-    params = params.map(p => {
-        if (typeof p === 'string') {
-            return `String(${p.length})`;
-        } else {
-            return JSON.stringify(p);
-        }
-    });
+    params = params.map(p => JSON.stringify(p));
 
     let resultStr = JSON.stringify(result);
     if (Array.isArray(result)) {

@@ -1,3 +1,4 @@
+import { browser } from '$app/environment';
 import { writable } from 'svelte/store';
 import type { Result } from '$lib/utils/result';
 
@@ -39,6 +40,7 @@ export const notify: Notify = (
     type = NotificationType.INFO,
     timeout = 3000
 ): void => {
+    if (!browser) return;
     addNotification({
         text,
         type,

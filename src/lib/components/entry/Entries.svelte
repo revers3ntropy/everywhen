@@ -8,7 +8,7 @@
     import type { EntryFilter } from '$lib/controllers/entry/entry';
     import { encryptionKey, obfuscated } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
-    import { encrypt } from '$lib/utils/encryption/encryption.client';
+    import { encrypt } from '$lib/utils/encryption';
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import type { EntryFormMode } from '$lib/components/entryForm/entryFormMode';

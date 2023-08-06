@@ -50,7 +50,7 @@ namespace AuthServer {
         const sessionId = await UUIdControllerServer.generate();
 
         const session: Session = {
-            id: sessionId,
+            id: res[0].id,
             username,
             key,
             created: nowUtc()

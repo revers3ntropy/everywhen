@@ -10,7 +10,7 @@ import { UserControllerServer } from '$lib/controllers/user/user.server';
 import { Auth } from '$lib/controllers/auth/auth.server';
 
 export const POST = (async ({ request, cookies }) => {
-    const body = await getUnwrappedReqBody(request, {
+    const body = await getUnwrappedReqBody(null, request, {
         username: 'string',
         password: 'string'
     });

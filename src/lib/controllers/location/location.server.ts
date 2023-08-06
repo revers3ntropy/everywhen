@@ -1,6 +1,6 @@
 import type { ResultSetHeader } from 'mysql2';
 import type { QueryFunc } from '$lib/db/mysql.server';
-import { decrypt, encrypt } from '$lib/utils/encryption/encryption.server';
+import { decrypt, encrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
 import { Location as _Location } from './location';
 import type { Auth } from '$lib/controllers/auth/auth.server';
