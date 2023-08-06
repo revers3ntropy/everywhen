@@ -1,12 +1,10 @@
 import { PUBLIC_INIT_VECTOR } from '$env/static/public';
 import crypto from 'crypto-js';
-import { notify } from '$lib/components/notifications/notifications';
 import { clientLogger } from './log';
 import { Result } from './result';
 
 export function encrypt(plaintext: string, key: string | null): string {
     if (!key) {
-        notify.error('Failed to encrypt data');
         clientLogger.error(key);
         throw new Error();
     }
@@ -16,7 +14,6 @@ export function encrypt(plaintext: string, key: string | null): string {
         });
         return crypto.enc.Hex.stringify(encrypted.ciphertext);
     } catch (e) {
-        notify.error('Failed to encrypt data');
         clientLogger.error(e);
         throw new Error();
     }
@@ -37,7 +34,6 @@ export function decrypt(ciphertext: string, key: string | null): Result<string> 
         const plaintext = decrypted.toString(crypto.enc.Utf8);
         return Result.ok(plaintext);
     } catch (e) {
-        notify.error('Failed to decrypt data');
         clientLogger.log({ ciphertext, key, keyLen: key.length });
         clientLogger.error(e);
         return Result.err('Failed to decrypt data');
