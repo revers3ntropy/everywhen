@@ -5,10 +5,11 @@ import { Result } from './result';
 
 const wordArrayIv = crypto.enc.Utf8.parse(PUBLIC_INIT_VECTOR);
 
-export function encrypt(plaintext: string, key: string | null): string {
+export function encrypt(plaintext: string, key: string | null, emptyOnNoKey = false): string {
     if (!key) {
+        if (emptyOnNoKey) return '';
         clientLogger.error(key);
-        throw new Error();
+        throw new Error('No key');
     }
     try {
         const encrypted = crypto.AES.encrypt(plaintext, crypto.enc.Utf8.parse(key), {
@@ -16,9 +17,9 @@ export function encrypt(plaintext: string, key: string | null): string {
         });
         return crypto.enc.Hex.stringify(encrypted.ciphertext);
     } catch (e) {
-        clientLogger.log({ plaintext, key, keyLen: key.length });
+        clientLogger.trace({ plaintext, key, keyLen: key.length });
         clientLogger.error(e);
-        throw new Error();
+        throw new Error(JSON.stringify(e));
     }
 }
 

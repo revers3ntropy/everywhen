@@ -38,7 +38,11 @@ export class Logger {
     }
 
     public log(...args: unknown[]): void {
-        this.logger.info(this.fmt(false, ...args));
+        this.logger.log(this.fmt(false, ...args));
+    }
+
+    public trace(...args: unknown[]): void {
+        this.logger.trace(this.fmt(false, ...args));
     }
 
     public warn(...args: unknown[]): void {

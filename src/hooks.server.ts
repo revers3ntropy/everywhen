@@ -118,6 +118,8 @@ function getCookieWritableCookies(cookies: Cookies): App.Locals['__cookieWritabl
         }
     }
 
+    delete result.sessionId;
+
     return result as App.Locals['__cookieWritables'];
 }
 

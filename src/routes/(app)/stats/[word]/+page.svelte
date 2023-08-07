@@ -81,7 +81,7 @@
         <section class="entries">
             <Entries
                 options={{
-                    search: encrypt(data.theWord, $encryptionKey)
+                    search: encrypt(data.theWord, $encryptionKey, true)
                 }}
                 showSearch={false}
             />

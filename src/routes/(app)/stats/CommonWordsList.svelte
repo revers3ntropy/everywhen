@@ -10,7 +10,7 @@
     {#each words as [word, count], i}
         <div>#{i + 1}</div>
         <a
-            href="/stats/{encrypt(word, $encryptionKey)}"
+            href="/stats/{encrypt(word, $encryptionKey, true)}"
             class="word"
             data-sveltekit-preload-data="tap"
         >

@@ -444,7 +444,7 @@ async function getAndCheckVersions() {
     return { remoteVersion, localVersion };
 }
 
-async function preCommit() {
+async function checkAndTest() {
     await $`bin/precommit --reporter=line`;
 }
 
@@ -494,16 +494,18 @@ async function main() {
 
     const migrations = await getMigrations(remoteVersion, localVersion);
 
-    await preCommit();
+    await checkAndTest();
+
     await build();
 
     const serverDownStart = now();
+
     await tearDownRemote();
+
     // must do between stopping the server and deleting remote dir
     await doMigrations(migrations);
 
     await setupLibWebP();
-
     await upload();
 
     await restartServer(localVersion);
