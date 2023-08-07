@@ -1,4 +1,8 @@
-import { COOKIES_TO_CLEAR_ON_LOGOUT, LS_TO_CLEAR_ON_LOGOUT } from '$lib/constants';
+import {
+    COOKIES_TO_CLEAR_ON_LOGOUT,
+    LS_TO_CLEAR_ON_LOGOUT,
+    SESSION_TO_CLEAR_ON_LOGOUT
+} from '$lib/constants';
 import { decrypt } from '$lib/utils/encryption';
 import Cookie from 'js-cookie';
 import { api } from '$lib/utils/apiRequest';
@@ -11,14 +15,27 @@ export interface Auth {
     key: string;
 }
 
-export type RawAuth = Omit<Auth, 'id'>;
-
 export namespace Auth {
+    function removeFromStorageAndEmitEvent(storage: Storage, key: string) {
+        const oldValue = storage.getItem(key);
+        storage.removeItem(key);
+        window.dispatchEvent(
+            new StorageEvent('storage', {
+                key,
+                oldValue,
+                newValue: null,
+                storageArea: storage
+            })
+        );
+    }
+
     export async function logOut(wantsToStay = false) {
         for (const key of LS_TO_CLEAR_ON_LOGOUT) {
-            localStorage.removeItem(key);
+            removeFromStorageAndEmitEvent(localStorage, key);
         }
-
+        for (const key of SESSION_TO_CLEAR_ON_LOGOUT) {
+            removeFromStorageAndEmitEvent(sessionStorage, key);
+        }
         for (const key of COOKIES_TO_CLEAR_ON_LOGOUT) {
             Cookie.remove(key);
         }

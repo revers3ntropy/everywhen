@@ -2,16 +2,12 @@ import { browser } from '$app/environment';
 import { Auth } from '$lib/controllers/auth/auth';
 import { encryptionKey } from '$lib/stores';
 import { encrypt } from '$lib/utils/encryption';
+import { get } from 'svelte/store';
 import type { apiRes404, GenericResponse } from './apiResponse.server';
 import { serializeGETArgs } from './GETArgs';
 import { clientLogger } from './log';
 import { Result } from './result';
 import { currentTzOffset, nowUtc } from './time';
-
-let latestEncryptionKey: string | null = null;
-encryptionKey.subscribe(key => {
-    latestEncryptionKey = key;
-});
 
 export type ReqBody = {
     timezoneUtcOffset?: number;
@@ -135,7 +131,12 @@ export async function makeApiReq<
     Verb extends keyof ApiResponse,
     Path extends keyof ApiResponse[Verb],
     Body extends ReqBody
->(method: Verb, path: string, body: Body | null = null): Promise<Result<ApiResponse[Verb][Path]>> {
+>(
+    method: Verb,
+    path: string,
+    body: Body | null = null,
+    encryptBody = true
+): Promise<Result<ApiResponse[Verb][Path]>> {
     const url = `/api${path}`;
     if (!browser) {
         return Result.err(`Cannot make API request on server`);
@@ -161,8 +162,10 @@ export async function makeApiReq<
         }
     };
 
+    const latestEncryptionKey = get(encryptionKey);
+
     if (body) {
-        if (latestEncryptionKey) {
+        if (latestEncryptionKey && encryptBody) {
             init.body = encrypt(JSON.stringify(body), latestEncryptionKey);
         } else {
             init.body = JSON.stringify(body);
@@ -210,23 +213,33 @@ export async function makeApiReq<
 export const api = {
     get: async <Path extends keyof ApiResponse['GET'], Body extends ReqBody>(
         path: Path,
-        args: Record<string, string | number | boolean | undefined> = {}
-    ) => await makeApiReq<'GET', Path, Body>('GET', path + serializeGETArgs(args)),
+        args: Record<string, string | number | boolean | undefined> = {},
+        encryptBodyIfCan = true
+    ) =>
+        await makeApiReq<'GET', Path, Body>(
+            'GET',
+            path + serializeGETArgs(args),
+            null,
+            encryptBodyIfCan
+        ),
 
     post: async <Path extends keyof ApiResponse['POST'], Body extends ReqBody>(
         path: Path,
-        body: Body = {} as Body
-    ) => await makeApiReq<'POST', Path, Body>('POST', path, body),
+        body: Body = {} as Body,
+        encryptBodyIfCan = true
+    ) => await makeApiReq<'POST', Path, Body>('POST', path, body, encryptBodyIfCan),
 
     put: async <Path extends keyof ApiResponse['PUT'], Body extends ReqBody>(
         path: Path,
-        body: Body = {} as Body
-    ) => await makeApiReq<'PUT', Path, Body>('PUT', path, body),
+        body: Body = {} as Body,
+        encryptBodyIfCan = true
+    ) => await makeApiReq<'PUT', Path, Body>('PUT', path, body, encryptBodyIfCan),
 
     delete: async <Path extends keyof ApiResponse['DELETE'], Body extends ReqBody>(
         path: Path,
-        body: Body = {} as Body
-    ) => await makeApiReq<'DELETE', Path, Body>('DELETE', path, body)
+        body: Body = {} as Body,
+        encryptBodyIfCan = true
+    ) => await makeApiReq<'DELETE', Path, Body>('DELETE', path, body, encryptBodyIfCan)
 };
 
 // eg '/labels/?', '1' ==> '/labels/1' but returns '/labels/?' as type

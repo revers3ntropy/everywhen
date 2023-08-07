@@ -21,10 +21,14 @@
         $encryptionKey = key;
 
         displayNotifOnErr(
-            await api.post(`/users`, {
-                password: key,
-                username
-            }),
+            await api.post(
+                `/users`,
+                {
+                    password: key,
+                    username
+                },
+                false
+            ),
             () => (actionPending = false)
         );
 

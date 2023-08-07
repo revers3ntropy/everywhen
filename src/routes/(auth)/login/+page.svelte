@@ -21,11 +21,15 @@
         $encryptionKey = key;
 
         const auth = displayNotifOnErr(
-            await api.get('/auth', {
-                key,
-                username,
-                rememberMe: rememberMeInput.checked
-            }),
+            await api.get(
+                '/auth',
+                {
+                    key,
+                    username,
+                    rememberMe: rememberMeInput.checked
+                },
+                false
+            ),
             () => (actionPending = false)
         );
 
