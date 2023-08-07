@@ -1,5 +1,6 @@
 import { browser } from '$app/environment';
 import { DB, DB_HOST, DB_PASS, DB_PORT, DB_USER } from '$env/static/private';
+import { recursivelyTrimStrings } from '$lib/utils/text';
 import chalk from 'chalk';
 import mysql from 'mysql2/promise';
 import '../require';
@@ -42,10 +43,8 @@ export function getConfig(): mysql.ConnectionOptions {
 function logQuery(query: string, params: unknown[], result: unknown, time: Milliseconds) {
     params = params.map(p => JSON.stringify(p));
 
-    let resultStr = JSON.stringify(result);
-    if (Array.isArray(result)) {
-        resultStr = `Array(${result.length})`;
-    }
+    let resultStr = JSON.stringify(recursivelyTrimStrings(result, 20));
+
     if (
         typeof result === 'object' &&
         result !== null &&

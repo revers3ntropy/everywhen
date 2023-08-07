@@ -1,6 +1,7 @@
 import { browser } from '$app/environment';
-import { decrypt } from '$lib/utils/encryption';
+import { Auth } from '$lib/controllers/auth/auth';
 import { encryptionKey } from '$lib/stores';
+import { encrypt } from '$lib/utils/encryption';
 import type { apiRes404, GenericResponse } from './apiResponse.server';
 import { serializeGETArgs } from './GETArgs';
 import { clientLogger } from './log';
@@ -108,14 +109,11 @@ async function handleOkResponse(
         jsonRes = JSON.parse(textResult);
     } catch (e) {
         if (!key) {
-            clientLogger.error(
-                `Can't parse response and no encryptionKey (${method} ${url})`,
-                textResult
-            );
-            return Result.err('Invalid response from server');
+            await Auth.logOut();
+            return Result.err('Invalid auth');
         }
-        const { err, val: decryptedRes } = decrypt(textResult, key);
-        if (err) return Result.err(err);
+
+        const decryptedRes = Auth.decryptOrLogOut(textResult, key);
 
         try {
             jsonRes = JSON.parse(decryptedRes);
@@ -164,7 +162,11 @@ export async function makeApiReq<
     };
 
     if (body) {
-        init.body = JSON.stringify(body);
+        if (latestEncryptionKey) {
+            init.body = encrypt(JSON.stringify(body), latestEncryptionKey);
+        } else {
+            init.body = JSON.stringify(body);
+        }
     }
 
     const response = await fetch(url, init);

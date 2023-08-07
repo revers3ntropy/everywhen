@@ -102,3 +102,17 @@ export function removeAnsi(str: string): string {
 export function capitalise(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+export function recursivelyTrimStrings<T>(obj: T, maxStrLen = 10): T {
+    if (typeof obj === 'string') {
+        return (obj.length > maxStrLen ? obj.slice(0, maxStrLen) + '...' : obj) as T;
+    } else if (typeof obj === 'object' && obj !== null) {
+        if (Array.isArray(obj)) {
+            return obj.map(o => recursivelyTrimStrings(o, maxStrLen)) as T;
+        }
+        return Object.fromEntries(
+            Object.entries(obj).map(([k, v]) => [k, recursivelyTrimStrings(v, maxStrLen)])
+        ) as T;
+    }
+    return obj;
+}

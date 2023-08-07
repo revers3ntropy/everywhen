@@ -19,20 +19,35 @@ namespace AuthServer {
 
     const sessions = new Map<string, Session>();
 
-    export function invalidateAllSessionsForUser(userId: string): void {
-        for (const [sessionId, { id }] of sessions.entries()) {
-            if (id === userId) {
+    setInterval(() => {
+        const now = nowUtc();
+        for (const [sessionId, { expires }] of sessions.entries()) {
+            if (expires < now) {
                 sessions.delete(sessionId);
             }
         }
+    }, 5 * 1000);
+
+    /**
+     * @returns the number of sessions deleted
+     */
+    export function invalidateAllSessionsForUser(userId: string): number {
+        let deletes = 0;
+        for (const [sessionId, { id }] of sessions.entries()) {
+            if (id === userId) {
+                deletes++;
+                sessions.delete(sessionId);
+            }
+        }
+        return deletes;
     }
 
-    export function getSession(id: string): Session | undefined {
+    export function getSession(id: string): Session | null {
         const session = sessions.get(id);
-        if (!session) return undefined;
+        if (!session) return null;
         if (session.expires < nowUtc()) {
             sessions.delete(id);
-            return undefined;
+            return null;
         }
         return session;
     }

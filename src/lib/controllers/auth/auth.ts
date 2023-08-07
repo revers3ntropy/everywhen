@@ -1,4 +1,5 @@
 import { COOKIES_TO_CLEAR_ON_LOGOUT, LS_TO_CLEAR_ON_LOGOUT } from '$lib/constants';
+import { decrypt } from '$lib/utils/encryption';
 import Cookie from 'js-cookie';
 import { api } from '$lib/utils/apiRequest';
 import { goto } from '$app/navigation';
@@ -30,6 +31,16 @@ export namespace Auth {
         } else {
             await goto('/');
         }
+    }
+
+    export function decryptOrLogOut(ciphertext: string, key: string | null): string {
+        const { err, val } = decrypt(ciphertext, key);
+        if (err) {
+            void logOut();
+            console.error(err);
+            throw new Error('Could not decrypt');
+        }
+        return val;
     }
 
     export function encryptionKeyFromPassword(pass: string): string {
