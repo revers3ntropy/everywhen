@@ -1,3 +1,4 @@
+import { clientLogger } from '$lib/utils/log';
 import moment from 'moment/moment';
 import { capitalise } from '$lib/utils/text';
 import { dayUtcFromTimestamp, fmtUtc, nowUtc } from '$lib/utils/time';
@@ -75,14 +76,14 @@ function datasetFactoryForStandardBuckets(
     }
 
     function bucketiseTime(time: Seconds, bucket: Bucket): Seconds {
-        const date = moment(new Date(time * 1000));
+        const date = moment.utc(time * 1000);
         switch (bucket) {
             case Bucket.Year:
                 return date.startOf('year').unix();
             case Bucket.Month:
                 return date.startOf('month').unix();
             case Bucket.Week:
-                return date.startOf('week').unix();
+                return date.startOf('isoWeek').unix();
             case Bucket.Day:
                 return dayUtcFromTimestamp(time, 0);
         }
@@ -90,7 +91,7 @@ function datasetFactoryForStandardBuckets(
     }
 
     return (sortedEntries: EntryWithWordCount[], by: By): Record<string | number, number> => {
-        const start = Entry.localTime(sortedEntries[0]);
+        const start = sortedEntries[0].created;
 
         const buckets: Record<string, number> = {};
         const end = nowUtc() + bucketSize(selectedBucket);
@@ -107,8 +108,8 @@ function datasetFactoryForStandardBuckets(
         }
 
         if (isNaN(Object.values(buckets).reduce((a, b) => a + b, 0))) {
-            console.error(buckets);
-            console.error('NaN in buckets');
+            clientLogger.error(buckets);
+            clientLogger.error('NaN in buckets');
         }
 
         const lastBucket = Object.keys(buckets)

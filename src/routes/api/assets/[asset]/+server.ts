@@ -1,3 +1,4 @@
+import { errorLogger } from '$lib/utils/log.server';
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
 import {
@@ -29,7 +30,7 @@ export const GET = (async ({ params, url, cookies }) => {
     let img;
     // backwards compatibility with old image formats
     if (/^data:image\/((jpeg)|(jpg)|(png));base64,/i.test(asset.content)) {
-        console.log('\n\n   !! Converting image to webp\n\n');
+        await errorLogger.log('\n\n   !! Converting image to webp !!\n\n');
         const fileExt = asset.fileName.split('.').pop();
         if (!fileExt) throw error(400, 'No file extension on image');
         const contentType = fileExtToContentType[fileExt];
