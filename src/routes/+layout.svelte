@@ -1,10 +1,10 @@
 <script lang="ts">
-    import '../app.less';
-    import { browser } from '$app/environment';
     import type { PageData } from './$types';
-    import { onMount } from 'svelte';
+    import { browser } from '$app/environment';
     import { navigating } from '$app/stores';
+    import { onMount } from 'svelte';
     import Modal from 'svelte-simple-modal';
+    import '../app.less';
     import Notifications from '$lib/components/notifications/Notifications.svelte';
     import { POLL_FOR_UPDATE_INTERVAL } from '$lib/constants';
     import { populateCookieWritablesWithCookies, popup, theme } from '$lib/stores';

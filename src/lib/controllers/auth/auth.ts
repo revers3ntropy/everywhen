@@ -1,3 +1,4 @@
+import { browser } from '$app/environment';
 import {
     COOKIES_TO_CLEAR_ON_LOGOUT,
     LS_TO_CLEAR_ON_LOGOUT,
@@ -30,6 +31,8 @@ export namespace Auth {
     }
 
     export async function logOut(wantsToStay = false) {
+        if (!browser) return;
+
         for (const key of LS_TO_CLEAR_ON_LOGOUT) {
             removeFromStorageAndEmitEvent(localStorage, key);
         }

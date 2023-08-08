@@ -16,6 +16,8 @@
 
     export let data: PageData;
 
+    let { assets, assetCount } = data;
+
     async function loadMoreAssets(
         offset: number,
         count: number
@@ -35,19 +37,17 @@
         }
         const { id, publicId, fileName } = res;
 
-        data = {
-            ...data,
-            assets: [
-                {
-                    id,
-                    publicId,
-                    fileName,
-                    created: nowUtc()
-                },
-                ...data.assets
-            ],
-            assetCount: data.assetCount + 1
-        };
+        assets = [
+            {
+                id,
+                publicId,
+                fileName,
+                created: nowUtc()
+            },
+            ...assets
+        ];
+
+        assetCount = assetCount + 1;
     }) as ChangeEventHandler<HTMLInputElement>;
 
     let fileDropInput: HTMLInputElement;
@@ -75,33 +75,29 @@
         <div class="flex-center" style="font-size: 40px;">
             <ImageOutline size="40" />
             <span> Gallery </span>
-            {#if data.assetCount > 0}
+            {#if assetCount > 0}
                 <Dot light />
-                <span class="text-light">{data.assetCount}</span>
+                <span class="text-light">{assetCount}</span>
             {/if}
         </div>
         <div />
     </div>
 
-    {#if data.assetCount === 0}
+    {#if assetCount === 0}
         <div class="flex-center container invisible">
             <i>No images yet</i>
         </div>
     {:else}
         <InfiniteScroller
-            bind:items={data.assets}
+            bind:items={assets}
             batchSize={4}
-            numItems={data.assetCount}
+            numItems={assetCount}
             loadItems={loadMoreAssets}
             margin="{browser ? innerHeight : 1000}px"
         >
             <div class="assets">
-                {#each data.assets as asset}
-                    <Asset
-                        {...asset}
-                        on:delete={() => data.assetCount--}
-                        obfuscated={$obfuscated}
-                    />
+                {#each assets as asset}
+                    <Asset {...asset} on:delete={() => assetCount--} obfuscated={$obfuscated} />
                 {/each}
             </div>
         </InfiniteScroller>

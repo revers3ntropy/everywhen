@@ -1,4 +1,5 @@
 import { PUBLIC_INIT_VECTOR } from '$env/static/public';
+import { recursivelyTrimStrings } from '$lib/utils/text';
 import crypto from 'crypto-js';
 import { clientLogger } from './log';
 import { Result } from './result';
@@ -17,7 +18,7 @@ export function encrypt(plaintext: string, key: string | null, emptyOnNoKey = fa
         });
         return crypto.enc.Hex.stringify(encrypted.ciphertext);
     } catch (e) {
-        clientLogger.trace({ plaintext, key, keyLen: key.length });
+        clientLogger.trace(recursivelyTrimStrings({ plaintext, key, keyLen: key.length }));
         clientLogger.error(e);
         throw new Error(JSON.stringify(e));
     }
