@@ -3,7 +3,7 @@
     import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import { api } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/components/notifications/notifications';
+    import { notify } from '$lib/components/notifications/notifications';
     import { nowUtc } from '$lib/utils/time';
     import { listen } from '$lib/dataChangeEvents';
     import Dot from '$lib/components/Dot.svelte';
@@ -23,7 +23,7 @@
             color: '#000'
         };
 
-        const { id } = displayNotifOnErr(await api.post('/labels', newLabel));
+        const { id } = notify.onErr(await api.post('/labels', newLabel));
 
         data = {
             ...data,

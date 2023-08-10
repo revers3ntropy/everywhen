@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { displayNotifOnErr } from '$lib/components/notifications/notifications.js';
+    import { notify } from '$lib/components/notifications/notifications.js';
     import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
     import { page } from '$app/stores';
@@ -23,7 +23,7 @@
             return;
         }
 
-        displayNotifOnErr(
+        notify.onErr(
             await api.post('/oauth/gh', {
                 code,
                 state: stateFromGH

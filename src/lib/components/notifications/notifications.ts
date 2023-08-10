@@ -22,6 +22,10 @@ export interface Notify {
     info(text: string, timeout?: Milliseconds): void;
     success(text: string, timeout?: Milliseconds): void;
     error(text: string, timeout?: Milliseconds): void;
+    onErr<T extends NonNullable<unknown>>(
+        result: Result<T>,
+        onErr?: (err: string | null) => unknown
+    ): T;
 }
 
 export function removeNotification(notification: Notification) {
@@ -57,11 +61,10 @@ notify.error = (text: string, timeout: Milliseconds = 5000) => {
     console.error(text);
     notify(text, NotificationType.ERROR, timeout);
 };
-
-export function displayNotifOnErr<T extends NonNullable<unknown>>(
+notify.onErr = <T extends NonNullable<unknown>>(
     { err, val }: Result<T>,
     onErr: (err: string | null) => unknown = () => 0
-): T {
+): T => {
     if (err) {
         try {
             err = (JSON.parse(err) as Record<string, string>)?.['message'] || err;
@@ -73,4 +76,4 @@ export function displayNotifOnErr<T extends NonNullable<unknown>>(
         throw err;
     }
     return val;
-}
+};

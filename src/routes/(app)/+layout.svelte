@@ -13,7 +13,7 @@
         username
     } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
+    import { notify } from '$lib/components/notifications/notifications';
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
     import Nav from '$lib/components/Nav.svelte';
     import PasscodeModal from '$lib/components/dialogs/PasscodeModal.svelte';
@@ -47,7 +47,7 @@
     async function downloadBackup() {
         if (downloadingBackup) return;
         downloadingBackup = true;
-        const { data: backupData } = displayNotifOnErr(await api.get('/backups', { encrypted: 1 }));
+        const { data: backupData } = notify.onErr(await api.get('/backups', { encrypted: 1 }));
         BackupControllerClient.download(backupData, $username, true);
         downloadingBackup = false;
     }

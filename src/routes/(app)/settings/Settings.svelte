@@ -4,7 +4,7 @@
     import CloudCheckOutline from 'svelte-material-icons/CloudCheckOutline.svelte';
     import Sync from 'svelte-material-icons/Sync.svelte';
     import { api } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/components/notifications/notifications.js';
+    import { notify } from '$lib/components/notifications/notifications.js';
     import { currentTzOffset, fmtDuration, fmtUtc, nowUtc } from '$lib/utils/time.js';
     import type { SettingsConfig } from '$lib/controllers/settings/settings';
     import { settingsStore } from '$lib/stores';
@@ -52,7 +52,7 @@
             value: newValue
         };
 
-        displayNotifOnErr(await api.put('/settings', changes));
+        notify.onErr(await api.put('/settings', changes));
 
         $settingsStore[k].value = newValue;
         $settingsStore[k].created = nowUtc();

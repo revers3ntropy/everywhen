@@ -5,7 +5,7 @@
     import DownloadLock from 'svelte-material-icons/DownloadLock.svelte';
     import Upload from 'svelte-material-icons/Upload.svelte';
     import { api } from '../utils/apiRequest';
-    import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
+    import { notify } from '$lib/components/notifications/notifications';
     import { showPopup } from '../utils/popups';
     import type { Result } from '../utils/result';
     import FileDropDialog from '$lib/components/dialogs/FileDropDialog.svelte';
@@ -16,7 +16,7 @@
     async function download(encrypted: boolean) {
         if (downloading) return;
         downloading = true;
-        const { data: backupData } = displayNotifOnErr(await api.get('/backups', { encrypted }));
+        const { data: backupData } = notify.onErr(await api.get('/backups', { encrypted }));
         BackupControllerClient.download(backupData, $username, encrypted);
         downloading = false;
     }
@@ -33,7 +33,7 @@
             textBoxLabel:
                 'Password of account the backup came from ' + '(leave blank if same account)',
             withContents: async (res: Result<string>, password?: string) => {
-                let contents = displayNotifOnErr(res);
+                let contents = notify.onErr(res);
 
                 if (!confirm(confirmRestoreMessage)) return;
 
@@ -49,7 +49,7 @@
                     key = Auth.encryptionKeyFromPassword(password);
                 }
 
-                displayNotifOnErr(
+                notify.onErr(
                     await api.post('/backups', {
                         data: contents,
                         key: key

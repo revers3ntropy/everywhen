@@ -1,7 +1,7 @@
 <script lang="ts">
     import { popup } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/components/notifications/notifications';
+    import { notify } from '$lib/components/notifications/notifications';
     import { Auth } from '$lib/controllers/auth/auth';
 
     let currentPassword = '';
@@ -20,7 +20,7 @@
         passwordsDoNotMatch = false;
 
         submitted = true;
-        displayNotifOnErr(
+        notify.onErr(
             await api.put('/auth', {
                 currentPassword,
                 newPassword

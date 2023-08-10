@@ -8,7 +8,7 @@
     import Notifications from '$lib/components/notifications/Notifications.svelte';
     import { POLL_FOR_UPDATE_INTERVAL } from '$lib/constants';
     import { populateCookieWritablesWithCookies, popup, theme } from '$lib/stores';
-    import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
+    import { notify } from '$lib/components/notifications/notifications';
     import { api } from '$lib/utils/apiRequest';
     import Footer from '$lib/components/Footer.svelte';
 
@@ -26,7 +26,7 @@
         if (document.visibilityState !== 'visible') return;
 
         const currentVersion = __VERSION__;
-        const newVersion = displayNotifOnErr(await api.get('/version')).v;
+        const newVersion = notify.onErr(await api.get('/version')).v;
         if (newVersion !== currentVersion) {
             if (isNewVersionAvailable) return;
             isNewVersionAvailable = true;

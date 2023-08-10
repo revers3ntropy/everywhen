@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { Location } from '$lib/controllers/location/location';
-    import { displayNotifOnErr } from '$lib/components/notifications/notifications';
+    import { notify } from '$lib/components/notifications/notifications';
     import { api } from '$lib/utils/apiRequest';
     import { onMount } from 'svelte';
     import { Entry as EntryController } from '$lib/controllers/entry/entry.client';
@@ -13,7 +13,7 @@
     let locations = null as Location[] | null;
 
     async function loadLocations() {
-        locations = displayNotifOnErr(await api.get('/locations')).locations;
+        locations = notify.onErr(await api.get('/locations')).locations;
     }
 
     onMount(() => {

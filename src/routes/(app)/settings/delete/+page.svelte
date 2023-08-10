@@ -3,7 +3,7 @@
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import Skull from 'svelte-material-icons/Skull.svelte';
     import { api } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/components/notifications/notifications';
+    import { notify } from '$lib/components/notifications/notifications';
     import type { PageData } from './$types';
     import { username } from '$lib/stores';
     import { Auth } from '$lib/controllers/auth/auth';
@@ -16,7 +16,7 @@
             return;
         }
 
-        const { backup: backupData } = displayNotifOnErr(await api.delete('/users'));
+        const { backup: backupData } = notify.onErr(await api.delete('/users'));
         BackupControllerClient.download(backupData, $username, true);
         await Auth.logOut(false);
     }

@@ -8,7 +8,7 @@
     import { Entry } from '$lib/controllers/entry/entry.client';
     import type { Label } from '$lib/controllers/label/label';
     import { dispatch } from '$lib/dataChangeEvents';
-    import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
+    import { notify } from '$lib/components/notifications/notifications';
     import { enabledLocation } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { getLocation } from '$lib/utils/geolocation';
@@ -61,7 +61,7 @@
             createdTZOffset
         } as RawEntry;
 
-        const res = displayNotifOnErr(await api.post('/entries', { ...body }));
+        const res = notify.onErr(await api.post('/entries', { ...body }));
 
         if (!res.id) {
             clientLogger.error(res);
@@ -106,7 +106,7 @@
     let labels = null as Label[] | null;
 
     onMount(async () => {
-        labels = displayNotifOnErr(await api.get('/labels')).labels;
+        labels = notify.onErr(await api.get('/labels')).labels;
     });
 </script>
 

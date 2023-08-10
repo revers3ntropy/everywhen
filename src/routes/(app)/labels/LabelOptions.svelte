@@ -3,7 +3,7 @@
     import { dispatch } from '$lib/dataChangeEvents';
     import Delete from 'svelte-material-icons/DeleteOutline.svelte';
     import { api, apiPath } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/components/notifications/notifications';
+    import { notify } from '$lib/components/notifications/notifications';
     import { showPopup } from '$lib/utils/popups';
     import DeleteLabelDialog from './DeleteLabelDialog.svelte';
 
@@ -17,7 +17,7 @@
     export let eventCount: number;
 
     async function updateLabel(changes: { name?: string; color?: string }) {
-        displayNotifOnErr(await api.put(apiPath(`/labels/?`, id), changes));
+        notify.onErr(await api.put(apiPath(`/labels/?`, id), changes));
         await dispatch.update('label', {
             id,
             created,
@@ -33,7 +33,7 @@
         // a more complex approach is required to clear the
         // label from the entries and events
         if (entryCount + eventCount < 1) {
-            displayNotifOnErr(await api.delete(apiPath(`/labels/?`, id)));
+            notify.onErr(await api.delete(apiPath(`/labels/?`, id)));
             await dispatch.delete('label', id);
             return;
         }

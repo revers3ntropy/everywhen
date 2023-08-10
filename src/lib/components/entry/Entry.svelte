@@ -18,7 +18,7 @@
     import { popup, settingsStore } from '$lib/stores';
     import { ANIMATION_DURATION } from '$lib/constants';
     import { api, apiPath } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
+    import { notify } from '$lib/components/notifications/notifications';
     import { obfuscate, rawMdToHtml, wordCount } from '$lib/utils/text';
     import UtcTime from '$lib/components/UtcTime.svelte';
     import Dropdown from '$lib/components/Dropdown.svelte';
@@ -63,7 +63,7 @@
             return;
         }
 
-        displayNotifOnErr(
+        notify.onErr(
             await api.delete(apiPath('/entries/?', id), {
                 restore: !!deleted
             })
@@ -76,7 +76,7 @@
     }
 
     async function pinSelf() {
-        displayNotifOnErr(
+        notify.onErr(
             await api.put(apiPath('/entries/?/pinned', id), {
                 pinned: !pinned
             })

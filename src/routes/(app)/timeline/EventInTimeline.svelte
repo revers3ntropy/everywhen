@@ -2,7 +2,7 @@
     import { canvasState, type RenderProps, START_ZOOM } from '$lib/components/canvas/canvasState';
     import { DurationRectCollider } from '$lib/components/canvas/collider';
     import { interactable } from '$lib/components/canvas/interactable';
-    import { displayNotifOnErr } from '$lib/components/notifications/notifications';
+    import { notify } from '$lib/components/notifications/notifications';
     import { Event as EventController } from '$lib/controllers/event/event.client';
     import Event from '$lib/components/event/Event.svelte';
     import type { Label } from '$lib/controllers/label/label';
@@ -34,7 +34,7 @@
         start?: TimestampSecs;
         end?: TimestampSecs;
     }): Promise<void> {
-        displayNotifOnErr(await api.put(apiPath('/events/?', id), changes));
+        notify.onErr(await api.put(apiPath('/events/?', id), changes));
         const event: EventController = {
             id,
             name,

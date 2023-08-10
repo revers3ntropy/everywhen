@@ -1,6 +1,6 @@
 <script lang="ts">
     import { PUBLIC_GITHUB_AUTH_CLIENT_ID, PUBLIC_ENV } from '$env/static/public';
-    import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications.js';
+    import { notify } from '$lib/components/notifications/notifications.js';
     import { Auth } from '$lib/controllers/auth/auth';
     import type { GitHubUser } from '$lib/controllers/ghAPI/ghAPI.server';
     import { settingsStore } from '$lib/stores';
@@ -44,7 +44,7 @@
 
     onMount(async () => {
         if ($settingsStore.gitHubAccessToken.value) {
-            gitHubUser = displayNotifOnErr(await api.get('/oauth/gh/user'));
+            gitHubUser = notify.onErr(await api.get('/oauth/gh/user'));
         }
     });
 </script>

@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { PageData } from './$types';
     import { Dataset, type DatasetPresetName } from '$lib/controllers/dataset/dataset.client';
-    import { displayNotifOnErr } from '$lib/components/notifications/notifications';
+    import { notify } from '$lib/components/notifications/notifications';
     import { api } from '$lib/utils/apiRequest';
 
     export let data: PageData;
@@ -11,7 +11,7 @@
     ) as DatasetPresetName[];
 
     async function makeFromPreset(presetName: DatasetPresetName) {
-        displayNotifOnErr(
+        notify.onErr(
             await api.post('/datasets', {
                 name: presetName,
                 columns: Dataset.dataSetPresets[presetName].columns

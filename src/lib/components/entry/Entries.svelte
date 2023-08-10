@@ -10,7 +10,7 @@
     import { api } from '$lib/utils/apiRequest';
     import { encrypt } from '$lib/utils/encryption';
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
-    import { displayNotifOnErr } from '$lib/components/notifications/notifications';
+    import { notify } from '$lib/components/notifications/notifications';
     import type { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
     import { Entry } from '$lib/controllers/entry/entry.client';
     import Spinner from '../BookSpinner.svelte';
@@ -50,7 +50,7 @@
     }
 
     async function loadTitles() {
-        const res = displayNotifOnErr(await api.get('/entries/titles'));
+        const res = notify.onErr(await api.get('/entries/titles'));
         entryTitles = Entry.groupEntriesByDay(res.entries);
     }
 
@@ -77,7 +77,7 @@
 
         const entriesOptions = getEntriesOptions();
 
-        const res = displayNotifOnErr(
+        const res = notify.onErr(
             await api.get(
                 `/entries`,
                 entriesOptions as Record<string, number | string | boolean | undefined>
@@ -121,7 +121,7 @@
     }
 
     async function loadLocations() {
-        locations = displayNotifOnErr(await api.get('/locations')).locations;
+        locations = notify.onErr(await api.get('/locations')).locations;
     }
 
     function emptyEntries(): Record<string, Entry[]> {

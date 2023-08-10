@@ -38,13 +38,13 @@
         username
     } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/components/notifications/notifications';
+    import { notify } from '$lib/components/notifications/notifications';
     import { Auth } from '$lib/controllers/auth/auth';
 
     async function downloadBackup() {
         if (isDownloadingBackup) return;
         isDownloadingBackup = true;
-        const { data: backupData } = displayNotifOnErr(await api.get('/backups', { encrypted: 1 }));
+        const { data: backupData } = notify.onErr(await api.get('/backups', { encrypted: 1 }));
         BackupControllerClient.download(backupData, $username, true);
         isDownloadingBackup = false;
     }
@@ -53,12 +53,12 @@
         name: string,
         defaultColor: string
     ): Promise<string> {
-        const { labels } = displayNotifOnErr(await api.get('/labels'));
+        const { labels } = notify.onErr(await api.get('/labels'));
         const label = labels.find(label => label.name === name);
         if (label) {
             return label.id;
         }
-        const res = displayNotifOnErr(
+        const res = notify.onErr(
             await api.post('/labels', {
                 name,
                 color: defaultColor
@@ -125,7 +125,7 @@
         eventsSortKey.set('created');
 
         const now = nowUtc();
-        displayNotifOnErr(
+        notify.onErr(
             await api.post('/events', {
                 name: EventController.NEW_EVENT_NAME,
                 start: now,

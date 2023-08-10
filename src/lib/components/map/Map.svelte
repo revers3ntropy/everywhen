@@ -27,7 +27,7 @@
     import EditLocation from '../location/EditLocation.svelte';
     import EntryDialog from '$lib/components/dialogs/EntryDialog.svelte';
     import EntryTooltipOnMap from './EntryTooltipOnMap.svelte';
-    import { displayNotifOnErr } from '$lib/components/notifications/notifications';
+    import { notify } from '$lib/components/notifications/notifications';
     import {
         type EntryFeature,
         lastEntry,
@@ -48,7 +48,7 @@
     export let mobileHeight = 'calc(100vh - var(--nav-height) - 5rem)';
 
     async function reloadLocations() {
-        const res = displayNotifOnErr(await api.get('/locations'));
+        const res = notify.onErr(await api.get('/locations'));
         locations = res.locations;
     }
 
@@ -58,7 +58,7 @@
         longitude: number,
         radius: number
     ): Promise<void> {
-        displayNotifOnErr(
+        notify.onErr(
             await api.put(apiPath('/locations/?', id), {
                 latitude,
                 longitude,
@@ -71,7 +71,7 @@
         const coordinate = object.coordinate;
         const [long, lat] = toLonLat(coordinate);
 
-        displayNotifOnErr(
+        notify.onErr(
             await api.post('/locations', {
                 latitude: lat,
                 longitude: long,

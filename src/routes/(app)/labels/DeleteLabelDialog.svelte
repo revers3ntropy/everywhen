@@ -6,7 +6,7 @@
     import type { Label } from '$lib/controllers/label/label';
     import { popup } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/components/notifications/notifications';
+    import { notify } from '$lib/components/notifications/notifications';
 
     export let id: string;
     export let color: string;
@@ -23,20 +23,20 @@
     async function reloadEntries() {
         loaded = false;
 
-        const entriesRes = displayNotifOnErr(await api.get(`/entries`, { labelId: id }));
+        const entriesRes = notify.onErr(await api.get(`/entries`, { labelId: id }));
         entryCount = entriesRes.totalEntries;
 
-        const eventsRes = displayNotifOnErr(await api.get(`/events`, { labelId: id }));
+        const eventsRes = notify.onErr(await api.get(`/events`, { labelId: id }));
         eventCount = eventsRes.events.filter(e => e.label?.id === id).length;
 
-        const labelsRes = displayNotifOnErr(await api.get('/labels'));
+        const labelsRes = notify.onErr(await api.get('/labels'));
         labels = labelsRes.labels;
 
         loaded = true;
     }
 
     async function rmLabel() {
-        displayNotifOnErr(
+        notify.onErr(
             await api.delete(apiPath(`/labels/?`, id), {
                 strategy: 'remove'
             })
@@ -50,7 +50,7 @@
     }
 
     async function reassign() {
-        displayNotifOnErr(
+        notify.onErr(
             await api.delete(apiPath(`/labels/?`, id), {
                 strategy: 'reassign',
                 newLabelId: changeLabelId

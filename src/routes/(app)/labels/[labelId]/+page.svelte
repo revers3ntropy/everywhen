@@ -5,7 +5,7 @@
     import Entries from '$lib/components/entry/Entries.svelte';
     import { obfuscated } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/components/notifications/notifications';
+    import { notify } from '$lib/components/notifications/notifications';
     import { showPopup } from '$lib/utils/popups';
     import Event from '$lib/components/event/Event.svelte';
     import DeleteLabelDialog from '../DeleteLabelDialog.svelte';
@@ -14,7 +14,7 @@
     export let data: PageData;
 
     async function updateName() {
-        displayNotifOnErr(
+        notify.onErr(
             await api.put(apiPath('/labels/?', data.label.id), {
                 name: data.label.name
             })
@@ -22,7 +22,7 @@
     }
 
     async function updateColor() {
-        displayNotifOnErr(
+        notify.onErr(
             await api.put(apiPath('/labels/?', data.label.id), {
                 color: data.label.color
             })
@@ -35,7 +35,7 @@
         // a more complex approach is required to clear the
         // label from the entries and events
         if (data.entryCount + eventCount < 1) {
-            displayNotifOnErr(await api.delete(apiPath(`/labels/?`, data.label.id)));
+            notify.onErr(await api.delete(apiPath(`/labels/?`, data.label.id)));
             await goto('../');
             return;
         }

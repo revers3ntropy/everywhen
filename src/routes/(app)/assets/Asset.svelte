@@ -8,7 +8,7 @@
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import UtcTime from '$lib/components/UtcTime.svelte';
     import { api, apiPath } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
+    import { notify } from '$lib/components/notifications/notifications';
     import { Asset } from '$lib/controllers/asset/asset';
 
     const dispatch = createEventDispatcher();
@@ -29,7 +29,7 @@
 
     async function deleteImg() {
         if (!confirm(confirmDeleteMessage)) return;
-        displayNotifOnErr(await api.delete(apiPath(`/assets/?`, publicId)));
+        notify.onErr(await api.delete(apiPath(`/assets/?`, publicId)));
         notify.success('Deleted asset');
         deleted = true;
         dispatch('delete');

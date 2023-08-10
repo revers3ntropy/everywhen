@@ -1,7 +1,7 @@
 <script lang="ts">
     import { canvasState } from '$lib/components/canvas/canvasState';
     import Event from '$lib/components/event/Event.svelte';
-    import { displayNotifOnErr } from '$lib/components/notifications/notifications';
+    import { notify } from '$lib/components/notifications/notifications';
     import { Event as EventController } from '$lib/controllers/event/event.client';
     import type { Label } from '$lib/controllers/label/label';
     import { dispatch } from '$lib/dataChangeEvents';
@@ -19,7 +19,7 @@
         const zoomMargin = 15 * 60;
         $canvasState.zoomTo(start - zoomMargin, end + zoomMargin);
 
-        const { id } = displayNotifOnErr(
+        const { id } = notify.onErr(
             await api.post('/events', {
                 name: EventController.NEW_EVENT_NAME,
                 start,

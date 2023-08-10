@@ -4,7 +4,7 @@
     import type { Location } from '$lib/controllers/location/location';
     import type { Entry as EntryController } from '../../controllers/entry/entry';
     import { api, apiPath } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/components/notifications/notifications';
+    import { notify } from '$lib/components/notifications/notifications';
     import BookSpinner from '../BookSpinner.svelte';
     import Entry from '$lib/components/entry/Entry.svelte';
 
@@ -15,11 +15,11 @@
     let locations = null as Location[] | null;
 
     async function loadEntry() {
-        entry = displayNotifOnErr(await api.get(apiPath('/entries/?', id)), () => popup.set(null));
+        entry = notify.onErr(await api.get(apiPath('/entries/?', id)), () => popup.set(null));
     }
 
     async function loadLocations() {
-        locations = displayNotifOnErr(await api.get('/locations')).locations;
+        locations = notify.onErr(await api.get('/locations')).locations;
     }
 
     onMount(() => {

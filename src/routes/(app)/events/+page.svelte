@@ -7,7 +7,7 @@
     import { Event as EventController } from '$lib/controllers/event/event.client';
     import { eventsSortKey, obfuscated } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/components/notifications/notifications';
+    import { notify } from '$lib/components/notifications/notifications';
     import { nowUtc } from '$lib/utils/time';
     import Event from '$lib/components/event/Event.svelte';
     import type { PageData } from './$types';
@@ -34,7 +34,7 @@
     async function newEvent() {
         const now = nowUtc();
 
-        const { id } = displayNotifOnErr(
+        const { id } = notify.onErr(
             await api.post('/events', {
                 name: EventController.NEW_EVENT_NAME,
                 start: now,

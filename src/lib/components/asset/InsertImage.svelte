@@ -3,7 +3,7 @@
     import InfiniteScroller from '$lib/components/InfiniteScroller.svelte';
     import { FILE_INPUT_ACCEPT_TYPES } from '$lib/constants';
     import { Asset } from '$lib/controllers/asset/asset';
-    import { displayNotifOnErr } from '$lib/components/notifications/notifications';
+    import { notify } from '$lib/components/notifications/notifications';
     import { api } from '$lib/utils/apiRequest';
     import { nowUtc } from '$lib/utils/time';
     import { onMount } from 'svelte';
@@ -19,7 +19,7 @@
         offset: number,
         count: number
     ): Promise<Omit<Asset, 'content'>[]> {
-        const res = displayNotifOnErr(await api.get(`/assets`, { offset, count }));
+        const res = notify.onErr(await api.get(`/assets`, { offset, count }));
         assetCount = res.assetCount;
         return res.assets;
     }

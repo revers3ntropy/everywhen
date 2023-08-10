@@ -5,7 +5,7 @@
     import { createEventDispatcher } from 'svelte';
     import { Event } from '$lib/controllers/event/event.client';
     import { api } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
+    import { notify } from '$lib/components/notifications/notifications';
 
     const dispatchEvent = createEventDispatcher();
 
@@ -18,7 +18,7 @@
             return;
         }
 
-        const { id } = displayNotifOnErr(
+        const { id } = notify.onErr(
             await api.post('/labels', {
                 name: labelName,
                 color: labelColor

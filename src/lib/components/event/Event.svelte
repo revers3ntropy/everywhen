@@ -14,7 +14,7 @@
     import { Event } from '$lib/controllers/event/event.client';
     import type { Label as LabelController } from '../../controllers/label/label';
     import { api, apiPath } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/components/notifications/notifications';
+    import { notify } from '$lib/components/notifications/notifications';
     import { obfuscate } from '$lib/utils/text';
     import {
         currentTzOffset,
@@ -41,7 +41,7 @@
         end?: TimestampSecs;
         label?: LabelController['id'];
     }) {
-        displayNotifOnErr(await api.put(apiPath('/events/?', event.id), changes));
+        notify.onErr(await api.put(apiPath('/events/?', event.id), changes));
 
         const label = changes.label ? labels?.find(l => l.id === changes.label) : event.label;
 
@@ -97,12 +97,12 @@
 
     async function deleteEvent() {
         event.deleted = true;
-        displayNotifOnErr(await api.delete(apiPath('/events/?', event.id)));
+        notify.onErr(await api.delete(apiPath('/events/?', event.id)));
         await dispatch.delete('event', event.id);
     }
 
     async function restoreEvent() {
-        const { id } = displayNotifOnErr(
+        const { id } = notify.onErr(
             await api.post(`/events`, {
                 name: event.name,
                 start: event.start,

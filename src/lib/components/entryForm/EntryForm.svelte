@@ -19,7 +19,7 @@
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { getLocation } from '$lib/utils/geolocation';
     import { clientLogger } from '$lib/utils/log';
-    import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
+    import { notify } from '$lib/components/notifications/notifications';
     import { obfuscate } from '$lib/utils/text';
     import { currentTzOffset, nowUtc } from '$lib/utils/time';
     import FormatOptions from './FormatOptions.svelte';
@@ -113,7 +113,7 @@
     }
 
     async function onEntryCreation(body: RawEntry) {
-        const res = displayNotifOnErr(await api.post('/entries', { ...body }));
+        const res = notify.onErr(await api.post('/entries', { ...body }));
         submitted = false;
         if (res.id) {
             // make really sure it's saved before resetting
@@ -153,7 +153,7 @@
                 return;
             }
         }
-        displayNotifOnErr(await api.put(apiPath('/entries/?', entry.id), body));
+        notify.onErr(await api.put(apiPath('/entries/?', entry.id), body));
         await goto(`/journal/${entry.id}?obfuscate=0`);
     }
 
@@ -211,7 +211,7 @@
     }
 
     async function loadLabels() {
-        labels = displayNotifOnErr(await api.get('/labels')).labels;
+        labels = notify.onErr(await api.get('/labels')).labels;
     }
 
     function resizeTextAreaToFitContent(self: HTMLTextAreaElement | null = newEntryInputElement) {
@@ -232,12 +232,11 @@
     }
 
     async function pasteFiles(files: File[] | FileList) {
-        console.log(files.length);
         const res = await uploadImages(files);
         if (res === null) return;
 
         for (const { publicId, fileName } of res) {
-            insertAtCursor(newEntryInputElement, Asset.generateMarkdownLink(fileName, publicId));
+            onNewImage(Asset.generateMarkdownLink(fileName, publicId));
         }
     }
 

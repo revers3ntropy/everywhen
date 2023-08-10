@@ -3,7 +3,7 @@
     import type { Dataset } from '$lib/controllers/dataset/dataset';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import { ANIMATION_DURATION } from '$lib/constants';
-    import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
+    import { notify } from '$lib/components/notifications/notifications';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { currentTzOffset, nowUtc } from '$lib/utils/time';
 
@@ -19,7 +19,7 @@
 
         submitting = true;
 
-        displayNotifOnErr(
+        notify.onErr(
             await api.post(apiPath('/datasets/?', dataset.id), {
                 rows: [
                     {

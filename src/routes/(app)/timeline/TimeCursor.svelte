@@ -9,13 +9,13 @@
     import { api } from '$lib/utils/apiRequest';
     import { showPopup } from '$lib/utils/popups';
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
-    import { displayNotifOnErr } from '$lib/components/notifications/notifications.js';
+    import { notify } from '$lib/components/notifications/notifications.js';
     import { makeStandardContextMenu } from './standardContextMenu';
 
     export let labels: Label[];
 
     async function newEvent(start: TimestampSecs, end: TimestampSecs) {
-        const { id } = displayNotifOnErr(
+        const { id } = notify.onErr(
             await api.post('/events', {
                 name: EventController.NEW_EVENT_NAME,
                 start,

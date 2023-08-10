@@ -7,7 +7,7 @@
     import { Location } from '$lib/controllers/location/location.client';
     import { popup } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/components/notifications/notifications';
+    import { notify } from '$lib/components/notifications/notifications';
     import { round1DP } from '$lib/utils/text';
 
     export let isInDialog = false;
@@ -25,7 +25,7 @@
 
     async function syncWithServer() {
         synced = false;
-        displayNotifOnErr(
+        notify.onErr(
             await api.put(apiPath('/locations/?', id), {
                 name,
                 radius
@@ -49,7 +49,7 @@
         if (!confirm(`Are you sure you want to delete the location '${name}'?`)) {
             return;
         }
-        displayNotifOnErr(await api.delete(apiPath('/locations/?', id)));
+        notify.onErr(await api.delete(apiPath('/locations/?', id)));
         popup.set(null);
         if (onChange !== null) {
             await onChange(null);

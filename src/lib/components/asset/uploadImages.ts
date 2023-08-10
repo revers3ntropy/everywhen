@@ -1,5 +1,5 @@
 import { MAX_IMAGE_SIZE } from '$lib/constants';
-import { displayNotifOnErr, notify } from '$lib/components/notifications/notifications';
+import { notify } from '$lib/components/notifications/notifications';
 import { api } from '$lib/utils/apiRequest';
 import { getFileContents } from '$lib/utils/files.client';
 import { Result } from '$lib/utils/result';
@@ -41,20 +41,20 @@ export async function uploadImages(
     const fileResults = [] as { publicId: string; id: string; fileName: string }[];
 
     for (const file of files) {
-        const content = displayNotifOnErr(await getFileContents(file, 'b64'));
+        const content = notify.onErr(await getFileContents(file, 'b64'));
 
         if (!content) {
             notify.error('Failed to read file');
             return null;
         }
-        const contentAsWebP = displayNotifOnErr(await imageAsWebP(content));
+        const contentAsWebP = notify.onErr(await imageAsWebP(content));
 
         if (contentAsWebP.length > MAX_IMAGE_SIZE) {
             notify.error('Image is too large');
             return null;
         }
 
-        const { publicId, id } = displayNotifOnErr(
+        const { publicId, id } = notify.onErr(
             await api.post('/assets', {
                 fileName: file.name,
                 content: contentAsWebP

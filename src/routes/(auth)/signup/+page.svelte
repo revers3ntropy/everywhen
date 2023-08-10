@@ -9,7 +9,7 @@
     import { populateCookiesAndSettingsAfterAuth } from '../actions.client';
     import type { PageData } from './$types';
     import { api } from '$lib/utils/apiRequest.js';
-    import { displayNotifOnErr } from '$lib/components/notifications/notifications.js';
+    import { notify } from '$lib/components/notifications/notifications.js';
     import Dot from '$lib/components/Dot.svelte';
 
     export let data: PageData;
@@ -20,7 +20,7 @@
         const key = Auth.encryptionKeyFromPassword(password);
         $encryptionKey = key;
 
-        displayNotifOnErr(
+        notify.onErr(
             await api.post(
                 `/users`,
                 {
@@ -35,7 +35,7 @@
         $usernameStore = username;
 
         if (passcode) {
-            displayNotifOnErr(
+            notify.onErr(
                 await api.put(`/settings`, {
                     key: 'passcode',
                     value: passcode

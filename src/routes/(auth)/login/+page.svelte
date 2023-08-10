@@ -4,7 +4,7 @@
     import { Auth } from '$lib/controllers/auth/auth';
     import ChevronRight from 'svelte-material-icons/ChevronRight.svelte';
     import { api } from '$lib/utils/apiRequest';
-    import { displayNotifOnErr } from '$lib/components/notifications/notifications';
+    import { notify } from '$lib/components/notifications/notifications';
     import InformationOutline from 'svelte-material-icons/InformationOutline.svelte';
     import { populateCookiesAndSettingsAfterAuth } from '../actions.client';
     import type { PageData } from './$types';
@@ -20,7 +20,7 @@
 
         $encryptionKey = key;
 
-        const auth = displayNotifOnErr(
+        const auth = notify.onErr(
             await api.get(
                 '/auth',
                 {
