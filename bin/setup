@@ -14,7 +14,6 @@ rm ./testBackup.json
 (
   export PLAYWRIGHT_SKIP_BROWSER_GC=1
   npm i -f
-  mkdir node_modules/webp-converter/temp/
 ) & (
   cd ./bin || exit 1
   npm i

@@ -1,8 +1,10 @@
 <script lang="ts">
     import { browser } from '$app/environment';
     import { beforeNavigate, goto } from '$app/navigation';
+    import { uploadImages } from '$lib/components/asset/uploadImages';
     import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
     import InsertImage from '$lib/components/asset/InsertImage.svelte';
+    import { Asset } from '$lib/controllers/asset/asset';
     import { dispatch, listen } from '$lib/dataChangeEvents.js';
     import { serializedAgentData } from '$lib/utils/userAgent';
     import { tooltip } from '@svelte-plugins/tooltips';
@@ -22,6 +24,7 @@
     import { currentTzOffset, nowUtc } from '$lib/utils/time';
     import FormatOptions from './FormatOptions.svelte';
     import LocationToggle from '../location/LocationToggle.svelte';
+    import { paste } from './paste';
 
     // as this form is used in entry editing and creating
     export let action: 'create' | 'edit' = 'create';
@@ -223,6 +226,21 @@
         insertAtCursor(newEntryInputElement, '\t');
     }
 
+    function pasteText(text: string) {
+        console.log('pasted');
+        insertAtCursor(newEntryInputElement, text);
+    }
+
+    async function pasteFiles(files: File[] | FileList) {
+        console.log(files.length);
+        const res = await uploadImages(files);
+        if (res === null) return;
+
+        for (const { publicId, fileName } of res) {
+            insertAtCursor(newEntryInputElement, Asset.generateMarkdownLink(fileName, publicId));
+        }
+    }
+
     beforeNavigate(({ cancel }) => {
         // would save to LS here, except sometimes we want to navigate away
         // after editing something in LS, for example making 'Dream' entry from navbar
@@ -362,6 +380,7 @@
                 bind:this={newEntryInputElement}
                 bind:value={newEntryBody}
                 on:keydown={handleEntryInputKeydown}
+                use:paste={{ handleText: pasteText, handleFiles: pasteFiles }}
                 disabled={submitted}
                 aria-label="Entry Body"
                 placeholder="Start writing here..."

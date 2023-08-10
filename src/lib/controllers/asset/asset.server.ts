@@ -1,9 +1,7 @@
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
 import { nowUtc } from '$lib/utils/time';
-import fs from 'fs';
 import type { ResultSetHeader } from 'mysql2';
-import webp from 'webp-converter';
 import { z } from 'zod';
 import { Asset as _Asset, type AssetMetadata } from './asset';
 import { UUIdControllerServer } from '$lib/controllers/uuid/uuid.server';
@@ -172,35 +170,6 @@ namespace AssetServer {
         if (!res.affectedRows) {
             return Result.err('Asset not found');
         }
-        return Result.ok(null);
-    }
-
-    export async function base64ToWebP(b64: string, fileExt: string, quality: number) {
-        // it's either do it here or when deploying,
-        // and doing it here is somehow less painful...
-        const exePath = './server/bin/libwebp_linux/bin/cwebp';
-        if (fs.existsSync(exePath)) {
-            fs.chmodSync(exePath, 0o755);
-        }
-
-        const imgB64 = b64.replace(/^data:image\/((jpeg)|(jpg)|(png)|(webp));base64,/, '');
-
-        return await webp.str2webpstr(imgB64, fileExt, `-q ${quality}`);
-    }
-
-    export async function updateAssetContentToWebP(
-        auth: Auth,
-        publicId: string,
-        webp: string
-    ): Promise<Result> {
-        const encryptedContents = encrypt(webp, auth.key);
-
-        await query`
-            UPDATE assets
-            SET content = ${encryptedContents}
-            WHERE publicId = ${publicId}
-              AND user = ${auth.id}
-        `;
         return Result.ok(null);
     }
 

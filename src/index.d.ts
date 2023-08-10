@@ -12,15 +12,6 @@ declare module '@svelte-plugins/tooltips' {
     ): ActionReturn;
 }
 
-declare class WebpConverter {
-    static str2webpstr(str: string, type: string, options: string): Promise<string>;
-    static grant_permission(): Promise<void>;
-}
-
-declare module 'webp-converter' {
-    export = WebpConverter;
-}
-
 declare module 'svelte-heatmap';
 
 declare module 'crypto-browserify';

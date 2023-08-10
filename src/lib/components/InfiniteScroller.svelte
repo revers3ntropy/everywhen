@@ -58,4 +58,7 @@
         on:inview_enter={load}
         on:inview_leave={() => (pageEndInView = false)}
     />
+{:else}
+    Nothing!
+    <slot name="empty" />
 {/if}

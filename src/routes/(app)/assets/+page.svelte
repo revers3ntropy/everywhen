@@ -1,7 +1,8 @@
 <script lang="ts">
     import { browser } from '$app/environment';
-    import { uploadImage } from '$lib/components/asset/uploadImage';
+    import { uploadImages } from '$lib/components/asset/uploadImages';
     import InfiniteScroller from '$lib/components/InfiniteScroller.svelte';
+    import { FILE_INPUT_ACCEPT_TYPES } from '$lib/constants';
     import { api } from '$lib/utils/apiRequest';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import { nowUtc } from '$lib/utils/time';
@@ -31,23 +32,20 @@
             return;
         }
         const files = e.target.files as FileList;
-        const res = await uploadImage(files);
-        if (res === null) {
-            return;
-        }
-        const { id, publicId, fileName } = res;
+        const res = await uploadImages(files);
+        if (res === null) return;
 
         assets = [
-            {
+            ...res.map(({ id, publicId, fileName }) => ({
                 id,
                 publicId,
                 fileName,
                 created: nowUtc()
-            },
+            })),
             ...assets
         ];
 
-        assetCount = assetCount + 1;
+        assetCount = assetCount + res.length;
     }) as ChangeEventHandler<HTMLInputElement>;
 
     let fileDropInput: HTMLInputElement;
@@ -69,7 +67,8 @@
                 on:change={upload}
                 bind:this={fileDropInput}
                 style="display: none"
-                accept="image/png, image/jpeg, image/jpg, image/webp"
+                multiple
+                accept={FILE_INPUT_ACCEPT_TYPES}
             />
         </div>
         <div class="flex-center" style="font-size: 40px;">

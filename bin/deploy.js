@@ -51,8 +51,7 @@ const uploadPaths = {
     [`./secrets/${env}/ca.pem`]: '/ca.pem',
     [`./secrets/${env}/remote.env`]: '/.env',
     ['./server/server.js']: '/server.js',
-    [`./server/remote.package.json`]: '/package.json',
-    [`./node_modules/webp-converter/bin/libwebp_linux/bin/cwebp`]: `/server/bin/libwebp_linux/bin/cwebp`
+    [`./server/remote.package.json`]: '/package.json'
 };
 
 const LOG_PREFIX = c.blueBright('[deploy.js]');
@@ -481,12 +480,6 @@ async function tearDownRemote() {
     await runRemoteCommand(`rm -rf ~/${remoteDir()}`, false);
 }
 
-async function setupLibWebP() {
-    // Required by 'webp-converter' package TODO: Remove this requirement
-    await runRemoteCommand(`mkdir -p ~/${remoteDir()}/server/bin/libwebp_linux/bin`);
-    await runRemoteCommand(`mkdir -p ~/${remoteDir()}/server/temp`);
-}
-
 async function main() {
     const start = now();
 
@@ -505,7 +498,6 @@ async function main() {
     // must do between stopping the server and deleting remote dir
     await doMigrations(migrations);
 
-    await setupLibWebP();
     await upload();
 
     await restartServer(localVersion);

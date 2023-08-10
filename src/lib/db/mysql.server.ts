@@ -41,8 +41,7 @@ export function getConfig(): mysql.ConnectionOptions {
 }
 
 function logQuery(query: string, params: unknown[], result: unknown, time: Milliseconds) {
-    params = params.map(p => JSON.stringify(p));
-
+    const paramsFmt = JSON.stringify(recursivelyTrimStrings(params, 20));
     let resultStr = JSON.stringify(recursivelyTrimStrings(result, 20));
 
     if (
@@ -58,7 +57,7 @@ function logQuery(query: string, params: unknown[], result: unknown, time: Milli
 
     void dbLogger.log(
         `\`${queryStr}\`` +
-            `\n     [${params.join(', ')}]` +
+            `\n     ${paramsFmt}` +
             `\n     (${time.toPrecision(3)}ms) => ${resultStr}`
     );
 }

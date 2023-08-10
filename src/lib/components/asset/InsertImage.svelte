@@ -1,6 +1,7 @@
 <script lang="ts">
-    import { uploadImage } from '$lib/components/asset/uploadImage';
+    import { uploadImages } from '$lib/components/asset/uploadImages';
     import InfiniteScroller from '$lib/components/InfiniteScroller.svelte';
+    import { FILE_INPUT_ACCEPT_TYPES } from '$lib/constants';
     import { Asset } from '$lib/controllers/asset/asset';
     import { displayNotifOnErr } from '$lib/components/notifications/notifications';
     import { api } from '$lib/utils/apiRequest';
@@ -28,19 +29,20 @@
             return;
         }
         const files = e.target.files as FileList;
-        const res = await uploadImage(files);
+        const res = await uploadImages(files);
         if (res === null) return;
-        const { publicId, fileName, id } = res;
         assets = [
-            {
+            ...res.map(({ id, publicId, fileName }) => ({
                 id,
                 publicId,
                 fileName,
                 created: nowUtc()
-            },
+            })),
             ...assets
         ];
-        onInput(Asset.generateMarkdownLink(fileName, publicId));
+        for (const { publicId, fileName } of res) {
+            onInput(Asset.generateMarkdownLink(fileName, publicId));
+        }
         closePopup();
     }) as ChangeEventHandler<HTMLInputElement>;
 
@@ -60,7 +62,10 @@
             <ImageArea {size} />
         </span>
         <div style="padding: 1rem 0">
-            <button on:click={() => fileDropInput.click()} class="with-icon upload-button">
+            <button
+                on:click={() => fileDropInput.click()}
+                class="with-icon upload-button icon-gradient-on-hover"
+            >
                 <Upload size="30" />
                 Upload
             </button>
@@ -69,7 +74,8 @@
                 on:change={upload}
                 bind:this={fileDropInput}
                 style="display: none"
-                accept="image/png, image/jpeg, image/jpg, image/webp"
+                multiple
+                accept={FILE_INPUT_ACCEPT_TYPES}
             />
 
             <hr />
@@ -101,6 +107,8 @@
                             </button>
                         {/each}
                     </InfiniteScroller>
+                {:else}
+                    <div class="text-light" style="margin: 1rem"> No images in gallery yet </div>
                 {/if}
             </div>
         </div>
@@ -108,22 +116,20 @@
 </div>
 
 <style lang="less">
-    .dropdown-contents {
-        .upload-button {
-            width: 100%;
-            padding: 4px;
-            margin: 1rem 0 0 0;
-            text-align: left;
-
-            &:hover {
-                background-color: var(--v-light-accent);
-            }
+    .asset {
+        &:hover {
+            filter: brightness(0.85);
         }
+    }
 
-        .asset {
-            &:hover {
-                filter: brightness(0.85);
-            }
+    .upload-button {
+        width: 100%;
+        padding: 4px;
+        margin: 0;
+        text-align: left;
+
+        &:hover {
+            background-color: var(--v-light-accent);
         }
     }
 </style>

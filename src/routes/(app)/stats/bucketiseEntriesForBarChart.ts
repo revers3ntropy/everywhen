@@ -91,7 +91,7 @@ function datasetFactoryForStandardBuckets(
     }
 
     return (sortedEntries: EntryWithWordCount[], by: By): Record<string | number, number> => {
-        const start = sortedEntries[0].created;
+        const start = Entry.localTime(sortedEntries[0]);
 
         const buckets: Record<string, number> = {};
         const end = nowUtc() + bucketSize(selectedBucket);

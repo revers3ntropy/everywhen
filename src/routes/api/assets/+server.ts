@@ -6,8 +6,6 @@ import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import { Auth } from '$lib/controllers/auth/auth.server';
 
-const IMG_QUALITY = 100;
-
 export const GET = cachedApiRoute(async (auth, { url }) => {
     let offset: number, count: number;
     try {
@@ -42,14 +40,7 @@ export const POST = (async ({ request, cookies }) => {
     const fileExt = body.fileName.split('.').pop();
     if (!fileExt) throw error(400, 'No file extension provided');
 
-    let img;
-    if (fileExt.toLowerCase() === 'webp') {
-        img = body.content.replace(/^data:image\/webp;base64,/, '');
-    } else {
-        img = await Asset.Server.base64ToWebP(body.content, fileExt, IMG_QUALITY);
-    }
-
-    const { err, val } = await Asset.Server.create(auth, body.fileName, img);
+    const { err, val } = await Asset.Server.create(auth, body.fileName, body.content);
     if (err) throw error(400, err);
 
     return apiResponse(auth, val);
