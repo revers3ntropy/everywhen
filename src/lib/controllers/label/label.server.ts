@@ -106,7 +106,7 @@ namespace LabelUtils {
         auth: Auth,
         id: string
     ): Promise<boolean> {
-        return (await Label.fromId(query, auth, id)).isOk;
+        return (await Label.fromId(query, auth, id)).ok;
     }
 
     export async function userHasLabelWithName(
@@ -114,7 +114,7 @@ namespace LabelUtils {
         auth: Auth,
         nameDecrypted: string
     ): Promise<boolean> {
-        return (await Label.fromName(query, auth, nameDecrypted)).isOk;
+        return (await Label.fromName(query, auth, nameDecrypted)).ok;
     }
 
     export async function purgeWithId(query: QueryFunc, auth: Auth, id: string): Promise<void> {

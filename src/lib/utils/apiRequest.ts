@@ -91,7 +91,7 @@ async function handleOkResponse(
     method: string,
     url: string,
     key: string | null
-): Promise<Result<unknown>> {
+): Promise<Result<object>> {
     let textResult: string;
     try {
         textResult = await response.text();
