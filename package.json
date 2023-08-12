@@ -1,6 +1,6 @@
 {
     "name": "halcyon.land",
-    "version": "0.5.77",
+    "version": "0.5.78",
     "type": "module",
     "private": true,
     "scripts": {
@@ -34,6 +34,7 @@
         "dotenv": "^16.3.1",
         "eslint": "^8.46.0",
         "eslint-config-prettier": "^9.0.0",
+        "eslint-plugin-prettier": "^5.0.0",
         "eslint-plugin-svelte": "^2.32.4",
         "filedrop-svelte": "^0.1.2",
         "js-cookie": "^3.0.5",
@@ -58,7 +59,6 @@
         "svelte-material-icons": "^3.0.5",
         "svelte-preprocess": "^5.0.4",
         "svelte-simple-modal": "^1.6.1",
-        "timeago.js": "^4.0.2",
         "ts-polyfill": "^3.8.2",
         "tslib": "^2.6.1",
         "typescript": "^5.1.6",

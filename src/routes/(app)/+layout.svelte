@@ -76,13 +76,13 @@
         }
     }
 
-    const day = fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD');
-
     function checkDayDifferent() {
         if (day !== fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD')) {
             window.location.reload();
         }
     }
+
+    const day = fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD');
 
     let lastActivity = nowUtc();
 

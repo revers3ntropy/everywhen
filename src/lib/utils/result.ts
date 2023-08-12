@@ -17,9 +17,9 @@ export class Result<
         return this.ok ? ok(this.valOrErr as T) : err(this.valOrErr as E);
     }
 
-    public get err(): E | undefined {
+    public get err(): E | null {
         return this.match(
-            () => undefined,
+            () => null,
             err => err
         );
     }

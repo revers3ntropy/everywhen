@@ -6,18 +6,20 @@ describe('encryption', () => {
         const key = 'k'.repeat(32);
         const plaintext = 'plaintext';
         const ciphertext = encrypt(plaintext, key);
-        const { err, val } = decrypt(ciphertext, key);
-        expect(err).toBe(null);
-        expect(val).toBe(plaintext);
+        decrypt(ciphertext, key).match(
+            val => expect(val).toBe(plaintext),
+            err => expect(err).toBe(null)
+        );
     });
 
     it('encrypts and decrypts empty string', () => {
         const key = 'k'.repeat(32);
         const plaintext = '';
         const ciphertext = encrypt(plaintext, key);
-        const { err, val } = decrypt(ciphertext, key);
-        expect(err).toBe(null);
-        expect(val).toBe(plaintext);
+        decrypt(ciphertext, key).match(
+            val => expect(val).toBe(plaintext),
+            err => expect(err).toBe(null)
+        );
     });
 
     it('encrypts and decrypts with different keys', () => {
@@ -40,8 +42,9 @@ describe('encryption', () => {
 
     it('decrypts empty ciphertext as empty plaintext', () => {
         const key = 'k'.repeat(32);
-        const { err, val } = decrypt('', key);
-        expect(err).toBe(null);
-        expect(val).toBe('');
+        decrypt('', key).match(
+            val => expect(val).toBe(''),
+            err => expect(err).toBe(null)
+        );
     });
 });

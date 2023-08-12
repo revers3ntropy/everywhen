@@ -1,8 +1,7 @@
 <script lang="ts">
     import { tooltip } from '@svelte-plugins/tooltips';
-    import * as timeago from 'timeago.js';
     import { numberAsSignedStr } from '../utils/text';
-    import { currentTzOffset, fmtUtc } from '../utils/time';
+    import { currentTzOffset, fmtUtc, fmtUtcRelative } from '../utils/time';
 
     export let timestamp: Seconds;
     export let tzOffset: Hours = currentTzOffset();
@@ -16,7 +15,7 @@
     <span
         use:tooltip={{
             content:
-                `<span class="oneline">${fmtUtc(timestamp, tzOffset, 'hh:mma')} (GMT` +
+                `<span class="oneline">${fmtUtcRelative(timestamp)} (GMT` +
                 `${numberAsSignedStr(tzOffset)})</span><br>` +
                 `<span class="oneline">${fmtUtc(timestamp, 0, 'hh:mma')} GMT </span><br>` +
                 `<span class="oneline">${fmtUtc(timestamp, currentTzOffset(), 'hh:mma')} local ` +
@@ -26,7 +25,7 @@
         }}
     >
         {#if relative}
-            {timeago.format(timestamp * 1000)}
+            {fmtUtcRelative(timestamp)}
         {:else}
             {fmtUtc(timestamp, tzOffset, fmt)}
         {/if}
@@ -34,7 +33,7 @@
 {:else}
     <span>
         {#if relative}
-            {timeago.format(timestamp * 1000)}
+            {fmtUtcRelative(timestamp)}
         {:else}
             {fmtUtc(timestamp, tzOffset, fmt)}
         {/if}

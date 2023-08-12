@@ -3,6 +3,25 @@ import { PUBLIC_ENV } from '$env/static/public';
 import { DEV_USE_TZ_OFFSET_0 } from '$lib/constants';
 import { browser } from '$app/environment';
 
+moment.updateLocale('en', {
+    relativeTime: {
+        future: 'in %s',
+        past: '%s ago',
+        s: '1s',
+        ss: '%ds',
+        m: '1m',
+        mm: '%dm',
+        h: '1h',
+        hh: '%dh',
+        d: '1d',
+        dd: '%dd',
+        M: '1mo',
+        MM: '%dmo',
+        y: '1y',
+        yy: '%dy'
+    }
+});
+
 /**
  * Get the UTC timestamp of now in seconds
  * @returns {TimestampSecs}
@@ -26,6 +45,12 @@ export function fmtUtc(timestamp: TimestampSecs, tzOffset: Hours, fmt: string): 
 
 export function fmtDuration(time: Seconds): string {
     return moment.duration(time, 's').humanize();
+}
+
+export function fmtUtcRelative(timestamp: TimestampSecs): string {
+    return moment(timestamp * 1000)
+        .utc()
+        .fromNow();
 }
 
 export function fmtTimestampForInput(

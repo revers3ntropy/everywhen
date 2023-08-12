@@ -30,6 +30,7 @@ module.exports = {
     ],
     plugins: [
         '@typescript-eslint',
+        'prettier'
     ],
     env: {
         es6: true,
@@ -37,6 +38,15 @@ module.exports = {
         node: true
     },
     rules: {
+        'prettier/prettier': 'error',
+        '@typescript-eslint/strict-boolean-expressions': ['off', {
+            allowString: false,
+            allowNumber: false,
+            allowNullableObject: true,
+            allowNullableBoolean: true,
+            allowNullableString: false,
+            allowNullableNumber: false,
+        }],
         // so I can do `while (true)`
         'no-constant-condition': 'off',
         // treats <script> tags as functions or something and complains
