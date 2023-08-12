@@ -1,5 +1,5 @@
 import '@total-typescript/ts-reset';
-import { COOKIE_KEYS } from '$lib/constants';
+import type { COOKIE_KEYS } from '$lib/constants';
 import type { SettingsConfig } from '$lib/controllers/settings/settings';
 import type { Auth } from '$lib/controllers/auth/auth';
 
