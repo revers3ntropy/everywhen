@@ -154,7 +154,7 @@
             }
         }
         notify.onErr(await api.put(apiPath('/entries/?', entry.id), body));
-        await goto(`/journal/${entry.id}?obfuscate=0`);
+        await goto(`/journal/${entry.id}`);
     }
 
     async function submit() {

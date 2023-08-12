@@ -5,11 +5,10 @@ type ErrorDefault = string;
 
 export class Result<
     T extends ValueConstraint = ValueDefault,
-    E extends ErrorConstraint = ErrorDefault,
-    Ok extends boolean = boolean
+    E extends ErrorConstraint = ErrorDefault
 > {
     protected constructor(
-        public readonly ok: Ok,
+        public readonly ok: boolean,
         private readonly valOrErr: T | E
     ) {}
 
@@ -73,15 +72,15 @@ export class Result<
     public static ok<
         T extends ValueConstraint = ValueDefault,
         E extends ErrorConstraint = ErrorDefault
-    >(value: T = null as T): Result<T, E, true> {
-        return new Result<T, E, true>(true, value);
+    >(value: T = null as T): Result<T, E> {
+        return new Result<T, E>(true, value);
     }
 
     public static err<
         T extends ValueConstraint = ValueDefault,
         E extends ErrorConstraint = ErrorDefault
-    >(error: E): Result<T, E, false> {
-        return new Result<T, E, false>(false, error);
+    >(error: E): Result<T, E> {
+        return new Result<T, E>(false, error);
     }
 
     public static collect<

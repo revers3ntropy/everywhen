@@ -158,7 +158,7 @@
                 {#if (latitude && longitude && showLocations) || ($settingsStore.showAgentWidgetOnEntries.value && !showFullDate)}
                     <Dot />
                 {/if}
-                <a href="/journal/{id}?history=on&obfuscate=0" class="edits-link link">
+                <a href="/journal/{id}?history=on" class="edits-link link">
                     {edits.length} edit{edits.length > 1 ? 's' : ''}
                 </a>
             {/if}
@@ -201,7 +201,7 @@
                             </button>
                             {#if !deleted}
                                 <a
-                                    href="/journal/{id}/edit?obfuscate=0"
+                                    href="/journal/{id}/edit"
                                     class="with-icon"
                                     aria-label="edit entry"
                                 >
@@ -252,7 +252,6 @@
                 component={() => import('$lib/components/map/Map.svelte')}
                 props={{
                     entriesInteractable: false,
-
                     width: '100%',
                     height: '300px',
                     mobileHeight: '200px',
@@ -263,8 +262,7 @@
                             latitude,
                             longitude
                         }
-                    ],
-                    showArrowsBetweenEntriesOnMap: false
+                    ]
                 }}
             />
         </div>

@@ -43,14 +43,14 @@
     {#if !data.history}
         {#if data.entry.edits?.length}
             <div class="flex-center">
-                <a href="/journal/{data.entry.id}?history=on&obfuscate=0">
+                <a href="/journal/{data.entry.id}?history=on">
                     Show History ({data.entry.edits?.length} edits)
                 </a>
             </div>
         {/if}
     {:else}
         <div class="flex-center">
-            <a href="/journal/{data.entry.id}?obfuscate=0">
+            <a href="/journal/{data.entry.id}">
                 Hide History ({data.entry.edits?.length} edits)
             </a>
         </div>

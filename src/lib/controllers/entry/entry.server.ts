@@ -1,5 +1,6 @@
 import type { QueryFunc } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/utils/encryption';
+import { errorLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 import { fmtUtc, nowUtc } from '$lib/utils/time';
 import type { Auth } from '../auth/auth.server';
@@ -157,6 +158,7 @@ namespace EntryUtils {
         query: QueryFunc,
         auth: Auth,
         rawEntry: RawEntry,
+        labels: Label[],
         isEdit = false
     ): Promise<Result<Entry>> {
         const { err: titleErr, val: decryptedTitle } = decrypt(rawEntry.title, auth.key);
@@ -185,13 +187,16 @@ namespace EntryUtils {
         };
 
         if (rawEntry.label) {
-            const { err, val } = await addLabel(query, auth, entry, rawEntry.label);
-            if (err) return Result.err(err);
-            entry = val;
+            const label = labels.find(l => l.id === rawEntry.label);
+            if (!label) {
+                await errorLogger.error('Label not found', rawEntry);
+                return Result.err('Label not found');
+            }
+            entry = { ...entry, label };
         }
 
         if (!isEdit) {
-            const { err, val } = await addEdits(query, auth, entry);
+            const { err, val } = await addEdits(query, auth, entry, labels);
             if (err) return Result.err(err);
             entry = val;
         }
@@ -231,7 +236,10 @@ namespace EntryUtils {
             return Result.err('Entry is deleted');
         }
 
-        return await fromRaw(query, auth, entries[0]);
+        const { val: labels, err: labelErr } = await Label.all(query, auth);
+        if (labelErr) return Result.err(labelErr);
+
+        return await fromRaw(query, auth, entries[0], labels);
     }
 
     export async function create(
@@ -274,8 +282,10 @@ namespace EntryUtils {
         );
 
         if (json.label) {
-            const { err } = await addLabel(query, auth, entry, json.label);
-            if (err) return Result.err(err);
+            if (!(await Label.userHasLabelWithId(query, auth, json.label))) {
+                await errorLogger.error('Label not found', json);
+                return Result.err('Label not found');
+            }
         }
 
         const encryptedTitle = encrypt(entry.title, auth.key);
@@ -342,30 +352,6 @@ namespace EntryUtils {
 
         self.label = undefined;
         return Result.ok(self);
-    }
-
-    export async function updateLabel(
-        query: QueryFunc,
-        auth: Auth,
-        self: Entry,
-        label: string | null
-    ): Promise<Result<Entry>> {
-        if (label == null) {
-            return Entry.removeLabel(query, auth, self);
-        }
-
-        if (self.label?.id === label) {
-            return Result.err('Entry already has that label');
-        }
-
-        await query`
-            UPDATE entries
-            SET label = ${label}
-            WHERE id = ${self.id}
-              AND user = ${auth.id}
-        `;
-
-        return await addLabel(query, auth, self, label);
     }
 
     export async function setPinned(
@@ -627,10 +613,13 @@ namespace EntryUtils {
               AND entries.id = entryEdits.entryId
         `;
 
+        const { err, val: labels } = await Label.all(query, auth);
+        if (err) return Result.err(err);
+
         const { err: editsErr, val: edits } = Result.collect(
             await Promise.all(
                 rawEdits.map(async (e): Promise<Result<Entry & { entryId: string }>> => {
-                    const entry = await Entry.fromRaw(query, auth, e, true);
+                    const entry = await fromRaw(query, auth, e, labels, true);
                     if (entry.err) return Result.err(entry.err);
                     return Result.ok({
                         ...entry.val,
@@ -647,9 +636,6 @@ namespace EntryUtils {
             prev[edit.entryId].push(edit);
             return prev;
         }, {});
-
-        const { err, val: labels } = await Label.all(query, auth);
-        if (err) return Result.err(err);
 
         const groupedLabels = labels.reduce<Record<string, Label>>((prev, label) => {
             prev[label.id] = label;
@@ -694,26 +680,12 @@ namespace EntryUtils {
         );
     }
 
-    async function addLabel(
+    async function addEdits(
         query: QueryFunc,
         auth: Auth,
         self: Entry,
-        label: Label | string
-    ): Promise<Result<Entry>> {
-        if (typeof label === 'string') {
-            const { val, err } = await Label.fromId(query, auth, label);
-            if (err) {
-                return Result.err(err);
-            }
-            self.label = val;
-        } else {
-            self.label = label;
-        }
-
-        return Result.ok(self);
-    }
-
-    async function addEdits(query: QueryFunc, auth: Auth, self: Entry): Promise<Result<EntryEdit>> {
+        labels: Label[]
+    ): Promise<Result<EntryEdit>> {
         const rawEdits = await query<RawEntry[]>`
             SELECT created, createdTZOffset, latitude, longitude, title, entry, label, agentData
             FROM entryEdits
@@ -721,7 +693,7 @@ namespace EntryUtils {
         `;
 
         const { err, val: edits } = Result.collect(
-            await Promise.all(rawEdits.map(e => Entry.fromRaw(query, auth, e, true)))
+            await Promise.all(rawEdits.map(e => fromRaw(query, auth, e, labels, true)))
         );
         if (err) return Result.err(err);
 
