@@ -1,5 +1,6 @@
 <script lang="ts">
     import AllowCookies from '$lib/components/AllowCookies.svelte';
+    import { Auth } from '$lib/controllers/auth/auth';
     import { BackupControllerClient } from '$lib/controllers/backup/backup';
     import type { LayoutData } from './$types';
     import { onDestroy } from 'svelte';
@@ -107,6 +108,8 @@
             window.clearInterval(intervalId);
         }
     });
+
+    $: if (!$username) void Auth.logOut(true);
 
     passcodeLastEntered.subscribe(v => void checkPasscode(v));
 
