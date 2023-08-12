@@ -1,6 +1,6 @@
 import { browser } from '$app/environment';
 import { DB, DB_HOST, DB_PASS, DB_PORT, DB_USER } from '$env/static/private';
-import { recursivelyTrimStrings } from '$lib/utils/text';
+import { collapseWhitespace, recursivelyTrimAndStringify } from '$lib/utils/text';
 import chalk from 'chalk';
 import mysql from 'mysql2/promise';
 import '../require';
@@ -41,8 +41,8 @@ export function getConfig(): mysql.ConnectionOptions {
 }
 
 function logQuery(query: string, params: unknown[], result: unknown, time: Milliseconds) {
-    const paramsFmt = JSON.stringify(recursivelyTrimStrings(params, 20));
-    let resultStr = JSON.stringify(recursivelyTrimStrings(result, 20));
+    const paramsFmt = recursivelyTrimAndStringify(params, 20, 5);
+    let resultStr = recursivelyTrimAndStringify(result, 20, 5);
 
     if (
         typeof result === 'object' &&
@@ -53,10 +53,8 @@ function logQuery(query: string, params: unknown[], result: unknown, time: Milli
         resultStr = result.info;
     }
 
-    const queryStr = query.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
-
     void dbLogger.log(
-        `\`${queryStr}\`` +
+        `\`${collapseWhitespace(query)}\`` +
             `\n     ${paramsFmt}` +
             `\n     (${time.toPrecision(3)}ms) => ${resultStr}`
     );

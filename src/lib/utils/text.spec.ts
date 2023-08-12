@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { obfuscate, wordCount } from './text';
+import { obfuscate, recursivelyTrimAndStringify, wordCount } from './text';
 
 describe('obfuscate', () => {
     it('changes the string', () => {
@@ -23,5 +23,19 @@ describe('wordCount', () => {
         expect(wordCount(`Although, I'd say...`)).toBe(3);
         expect(wordCount(`Although, I'd say ...`)).toBe(3);
         expect(wordCount(`yes   a       !`)).toBe(2);
+    });
+});
+
+describe('recursivelyTrimAndStringify', () => {
+    it('works', () => {
+        const s = recursivelyTrimAndStringify;
+        expect(s('')).toBe(`''`);
+        expect(s('1234567890123')).toBe(`'1234567890'..3`);
+        expect(s('12345678901234')).toBe(`'1234567890'..4`);
+        expect(s([])).toBe('[]');
+        expect(s([1, '', ['hi']])).toBe(`[1, '', ['hi']]`);
+        expect(s([[1, 2, 3]], 2, 2)).toBe(`[[1, 2, ..1]]`);
+        expect(s({})).toBe('{ }');
+        expect(s({ a: { b: 1, c: 2, d: 3 } }, 2, 2)).toBe('{ a: { b: 1, c: 2, ..1 } }');
     });
 });

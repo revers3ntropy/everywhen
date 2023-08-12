@@ -103,16 +103,49 @@ export function capitalise(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export function recursivelyTrimStrings<T>(obj: T, maxStrLen = 10): T {
+export function collapseWhitespace(str: string): string {
+    return str.replace(/\n/g, ' ').replace(/\s+/g, ' ').replace(`'`, `\\'`).trim();
+}
+
+export function recursivelyTrimAndStringify<T>(obj: T, maxStrLen = 10, maxKeys = 10): string {
     if (typeof obj === 'string') {
-        return (obj.length > maxStrLen ? obj.slice(0, maxStrLen) + '...' : obj) as T;
+        if (obj.length > maxStrLen) {
+            return `'${collapseWhitespace(obj.slice(0, maxStrLen))}'..${obj.length - maxStrLen}`;
+        }
+        return `'${collapseWhitespace(obj)}'`;
     } else if (typeof obj === 'object' && obj !== null) {
         if (Array.isArray(obj)) {
-            return obj.map(o => recursivelyTrimStrings(o, maxStrLen)) as T;
+            if (obj.length > maxKeys) {
+                return (
+                    '[' +
+                    obj
+                        .slice(0, maxKeys)
+                        .map(o => recursivelyTrimAndStringify(o, maxStrLen, maxKeys))
+                        .join(', ') +
+                    `, ..${obj.length - maxKeys}]`
+                );
+            }
+            return (
+                '[' +
+                obj.map(o => recursivelyTrimAndStringify(o, maxStrLen, maxKeys)).join(', ') +
+                ']'
+            );
         }
-        return Object.fromEntries(
-            Object.entries(obj).map(([k, v]) => [k, recursivelyTrimStrings(v, maxStrLen)])
-        ) as T;
+        const objectEntries = Object.entries(obj).map(([k, v]) => [
+            k,
+            recursivelyTrimAndStringify(v, maxStrLen, maxKeys)
+        ]);
+        if (objectEntries.length > maxKeys) {
+            return (
+                '{' +
+                objectEntries
+                    .slice(0, maxKeys)
+                    .map(([k, v]) => ` ${k}: ${v}`)
+                    .join(',') +
+                `, ..${objectEntries.length - maxKeys} }`
+            );
+        }
+        return '{' + objectEntries.map(([k, v]) => ` ${k}: ${v}`).join(', ') + ' }';
     }
-    return obj;
+    return obj + '';
 }
