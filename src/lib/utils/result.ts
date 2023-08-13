@@ -97,6 +97,21 @@ export class Result<
         return Result.ok(results);
     }
 
+    public static async collectAsync<
+        T extends ValueConstraint = ValueDefault,
+        E extends ErrorConstraint = ErrorDefault
+    >(iter: Iterable<Promise<Result<T, E>>>): Promise<Result<T[], E>> {
+        return Result.collect(
+            (await Promise.allSettled(iter)).map(result => {
+                if (result.status === 'fulfilled') {
+                    return result.value;
+                } else {
+                    return Result.err(result.reason);
+                }
+            })
+        );
+    }
+
     public static wrap<T extends ValueConstraint = ValueDefault>(
         f: () => T
     ): Result<T, ErrorConstraint> {

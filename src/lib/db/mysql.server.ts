@@ -1,4 +1,3 @@
-import { browser } from '$app/environment';
 import { DB, DB_HOST, DB_PASS, DB_PORT, DB_USER } from '$env/static/private';
 import { collapseWhitespace, recursivelyTrimAndStringify } from '$lib/utils/text';
 import chalk from 'chalk';
@@ -40,7 +39,7 @@ export function getConfig(): mysql.ConnectionOptions {
     };
 }
 
-function logQuery(query: string, params: unknown[], result: unknown, time: Milliseconds) {
+async function logQuery(query: string, params: unknown[], result: unknown, time: Milliseconds) {
     const paramsFmt = recursivelyTrimAndStringify(params, 20, 5);
     let resultStr = recursivelyTrimAndStringify(result, 20, 5);
 
@@ -53,7 +52,7 @@ function logQuery(query: string, params: unknown[], result: unknown, time: Milli
         resultStr = result.info;
     }
 
-    void dbLogger.log(
+    await dbLogger.log(
         `\`${collapseWhitespace(query)}\`` +
             `\n     ${paramsFmt}` +
             `\n     (${time.toPrecision(3)}ms) => ${resultStr}`
@@ -101,9 +100,7 @@ export interface QueryFunc extends QueryExecutor {
 export const query = (async <Res extends QueryResult = never>(
     queryParts: TemplateStringsArray,
     ...params: QueryParam[]
-): Promise<Res extends (infer A)[] ? NonFunctionProperties<A>[] : Res> => {
-    if (browser) throw new Error('Cannot query database from browser');
-
+): Promise<Res> => {
     const start = performance.now();
 
     if (!dbConnection) await connect();
@@ -112,14 +109,17 @@ export const query = (async <Res extends QueryResult = never>(
 
     const result = ((await dbConnection?.query(query, queryParams).catch((e: unknown) => {
         const end = performance.now();
-        logQuery(query, queryParams, null, end - start);
-        void dbLogger.log(`Error querying mysql db '${DB}'`);
-        void dbLogger.log(e);
-    })) || [])[0] as Res extends (infer A)[] ? NonFunctionProperties<A>[] : Res;
+        void (async () => {
+            await logQuery(query, queryParams, null, end - start);
+            await dbLogger.log(`Error querying mysql db '${DB}'`);
+            await dbLogger.error(e);
+        })();
+        throw e;
+    })) || [])[0] as Res;
 
     const end = performance.now();
 
-    logQuery(query, params, result, end - start);
+    void logQuery(query, params, result, end - start);
 
     return result;
 }) as QueryFunc;
@@ -127,16 +127,19 @@ export const query = (async <Res extends QueryResult = never>(
 query.unlogged = (async <Res extends QueryResult = never>(
     queryParts: TemplateStringsArray,
     ...params: QueryParam[]
-): Promise<Res extends (infer A)[] ? NonFunctionProperties<A>[] : Res> => {
-    if (browser) throw new Error('Cannot query database from browser');
+): Promise<Res> => {
     if (!dbConnection) await connect();
 
     const [query, queryParams] = buildQuery(queryParts, params);
 
     return ((await dbConnection?.query(query, queryParams).catch((e: unknown) => {
-        void dbLogger.log(`Error querying mysql db '${DB}'`);
-        void dbLogger.log(e);
-    })) || [])[0] as Res extends (infer A)[] ? NonFunctionProperties<A>[] : Res;
+        void (async () => {
+            await logQuery(query, queryParams, null, 0);
+            await dbLogger.log(`Error querying mysql db '${DB}'`);
+            await dbLogger.error(e);
+        })();
+        throw e;
+    })) || [])[0] as Res;
 }) as QueryFunc;
 
 query.unlogged.unlogged = query.unlogged;

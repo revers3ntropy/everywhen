@@ -84,7 +84,6 @@ namespace LabelUtils {
             SELECT id, color, name, created
             FROM labels
             WHERE user = ${auth.id}
-            ORDER BY name
         `;
 
         return Result.collect(
