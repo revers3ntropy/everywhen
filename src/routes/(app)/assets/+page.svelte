@@ -1,10 +1,10 @@
 <script lang="ts">
     import { browser } from '$app/environment';
-    import { uploadImages } from '$lib/components/asset/uploadImages';
     import InfiniteScroller from '$lib/components/InfiniteScroller.svelte';
     import { FILE_INPUT_ACCEPT_TYPES } from '$lib/constants';
     import { api } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
+    import { Result } from '$lib/utils/result';
     import { nowUtc } from '$lib/utils/time';
     import ImageOutline from 'svelte-material-icons/ImageOutline.svelte';
     import Upload from 'svelte-material-icons/Upload.svelte';
@@ -13,7 +13,7 @@
     import type { ChangeEventHandler } from 'svelte/elements';
     import Asset from './Asset.svelte';
     import type { PageData } from './$types';
-    import type { Asset as IAsset } from '$lib/controllers/asset/asset';
+    import { Asset as IAsset } from '$lib/controllers/asset/asset';
 
     export let data: PageData;
 
@@ -28,15 +28,15 @@
     }
 
     const upload = (async e => {
-        if (e.target === null || !('files' in e.target)) {
+        if (!e.target || !('files' in e.target)) {
             return;
         }
         const files = e.target.files as FileList;
-        const res = await uploadImages(files);
-        if (res === null) return;
+        const [uploadedImages, errors] = Result.filter(await IAsset.uploadImages(files));
+        notify.error(errors);
 
         assets = [
-            ...res.map(({ id, publicId, fileName }) => ({
+            ...uploadedImages.map(({ id, publicId, fileName }) => ({
                 id,
                 publicId,
                 fileName,
@@ -45,7 +45,7 @@
             ...assets
         ];
 
-        assetCount = assetCount + res.length;
+        assetCount = assetCount + uploadedImages.length;
     }) as ChangeEventHandler<HTMLInputElement>;
 
     let fileDropInput: HTMLInputElement;

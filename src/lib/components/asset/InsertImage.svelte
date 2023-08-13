@@ -1,10 +1,10 @@
 <script lang="ts">
-    import { uploadImages } from '$lib/components/asset/uploadImages';
     import InfiniteScroller from '$lib/components/InfiniteScroller.svelte';
     import { FILE_INPUT_ACCEPT_TYPES } from '$lib/constants';
     import { Asset } from '$lib/controllers/asset/asset';
     import { notify } from '$lib/components/notifications/notifications';
     import { api } from '$lib/utils/apiRequest';
+    import { Result } from '$lib/utils/result';
     import { nowUtc } from '$lib/utils/time';
     import { onMount } from 'svelte';
     import ImageArea from 'svelte-material-icons/ImageArea.svelte';
@@ -29,10 +29,12 @@
             return;
         }
         const files = e.target.files as FileList;
-        const res = await uploadImages(files);
-        if (res === null) return;
+        const [uploadedImages, errors] = Result.filter(await Asset.uploadImages(files));
+
+        notify.error(errors);
+
         assets = [
-            ...res.map(({ id, publicId, fileName }) => ({
+            ...uploadedImages.map(({ id, publicId, fileName }) => ({
                 id,
                 publicId,
                 fileName,
@@ -40,7 +42,7 @@
             })),
             ...assets
         ];
-        for (const { publicId, fileName } of res) {
+        for (const { publicId, fileName } of uploadedImages) {
             onInput(Asset.generateMarkdownLink(fileName, publicId));
         }
         closePopup();

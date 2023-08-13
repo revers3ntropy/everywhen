@@ -1,11 +1,11 @@
 <script lang="ts">
     import { browser } from '$app/environment';
     import { beforeNavigate, goto } from '$app/navigation';
-    import { uploadImages } from '$lib/components/asset/uploadImages';
     import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
     import InsertImage from '$lib/components/asset/InsertImage.svelte';
     import { Asset } from '$lib/controllers/asset/asset';
     import { dispatch, listen } from '$lib/dataChangeEvents.js';
+    import { Result } from '$lib/utils/result';
     import { serializedAgentData } from '$lib/utils/userAgent';
     import { tooltip } from '@svelte-plugins/tooltips';
     import { onMount } from 'svelte';
@@ -15,7 +15,7 @@
     import { LS_KEYS } from '$lib/constants';
     import type { Entry, RawEntry } from '$lib/controllers/entry/entry';
     import type { Label } from '$lib/controllers/label/label';
-    import { enabledLocation } from '$lib/stores.js';
+    import { currentlyUploadingAssets, enabledLocation } from '$lib/stores.js';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { getLocation } from '$lib/utils/geolocation';
     import { clientLogger } from '$lib/utils/log';
@@ -232,10 +232,11 @@
     }
 
     async function pasteFiles(files: File[] | FileList) {
-        const res = await uploadImages(files);
-        if (res === null) return;
+        const [uploadedImages, errors] = Result.filter(await Asset.uploadImages(files));
 
-        for (const { publicId, fileName } of res) {
+        notify.error(errors);
+
+        for (const { publicId, fileName } of uploadedImages) {
             onNewImage(Asset.generateMarkdownLink(fileName, publicId));
         }
     }
@@ -332,6 +333,15 @@
             <FormatOptions {makeWrapper} />
 
             <InsertImage onInput={onNewImage} />
+
+            {#if $currentlyUploadingAssets[1] > 0}
+                <div style="margin: 0 0 0 4px;">
+                    <i class="text-light">
+                        Uploaded {$currentlyUploadingAssets[0]} /
+                        {$currentlyUploadingAssets[1]}{#if $currentlyUploadingAssets[0] !== $currentlyUploadingAssets[1]}...{/if}
+                    </i>
+                </div>
+            {/if}
         </div>
         <div class="right-options {obfuscated ? 'blur' : ''}">
             <div class="label-select-container">

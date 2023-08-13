@@ -1,4 +1,5 @@
 import { browser } from '$app/environment';
+import { clientLogger } from '$lib/utils/log';
 import { writable } from 'svelte/store';
 import type { Result } from '$lib/utils/result';
 
@@ -18,10 +19,10 @@ export interface Notification {
 export const notifications = writable<Notification[]>([]);
 
 export interface Notify {
-    (text: string, type?: NotificationType, timeout?: Milliseconds): void;
-    info(text: string, timeout?: Milliseconds): void;
-    success(text: string, timeout?: Milliseconds): void;
-    error(text: string, timeout?: Milliseconds): void;
+    (text: string | string[], type?: NotificationType, timeout?: Milliseconds): void;
+    info(text: string | string[], timeout?: Milliseconds): void;
+    success(text: string | string[], timeout?: Milliseconds): void;
+    error(text: string | string[], timeout?: Milliseconds): void;
     onErr<T extends NonNullable<unknown>>(
         result: Result<T>,
         onErr?: (err: string | null) => unknown
@@ -40,25 +41,32 @@ export function addNotification(notification: Notification) {
 }
 
 export const notify: Notify = (
-    text: string,
+    texts: string | string[],
     type = NotificationType.INFO,
     timeout = 3000
 ): void => {
     if (!browser) return;
-    addNotification({
-        text,
-        type,
-        timeout,
-        created: Date.now()
-    });
+    if (typeof texts === 'string') {
+        texts = [texts];
+    }
+    for (const message of texts) {
+        addNotification({
+            text: message,
+            type,
+            timeout,
+            created: Date.now()
+        });
+    }
 };
 
-notify.info = (text: string, timeout: Milliseconds = 4000) =>
+notify.info = (text: string | string[], timeout: Milliseconds = 4000) =>
     notify(text, NotificationType.INFO, timeout);
-notify.success = (text: string, timeout: Milliseconds = 2000) =>
+notify.success = (text: string | string[], timeout: Milliseconds = 2000) =>
     notify(text, NotificationType.SUCCESS, timeout);
-notify.error = (text: string, timeout: Milliseconds = 5000) => {
-    console.error(text);
+notify.error = (text: string | string[], timeout: Milliseconds = 5000) => {
+    if (typeof text === 'string' || text.length > 0) {
+        clientLogger.error(text);
+    }
     notify(text, NotificationType.ERROR, timeout);
 };
 notify.onErr = <T extends NonNullable<unknown>>(

@@ -8,6 +8,7 @@ import { persisted } from 'svelte-local-storage-store';
 // ephemeral
 export const popup = writable<typeof SvelteComponent | null | undefined>(null);
 export const settingsStore = writable<SettingsConfig>();
+export const currentlyUploadingAssets = writable<[number, number]>([0, 0]);
 
 // local storage
 export const doesNotWantToEnableLocation = persisted<boolean>(

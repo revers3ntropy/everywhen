@@ -12,8 +12,14 @@ export class Result<
         private readonly valOrErr: T | E
     ) {}
 
-    public match<U, V>(ok: (value: T) => U, err: (error: E) => V): U | V {
-        return this.ok ? ok(this.valOrErr as T) : err(this.valOrErr as E);
+    public match<U, V>(
+        ok: (value: T) => U,
+        err: (error: E) => V,
+        either: (valOrErr: T | E, piped: U | V) => void = () => void 0
+    ): U | V {
+        const res = this.ok ? ok(this.valOrErr as T) : err(this.valOrErr as E);
+        either(this.valOrErr, res);
+        return res;
     }
 
     public get err(): E | null {
@@ -69,6 +75,13 @@ export class Result<
         );
     }
 
+    public mapErr<F extends ErrorConstraint = ErrorDefault>(f: (error: E) => F): Result<T, F> {
+        return this.match(
+            val => Result.ok(val),
+            err => Result.err(f(err))
+        );
+    }
+
     public static ok<
         T extends ValueConstraint = ValueDefault,
         E extends ErrorConstraint = ErrorDefault
@@ -95,6 +108,21 @@ export class Result<
             results.push(result.unwrap());
         }
         return Result.ok(results);
+    }
+
+    public static filter<
+        T extends ValueConstraint = ValueDefault,
+        E extends ErrorConstraint = ErrorDefault
+    >(iter: Iterable<Result<T, E>>): [T[], E[]] {
+        const results: T[] = [];
+        const errors: E[] = [];
+        for (const result of iter) {
+            result.match(
+                val => results.push(val),
+                err => errors.push(err)
+            );
+        }
+        return [results, errors];
     }
 
     public static async collectAsync<
