@@ -38,6 +38,22 @@
         titles = { ...titles };
     });
 
+    listen.entry.onUpdate(entry => {
+        if (!titles) titles = {};
+
+        const localDate = fmtUtc(entry.created, entry.createdTZOffset, 'YYYY-MM-DD');
+
+        console.log(entry);
+
+        titles = {
+            ...titles,
+            [localDate]: [
+                Entry.entryToTitleEntry(entry),
+                ...(titles[localDate] || []).filter(e => e.id !== entry.id)
+            ]
+        };
+    });
+
     listen.entry.onDelete(id => {
         if (!titles) return;
 

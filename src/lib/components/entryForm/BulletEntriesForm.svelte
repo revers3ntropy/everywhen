@@ -9,7 +9,7 @@
     import type { Label } from '$lib/controllers/label/label';
     import { dispatch } from '$lib/dataChangeEvents';
     import { notify } from '$lib/components/notifications/notifications';
-    import { enabledLocation } from '$lib/stores';
+    import { currentlyUploadingEntries, enabledLocation } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { getLocation } from '$lib/utils/geolocation';
     import { clientLogger } from '$lib/utils/log';
@@ -24,27 +24,13 @@
     export let submitIsPrimaryButton = true;
 
     async function submit() {
+        currentlyUploadingEntries.update(v => v + 1);
+
         const entryVal = entry.value;
         entry.value = '';
 
         const agentData = serializedAgentData();
         const createdTZOffset = currentTzOffset();
-
-        const loadingId = `loading-${nowUtc(false).toString().replace('.', '_')}`;
-        await dispatch.create('entry', {
-            entry: {
-                id: loadingId,
-                title: '',
-                entry: '...',
-                latitude: null,
-                longitude: null,
-                created: nowUtc(),
-                flags: Entry.Flags.NONE,
-                agentData,
-                createdTZOffset
-            },
-            entryMode: EntryFormMode.Bullet
-        });
 
         entry?.focus();
 
@@ -85,13 +71,13 @@
             }
         }
 
-        await dispatch.delete('entry', loadingId);
         await dispatch.create('entry', {
             entry: newEntry,
             entryMode: EntryFormMode.Bullet
         });
 
         entry?.focus();
+        currentlyUploadingEntries.update(v => v - 1);
     }
 
     function onInput(e: KeyboardEvent) {

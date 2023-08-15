@@ -7,6 +7,7 @@
 
 <script lang="ts">
     import { page } from '$app/stores';
+    import { currentlyUploadingEntries } from '$lib/stores';
     import { fly, slide } from 'svelte/transition';
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
@@ -57,15 +58,13 @@
     $: isToday = utcEq(nowUtc(), day, currentTzOffset(), 0, 'YYYY-MM-DD');
     $: $collapsed[day] = entries.length < 1 && (!isToday || !showEntryForm);
 
-    listen.entry.onCreate(
-        ({ entry, entryMode }: { entry: EntryController; entryMode: EntryFormMode }) => {
-            if (!isToday) return;
-            entries = [...entries, entry].sort((a, b) => b.created - a.created);
-            if (entryMode === EntryFormMode.Standard) {
-                scrollToEntry(entry.id);
-            }
+    listen.entry.onCreate(({ entry, entryMode }) => {
+        if (!isToday) return;
+        entries = [...entries, entry].sort((a, b) => b.created - a.created);
+        if (entryMode === EntryFormMode.Standard) {
+            scrollToEntry(entry.id);
         }
-    );
+    });
     listen.entry.onDelete(id => {
         entries = entries.filter(entry => entry.id !== id);
     });
@@ -137,6 +136,21 @@
                 duration: ANIMATION_DURATION
             }}
         >
+            {#if isToday && $currentlyUploadingEntries}
+                {#each { length: $currentlyUploadingEntries } as i}
+                    <Entry
+                        id="temp-{i}"
+                        title=""
+                        entry="..."
+                        created={nowUtc()}
+                        {obfuscated}
+                        {showLabels}
+                        {showLocations}
+                        {locations}
+                        flags={0}
+                    />
+                {/each}
+            {/if}
             {#each entries as entry (entry.id)}
                 <Entry {...entry} {obfuscated} {showLabels} {showLocations} {locations} />
             {/each}

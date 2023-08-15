@@ -15,7 +15,11 @@
     import { LS_KEYS } from '$lib/constants';
     import type { Entry, RawEntry } from '$lib/controllers/entry/entry';
     import type { Label } from '$lib/controllers/label/label';
-    import { currentlyUploadingAssets, enabledLocation } from '$lib/stores.js';
+    import {
+        currentlyUploadingAssets,
+        currentlyUploadingEntries,
+        enabledLocation
+    } from '$lib/stores.js';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { getLocation } from '$lib/utils/geolocation';
     import { clientLogger } from '$lib/utils/log';
@@ -158,6 +162,8 @@
     }
 
     async function submit() {
+        currentlyUploadingEntries.update(v => v + 1);
+
         submitted = true;
 
         const currentLocation = $enabledLocation ? await getLocation() : [null, null];
@@ -183,6 +189,8 @@
             default:
                 throw new Error(`Unknown action: ${action as string}`);
         }
+
+        currentlyUploadingEntries.update(v => v - 1);
     }
 
     function onNewImage(md: string) {
