@@ -86,47 +86,6 @@ interface ApiResponse {
     };
 }
 
-async function handleOkResponse(
-    response: Response,
-    method: string,
-    url: string,
-    key: string | null
-): Promise<Result<object>> {
-    let textResult: string;
-    try {
-        textResult = await response.text();
-    } catch (e) {
-        clientLogger.error(`Error getting text from fetch (${method} ${url})`, response);
-        return Result.err('Invalid response from server');
-    }
-
-    let jsonRes: unknown;
-    try {
-        jsonRes = JSON.parse(textResult);
-    } catch (e) {
-        if (!key) {
-            await Auth.logOut();
-            return Result.err('Invalid auth');
-        }
-
-        const decryptedRes = Auth.decryptOrLogOut(textResult, key);
-
-        try {
-            jsonRes = JSON.parse(decryptedRes);
-        } catch (e) {
-            clientLogger.log({ key, textResult, decryptedRes });
-            clientLogger.error(`Can't parse response (${method} ${url})`);
-            return Result.err('Invalid response from server');
-        }
-    }
-
-    if (typeof jsonRes !== 'object' || jsonRes === null) {
-        clientLogger.error(`non-object returned (${method} ${url})`, jsonRes);
-        return Result.err('Invalid response from server');
-    }
-    return Result.ok(jsonRes);
-}
-
 export async function makeApiReq<
     Verb extends keyof ApiResponse,
     Path extends keyof ApiResponse[Verb],
@@ -137,10 +96,8 @@ export async function makeApiReq<
     body: Body | null = null,
     encryptBody = true
 ): Promise<Result<ApiResponse[Verb][Path]>> {
+    if (!browser) return Result.err(`Cannot make API request on server`);
     const url = `/api${path}`;
-    if (!browser) {
-        return Result.err(`Cannot make API request on server`);
-    }
 
     if (method !== 'GET') {
         body ??= {} as Body;
@@ -175,13 +132,74 @@ export async function makeApiReq<
     const response = await fetch(url, init);
 
     if (response.ok) {
-        const { err, val } = await handleOkResponse(response, method, url, latestEncryptionKey);
-        if (err) return Result.err(err);
-        return Result.ok(val as ApiResponse[Verb][Path]);
+        return await handleOkResponse<ApiResponse[Verb][Path]>(
+            response,
+            method,
+            url,
+            latestEncryptionKey
+        );
     }
 
+    return Result.err(await handleErrorResponse(response, method, path, url));
+}
+
+async function handleOkResponse<T extends object>(
+    response: Response,
+    method: string,
+    url: string,
+    key: string | null
+): Promise<Result<T>> {
+    let textResult: string;
+    try {
+        textResult = await response.text();
+    } catch (e) {
+        clientLogger.error(`Error getting text from fetch (${method} ${url})`, response);
+        return Result.err('Invalid response from server');
+    }
+
+    let jsonRes: unknown;
+    try {
+        jsonRes = JSON.parse(textResult);
+    } catch (e) {
+        if (!key) {
+            await Auth.logOut();
+            return Result.err('Invalid auth');
+        }
+
+        const decryptedRes = Auth.decryptOrLogOut(textResult, key);
+
+        try {
+            jsonRes = JSON.parse(decryptedRes);
+        } catch (e) {
+            clientLogger.log({ key, textResult, decryptedRes });
+            clientLogger.error(`Can't parse response (${method} ${url})`);
+            return Result.err('Invalid response from server');
+        }
+    }
+
+    if (typeof jsonRes !== 'object' || jsonRes === null) {
+        clientLogger.error(`non-object returned (${method} ${url})`, jsonRes);
+        return Result.err('Invalid response from server');
+    }
+    return Result.ok(jsonRes as T);
+}
+
+async function handleErrorResponse(
+    response: Response,
+    method: string,
+    path: string,
+    url: string
+): Promise<string> {
     if (response.status === 503) {
-        return Result.err('Server is down for maintenance');
+        return 'Server is down for maintenance';
+    }
+    if (response.status === 401) {
+        // this api route is called by Auth.logOut(),
+        // so prevent infinite loop
+        if (!(path === '/auth' && method === 'DELETE')) {
+            await Auth.logOut();
+        }
+        return 'Invalid auth';
     }
     clientLogger.error(`Error on api fetch  (${method} ${url})`, response);
 
@@ -191,22 +209,20 @@ export async function makeApiReq<
             const res = JSON.parse(resTxt);
             if (typeof res === 'object' && res !== null) {
                 if ('error' in res) {
-                    return Result.err(
-                        typeof res.error === 'string' ? res.error : JSON.stringify(res.error)
-                    );
+                    return typeof res.error === 'string' ? res.error : JSON.stringify(res.error);
                 }
                 if ('message' in res) {
-                    return Result.err(
-                        typeof res.message === 'string' ? res.message : JSON.stringify(res.message)
-                    );
+                    return typeof res.message === 'string'
+                        ? res.message
+                        : JSON.stringify(res.message);
                 }
             }
         } catch (e) {
             // ignore
         }
-        return Result.err(resTxt);
+        return resTxt;
     } catch (e) {
-        return Result.err('An unknown error has occurred');
+        return 'An unknown error has occurred';
     }
 }
 

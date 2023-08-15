@@ -2,6 +2,7 @@ import { MAX_IMAGE_SIZE } from '$lib/constants';
 import { currentlyUploadingAssets } from '$lib/stores';
 import { api } from '$lib/utils/apiRequest';
 import { getFileContents } from '$lib/utils/files.client';
+import { clientLogger } from '$lib/utils/log';
 import { Result } from '$lib/utils/result';
 
 export interface Asset {
@@ -19,7 +20,7 @@ export namespace Asset {
         return `![${fileName}](/api/assets/${publicId})`;
     }
 
-    function imageAsWebP(imageFileContentB64: string): Promise<Result<string>> {
+    function imageToWebpUsingCanvas(imageFileContentB64: string): Promise<Result<string>> {
         return new Promise(resolve => {
             const image = new Image();
             image.onload = () => {
@@ -40,7 +41,9 @@ export namespace Asset {
                 );
                 resolve(Result.ok(imageWebpNoHeader));
             };
-            image.onerror = () => {
+            image.onerror = e => {
+                clientLogger.error(e);
+                clientLogger.error('Failed to load image');
                 resolve(Result.err('Failed to load image'));
             };
             image.src = imageFileContentB64;
@@ -82,7 +85,9 @@ export namespace Asset {
                     return finishedUpload(Result.err('Failed to read file'));
                 }
 
-                const { val: contentAsWebP, err: webPConvertErr } = await imageAsWebP(content);
+                const { val: contentAsWebP, err: webPConvertErr } = await imageToWebpUsingCanvas(
+                    content
+                );
 
                 if (webPConvertErr) {
                     return finishedUpload(Result.err(webPConvertErr));

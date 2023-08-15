@@ -1,6 +1,6 @@
 import { PUBLIC_ENV } from '$env/static/public';
 import { ENABLE_CACHING } from '$lib/constants';
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 import type { RequestEvent, ServerLoadEvent } from '@sveltejs/kit';
 import chalk from 'chalk';
 import type { GenericResponse } from './apiResponse.server';
@@ -124,9 +124,9 @@ export function cachedApiRoute<
 >(
     handler: (auth: Auth, event: RequestEvent<Params, RouteId>) => Promise<Res>
 ): (event: RequestEvent<Params, RouteId>) => Promise<GenericResponse<Res>> {
-    return (async (props: RequestEvent<Params, RouteId>): Promise<GenericResponse<Res>> => {
-        const url = props.url.href;
-        const auth = props.locals.auth;
+    return (async (event: RequestEvent<Params, RouteId>): Promise<GenericResponse<Res>> => {
+        const url = event.url.href;
+        const auth = event.locals.auth;
 
         if (!auth) throw error(401, 'Unauthorized');
 
@@ -135,7 +135,7 @@ export function cachedApiRoute<
             return cached as GenericResponse<Res>;
         }
 
-        const response = await handler(auth, props);
+        const response = await handler(auth, event);
         if (typeof response !== 'object') {
             throw new Error('Body must be an object');
         }
@@ -176,7 +176,7 @@ export function cachedPageRoute<
         const url = props.url.href;
         let auth = props.locals.auth as Auth | (MustHaveAuth extends true ? Auth : null);
         if (requireAuth) {
-            if (!auth) throw error(401, 'Unauthorized');
+            if (!auth) throw redirect(301, 'Unauthorized');
         } else {
             auth = null as unknown as Auth;
         }

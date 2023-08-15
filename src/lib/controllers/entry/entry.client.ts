@@ -112,7 +112,6 @@ namespace EntryUtils {
     export function entryToTitleEntry(entry: Entry): Entry {
         return {
             ...entry,
-            title: stringToShortTitle(entry.title),
             entry: stringToShortTitle(entry.entry)
         };
     }
