@@ -1,5 +1,6 @@
 import { COOKIE_KEYS, sessionCookieOptions } from '$lib/constants';
 import { Log } from '$lib/controllers/log/log';
+import { encryptionKey } from '$lib/stores';
 import { nowUtc } from '$lib/utils/time';
 import type { Cookies, Handle, RequestEvent } from '@sveltejs/kit';
 import chalk from 'chalk';
@@ -8,6 +9,7 @@ import { cleanupCache } from '$lib/utils/cache.server';
 import { errorLogger, FileLogger } from '$lib/utils/log.server';
 import { Auth } from '$lib/controllers/auth/auth.server';
 import '$lib/controllers/auth/auth.server';
+import { get } from 'svelte/store';
 
 const reqLogger = new FileLogger('REQ', chalk.bgWhite.black);
 
@@ -127,11 +129,21 @@ export const handle = (async ({ event, resolve }) => {
     const start = performance.now();
     const now = nowUtc();
 
+    if (get(encryptionKey) !== null) {
+        await errorLogger.error('encryption key may be leaked - bad!!');
+    }
+
     const auth = Auth.Server.tryGetAuthFromCookies(event.cookies);
     if (auth) {
         event.locals.auth = { ...auth };
+
+        if (event.route.id?.startsWith('/(app)')) {
+            // only accessible from server during ssr, not sent to client
+            encryptionKey.set(auth.key);
+        }
     } else {
         event.locals.auth = null;
+        encryptionKey.set(null);
 
         // unset session cookie if invalid session
         event.cookies.delete(COOKIE_KEYS.sessionId, sessionCookieOptions(false));
@@ -153,6 +165,8 @@ export const handle = (async ({ event, resolve }) => {
             status: 500
         });
     }
+
+    encryptionKey.set(null);
 
     void logReq(performance.now() - start, now, eventClone, result.clone(), auth).catch(
         (...args: unknown[]) => void errorLogger.error(...args)
