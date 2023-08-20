@@ -18,7 +18,7 @@
         actionPending = true;
 
         const key = Auth.encryptionKeyFromPassword(password);
-        $encryptionKey = key;
+        encryptionKey.set(key);
 
         notify.onErr(
             await api.post(
@@ -27,12 +27,12 @@
                     password: key,
                     username
                 },
-                false
+                { doNotEncryptBody: true }
             ),
             () => (actionPending = false)
         );
 
-        $usernameStore = username;
+        usernameStore.set(username);
 
         if (passcode) {
             notify.onErr(

@@ -59,7 +59,7 @@ export const DELETE = (({ cookies }) => {
     cookies.delete(COOKIE_KEYS.sessionId, sessionCookieOptions(false));
     Auth.Server.invalidateAllSessionsForUser(auth.id);
 
-    return apiResponse(auth, {});
+    return apiResponse(null, {});
 }) satisfies RequestHandler;
 
 export const POST = apiRes404;

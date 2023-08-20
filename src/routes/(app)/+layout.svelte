@@ -8,6 +8,7 @@
     import { page } from '$app/stores';
     import {
         allowedCookies,
+        encryptionKey,
         obfuscated,
         passcodeLastEntered,
         settingsStore,
@@ -79,7 +80,7 @@
 
     function checkDayDifferent() {
         if (day !== fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD')) {
-            window.location.reload();
+            location.reload();
         }
     }
 
@@ -110,6 +111,7 @@
     });
 
     $: if (!$username) void Auth.logOut(true);
+    $: if (!$encryptionKey) void Auth.logOut(true);
 
     passcodeLastEntered.subscribe(v => void checkPasscode(v));
 

@@ -28,7 +28,7 @@
                     username,
                     rememberMe: rememberMeInput.checked
                 },
-                false
+                { doNotEncryptBody: true }
             ),
             () => (actionPending = false)
         );

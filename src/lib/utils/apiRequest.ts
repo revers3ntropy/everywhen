@@ -1,4 +1,5 @@
 import { browser } from '$app/environment';
+import { notify } from '$lib/components/notifications/notifications';
 import { Auth } from '$lib/controllers/auth/auth';
 import { encryptionKey } from '$lib/stores';
 import { encrypt } from '$lib/utils/encryption';
@@ -9,11 +10,17 @@ import { clientLogger } from './log';
 import { Result } from './result';
 import { currentTzOffset, nowUtc } from './time';
 
-export type ReqBody = {
+export interface ReqBody {
     timezoneUtcOffset?: number;
     utcTimeS?: number;
     [key: string]: unknown;
-};
+}
+
+export interface Options {
+    doNotEncryptBody: boolean;
+    doNotTryToDecryptResponse: boolean;
+    doNotLogoutOn401: boolean;
+}
 
 export type ResType<T> = T extends typeof apiRes404
     ? 'this path gives a 404'
@@ -94,7 +101,7 @@ export async function makeApiReq<
     method: Verb,
     path: string,
     body: Body | null = null,
-    encryptBody = true
+    options: Partial<Options> = {}
 ): Promise<Result<ApiResponse[Verb][Path]>> {
     if (!browser) return Result.err(`Cannot make API request on server`);
     const url = `/api${path}`;
@@ -105,9 +112,7 @@ export async function makeApiReq<
         body = { ...body };
 
         // supply default timezone to all requests
-        if (browser) {
-            body.timezoneUtcOffset ??= currentTzOffset();
-        }
+        body.timezoneUtcOffset ??= currentTzOffset();
         body.utcTimeS ??= nowUtc();
     }
 
@@ -122,7 +127,12 @@ export async function makeApiReq<
     const latestEncryptionKey = get(encryptionKey);
 
     if (body) {
-        if (latestEncryptionKey && encryptBody) {
+        if (!options.doNotEncryptBody) {
+            if (!latestEncryptionKey) {
+                notify.error('Failed to make API call');
+                clientLogger.error('no encryption key found', latestEncryptionKey);
+                throw new Error();
+            }
             init.body = encrypt(JSON.stringify(body), latestEncryptionKey);
         } else {
             init.body = JSON.stringify(body);
@@ -136,18 +146,20 @@ export async function makeApiReq<
             response,
             method,
             url,
-            latestEncryptionKey
+            latestEncryptionKey,
+            options
         );
     }
 
-    return Result.err(await handleErrorResponse(response, method, path, url));
+    return Result.err(await handleErrorResponse(response, method, url, options));
 }
 
 async function handleOkResponse<T extends object>(
     response: Response,
     method: string,
     url: string,
-    key: string | null
+    key: string | null,
+    options: Partial<Options>
 ): Promise<Result<T>> {
     let textResult: string;
     try {
@@ -161,9 +173,16 @@ async function handleOkResponse<T extends object>(
     try {
         jsonRes = JSON.parse(textResult);
     } catch (e) {
+        if (options.doNotTryToDecryptResponse) {
+            notify.error('invalid response from server');
+            clientLogger.error('Response is not JSON: ', textResult);
+            return Result.err('Invalid response from server');
+        }
         if (!key) {
-            await Auth.logOut();
-            return Result.err('Invalid auth');
+            if (!options.doNotLogoutOn401) {
+                await Auth.logOut();
+            }
+            return Result.err('Something went wrong, please log in again');
         }
 
         const decryptedRes = Auth.decryptOrLogOut(textResult, key);
@@ -187,19 +206,17 @@ async function handleOkResponse<T extends object>(
 async function handleErrorResponse(
     response: Response,
     method: string,
-    path: string,
-    url: string
+    url: string,
+    options: Partial<Options>
 ): Promise<string> {
     if (response.status === 503) {
         return 'Server is down for maintenance';
     }
     if (response.status === 401) {
-        // this api route is called by Auth.logOut(),
-        // so prevent infinite loop
-        if (!(path === '/auth' && method === 'DELETE')) {
-            await Auth.logOut();
+        if (!options.doNotLogoutOn401) {
+            await Auth.logOut(true);
         }
-        return 'Invalid auth';
+        return 'Invalid log in';
     }
     clientLogger.error(`Error on api fetch  (${method} ${url})`, response);
 
@@ -230,37 +247,31 @@ export const api = {
     get: async <Path extends keyof ApiResponse['GET'], Body extends ReqBody>(
         path: Path,
         args: Record<string, string | number | boolean | undefined> = {},
-        encryptBodyIfCan = true
-    ) =>
-        await makeApiReq<'GET', Path, Body>(
-            'GET',
-            path + serializeGETArgs(args),
-            null,
-            encryptBodyIfCan
-        ),
+        options: Partial<Options> = {}
+    ) => await makeApiReq<'GET', Path, Body>('GET', path + serializeGETArgs(args), null, options),
 
     post: async <Path extends keyof ApiResponse['POST'], Body extends ReqBody>(
         path: Path,
         body: Body = {} as Body,
-        encryptBodyIfCan = true
-    ) => await makeApiReq<'POST', Path, Body>('POST', path, body, encryptBodyIfCan),
+        options: Partial<Options> = {}
+    ) => await makeApiReq<'POST', Path, Body>('POST', path, body, options),
 
     put: async <Path extends keyof ApiResponse['PUT'], Body extends ReqBody>(
         path: Path,
         body: Body = {} as Body,
-        encryptBodyIfCan = true
-    ) => await makeApiReq<'PUT', Path, Body>('PUT', path, body, encryptBodyIfCan),
+        options: Partial<Options> = {}
+    ) => await makeApiReq<'PUT', Path, Body>('PUT', path, body, options),
 
     delete: async <Path extends keyof ApiResponse['DELETE'], Body extends ReqBody>(
         path: Path,
         body: Body = {} as Body,
-        encryptBodyIfCan = true
-    ) => await makeApiReq<'DELETE', Path, Body>('DELETE', path, body, encryptBodyIfCan)
+        options: Partial<Options> = {}
+    ) => await makeApiReq<'DELETE', Path, Body>('DELETE', path, body, options)
 };
+
+export type Api = typeof api;
 
 // eg '/labels/?', '1' ==> '/labels/1' but returns '/labels/?' as type
 export function apiPath<T extends string>(path: T, ...params: string[]): T {
     return path.replace(/\?/g, () => params.shift() || '') as T;
 }
-
-export type Api = typeof api;

@@ -30,9 +30,7 @@ export interface Notify {
 }
 
 export function removeNotification(notification: Notification) {
-    notifications.update(notifs => {
-        return notifs.filter(n => n !== notification);
-    });
+    notifications.update(notifs => notifs.filter(n => n !== notification));
 }
 
 export function addNotification(notification: Notification) {

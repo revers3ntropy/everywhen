@@ -2,8 +2,10 @@ import { browser } from '$app/environment';
 import {
     COOKIES_TO_CLEAR_ON_LOGOUT,
     LS_TO_CLEAR_ON_LOGOUT,
+    SESSION_KEYS,
     SESSION_TO_CLEAR_ON_LOGOUT
 } from '$lib/constants';
+import { currentlyUploadingAssets, currentlyUploadingEntries } from '$lib/stores';
 import { decrypt } from '$lib/utils/encryption';
 import Cookie from 'js-cookie';
 import { api } from '$lib/utils/apiRequest';
@@ -43,8 +45,20 @@ export namespace Auth {
             Cookie.remove(key);
         }
 
-        await api.delete('/auth');
+        await api.delete(
+            '/auth',
+            {},
+            { doNotEncryptBody: true, doNotTryToDecryptResponse: true, doNotLogoutOn401: true }
+        );
 
+        // do not trigger storage event for these
+        sessionStorage.removeItem(SESSION_KEYS.username);
+        sessionStorage.removeItem(SESSION_KEYS.encryptionKey);
+
+        currentlyUploadingAssets.set(0);
+        currentlyUploadingEntries.set(0);
+
+        console.log({ wantsToStay });
         if (wantsToStay) {
             const returnPath = encodeURIComponent(location.pathname.substring(1) + location.search);
             await goto(`/login?redirect=${returnPath}`);

@@ -47,11 +47,7 @@ export const LS_TO_CLEAR_ON_LOGOUT = Object.freeze([
     LS_KEYS.lastTipNumber,
     LS_KEYS.doesNotWantToEnableLocation
 ]);
-export const SESSION_TO_CLEAR_ON_LOGOUT = Object.freeze([
-    SESSION_KEYS.username,
-    SESSION_KEYS.encryptionKey,
-    SESSION_KEYS.GH_CB
-]);
+export const SESSION_TO_CLEAR_ON_LOGOUT = Object.freeze([SESSION_KEYS.GH_CB]);
 export const COOKIES_TO_CLEAR_ON_LOGOUT = Object.freeze([]);
 
 // possible characters to show when the text is blurred

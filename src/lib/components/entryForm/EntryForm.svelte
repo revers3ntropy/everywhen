@@ -342,11 +342,10 @@
 
             <InsertImage onInput={onNewImage} />
 
-            {#if $currentlyUploadingAssets[1] > 0}
+            {#if $currentlyUploadingAssets > 0}
                 <div style="margin: 0 0 0 4px;">
                     <i class="text-light">
-                        Uploaded {$currentlyUploadingAssets[0]} /
-                        {$currentlyUploadingAssets[1]}{#if $currentlyUploadingAssets[0] !== $currentlyUploadingAssets[1]}...{/if}
+                        Uploading {$currentlyUploadingAssets} images...
                     </i>
                 </div>
             {/if}

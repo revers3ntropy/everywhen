@@ -298,7 +298,7 @@
                         <Streaks condensed />
                     </span>
                     <span class="username">
-                        {$username}
+                        {$username || '...'}
                     </span>
                 </span>
                 <span class="hide-mobile flex-center">

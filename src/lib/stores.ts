@@ -8,7 +8,7 @@ import { persisted } from 'svelte-local-storage-store';
 // ephemeral
 export const popup = writable<typeof SvelteComponent | null | undefined>(null);
 export const settingsStore = writable<SettingsConfig>();
-export const currentlyUploadingAssets = writable<[number, number]>([0, 0]);
+export const currentlyUploadingAssets = writable<number>(0);
 export const currentlyUploadingEntries = writable<number>(0);
 
 // local storage

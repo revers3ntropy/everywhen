@@ -18,7 +18,7 @@
 
         const { backup: backupData } = notify.onErr(await api.delete('/users'));
         BackupControllerClient.download(backupData, $username, true);
-        await Auth.logOut(false);
+        await Auth.logOut();
     }
 
     let badUsername = false;

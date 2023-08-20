@@ -62,10 +62,10 @@ export namespace Asset {
         const fileResults = [] as Result<{ publicId: string; id: string; fileName: string }>[];
         if (files.length < 1) return fileResults;
 
-        currentlyUploadingAssets.update(([current, total]) => [current, total + files.length]);
+        currentlyUploadingAssets.update(v => v + files.length);
 
-        function finishedUpload(result: Result<UploadImageResult>) {
-            currentlyUploadingAssets.update(([current, total]) => [current + 1, total]);
+        function finishedUpload(result: Result<UploadImageResult>): void {
+            currentlyUploadingAssets.update(v => v - 1);
             fileResults.push(result);
         }
 
@@ -114,13 +114,6 @@ export namespace Asset {
                 );
             })
         );
-
-        setTimeout(() => {
-            currentlyUploadingAssets.update(([current, total]) => {
-                if (current === total) return [0, 0];
-                return [current, total];
-            });
-        }, 2 * 1000);
 
         return fileResults;
     }
