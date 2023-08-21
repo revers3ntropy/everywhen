@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { BackupControllerClient } from '$lib/controllers/backup/backup';
+    import { Backup } from '$lib/controllers/backup/backup';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import Skull from 'svelte-material-icons/Skull.svelte';
     import { api } from '$lib/utils/apiRequest';
@@ -28,7 +28,7 @@
                 { doNotTryToDecryptResponse: true }
             )
         );
-        BackupControllerClient.download(backupData, $username, true);
+        Backup.download(backupData, $username, true);
         await Auth.logOut();
     }
 

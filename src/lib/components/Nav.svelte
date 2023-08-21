@@ -1,7 +1,7 @@
 <script lang="ts">
     import { afterNavigate, beforeNavigate, goto } from '$app/navigation';
     import { page } from '$app/stores';
-    import { BackupControllerClient } from '$lib/controllers/backup/backup';
+    import { Backup } from '$lib/controllers/backup/backup';
     import { tooltip } from '@svelte-plugins/tooltips';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import Brain from 'svelte-material-icons/Brain.svelte';
@@ -45,7 +45,7 @@
         if (isDownloadingBackup) return;
         isDownloadingBackup = true;
         const { data: backupData } = notify.onErr(await api.get('/backups', { encrypted: 1 }));
-        BackupControllerClient.download(backupData, $username, true);
+        Backup.download(backupData, $username, true);
         isDownloadingBackup = false;
     }
 

@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Auth } from '$lib/controllers/auth/auth';
-    import { BackupControllerClient } from '$lib/controllers/backup/backup';
+    import { Backup } from '$lib/controllers/backup/backup';
     import Download from 'svelte-material-icons/Download.svelte';
     import DownloadLock from 'svelte-material-icons/DownloadLock.svelte';
     import Upload from 'svelte-material-icons/Upload.svelte';
@@ -17,7 +17,7 @@
         if (downloading) return;
         downloading = true;
         const { data: backupData } = notify.onErr(await api.get('/backups', { encrypted }));
-        BackupControllerClient.download(backupData, $username, encrypted);
+        Backup.download(backupData, $username, encrypted);
         downloading = false;
     }
 

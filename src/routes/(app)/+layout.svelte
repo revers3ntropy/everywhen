@@ -1,7 +1,7 @@
 <script lang="ts">
     import AllowCookies from '$lib/components/AllowCookies.svelte';
     import { Auth } from '$lib/controllers/auth/auth';
-    import { BackupControllerClient } from '$lib/controllers/backup/backup';
+    import { Backup } from '$lib/controllers/backup/backup';
     import type { LayoutData } from './$types';
     import { onDestroy } from 'svelte';
     import { browser } from '$app/environment';
@@ -50,7 +50,7 @@
         if (downloadingBackup) return;
         downloadingBackup = true;
         const { data: backupData } = notify.onErr(await api.get('/backups', { encrypted: 1 }));
-        BackupControllerClient.download(backupData, $username, true);
+        Backup.download(backupData, $username, true);
         downloadingBackup = false;
     }
 

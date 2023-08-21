@@ -1,4 +1,4 @@
-import { BackupControllerServer } from '$lib/controllers/backup/backup.server';
+import { Backup } from '$lib/controllers/backup/backup.server';
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
 import { COOKIE_KEYS, maxAgeFromShouldRememberMe, sessionCookieOptions } from '$lib/constants';
@@ -48,7 +48,7 @@ export const DELETE = (async ({ cookies, request, locals: { auth } }) => {
     if (authErr) throw error(401, authErr);
     if (userIdFromLogIn !== auth.id) throw error(401, 'Invalid authentication');
 
-    const { err, val: backup } = await BackupControllerServer.generate(query, auth);
+    const { err, val: backup } = await Backup.Server.generate(auth);
     if (err) throw error(400, err);
 
     await UserControllerServer.purge(query, auth);

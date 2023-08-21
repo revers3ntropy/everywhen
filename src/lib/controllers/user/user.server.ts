@@ -1,4 +1,4 @@
-import { BackupControllerServer } from '$lib/controllers/backup/backup.server';
+import { Backup } from '$lib/controllers/backup/backup.server';
 import type { QueryFunc } from '$lib/db/mysql.server';
 import { Result } from '$lib/utils/result';
 import { nowUtc } from '$lib/utils/time';
@@ -132,13 +132,10 @@ export namespace UserControllerServer {
             key: newKey
         };
 
-        const { val: backup, err: generateErr } = await BackupControllerServer.generate(
-            query,
-            auth
-        );
+        const { val: backup, err: generateErr } = await Backup.Server.generate(auth);
         if (generateErr) return Result.err(generateErr);
 
-        const encryptedBackup = BackupControllerServer.asEncryptedString(backup, auth.key);
+        const encryptedBackup = Backup.Server.asEncryptedString(backup, auth.key);
 
         Auth.Server.invalidateAllSessionsForUser(auth.id);
 
@@ -148,12 +145,7 @@ export namespace UserControllerServer {
             WHERE id = ${auth.id}
         `;
 
-        const { err } = await BackupControllerServer.restore(
-            query,
-            newAuth,
-            encryptedBackup,
-            auth.key
-        );
+        const { err } = await Backup.Server.restore(newAuth, encryptedBackup, auth.key);
         if (err) return Result.err(err);
 
         return await Settings.changeEncryptionKeyInDB(query, auth, newKey);

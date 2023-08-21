@@ -1,7 +1,7 @@
 import { download as downloadFile } from '$lib/utils/files.client';
 import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
 
-export interface IBackup {
+export interface Backup {
     entries: {
         title: string;
         label?: string; // label's name
@@ -53,7 +53,7 @@ export interface IBackup {
     appVersion: string;
 }
 
-export namespace BackupControllerClient {
+export namespace Backup {
     export function download(data: string, username: string | null, encrypted: boolean): void {
         const dateFmt = fmtUtc(nowUtc(), currentTzOffset(), 'yyyyMMDD-HHmm');
         const encryptedExt = encrypted ? '.encrypted' : '';

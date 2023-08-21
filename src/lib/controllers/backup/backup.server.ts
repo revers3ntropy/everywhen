@@ -1,27 +1,25 @@
 import { Location } from '$lib/controllers/location/location';
+import { query } from '$lib/db/mysql.server';
 import { SemVer } from '$lib/utils/semVer';
 import schemion from 'schemion';
-import type { QueryFunc } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
 import { nowUtc } from '$lib/utils/time';
 import { Entry } from '../entry/entry';
 import { Event } from '../event/event';
 import { Label } from '../label/label';
-import type { IBackup } from './backup';
+import { Backup as _Backup } from './backup';
 import type { Auth } from '$lib/controllers/auth/auth';
 import { Asset } from '$lib/controllers/asset/asset.server';
 
-export namespace BackupControllerServer {
-    export function asEncryptedString(self: IBackup, key: string): string {
+export namespace BackupServer {
+    type Backup = _Backup;
+
+    export function asEncryptedString(self: Backup, key: string): string {
         return encrypt(JSON.stringify(self), key);
     }
 
-    export async function generate(
-        query: QueryFunc,
-        auth: Auth,
-        created?: number
-    ): Promise<Result<IBackup>> {
+    export async function generate(auth: Auth, created?: number): Promise<Result<Backup>> {
         const { err: entryErr, val: entries } = await Entry.all(query, auth, {
             deleted: 'both'
         });
@@ -93,7 +91,6 @@ export namespace BackupControllerServer {
     }
 
     export async function restore(
-        query: QueryFunc,
         auth: Auth,
         backupEncrypted: string,
         key: string
@@ -241,7 +238,7 @@ export namespace BackupControllerServer {
         return Result.ok(null);
     }
 
-    export function migrate(json: Partial<IBackup> & Record<string, unknown>): Result<IBackup> {
+    export function migrate(json: Partial<Backup> & Record<string, unknown>): Result<Backup> {
         json.appVersion ||= '0.0.0';
         const { val: version, err } = SemVer.fromString(json.appVersion);
         if (err) return Result.err(err);
@@ -264,6 +261,13 @@ export namespace BackupControllerServer {
             }
         }
 
-        return Result.ok(json as IBackup);
+        return Result.ok(json as Backup);
     }
 }
+
+export const Backup = {
+    ..._Backup,
+    Server: BackupServer
+};
+
+export type Backup = _Backup;
