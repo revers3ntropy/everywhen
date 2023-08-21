@@ -7,7 +7,7 @@ import type { GenericResponse } from './apiResponse.server';
 import { FileLogger } from './log.server';
 import { fmtBytes } from './text';
 import { nowUtc } from './time';
-import type { Auth } from '$lib/controllers/auth/auth';
+import { Auth } from '$lib/controllers/auth/auth';
 import { encrypt } from '$lib/utils/encryption';
 
 const cacheLogger = new FileLogger('CACHE', chalk.magentaBright);
@@ -176,7 +176,7 @@ export function cachedPageRoute<
         const url = props.url.href;
         let auth = props.locals.auth as Auth | (MustHaveAuth extends true ? Auth : null);
         if (requireAuth) {
-            if (!auth) throw redirect(301, 'Unauthorized');
+            if (!auth) throw redirect(301, Auth.requireAuthUrl(url));
         } else {
             auth = null as unknown as Auth;
         }

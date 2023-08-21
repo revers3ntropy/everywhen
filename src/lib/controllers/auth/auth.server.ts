@@ -64,11 +64,7 @@ namespace AuthServer {
         return user;
     }
 
-    export async function authenticateUserFromLogIn(
-        username: string,
-        key: string,
-        expireAfter: Seconds
-    ): Promise<Result<string>> {
+    export async function userIdFromLogIn(username: string, key: string): Promise<Result<string>> {
         const res = await query<{ id: string }[]>`
             SELECT id
             FROM users
@@ -78,10 +74,21 @@ namespace AuthServer {
         if (res.length !== 1) {
             return Result.err('Invalid login');
         }
+        return Result.ok(res[0].id);
+    }
+
+    export async function authenticateUserFromLogIn(
+        username: string,
+        key: string,
+        expireAfter: Seconds
+    ): Promise<Result<string>> {
+        const rUserId = await userIdFromLogIn(username, key);
+        if (!rUserId.ok) return rUserId;
+
         const sessionId = await UUIdControllerServer.generate();
 
         const session: Session = {
-            id: res[0].id,
+            id: rUserId.val,
             username,
             key,
             created: nowUtc(),

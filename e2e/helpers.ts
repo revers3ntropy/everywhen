@@ -1,3 +1,4 @@
+import '@total-typescript/ts-reset';
 import { type APIRequestContext, expect, type Page, request } from '@playwright/test';
 import crypto from 'crypto-js';
 import { serialize } from 'cookie';
@@ -87,7 +88,7 @@ export async function generateUser(): Promise<{
     const makeRes = await api.post('./users', {
         data: {
             username,
-            password: key
+            encryptionKey: key
         }
     });
     if (!makeRes.ok()) {
@@ -120,25 +121,38 @@ export async function generateUserAndSignIn(page: Page): Promise<{
     return { auth, api };
 }
 
-export async function deleteUser(api: APIRequestContext): Promise<Result> {
-    const res = await api.delete('./users');
+export async function deleteUser(
+    api: APIRequestContext,
+    user: { username: string; key: string }
+): Promise<Result> {
+    const res = await api.delete('./users', {
+        data: {
+            username: user.username,
+            encryptionKey: user.key
+        }
+    });
     if (res.ok()) {
-        const result = await res.json();
-        if (typeof result?.backup === 'string') {
+        const result = (await res.json()) as Record<string, unknown>;
+        if (typeof result !== 'object' || typeof result['backup'] === 'string') {
             return Result.ok(null);
         }
         return Result.err('Failed to delete user: no backup');
     }
     const body = await res.text();
     try {
-        return Result.err(String((JSON.parse(body) as Record<string, unknown>)?.message || body));
+        return Result.err(
+            String((JSON.parse(body) as Record<string, unknown>)?.['message'] || body)
+        );
     } catch (e) {
         return Result.err(body);
     }
 }
 
-export async function expectDeleteUser(api: APIRequestContext): Promise<void> {
-    const { err } = await deleteUser(api);
+export async function expectDeleteUser(
+    api: APIRequestContext,
+    user: { username: string; key: string }
+): Promise<void> {
+    const { err } = await deleteUser(api, user);
     expect(err).toBe(null);
 }
 

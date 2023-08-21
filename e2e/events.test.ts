@@ -8,9 +8,9 @@ test.describe('/events', () => {
     });
 
     test('Can view page', async ({ page }) => {
-        const { api } = await generateUserAndSignIn(page);
+        const { api, auth } = await generateUserAndSignIn(page);
         await page.goto('/events', { waitUntil: 'networkidle' });
         await expect(page).toHaveURL('/events');
-        await expectDeleteUser(api);
+        await expectDeleteUser(api, auth);
     });
 });

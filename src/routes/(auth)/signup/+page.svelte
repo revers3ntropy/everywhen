@@ -24,7 +24,7 @@
             await api.post(
                 `/users`,
                 {
-                    password: key,
+                    encryptionKey: key,
                     username
                 },
                 { doNotEncryptBody: true }

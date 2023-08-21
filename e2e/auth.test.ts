@@ -1,6 +1,13 @@
 import { expect, test } from '@playwright/test';
 import { COOKIE_KEYS } from '../src/lib/constants';
-import { deleteUser, expectDeleteUser, generateApiCtx, generateUser, randStr } from './helpers';
+import {
+    deleteUser,
+    encryptionKeyFromPassword,
+    expectDeleteUser,
+    generateApiCtx,
+    generateUser,
+    randStr
+} from './helpers';
 
 test.describe('/signup', () => {
     test('Has title', async ({ page }) => {
@@ -60,7 +67,10 @@ test.describe('/signup', () => {
 
         const api = await generateApiCtx((await page.context().cookies())[sessionCookieIdx].value);
 
-        await expectDeleteUser(api);
+        await expectDeleteUser(api, {
+            username: auth.username,
+            key: encryptionKeyFromPassword(auth.password)
+        });
 
         await page.waitForLoadState();
         await page.goto('/login', { waitUntil: 'networkidle' });
@@ -87,7 +97,7 @@ test.describe('/signup', () => {
 
         await page.waitForURL('/home', { waitUntil: 'networkidle' });
 
-        const { err } = await deleteUser(api);
+        const { err } = await deleteUser(api, auth);
         expect(err).toBe(null);
 
         await page.goto('/home', { waitUntil: 'networkidle' });

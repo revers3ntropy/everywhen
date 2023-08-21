@@ -32,6 +32,12 @@ export namespace Auth {
         );
     }
 
+    export function requireAuthUrl(currentUrl: string): string {
+        const url = new URL(currentUrl);
+        const returnPath = encodeURIComponent(url.pathname.substring(1) + url.search);
+        return `/login?redirect=${returnPath}`;
+    }
+
     export async function logOut(wantsToStay = false) {
         if (!browser) return;
 
@@ -51,17 +57,15 @@ export namespace Auth {
             { doNotEncryptBody: true, doNotTryToDecryptResponse: true, doNotLogoutOn401: true }
         );
 
+        currentlyUploadingAssets.set(0);
+        currentlyUploadingEntries.set(0);
+
         // do not trigger storage event for these
         sessionStorage.removeItem(SESSION_KEYS.username);
         sessionStorage.removeItem(SESSION_KEYS.encryptionKey);
 
-        currentlyUploadingAssets.set(0);
-        currentlyUploadingEntries.set(0);
-
-        console.log({ wantsToStay });
         if (wantsToStay) {
-            const returnPath = encodeURIComponent(location.pathname.substring(1) + location.search);
-            await goto(`/login?redirect=${returnPath}`);
+            await goto(requireAuthUrl(location.href));
         } else {
             await goto('/');
         }

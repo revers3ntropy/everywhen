@@ -14,7 +14,7 @@ test.describe('/journal', () => {
     });
 
     test('Can create and view entry', async ({ page }) => {
-        const { api } = await generateUserAndSignIn(page);
+        const { api, auth } = await generateUserAndSignIn(page);
         await page.goto('/journal', { waitUntil: 'networkidle' });
 
         const entryBody = 'This is a test entry body!';
@@ -31,11 +31,11 @@ test.describe('/journal', () => {
         // mobile title, entry title, and title in list of titles
         expect(await page.getByText(entryTitle).all()).toHaveLength(3);
 
-        await expectDeleteUser(api);
+        await expectDeleteUser(api, auth);
     });
 
     test('Can create entry with newly created label', async ({ page }) => {
-        const { api } = await generateUserAndSignIn(page);
+        const { api, auth } = await generateUserAndSignIn(page);
         await page.goto('/journal', { waitUntil: 'networkidle' });
 
         const labelName = 'Testing Label!';
@@ -52,7 +52,7 @@ test.describe('/journal', () => {
         ).toBeAttached();
         await expect(page.getByText(LONG_TEXT)).toBeAttached();
 
-        await expectDeleteUser(api);
+        await expectDeleteUser(api, auth);
     });
 
     test('Can mark entry as favourite and unfavourite', async ({ page }) => {
@@ -64,7 +64,7 @@ test.describe('/journal', () => {
                 data: JSON.stringify({ entry })
             })
         ).text();
-        const { id } = JSON.parse(decrypt(makeEntryRes, auth.key).val);
+        const { id } = JSON.parse(decrypt(makeEntryRes, auth.key).val) as Record<string, unknown>;
         expect(typeof id === 'string').toBe(true);
         if (typeof id !== 'string') throw id;
         expect(id).toHaveLength(UUID_LEN);

@@ -8,9 +8,9 @@ test.describe('/journal/deleted', () => {
     });
 
     test('Can view page', async ({ page }) => {
-        const { api } = await generateUserAndSignIn(page);
+        const { api, auth } = await generateUserAndSignIn(page);
         await page.goto('/journal/deleted', { waitUntil: 'networkidle' });
         await expect(page).toHaveURL('/journal/deleted');
-        await expectDeleteUser(api);
+        await expectDeleteUser(api, auth);
     });
 });

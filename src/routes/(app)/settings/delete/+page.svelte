@@ -5,7 +5,7 @@
     import { api } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
     import type { PageData } from './$types';
-    import { username } from '$lib/stores';
+    import { encryptionKey, username } from '$lib/stores';
     import { Auth } from '$lib/controllers/auth/auth';
 
     export let data: PageData;
@@ -16,13 +16,26 @@
             return;
         }
 
-        const { backup: backupData } = notify.onErr(await api.delete('/users'));
+        if (Auth.encryptionKeyFromPassword(passwordInput.value) !== $encryptionKey) {
+            badUsername = true;
+            return;
+        }
+
+        const { backup: backupData } = notify.onErr(
+            await api.delete(
+                '/users',
+                { username: $username, encryptionKey: $encryptionKey },
+                { doNotTryToDecryptResponse: true }
+            )
+        );
         BackupControllerClient.download(backupData, $username, true);
         await Auth.logOut();
     }
 
     let badUsername = false;
+    let badPassword = false;
     let usernameInput: HTMLInputElement;
+    let passwordInput: HTMLInputElement;
 </script>
 
 <svelte:head>
@@ -44,16 +57,28 @@
         </p>
 
         <form>
-            Please type your <b>username</b> to confirm:
-            <input bind:this={usernameInput} type="text" />
-            {#if badUsername}
-                <p class="text-warning"> Please enter your username </p>
-            {/if}
+            <h3> Please enter your username and password to confirm </h3>
+
+            <div style="margin: 1rem 0">
+                Username:
+                <input bind:this={usernameInput} type="text" />
+                {#if badUsername}
+                    <p class="text-warning"> Please enter your username </p>
+                {/if}
+            </div>
+
+            <div>
+                Password:
+                <input bind:this={passwordInput} type="text" />
+                {#if badPassword}
+                    <p class="text-warning"> Please enter your password </p>
+                {/if}
+            </div>
         </form>
 
         <button aria-label="Delete Account" class="with-icon primary" on:click={deleteAccount}>
             <Skull size="30" />
-            Delete Account and Erase Data
+            Delete Account, Erase & Download Data
         </button>
     </section>
 </main>

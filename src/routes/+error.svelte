@@ -3,15 +3,19 @@
 </script>
 
 <svelte:head>
-    <title>Error | Halcyon.Land</title>
+    <title>{$page.status} | Halcyon.Land</title>
 </svelte:head>
 
 <main>
-    <div>
-        <div>
-            {$page.status}
+    <div class="container">
+        <div style="font-size: 1rem; margin: 0 0 1rem 0">
+            <a href="/">Home</a>
         </div>
-        <div>
+        <div> Looks like something went wrong! </div>
+        <h1 style="text-align: left; font-size: 5rem">
+            {$page.status}
+        </h1>
+        <div style="font-size: 1.4rem">
             {$page.error?.message || 'An error occurred'}
         </div>
     </div>
@@ -22,28 +26,10 @@
 
     main {
         .flex-center();
-        font-size: 2em;
         height: 100vh;
 
-        & > div {
-            width: fit-content;
-            display: grid;
-            grid-template-columns: 3em 1fr;
-            place-items: center;
-
-            & > :first-child {
-                border-right: 2px solid var(--border-heavy);
-                text-align: right;
-            }
-
-            & > div {
-                padding: 1rem;
-            }
-
-            & > :last-child {
-                text-align: left;
-                font-size: 1.3rem !important;
-            }
+        .container {
+            padding: 2rem;
         }
     }
 </style>

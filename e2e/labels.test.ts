@@ -8,9 +8,9 @@ test.describe('/labels', () => {
     });
 
     test('Can view page', async ({ page }) => {
-        const { api } = await generateUserAndSignIn(page);
+        const { api, auth } = await generateUserAndSignIn(page);
         await page.goto('/labels', { waitUntil: 'networkidle' });
         await expect(page).toHaveURL('/labels');
-        await expectDeleteUser(api);
+        await expectDeleteUser(api, auth);
     });
 });
