@@ -23,7 +23,7 @@
     import UtcTime from '$lib/components/UtcTime.svelte';
     import Dropdown from '$lib/components/Dropdown.svelte';
     import AgentWidget from './AgentWidget.svelte';
-    import Dot from '../Dot.svelte';
+    import Pencil from 'svelte-material-icons/Pencil.svelte';
     import Label from '$lib/components/label/Label.svelte';
     import LocationWidget from '../location/LocationWidget.svelte';
 
@@ -111,7 +111,7 @@
     $: pinTooltip = pinned ? 'Unpin Entry' : 'Pin Entry';
 </script>
 
-<div class="entry" class:obfuscated class:in-dialog={isInDialog} {id}>
+<div class="entry" class:in-dialog={isInDialog} {id}>
     {#if showFullDate}
         <div class="text-light">
             <UtcTime
@@ -126,7 +126,7 @@
         {obfuscated ? obfuscate(title) : title}
     </p>
     <div class="header">
-        <div style="display: flex; align-items: center; max-width: calc(100% - 60px)">
+        <div style="display: flex; align-items: center; max-width: calc(100% - 60px); gap: 0.5rem;">
             {#if !showFullDate}
                 <span class="time">
                     <UtcTime
@@ -154,11 +154,9 @@
                 </button>
             {/if}
 
-            {#if !obfuscated && !isEdit && edits?.length}
-                {#if (latitude && longitude && showLocations) || ($settingsStore.showAgentWidgetOnEntries.value && !showFullDate)}
-                    <Dot />
-                {/if}
-                <a href="/journal/{id}?history=on" class="edits-link link">
+            {#if !isEdit && edits?.length}
+                <a href="/journal/{id}?history=on" class="edits-link link flex-center">
+                    <Pencil />
                     {edits.length} edit{edits.length > 1 ? 's' : ''}
                 </a>
             {/if}
@@ -173,7 +171,7 @@
         </div>
 
         <div class="flex-center">
-            {#if !obfuscated && !isEdit}
+            {#if !isEdit}
                 <Dropdown fromRight>
                     <div slot="button" class="options-dropdown-button">
                         <DotsVertical size="22" />
@@ -336,7 +334,6 @@
             .ellipsis();
             font-size: 1.1em;
             font-weight: 500;
-            padding: 0 0 0 0.2rem;
 
             @media @mobile {
                 display: none;

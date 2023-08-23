@@ -506,6 +506,7 @@ async function standardDeploy() {
 
 async function awsDeploy() {
     await $`bin/build`;
+    console.error('AWS deployment not implemented');
 }
 
 async function main() {
