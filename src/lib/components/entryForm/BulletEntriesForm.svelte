@@ -7,7 +7,7 @@
     import TextBoxOutline from 'svelte-material-icons/TextBoxOutline.svelte';
     import { Entry } from '$lib/controllers/entry/entry.client';
     import type { Label } from '$lib/controllers/label/label';
-    import { dispatch } from '$lib/dataChangeEvents';
+    import { dispatch, listen } from '$lib/dataChangeEvents';
     import { notify } from '$lib/components/notifications/notifications';
     import { currentlyUploadingEntries, enabledLocation } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
@@ -93,6 +93,24 @@
 
     onMount(async () => {
         labels = notify.onErr(await api.get('/labels')).labels;
+    });
+
+    listen.label.onCreate(label => {
+        labels = [...(labels || []), label];
+    });
+    listen.label.onUpdate(label => {
+        if (labels === null) {
+            clientLogger.error('labels should not be null');
+            return;
+        }
+        labels = labels.map(l => (l.id === label.id ? label : l));
+    });
+    listen.label.onDelete(id => {
+        if (labels === null) {
+            clientLogger.error('labels should not be null');
+            return;
+        }
+        labels = labels.filter(l => l.id !== id);
     });
 </script>
 

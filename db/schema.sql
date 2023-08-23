@@ -2,14 +2,15 @@ START TRANSACTION;
 
 CREATE TABLE users
 (
-    id              char(32)     NOT NULL,
-    username        varchar(255) NOT NULL,
-    password        varchar(255) NOT NULL,
-    salt            varchar(255) NOT NULL,
-    created         int(64)      NOT NULL,
+    id                  char(32)     NOT NULL,
+    username            varchar(255) NOT NULL,
+    password            varchar(255) NOT NULL,
+    salt                varchar(255) NOT NULL,
+    created             int(64)      NOT NULL,
+    versionLastLoggedIn varchar(32)  NOT NULL DEFAULT '0.5.86',
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4;
+    DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE entries
 (
@@ -26,7 +27,7 @@ CREATE TABLE entries
     agentData       longtext     NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = latin1;
+    DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE entryEdits
 (
@@ -42,7 +43,7 @@ CREATE TABLE entryEdits
     agentData       longtext     NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = latin1;
+    DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE events
 (
@@ -55,7 +56,7 @@ CREATE TABLE events
     created int(64)      NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = latin1;
+    DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE labels
 (
@@ -66,7 +67,7 @@ CREATE TABLE labels
     created int(64)      NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = latin1;
+    DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE assets
 (
@@ -84,7 +85,7 @@ CREATE TABLE assets
     content     longtext     NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = latin1;
+    DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE settings
 (
@@ -95,7 +96,7 @@ CREATE TABLE settings
     value   longtext     NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = latin1;
+    DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE locations
 (
@@ -109,7 +110,7 @@ CREATE TABLE locations
     radius          double       NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = latin1;
+    DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE pageLoads
 (
@@ -125,7 +126,7 @@ CREATE TABLE pageLoads
     responseSize int(64)      NOT NULL,
     ipAddress    varchar(64)  DEFAULT NULL
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = latin1;
+    DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE datasets
 (
@@ -135,7 +136,7 @@ CREATE TABLE datasets
     name    varchar(256) NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = latin1;
+    DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE datasetColumnTypes
 (
@@ -145,7 +146,8 @@ CREATE TABLE datasetColumnTypes
     name    varchar(256) NOT NULL,
     unit    varchar(32)  NOT NULL,
     PRIMARY KEY (id)
-) ENGINE = InnoDB DEFAULT CHARSET = latin1;
+) ENGINE = InnoDB
+    DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE datasetColumns
 (
@@ -155,7 +157,8 @@ CREATE TABLE datasetColumns
     name    varchar(256) NOT NULL,
     type    char(32)     NOT NULL,
     PRIMARY KEY (id)
-) ENGINE = InnoDB DEFAULT CHARSET = latin1;
+) ENGINE = InnoDB
+    DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE datasetRows
 (
@@ -165,7 +168,8 @@ CREATE TABLE datasetRows
     timestamp         int(64)      NOT NULL,
     timestampTzOffset double       NOT NULL,
     PRIMARY KEY (id)
-) ENGINE = InnoDB DEFAULT CHARSET = latin1;
+) ENGINE = InnoDB
+    DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE datasetElements
 (
@@ -173,19 +177,21 @@ CREATE TABLE datasetElements
     `column` int(32)       NOT NULL,
     `row`    int(32)       NOT NULL,
     data     varchar(2048) NOT NULL
-) ENGINE = InnoDB DEFAULT CHARSET = latin1;
+) ENGINE = InnoDB
+    DEFAULT CHARSET = utf8mb4;
 
 CREATE TABLE ids
 (
     id char(32) NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
-  DEFAULT CHARSET = latin1;
+    DEFAULT CHARSET = utf8mb4;
 
 CREATE UNIQUE INDEX uidx_users_username
     ON users (username);
 
 ALTER TABLE assets ADD INDEX `idx_assets_user` (`user`);
+ALTER TABLE assets ADD INDEX `idx_assets_publicId` (`publicId`);
 ALTER TABLE entries ADD INDEX `idx_entries_user` (`user`);
 ALTER TABLE datasets ADD INDEX `idx_datasets_user` (`user`);
 ALTER TABLE events ADD INDEX `idx_events_user` (`user`);

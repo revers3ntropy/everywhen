@@ -56,3 +56,5 @@ export class SemVer {
         return `${this.major}.${this.minor}.${this.patch}`;
     }
 }
+
+export const currentVersion = SemVer.fromString(__VERSION__).unwrap();

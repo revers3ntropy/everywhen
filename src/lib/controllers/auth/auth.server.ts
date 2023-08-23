@@ -1,4 +1,7 @@
 import { Auth as _Auth } from '$lib/controllers/auth/auth';
+import { migrateUser } from '$lib/controllers/user/accountMigration.server';
+import type { User } from '$lib/controllers/user/user';
+import { SemVer } from '$lib/utils/semVer';
 import { type Cookies, error } from '@sveltejs/kit';
 import { COOKIE_KEYS } from '$lib/constants';
 import { query } from '$lib/db/mysql.server';
@@ -77,23 +80,58 @@ namespace AuthServer {
         return Result.ok(res[0].id);
     }
 
+    export async function userIdAndLastVersionFromLogIn(
+        username: string,
+        key: string
+    ): Promise<Result<{ id: string; lastVer: SemVer }>> {
+        const res = await query<{ id: string; versionLastLoggedIn: string }[]>`
+            SELECT id, versionLastLoggedIn
+            FROM users
+            WHERE username = ${username}
+              AND password = SHA2(CONCAT(${key}, salt), 256)
+        `;
+        if (res.length !== 1) {
+            return Result.err('Invalid login');
+        }
+        const { val: lastVer, err } = SemVer.fromString(res[0].versionLastLoggedIn);
+        if (err) return Result.err(err);
+        return Result.ok({
+            id: res[0].id,
+            lastVer
+        });
+    }
+
     export async function authenticateUserFromLogIn(
         username: string,
         key: string,
         expireAfter: Seconds
     ): Promise<Result<string>> {
-        const rUserId = await userIdFromLogIn(username, key);
-        if (!rUserId.ok) return rUserId;
+        const { val: userDetails, err } = await userIdAndLastVersionFromLogIn(username, key);
+        if (err) return Result.err(err);
 
         const sessionId = await UUIdControllerServer.generate();
 
+        const now = nowUtc();
+
         const session: Session = {
-            id: rUserId.val,
+            id: userDetails.id,
             username,
             key,
-            created: nowUtc(),
-            expires: nowUtc() + expireAfter
+            created: now,
+            expires: now + expireAfter
         };
+
+        const user: User = {
+            id: session.id,
+            username: session.username,
+            key,
+            versionLastLoggedIn: userDetails.lastVer
+        };
+
+        // normally very quick, but might be very slow if they haven't logged in for ages...
+        // should really do all the time, but as all sessions must be regenerated after
+        // a version bump, they must re-login anyway
+        await migrateUser(user);
 
         sessions.set(sessionId, session);
 

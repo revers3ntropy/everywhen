@@ -1,8 +1,8 @@
+import mysql from 'mysql2/promise';
+import chalk from 'chalk';
+import '../require';
 import { DB, DB_HOST, DB_PASS, DB_PORT, DB_USER } from '$env/static/private';
 import { collapseWhitespace, recursivelyTrimAndStringify } from '$lib/utils/text';
-import chalk from 'chalk';
-import mysql from 'mysql2/promise';
-import '../require';
 import { FileLogger } from '../utils/log.server';
 
 export type QueryResult =
@@ -52,10 +52,13 @@ async function logQuery(query: string, params: unknown[], result: unknown, time:
         resultStr = result.info;
     }
 
+    const durationFmt =
+        time > 1000 ? `${(time / 1000).toPrecision(3)}s` : `${time.toPrecision(3)}ms`;
+
     await dbLogger.log(
         `\`${collapseWhitespace(query)}\`` +
             `\n     ${paramsFmt}` +
-            `\n     (${time.toPrecision(3)}ms) => ${resultStr}`
+            `\n     (${durationFmt}) => ${resultStr}`
     );
 }
 

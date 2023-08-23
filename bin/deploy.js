@@ -480,9 +480,7 @@ async function tearDownRemote() {
     await runRemoteCommand(`rm -rf ~/${remoteDir()}`, false);
 }
 
-async function main() {
-    const start = now();
-
+async function standardDeploy() {
     const { remoteVersion, localVersion } = await getAndCheckVersions();
 
     const migrations = await getMigrations(remoteVersion, localVersion);
@@ -504,6 +502,28 @@ async function main() {
 
     const downtime = (now() - serverDownStart) / 1000;
     console.log(`Estimated downtime: ${c.red(downtime.toPrecision(3))}s`);
+}
+
+async function awsDeploy() {
+    await $`bin/build`;
+}
+
+async function main() {
+    const start = now();
+
+    switch (env) {
+        case 'aws':
+            await awsDeploy();
+            break;
+        case 'staging':
+        case 'prod':
+            await standardDeploy();
+            break;
+        default:
+            console.error('Invalid env: ' + env);
+            break;
+    }
+
     const totalTime = (now() - start) / 1000;
     console.log(`Total time: ${c.cyan(totalTime.toPrecision(3))}s`);
 }

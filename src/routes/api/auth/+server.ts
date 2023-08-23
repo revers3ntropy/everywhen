@@ -4,9 +4,8 @@ import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
 import { COOKIE_KEYS, maxAgeFromShouldRememberMe, sessionCookieOptions } from '$lib/constants';
-import { query } from '$lib/db/mysql.server';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
-import { UserControllerServer } from '$lib/controllers/user/user.server';
+import { User } from '$lib/controllers/user/user.server';
 import { Auth } from '$lib/controllers/auth/auth.server';
 
 export const GET = (async ({ url, cookies }) => {
@@ -41,12 +40,7 @@ export const PUT = (async ({ request, cookies }) => {
         newPassword: 'string'
     });
 
-    const { err } = await UserControllerServer.changePassword(
-        query,
-        auth,
-        currentPassword,
-        newPassword
-    );
+    const { err } = await User.Server.changePassword(auth, currentPassword, newPassword);
     if (err) throw error(400, err);
 
     return apiResponse(auth, {});

@@ -1,24 +1,25 @@
 import { Backup } from '$lib/controllers/backup/backup.server';
+import { query } from '$lib/db/mysql.server';
 import type { QueryFunc } from '$lib/db/mysql.server';
 import { Result } from '$lib/utils/result';
+import { currentVersion } from '$lib/utils/semVer';
 import { nowUtc } from '$lib/utils/time';
 import crypto from 'crypto';
 import { Entry } from '../entry/entry';
 import { Event } from '../event/event';
 import { Label } from '../label/label';
 import { Settings } from '../settings/settings';
-import type { IUser } from './user';
+import type { User as _User } from './user';
 import { UUIdControllerServer } from '$lib/controllers/uuid/uuid.server';
 import { Auth } from '$lib/controllers/auth/auth.server';
 import { Asset } from '$lib/controllers/asset/asset.server';
 
-export namespace UserControllerServer {
+export namespace UserServer {
+    type User = _User;
+
     const SALT_LENGTH = 10;
 
-    export async function userExistsWithUsername(
-        query: QueryFunc,
-        username: string
-    ): Promise<boolean> {
+    export async function userExistsWithUsername(username: string): Promise<boolean> {
         const res = await query<Record<string, number>[]>`
             SELECT 1
             FROM users
@@ -27,11 +28,7 @@ export namespace UserControllerServer {
         return res.length === 1;
     }
 
-    export async function newUserIsValid(
-        query: QueryFunc,
-        username: string,
-        password: string
-    ): Promise<Result> {
+    export async function newUserIsValid(username: string, password: string): Promise<Result> {
         if (username.length < 3) {
             return Result.err('Username must be at least 3 characters');
         }
@@ -43,37 +40,35 @@ export namespace UserControllerServer {
             return Result.err('Username must be less than 128 characters');
         }
 
-        if (await userExistsWithUsername(query, username)) {
+        if (await userExistsWithUsername(username)) {
             return Result.err('Username already in use');
         }
 
         return Result.ok(null);
     }
 
-    export async function create(
-        query: QueryFunc,
-        username: string,
-        password: string
-    ): Promise<Result<IUser>> {
-        const { err } = await newUserIsValid(query, username, password);
+    export async function create(username: string, password: string): Promise<Result<User>> {
+        const { err } = await newUserIsValid(username, password);
         if (err) return Result.err(err);
 
         const salt = await generateSalt(query);
         const id = await UUIdControllerServer.generate();
 
         await query`
-            INSERT INTO users (id, username, password, salt, created)
+            INSERT INTO users (id, username, password, salt, created, versionLastLoggedIn)
             VALUES (${id},
                     ${username},
                     SHA2(${password + salt}, 256),
                     ${salt},
-                    ${nowUtc()});
+                    ${nowUtc()},
+                    ${currentVersion.str()});
+                   
         `;
 
-        return Result.ok({ id, username, key: password });
+        return Result.ok({ id, username, key: password, versionLastLoggedIn: currentVersion });
     }
 
-    export async function purge(query: QueryFunc, auth: Auth): Promise<void> {
+    export async function purge(auth: Auth): Promise<void> {
         await Label.purgeAll(query, auth);
         await Entry.purgeAll(query, auth);
         await Asset.Server.purgeAll(auth);
@@ -104,7 +99,6 @@ export namespace UserControllerServer {
     }
 
     export async function changePassword(
-        query: QueryFunc,
         auth: Auth,
         oldPassword: string,
         newPassword: string
@@ -151,3 +145,9 @@ export namespace UserControllerServer {
         return await Settings.changeEncryptionKeyInDB(query, auth, newKey);
     }
 }
+
+export const User = {
+    Server: UserServer
+};
+
+export type User = _User;
