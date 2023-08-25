@@ -5,9 +5,7 @@ import { Label } from '$lib/controllers/label/label';
 import { query } from '$lib/db/mysql.server';
 import { cachedPageRoute } from '$lib/utils/cache.server';
 
-export type TimelineEntry = Omit<Entry, 'entry'> & {
-    wordCount: number;
-};
+export type TimelineEntry = Omit<Entry, 'entry'>;
 
 export const load = cachedPageRoute(async auth => {
     const { val: entries, err } = await Entry.Server.all(auth);

@@ -28,7 +28,6 @@ export const load = cachedPageRoute(async auth => {
         commonWords = commonWordsFromText(entry.title, commonWords);
 
         const e: EntryWithWordCount = entry as EntryWithWordCount;
-        e.wordCount = entry.wordCount;
         delete e.entry;
         delete e.title;
         entriesWithWordCount.push(e);

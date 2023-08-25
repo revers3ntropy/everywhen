@@ -49,7 +49,7 @@
 <slot {items} />
 
 {#if numItems !== 0}
-    {#if showSpinner && ((loadingAt !== null && loadingAt < numItems) || !loadedAny)}
+    {#if showSpinner && items.length < numItems}
         <Spinner />
     {/if}
     <div

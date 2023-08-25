@@ -45,7 +45,7 @@
             ...assets
         ];
 
-        assetCount = assetCount + uploadedImages.length;
+        assetCount += uploadedImages.length;
     }) as ChangeEventHandler<HTMLInputElement>;
 
     let fileDropInput: HTMLInputElement;

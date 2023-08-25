@@ -7,7 +7,7 @@
     import type { Label } from '$lib/controllers/label/label';
     import { obfuscated } from '$lib/stores';
     import { showPopup } from '$lib/utils/popups';
-    import { limitStrLen } from '$lib/utils/text.js';
+    import { limitStrLen } from '$lib/utils/text';
 
     export let id: string;
     export let created: number;
