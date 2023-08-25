@@ -43,8 +43,6 @@
 
         const localDate = fmtUtc(entry.created, entry.createdTZOffset, 'YYYY-MM-DD');
 
-        console.log(entry);
-
         titles = {
             ...titles,
             [localDate]: [

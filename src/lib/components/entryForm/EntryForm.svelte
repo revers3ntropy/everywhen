@@ -243,7 +243,6 @@
     }
 
     function pasteText(text: string) {
-        console.log('pasted');
         insertAtCursor(newEntryInputElement, text);
     }
 
