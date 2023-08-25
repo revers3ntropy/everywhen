@@ -5,7 +5,7 @@ import { Result } from '$lib/utils/result';
 import { currentVersion } from '$lib/utils/semVer';
 import { nowUtc } from '$lib/utils/time';
 import crypto from 'crypto';
-import { Entry } from '../entry/entry';
+import { Entry } from '../entry/entry.server';
 import { Event } from '../event/event';
 import { Label } from '../label/label';
 import { Settings } from '../settings/settings';
@@ -28,7 +28,10 @@ export namespace UserServer {
         return res.length === 1;
     }
 
-    export async function newUserIsValid(username: string, password: string): Promise<Result> {
+    export async function newUserIsValid(
+        username: string,
+        password: string
+    ): Promise<Result<null>> {
         if (username.length < 3) {
             return Result.err('Username must be at least 3 characters');
         }
@@ -70,7 +73,7 @@ export namespace UserServer {
 
     export async function purge(auth: Auth): Promise<void> {
         await Label.purgeAll(query, auth);
-        await Entry.purgeAll(query, auth);
+        await Entry.Server.purgeAll(auth);
         await Asset.Server.purgeAll(auth);
         await Event.purgeAll(query, auth);
         await Settings.purgeAll(query, auth);
@@ -102,7 +105,7 @@ export namespace UserServer {
         auth: Auth,
         oldPassword: string,
         newPassword: string
-    ): Promise<Result> {
+    ): Promise<Result<null>> {
         if (!oldPassword) return Result.err('Invalid password');
 
         if (newPassword.length < 5) {

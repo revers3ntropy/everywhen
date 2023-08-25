@@ -97,7 +97,7 @@ export namespace ghAPI {
         return Result.ok(accessToken);
     }
 
-    export async function unlinkToGitHubOAuth(query: QueryFunc, auth: Auth): Promise<Result> {
+    export async function unlinkToGitHubOAuth(query: QueryFunc, auth: Auth): Promise<Result<null>> {
         const { err: saveErr } = await Settings.update(query, auth, 'gitHubAccessToken', '');
         if (saveErr) return Result.err(saveErr);
         return Result.ok(null);

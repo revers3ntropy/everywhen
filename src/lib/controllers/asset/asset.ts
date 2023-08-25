@@ -74,27 +74,26 @@ export namespace Asset {
                 const { val: content, err: readErr } = await getFileContents(file, 'b64');
 
                 if (readErr) {
-                    return finishedUpload(Result.err(readErr));
+                    return void finishedUpload(Result.err(readErr));
                 }
 
                 if (content.length > 1024 * 1024 * 32) {
-                    return finishedUpload(Result.err('Image is too large'));
+                    return void finishedUpload(Result.err('Image is too large'));
                 }
 
                 if (!content) {
-                    return finishedUpload(Result.err('Failed to read file'));
+                    return void finishedUpload(Result.err('Failed to read file'));
                 }
 
-                const { val: contentAsWebP, err: webPConvertErr } = await imageToWebpUsingCanvas(
-                    content
-                );
+                const { val: contentAsWebP, err: webPConvertErr } =
+                    await imageToWebpUsingCanvas(content);
 
                 if (webPConvertErr) {
-                    return finishedUpload(Result.err(webPConvertErr));
+                    return void finishedUpload(Result.err(webPConvertErr));
                 }
 
                 if (contentAsWebP.length > MAX_IMAGE_SIZE) {
-                    return finishedUpload(Result.err('Image is too large'));
+                    return void finishedUpload(Result.err('Image is too large'));
                 }
 
                 (

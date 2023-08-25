@@ -18,7 +18,7 @@
     export let label = null as Label | null;
     export let edits = [] as EntryEdit[];
     export let createdTZOffset = 0;
-    export let agentData = '';
+    export let agentData = null as string | null;
     export let latitude = null as number | null;
     export let longitude = null as number | null;
 

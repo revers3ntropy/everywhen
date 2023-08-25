@@ -10,7 +10,7 @@
 <script lang="ts">
     import type { FeatureLike } from 'ol/Feature';
     import { writable } from 'svelte/store';
-    import type { EntryLocation } from '$lib/controllers/entry/entry';
+    import type { EntryAsLocation } from '$lib/controllers/entry/entry';
     import type { CallbackObject } from 'ol-contextmenu/dist/types';
     import type { MapBrowserEvent } from 'ol';
     import Map from 'ol/Map';
@@ -39,7 +39,7 @@
 
     // https://openlayers.org/
 
-    export let entries = [] as EntryLocation[];
+    export let entries = [] as EntryAsLocation[];
     export let locations = [] as Location[];
     export let entriesInteractable = true;
     export let width = 'calc(100vw - 2rem)';
@@ -132,7 +132,7 @@
             entries
         }: {
             locations: Location[];
-            entries: EntryLocation[];
+            entries: EntryAsLocation[];
         }
     ): Map {
         const osmLayer = new TileLayer({
@@ -274,14 +274,14 @@
 
     function map(
         node: HTMLElement,
-        { locations, entries }: { locations: Location[]; entries: EntryLocation[] }
+        { locations, entries }: { locations: Location[]; entries: EntryAsLocation[] }
     ) {
         let map = setupMap(node, { locations, entries });
         return {
             destroy() {
                 map.setTarget(undefined as unknown as HTMLElement);
             },
-            update(props: { locations: Location[]; entries: EntryLocation[] }) {
+            update(props: { locations: Location[]; entries: EntryAsLocation[] }) {
                 map.setTarget(undefined as unknown as HTMLElement);
                 map = setupMap(node, props);
             }

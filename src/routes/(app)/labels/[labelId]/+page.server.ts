@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { Entry } from '$lib/controllers/entry/entry';
+import { Entry } from '$lib/controllers/entry/entry.server';
 import { Event } from '$lib/controllers/event/event';
 import { Label } from '$lib/controllers/label/label';
 import { query } from '$lib/db/mysql.server';
@@ -13,7 +13,9 @@ export const load = cachedPageRoute(async (auth, { params }) => {
     const { val: label, err } = await Label.fromId(query, auth, labelId);
     if (err) throw error(404, err);
 
-    const { val: entries, err: entriesErr } = await Entry.getPage(query, auth, 0, 1, { labelId });
+    const { val: entries, err: entriesErr } = await Entry.Server.getPage(auth, 0, 1, {
+        labelId
+    });
     if (entriesErr) throw error(400, entriesErr);
 
     const { err: eventsErr, val: events } = await Event.all(query, auth);

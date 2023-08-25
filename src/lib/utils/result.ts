@@ -1,12 +1,6 @@
-type ValueConstraint = NonNullable<unknown> | null;
-type ErrorConstraint = NonNullable<unknown>;
-type ValueDefault = null;
 type ErrorDefault = string;
 
-export class Result<
-    T extends ValueConstraint = ValueDefault,
-    E extends ErrorConstraint = ErrorDefault
-> {
+export class Result<T, E = ErrorDefault> {
     protected constructor(
         public readonly ok: boolean,
         private readonly valOrErr: T | E
@@ -68,38 +62,29 @@ export class Result<
         );
     }
 
-    public map<U extends ValueConstraint = ValueDefault>(f: (value: T) => U): Result<U, E> {
+    public map<U>(f: (value: T) => U): Result<U, E> {
         return this.match(
             val => Result.ok(f(val)),
             err => Result.err(err)
         );
     }
 
-    public mapErr<F extends ErrorConstraint = ErrorDefault>(f: (error: E) => F): Result<T, F> {
+    public mapErr<F = ErrorDefault>(f: (error: E) => F): Result<T, F> {
         return this.match(
             val => Result.ok(val),
             err => Result.err(f(err))
         );
     }
 
-    public static ok<
-        T extends ValueConstraint = ValueDefault,
-        E extends ErrorConstraint = ErrorDefault
-    >(value: T = null as T): Result<T, E> {
+    public static ok<T, E = ErrorDefault>(value: T = null as T): Result<T, E> {
         return new Result<T, E>(true, value);
     }
 
-    public static err<
-        T extends ValueConstraint = ValueDefault,
-        E extends ErrorConstraint = ErrorDefault
-    >(error: E): Result<T, E> {
+    public static err<T, E = ErrorDefault>(error: E): Result<T, E> {
         return new Result<T, E>(false, error);
     }
 
-    public static collect<
-        T extends ValueConstraint = ValueDefault,
-        E extends ErrorConstraint = ErrorDefault
-    >(iter: Iterable<Result<T, E>>): Result<T[], E> {
+    public static collect<T, E = ErrorDefault>(iter: Iterable<Result<T, E>>): Result<T[], E> {
         const results: T[] = [];
         for (const result of iter) {
             if (result.err) {
@@ -110,10 +95,7 @@ export class Result<
         return Result.ok(results);
     }
 
-    public static filter<
-        T extends ValueConstraint = ValueDefault,
-        E extends ErrorConstraint = ErrorDefault
-    >(iter: Iterable<Result<T, E>>): [T[], E[]] {
+    public static filter<T, E = ErrorDefault>(iter: Iterable<Result<T, E>>): [T[], E[]] {
         const results: T[] = [];
         const errors: E[] = [];
         for (const result of iter) {
@@ -125,10 +107,9 @@ export class Result<
         return [results, errors];
     }
 
-    public static async collectAsync<
-        T extends ValueConstraint = ValueDefault,
-        E extends ErrorConstraint = ErrorDefault
-    >(iter: Iterable<Promise<Result<T, E>>>): Promise<Result<T[], E>> {
+    public static async collectAsync<T, E = ErrorDefault>(
+        iter: Iterable<Promise<Result<T, E>>>
+    ): Promise<Result<T[], E>> {
         return Result.collect(
             (await Promise.allSettled(iter)).map(result => {
                 if (result.status === 'fulfilled') {
@@ -140,25 +121,21 @@ export class Result<
         );
     }
 
-    public static wrap<T extends ValueConstraint = ValueDefault>(
-        f: () => T
-    ): Result<T, ErrorConstraint> {
+    public static wrap<T>(f: () => T): Result<T, unknown> {
         try {
             return Result.ok(f());
         } catch (e: unknown) {
-            return Result.err(e as ErrorConstraint);
+            return Result.err(e);
         }
     }
 
-    public static wrapAsync<T extends ValueConstraint = ValueDefault>(
-        op: () => Promise<T>
-    ): Promise<Result<T, ErrorConstraint>> {
+    public static wrapAsync<T>(op: () => Promise<T>): Promise<Result<T, unknown>> {
         try {
             return op()
                 .then(val => Result.ok(val))
                 .catch(e => Result.err(e));
         } catch (e) {
-            return Promise.resolve(Result.err(e as ErrorConstraint));
+            return Promise.resolve(Result.err(e));
         }
     }
 }

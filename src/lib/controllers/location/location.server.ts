@@ -212,7 +212,7 @@ namespace LocationUtils {
         });
     }
 
-    export async function purge(query: QueryFunc, auth: Auth, id: string): Promise<Result> {
+    export async function purge(query: QueryFunc, auth: Auth, id: string): Promise<Result<null>> {
         const res = await query<ResultSetHeader>`
             DELETE
             FROM locations
@@ -225,7 +225,7 @@ namespace LocationUtils {
         return Result.ok(null);
     }
 
-    export async function purgeAll(query: QueryFunc, auth: Auth): Promise<Result> {
+    export async function purgeAll(query: QueryFunc, auth: Auth): Promise<Result<null>> {
         await query`
             DELETE
             FROM locations

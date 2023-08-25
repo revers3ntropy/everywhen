@@ -159,7 +159,7 @@ namespace AssetServer {
         `;
     }
 
-    export async function purgeWithPublicId(auth: Auth, publicId: string): Promise<Result> {
+    export async function purgeWithPublicId(auth: Auth, publicId: string): Promise<Result<null>> {
         const res = await query<ResultSetHeader>`
             DELETE
             FROM assets

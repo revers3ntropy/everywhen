@@ -1,16 +1,12 @@
 import { error } from '@sveltejs/kit';
-import { Entry } from '$lib/controllers/entry/entry';
-import { query } from '$lib/db/mysql.server';
+import { Entry } from '$lib/controllers/entry/entry.server';
 import { cachedPageRoute } from '$lib/utils/cache.server';
-import { wordCount as txtWordCount } from '$lib/utils/text';
 import { daysSince, nowUtc } from '$lib/utils/time';
 import type { PageServerLoad } from './$types';
 import { commonWordsFromText, type EntryWithWordCount } from './helpers';
 
 export const load = cachedPageRoute(async auth => {
-    const { val: entries, err } = await Entry.all(query, auth, {
-        deleted: false
-    });
+    const { val: entries, err } = await Entry.Server.all(auth, { deleted: false });
     if (err) throw error(400, err);
 
     let earliestEntryTimeStamp = nowUtc();
@@ -24,9 +20,7 @@ export const load = cachedPageRoute(async auth => {
             earliestEntryTimeStamp = entry.created;
         }
 
-        const entryWordCount = txtWordCount(entry.entry) + txtWordCount(entry.title);
-
-        wordCount += entryWordCount;
+        wordCount += entry.wordCount;
         charCount += entry.entry.length + entry.title.length;
 
         commonWords = commonWordsFromText(entry.entry, commonWords);
@@ -34,7 +28,7 @@ export const load = cachedPageRoute(async auth => {
         commonWords = commonWordsFromText(entry.title, commonWords);
 
         const e: EntryWithWordCount = entry as EntryWithWordCount;
-        e.wordCount = entryWordCount;
+        e.wordCount = entry.wordCount;
         delete e.entry;
         delete e.title;
         entriesWithWordCount.push(e);

@@ -1,4 +1,4 @@
-import { Entry } from '$lib/controllers/entry/entry';
+import { Entry } from '$lib/controllers/entry/entry.server';
 import { fmtUtc, nowUtc } from '$lib/utils/time';
 import { error } from '@sveltejs/kit';
 import { query } from '$lib/db/mysql.server';
@@ -32,7 +32,7 @@ function entriesYearsAgoToday(entries: Entry[]): Record<string, Entry[]> {
 }
 
 export const load = cachedPageRoute(async (auth, { parent, locals }) => {
-    const { val: titles, err } = await Entry.getTitles(query, auth);
+    const { val: titles, err } = await Entry.Server.getTitles(auth);
     if (err) throw error(400, err);
 
     const firstNTitles = Entry.groupEntriesByDay<Entry>(

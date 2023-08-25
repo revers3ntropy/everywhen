@@ -1,6 +1,7 @@
 import { decrypt } from '$lib/utils/encryption';
+import { wordCount } from '$lib/utils/text';
 import { error } from '@sveltejs/kit';
-import { Entry } from '$lib/controllers/entry/entry';
+import { Entry } from '$lib/controllers/entry/entry.server';
 import { Label } from '$lib/controllers/label/label';
 import { query } from '$lib/db/mysql.server';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
@@ -24,7 +25,7 @@ export const GET = cachedApiRoute(async (auth, { url }) => {
     const { err: searchErr, val: searchDecrypted } = decrypt(search, auth.key);
     if (searchErr) throw error(400, 'Invalid search query');
 
-    const { val, err } = await Entry.getPage(query, auth, offset, count, {
+    const { val, err } = await Entry.Server.getPage(auth, offset, count, {
         deleted,
         labelId,
         search: searchDecrypted.toLowerCase(),
@@ -57,7 +58,8 @@ export const POST = (async ({ request, cookies }) => {
             entry: 'string',
             label: 'string',
             timezoneUtcOffset: 'number',
-            agentData: 'string'
+            agentData: 'string',
+            wordCount: 'number'
         },
         {
             title: '',
@@ -66,23 +68,29 @@ export const POST = (async ({ request, cookies }) => {
             longitude: 0,
             created: nowUtc(),
             timezoneUtcOffset: 0,
-            agentData: ''
+            agentData: '',
+            wordCount: -1
         }
     );
 
-    if (body.label) {
-        if (!(await Label.userHasLabelWithId(query, auth, body.label))) {
-            throw error(400, `Label doesn't exist`);
-        }
-    }
+    const { val: labels, err: labelsErr } = await Label.all(query, auth);
+    if (labelsErr) throw error(400, labelsErr);
 
-    const { val: entry, err } = await Entry.create(query, auth, {
-        ...body,
-        latitude: body.latitude || null,
-        longitude: body.longitude || null,
-        // timezoneUtcOffset is automatically added to every req
-        createdTZOffset: body.timezoneUtcOffset
-    });
+    const { val: entry, err } = await Entry.Server.create(
+        auth,
+        labels,
+        body.title,
+        body.entry,
+        body.created,
+        body.timezoneUtcOffset,
+        Entry.Flags.NONE,
+        body.latitude || null,
+        body.longitude || null,
+        body.label,
+        body.agentData,
+        body.wordCount > -1 ? body.wordCount : wordCount(body.entry),
+        []
+    );
     if (err) throw error(400, err);
 
     return apiResponse(auth, { id: entry.id });

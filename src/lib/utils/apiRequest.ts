@@ -154,7 +154,7 @@ export async function makeApiReq<
     return Result.err(await handleErrorResponse(response, method, url, options));
 }
 
-async function handleOkResponse<T extends object>(
+async function handleOkResponse<T>(
     response: Response,
     method: string,
     url: string,

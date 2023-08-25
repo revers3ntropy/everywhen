@@ -12,6 +12,7 @@ export interface Backup {
         createdTZOffset: number;
         agentData?: string;
         flags?: number;
+        wordCount?: number;
         edits: {
             title: string;
             label?: string; // label's name

@@ -3,7 +3,7 @@
     import { notify } from '$lib/components/notifications/notifications';
     import { api } from '$lib/utils/apiRequest';
     import { onMount } from 'svelte';
-    import { Entry as EntryController } from '$lib/controllers/entry/entry.client';
+    import { Entry as EntryController } from '$lib/controllers/entry/entry';
     import Entry from '$lib/components/entry/Entry.svelte';
     import { obfuscated } from '$lib/stores';
     import type { PageData } from './$types';
@@ -61,6 +61,8 @@
             {#each (data.entry.edits || []).sort((a, b) => b.created - a.created) as edit}
                 <Entry
                     {...edit}
+                    flags={EntryController.Flags.NONE}
+                    wordCount={-1}
                     obfuscated={$obfuscated}
                     isEdit={true}
                     showFullDate={true}

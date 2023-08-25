@@ -1,5 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { Entry } from '$lib/controllers/entry/entry';
+import { Entry } from '$lib/controllers/entry/entry.server';
 import { Event } from '$lib/controllers/event/event';
 import { Label } from '$lib/controllers/label/label';
 import { query } from '$lib/db/mysql.server';
@@ -58,7 +58,7 @@ export const DELETE = (async ({ cookies, params, request }) => {
         throw error(404, 'Label with that id not found');
     }
 
-    const { val, err } = await Entry.getPage(query, auth, 0, 1, {
+    const { val, err } = await Entry.Server.getPage(auth, 0, 1, {
         labelId: params.labelId,
         deleted: 'both'
     });
@@ -95,14 +95,14 @@ export const DELETE = (async ({ cookies, params, request }) => {
             throw error(400, 'New label not found');
         }
 
-        await Entry.reassignAllLabels(query, auth, params.labelId, newLabelId);
+        await Entry.Server.reassignAllLabels(auth, params.labelId, newLabelId);
         await Event.reassignAllLabels(query, auth, params.labelId, newLabelId);
         await Label.purgeWithId(query, auth, params.labelId);
         return apiResponse(auth, {});
     }
 
     if (strategy === 'remove') {
-        await Entry.removeAllLabel(query, auth, params.labelId);
+        await Entry.Server.removeAllLabel(auth, params.labelId);
         await Event.removeAllLabel(query, auth, params.labelId);
         await Label.purgeWithId(query, auth, params.labelId);
         return apiResponse(auth, {});

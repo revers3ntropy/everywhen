@@ -3,7 +3,7 @@
     import { listen } from '$lib/dataChangeEvents';
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
-    import { Entry } from '$lib/controllers/entry/entry.client';
+    import { Entry } from '$lib/controllers/entry/entry';
     import { showPopup } from '$lib/utils/popups';
     import { obfuscate } from '$lib/utils/text';
     import { currentTzOffset, fmtUtc, nowUtc, utcEq } from '$lib/utils/time';

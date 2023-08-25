@@ -25,6 +25,7 @@ CREATE TABLE entries
     label           char(32)     DEFAULT NULL,
     flags           int(8)       DEFAULT 0,
     agentData       longtext     NOT NULL,
+    wordCount       int(32)      NOT NULL DEFAULT -1,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
     DEFAULT CHARSET = utf8mb4;

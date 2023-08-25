@@ -251,7 +251,7 @@ namespace DatasetUtils {
             timestamp?: TimestampSecs;
             timestampTzOffset?: Hours;
         }[]
-    ): Promise<Result> {
+    ): Promise<Result<null>> {
         const { val: columns, err: getColumnsErr } = await allColumns(query, auth);
         if (getColumnsErr) return Result.err(getColumnsErr);
 

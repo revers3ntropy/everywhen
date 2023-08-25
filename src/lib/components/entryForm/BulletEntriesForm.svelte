@@ -1,11 +1,11 @@
 <script lang="ts">
     import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
-    import type { RawEntry } from '$lib/controllers/entry/entry';
+    import { wordCount } from '$lib/utils/text';
     import { tooltip } from '@svelte-plugins/tooltips';
     import LocationToggle from '$lib/components/location/LocationToggle.svelte';
     import LabelSelect from '$lib/components/label/LabelSelect.svelte';
     import TextBoxOutline from 'svelte-material-icons/TextBoxOutline.svelte';
-    import { Entry } from '$lib/controllers/entry/entry.client';
+    import { Entry } from '$lib/controllers/entry/entry';
     import type { Label } from '$lib/controllers/label/label';
     import { dispatch, listen } from '$lib/dataChangeEvents';
     import { notify } from '$lib/components/notifications/notifications';
@@ -44,8 +44,9 @@
             longitude: currentLocation[1],
             created: nowUtc(),
             agentData,
-            createdTZOffset
-        } as RawEntry;
+            createdTZOffset,
+            wordCount: wordCount(entryVal)
+        };
 
         const res = notify.onErr(await api.post('/entries', { ...body }));
 
@@ -55,14 +56,16 @@
             return;
         }
 
-        const newEntry = {
+        const newEntry: Mutable<Entry> = {
             ...body,
             id: res.id,
-            flags: Entry.Flags.NONE
-        } as Mutable<Entry>;
+            flags: Entry.Flags.NONE,
+            edits: [],
+            label: null
+        };
 
         if (body.label && labels) {
-            newEntry.label = labels.find(l => l.id === body.label);
+            newEntry.label = labels.find(l => l.id === body.label) ?? null;
             if (!newEntry.label) {
                 notify.error(`Failed to find label`);
                 clientLogger.error(

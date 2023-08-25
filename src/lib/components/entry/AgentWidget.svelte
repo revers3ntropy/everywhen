@@ -18,7 +18,7 @@
     import Watch from 'svelte-material-icons/Watch.svelte';
     import UAParser from 'ua-parser-js';
 
-    export let data = '';
+    export let data = null as string | null;
     export let size: Pixels = 20;
     export let tooltipPosition = 'right' as TooltipPosition;
 

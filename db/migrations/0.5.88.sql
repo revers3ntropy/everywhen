@@ -1,0 +1,1 @@
+ALTER TABLE `entries` ADD `wordCount` INT NOT NULL DEFAULT '-1' AFTER `flags`;

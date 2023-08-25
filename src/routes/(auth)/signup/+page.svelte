@@ -17,7 +17,7 @@
     async function create(): Promise<void> {
         actionPending = true;
 
-        const key = Auth.encryptionKeyFromPassword(password);
+        const key = Auth.encryptionKeyFromPassword(password.value);
         encryptionKey.set(key);
 
         notify.onErr(
@@ -25,20 +25,20 @@
                 `/users`,
                 {
                     encryptionKey: key,
-                    username
+                    username: username.value
                 },
                 { doNotEncryptBody: true }
             ),
             () => (actionPending = false)
         );
 
-        usernameStore.set(username);
+        usernameStore.set(username.value);
 
-        if (passcode) {
+        if (passcode.value) {
             notify.onErr(
                 await api.put(`/settings`, {
                     key: 'passcode',
-                    value: passcode
+                    value: passcode.value
                 }),
                 () => (actionPending = false)
             );
@@ -50,10 +50,28 @@
         await goto('/' + data.redirect);
     }
 
+    function usernameInputKeypress(event: { code: string }) {
+        if (event.code === 'Enter') {
+            password.focus();
+        }
+    }
+
+    function passwordInputKeypress(event: { code: string }) {
+        if (event.code === 'Enter') {
+            passcode.focus();
+        }
+    }
+
+    function passcodeInputKeypress(event: { code: string }) {
+        if (event.code === 'Enter') {
+            void create();
+        }
+    }
+
     // user log in / create account form values
-    let password = '';
-    let username = '';
-    let passcode = '';
+    let password: HTMLInputElement;
+    let username: HTMLInputElement;
+    let passcode: HTMLInputElement;
 
     let actionPending = false;
 </script>
@@ -70,8 +88,9 @@
             <input
                 aria-label="Username"
                 autocomplete="username"
-                bind:value={username}
+                bind:this={username}
                 disabled={actionPending}
+                on:keypress={usernameInputKeypress}
             />
         </label>
         <label>
@@ -90,9 +109,10 @@
             <input
                 aria-label="Password"
                 autocomplete="new-password"
-                bind:value={password}
+                bind:this={password}
                 disabled={actionPending}
                 type="password"
+                on:keypress={passwordInputKeypress}
             />
         </label>
         <label>
@@ -112,10 +132,11 @@
             </span>
             <input
                 aria-label="Passcode"
-                bind:value={passcode}
+                bind:this={passcode}
                 disabled={actionPending}
                 type="password"
                 placeholder="No passcode"
+                on:keypress={passcodeInputKeypress}
             />
         </label>
         <div class="flex-center" style="justify-content: space-between">

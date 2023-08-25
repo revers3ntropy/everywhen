@@ -16,16 +16,16 @@
     async function login(): Promise<void> {
         actionPending = true;
 
-        const key = Auth.encryptionKeyFromPassword(password);
+        const key = Auth.encryptionKeyFromPassword(password.value);
 
         $encryptionKey = key;
 
-        const auth = notify.onErr(
+        notify.onErr(
             await api.get(
                 '/auth',
                 {
                     key,
-                    username,
+                    username: username.value,
                     rememberMe: rememberMeInput.checked
                 },
                 { doNotEncryptBody: true }
@@ -33,15 +33,27 @@
             () => (actionPending = false)
         );
 
-        $usernameStore = auth.username;
+        $usernameStore = username.value;
         await populateCookiesAndSettingsAfterAuth(() => (actionPending = false));
 
         await goto('/' + data.redirect);
     }
 
+    function usernameInputKeypress(event: { code: string }) {
+        if (event.code === 'Enter') {
+            password.focus();
+        }
+    }
+
+    function passwordInputKeypress(event: { code: string }) {
+        if (event.code === 'Enter') {
+            void login();
+        }
+    }
+
     // user log in / create account form values
-    let password = '';
-    let username = '';
+    let password: HTMLInputElement;
+    let username: HTMLInputElement;
     let rememberMeInput: HTMLInputElement;
     let actionPending = false;
 </script>
@@ -58,9 +70,10 @@
             <input
                 aria-label="Username"
                 autocomplete="username"
-                bind:value={username}
+                bind:this={username}
                 disabled={actionPending}
                 style="font-size: x-large"
+                on:keypress={usernameInputKeypress}
             />
         </label>
         <label>
@@ -68,10 +81,11 @@
             <input
                 aria-label="Password"
                 autocomplete="current-password"
-                bind:value={password}
+                bind:this={password}
                 disabled={actionPending}
                 style="font-size: x-large"
                 type="password"
+                on:keypress={passwordInputKeypress}
             />
         </label>
         <div style="text-align: right; margin-bottom: 1rem">

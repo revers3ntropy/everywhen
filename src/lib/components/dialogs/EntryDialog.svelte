@@ -11,7 +11,7 @@
     export let id: string;
     export let obfuscated = false;
 
-    let entry: EntryController | null = null;
+    let entry = null as EntryController | null;
     let locations = null as Location[] | null;
 
     async function loadEntry() {

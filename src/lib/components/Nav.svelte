@@ -326,7 +326,7 @@
                 </button>
 
                 <button class="account-dropdown-button" on:click={switchTheme}>
-                    {#if $theme === Theme.dark}
+                    {#if $theme === Theme.light}
                         <DarkTheme size="30" />
                         Dark Mode
                     {:else}

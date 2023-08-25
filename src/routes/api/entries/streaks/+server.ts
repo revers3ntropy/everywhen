@@ -1,8 +1,7 @@
 import { cachedApiRoute } from '$lib/utils/cache.server';
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
-import { Entry } from '$lib/controllers/entry/entry';
-import { query } from '$lib/db/mysql.server';
+import { Entry } from '$lib/controllers/entry/entry.server';
 import { apiRes404 } from '$lib/utils/apiResponse.server';
 
 export const GET = cachedApiRoute(async (auth, { url }) => {
@@ -16,7 +15,7 @@ export const GET = cachedApiRoute(async (auth, { url }) => {
     }
     if (tz < -24 || tz > 24) throw error(400, 'Invalid timezone offset (tz)');
 
-    const { val: streaks, err } = await Entry.getStreaks(query, auth, tz);
+    const { val: streaks, err } = await Entry.Server.getStreaks(auth, tz);
     if (err) throw error(400, err);
     return streaks;
 }) satisfies RequestHandler;

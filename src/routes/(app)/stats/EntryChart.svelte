@@ -24,7 +24,7 @@
         initialBucketName
     } from './helpers';
     import { cssVarValue } from '$lib/utils/getCssVar';
-    import { Entry } from '$lib/controllers/entry/entry.client';
+    import { Entry } from '$lib/controllers/entry/entry';
 
     Chart.register(
         Title,

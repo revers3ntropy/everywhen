@@ -55,6 +55,12 @@ export class SemVer {
     str(): string {
         return `${this.major}.${this.minor}.${this.patch}`;
     }
+
+    compare(version: SemVer): number {
+        if (this.isEqual(version)) return 0;
+        if (this.isGreaterThan(version)) return 1;
+        return -1;
+    }
 }
 
 export const currentVersion = SemVer.fromString(__VERSION__).unwrap();

@@ -24,7 +24,7 @@
     import { getLocation } from '$lib/utils/geolocation';
     import { clientLogger } from '$lib/utils/log';
     import { notify } from '$lib/components/notifications/notifications';
-    import { obfuscate } from '$lib/utils/text';
+    import { obfuscate, wordCount } from '$lib/utils/text';
     import { currentTzOffset, nowUtc } from '$lib/utils/time';
     import FormatOptions from './FormatOptions.svelte';
     import LocationToggle from '../location/LocationToggle.svelte';
@@ -33,7 +33,7 @@
     // as this form is used in entry editing and creating
     export let action: 'create' | 'edit' = 'create';
 
-    export let entry: Entry | null = null;
+    export let entry = null as Entry | null;
     if (entry && action !== 'edit') {
         throw new Error('eventID can only be set when action is edit');
     }
@@ -127,14 +127,16 @@
             notify.error(`Failed to create entry: ${JSON.stringify(res)}`);
         }
 
-        const entry = {
+        const entry: Mutable<Entry> = {
             ...body,
             id: res.id,
-            flags: 0
-        } as Mutable<Entry>;
+            flags: 0,
+            edits: [],
+            label: null
+        };
 
         if (body.label && labels) {
-            entry.label = labels.find(l => l.id === body.label);
+            entry.label = labels.find(l => l.id === body.label) ?? null;
             if (!entry.label) {
                 notify.error('label not found');
                 clientLogger.log('label not found');
@@ -157,7 +159,12 @@
                 return;
             }
         }
-        notify.onErr(await api.put(apiPath('/entries/?', entry.id), body));
+        notify.onErr(
+            await api.put(
+                apiPath('/entries/?', entry.id),
+                body as unknown as Record<string, unknown>
+            )
+        );
         await goto(`/journal/${entry.id}`);
     }
 
@@ -176,7 +183,8 @@
             longitude: currentLocation[1],
             created: nowUtc(),
             agentData: serializedAgentData(),
-            createdTZOffset: currentTzOffset()
+            createdTZOffset: currentTzOffset(),
+            wordCount: wordCount(newEntryBody)
         } as RawEntry;
 
         switch (action) {

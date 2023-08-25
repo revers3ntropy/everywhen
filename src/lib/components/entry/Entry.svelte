@@ -1,6 +1,7 @@
 <script lang="ts">
     import { browser } from '$app/environment';
     import Lazy from '$lib/components/Lazy.svelte';
+    import type { EntryEdit } from '$lib/controllers/entry/entry';
     import { slide } from 'svelte/transition';
     import { tooltip } from '@svelte-plugins/tooltips';
     import Bin from 'svelte-material-icons/Delete.svelte';
@@ -14,12 +15,12 @@
     import type { Location } from '$lib/controllers/location/location';
     import type { Label as LabelController } from '../../controllers/label/label';
     import { dispatch } from '$lib/dataChangeEvents';
-    import { Entry } from '$lib/controllers/entry/entry.client';
+    import { Entry } from '$lib/controllers/entry/entry';
     import { popup, settingsStore } from '$lib/stores';
     import { ANIMATION_DURATION } from '$lib/constants';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
-    import { obfuscate, rawMdToHtml, wordCount } from '$lib/utils/text';
+    import { obfuscate, rawMdToHtml } from '$lib/utils/text';
     import UtcTime from '$lib/components/UtcTime.svelte';
     import Dropdown from '$lib/components/Dropdown.svelte';
     import AgentWidget from './AgentWidget.svelte';
@@ -32,12 +33,13 @@
     export let entry: string;
     export let created: number;
     export let createdTZOffset = 0;
-    export let label = undefined as LabelController | null | undefined;
+    export let label = null as LabelController | null;
     export let latitude = null as number | null;
     export let longitude = null as number | null;
     export let flags: number;
-    export let agentData = '';
-    export let edits = [] as Entry[];
+    export let wordCount: number;
+    export let agentData = null as string | null;
+    export let edits = [] as EntryEdit[];
     export let isEdit = false;
     export let showFullDate = false;
 
@@ -93,7 +95,10 @@
             flags: Entry.Flags.setPinned(flags, !pinned),
             latitude,
             longitude,
-            agentData
+            label,
+            agentData,
+            wordCount,
+            edits
         });
     }
 
@@ -178,7 +183,7 @@
                     </div>
                     <div>
                         <div class="text-light flex-center" style="padding: 6px">
-                            {wordCount(entry)} words
+                            {wordCount} words
                         </div>
 
                         <hr />

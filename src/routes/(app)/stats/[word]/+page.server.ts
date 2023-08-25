@@ -1,16 +1,13 @@
 import { decrypt } from '$lib/utils/encryption';
 import { error } from '@sveltejs/kit';
-import { Entry } from '$lib/controllers/entry/entry';
-import { query } from '$lib/db/mysql.server';
+import { Entry } from '$lib/controllers/entry/entry.server';
 import { cachedPageRoute } from '$lib/utils/cache.server';
 import { wordsFromText } from '$lib/utils/text';
 import type { EntryWithWordCount } from '../helpers';
 import type { PageServerLoad } from './$types';
 
 export const load = cachedPageRoute(async (auth, { params }) => {
-    const { val: entries, err } = await Entry.all(query, auth, {
-        deleted: false
-    });
+    const { val: entries, err } = await Entry.Server.all(auth, { deleted: false });
     if (err) throw error(400, err);
 
     const { err: decryptErr, val: theWord } = decrypt(params.word, auth.key).map(w =>

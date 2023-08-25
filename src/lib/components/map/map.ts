@@ -1,4 +1,4 @@
-import type { EntryLocation } from '$lib/controllers/entry/entry';
+import type { EntryAsLocation } from '$lib/controllers/entry/entry';
 import Feature from 'ol/Feature';
 import { Circle, type Geometry, Polygon, Point } from 'ol/geom';
 import { fromLonLat, toLonLat } from 'ol/proj';
@@ -18,10 +18,10 @@ export interface LocationFeature extends Feature<Circle> {
 }
 
 export interface EntryFeature extends Feature<Point> {
-    entry: EntryLocation;
+    entry: EntryAsLocation;
 }
 
-export function lastEntry(entries: EntryLocation[]): EntryLocation | null {
+export function lastEntry(entries: EntryAsLocation[]): EntryAsLocation | null {
     let lastEntry = null;
     let lastDate = null;
     for (const entry of entries) {
@@ -196,7 +196,9 @@ export function olFeatureFromLocation(location: Location, view: View): LocationF
     return feature;
 }
 
-export function olLayerFromEntries(entries: EntryLocation[]): VectorLayer<VectorSource<Geometry>> {
+export function olLayerFromEntries(
+    entries: EntryAsLocation[]
+): VectorLayer<VectorSource<Geometry>> {
     return new LayerVector({
         source: new SourceVector({
             features: entries.map(olFeatureFromEntry).filter(Boolean)
@@ -204,7 +206,7 @@ export function olLayerFromEntries(entries: EntryLocation[]): VectorLayer<Vector
     });
 }
 
-export function olFeatureFromEntry(entry: EntryLocation): EntryFeature | null {
+export function olFeatureFromEntry(entry: EntryAsLocation): EntryFeature | null {
     if (!entry.latitude || !entry.longitude) {
         return null;
     }
@@ -219,7 +221,7 @@ export function olFeatureFromEntry(entry: EntryLocation): EntryFeature | null {
 }
 
 export function olEntryBezierArrows(
-    entries: EntryLocation[],
+    entries: EntryAsLocation[],
     view: View
 ): VectorLayer<VectorSource<Geometry>> {
     const mPerUnit = view.getProjection().getMetersPerUnit();

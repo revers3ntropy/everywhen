@@ -12,7 +12,7 @@
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
     import { notify } from '$lib/components/notifications/notifications';
     import type { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
-    import { Entry } from '$lib/controllers/entry/entry.client';
+    import { Entry } from '$lib/controllers/entry/entry';
     import Spinner from '../BookSpinner.svelte';
     import EntryGroup from '$lib/components/entry/EntryGroup.svelte';
     import Sidebar from './EntriesSidebar.svelte';

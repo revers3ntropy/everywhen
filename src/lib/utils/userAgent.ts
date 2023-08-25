@@ -59,13 +59,12 @@ export function osGroupFromUserAgentString(userAgentString: string): OsGroup {
     return osGroupFromOS(osFromUserAgentString(userAgentString) || '');
 }
 
-export function userAgentFromEntry(entry: { agentData?: string }): string {
-    const agentData = entry.agentData;
-    if (!agentData) return '';
+export function userAgentFromEntry(entry: { agentData: string | null }): string {
+    if (!entry.agentData) return '';
 
     let parsed;
     try {
-        parsed = JSON.parse(agentData);
+        parsed = JSON.parse(entry.agentData);
     } catch (e) {
         /* empty */
     }
@@ -76,7 +75,7 @@ export function userAgentFromEntry(entry: { agentData?: string }): string {
     return parsed.userAgent;
 }
 
-export function osGroupFromEntry(entry: { agentData?: string }): OsGroup {
+export function osGroupFromEntry(entry: { agentData: string | null }): OsGroup {
     return osGroupFromUserAgentString(userAgentFromEntry(entry));
 }
 

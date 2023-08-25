@@ -176,7 +176,7 @@ namespace SettingsUtils {
         return Result.ok(_Settings.fillWithDefaults(settings));
     }
 
-    export async function purgeAll(query: QueryFunc, auth: Auth): Promise<Result> {
+    export async function purgeAll(query: QueryFunc, auth: Auth): Promise<Result<null>> {
         await query`
             DELETE
             FROM settings
@@ -189,7 +189,7 @@ namespace SettingsUtils {
         query: QueryFunc,
         auth: Auth,
         newKey: string
-    ): Promise<Result> {
+    ): Promise<Result<null>> {
         const { val: unencryptedSettings, err } = await all(query, auth);
         if (err) return Result.err(err);
         for (const setting of unencryptedSettings) {

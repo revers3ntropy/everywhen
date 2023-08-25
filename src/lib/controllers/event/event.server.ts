@@ -276,7 +276,7 @@ namespace EventUtils {
         return Result.ok(self);
     }
 
-    export async function purge(query: QueryFunc, auth: Auth, self: Event): Promise<Result> {
+    export async function purge(query: QueryFunc, auth: Auth, self: Event): Promise<Result<null>> {
         await query`
             DELETE
             FROM events
@@ -305,7 +305,7 @@ namespace EventUtils {
         auth: Auth,
         oldLabel: string,
         newLabel: string
-    ): Promise<Result> {
+    ): Promise<Result<null>> {
         await query`
             UPDATE events
             SET label = ${newLabel}
@@ -319,7 +319,7 @@ namespace EventUtils {
         query: QueryFunc,
         auth: Auth,
         labelId: string
-    ): Promise<Result> {
+    ): Promise<Result<null>> {
         await query`
             UPDATE events
             SET label = NULL

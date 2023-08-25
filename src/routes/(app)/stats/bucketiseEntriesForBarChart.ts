@@ -4,7 +4,7 @@ import { capitalise } from '$lib/utils/text';
 import { dayUtcFromTimestamp, fmtUtc, nowUtc } from '$lib/utils/time';
 import { type OsGroup, osGroupFromEntry, osGroups } from '$lib/utils/userAgent';
 import { Bucket, By, type EntryWithWordCount } from './helpers';
-import { Entry } from '$lib/controllers/entry/entry.client';
+import { Entry } from '$lib/controllers/entry/entry';
 import { cssVarValue } from '$lib/utils/getCssVar';
 
 export interface ChartData {

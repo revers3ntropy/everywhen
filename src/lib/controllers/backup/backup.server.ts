@@ -1,11 +1,12 @@
 import { Location } from '$lib/controllers/location/location';
 import { query } from '$lib/db/mysql.server';
 import { SemVer } from '$lib/utils/semVer';
+import { wordCount } from '$lib/utils/text';
 import schemion from 'schemion';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
 import { nowUtc } from '$lib/utils/time';
-import { Entry } from '../entry/entry';
+import { Entry } from '../entry/entry.server';
 import { Event } from '../event/event';
 import { Label } from '../label/label';
 import { Backup as _Backup } from './backup';
@@ -20,7 +21,7 @@ export namespace BackupServer {
     }
 
     export async function generate(auth: Auth, created?: number): Promise<Result<Backup>> {
-        const { err: entryErr, val: entries } = await Entry.all(query, auth, {
+        const { err: entryErr, val: entries } = await Entry.Server.all(auth, {
             deleted: 'both'
         });
         if (entryErr) return Result.err(entryErr);
@@ -41,12 +42,12 @@ export namespace BackupServer {
                 entry: entry.entry,
                 created: entry.created,
                 createdTZOffset: entry.createdTZOffset,
-                // not `null`
                 latitude: entry.latitude ?? undefined,
                 longitude: entry.longitude ?? undefined,
                 title: entry.title,
-                agentData: entry.agentData,
+                agentData: entry.agentData ?? undefined,
                 flags: entry.flags,
+                wordCount: entry.wordCount,
                 edits:
                     entry.edits?.map(edit => ({
                         entry: edit.entry,
@@ -56,7 +57,7 @@ export namespace BackupServer {
                         latitude: edit.latitude ?? undefined,
                         longitude: edit.longitude ?? undefined,
                         title: edit.title,
-                        agentData: edit.agentData
+                        agentData: edit.agentData ?? undefined
                     })) || []
             })),
             labels: labels.map(label => ({
@@ -94,7 +95,7 @@ export namespace BackupServer {
         auth: Auth,
         backupEncrypted: string,
         key: string
-    ): Promise<Result> {
+    ): Promise<Result<null>> {
         let decryptedData: unknown;
         try {
             decryptedData = JSON.parse(backupEncrypted);
@@ -145,16 +146,19 @@ export namespace BackupServer {
         // set up labels first
         await Label.purgeAll(query, auth);
 
+        const createdLabels = [] as Label[];
+
         for (const label of labels) {
             if (!Label.jsonIsRawLabel(label)) {
                 return Result.err('Invalid label format in JSON');
             }
 
-            const { err } = await Label.create(query, auth, label);
+            const { err, val } = await Label.create(query, auth, label);
             if (err) return Result.err(err);
+            createdLabels.push(val);
         }
 
-        await Entry.purgeAll(query, auth);
+        await Entry.Server.purgeAll(auth);
 
         for (const entry of entries) {
             if (!Entry.jsonIsRawEntry(entry)) {
@@ -167,7 +171,21 @@ export namespace BackupServer {
                 entry.label = val;
             }
 
-            const { err } = await Entry.create(query, auth, entry);
+            const { err } = await Entry.Server.create(
+                auth,
+                createdLabels,
+                entry.title,
+                entry.entry,
+                entry.created,
+                entry.createdTZOffset,
+                entry.flags,
+                entry.latitude,
+                entry.longitude,
+                entry.label ?? null,
+                entry.agentData,
+                entry.wordCount,
+                entry.edits
+            );
             if (err) return Result.err(err);
         }
 
@@ -243,11 +261,11 @@ export namespace BackupServer {
         const { val: version, err } = SemVer.fromString(json.appVersion);
         if (err) return Result.err(err);
 
-        if (version.isGreaterThan(SemVer.fromString('1.0.0').val, true)) {
+        if (version.isGreaterThan(SemVer.fromString('1.0.0').unwrap(), true)) {
             return Result.err(`Cannot time travel to version 1`);
         }
 
-        if (version.isLessThan(SemVer.fromString('0.4.72').val)) {
+        if (version.isLessThan(SemVer.fromString('0.4.72').unwrap())) {
             // entry.deleted -> entry.flags
             if (json.entries) {
                 for (const entry of json.entries) {
@@ -257,6 +275,15 @@ export namespace BackupServer {
                         e.flags |= Entry.Flags.DELETED;
                     }
                     delete e.deleted;
+                }
+            }
+        }
+
+        if (version.isLessThan(SemVer.fromString('0.5.88').unwrap())) {
+            // add entry.wordCount
+            if (json.entries) {
+                for (const entry of json.entries) {
+                    entry.wordCount = wordCount(entry.entry);
                 }
             }
         }

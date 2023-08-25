@@ -148,6 +148,7 @@
                         {showLocations}
                         {locations}
                         flags={0}
+                        wordCount={0}
                     />
                 {/each}
             {/if}
