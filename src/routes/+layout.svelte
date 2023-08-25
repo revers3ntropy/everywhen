@@ -65,7 +65,7 @@
             display: none;
         }
     </style>
-    <div class="root">
+    <div>
         <h1>Enable JavaScript</h1>
         <p>
             Halcyon.Land requires JavaScript to be enabled to function. Please enable JavaScript and
@@ -90,25 +90,3 @@
 
     <Footer />
 </div>
-
-<style lang="less">
-    @import '../styles/variables';
-
-    :global(html),
-    :global(body) {
-        width: 100%;
-        margin: 0;
-        padding: 0;
-        overflow-y: hidden;
-    }
-
-    .root {
-        // scroll inside root so that the scrollbar is styled
-        // with correct theme
-        height: 100vh;
-        background: var(--background-color);
-        padding: 0;
-        overflow-y: scroll;
-        overflow-x: hidden;
-    }
-</style>

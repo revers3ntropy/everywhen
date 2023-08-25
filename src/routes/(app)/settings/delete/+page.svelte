@@ -11,15 +11,9 @@
     export let data: PageData;
 
     async function deleteAccount() {
-        if (usernameInput.value !== $username) {
-            badUsername = true;
-            return;
-        }
-
-        if (Auth.encryptionKeyFromPassword(passwordInput.value) !== $encryptionKey) {
-            badUsername = true;
-            return;
-        }
+        badUsername = usernameInput.value !== $username;
+        badPassword = Auth.encryptionKeyFromPassword(passwordInput.value) !== $encryptionKey;
+        if (badUsername || badPassword) return;
 
         const { backup: backupData } = notify.onErr(
             await api.delete(
@@ -69,7 +63,7 @@
 
             <div>
                 Password:
-                <input bind:this={passwordInput} type="text" />
+                <input bind:this={passwordInput} type="password" />
                 {#if badPassword}
                     <p class="text-warning"> Please enter your password </p>
                 {/if}

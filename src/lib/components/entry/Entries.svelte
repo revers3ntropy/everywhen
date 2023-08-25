@@ -159,7 +159,7 @@
     <div style="width: 100%; max-width: {showSidebar ? 1400 : 800}px">
         <div class:sidebar-and-entries={showSidebar}>
             {#if showSidebar}
-                <div style="margin-top: 85px">
+                <div class="sidebar-container">
                     <Sidebar titles={entryTitles} obfuscated={$obfuscated} />
                 </div>
             {/if}
@@ -290,6 +290,14 @@
                     justify-content: space-around !important;
                 }
             }
+        }
+    }
+
+    .sidebar-container {
+        margin-top: 85px;
+
+        @media @mobile {
+            margin-top: 0;
         }
     }
 </style>

@@ -3,7 +3,6 @@
     import { page } from '$app/stores';
     import { Backup } from '$lib/controllers/backup/backup';
     import { tooltip } from '@svelte-plugins/tooltips';
-    import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import Brain from 'svelte-material-icons/Brain.svelte';
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
     import Cog from 'svelte-material-icons/Cog.svelte';
@@ -293,16 +292,11 @@
 
         <Dropdown fromRight width="200px">
             <span class="account-button" slot="button">
-                <span class="username-span">
-                    <span class="streaks">
-                        <Streaks condensed />
-                    </span>
-                    <span class="username">
-                        {$username || '...'}
-                    </span>
+                <span class="username">
+                    {$username || '...'}
                 </span>
-                <span class="hide-mobile flex-center">
-                    <AccountCircleOutline size="35" />
+                <span class="streaks">
+                    <Streaks condensed />
                 </span>
             </span>
 
@@ -421,50 +415,23 @@
     }
 
     .account-button {
-        .bordered();
+        .container();
         display: grid;
-        grid-template-columns: 1fr 40px;
+        grid-template-columns: 1fr auto;
         align-items: center;
+        justify-content: center;
         gap: 0.5rem;
-        text-align: right;
-        cursor: pointer;
         border-radius: @border-radius;
-        padding: 0.1rem 0.3rem;
-        width: fit-content;
-        background: var(--nav-bg);
+        padding: 0.4rem 1rem;
+        margin: 0;
 
         &:hover {
             background-color: var(--light-accent);
         }
 
         @media @mobile {
-            height: 40px;
-            grid-template-columns: 1fr;
-        }
-
-        .username-span {
-            min-width: 6rem;
-            display: grid;
-            grid-template-columns: 3.2rem 1fr;
-            place-items: center;
-
-            @media @mobile {
-                padding-right: 0.4rem;
-            }
-
-            .streaks {
-                display: flex;
-                justify-content: flex-start;
-                align-items: center;
-                width: 100%;
-                height: 100%;
-            }
-
-            .username {
-                .ellipsis();
-                text-align: right;
-                width: 100%;
-            }
+            padding: 0.4rem 1rem;
+            margin: 0;
         }
     }
 

@@ -37,7 +37,7 @@
 {#if ua}
     <span
         use:tooltip={{
-            content: `Created on ${osName}`,
+            content: `<span class="oneline">Created on ${osName}</span>`,
             position: tooltipPosition
         }}
     >

@@ -15,6 +15,7 @@
         <section>
             <h2>Upcoming Features</h2>
             <ul>
+                <li>Datasets</li>
                 <li>Achievements/Badges</li>
                 <li>Mood attached to entries</li>
                 <li>Automatic mood tracking with Tone Analysis</li>
@@ -29,7 +30,7 @@
             </ul>
         </section>
         <section>
-            <h2>0.4</h2>
+            <h2>0.5</h2>
             <ul>
                 <li>Allow app to be installed on mobile (PWA)</li>
                 <li>Better zooming the timeline on mobile</li>
@@ -62,6 +63,18 @@
             </ul>
         </section>
         <section>
+            <h2>0.4</h2>
+            <ul>
+                <li>Made public on GitHub</li>
+                <li>Download plaintext backups</li>
+                <li>Better mobile support</li>
+                <li>Better default zoom for timeline</li>
+                <li>'n' Years Ago Today entries</li>
+                <li>Better 'buckets' for barchart in insights</li>
+                <li>Ask to leave page with unsaved changes when editing entry</li>
+            </ul>
+        </section>
+        <section>
             <h2>0.3</h2>
             <ul>
                 <li>Made public on GitHub</li>
@@ -76,18 +89,6 @@
         <section>
             <h2>0.2</h2>
             <ul>
-                <li>Made public on GitHub</li>
-                <li>Download plaintext backups</li>
-                <li>Better mobile support</li>
-                <li>Better default zoom for timeline</li>
-                <li>'n' Years Ago Today entries</li>
-                <li>Better 'buckets' for barchart in insights</li>
-                <li>Ask to leave page with unsaved changes when editing entry</li>
-            </ul>
-        </section>
-        <section>
-            <h2>0.1</h2>
-            <ul>
                 <li>Better navbar for mobile</li>
                 <li>Import entries from JSON file</li>
                 <li>Import events from JSON file</li>
@@ -98,7 +99,7 @@
             </ul>
         </section>
         <section>
-            <h2>0.0</h2>
+            <h2>0.1</h2>
             <ul>
                 <li>Publish to halcyon.land</li>
                 <li>Integrate testing framework</li>

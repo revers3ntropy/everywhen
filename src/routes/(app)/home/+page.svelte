@@ -188,18 +188,29 @@
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
-        margin: 1rem 0;
+        margin: 1rem 1rem;
+        gap: 1rem;
 
         @media @mobile {
-            margin: 0;
+            margin: 1rem 0;
             flex-direction: column;
+            gap: 0.2rem;
         }
 
         a,
         button {
             padding: 0.5rem;
-            margin: 0.2rem 1rem;
             font-size: 1.1rem;
+
+            &.icon-gradient-on-hover.with-icon {
+                background: var(--v-light-accent);
+                border-radius: @border-radius;
+                padding: 0.4em 0.8em 0.4em 0.4em;
+
+                &:hover {
+                    background: var(--light-accent);
+                }
+            }
         }
     }
 
