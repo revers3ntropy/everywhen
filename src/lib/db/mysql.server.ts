@@ -3,6 +3,7 @@ import chalk from 'chalk';
 import '../require';
 import { DB, DB_HOST, DB_PASS, DB_PORT, DB_USER } from '$env/static/private';
 import { collapseWhitespace, recursivelyTrimAndStringify } from '$lib/utils/text';
+import type { Expand } from '../../types';
 import { FileLogger } from '../utils/log.server';
 
 export type QueryResult =
@@ -94,7 +95,11 @@ export type QueryParam = string | number | null | boolean | undefined;
 type QueryExecutor = <Res extends QueryResult = never>(
     queryParts: TemplateStringsArray,
     ...params: QueryParam[]
-) => Promise<Res extends (infer A)[] ? NonFunctionProperties<A>[] : Res>;
+) => Promise<
+    Res extends (infer A)[]
+        ? Expand<NonFunctionProperties<A>>[]
+        : Expand<NonFunctionProperties<Res>>
+>;
 
 export interface QueryFunc extends QueryExecutor {
     unlogged: QueryFunc;

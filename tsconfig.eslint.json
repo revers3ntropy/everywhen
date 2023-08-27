@@ -13,7 +13,7 @@
         "./playwright.config.ts",
         "./rollup.config.ts",
         "./svelte.config.js",
-        "./bin/deploy.js",
+        "./bin/*.js",
         "./src/service-worker.ts",
         "ambient.d.ts",
         "./.svelte-kit/ambient.d.ts",

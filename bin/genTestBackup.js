@@ -5,9 +5,9 @@ const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 
 const num = {
     entries: {
-        incrementing: 1,
+        incrementing: 100_000,
         long: {
-            count: 1,
+            count: 0,
             chars: 100_000
         }
     }

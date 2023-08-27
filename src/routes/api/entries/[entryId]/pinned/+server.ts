@@ -9,7 +9,7 @@ import { Auth } from '$lib/controllers/auth/auth.server';
 export const GET = cachedApiRoute(async (auth, { params }) => {
     if (!params.entryId) throw error(400, 'invalid id');
 
-    const { err, val: entry } = await Entry.Server.fromId(auth, params.entryId, true);
+    const { err, val: entry } = await Entry.Server.getFromId(auth, params.entryId, true);
 
     if (err) throw error(400, err);
 
@@ -23,7 +23,7 @@ export const PUT = (async ({ request, params, cookies }) => {
 
     const body = await getUnwrappedReqBody(auth, request, { pinned: 'boolean' }, { pinned: false });
 
-    const { err: entryErr, val: entry } = await Entry.Server.fromId(auth, params.entryId, true);
+    const { err: entryErr, val: entry } = await Entry.Server.getFromId(auth, params.entryId, true);
     if (entryErr) throw error(404, entryErr);
 
     const { err: updateErr } = await Entry.Server.setPinned(auth, entry, body.pinned);

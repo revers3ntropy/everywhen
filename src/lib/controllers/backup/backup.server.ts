@@ -174,17 +174,17 @@ export namespace BackupServer {
             const { err } = await Entry.Server.create(
                 auth,
                 createdLabels,
-                entry.title,
-                entry.entry,
-                entry.created,
-                entry.createdTZOffset,
-                entry.flags,
-                entry.latitude,
-                entry.longitude,
-                entry.label ?? null,
-                entry.agentData,
-                entry.wordCount,
-                entry.edits
+                entry.title || '',
+                entry.entry || '',
+                entry.created || 0,
+                entry.createdTZOffset || 0,
+                entry.flags || 0,
+                entry.latitude || null,
+                entry.longitude || null,
+                entry.label || null,
+                entry.agentData || '',
+                entry.wordCount || wordCount(entry.entry || ''),
+                entry.edits || []
             );
             if (err) return Result.err(err);
         }

@@ -1,3 +1,10 @@
+import { entryFromId } from '$lib/controllers/entry/getEntrySingle.server';
+import {
+    all as _all,
+    getTitles as _getTitles,
+    getPage as _getPage,
+    near as _near
+} from '$lib/controllers/entry/getEntryMulti.server';
 import { query } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import { errorLogger } from '$lib/utils/log.server';
@@ -5,17 +12,9 @@ import { Result } from '$lib/utils/result';
 import { wordCount } from '$lib/utils/text';
 import { fmtUtc, nowUtc } from '$lib/utils/time';
 import type { Auth } from '../auth/auth.server';
-import { Label } from '../label/label';
-import { Location } from '../location/location';
+import type { Label } from '../label/label';
 import { UUIdControllerServer } from '$lib/controllers/uuid/uuid.server';
-import {
-    Entry as _Entry,
-    type EntryEdit,
-    type EntryFilter,
-    type RawEntry,
-    type Streaks,
-    type RawEntryEdit
-} from './entry';
+import { Entry as _Entry, type EntryEdit, type RawEntryEdit, type Streaks } from './entry';
 
 namespace EntryServer {
     type Entry = _Entry;
@@ -61,220 +60,6 @@ namespace EntryServer {
             FROM entries
             WHERE user = ${auth.id}
         `;
-    }
-
-    export async function allRaw(
-        auth: Auth,
-        filter: Omit<EntryFilter, 'search'> = {}
-    ): Promise<Result<RawEntry[]>> {
-        let location: Location | undefined;
-        if (filter.locationId) {
-            const locationResult = await Location.fromId(query, auth, filter.locationId);
-            if (locationResult.err) return Result.err(locationResult.err);
-            location = locationResult.val;
-        }
-        const rawEntries = await query<RawEntry[]>`
-            SELECT id,
-                   created,
-                   createdTZOffset,
-                   title,
-                   flags,
-                   label,
-                   entry,
-                   latitude,
-                   longitude,
-                   agentData,
-                   wordCount
-            FROM entries
-            WHERE ((flags & ${Entry.Flags.DELETED}) = ${
-                filter.deleted ? Entry.Flags.DELETED : 0
-            } OR ${filter.deleted === 'both'})
-                  AND (label = ${filter.labelId || ''} OR ${filter.labelId === undefined})
-              AND (${location === undefined} OR (
-                    latitude IS NOT NULL
-                    AND longitude IS NOT NULL
-                    AND SQRT(
-                                POW(latitude - ${location?.latitude || 0}, 2)
-                                + POW(longitude - ${location?.longitude || 0}, 2)
-                        ) <= ${(location?.radius || 0) * 2}
-                ))
-              AND user = ${auth.id}
-            ORDER BY created DESC, id
-        `;
-
-        if (location) {
-            return Result.ok(
-                Location.filterByCirclePrecise(
-                    rawEntries,
-                    location.latitude,
-                    location.longitude,
-                    Location.degreesToMeters(location.radius)
-                )
-            );
-        }
-        return Result.ok(rawEntries);
-    }
-
-    export async function all(auth: Auth, filter: EntryFilter = {}): Promise<Result<Entry[]>> {
-        const { err, val: rawEntries } = await allRaw(auth, filter);
-        if (err) return Result.err(err);
-        return fromRawMulti(auth, rawEntries);
-    }
-
-    export async function getPage(
-        auth: Auth,
-        offset: number,
-        count: number,
-        filters: EntryFilter = {}
-    ): Promise<Result<[Entry[], number]>> {
-        const { val: rawEntries, err: rawErr } = await allRaw(auth, filters);
-        if (rawErr) return Result.err(rawErr);
-        const { val, err } = await fromRawMulti(auth, rawEntries);
-        if (err) return Result.err(err);
-        let entries = val;
-
-        if (filters.search) {
-            entries = entries.filter(
-                e =>
-                    e.title.toLowerCase().includes(filters.search || '') ||
-                    e.entry.toLowerCase().includes(filters.search || '')
-            );
-        }
-
-        const start = offset;
-        const end = start + count;
-
-        return Result.ok([entries.slice(start, end), entries.length]);
-    }
-
-    export async function fromRaw(
-        auth: Auth,
-        rawEntry: RawEntry,
-        labels: Label[]
-    ): Promise<Result<Entry>> {
-        const { err: titleErr, val: decryptedTitle } = decrypt(rawEntry.title, auth.key);
-        if (titleErr) return Result.err(titleErr);
-
-        const { err: entryErr, val: decryptedEntry } = decrypt(rawEntry.entry, auth.key);
-        if (entryErr) return Result.err(entryErr);
-
-        let decryptedAgent = '';
-        if (rawEntry.agentData) {
-            const { err: agentErr, val } = decrypt(rawEntry.agentData, auth.key);
-            if (agentErr) return Result.err(agentErr);
-            decryptedAgent = val;
-        }
-
-        let entry: Entry = {
-            id: rawEntry.id,
-            title: decryptedTitle,
-            entry: decryptedEntry,
-            created: rawEntry.created,
-            createdTZOffset: rawEntry.createdTZOffset,
-            flags: rawEntry.flags,
-            latitude: rawEntry.latitude,
-            longitude: rawEntry.longitude,
-            agentData: decryptedAgent,
-            wordCount: rawEntry.wordCount,
-            label: null,
-            edits: []
-        };
-
-        if (rawEntry.label) {
-            const label = labels.find(l => l.id === rawEntry.label);
-            if (!label) {
-                await errorLogger.error('Label not found', rawEntry);
-                return Result.err('Label not found');
-            }
-            entry = { ...entry, label };
-        }
-
-        const { err, val } = await addEdits(auth, entry, labels);
-        if (err) return Result.err(err);
-        entry = val;
-
-        return Result.ok(entry);
-    }
-
-    export async function fromRawEdit(
-        auth: Auth,
-        labels: Label[],
-        rawEdit: RawEntryEdit
-    ): Promise<Result<EntryEdit>> {
-        const { err: titleErr, val: decryptedTitle } = decrypt(rawEdit.title, auth.key);
-        if (titleErr) return Result.err(titleErr);
-
-        const { err: entryErr, val: decryptedEntry } = decrypt(rawEdit.entry, auth.key);
-        if (entryErr) return Result.err(entryErr);
-
-        let decryptedAgent = '';
-        if (rawEdit.agentData) {
-            const { err: agentErr, val } = decrypt(rawEdit.agentData, auth.key);
-            if (agentErr) return Result.err(agentErr);
-            decryptedAgent = val;
-        }
-
-        let entry: EntryEdit = {
-            id: rawEdit.id,
-            entryId: rawEdit.entryId,
-            title: decryptedTitle,
-            entry: decryptedEntry,
-            created: rawEdit.created,
-            createdTZOffset: rawEdit.createdTZOffset,
-            latitude: rawEdit.latitude,
-            longitude: rawEdit.longitude,
-            agentData: decryptedAgent,
-            label: null
-        };
-
-        if (rawEdit.label) {
-            const label = labels.find(l => l.id === rawEdit.label);
-            if (!label) {
-                await errorLogger.error('Label not found', { rawEdit, labels });
-                return Result.err('Label not found');
-            }
-            entry = { ...entry, label };
-        }
-
-        return Result.ok(entry);
-    }
-
-    /**
-     * Returns a decrypted `Entry` with (optional) decrypted `Label`.
-     */
-    export async function fromId(
-        auth: Auth,
-        id: string,
-        mustNotBeDeleted = true
-    ): Promise<Result<Entry>> {
-        const entries = await query<RawEntry[]>`
-            SELECT label,
-                   flags,
-                   id,
-                   created,
-                   createdTZOffset,
-                   title,
-                   entry,
-                   latitude,
-                   longitude,
-                   agentData,
-                   wordCount
-            FROM entries
-            WHERE id = ${id}
-              AND user = ${auth.id}
-        `;
-
-        if (entries.length !== 1) {
-            return Result.err('Entry not found');
-        }
-        if (mustNotBeDeleted && _Entry.isDeleted(entries[0])) {
-            return Result.err('Entry is deleted');
-        }
-
-        const { val: labels, err: labelErr } = await Label.all(query, auth);
-        if (labelErr) return Result.err(labelErr);
-
-        return await fromRaw(auth, entries[0], labels);
     }
 
     export async function create(
@@ -365,22 +150,6 @@ namespace EntryServer {
         });
     }
 
-    export async function removeLabel(auth: Auth, self: Entry): Promise<Result<Entry>> {
-        if (!self.label) {
-            return Result.err('Entry does not have a label to remove');
-        }
-
-        await query`
-            UPDATE entries
-            SET label = ${null}
-            WHERE entries.id = ${self.id}
-              AND user = ${auth.id}
-        `;
-
-        self.label = null;
-        return Result.ok(self);
-    }
-
     export async function setPinned(
         auth: Auth,
         self: Entry,
@@ -442,21 +211,15 @@ namespace EntryServer {
 
         await query`
             UPDATE entries
-            SET title = ${encryptedNewTitle},
-                entry = ${encryptedNewEntry},
-                label = ${newLabel ?? null},
+            SET title     = ${encryptedNewTitle},
+                entry     = ${encryptedNewEntry},
+                label     = ${newLabel ?? null},
                 wordCount = ${wordCount(newEntry)}
             WHERE id = ${entry.id}
               AND user = ${auth.id}
         `;
 
         return Result.ok(null);
-    }
-
-    export async function getTitles(auth: Auth): Promise<Result<Entry[]>> {
-        const { val: entries, err } = await all(auth);
-        if (err) return Result.err(err);
-        return Result.ok(entries.map(Entry.entryToTitleEntry));
     }
 
     export async function reassignAllLabels(
@@ -573,137 +336,50 @@ namespace EntryServer {
         });
     }
 
-    export async function near(
+    export async function fromRawEdit(
         auth: Auth,
-        location: Location,
-        deleted: boolean | 'both' = false
-    ): Promise<Result<Entry[]>> {
-        const raw = await query<RawEntry[]>`
-            SELECT id,
-                   created,
-                   createdTZOffset,
-                   flags,
-                   latitude,
-                   longitude,
-                   title,
-                   entry,
-                   label,
-                   agentData,
-                   wordCount
-            FROM entries
-            WHERE ((flags & ${_Entry.Flags.DELETED}) = ${deleted ? _Entry.Flags.DELETED : 0} OR ${
-                deleted === 'both'
-            })
-            AND user = ${auth.id}
-            AND latitude IS NOT NULL
-            AND longitude IS NOT NULL
-            AND SQRT(
-                POW(latitude - ${location.latitude}, 2)
-                + POW(longitude - ${location.longitude}, 2)
-            ) <= ${location.radius}
-        `;
-        return await fromRawMulti(auth, raw);
+        labels: Label[],
+        rawEdit: RawEntryEdit
+    ): Promise<Result<EntryEdit>> {
+        const { err: titleErr, val: decryptedTitle } = decrypt(rawEdit.title, auth.key);
+        if (titleErr) return Result.err(titleErr);
+
+        const { err: entryErr, val: decryptedEntry } = decrypt(rawEdit.entry, auth.key);
+        if (entryErr) return Result.err(entryErr);
+
+        let decryptedAgent = '';
+        if (rawEdit.agentData) {
+            const { err: agentErr, val } = decrypt(rawEdit.agentData, auth.key);
+            if (agentErr) return Result.err(agentErr);
+            decryptedAgent = val;
+        }
+
+        const edit: EntryEdit = {
+            id: rawEdit.id,
+            entryId: rawEdit.entryId,
+            title: decryptedTitle,
+            entry: decryptedEntry,
+            created: rawEdit.created,
+            createdTZOffset: rawEdit.createdTZOffset,
+            latitude: rawEdit.latitude,
+            longitude: rawEdit.longitude,
+            agentData: decryptedAgent,
+            label: labels.find(l => l.id === rawEdit.label) ?? null
+        };
+
+        if (rawEdit.label && !edit.label) {
+            await errorLogger.error('Label not found', { rawEdit, labels });
+            return Result.err('Label not found');
+        }
+
+        return Result.ok(edit);
     }
 
-    async function fromRawMulti(auth: Auth, raw: RawEntry[]): Promise<Result<Entry[]>> {
-        const rawEdits = await query<(RawEntry & { entryId: string })[]>`
-            SELECT entryEdits.created,
-                   entryEdits.entryId,
-                   entryEdits.createdTZOffset,
-                   entryEdits.latitude,
-                   entryEdits.longitude,
-                   entryEdits.title,
-                   entryEdits.entry,
-                   entryEdits.label,
-                   entryEdits.agentData
-            FROM entryEdits,
-                 entries
-            WHERE entries.user = ${auth.id}
-              AND entries.id = entryEdits.entryId
-        `;
-
-        const { err, val: labels } = await Label.all(query, auth);
-        if (err) return Result.err(err);
-
-        const { err: editsErr, val: edits } = await Result.collectAsync(
-            rawEdits.map(async e => await fromRawEdit(auth, labels, e))
-        );
-        if (editsErr) return Result.err(editsErr);
-
-        const groupedEdits = edits.reduce<Record<string, EntryEdit[]>>((prev, edit) => {
-            if (!edit.entryId) return prev;
-            prev[edit.entryId] ??= [];
-            prev[edit.entryId].push(edit);
-            return prev;
-        }, {});
-
-        const groupedLabels = labels.reduce<Record<string, Label>>((prev, label) => {
-            prev[label.id] = label;
-            return prev;
-        }, {});
-
-        return Result.collect(
-            raw.map(rawEntry => {
-                const { err: titleErr, val: decryptedTitle } = decrypt(rawEntry.title, auth.key);
-                if (titleErr) return Result.err(titleErr);
-
-                const { err: entryErr, val: decryptedEntry } = decrypt(rawEntry.entry, auth.key);
-                if (entryErr) return Result.err(entryErr);
-
-                let decryptedAgentData = '';
-                if (rawEntry.agentData) {
-                    const { err: agentErr, val } = decrypt(rawEntry.agentData, auth.key);
-                    if (agentErr) return Result.err(agentErr);
-                    decryptedAgentData = val;
-                }
-
-                return Result.ok({
-                    id: rawEntry.id,
-                    title: decryptedTitle,
-                    entry: decryptedEntry,
-                    created: rawEntry.created,
-                    createdTZOffset: rawEntry.createdTZOffset,
-                    flags: rawEntry.flags,
-                    latitude: rawEntry.latitude,
-                    longitude: rawEntry.longitude,
-                    agentData: decryptedAgentData,
-                    wordCount: rawEntry.wordCount,
-                    label: rawEntry.label ? groupedLabels[rawEntry.label] : null,
-                    edits: groupedEdits[rawEntry.id]
-                });
-            })
-        );
-    }
-
-    async function addEdits(auth: Auth, self: Entry, labels: Label[]): Promise<Result<Entry>> {
-        const rawEdits = await query<RawEntryEdit[]>`
-            SELECT 
-                entryEdits.id, 
-                entryEdits.created, 
-                entryEdits.createdTZOffset, 
-                entryEdits.latitude, 
-                entryEdits.longitude, 
-                entryEdits.title, 
-                entryEdits.entry, 
-                entryEdits.label, 
-                entryEdits.agentData
-            FROM entryEdits, entries
-            WHERE entries.id = ${self.id}
-                AND entryEdits.entryId = entries.id
-                AND entries.user = ${auth.id}
-            ORDER BY entryEdits.created DESC
-        `;
-
-        const { err, val: edits } = await Result.collectAsync(
-            rawEdits.map(e => fromRawEdit(auth, labels, e))
-        );
-
-        if (err) return Result.err(err);
-
-        self.edits = edits;
-
-        return Result.ok(self);
-    }
+    export const getFromId = entryFromId;
+    export const getTitles = _getTitles;
+    export const all = _all;
+    export const getPage = _getPage;
+    export const near = _near;
 }
 
 export const Entry = {
