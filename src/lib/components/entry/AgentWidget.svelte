@@ -1,60 +1,62 @@
 <script lang="ts">
-    import {
-        consoleOSs,
-        macOSs,
-        mobileOSs,
-        tvOSs,
-        userAgentFromEntry,
-        watchOSs,
-        windowsOSs
-    } from '$lib/utils/userAgent';
+    import { deviceDataFromEntry } from '$lib/utils/userAgent';
     import { tooltip } from '@svelte-plugins/tooltips';
-    import { onMount } from 'svelte';
     import Apple from 'svelte-material-icons/Apple.svelte';
     import Cellphone from 'svelte-material-icons/Cellphone.svelte';
     import Linux from 'svelte-material-icons/Linux.svelte';
     import Windows from 'svelte-material-icons/MicrosoftWindows.svelte';
     import Television from 'svelte-material-icons/Television.svelte';
     import Watch from 'svelte-material-icons/Watch.svelte';
-    import UAParser from 'ua-parser-js';
 
     export let data = null as string | null;
     export let size: Pixels = 20;
     export let tooltipPosition = 'right' as TooltipPosition;
 
-    let ua = null as ReturnType<typeof UAParser> | null;
-
-    onMount(() => {
-        if (!data) return;
-        const userAgentString = userAgentFromEntry({ agentData: data });
-        if (!userAgentString) return;
-        ua = new UAParser(userAgentString).getResult();
-    });
-
-    $: osName = ua !== null ? ua?.os?.name || 'Unknown OS' : '';
+    const deviceData = deviceDataFromEntry({ agentData: data });
+    let tooltipContent = `
+        <span class="oneline">
+            Created on ${deviceData.os}
+        </span>
+    `;
+    if (deviceData.deviceSpecific || deviceData.device) {
+        tooltipContent += `
+            <span class="oneline">
+                on ${deviceData.deviceSpecific || deviceData.device}
+            </span>
+        `;
+    }
+    if (deviceData.browser) {
+        tooltipContent += `
+            <span class="oneline">
+                with ${deviceData.browser} ${deviceData.browserVersion || ''}
+            </span>
+        `;
+    }
 </script>
 
-{#if ua}
+{#if deviceData}
     <span
         use:tooltip={{
-            content: `<span class="oneline">Created on ${osName}</span>`,
+            content: tooltipContent,
             position: tooltipPosition
         }}
     >
-        {#if mobileOSs.includes(osName)}
+        {#if deviceData.osGroup === 'mobile'}
             <Cellphone {size} />
-        {:else if watchOSs.includes(osName)}
+        {:else if deviceData.osGroup === 'watch'}
             <Watch {size} />
-        {:else if tvOSs.includes(osName)}
+        {:else if deviceData.osGroup === 'tv'}
             <Television {size} />
-        {:else if consoleOSs.includes(osName)}
+        {:else if deviceData.osGroup === 'console'}
             <Television {size} />
-        {:else if macOSs.includes(osName)}
+        {:else if deviceData.osGroup === 'mac'}
             <Apple {size} />
-        {:else if windowsOSs.includes(osName)}
+        {:else if deviceData.osGroup === 'windows'}
             <Windows {size} />
-        {:else}
+        {:else if deviceData.osGroup === 'linux'}
             <Linux {size} />
+        {:else}
+            ?
         {/if}
     </span>
 {/if}

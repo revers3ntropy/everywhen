@@ -49,16 +49,6 @@ function osGroupFromOS(os: string): OsGroup {
     return 'unknown';
 }
 
-export function osFromUserAgentString(userAgentString: string): string | undefined {
-    if (!userAgentString) return undefined;
-    const ua = new UAParser(userAgentString).getResult();
-    return ua?.os?.name;
-}
-
-export function osGroupFromUserAgentString(userAgentString: string): OsGroup {
-    return osGroupFromOS(osFromUserAgentString(userAgentString) || '');
-}
-
 export function userAgentFromEntry(entry: { agentData: string | null }): string {
     if (!entry.agentData) return '';
 
@@ -75,22 +65,72 @@ export function userAgentFromEntry(entry: { agentData: string | null }): string 
     return parsed.userAgent;
 }
 
-export function osGroupFromEntry(entry: { agentData: string | null }): OsGroup {
-    return osGroupFromUserAgentString(userAgentFromEntry(entry));
+export interface DeviceData {
+    os: string | null;
+    osGroup: OsGroup;
+    browser: string | null;
+    browserVersion: string | null;
+    device: string | null;
+    deviceSpecific: string | null;
+}
+
+export function deviceDataFromEntry(entry: { agentData: string | null }): DeviceData {
+    const userAgent = userAgentFromEntry(entry);
+    const ua = new UAParser(userAgent).getResult();
+
+    const data: DeviceData = {
+        os: ua?.os?.name || null,
+        osGroup: osGroupFromOS(ua?.os?.name || ''),
+        browser: ua?.browser?.name || null,
+        browserVersion: ua?.browser?.version?.split('.')[0] || null,
+        device: ua?.device?.vendor || null,
+        deviceSpecific: null
+    };
+
+    if (ua?.device?.model && ua?.device?.vendor) {
+        data.deviceSpecific = `${ua.device.vendor} ${ua.device.model}`;
+    }
+    if (ua?.cpu?.architecture) {
+        if (data.deviceSpecific) {
+            // knows the device, add a little extra info
+            data.deviceSpecific += ` (${ua.cpu.architecture})`;
+        } else {
+            // doesn't know device, only CPU architecture
+            data.deviceSpecific = `${ua.cpu.architecture}`;
+        }
+    }
+
+    switch (ua?.device?.type) {
+        case 'mobile':
+            data.osGroup = 'mobile';
+            break;
+        case 'tablet':
+            data.osGroup = 'mobile';
+            break;
+        case 'smarttv':
+            data.osGroup = 'tv';
+            break;
+        case 'console':
+            data.osGroup = 'console';
+            break;
+        case 'wearable':
+            data.osGroup = 'watch';
+            break;
+        case 'embedded':
+            data.osGroup = 'unknown';
+    }
+
+    return data;
 }
 
 export interface AgentData {
     userAgent: string;
     language: string;
-    appVersion: string;
-    platform: string;
 }
 
 export function serializedAgentData(): string {
     return JSON.stringify({
         userAgent: navigator.userAgent,
-        language: navigator.language,
-        appVersion: navigator.appVersion,
-        platform: navigator.platform
+        language: navigator.language
     } as AgentData);
 }

@@ -451,12 +451,12 @@ async function checkAndTest() {
  * @returns {Promise<void>}
  */
 async function build() {
-    await $`mv .env tmp.env`;
-    await $`mv ./secrets/${env}/remote.env .env`;
+    await $`cp .env tmp.env`;
+    await $`cp ./secrets/${env}/remote.env .env`;
 
     async function cleanup() {
-        await $`mv .env ./secrets/${env}/remote.env`;
-        await $`mv tmp.env .env`;
+        await $`cp tmp.env .env`;
+        await $`rm tmp.env`;
     }
 
     try {

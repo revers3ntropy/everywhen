@@ -2,7 +2,7 @@ import { clientLogger } from '$lib/utils/log';
 import moment from 'moment/moment';
 import { capitalise } from '$lib/utils/text';
 import { dayUtcFromTimestamp, fmtUtc, nowUtc } from '$lib/utils/time';
-import { type OsGroup, osGroupFromEntry, osGroups } from '$lib/utils/userAgent';
+import { deviceDataFromEntry, type OsGroup, osGroups } from '$lib/utils/userAgent';
 import { Bucket, By, type EntryWithWordCount } from './helpers';
 import { Entry } from '$lib/controllers/entry/entry';
 import { cssVarValue } from '$lib/utils/getCssVar';
@@ -162,7 +162,7 @@ const generateDataset: Record<
         );
 
         for (const entry of sortedEntries) {
-            const bucket = osGroupFromEntry(entry);
+            const bucket = deviceDataFromEntry(entry).osGroup;
             buckets[bucket] += by === By.Entries ? 1 : entry.wordCount;
         }
 
