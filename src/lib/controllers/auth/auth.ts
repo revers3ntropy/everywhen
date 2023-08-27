@@ -61,8 +61,8 @@ export namespace Auth {
         currentlyUploadingEntries.set(0);
 
         // do not trigger storage event for these
-        sessionStorage.removeItem(SESSION_KEYS.username);
-        sessionStorage.removeItem(SESSION_KEYS.encryptionKey);
+        localStorage.removeItem(SESSION_KEYS.username);
+        localStorage.removeItem(SESSION_KEYS.encryptionKey);
 
         if (wantsToStay) {
             await goto(requireAuthUrl(location.href));

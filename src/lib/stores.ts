@@ -23,12 +23,8 @@ export const lastTipNumber = persisted<number>(LS_KEYS.lastTipNumber, 0);
 export const obfuscated = persisted<boolean>(LS_KEYS.obfuscated, false);
 
 // session storage
-export const username = persisted<string | null>(SESSION_KEYS.username, null, {
-    storage: 'session'
-});
-export const encryptionKey = persisted<string | null>(SESSION_KEYS.encryptionKey, null, {
-    storage: 'session'
-});
+export const username = persisted<string | null>(SESSION_KEYS.username, null);
+export const encryptionKey = persisted<string | null>(SESSION_KEYS.encryptionKey, null);
 
 // cookie
 export const theme = cookieWritable<Theme>(COOKIE_KEYS.theme, Theme.light);

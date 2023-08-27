@@ -40,13 +40,13 @@
     listen.event.onDelete(id => {
         data = {
             ...data,
-            events: [...data.events.filter(event => event.id !== id)]
+            events: [...data.events.filter(e => e.id !== id)]
         };
     });
     listen.event.onUpdate(changedEvent => {
         data = {
             ...data,
-            events: [...data.events.filter(event => event.id !== changedEvent.id), changedEvent]
+            events: [...data.events.filter(e => e.id !== changedEvent.id), changedEvent]
         };
     });
     listen.entry.onDelete(id => {

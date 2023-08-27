@@ -53,8 +53,8 @@
         whenDragReleased(state: RenderProps, time: TimestampSecs) {
             this.dragging = false;
 
-            let dragStart = Math.floor(this.dragStartTime);
-            let dragEnd = Math.floor(time);
+            let dragStart: TimestampSecs = Math.floor(this.dragStartTime);
+            let dragEnd: TimestampSecs = Math.floor(time);
 
             if (dragStart > dragEnd) {
                 [dragStart, dragEnd] = [dragEnd, dragStart];
@@ -68,13 +68,15 @@
         },
 
         setup(state) {
-            state.listen('mouseup', () => {
+            state.listen('mouseup', event => {
                 if (!this.dragging) return;
                 this.whenDragReleased(state, state.mouseTime);
+                event.preventDefault();
             });
-            state.listen('touchend', () => {
+            state.listen('touchend', event => {
                 if (!this.dragging) return;
                 this.whenDragReleased(state, state.mouseTime);
+                event.preventDefault();
             });
         },
 
