@@ -13,6 +13,7 @@ export interface EntryFilter {
     readonly labelId?: string;
     readonly locationId?: string;
     readonly deleted?: boolean | 'both';
+    readonly onlyWithLocation?: boolean;
 }
 
 export interface Streaks {

@@ -5,7 +5,7 @@ import { nowUtc } from '$lib/utils/time';
 import type { SettingsKey } from '$lib/controllers/settings/settings.client';
 import { errorLogger } from '$lib/utils/log.server';
 import { Settings as _Settings, type SettingsConfig } from './settings';
-import { UUIdControllerServer } from '$lib/controllers/uuid/uuid.server';
+import { UId } from '$lib/controllers/uuid/uuid.server';
 import type { Auth } from '$lib/controllers/auth/auth';
 
 export type Settings<T = unknown> = _Settings<T>;
@@ -50,7 +50,7 @@ namespace SettingsUtils {
             return Result.ok({ id, created: now, key, value });
         }
 
-        const id = await UUIdControllerServer.generate();
+        const id = await UId.Server.generate();
 
         await query`
             INSERT INTO settings (id, user, created, \`key\`, value)

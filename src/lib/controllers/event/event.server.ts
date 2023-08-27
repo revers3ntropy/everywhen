@@ -1,3 +1,4 @@
+import { MAXIMUM_ENTITIES } from '$lib/constants';
 import type { QueryFunc } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
@@ -5,13 +6,16 @@ import { nowUtc } from '$lib/utils/time';
 import type { Auth } from '../auth/auth.server';
 import { Label } from '../label/label';
 import type { Event as _Event, RawEvent } from './event';
-import { UUIdControllerServer } from '$lib/controllers/uuid/uuid.server';
+import { UId } from '$lib/controllers/uuid/uuid.server';
 
 export type Event = _Event;
 
 namespace EventUtils {
-    export async function allRaw(query: QueryFunc, auth: Auth): Promise<RawEvent[]> {
-        return await query<RawEvent[]>`
+    export async function all(query: QueryFunc, auth: Auth): Promise<Result<Event[]>> {
+        const { err, val: labels } = await Label.all(query, auth);
+        if (err) return Result.err(err);
+
+        const rawEvents = await query<RawEvent[]>`
             SELECT id,
                    name,
                    start,
@@ -22,13 +26,6 @@ namespace EventUtils {
             WHERE user = ${auth.id}
             ORDER BY created DESC
         `;
-    }
-
-    export async function all(query: QueryFunc, auth: Auth): Promise<Result<Event[]>> {
-        const { err, val: labels } = await Label.all(query, auth);
-        if (err) return Result.err(err);
-
-        const rawEvents = await Event.allRaw(query, auth);
 
         const events = [];
 
@@ -102,7 +99,16 @@ namespace EventUtils {
         label?: string,
         created?: TimestampSecs
     ): Promise<Result<Event>> {
-        const id = await UUIdControllerServer.generate();
+        const numEvents = await query<{ count: number }[]>`
+            SELECT COUNT(*) as count
+            FROM events
+            WHERE user = ${auth.id}
+        `;
+        if (numEvents[0].count >= MAXIMUM_ENTITIES.event) {
+            return Result.err(`Maximum number of events (${MAXIMUM_ENTITIES.event}) reached`);
+        }
+
+        const id = await UId.Server.generate();
         created ??= nowUtc();
 
         if (!name) {

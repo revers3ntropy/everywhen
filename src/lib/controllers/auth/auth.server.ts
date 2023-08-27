@@ -6,7 +6,7 @@ import { type Cookies, error } from '@sveltejs/kit';
 import { COOKIE_KEYS } from '$lib/constants';
 import { query } from '$lib/db/mysql.server';
 import { Result } from '$lib/utils/result';
-import { UUIdControllerServer } from '$lib/controllers/uuid/uuid.server';
+import { UId } from '$lib/controllers/uuid/uuid.server';
 import { nowUtc } from '$lib/utils/time';
 
 namespace AuthServer {
@@ -109,7 +109,7 @@ namespace AuthServer {
         const { val: userDetails, err } = await userIdAndLastVersionFromLogIn(username, key);
         if (err) return Result.err(err);
 
-        const sessionId = await UUIdControllerServer.generate();
+        const sessionId = await UId.Server.generate();
 
         const now = nowUtc();
 

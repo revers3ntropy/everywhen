@@ -1,14 +1,35 @@
+import { MAXIMUM_ENTITIES } from '$lib/constants';
+import { query } from '$lib/db/mysql.server';
 import type { ResultSetHeader } from 'mysql2';
 import type { QueryFunc } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
 import { Location as _Location } from './location';
 import type { Auth } from '$lib/controllers/auth/auth.server';
-import { UUIdControllerServer } from '$lib/controllers/uuid/uuid.server';
+import { UId } from '$lib/controllers/uuid/uuid.server';
 
 export type Location = _Location;
 
 namespace LocationUtils {
+    async function canCreateWithName(auth: Auth, name: string): Promise<true | string> {
+        if (!name) return 'Location name too short';
+        if (name.length > 100) return 'Location name too long (> 100 characters)';
+
+        const encryptedName = encrypt(name, auth.key);
+        if (encryptedName.length > 256) return 'Location name too long';
+
+        const numLocations = await query<{ count: number }[]>`
+            SELECT COUNT(*) as count
+            FROM locations
+            WHERE user = ${auth.id}
+        `;
+
+        if (numLocations[0].count >= MAXIMUM_ENTITIES.location) {
+            return 'Maximum number of locations reached';
+        }
+
+        return true;
+    }
     export async function create(
         query: QueryFunc,
         auth: Auth,
@@ -22,11 +43,11 @@ namespace LocationUtils {
         if (radius < 0) {
             return Result.err('Radius cannot be negative');
         }
-        if (!name) {
-            return Result.err('Name cannot be empty');
-        }
 
-        const id = await UUIdControllerServer.generate();
+        const canCreate = await canCreateWithName(auth, name);
+        if (canCreate !== true) return Result.err(canCreate);
+
+        const id = await UId.Server.generate();
 
         const encryptedName = encrypt(name, auth.key);
         if (encryptedName.length > 256) {

@@ -6,7 +6,7 @@ import { cachedPageRoute } from '$lib/utils/cache.server';
 import type { PageServerLoad } from './$types';
 
 export const load = cachedPageRoute(async auth => {
-    const { val: entries, err } = await Entry.Server.all(auth, { deleted: false });
+    const { val: entries, err } = await Entry.Server.all(auth, { onlyWithLocation: true });
     if (err) throw error(400, err);
 
     const { err: locationErr, val: locations } = await Location.all(query, auth);

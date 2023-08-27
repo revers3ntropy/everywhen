@@ -10,7 +10,7 @@ import { Event } from '../event/event';
 import { Label } from '../label/label';
 import { Settings } from '../settings/settings';
 import type { User as _User } from './user';
-import { UUIdControllerServer } from '$lib/controllers/uuid/uuid.server';
+import { UId } from '$lib/controllers/uuid/uuid.server';
 import { Auth } from '$lib/controllers/auth/auth.server';
 import { Asset } from '$lib/controllers/asset/asset.server';
 
@@ -55,7 +55,7 @@ export namespace UserServer {
         if (err) return Result.err(err);
 
         const salt = await generateSalt(query);
-        const id = await UUIdControllerServer.generate();
+        const id = await UId.Server.generate();
 
         await query`
             INSERT INTO users (id, username, password, salt, created, versionLastLoggedIn)

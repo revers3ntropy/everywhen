@@ -1,10 +1,11 @@
+import { MAXIMUM_ENTITIES } from '$lib/constants';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
 import { nowUtc } from '$lib/utils/time';
 import type { ResultSetHeader } from 'mysql2';
 import { z } from 'zod';
 import { Asset as _Asset, type AssetMetadata } from './asset';
-import { UUIdControllerServer } from '$lib/controllers/uuid/uuid.server';
+import { UId } from '$lib/controllers/uuid/uuid.server';
 import type { Auth } from '$lib/controllers/auth/auth';
 import { query } from '$lib/db/mysql.server';
 
@@ -18,8 +19,17 @@ namespace AssetServer {
         created?: TimestampSecs,
         publicId?: string
     ): Promise<Result<{ publicId: string; id: string }>> {
-        publicId ??= await UUIdControllerServer.generate();
-        const id = await UUIdControllerServer.generate();
+        const numEntries = await query<{ count: number }[]>`
+            SELECT COUNT(*) as count
+            FROM assets
+            WHERE user = ${auth.id}
+        `;
+        if (numEntries[0].count >= MAXIMUM_ENTITIES.asset) {
+            return Result.err(`Maximum number of assets (${MAXIMUM_ENTITIES.asset}) reached`);
+        }
+
+        publicId ??= await UId.Server.generate();
+        const id = await UId.Server.generate();
         const fileExt = fileNamePlainText.split('.').pop();
         if (!fileExt) {
             return Result.err('Invalid file extension');

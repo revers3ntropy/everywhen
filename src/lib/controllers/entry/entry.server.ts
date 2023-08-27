@@ -1,3 +1,4 @@
+import { MAXIMUM_ENTITIES } from '$lib/constants';
 import { entryFromId } from '$lib/controllers/entry/getEntrySingle.server';
 import {
     all as _all,
@@ -13,7 +14,7 @@ import { wordCount } from '$lib/utils/text';
 import { fmtUtc, nowUtc } from '$lib/utils/time';
 import type { Auth } from '../auth/auth.server';
 import type { Label } from '../label/label';
-import { UUIdControllerServer } from '$lib/controllers/uuid/uuid.server';
+import { UId } from '$lib/controllers/uuid/uuid.server';
 import { Entry as _Entry, type EntryEdit, type RawEntryEdit, type Streaks } from './entry';
 
 namespace EntryServer {
@@ -77,18 +78,24 @@ namespace EntryServer {
         wordCount: number,
         edits: EntryEdit[]
     ): Promise<Result<Entry>> {
-        const id = await UUIdControllerServer.generate();
+        const numEntries = await query<{ count: number }[]>`
+            SELECT COUNT(*) as count
+            FROM entries
+            WHERE user = ${auth.id}
+        `;
+        if (numEntries[0].count >= MAXIMUM_ENTITIES.entry) {
+            return Result.err(`Maximum number of entries (${MAXIMUM_ENTITIES.entry}) reached`);
+        }
 
-        if (label) {
-            if (!labels.find(l => l.id === label)) {
-                await errorLogger.error('Label not found', { label, id, username: auth.username });
-                return Result.err('Label not found');
-            }
+        if (label && !labels.find(l => l.id === label)) {
+            await errorLogger.error('Label not found', { label, username: auth.username });
+            return Result.err('Label not found');
         }
 
         const encryptedTitle = encrypt(title, auth.key);
         const encryptedEntry = encrypt(entry, auth.key);
         const encryptedAgent = encrypt(agentData || '', auth.key);
+        const id = await UId.Server.generate();
 
         await query`
             INSERT INTO entries
@@ -191,7 +198,7 @@ namespace EntryServer {
         const encryptedOldTitle = encrypt(entry.title, auth.key);
         const encryptedOldEntry = encrypt(entry.entry, auth.key);
 
-        const editId = await UUIdControllerServer.generate();
+        const editId = await UId.Server.generate();
 
         await query`
             INSERT INTO entryEdits

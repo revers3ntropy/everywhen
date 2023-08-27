@@ -107,3 +107,12 @@ export const LOG_FILE_NAME = 'general.log';
 export const DEV_USE_TZ_OFFSET_0 = false;
 
 export const FILE_INPUT_ACCEPT_TYPES = 'image/png, image/jpeg, image/jpg, image/webp';
+
+export const MAXIMUM_ENTITIES = {
+    asset: 1000,
+    dataset: 1000,
+    entry: 1_000_000,
+    event: 1000,
+    label: 100,
+    location: 1000
+};

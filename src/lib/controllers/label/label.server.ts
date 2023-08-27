@@ -1,10 +1,12 @@
+import { MAXIMUM_ENTITIES } from '$lib/constants';
+import { query } from '$lib/db/mysql.server';
 import type { QueryFunc } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
 import { nowUtc } from '$lib/utils/time';
 import type { Auth } from '../auth/auth.server';
 import type { Label as _Label, LabelWithCount } from './label';
-import { UUIdControllerServer } from '$lib/controllers/uuid/uuid.server';
+import { UId } from '$lib/controllers/uuid/uuid.server';
 
 export type Label = _Label;
 
@@ -133,17 +135,33 @@ namespace LabelUtils {
         `;
     }
 
+    async function canCreateWithName(auth: Auth, name: string): Promise<string | true> {
+        if (await userHasLabelWithName(query, auth, name)) {
+            return 'Label with that name already exists';
+        }
+
+        const numLabels = await query<{ count: number }[]>`
+            SELECT COUNT(*) as count    
+            FROM labels
+            WHERE user = ${auth.id}
+        `;
+        if (numLabels[0].count >= MAXIMUM_ENTITIES.label) {
+            return `Maximum number of labels (${MAXIMUM_ENTITIES.label}) reached`;
+        }
+
+        return true;
+    }
+
     export async function create(
         query: QueryFunc,
         auth: Auth,
         json: PickOptional<Label, 'id' | 'created'>
     ): Promise<Result<Label>> {
-        if (await Label.userHasLabelWithName(query, auth, json.name)) {
-            return Result.err('Label with that name already exists');
-        }
+        const canCreate = await canCreateWithName(auth, json.name);
+        if (canCreate !== true) return Result.err(canCreate);
 
         json = { ...json };
-        json.id ??= await UUIdControllerServer.generate();
+        json.id ??= await UId.Server.generate();
         json.created ??= nowUtc();
 
         const encryptedName = encrypt(json.name, auth.key);

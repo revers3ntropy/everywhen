@@ -1,9 +1,4 @@
-import { browser } from '$app/environment';
-
 export function cssVarValue($el: Element | string, v?: string): string {
-    if (!browser) {
-        return '';
-    }
     if (!v && typeof $el === 'string') {
         const root = document.querySelector('.root');
         if (!root) throw new Error('No .root element found');

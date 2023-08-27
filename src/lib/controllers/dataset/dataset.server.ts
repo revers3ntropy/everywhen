@@ -1,4 +1,6 @@
+import { MAXIMUM_ENTITIES } from '$lib/constants';
 import type { SettingsConfig } from '$lib/controllers/settings/settings';
+import { query } from '$lib/db/mysql.server';
 import type { QueryFunc } from '$lib/db/mysql.server';
 import { Result } from '$lib/utils/result';
 import { Dataset as DatasetClient } from './dataset.client';
@@ -13,7 +15,7 @@ import type {
 import { nowUtc } from '$lib/utils/time';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import type { Auth } from '$lib/controllers/auth/auth';
-import { UUIdControllerServer } from '$lib/controllers/uuid/uuid.server';
+import { UId } from '$lib/controllers/uuid/uuid.server';
 
 export type Dataset = _Dataset;
 
@@ -188,17 +190,24 @@ namespace DatasetUtils {
         return Result.ok(res);
     }
 
-    export async function create(
-        query: QueryFunc,
-        auth: Auth,
-        name: string,
-        created: TimestampSecs,
-        columns: { name: string; type: string }[]
-    ): Promise<Result<Dataset>> {
-        if (name.length < 1) return Result.err('Name must be at least 1 character long');
-        if (name.length > 100) return Result.err('Name must be at most 100 characters long');
+    async function canCreateWithName(auth: Auth, namePlaintext: string): Promise<string | true> {
+        if (namePlaintext.length < 1) {
+            return 'Name must be at least 1 character long';
+        }
+        if (namePlaintext.length > 100) {
+            return 'Name must be at most 100 characters long';
+        }
 
-        const encryptedName = encrypt(name, auth.key);
+        const numDatasets = await query<{ count: number }[]>`
+            SELECT COUNT(*) AS count
+            FROM datasets
+            WHERE datasets.user = ${auth.id}
+        `;
+        if (numDatasets[0].count >= MAXIMUM_ENTITIES.dataset) {
+            return `Maximum number of datasets (${MAXIMUM_ENTITIES.dataset}) reached`;
+        }
+
+        const encryptedName = encrypt(namePlaintext, auth.key);
 
         const existingWithName = await query<{ name: string }[]>`
             SELECT name
@@ -206,16 +215,28 @@ namespace DatasetUtils {
             WHERE name = ${encryptedName}
               AND datasets.user = ${auth.id}
         `;
-
         if (existingWithName.length > 0) {
-            return Result.err('Dataset with that name already exists');
+            return 'Dataset with that name already exists';
         }
 
-        const id = await UUIdControllerServer.generate();
+        return true;
+    }
+
+    export async function create(
+        query: QueryFunc,
+        auth: Auth,
+        name: string,
+        created: TimestampSecs,
+        columns: { name: string; type: string }[]
+    ): Promise<Result<Dataset>> {
+        const id = await UId.Server.generate();
+
+        const canCreate = await canCreateWithName(auth, name);
+        if (canCreate !== true) return Result.err(canCreate);
 
         await query`
             INSERT INTO datasets (id, user, name, created)
-            VALUES (${id}, ${auth.id}, ${encryptedName}, ${created})
+            VALUES (${id}, ${auth.id}, ${encrypt(name, auth.key)}, ${created})
         `;
 
         const { val: types, err: getTypesErr } = await allTypes(query, auth);

@@ -21,6 +21,12 @@ export async function all(auth: Auth, filter: EntryFilter = {}): Promise<Result<
         if (locationResult.err) return Result.err(locationResult.err);
         location = locationResult.val;
     }
+    if (filter.onlyWithLocation && location) {
+        return Result.err(
+            'Cannot both filter out all entries with a location and filter by location'
+        );
+    }
+
     const rawEntries = await query<RawEntry[]>`
         SELECT id,
                created,
@@ -37,7 +43,8 @@ export async function all(auth: Auth, filter: EntryFilter = {}): Promise<Result<
         WHERE ((flags & ${Entry.Flags.DELETED}) = ${filter.deleted ? Entry.Flags.DELETED : 0} OR ${
             filter.deleted === 'both'
         })
-              AND (label = ${filter.labelId || ''} OR ${filter.labelId === undefined})
+          AND (label = ${filter.labelId || ''} OR ${filter.labelId === undefined})
+          AND (${!filter.onlyWithLocation} OR (latitude IS NOT NULL AND longitude IS NOT NULL))
           AND (${!location} OR (
                 latitude IS NOT NULL
                 AND longitude IS NOT NULL
