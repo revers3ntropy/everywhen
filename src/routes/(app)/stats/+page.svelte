@@ -77,26 +77,24 @@
             </div>
         </section>
 
-        <section class="charts">
-            <div class="container" style="margin: 0; padding: 1rem;">
-                <EntryHeatMap {by} entries={data.entries} />
+        <div class="container" style="padding: 1rem;">
+            <EntryHeatMap {by} entries={data.entries} />
+        </div>
+        {#if data.entryCount > 4}
+            <div
+                class="container"
+                style="padding: 1rem;"
+                in:fade={{
+                    // stop weird animation when changing buckets
+                    duration: ANIMATION_DURATION,
+                    delay: ANIMATION_DURATION
+                }}
+            >
+                <EntryBarChart {by} entries={data.entries} days={data.days} />
             </div>
-            {#if data.entryCount > 4}
-                <div
-                    class="container"
-                    style="margin: 1rem 0; padding: 1rem;"
-                    in:fade={{
-                        // stop weird animation when changing buckets
-                        duration: ANIMATION_DURATION,
-                        delay: ANIMATION_DURATION
-                    }}
-                >
-                    <EntryBarChart {by} entries={data.entries} days={data.days} />
-                </div>
-            {/if}
-        </section>
+        {/if}
 
-        <section class="container" style="margin: 0; padding: 1rem 1rem 3rem 1rem;">
+        <section class="container" style="padding: 1rem 1rem 3rem 1rem;">
             <h3 style="padding: 0 0 2rem 0"> Common Words </h3>
             <CommonWordsList entryCount={data.entryCount} words={data.commonWords} />
         </section>

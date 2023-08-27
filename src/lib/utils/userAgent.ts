@@ -76,6 +76,16 @@ export interface DeviceData {
 
 export function deviceDataFromEntry(entry: { agentData: string | null }): DeviceData {
     const userAgent = userAgentFromEntry(entry);
+    if (!userAgent) {
+        return {
+            os: null,
+            osGroup: 'unknown',
+            browser: null,
+            browserVersion: null,
+            device: null,
+            deviceSpecific: null
+        };
+    }
     const ua = new UAParser(userAgent).getResult();
 
     const data: DeviceData = {

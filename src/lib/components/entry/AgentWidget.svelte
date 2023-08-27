@@ -15,13 +15,16 @@
     const deviceData = deviceDataFromEntry({ agentData: data });
     let tooltipContent = `
         <span class="oneline">
-            Created on ${deviceData.os}
+            Created on ${deviceData.os || 'unknown device'}
         </span>
     `;
     if (deviceData.deviceSpecific || deviceData.device) {
-        tooltipContent += `
+        tooltipContent = `
             <span class="oneline">
-                on ${deviceData.deviceSpecific || deviceData.device}
+                Created on ${deviceData.deviceSpecific || deviceData.device}
+            </span>
+            <span class="oneline">
+                running ${deviceData.os || 'unknown device'}
             </span>
         `;
     }
