@@ -4,7 +4,7 @@
     import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
     import InsertImage from '$lib/components/asset/InsertImage.svelte';
     import { Asset } from '$lib/controllers/asset/asset';
-    import { dispatch, listen } from '$lib/dataChangeEvents.js';
+    import { dispatch, listen } from '$lib/dataChangeEvents';
     import { Result } from '$lib/utils/result';
     import { serializedAgentData } from '$lib/utils/userAgent';
     import { tooltip } from '@svelte-plugins/tooltips';
@@ -19,7 +19,7 @@
         currentlyUploadingAssets,
         currentlyUploadingEntries,
         enabledLocation
-    } from '$lib/stores.js';
+    } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { getLocation } from '$lib/utils/geolocation';
     import { clientLogger } from '$lib/utils/log';

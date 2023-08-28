@@ -107,7 +107,7 @@ export function collapseWhitespace(str: string): string {
     return str.replace(/\n/g, ' ').replace(/\s+/g, ' ').replace(`'`, `\\'`).trim();
 }
 
-export function recursivelyTrimAndStringify<T>(obj: T, maxStrLen = 10, maxKeys = 10): string {
+export function recursivelyTrimAndStringify<T>(obj: T, maxStrLen = 10, maxKeys = 3): string {
     if (typeof obj === 'string') {
         if (obj.length > maxStrLen) {
             return `'${collapseWhitespace(obj.slice(0, maxStrLen))}'..${obj.length - maxStrLen}`;

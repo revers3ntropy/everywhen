@@ -34,7 +34,7 @@ function genEntries() {
         entries.push({
             title: '',
             entry: `entry ${i}`,
-            created: today - i * 60
+            created: today - i * 60 * 60 * 6
         });
     }
 

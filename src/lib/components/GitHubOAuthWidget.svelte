@@ -1,6 +1,6 @@
 <script lang="ts">
     import { PUBLIC_GITHUB_AUTH_CLIENT_ID, PUBLIC_ENV } from '$env/static/public';
-    import { notify } from '$lib/components/notifications/notifications.js';
+    import { notify } from '$lib/components/notifications/notifications';
     import { Auth } from '$lib/controllers/auth/auth';
     import type { GitHubUser } from '$lib/controllers/ghAPI/ghAPI.server';
     import { settingsStore } from '$lib/stores';
@@ -8,7 +8,7 @@
     import { serializeGETArgs } from '$lib/utils/GETArgs';
     import { onMount } from 'svelte';
     import GitHub from 'svelte-material-icons/Github.svelte';
-    import { SESSION_KEYS } from '$lib/constants.js';
+    import { SESSION_KEYS } from '$lib/constants';
 
     export let size = 30;
 

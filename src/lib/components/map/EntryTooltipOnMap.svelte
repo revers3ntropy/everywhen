@@ -5,7 +5,7 @@
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { obfuscated } from '$lib/stores';
     import UtcTime from '../UtcTime.svelte';
-    import { obfuscate } from '$lib/utils/text.js';
+    import { obfuscate } from '$lib/utils/text';
 
     export let id: string;
     export let entry: Entry | null = null;

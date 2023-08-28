@@ -17,7 +17,7 @@
     import EntryGroup from '$lib/components/entry/EntryGroup.svelte';
     import Sidebar from './EntriesSidebar.svelte';
 
-    interface IOptions extends EntryFilter {
+    interface IOptions extends EntryFilter, Record<string, number | string | boolean | undefined> {
         readonly count?: number;
         readonly offset?: number;
     }
@@ -49,18 +49,13 @@
         return Object.freeze(entriesOptions);
     }
 
-    async function loadTitles() {
-        const res = notify.onErr(await api.get('/entries/titles'));
-        entryTitles = Entry.groupEntriesByDay(res.entries);
-    }
-
-    async function reloadEntries(reloadTitles = false) {
+    async function reloadEntries() {
         currentOffset = 0;
         loadingAt = null;
         entries = emptyEntries();
         numberOfEntries = Infinity;
 
-        await Promise.all([loadMoreEntries(true), reloadTitles ? loadTitles() : Promise.resolve()]);
+        await loadMoreEntries(true);
     }
 
     async function loadMoreEntries(isInitialLoad = false) {
@@ -77,12 +72,7 @@
 
         const entriesOptions = getEntriesOptions();
 
-        const res = notify.onErr(
-            await api.get(
-                `/entries`,
-                entriesOptions as Record<string, number | string | boolean | undefined>
-            )
-        );
+        const res = notify.onErr(await api.get(`/entries`, entriesOptions));
 
         numberOfEntries = res.totalEntries;
 
@@ -134,7 +124,6 @@
 
     const batchSize = 10;
     let pageEndInView = false;
-    let entryTitles = null as Record<string, Entry[]> | null;
     let entries = emptyEntries();
     let currentOffset = 0;
     let loadingAt = null as number | null;
@@ -142,7 +131,6 @@
     let locations = null as Location[] | null;
 
     onMount(() => {
-        void loadTitles();
         void loadLocations();
     });
 
@@ -160,7 +148,7 @@
         <div class:sidebar-and-entries={showSidebar}>
             {#if showSidebar}
                 <div class="sidebar-container">
-                    <Sidebar titles={entryTitles} obfuscated={$obfuscated} />
+                    <Sidebar obfuscated={$obfuscated} />
                 </div>
             {/if}
 

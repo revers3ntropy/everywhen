@@ -121,6 +121,22 @@ export class Result<T, E = ErrorDefault> {
         );
     }
 
+    public static async fromAsync<T>(op: () => Promise<T>): Promise<Result<T, unknown>> {
+        try {
+            return Result.ok(await op());
+        } catch (e: unknown) {
+            return Result.err(e);
+        }
+    }
+
+    public static from<T>(op: () => T): Result<T, unknown> {
+        try {
+            return Result.ok(op());
+        } catch (e: unknown) {
+            return Result.err(e);
+        }
+    }
+
     public static wrap<T>(f: () => T): Result<T, unknown> {
         try {
             return Result.ok(f());

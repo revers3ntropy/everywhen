@@ -82,11 +82,14 @@
     async function pinSelf() {
         notify.onErr(
             await api.put(apiPath('/entries/?/pinned', id), {
-                pinned: !pinned
+                pinned: !Entry.isPinned({ pinned })
             })
         );
 
-        notify.success(`Entry ${!pinned ? 'favorited' : 'unfavorited'}`);
+        notify.success(`Entry ${!Entry.isPinned({ pinned }) ? 'favorited' : 'unfavorited'}`);
+
+        pinned = Entry.isPinned({ pinned }) ? null : nowUtc();
+
         await dispatch.update('entry', {
             id,
             title,
@@ -94,7 +97,7 @@
             created,
             createdTZOffset,
             deleted,
-            pinned: Entry.isPinned({ pinned }) ? null : nowUtc(),
+            pinned,
             latitude,
             longitude,
             label,

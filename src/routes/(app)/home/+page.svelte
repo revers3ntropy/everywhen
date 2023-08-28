@@ -2,6 +2,7 @@
     import BulletEntriesForm from '$lib/components/entryForm/BulletEntriesForm.svelte';
     import Tips from '$lib/components/Tips.svelte';
     import { listen } from '$lib/dataChangeEvents';
+    import { fmtUtcRelative } from '$lib/utils/time';
     import Cog from 'svelte-material-icons/Cog.svelte';
     import ImageOutline from 'svelte-material-icons/ImageOutline.svelte';
     import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
@@ -11,35 +12,43 @@
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
     import { Entry } from '$lib/controllers/entry/entry';
-    import { obfuscated } from '$lib/stores.js';
-    import { dayUtcFromTimestamp, fmtUtc } from '$lib/utils/time';
+    import { obfuscated } from '$lib/stores';
     import type { PageData } from './$types';
     import EntryTitles from '$lib/components/entry/EntryTitles.svelte';
     import DatasetShortcutWidgets from '$lib/components/dataset/DatasetShortcutWidgets.svelte';
 
     export let data: PageData;
 
+    let { recentTitles, pinnedEntriesList, datasets, nYearsAgo } = data;
+
     const showLimitPinnedEntries = 10;
     let showingAllPinned = false;
 
     $: pinnedEntries = Entry.groupEntriesByDay(
         showingAllPinned
-            ? data.pinnedEntriesList
-            : data.pinnedEntriesList
+            ? pinnedEntriesList
+            : pinnedEntriesList
                   .sort((a, b) => b.created - a.created)
                   .slice(0, showLimitPinnedEntries)
     );
     $: areHiddenPinnedEntries =
-        data.pinnedEntriesList.length > showLimitPinnedEntries && !showingAllPinned;
+        pinnedEntriesList.length > showLimitPinnedEntries && !showingAllPinned;
 
     listen.entry.onCreate(({ entry }) => {
         // if no recent entries,
         // create a new group with the new entry
-        if (Object.keys(data.recentTitles).length < 1) {
-            data = {
-                ...data,
-                recentTitles: Entry.groupEntriesByDay([entry])
-            };
+        if (Object.keys(recentTitles).length < 1) {
+            recentTitles = Entry.groupEntriesByDay([entry]);
+        }
+
+        // if no pinned entries already, face to force the pinned entries to be shown
+        if (Entry.isPinned(entry) && !pinnedEntriesList.length) {
+            pinnedEntriesList = [entry];
+        }
+    });
+    listen.entry.onUpdate(entry => {
+        if (Entry.isPinned(entry) && !pinnedEntriesList.length) {
+            pinnedEntriesList = [entry];
         }
     });
 </script>
@@ -79,98 +88,78 @@
     </section>
 
     <section>
-        <DatasetShortcutWidgets datasets={data.datasets} />
+        <DatasetShortcutWidgets {datasets} />
     </section>
 
-    <section>
+    <section class="container" style="padding: 1rem">
         <Tips />
     </section>
 
-    <section>
-        <div class="container">
-            <BulletEntriesForm
-                obfuscated={$obfuscated}
-                showLocationToggle={false}
-                submitIsPrimaryButton={false}
-                setEntryFormMode={null}
-            />
-            <div style="margin: 1rem">
-                {#if Object.keys(data.recentTitles).length}
-                    <EntryTitles
-                        titles={data.recentTitles}
-                        obfuscated={$obfuscated}
-                        hideBlurToggle
-                    />
-                {:else}
-                    <p class="text-light"> No recent entries </p>
-                {/if}
-            </div>
+    <section class="container">
+        <BulletEntriesForm
+            obfuscated={$obfuscated}
+            showLocationToggle={false}
+            submitIsPrimaryButton={false}
+            setEntryFormMode={null}
+        />
+        <div style="margin: 1rem">
+            {#if Object.keys(recentTitles).length}
+                <EntryTitles titles={recentTitles} obfuscated={$obfuscated} hideBlurToggle />
+            {:else}
+                <p class="text-light"> No recent entries </p>
+            {/if}
         </div>
     </section>
 
     <div>
-        {#key [data.pinnedEntriesList, showingAllPinned]}
+        {#key [pinnedEntriesList, showingAllPinned]}
             {#if Object.keys(pinnedEntries).length}
-                <section>
-                    <div class="container">
-                        <h1
-                            class="gradient-icon flex-center"
-                            style="justify-content: start; gap: 8px;"
-                        >
-                            <Heart size="25" />
-                            Favourited
-                        </h1>
-                        <div style="margin: 1rem">
-                            <EntryTitles
-                                titles={pinnedEntries}
-                                obfuscated={$obfuscated}
-                                onCreateFilter={Entry.isPinned}
-                                hideBlurToggle
-                            />
-                            {#if areHiddenPinnedEntries}
-                                <button
-                                    class="text-light"
-                                    on:click={() => {
-                                        showingAllPinned = !showingAllPinned;
-                                    }}
-                                >
-                                    <ChevronDown />
-                                    Show all favourited entries ({data.pinnedEntriesList.length -
-                                        showLimitPinnedEntries})
-                                </button>
-                            {/if}
-                        </div>
+                <section class="container" style="padding: 1rem">
+                    <h1 class="gradient-icon flex-center" style="justify-content: start; gap: 8px;">
+                        <Heart size="25" />
+                        Favourited
+                    </h1>
+                    <div>
+                        <EntryTitles
+                            titles={pinnedEntries}
+                            obfuscated={$obfuscated}
+                            onCreateFilter={Entry.isPinned}
+                            showOnUpdateAndNotAlreadyShownFilter={Entry.isPinned}
+                            hideBlurToggle
+                        />
+                        {#if areHiddenPinnedEntries}
+                            <button
+                                class="text-light"
+                                on:click={() => {
+                                    showingAllPinned = !showingAllPinned;
+                                }}
+                            >
+                                <ChevronDown />
+                                Show all favourited entries ({pinnedEntriesList.length -
+                                    showLimitPinnedEntries})
+                            </button>
+                        {/if}
                     </div>
                 </section>
             {/if}
         {/key}
-        {#if Object.entries(data.nYearsAgo).length}
-            <section>
-                <div class="container">
-                    {#each Object.entries(data.nYearsAgo) as [yearsAgo, entries] (yearsAgo)}
-                        <h1>
-                            {yearsAgo === '1' ? `A Year` : `${yearsAgo} Years`} Ago Today
-                        </h1>
-                        <div style="margin: 1rem">
-                            <EntryTitles
-                                titles={{
-                                    [fmtUtc(
-                                        dayUtcFromTimestamp(
-                                            entries[0].created,
-                                            entries[0].createdTZOffset
-                                        ),
-                                        0,
-                                        'YYYY-MM-DD'
-                                    )]: entries
-                                }}
-                                obfuscated={$obfuscated}
-                                showTimeAgo={false}
-                                onCreateFilter={() => false}
-                                hideBlurToggle
-                            />
-                        </div>
-                    {/each}
-                </div>
+        {#if Object.entries(nYearsAgo).length}
+            <section class="container" style="padding: 1rem">
+                {#each Object.entries(nYearsAgo) as [date, entries] (date)}
+                    <h1>
+                        <!-- bit of a hack... -->
+                        {fmtUtcRelative(entries[0].created, 'en-full')} since...
+                    </h1>
+                    <EntryTitles
+                        titles={{
+                            [date]: entries
+                        }}
+                        obfuscated={$obfuscated}
+                        showTimeAgo={false}
+                        onCreateFilter={() => false}
+                        hideBlurToggle
+                    />
+                {/each}
             </section>
         {/if}
     </div>
@@ -216,16 +205,11 @@
 
     h1 {
         font-size: 1.3rem;
-        margin: 1rem;
-        padding: 0.5em;
         text-align: start;
+        padding: 1.5rem 0 1rem 0.5rem;
 
         @media @mobile {
             font-size: 1.2rem;
-        }
-
-        &.recent-entries {
-            margin: 1rem;
         }
     }
 </style>

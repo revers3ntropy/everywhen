@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { theme } from '$lib/stores.js';
+    import { theme } from '$lib/stores';
 
     // logo dimensions
     const WIDTH = 459;

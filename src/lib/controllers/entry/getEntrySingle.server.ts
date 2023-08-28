@@ -112,7 +112,7 @@ async function addEdits(auth: Auth, self: Entry, labels: Label[]): Promise<Resul
         ORDER BY entryEdits.created DESC
     `;
 
-    const { err, val: edits } = await Result.collectAsync(
+    const { err, val: edits } = Result.collect(
         rawEdits.map(e => Entry.Server.fromRawEdit(auth, labels, e))
     );
 

@@ -22,6 +22,25 @@ moment.updateLocale('en', {
     }
 });
 
+moment.updateLocale('en-full', {
+    relativeTime: {
+        future: '%s',
+        past: '%s',
+        s: 'a second',
+        ss: '%d seconds',
+        m: 'a minute',
+        mm: '%d minutes',
+        h: 'a hour',
+        hh: '%d hours',
+        d: 'a day',
+        dd: '%d days',
+        M: 'a month',
+        MM: '%d months',
+        y: 'a year',
+        yy: '%d years'
+    }
+});
+
 /**
  * Get the UTC timestamp of now in seconds
  * @returns {TimestampSecs}
@@ -47,9 +66,10 @@ export function fmtDuration(time: Seconds): string {
     return moment.duration(time, 's').humanize();
 }
 
-export function fmtUtcRelative(timestamp: TimestampSecs): string {
+export function fmtUtcRelative(timestamp: TimestampSecs, locale = 'en'): string {
     return moment(timestamp * 1000)
         .utc()
+        .locale(locale)
         .fromNow();
 }
 

@@ -1,4 +1,4 @@
-import { NORMAL_COOKIE_TIMEOUT_DAYS, REMEMBER_ME_COOKIE_TIMEOUT_DAYS } from '$lib/constants';
+import { NORMAL_COOKIE_TIMEOUT_DAYS, REMEMBER_ME_COOKIE_TIMEOUT_DAYS } from '../constants';
 import type { CookieSerializeOptions } from 'cookie';
 
 interface ICookieOptions {

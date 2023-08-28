@@ -36,33 +36,29 @@
     onMount(incrementLastTipNumber);
 </script>
 
-<div class="container">
-    <div>
-        {#if $lastTipNumber === null}
-            <h3> Did you know? </h3>
-            <p> ... </p>
-        {:else}
-            <div class="flex-center" style="justify-content: space-between">
-                <h3> Did you know? #{($lastTipNumber || 0) + 1} </h3>
-                <button on:click={incrementLastTipNumber} aria-label="Next tip">
-                    <ArrowRight size="30" />
-                </button>
-            </div>
-            {#key $lastTipNumber}
-                <p transition:slide={{ duration: ANIMATION_DURATION, axis: 'y' }}>
-                    {@html tips[$lastTipNumber]}
-                </p>
-            {/key}
-        {/if}
-    </div>
+<div class="wrapper">
+    {#if $lastTipNumber === null}
+        <h3> Did you know? </h3>
+        <p> ... </p>
+    {:else}
+        <div class="flex-center" style="justify-content: space-between">
+            <h3> Did you know? #{($lastTipNumber || 0) + 1} </h3>
+            <button on:click={incrementLastTipNumber} aria-label="Next tip">
+                <ArrowRight size="30" />
+            </button>
+        </div>
+        {#key $lastTipNumber}
+            <p transition:slide={{ duration: ANIMATION_DURATION, axis: 'y' }}>
+                {@html tips[$lastTipNumber]}
+            </p>
+        {/key}
+    {/if}
 </div>
 
 <style lang="less">
     @import '../../styles/variables';
 
-    .container {
-        padding: 1rem;
-
+    .wrapper {
         h3 {
             margin: 0 0 0.5rem 0;
         }

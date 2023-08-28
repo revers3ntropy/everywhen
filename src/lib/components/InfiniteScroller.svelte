@@ -49,16 +49,15 @@
 <slot {items} />
 
 {#if numItems !== 0}
-    {#if showSpinner && items.length < numItems}
-        <Spinner />
-    {/if}
     <div
         style="height: 1px"
         use:inview={{ rootMargin: margin }}
         on:inview_enter={load}
         on:inview_leave={() => (pageEndInView = false)}
     />
+    {#if showSpinner && items.length < numItems}
+        <Spinner />
+    {/if}
 {:else}
-    Nothing!
     <slot name="empty" />
 {/if}

@@ -43,6 +43,7 @@
             content: tooltipContent,
             position: tooltipPosition
         }}
+        class="flex-center"
     >
         {#if deviceData.osGroup === 'mobile'}
             <Cellphone {size} />
@@ -63,9 +64,3 @@
         {/if}
     </span>
 {/if}
-
-<style lang="less">
-    span {
-        margin: 0.3rem;
-    }
-</style>

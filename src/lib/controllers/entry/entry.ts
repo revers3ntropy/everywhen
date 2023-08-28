@@ -81,6 +81,26 @@ export interface Entry {
     edits: EntryEdit[];
 }
 
+export interface EntryTitle {
+    id: string;
+    title: string;
+    // shortened
+    entry: string;
+    created: TimestampSecs;
+    createdTZOffset: Hours;
+    label: Label | null;
+}
+
+export interface RawEntryTitle {
+    id: string;
+    title: string;
+    // shortened
+    entry: string;
+    created: TimestampSecs;
+    createdTZOffset: Hours;
+    label: string | null;
+}
+
 export namespace Entry {
     export const TITLE_LENGTH_CUTOFF = 30;
 
@@ -96,7 +116,7 @@ export namespace Entry {
         T extends {
             created: TimestampSecs;
             createdTZOffset: Hours;
-        } = Entry
+        }
     >(entries: T[], grouped: Record<string, T[]> = {}): Record<string, T[]> {
         entries.forEach(entry => {
             const localDate = fmtUtc(entry.created, entry.createdTZOffset, 'YYYY-MM-DD');

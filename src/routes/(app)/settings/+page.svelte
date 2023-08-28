@@ -41,7 +41,7 @@
 <main>
     <section>
         <h1>
-            <AccountCircleOutline size="30" />
+            <AccountCircleOutline size="35" />
             <span> My Data and Account </span>
         </h1>
 
@@ -68,7 +68,7 @@
     </section>
     <section>
         <h1>
-            <Cog size="30" />
+            <Cog size="35" />
             <span>General Settings</span>
         </h1>
 
@@ -88,7 +88,7 @@
     h1 {
         .flex-center();
         justify-content: start;
-        margin: 1rem 0 0 0;
+        padding: 1rem 0 2rem 3rem;
         font-size: 24px;
 
         span {
@@ -97,6 +97,7 @@
 
         @media @mobile {
             font-size: 30px;
+            padding: 1rem 0 1rem 1rem;
         }
     }
 

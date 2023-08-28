@@ -8,8 +8,8 @@
     import InformationOutline from 'svelte-material-icons/InformationOutline.svelte';
     import { populateCookiesAndSettingsAfterAuth } from '../actions.client';
     import type { PageData } from './$types';
-    import { api } from '$lib/utils/apiRequest.js';
-    import { notify } from '$lib/components/notifications/notifications.js';
+    import { api } from '$lib/utils/apiRequest';
+    import { notify } from '$lib/components/notifications/notifications';
     import Dot from '$lib/components/Dot.svelte';
 
     export let data: PageData;

@@ -3,7 +3,7 @@
     import { listen } from '$lib/dataChangeEvents';
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
-    import { Entry } from '$lib/controllers/entry/entry';
+    import { Entry, type EntryTitle } from '$lib/controllers/entry/entry';
     import { showPopup } from '$lib/utils/popups';
     import { obfuscate } from '$lib/utils/text';
     import { currentTzOffset, fmtUtc, nowUtc, utcEq } from '$lib/utils/time';
@@ -11,17 +11,17 @@
     import Dot from '../Dot.svelte';
     import UtcTime from '../UtcTime.svelte';
 
-    export let titles = null as Record<string, Entry[]> | null;
+    export let titles = null as Record<string, EntryTitle[]> | null;
     export let obfuscated = true;
     export let showTimeAgo = true;
     export let blurToggleOnLeft = false;
     export let hideBlurToggle = false;
     export let onCreateFilter: (entry: Entry) => boolean = () => true;
+    export let showOnUpdateAndNotAlreadyShownFilter: (entry: Entry) => boolean = () => false;
 
     function showEntryPopup(entryId: string) {
         showPopup(EntryDialog, {
             id: entryId,
-
             obfuscated
         });
     }
@@ -32,16 +32,21 @@
 
         const localDate = fmtUtc(entry.created, entry.createdTZOffset, 'YYYY-MM-DD');
 
-        titles[localDate] = [Entry.entryToTitleEntry(entry), ...(titles?.[localDate] || [])];
-
-        // force reactivity
-        titles = { ...titles };
+        titles = {
+            ...titles,
+            [localDate]: [Entry.entryToTitleEntry(entry), ...(titles?.[localDate] || [])]
+        };
     });
-
     listen.entry.onUpdate(entry => {
         if (!titles) titles = {};
 
         const localDate = fmtUtc(entry.created, entry.createdTZOffset, 'YYYY-MM-DD');
+
+        if (!(titles[localDate] || []).find(e => e.id === entry.id)) {
+            if (!showOnUpdateAndNotAlreadyShownFilter(entry)) {
+                return;
+            }
+        }
 
         titles = {
             ...titles,
@@ -51,16 +56,14 @@
             ]
         };
     });
-
     listen.entry.onDelete(id => {
         if (!titles) return;
-
-        for (const date in titles) {
-            titles[date] = titles[date].filter(entry => entry.id !== id);
-        }
-
-        // force reactivity
-        titles = { ...titles };
+        titles = Object.fromEntries(
+            Object.entries(titles).map(([date, entries]) => [
+                date,
+                entries.filter(e => e.id !== id)
+            ])
+        );
     });
 
     let sortedTitles: [number, string][] | null;

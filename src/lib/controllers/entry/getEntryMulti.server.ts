@@ -1,16 +1,54 @@
 import type { Auth } from '$lib/controllers/auth/auth.server';
-import type { EntryEdit, EntryFilter, RawEntry } from '$lib/controllers/entry/entry';
+import type {
+    EntryEdit,
+    EntryFilter,
+    EntryTitle,
+    RawEntry,
+    RawEntryEdit
+} from '$lib/controllers/entry/entry';
 import { Entry } from '$lib/controllers/entry/entry.server';
 import { Label } from '$lib/controllers/label/label.server';
 import { Location } from '$lib/controllers/location/location';
 import { query } from '$lib/db/mysql.server';
 import { decrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
+import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
 
-export async function getTitles(auth: Auth): Promise<Result<Entry[]>> {
-    const { val: entries, err } = await all(auth);
+export async function getTitles(
+    auth: Auth,
+    count: number,
+    offset: number
+): Promise<Result<[EntryTitle[], number]>> {
+    if (count < 1 || offset < 0 || isNaN(count) || isNaN(offset)) {
+        return Result.err('Invalid entry title count/offset');
+    }
+    const rawEntries = await query<RawEntry[]>`
+        SELECT
+            id,
+            title,
+            entry,
+            created,
+            createdTZOffset,
+            label
+        FROM entries
+        WHERE deleted IS NULL
+          AND user = ${auth.id}
+        ORDER BY created DESC, id
+        LIMIT ${count}
+        OFFSET ${offset}
+    `;
+
+    const { val: entries, err } = await fromRawMulti(auth, rawEntries);
     if (err) return Result.err(err);
-    return Result.ok(entries.map(Entry.entryToTitleEntry));
+
+    const [{ totalCount }] = await query<{ totalCount: number }[]>`
+        SELECT COUNT(*) as totalCount 
+        FROM entries
+        WHERE deleted IS NULL
+          AND user = ${auth.id}
+    `;
+
+    return Result.ok([entries.map(Entry.entryToTitleEntry), totalCount]);
 }
 
 export async function all(auth: Auth, filter: EntryFilter = {}): Promise<Result<Entry[]>> {
@@ -176,6 +214,80 @@ export async function near(
     return await fromRawMulti(auth, raw);
 }
 
+export async function getTitlesNYearsAgo(
+    auth: Auth
+): Promise<Result<Record<string, EntryTitle[]>>> {
+    const earliestEntry = await query<{ created: TimestampSecs; createdTZOffset: Hours }[]>`
+        SELECT created, createdTZOffset
+        FROM entries
+        WHERE user = ${auth.id} 
+          AND deleted IS NULL
+        ORDER BY created
+        LIMIT 1
+    `;
+    if (earliestEntry.length === 0) return Result.ok({});
+    const earliestEntryYear = parseInt(
+        fmtUtc(earliestEntry[0].created, earliestEntry[0].createdTZOffset, 'YYYY')
+    );
+    const numYearsBack = parseInt(fmtUtc(nowUtc(), currentTzOffset(), 'YYYY')) - earliestEntryYear;
+
+    return (
+        await Result.collectAsync(
+            Array.from({ length: numYearsBack }, (_, i) => i + earliestEntryYear)
+                .map(y => `${y}-${fmtUtc(nowUtc(), 0, 'MM-DD')}`)
+                .map(date => ({
+                    date,
+                    rawEntries: query<RawEntry[]>`
+                        SELECT
+                            id,
+                            created,
+                            createdTZOffset,
+                            title,
+                            entry,
+                            label
+                        FROM entries
+                        WHERE user = ${auth.id}
+                            AND deleted IS NULL
+                            AND DATE_FORMAT(FROM_UNIXTIME(created + createdTZOffset * 60 * 60), '%Y-%m-%d') = ${date}
+                    `
+                }))
+                .map(async ({ rawEntries, date }) =>
+                    (await fromRawMulti(auth, await rawEntries)).map(entries => ({
+                        titles: entries.map(Entry.entryToTitleEntry),
+                        date
+                    }))
+                )
+        )
+    ).map(groups =>
+        groups.reduce(
+            (prev, curr) => {
+                if (curr.titles.length < 1) return prev;
+                return { ...prev, [curr.date]: curr.titles };
+            },
+            {} as Record<string, EntryTitle[]>
+        )
+    );
+}
+
+export async function getTitlesPinned(auth: Auth): Promise<Result<EntryTitle[]>> {
+    return await fromRawMulti(
+        auth,
+        await query<RawEntry[]>`
+            SELECT
+                id,
+                created,
+                createdTZOffset,
+                title,
+                entry,
+                label
+            FROM entries
+            WHERE user = ${auth.id}
+                AND deleted IS NULL
+                AND pinned IS NOT NULL
+        `
+    );
+}
+
 function filterEntriesBySearchTerm(entries: Entry[], searchTerm: string): Entry[] {
     if (!searchTerm) return entries;
 
@@ -187,7 +299,7 @@ function filterEntriesBySearchTerm(entries: Entry[], searchTerm: string): Entry[
 }
 
 async function fromRawMulti(auth: Auth, raw: RawEntry[]): Promise<Result<Entry[]>> {
-    const rawEdits = await query<(RawEntry & { entryId: string })[]>`
+    const rawEdits = await query<RawEntryEdit[]>`
         SELECT entryEdits.created,
                entryEdits.entryId,
                entryEdits.createdTZOffset,
@@ -206,8 +318,8 @@ async function fromRawMulti(auth: Auth, raw: RawEntry[]): Promise<Result<Entry[]
     const { err, val: labels } = await Label.Server.all(auth);
     if (err) return Result.err(err);
 
-    const { err: editsErr, val: edits } = await Result.collectAsync(
-        rawEdits.map(async e => await Entry.Server.fromRawEdit(auth, labels, e))
+    const { err: editsErr, val: edits } = Result.collect(
+        rawEdits.map(e => Entry.Server.fromRawEdit(auth, labels, e))
     );
     if (editsErr) return Result.err(editsErr);
 
@@ -221,10 +333,13 @@ async function fromRawMulti(auth: Auth, raw: RawEntry[]): Promise<Result<Entry[]
         {} as Record<string, EntryEdit[]>
     );
 
-    const groupedLabels = labels.reduce<Record<string, Label>>((prev, label) => {
-        prev[label.id] = label;
-        return prev;
-    }, {});
+    const groupedLabels = labels.reduce(
+        (prev, label) => {
+            prev[label.id] = label;
+            return prev;
+        },
+        {} as Record<string, Label>
+    );
 
     return Result.collect(
         raw.map(rawEntry => {

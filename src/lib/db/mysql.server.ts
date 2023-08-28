@@ -41,8 +41,8 @@ export function getConfig(): mysql.ConnectionOptions {
 }
 
 async function logQuery(query: string, params: unknown[], result: unknown, time: Milliseconds) {
-    const paramsFmt = recursivelyTrimAndStringify(params, 20, 5);
-    let resultStr = recursivelyTrimAndStringify(result, 20, 5);
+    const paramsFmt = recursivelyTrimAndStringify(params);
+    let resultStr = recursivelyTrimAndStringify(result);
 
     if (
         typeof result === 'object' &&

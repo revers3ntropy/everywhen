@@ -1,7 +1,7 @@
 <script lang="ts">
     import { canvasState } from '$lib/components/canvas/canvasState';
     import { RectCollider } from '$lib/components/canvas/collider';
-    import { interactable } from '$lib/components/canvas/interactable.js';
+    import { interactable } from '$lib/components/canvas/interactable';
     import type { Label } from '$lib/controllers/label/label';
     import { makeStandardContextMenu } from './standardContextMenu';
 

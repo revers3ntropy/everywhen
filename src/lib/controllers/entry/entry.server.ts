@@ -4,7 +4,9 @@ import {
     all as _all,
     getTitles as _getTitles,
     getPage as _getPage,
-    near as _near
+    near as _near,
+    getTitlesNYearsAgo as _getTitlesNYearsAgo,
+    getTitlesPinned as _getTitlesPinned
 } from '$lib/controllers/entry/getEntryMulti.server';
 import { query } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/utils/encryption';
@@ -353,11 +355,11 @@ namespace EntryServer {
         });
     }
 
-    export async function fromRawEdit(
+    export function fromRawEdit(
         auth: Auth,
         labels: Label[],
         rawEdit: RawEntryEdit
-    ): Promise<Result<EntryEdit>> {
+    ): Result<EntryEdit> {
         const { err: titleErr, val: decryptedTitle } = decrypt(rawEdit.title, auth.key);
         if (titleErr) return Result.err(titleErr);
 
@@ -385,7 +387,7 @@ namespace EntryServer {
         };
 
         if (rawEdit.label && !edit.label) {
-            await errorLogger.error('Label not found', { rawEdit, labels });
+            void errorLogger.error('Label not found', { rawEdit, labels });
             return Result.err('Label not found');
         }
 
@@ -397,6 +399,8 @@ namespace EntryServer {
     export const all = _all;
     export const getPage = _getPage;
     export const near = _near;
+    export const getTitlesNYearsAgo = _getTitlesNYearsAgo;
+    export const getTitlesPinned = _getTitlesPinned;
 }
 
 export const Entry = {
