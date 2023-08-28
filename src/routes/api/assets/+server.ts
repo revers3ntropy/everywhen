@@ -40,7 +40,7 @@ export const POST = (async ({ request, cookies }) => {
     const fileExt = body.fileName.split('.').pop();
     if (!fileExt) throw error(400, 'No file extension provided');
 
-    const { err, val } = await Asset.Server.create(auth, body.fileName, body.content);
+    const { err, val } = await Asset.Server.create(auth, body.content, body.fileName);
     if (err) throw error(400, err);
 
     return apiResponse(auth, val);

@@ -1,7 +1,7 @@
 import type { Auth } from '$lib/controllers/auth/auth.server';
 import type { RawEntry, RawEntryEdit } from '$lib/controllers/entry/entry';
 import { Entry } from '$lib/controllers/entry/entry.server';
-import { Label } from '$lib/controllers/label/label';
+import { Label } from '$lib/controllers/label/label.server';
 import { query } from '$lib/db/mysql.server';
 import { decrypt } from '$lib/utils/encryption';
 import { errorLogger } from '$lib/utils/log.server';
@@ -41,7 +41,7 @@ export async function entryFromId(
         return Result.err('Entry is deleted');
     }
 
-    const { val: labels, err: labelErr } = await Label.all(query, auth);
+    const { val: labels, err: labelErr } = await Label.Server.all(auth);
     if (labelErr) return Result.err(labelErr);
 
     return await fromRaw(auth, entry, labels);

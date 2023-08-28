@@ -1,18 +1,16 @@
 import { MAXIMUM_ENTITIES } from '$lib/constants';
-import type { QueryFunc } from '$lib/db/mysql.server';
+import { query } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
 import { nowUtc } from '$lib/utils/time';
 import type { Auth } from '../auth/auth.server';
-import { Label } from '../label/label';
-import type { Event as _Event, RawEvent } from './event';
+import { Label } from '../label/label.server';
+import { Event as _Event, type RawEvent } from './event';
 import { UId } from '$lib/controllers/uuid/uuid.server';
 
-export type Event = _Event;
-
-namespace EventUtils {
-    export async function all(query: QueryFunc, auth: Auth): Promise<Result<Event[]>> {
-        const { err, val: labels } = await Label.all(query, auth);
+namespace EventServer {
+    export async function all(auth: Auth): Promise<Result<Event[]>> {
+        const { err, val: labels } = await Label.Server.all(auth);
         if (err) return Result.err(err);
 
         const rawEvents = await query<RawEvent[]>`
@@ -30,7 +28,7 @@ namespace EventUtils {
         const events = [];
 
         for (const rawEvent of rawEvents) {
-            const { err, val } = await Event.fromRaw(query, auth, rawEvent, labels);
+            const { err, val } = await fromRaw(auth, rawEvent, labels);
             if (err) return Result.err(err);
             events.push(val);
         }
@@ -38,7 +36,7 @@ namespace EventUtils {
         return Result.ok(events);
     }
 
-    export async function fromId(query: QueryFunc, auth: Auth, id: string): Promise<Result<Event>> {
+    export async function fromId(auth: Auth, id: string): Promise<Result<Event>> {
         const events = await query<RawEvent[]>`
             SELECT id,
                    name,
@@ -54,11 +52,10 @@ namespace EventUtils {
             return Result.err(`Event not found`);
         }
 
-        return await Event.fromRaw(query, auth, events[0]);
+        return await fromRaw(auth, events[0]);
     }
 
     export async function fromRaw(
-        query: QueryFunc,
         auth: Auth,
         rawEvent: RawEvent,
         labels?: Label[]
@@ -79,7 +76,7 @@ namespace EventUtils {
                 event.label = labels.find(l => l.id === rawEvent.label);
             }
             if (!event.label) {
-                const { err } = await addLabel(query, auth, event, rawEvent.label);
+                const { err } = await addLabel(auth, event, rawEvent.label);
                 if (err) return Result.err(err);
             }
             if (!event.label) {
@@ -91,7 +88,6 @@ namespace EventUtils {
     }
 
     export async function create(
-        query: QueryFunc,
         auth: Auth,
         name: string,
         start: TimestampSecs,
@@ -118,7 +114,7 @@ namespace EventUtils {
         const event = { id, name, start, end, created };
 
         if (label) {
-            const { err } = await addLabel(query, auth, event, label);
+            const { err } = await addLabel(auth, event, label);
             if (err) return Result.err(err);
         }
 
@@ -143,7 +139,7 @@ namespace EventUtils {
         return Result.ok(event);
     }
 
-    export async function purgeAll(query: QueryFunc, auth: Auth): Promise<void> {
+    export async function purgeAll(auth: Auth): Promise<void> {
         await query`
             DELETE
             FROM events
@@ -152,7 +148,6 @@ namespace EventUtils {
     }
 
     export async function updateName(
-        query: QueryFunc,
         auth: Auth,
         self: Event,
         namePlaintext: string
@@ -177,14 +172,12 @@ namespace EventUtils {
     }
 
     export async function updateStart(
-        query: QueryFunc,
         auth: Auth,
         self: Event,
         start: TimestampSecs
     ): Promise<Result<Event>> {
         if (start > self.end) {
-            const { err } = await Event.updateEnd(
-                query,
+            const { err } = await updateEnd(
                 auth,
                 self,
                 // If trying to update start to be after end,
@@ -204,14 +197,12 @@ namespace EventUtils {
     }
 
     export async function updateEnd(
-        query: QueryFunc,
         auth: Auth,
         self: Event,
         end: TimestampSecs
     ): Promise<Result<Event>> {
         if (end < self.start) {
-            const { err } = await Event.updateStart(
-                query,
+            const { err } = await updateStart(
                 auth,
                 self,
                 // If trying to update end to be before start,
@@ -231,7 +222,6 @@ namespace EventUtils {
     }
 
     export async function updateStartAndEnd(
-        query: QueryFunc,
         auth: Auth,
         self: Event,
         start: TimestampSecs,
@@ -253,7 +243,6 @@ namespace EventUtils {
     }
 
     export async function updateLabel(
-        query: QueryFunc,
         auth: Auth,
         self: Event,
         labelId: string
@@ -269,7 +258,7 @@ namespace EventUtils {
             return Result.ok(self);
         }
 
-        const { err } = await addLabel(query, auth, self, labelId);
+        const { err } = await addLabel(auth, self, labelId);
         if (err) return Result.err(err);
 
         await query`
@@ -282,7 +271,7 @@ namespace EventUtils {
         return Result.ok(self);
     }
 
-    export async function purge(query: QueryFunc, auth: Auth, self: Event): Promise<Result<null>> {
+    export async function purge(auth: Auth, self: Event): Promise<Result<null>> {
         await query`
             DELETE
             FROM events
@@ -292,22 +281,17 @@ namespace EventUtils {
         return Result.ok(null);
     }
 
-    export async function withLabel(
-        query: QueryFunc,
-        auth: Auth,
-        labelId: string
-    ): Promise<Result<Event[]>> {
-        const { err } = await Label.fromId(query, auth, labelId);
+    export async function withLabel(auth: Auth, labelId: string): Promise<Result<Event[]>> {
+        const { err } = await Label.Server.fromId(auth, labelId);
         if (err) return Result.err(err);
 
-        const { val: events, err: allErr } = await Event.all(query, auth);
+        const { val: events, err: allErr } = await all(auth);
         if (allErr) return Result.err(allErr);
 
         return Result.ok(events.filter(evt => evt.label?.id === labelId));
     }
 
     export async function reassignAllLabels(
-        query: QueryFunc,
         auth: Auth,
         oldLabel: string,
         newLabel: string
@@ -321,11 +305,7 @@ namespace EventUtils {
         return Result.ok(null);
     }
 
-    export async function removeAllLabel(
-        query: QueryFunc,
-        auth: Auth,
-        labelId: string
-    ): Promise<Result<null>> {
+    export async function removeAllLabel(auth: Auth, labelId: string): Promise<Result<null>> {
         await query`
             UPDATE events
             SET label = NULL
@@ -336,13 +316,12 @@ namespace EventUtils {
     }
 
     async function addLabel(
-        query: QueryFunc,
         auth: Auth,
         self: Event,
         label: Label | string
     ): Promise<Result<Event>> {
         if (typeof label === 'string') {
-            const { val, err } = await Label.fromId(query, auth, label);
+            const { val, err } = await Label.Server.fromId(auth, label);
             if (err) {
                 return Result.err(err);
             }
@@ -355,4 +334,8 @@ namespace EventUtils {
     }
 }
 
-export const Event = EventUtils;
+export const Event = {
+    ..._Event,
+    Server: EventServer
+};
+export type Event = _Event;

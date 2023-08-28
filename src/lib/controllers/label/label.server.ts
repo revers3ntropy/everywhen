@@ -1,17 +1,17 @@
 import { MAXIMUM_ENTITIES } from '$lib/constants';
 import { query } from '$lib/db/mysql.server';
-import type { QueryFunc } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
 import { nowUtc } from '$lib/utils/time';
+import { z } from 'zod';
 import type { Auth } from '../auth/auth.server';
 import type { Label as _Label, LabelWithCount } from './label';
 import { UId } from '$lib/controllers/uuid/uuid.server';
 
-export type Label = _Label;
+namespace LabelServer {
+    type Label = _Label;
 
-namespace LabelUtils {
-    export async function fromId(query: QueryFunc, auth: Auth, id: string): Promise<Result<Label>> {
+    export async function fromId(auth: Auth, id: string): Promise<Result<Label>> {
         const res = await query<Required<Label>[]>`
             SELECT id, color, name, created
             FROM labels
@@ -35,7 +35,6 @@ namespace LabelUtils {
     }
 
     export async function getIdFromName(
-        query: QueryFunc,
         auth: Auth,
         nameDecrypted: string
     ): Promise<Result<string>> {
@@ -55,11 +54,7 @@ namespace LabelUtils {
         return Result.ok(res[0].id);
     }
 
-    export async function fromName(
-        query: QueryFunc,
-        auth: Auth,
-        nameDecrypted: string
-    ): Promise<Result<Label>> {
+    export async function fromName(auth: Auth, nameDecrypted: string): Promise<Result<Label>> {
         const encryptedName = encrypt(nameDecrypted, auth.key);
 
         const res = await query<Required<Label>[]>`
@@ -81,7 +76,7 @@ namespace LabelUtils {
         });
     }
 
-    export async function all(query: QueryFunc, auth: Auth): Promise<Result<Label[]>> {
+    export async function all(auth: Auth): Promise<Result<Label[]>> {
         const res = await query<Required<Label>[]>`
             SELECT id, color, name, created
             FROM labels
@@ -102,23 +97,18 @@ namespace LabelUtils {
         );
     }
 
-    export async function userHasLabelWithId(
-        query: QueryFunc,
-        auth: Auth,
-        id: string
-    ): Promise<boolean> {
-        return (await Label.fromId(query, auth, id)).ok;
+    export async function userHasLabelWithId(auth: Auth, id: string): Promise<boolean> {
+        return (await fromId(auth, id)).ok;
     }
 
     export async function userHasLabelWithName(
-        query: QueryFunc,
         auth: Auth,
         nameDecrypted: string
     ): Promise<boolean> {
-        return (await Label.fromName(query, auth, nameDecrypted)).ok;
+        return (await fromName(auth, nameDecrypted)).ok;
     }
 
-    export async function purgeWithId(query: QueryFunc, auth: Auth, id: string): Promise<void> {
+    export async function purgeWithId(auth: Auth, id: string): Promise<void> {
         await query`
             DELETE
             FROM labels
@@ -127,7 +117,7 @@ namespace LabelUtils {
         `;
     }
 
-    export async function purgeAll(query: QueryFunc, auth: Auth): Promise<void> {
+    export async function purgeAll(auth: Auth): Promise<void> {
         await query`
             DELETE
             FROM labels
@@ -136,7 +126,7 @@ namespace LabelUtils {
     }
 
     async function canCreateWithName(auth: Auth, name: string): Promise<string | true> {
-        if (await userHasLabelWithName(query, auth, name)) {
+        if (await userHasLabelWithName(auth, name)) {
             return 'Label with that name already exists';
         }
 
@@ -153,16 +143,14 @@ namespace LabelUtils {
     }
 
     export async function create(
-        query: QueryFunc,
         auth: Auth,
         json: PickOptional<Label, 'id' | 'created'>
     ): Promise<Result<Label>> {
         const canCreate = await canCreateWithName(auth, json.name);
         if (canCreate !== true) return Result.err(canCreate);
 
-        json = { ...json };
-        json.id ??= await UId.Server.generate();
-        json.created ??= nowUtc();
+        const id = await UId.Server.generate();
+        const created = json.created ?? nowUtc();
 
         const encryptedName = encrypt(json.name, auth.key);
 
@@ -172,28 +160,27 @@ namespace LabelUtils {
 
         await query`
             INSERT INTO labels (id, user, name, color, created)
-            VALUES (${json.id},
+            VALUES (${id},
                     ${auth.id},
                     ${encryptedName},
                     ${json.color},
-                    ${json.created})
+                    ${created})
         `;
 
         return Result.ok({
-            id: json.id,
+            id,
             color: json.color,
             name: json.name,
-            created: json.created
+            created
         });
     }
 
     export async function updateName(
-        query: QueryFunc,
         auth: Auth,
         label: Label,
         name: string
     ): Promise<Result<Label>> {
-        if (await Label.userHasLabelWithName(query, auth, name)) {
+        if (await userHasLabelWithName(auth, name)) {
             return Result.err('Label with that name already exists');
         }
 
@@ -214,11 +201,7 @@ namespace LabelUtils {
         return Result.ok(label);
     }
 
-    export async function updateColor(
-        query: QueryFunc,
-        label: Label,
-        color: string
-    ): Promise<Result<Label>> {
+    export async function updateColor(label: Label, color: string): Promise<Result<Label>> {
         await query`
             UPDATE labels
             SET color = ${color}
@@ -230,16 +213,13 @@ namespace LabelUtils {
         return Result.ok(label);
     }
 
-    export async function allWithCounts(
-        query: QueryFunc,
-        auth: Auth
-    ): Promise<Result<LabelWithCount[]>> {
-        const { err, val: all } = await Label.all(query, auth);
+    export async function allWithCounts(auth: Auth): Promise<Result<LabelWithCount[]>> {
+        const { err, val: labels } = await all(auth);
         if (err) return Result.err(err);
 
         return Result.ok(
             await Promise.all(
-                all.map(async label => {
+                labels.map(async label => {
                     const entryCount = await query<{ count: number }[]>`
                 SELECT COUNT(*) as count
                 FROM entries
@@ -270,6 +250,21 @@ namespace LabelUtils {
             )
         );
     }
+
+    export function jsonIsRawLabel(
+        json: unknown
+    ): json is { name: string; color: string; created?: number } {
+        const schema = z.object({
+            name: z.string(),
+            color: z.string(),
+            created: z.number().optional()
+        });
+
+        return schema.safeParse(json).success;
+    }
 }
 
-export const Label = LabelUtils;
+export const Label = {
+    Server: LabelServer
+};
+export type Label = _Label;

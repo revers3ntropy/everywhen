@@ -5,8 +5,9 @@ import { serialize } from 'cookie';
 import { sha256 } from 'js-sha256';
 import cookie from 'cookie';
 import dotenv from 'dotenv';
+import { sessionCookieOptions } from '../src/lib/utils/cookies';
 import { Result } from '../src/lib/utils/result';
-import { COOKIE_KEYS, sessionCookieOptions, UUID_LEN } from '../src/lib/constants';
+import { COOKIE_KEYS, UUID_LEN } from '../src/lib/constants';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 
@@ -124,7 +125,7 @@ export async function generateUserAndSignIn(page: Page): Promise<{
 export async function deleteUser(
     api: APIRequestContext,
     user: { username: string; key: string }
-): Promise<Result> {
+): Promise<Result<null>> {
     const res = await api.delete('./users', {
         data: {
             username: user.username,

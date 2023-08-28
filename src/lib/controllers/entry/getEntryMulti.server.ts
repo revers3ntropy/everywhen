@@ -1,7 +1,7 @@
 import type { Auth } from '$lib/controllers/auth/auth.server';
 import type { EntryEdit, EntryFilter, RawEntry } from '$lib/controllers/entry/entry';
 import { Entry } from '$lib/controllers/entry/entry.server';
-import { Label } from '$lib/controllers/label/label';
+import { Label } from '$lib/controllers/label/label.server';
 import { Location } from '$lib/controllers/location/location';
 import { query } from '$lib/db/mysql.server';
 import { decrypt } from '$lib/utils/encryption';
@@ -203,7 +203,7 @@ async function fromRawMulti(auth: Auth, raw: RawEntry[]): Promise<Result<Entry[]
           AND entries.id = entryEdits.entryId
     `;
 
-    const { err, val: labels } = await Label.all(query, auth);
+    const { err, val: labels } = await Label.Server.all(auth);
     if (err) return Result.err(err);
 
     const { err: editsErr, val: edits } = await Result.collectAsync(

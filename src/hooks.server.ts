@@ -1,5 +1,6 @@
-import { COOKIE_KEYS, sessionCookieOptions } from '$lib/constants';
+import { COOKIE_KEYS } from '$lib/constants';
 import { Log } from '$lib/controllers/log/log';
+import { sessionCookieOptions } from '$lib/utils/cookies';
 import { nowUtc } from '$lib/utils/time';
 import type { Cookies, Handle, RequestEvent } from '@sveltejs/kit';
 import chalk from 'chalk';

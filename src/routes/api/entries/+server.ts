@@ -2,8 +2,7 @@ import { decrypt } from '$lib/utils/encryption';
 import { wordCount } from '$lib/utils/text';
 import { error } from '@sveltejs/kit';
 import { Entry } from '$lib/controllers/entry/entry.server';
-import { Label } from '$lib/controllers/label/label';
-import { query } from '$lib/db/mysql.server';
+import { Label } from '$lib/controllers/label/label.server';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
 import { GETParamIsTruthy } from '$lib/utils/GETArgs';
@@ -73,7 +72,7 @@ export const POST = (async ({ request, cookies }) => {
         }
     );
 
-    const { val: labels, err: labelsErr } = await Label.all(query, auth);
+    const { val: labels, err: labelsErr } = await Label.Server.all(auth);
     if (labelsErr) throw error(400, labelsErr);
 
     const { val: entry, err } = await Entry.Server.create(

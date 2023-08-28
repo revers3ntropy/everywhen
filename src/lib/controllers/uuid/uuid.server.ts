@@ -46,7 +46,6 @@ export namespace UId.Server {
     }
 
     export async function generate(): Promise<UId> {
-        console.log({ buffer });
         const fromBuffer = buffer.pop();
         if (fromBuffer) return fromBuffer;
         await repopulateBuffer();

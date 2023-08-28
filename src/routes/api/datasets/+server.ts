@@ -2,7 +2,7 @@ import { Settings } from '$lib/controllers/settings/settings.server';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
 import type { RequestHandler } from './$types';
-import { Dataset } from '$lib/controllers/dataset/dataset';
+import { Dataset } from '$lib/controllers/dataset/dataset.server';
 import { query } from '$lib/db/mysql.server';
 import { error } from '@sveltejs/kit';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
@@ -12,7 +12,7 @@ import { Auth } from '$lib/controllers/auth/auth.server';
 export const GET = cachedApiRoute(async auth => {
     const { val: settings, err: getSettingsErr } = await Settings.allAsMapWithDefaults(query, auth);
     if (getSettingsErr) throw error(500, getSettingsErr);
-    const { val, err } = await Dataset.allMetaData(query, auth, settings);
+    const { val, err } = await Dataset.Server.allMetaData(query, auth, settings);
     if (err) throw error(400, err);
     return {
         datasets: val
@@ -55,7 +55,7 @@ export const POST = (async ({ request, cookies }) => {
         };
     });
 
-    const { val: dataset, err } = await Dataset.create(
+    const { val: dataset, err } = await Dataset.Server.create(
         query,
         auth,
         body.name,

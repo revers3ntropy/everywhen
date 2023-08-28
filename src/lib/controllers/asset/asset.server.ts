@@ -3,7 +3,6 @@ import { decrypt, encrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
 import { nowUtc } from '$lib/utils/time';
 import type { ResultSetHeader } from 'mysql2';
-import { z } from 'zod';
 import { Asset as _Asset, type AssetMetadata } from './asset';
 import { UId } from '$lib/controllers/uuid/uuid.server';
 import type { Auth } from '$lib/controllers/auth/auth';
@@ -14,8 +13,8 @@ namespace AssetServer {
 
     export async function create(
         auth: Auth,
-        fileNamePlainText: string,
         contentsPlainText: string,
+        fileNamePlainText?: string,
         created?: TimestampSecs,
         publicId?: string
     ): Promise<Result<{ publicId: string; id: string }>> {
@@ -30,13 +29,9 @@ namespace AssetServer {
 
         publicId ??= await UId.Server.generate();
         const id = await UId.Server.generate();
-        const fileExt = fileNamePlainText.split('.').pop();
-        if (!fileExt) {
-            return Result.err('Invalid file extension');
-        }
+        fileNamePlainText ??= `${publicId}`;
 
         const encryptedContents = encrypt(contentsPlainText, auth.key);
-
         const encryptedFileName = encrypt(fileNamePlainText, auth.key);
 
         await query`
@@ -181,16 +176,6 @@ namespace AssetServer {
             return Result.err('Asset not found');
         }
         return Result.ok(null);
-    }
-
-    export function jsonIsRawAsset(json: unknown): json is Omit<Asset, 'id'> {
-        const schema = z.object({
-            publicId: z.string(),
-            content: z.string(),
-            fileName: z.string(),
-            created: z.number()
-        });
-        return schema.safeParse(json).success;
     }
 }
 

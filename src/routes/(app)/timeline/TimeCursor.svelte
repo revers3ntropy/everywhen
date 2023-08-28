@@ -4,12 +4,12 @@
     import { interactable } from '$lib/components/canvas/interactable';
     import type { Label } from '$lib/controllers/label/label';
     import Event from '$lib/components/event/Event.svelte';
-    import { Event as EventController } from '$lib/controllers/event/event.client';
+    import { Event as EventController } from '$lib/controllers/event/event';
     import { dispatch } from '$lib/dataChangeEvents';
     import { api } from '$lib/utils/apiRequest';
     import { showPopup } from '$lib/utils/popups';
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
-    import { notify } from '$lib/components/notifications/notifications.js';
+    import { notify } from '$lib/components/notifications/notifications';
     import { makeStandardContextMenu } from './standardContextMenu';
 
     export let labels: Label[];

@@ -26,7 +26,7 @@
     import Dropdown from '$lib/components/Dropdown.svelte';
     import Streaks from '$lib/components/Streaks.svelte';
     import { LS_KEYS, Theme } from '$lib/constants';
-    import { Event as EventController } from '$lib/controllers/event/event.client';
+    import { Event as EventController } from '$lib/controllers/event/event';
     import { nowUtc } from '$lib/utils/time';
     import {
         eventsSortKey,

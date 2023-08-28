@@ -23,10 +23,7 @@ export interface Notify {
     info(text: string | string[], timeout?: Milliseconds): void;
     success(text: string | string[], timeout?: Milliseconds): void;
     error(text: string | string[], timeout?: Milliseconds): void;
-    onErr<T extends NonNullable<unknown>>(
-        result: Result<T>,
-        onErr?: (err: string | null) => unknown
-    ): T;
+    onErr<T>(result: Result<T>, onErr?: (err: string | null) => unknown): T;
 }
 
 export function removeNotification(notification: Notification) {
@@ -67,7 +64,7 @@ notify.error = (text: string | string[], timeout: Milliseconds = 5000) => {
     }
     notify(text, NotificationType.ERROR, timeout);
 };
-notify.onErr = <T extends NonNullable<unknown>>(
+notify.onErr = <T>(
     { err, val }: Result<T>,
     onErr: (err: string | null) => unknown = () => 0
 ): T => {

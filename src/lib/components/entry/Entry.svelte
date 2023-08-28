@@ -2,7 +2,7 @@
     import { browser } from '$app/environment';
     import Lazy from '$lib/components/Lazy.svelte';
     import type { EntryEdit } from '$lib/controllers/entry/entry';
-    import { nowUtc } from '$lib/utils/time';
+    import { fmtUtcRelative, nowUtc } from '$lib/utils/time';
     import { slide } from 'svelte/transition';
     import { tooltip } from '@svelte-plugins/tooltips';
     import Bin from 'svelte-material-icons/Delete.svelte';
@@ -143,8 +143,13 @@
                 </span>
             {/if}
 
-            {#if Entry.isPinned({ pinned })}
-                <span class="gradient-icon" use:tooltip={{ content: 'Favourited' }}>
+            {#if pinned !== null}
+                <span
+                    class="gradient-icon"
+                    use:tooltip={{
+                        content: `<span class="oneline">Favourited ${fmtUtcRelative(pinned)}</span>`
+                    }}
+                >
                     <Heart size="20" />
                 </span>
             {/if}

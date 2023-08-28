@@ -2,7 +2,7 @@
     import { canvasState } from '$lib/components/canvas/canvasState';
     import Event from '$lib/components/event/Event.svelte';
     import { notify } from '$lib/components/notifications/notifications';
-    import { Event as EventController } from '$lib/controllers/event/event.client';
+    import { Event as EventController } from '$lib/controllers/event/event';
     import type { Label } from '$lib/controllers/label/label';
     import { dispatch } from '$lib/dataChangeEvents';
     import { api } from '$lib/utils/apiRequest';

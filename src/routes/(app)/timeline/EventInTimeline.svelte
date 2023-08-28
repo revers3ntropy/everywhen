@@ -3,7 +3,7 @@
     import { DurationRectCollider } from '$lib/components/canvas/collider';
     import { interactable } from '$lib/components/canvas/interactable';
     import { notify } from '$lib/components/notifications/notifications';
-    import { Event as EventController } from '$lib/controllers/event/event.client';
+    import { Event as EventController } from '$lib/controllers/event/event';
     import Event from '$lib/components/event/Event.svelte';
     import type { Label } from '$lib/controllers/label/label';
     import { dispatch, listen } from '$lib/dataChangeEvents';

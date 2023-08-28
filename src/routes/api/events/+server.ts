@@ -1,7 +1,6 @@
 import { error } from '@sveltejs/kit';
-import { Event } from '$lib/controllers/event/event';
-import { Label } from '$lib/controllers/label/label';
-import { query } from '$lib/db/mysql.server';
+import { Event } from '$lib/controllers/event/event.server';
+import { Label } from '$lib/controllers/label/label.server';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
@@ -10,7 +9,7 @@ import type { RequestHandler } from './$types';
 import { Auth } from '$lib/controllers/auth/auth.server';
 
 export const GET = cachedApiRoute(async auth => {
-    const { err, val: events } = await Event.all(query, auth);
+    const { err, val: events } = await Event.Server.all(auth);
     if (err) throw error(400, err);
     return { events };
 }) satisfies RequestHandler;
@@ -37,13 +36,12 @@ export const POST = (async ({ request, cookies }) => {
 
     // check label exists
     if (body.label) {
-        if (!(await Label.userHasLabelWithId(query, auth, body.label))) {
+        if (!(await Label.Server.userHasLabelWithId(auth, body.label))) {
             throw error(400, `Label doesn't exist`);
         }
     }
 
-    const { val: event, err } = await Event.create(
-        query,
+    const { val: event, err } = await Event.Server.create(
         auth,
         body.name,
         body.start,

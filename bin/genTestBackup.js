@@ -1,16 +1,22 @@
 import fs from 'fs';
+
 const outputFile = 'testBackup.json';
 
+/** @type {{ version: string }} */
 const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 
 const num = {
     entries: {
-        incrementing: 100_000,
+        incrementing: 10_000,
         long: {
             count: 0,
             chars: 100_000
         }
-    }
+    },
+    labels: 100,
+    assets: 1000,
+    events: 1000,
+    locations: 100
 };
 
 function now() {
@@ -44,12 +50,41 @@ function genEntries() {
     return entries;
 }
 
+function genLabels() {
+    console.log('Generating labels...');
+    const labels = [];
+
+    for (let i = 0; i < num.labels; i++) {
+        labels.push({
+            name: `label ${i}`,
+            color: '#000000',
+            created: now()
+        });
+    }
+
+    return labels;
+}
+
+function genAssets() {
+    console.log('Generating assets...');
+    const assets = [];
+
+    for (let i = 0; i < num.assets; i++) {
+        assets.push({
+            content:
+                'UklGRsgCAABXRUJQVlA4WAoAAAAwAAAAFwAAFwAASUNDUMgBAAAAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADZBTFBIrAAAAAFHIBBI4SYXEREMwLWtPZVyrrfpZkrDSpfSISUO5aSC0iH13Mj33vgbRPR/AvjXg3S78I2TpMEXezot1159/SlYwAQLGJUmnDLyJczumEkdoYO+ox8+reBWINSE5syyZyFWzJefdhk9QC5wUovxX5hwCghSyZerdxBqzOFGyaqFebeXJV8/7oKzyR9fy8cWjHwFo6wS6C1AtAD7Oi3HQfUnnCQN+NKsv90v8K9WUDggJgAAANACAJ0BKhgAGAA+bTSWR6QjIiEoCACADYlpAAA9o6AA/vucwAAA'
+        });
+    }
+
+    return assets;
+}
+
 function gen() {
     console.log('Starting...');
     return {
         entries: genEntries(),
-        labels: [],
-        assets: [],
+        labels: genLabels(),
+        assets: genAssets(),
         events: [],
         locations: [],
         created: today,

@@ -6,9 +6,10 @@ import schemion from 'schemion';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
 import { nowUtc } from '$lib/utils/time';
+import { z } from 'zod';
 import { Entry } from '../entry/entry.server';
-import { Event } from '../event/event';
-import { Label } from '../label/label';
+import { Event } from '../event/event.server';
+import { Label } from '../label/label.server';
 import { Backup as _Backup } from './backup';
 import type { Auth } from '$lib/controllers/auth/auth';
 import { Asset } from '$lib/controllers/asset/asset.server';
@@ -25,9 +26,9 @@ export namespace BackupServer {
             deleted: 'both'
         });
         if (entryErr) return Result.err(entryErr);
-        const { err: eventsErr, val: events } = await Event.all(query, auth);
+        const { err: eventsErr, val: events } = await Event.Server.all(auth);
         if (eventsErr) return Result.err(eventsErr);
-        const { err: labelsErr, val: labels } = await Label.all(query, auth);
+        const { err: labelsErr, val: labels } = await Label.Server.all(auth);
         if (labelsErr) return Result.err(labelsErr);
         const { err: assetsErr, val: assets } = await Asset.Server.all(auth);
         if (assetsErr) return Result.err(assetsErr);
@@ -145,29 +146,46 @@ export namespace BackupServer {
         }
 
         // set up labels first
-        await Label.purgeAll(query, auth);
+        await Label.Server.purgeAll(auth);
 
         const createdLabels = [] as Label[];
 
         for (const label of labels) {
-            if (!Label.jsonIsRawLabel(label)) {
+            if (!Label.Server.jsonIsRawLabel(label)) {
                 return Result.err('Invalid label format in JSON');
             }
 
-            const { err, val } = await Label.create(query, auth, label);
+            const { err, val } = await Label.Server.create(auth, label);
             if (err) return Result.err(err);
             createdLabels.push(val);
         }
 
         await Entry.Server.purgeAll(auth);
 
+        const editSchemaShape = {
+            title: z.string().optional(),
+            entry: z.string(),
+            created: z.number().optional(),
+            createdTZOffset: z.number().optional(),
+            latitude: z.number().nullable().optional(),
+            longitude: z.number().nullable().optional(),
+            label: z.string().nullable().optional(),
+            agentData: z.string().optional()
+        };
+        const entrySchema = z.object({
+            ...editSchemaShape,
+            deleted: z.number().nullable().optional(),
+            pinned: z.number().nullable().optional(),
+            edits: z.array(z.object(editSchemaShape)).optional()
+        });
+
         for (const entry of entries) {
-            if (!Entry.jsonIsRawEntry(entry)) {
+            if (!entrySchema.safeParse(entry).success) {
                 return Result.err('Invalid entry format in JSON');
             }
 
             if (entry.label) {
-                const { err, val } = await Label.getIdFromName(query, auth, entry.label);
+                const { err, val } = await Label.Server.getIdFromName(auth, entry.label);
                 if (err) return Result.err(err);
                 entry.label = val;
             }
@@ -176,22 +194,27 @@ export namespace BackupServer {
                 auth,
                 createdLabels,
                 entry.title || '',
-                entry.entry || '',
+                entry.entry,
                 entry.created || 0,
                 entry.createdTZOffset || 0,
-                entry.pinned || null,
-                entry.deleted || null,
-                entry.latitude || null,
-                entry.longitude || null,
+                entry.pinned ?? null,
+                entry.deleted ?? null,
+                entry.latitude ?? null,
+                entry.longitude ?? null,
                 entry.label || null,
                 entry.agentData || '',
                 entry.wordCount || wordCount(entry.entry || ''),
-                entry.edits || []
+                (entry.edits || []).map(edit => ({
+                    ...edit,
+                    latitude: edit.latitude ?? null,
+                    longitude: edit.longitude ?? null,
+                    agentData: edit.agentData || ''
+                }))
             );
             if (err) return Result.err(err);
         }
 
-        await Event.purgeAll(query, auth);
+        await Event.Server.purgeAll(auth);
 
         for (const event of events) {
             if (!Event.jsonIsRawEvent(event)) {
@@ -199,13 +222,12 @@ export namespace BackupServer {
             }
 
             if (event.label) {
-                const { err, val } = await Label.getIdFromName(query, auth, event.label);
+                const { err, val } = await Label.Server.getIdFromName(auth, event.label);
                 if (err) return Result.err(err);
                 event.label = val;
             }
 
-            const { err } = await Event.create(
-                query,
+            const { err } = await Event.Server.create(
                 auth,
                 event.name,
                 event.start,
@@ -218,15 +240,22 @@ export namespace BackupServer {
 
         await Asset.Server.purgeAll(auth);
 
+        const assetSchema = z.object({
+            publicId: z.string().optional(),
+            content: z.string(),
+            fileName: z.string().optional(),
+            created: z.number().optional()
+        });
+
         for (const asset of assets) {
-            if (!Asset.Server.jsonIsRawAsset(asset)) {
+            if (!assetSchema.safeParse(asset).success) {
                 return Result.err('Invalid asset format in JSON');
             }
 
             const { err } = await Asset.Server.create(
                 auth,
-                asset.fileName,
                 asset.content,
+                asset.fileName,
                 // make sure to preserve id as this is
                 // card coded into entries
                 asset.created,

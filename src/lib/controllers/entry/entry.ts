@@ -1,5 +1,4 @@
 import { fmtUtc } from '$lib/utils/time';
-import { z } from 'zod';
 import type { Label } from '../label/label';
 
 export interface EntryAsLocation {
@@ -113,30 +112,6 @@ export namespace Entry {
         }
 
         return grouped;
-    }
-
-    export function jsonIsRawEntry(json: unknown): json is Omit<Entry, 'id' | 'label'> & {
-        label?: string;
-    } {
-        const editSchemaShape = {
-            title: z.string(),
-            entry: z.string(),
-            created: z.number(),
-            createdTZOffset: z.number().optional(),
-            latitude: z.number().nullable().optional(),
-            longitude: z.number().nullable().optional(),
-            label: z.string().nullable().optional(),
-            agentData: z.string().optional()
-        };
-        const entrySchema = z.object({
-            ...editSchemaShape,
-            deleted: z.number().nullable().optional(),
-            pinned: z.number().nullable().optional(),
-            edits: z.array(z.object(editSchemaShape)).optional()
-        });
-
-        const result = entrySchema.safeParse(json);
-        return result.success;
     }
 
     function stringToShortTitle(str: string): string {

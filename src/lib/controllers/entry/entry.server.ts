@@ -74,7 +74,7 @@ namespace EntryServer {
         label: string | null,
         agentData: string | null,
         wordCount: number,
-        edits: EntryEdit[]
+        edits: (Omit<EntryEdit, 'id' | 'entryId' | 'label'> & { label?: string })[]
     ): Promise<Result<Entry>> {
         const numEntries = await query<{ count: number }[]>`
             SELECT COUNT(*) as count
@@ -114,12 +114,20 @@ namespace EntryServer {
                     ${wordCount})
         `;
 
+        const editsWithIds: (Omit<EntryEdit, 'label'> & { label?: string })[] = [];
+
         for (const edit of edits) {
             const encryptedEditTitle = encrypt(edit.title, auth.key);
             const encryptedEditEntry = encrypt(edit.entry, auth.key);
             const encryptedAgentData = encrypt(edit.agentData || '', auth.key);
 
             const editId = await UId.Server.generate();
+
+            editsWithIds.push({
+                ...edit,
+                id: editId,
+                entryId: id
+            });
 
             await query`
                 INSERT INTO entryEdits
@@ -131,7 +139,7 @@ namespace EntryServer {
                         ${encryptedEditEntry},
                         ${edit.created},
                         ${edit.createdTZOffset ?? 0},
-                        ${edit.label?.id ?? null},
+                        ${edit.label ?? null},
                         ${edit.latitude ?? null},
                         ${edit.longitude ?? null},
                         ${encryptedAgentData || ''})
@@ -151,7 +159,7 @@ namespace EntryServer {
             label: label ? labels.find(l => l.id === label) || null : null,
             agentData,
             wordCount,
-            edits: edits.map(edit => ({
+            edits: editsWithIds.map(edit => ({
                 ...edit,
                 entryId: id,
                 label: label ? labels.find(l => l.id === label) || null : null

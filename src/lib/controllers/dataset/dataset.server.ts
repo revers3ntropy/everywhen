@@ -3,30 +3,27 @@ import type { SettingsConfig } from '$lib/controllers/settings/settings';
 import { query } from '$lib/db/mysql.server';
 import type { QueryFunc } from '$lib/db/mysql.server';
 import { Result } from '$lib/utils/result';
-import { Dataset as DatasetClient } from './dataset.client';
-import type {
+import {
     Dataset as _Dataset,
-    DatasetColumn,
-    DatasetColumnType,
-    DatasetData,
-    DatasetMetadata,
-    ThirdPartyDatasetIds
+    type DatasetColumn,
+    type DatasetColumnType,
+    type DatasetData,
+    type DatasetMetadata,
+    type ThirdPartyDatasetIds
 } from './dataset';
 import { nowUtc } from '$lib/utils/time';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import type { Auth } from '$lib/controllers/auth/auth';
 import { UId } from '$lib/controllers/uuid/uuid.server';
 
-export type Dataset = _Dataset;
+namespace DatasetServer {
+    const Dataset = _Dataset;
+    type Dataset = _Dataset;
 
-namespace DatasetUtils {
-    const thirdPartyDatasetProviders: {
-        [k in ThirdPartyDatasetIds]: (
-            query: QueryFunc,
-            auth: Auth,
-            settings: SettingsConfig
-        ) => MaybePromise<DatasetData | null>;
-    } = {
+    const thirdPartyDatasetProviders: Record<
+        ThirdPartyDatasetIds,
+        (query: QueryFunc, auth: Auth, settings: SettingsConfig) => MaybePromise<DatasetData | null>
+    > = {
         githubCommits(_query, _user, settings) {
             if (!settings.gitHubAccessToken.value) return null;
             return [];
@@ -49,7 +46,7 @@ namespace DatasetUtils {
             return {
                 id: 'githubCommits',
                 created: 0,
-                name: DatasetClient.thirdPartyDatasetIdsToNames.githubCommits,
+                name: Dataset.thirdPartyDatasetIdsToNames.githubCommits,
                 columns: []
             };
         },
@@ -58,7 +55,7 @@ namespace DatasetUtils {
             return {
                 id: 'githubLoC',
                 created: 0,
-                name: DatasetClient.thirdPartyDatasetIdsToNames.githubLoC,
+                name: Dataset.thirdPartyDatasetIdsToNames.githubLoC,
                 columns: []
             };
         }
@@ -90,7 +87,7 @@ namespace DatasetUtils {
                 serialize: JSON.stringify,
                 deserialize: JSON.parse
             })),
-            ...DatasetClient.builtInTypes
+            ...Dataset.builtInTypes
         ]);
     }
 
@@ -355,4 +352,15 @@ namespace DatasetUtils {
     }
 }
 
-export const Dataset = DatasetUtils;
+export const Dataset = {
+    ..._Dataset,
+    Server: DatasetServer
+};
+export type Dataset = _Dataset;
+export type {
+    DatasetColumn,
+    DatasetColumnType,
+    DatasetData,
+    DatasetMetadata,
+    ThirdPartyDatasetIds
+} from './dataset';

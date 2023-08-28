@@ -6,8 +6,8 @@ import { currentVersion } from '$lib/utils/semVer';
 import { nowUtc } from '$lib/utils/time';
 import crypto from 'crypto';
 import { Entry } from '../entry/entry.server';
-import { Event } from '../event/event';
-import { Label } from '../label/label';
+import { Event } from '../event/event.server';
+import { Label } from '../label/label.server';
 import { Settings } from '../settings/settings';
 import type { User as _User } from './user';
 import { UId } from '$lib/controllers/uuid/uuid.server';
@@ -72,10 +72,10 @@ export namespace UserServer {
     }
 
     export async function purge(auth: Auth): Promise<void> {
-        await Label.purgeAll(query, auth);
+        await Label.Server.purgeAll(auth);
         await Entry.Server.purgeAll(auth);
         await Asset.Server.purgeAll(auth);
-        await Event.purgeAll(query, auth);
+        await Event.Server.purgeAll(auth);
         await Settings.purgeAll(query, auth);
         Auth.Server.invalidateAllSessionsForUser(auth.id);
 

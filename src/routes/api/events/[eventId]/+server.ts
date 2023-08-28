@@ -1,6 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { Event } from '$lib/controllers/event/event';
-import { query } from '$lib/db/mysql.server';
+import { Event } from '$lib/controllers/event/event.server';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 import { invalidateCache } from '$lib/utils/cache.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
@@ -31,11 +30,11 @@ export const PUT = (async ({ request, params, cookies }) => {
         }
     );
 
-    const { err, val: event } = await Event.fromId(query, auth, params.eventId);
+    const { err, val: event } = await Event.Server.fromId(auth, params.eventId);
     if (err) throw error(404, err);
 
     if (body.name) {
-        const { err } = await Event.updateName(query, auth, event, body.name);
+        const { err } = await Event.Server.updateName(auth, event, body.name);
         if (err) throw error(400, err);
     }
 
@@ -43,22 +42,22 @@ export const PUT = (async ({ request, params, cookies }) => {
     // which always means one of them will be 'before'/'after' the other,
     // which is caught by the validation in the controller
     if (body.start && body.end) {
-        const { err } = await Event.updateStartAndEnd(query, auth, event, body.start, body.end);
+        const { err } = await Event.Server.updateStartAndEnd(auth, event, body.start, body.end);
         if (err) throw error(400, err);
     } else {
         if (body.start) {
-            const { err } = await Event.updateStart(query, auth, event, body.start);
+            const { err } = await Event.Server.updateStart(auth, event, body.start);
             if (err) throw error(400, err);
         }
 
         if (body.end) {
-            const { err } = await Event.updateEnd(query, auth, event, body.end);
+            const { err } = await Event.Server.updateEnd(auth, event, body.end);
             if (err) throw error(400, err);
         }
     }
 
     if (body.label !== 'NO_CHANGE') {
-        const { err } = await Event.updateLabel(query, auth, event, body.label);
+        const { err } = await Event.Server.updateLabel(auth, event, body.label);
         if (err) throw error(400, err);
     }
 
@@ -70,9 +69,9 @@ export const DELETE = (async ({ params, cookies }) => {
     if (!params.eventId) throw error(400, 'invalid event id');
     invalidateCache(auth.id);
 
-    const { err, val: event } = await Event.fromId(query, auth, params.eventId);
+    const { err, val: event } = await Event.Server.fromId(auth, params.eventId);
     if (err) throw error(404, err);
-    const { err: deleteErr } = await Event.purge(query, auth, event);
+    const { err: deleteErr } = await Event.Server.purge(auth, event);
     if (deleteErr) throw error(400, deleteErr);
 
     return apiResponse(auth, {});

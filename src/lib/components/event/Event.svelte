@@ -11,7 +11,7 @@
     import type { ChangeEventHandler } from 'svelte/elements';
     import LabelSelect from '$lib/components/label/LabelSelect.svelte';
     import UtcTime from '../UtcTime.svelte';
-    import { Event } from '$lib/controllers/event/event.client';
+    import { Event } from '$lib/controllers/event/event';
     import type { Label as LabelController } from '../../controllers/label/label';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';

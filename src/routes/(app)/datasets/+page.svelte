@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { PageData } from './$types';
-    import { Dataset, type DatasetPresetName } from '$lib/controllers/dataset/dataset.client';
+    import { Dataset, type DatasetPresetName } from '$lib/controllers/dataset/dataset';
     import { notify } from '$lib/components/notifications/notifications';
     import { api } from '$lib/utils/apiRequest';
 

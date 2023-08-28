@@ -1,8 +1,7 @@
 import { error } from '@sveltejs/kit';
 import { Entry } from '$lib/controllers/entry/entry.server';
-import { Event } from '$lib/controllers/event/event';
-import { Label } from '$lib/controllers/label/label';
-import { query } from '$lib/db/mysql.server';
+import { Event } from '$lib/controllers/event/event.server';
+import { Label } from '$lib/controllers/label/label.server';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
@@ -10,7 +9,7 @@ import type { RequestHandler } from './$types';
 import { Auth } from '$lib/controllers/auth/auth.server';
 
 export const GET = cachedApiRoute(async (auth, { params }) => {
-    const { val: label, err } = await Label.fromId(query, auth, params.labelId);
+    const { val: label, err } = await Label.Server.fromId(auth, params.labelId);
     if (err) throw error(404, err);
     return label;
 }) satisfies RequestHandler;
@@ -32,18 +31,18 @@ export const PUT = (async ({ cookies, request, params }) => {
         }
     );
 
-    const { val, err } = await Label.fromId(query, auth, params.labelId);
+    const { val, err } = await Label.Server.fromId(auth, params.labelId);
     if (err) throw error(400, err);
     let label = val;
 
     if (body.name) {
-        const { err, val } = await Label.updateName(query, auth, label, body.name);
+        const { err, val } = await Label.Server.updateName(auth, label, body.name);
         if (err) throw error(400, err);
         label = val;
     }
 
     if (body.color) {
-        const { err } = await Label.updateColor(query, label, body.color);
+        const { err } = await Label.Server.updateColor(label, body.color);
         if (err) throw error(400, err);
     }
 
@@ -54,7 +53,7 @@ export const DELETE = (async ({ cookies, params, request }) => {
     const auth = Auth.Server.getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
-    if (!(await Label.userHasLabelWithId(query, auth, params.labelId))) {
+    if (!(await Label.Server.userHasLabelWithId(auth, params.labelId))) {
         throw error(404, 'Label with that id not found');
     }
 
@@ -64,8 +63,7 @@ export const DELETE = (async ({ cookies, params, request }) => {
     });
     if (err) throw error(400, err);
 
-    const { err: eventsErr, val: eventsWithLabel } = await Event.withLabel(
-        query,
+    const { err: eventsErr, val: eventsWithLabel } = await Event.Server.withLabel(
         auth,
         params.labelId
     );
@@ -73,7 +71,7 @@ export const DELETE = (async ({ cookies, params, request }) => {
 
     const [, entriesWithLabel] = val;
     if (entriesWithLabel < 1 && eventsWithLabel.length < 1) {
-        await Label.purgeWithId(query, auth, params.labelId);
+        await Label.Server.purgeWithId(auth, params.labelId);
         return apiResponse(auth, {});
     }
 
@@ -91,20 +89,20 @@ export const DELETE = (async ({ cookies, params, request }) => {
     );
 
     if (strategy === 'reassign') {
-        if (!(await Label.userHasLabelWithId(query, auth, newLabelId))) {
+        if (!(await Label.Server.userHasLabelWithId(auth, newLabelId))) {
             throw error(400, 'New label not found');
         }
 
         await Entry.Server.reassignAllLabels(auth, params.labelId, newLabelId);
-        await Event.reassignAllLabels(query, auth, params.labelId, newLabelId);
-        await Label.purgeWithId(query, auth, params.labelId);
+        await Event.Server.reassignAllLabels(auth, params.labelId, newLabelId);
+        await Label.Server.purgeWithId(auth, params.labelId);
         return apiResponse(auth, {});
     }
 
     if (strategy === 'remove') {
         await Entry.Server.removeAllLabel(auth, params.labelId);
-        await Event.removeAllLabel(query, auth, params.labelId);
-        await Label.purgeWithId(query, auth, params.labelId);
+        await Event.Server.removeAllLabel(auth, params.labelId);
+        await Label.Server.purgeWithId(auth, params.labelId);
         return apiResponse(auth, {});
     }
 

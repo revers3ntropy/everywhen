@@ -9,6 +9,7 @@ import { serializeGETArgs } from './GETArgs';
 import { clientLogger } from './log';
 import { Result } from './result';
 import { currentTzOffset, nowUtc } from './time';
+import type { Expand } from '../../types';
 
 export interface ReqBody {
     timezoneUtcOffset?: number;
@@ -102,7 +103,7 @@ export async function makeApiReq<
     path: string,
     body: Body | null = null,
     options: Partial<Options> = {}
-): Promise<Result<ApiResponse[Verb][Path]>> {
+): Promise<Result<Expand<ApiResponse[Verb][Path]>>> {
     if (!browser) return Result.err(`Cannot make API request on server`);
     const url = `/api${path}`;
 
@@ -142,7 +143,7 @@ export async function makeApiReq<
     const response = await fetch(url, init);
 
     if (response.ok) {
-        return await handleOkResponse<ApiResponse[Verb][Path]>(
+        return await handleOkResponse<Expand<ApiResponse[Verb][Path]>>(
             response,
             method,
             url,

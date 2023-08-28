@@ -3,7 +3,7 @@
     import { dispatch } from '$lib/dataChangeEvents';
     import { nowUtc } from '$lib/utils/time';
     import { createEventDispatcher } from 'svelte';
-    import { Event } from '$lib/controllers/event/event.client';
+    import { Event } from '$lib/controllers/event/event';
     import { api } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
 

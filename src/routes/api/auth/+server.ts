@@ -1,9 +1,10 @@
 import { invalidateCache } from '$lib/utils/cache.server';
+import { maxAgeFromShouldRememberMe, sessionCookieOptions } from '$lib/utils/cookies';
 import { GETParamIsTruthy } from '$lib/utils/GETArgs';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
-import { COOKIE_KEYS, maxAgeFromShouldRememberMe, sessionCookieOptions } from '$lib/constants';
+import { COOKIE_KEYS } from '$lib/constants';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 import { User } from '$lib/controllers/user/user.server';
 import { Auth } from '$lib/controllers/auth/auth.server';

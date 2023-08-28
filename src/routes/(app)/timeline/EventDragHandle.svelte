@@ -2,7 +2,7 @@
     import type { RenderProps } from '$lib/components/canvas/canvasState';
     import { RectCollider } from '$lib/components/canvas/collider';
     import { interactable } from '$lib/components/canvas/interactable';
-    import { Event as EventController } from '$lib/controllers/event/event.client';
+    import { Event as EventController } from '$lib/controllers/event/event';
     import type { Label } from '$lib/controllers/label/label';
 
     const WIDTH = 8;
