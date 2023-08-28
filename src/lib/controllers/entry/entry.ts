@@ -1,4 +1,5 @@
 import { fmtUtc } from '$lib/utils/time';
+import { z } from 'zod';
 import type { Label } from '../label/label';
 
 export interface EntryAsLocation {
@@ -56,7 +57,8 @@ export interface RawEntry {
     entry: string;
     created: TimestampSecs;
     createdTZOffset: Hours;
-    flags: number;
+    pinned: number | null;
+    deleted: number | null;
     latitude: number | null;
     longitude: number | null;
     agentData: string | null;
@@ -70,7 +72,8 @@ export interface Entry {
     entry: string;
     created: TimestampSecs;
     createdTZOffset: Hours;
-    flags: number;
+    pinned: number | null;
+    deleted: number | null;
     latitude: number | null;
     longitude: number | null;
     agentData: string | null;
@@ -82,51 +85,12 @@ export interface Entry {
 export namespace Entry {
     export const TITLE_LENGTH_CUTOFF = 30;
 
-    export enum Flags {
-        DELETED = 0b1,
-        PINNED = 0b10
+    export function isDeleted(self: { deleted: number | null }): boolean {
+        return typeof self.deleted === 'number';
     }
 
-    export namespace Flags {
-        export const NONE = 0;
-
-        export function toString(flags: number): string {
-            const parts: string[] = [];
-            if ((flags & Flags.DELETED) !== 0) {
-                parts.push('deleted');
-            }
-            if ((flags & Flags.PINNED) !== 0) {
-                parts.push('pinned');
-            }
-            if (parts.length < 2) {
-                return parts[0] || 'none';
-            }
-            return parts.join(', ');
-        }
-
-        export function isDeleted(flags: number): boolean {
-            return (flags & Flags.DELETED) !== 0;
-        }
-
-        export function setDeleted(flags: number, deleted: boolean): number {
-            return deleted ? flags | Flags.DELETED : flags & ~Flags.DELETED;
-        }
-
-        export function isPinned(flags: number): boolean {
-            return (flags & Flags.PINNED) !== 0;
-        }
-
-        export function setPinned(flags: number, pinned: boolean): number {
-            return pinned ? flags | Flags.PINNED : flags & ~Flags.PINNED;
-        }
-    }
-
-    export function isDeleted(self: { flags: number }): boolean {
-        return Flags.isDeleted(self.flags);
-    }
-
-    export function isPinned(this: void, self: { flags: number }): boolean {
-        return Flags.isPinned(self.flags);
+    export function isPinned(self: { pinned: number | null }): boolean {
+        return typeof self.pinned === 'number';
     }
 
     export function groupEntriesByDay<
@@ -151,35 +115,28 @@ export namespace Entry {
         return grouped;
     }
 
-    export function jsonIsRawEntry(
-        json: unknown,
-        isEdit = false
-    ): json is Omit<Entry, 'id' | 'label'> & {
+    export function jsonIsRawEntry(json: unknown): json is Omit<Entry, 'id' | 'label'> & {
         label?: string;
     } {
-        return (
-            typeof json === 'object' &&
-            json !== null &&
-            'title' in json &&
-            typeof json.title === 'string' &&
-            'entry' in json &&
-            typeof json.entry === 'string' &&
-            (!('latitude' in json) ||
-                typeof json.latitude === 'number' ||
-                json.latitude === null) &&
-            (!('longitude' in json) ||
-                typeof json.longitude === 'number' ||
-                json.longitude === null) &&
-            (!('label' in json) || typeof json.label === 'string' || !json.label) &&
-            (!('wordCount' in json) || typeof json.wordCount === 'number') &&
-            (!('agentData' in json) || typeof json.agentData === 'string') &&
-            (!('flags' in json) || typeof json.flags === 'number') &&
-            'created' in json &&
-            typeof json.created === 'number' &&
-            (isEdit ||
-                !('edits' in json) ||
-                (Array.isArray(json.edits) && json.edits.every(e => Entry.jsonIsRawEntry(e, true))))
-        );
+        const editSchemaShape = {
+            title: z.string(),
+            entry: z.string(),
+            created: z.number(),
+            createdTZOffset: z.number().optional(),
+            latitude: z.number().nullable().optional(),
+            longitude: z.number().nullable().optional(),
+            label: z.string().nullable().optional(),
+            agentData: z.string().optional()
+        };
+        const entrySchema = z.object({
+            ...editSchemaShape,
+            deleted: z.number().nullable().optional(),
+            pinned: z.number().nullable().optional(),
+            edits: z.array(z.object(editSchemaShape)).optional()
+        });
+
+        const result = entrySchema.safeParse(json);
+        return result.success;
     }
 
     function stringToShortTitle(str: string): string {

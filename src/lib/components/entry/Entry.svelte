@@ -2,6 +2,7 @@
     import { browser } from '$app/environment';
     import Lazy from '$lib/components/Lazy.svelte';
     import type { EntryEdit } from '$lib/controllers/entry/entry';
+    import { nowUtc } from '$lib/utils/time';
     import { slide } from 'svelte/transition';
     import { tooltip } from '@svelte-plugins/tooltips';
     import Bin from 'svelte-material-icons/Delete.svelte';
@@ -36,7 +37,8 @@
     export let label = null as LabelController | null;
     export let latitude = null as number | null;
     export let longitude = null as number | null;
-    export let flags: number;
+    export let deleted: null | number;
+    export let pinned: null | number;
     export let wordCount: number;
     export let agentData = null as string | null;
     export let edits = [] as EntryEdit[];
@@ -60,20 +62,20 @@
     }
 
     async function deleteSelf() {
-        const deleted = Entry.Flags.isDeleted(flags);
-        if (!confirm(`Are you sure you want to ${deleted ? 'restore' : 'delete'} this entry?`)) {
-            return;
-        }
+        const thisIsDeleted = Entry.isDeleted({ deleted });
+        const fmtAction = thisIsDeleted ? 'restore' : 'delete';
+        const confirmMsg = `Are you sure you want to ${fmtAction} this entry?`;
+        if (!confirm(confirmMsg)) return;
 
         notify.onErr(
             await api.delete(apiPath('/entries/?', id), {
-                restore: !!deleted
+                restore: !!thisIsDeleted
             })
         );
 
         if (isInDialog) popup.set(null);
 
-        notify.success(`Entry ${deleted ? 'restored' : 'deleted'}`);
+        notify.success(`Entry ${thisIsDeleted ? 'restored' : 'deleted'}`);
         await dispatch.delete('entry', id);
     }
 
@@ -85,14 +87,14 @@
         );
 
         notify.success(`Entry ${!pinned ? 'favorited' : 'unfavorited'}`);
-        flags = Entry.Flags.setPinned(flags, !pinned);
         await dispatch.update('entry', {
             id,
             title,
             entry,
             created,
             createdTZOffset,
-            flags: Entry.Flags.setPinned(flags, !pinned),
+            deleted,
+            pinned: Entry.isPinned({ pinned }) ? null : nowUtc(),
             latitude,
             longitude,
             label,
@@ -108,12 +110,10 @@
 
     let showingMap = false;
 
-    $: deleted = Entry.Flags.isDeleted(flags);
-    $: pinned = Entry.Flags.isPinned(flags);
     $: entryHtml = browser ? rawMdToHtml(entry, obfuscated) : '';
     // doesn't set reactively on tooltip content if in props???
-    $: restoreDeleteTooltip = deleted ? 'Restore Entry' : 'Move Entry to Bin';
-    $: pinTooltip = pinned ? 'Unpin Entry' : 'Pin Entry';
+    $: restoreDeleteTooltip = Entry.isDeleted({ deleted }) ? 'Restore Entry' : 'Move Entry to Bin';
+    $: pinTooltip = Entry.isPinned({ pinned }) ? 'Unpin Entry' : 'Pin Entry';
 </script>
 
 <div class="entry" class:in-dialog={isInDialog} {id}>
@@ -143,7 +143,7 @@
                 </span>
             {/if}
 
-            {#if pinned}
+            {#if Entry.isPinned({ pinned })}
                 <span class="gradient-icon" use:tooltip={{ content: 'Favourited' }}>
                     <Heart size="20" />
                 </span>
@@ -194,7 +194,7 @@
                                 class="with-icon icon-gradient-on-hover"
                                 aria-label={pinTooltip}
                             >
-                                {#if pinned}
+                                {#if Entry.isPinned({ pinned })}
                                     <HeartOffOutline size="25" />
                                     Un-favourite
                                 {:else}
@@ -202,7 +202,7 @@
                                     Favourite
                                 {/if}
                             </button>
-                            {#if !deleted}
+                            {#if !Entry.isDeleted({ deleted })}
                                 <a
                                     href="/journal/{id}/edit"
                                     class="with-icon"
@@ -217,7 +217,7 @@
                                 class="with-icon danger"
                                 aria-label={restoreDeleteTooltip}
                             >
-                                {#if deleted}
+                                {#if Entry.isDeleted({ deleted })}
                                     <Restore size="25" />
                                     Remove from Bin
                                 {:else}

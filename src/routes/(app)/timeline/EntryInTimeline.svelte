@@ -14,7 +14,8 @@
     export let title: string;
     export let wordCount: number;
     export let entryTextParityHeight: boolean;
-    export let flags: number;
+    export let deleted: number | null;
+    export let pinned: number | null;
     export let label = null as Label | null;
     export let edits = [] as EntryEdit[];
     export let createdTZOffset = 0;

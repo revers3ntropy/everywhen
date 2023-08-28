@@ -35,7 +35,10 @@
     });
 
     listen.event.onCreate(event => {
-        data.events = [...data.events, event];
+        data = {
+            ...data,
+            events: [...data.events, event]
+        };
     });
     listen.event.onDelete(id => {
         data = {

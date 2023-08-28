@@ -130,7 +130,8 @@
         const entry: Mutable<Entry> = {
             ...body,
             id: res.id,
-            flags: 0,
+            deleted: null,
+            pinned: null,
             edits: [],
             label: null
         };

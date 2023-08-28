@@ -147,7 +147,8 @@
                         {showLabels}
                         {showLocations}
                         {locations}
-                        flags={0}
+                        deleted={null}
+                        pinned={null}
                         wordCount={0}
                     />
                 {/each}

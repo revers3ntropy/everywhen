@@ -61,7 +61,8 @@
             {#each (data.entry.edits || []).sort((a, b) => b.created - a.created) as edit}
                 <Entry
                     {...edit}
-                    flags={EntryController.Flags.NONE}
+                    deleted={null}
+                    pinned={null}
                     wordCount={-1}
                     obfuscated={$obfuscated}
                     isEdit={true}

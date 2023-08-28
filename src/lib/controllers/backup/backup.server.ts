@@ -46,7 +46,8 @@ export namespace BackupServer {
                 longitude: entry.longitude ?? undefined,
                 title: entry.title,
                 agentData: entry.agentData ?? undefined,
-                flags: entry.flags,
+                pinned: entry.pinned ?? undefined,
+                deleted: entry.deleted ?? undefined,
                 wordCount: entry.wordCount,
                 edits:
                     entry.edits?.map(edit => ({
@@ -178,7 +179,8 @@ export namespace BackupServer {
                 entry.entry || '',
                 entry.created || 0,
                 entry.createdTZOffset || 0,
-                entry.flags || 0,
+                entry.pinned || null,
+                entry.deleted || null,
                 entry.latitude || null,
                 entry.longitude || null,
                 entry.label || null,
@@ -269,10 +271,13 @@ export namespace BackupServer {
             // entry.deleted -> entry.flags
             if (json.entries) {
                 for (const entry of json.entries) {
-                    const e: typeof entry & { deleted?: boolean } = entry;
-                    e.flags ??= Entry.Flags.NONE;
+                    const e = entry as unknown as typeof entry & {
+                        deleted?: boolean;
+                        flags?: number;
+                    };
+                    e.flags ??= 0;
                     if (e.deleted) {
-                        e.flags |= Entry.Flags.DELETED;
+                        e.flags |= 1;
                     }
                     delete e.deleted;
                 }
@@ -284,6 +289,29 @@ export namespace BackupServer {
             if (json.entries) {
                 for (const entry of json.entries) {
                     entry.wordCount = wordCount(entry.entry);
+                }
+            }
+        }
+
+        if (version.isLessThan(SemVer.fromString('0.5.94').unwrap())) {
+            // entry.flags -> entry.deleted, entry.pinned
+            if (json.entries) {
+                for (const entry of json.entries) {
+                    const e: typeof entry & { flags?: number } = entry;
+                    e.flags ??= 0;
+                    if (e.flags === 0) {
+                        delete e.deleted;
+                        delete e.pinned;
+                    } else if (e.flags === 1) {
+                        e.deleted = nowUtc();
+                        delete e.pinned;
+                    } else if (e.flags === 2) {
+                        delete e.deleted;
+                        e.pinned = nowUtc();
+                    } else if (e.flags === 3) {
+                        e.deleted = nowUtc();
+                        e.pinned = nowUtc();
+                    }
                 }
             }
         }

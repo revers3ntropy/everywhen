@@ -16,33 +16,35 @@ export async function entryFromId(
     mustNotBeDeleted = true
 ): Promise<Result<Entry>> {
     const entries = await query<RawEntry[]>`
-            SELECT label,
-                   flags,
-                   id,
-                   created,
-                   createdTZOffset,
-                   title,
-                   entry,
-                   latitude,
-                   longitude,
-                   agentData,
-                   wordCount
-            FROM entries
-            WHERE id = ${id}
-              AND user = ${auth.id}
-        `;
+        SELECT label,
+               deleted,
+               pinned,
+               id,
+               created,
+               createdTZOffset,
+               title,
+               entry,
+               latitude,
+               longitude,
+               agentData,
+               wordCount
+        FROM entries
+        WHERE id = ${id}
+          AND user = ${auth.id}
+    `;
 
     if (entries.length !== 1) {
         return Result.err('Entry not found');
     }
-    if (mustNotBeDeleted && Entry.isDeleted(entries[0])) {
+    const [entry] = entries;
+    if (mustNotBeDeleted && Entry.isDeleted(entry)) {
         return Result.err('Entry is deleted');
     }
 
     const { val: labels, err: labelErr } = await Label.all(query, auth);
     if (labelErr) return Result.err(labelErr);
 
-    return await fromRaw(auth, entries[0], labels);
+    return await fromRaw(auth, entry, labels);
 }
 
 async function fromRaw(auth: Auth, rawEntry: RawEntry, labels: Label[]): Promise<Result<Entry>> {
@@ -65,7 +67,8 @@ async function fromRaw(auth: Auth, rawEntry: RawEntry, labels: Label[]): Promise
         entry: decryptedEntry,
         created: rawEntry.created,
         createdTZOffset: rawEntry.createdTZOffset,
-        flags: rawEntry.flags,
+        pinned: rawEntry.pinned,
+        deleted: rawEntry.deleted,
         latitude: rawEntry.latitude,
         longitude: rawEntry.longitude,
         agentData: decryptedAgent,
@@ -92,22 +95,22 @@ async function fromRaw(auth: Auth, rawEntry: RawEntry, labels: Label[]): Promise
 
 async function addEdits(auth: Auth, self: Entry, labels: Label[]): Promise<Result<Entry>> {
     const rawEdits = await query<RawEntryEdit[]>`
-            SELECT 
-                entryEdits.id, 
-                entryEdits.created, 
-                entryEdits.createdTZOffset, 
-                entryEdits.latitude, 
-                entryEdits.longitude, 
-                entryEdits.title, 
-                entryEdits.entry, 
-                entryEdits.label, 
-                entryEdits.agentData
-            FROM entryEdits, entries
-            WHERE entries.id = ${self.id}
-                AND entryEdits.entryId = entries.id
-                AND entries.user = ${auth.id}
-            ORDER BY entryEdits.created DESC
-        `;
+        SELECT 
+            entryEdits.id, 
+            entryEdits.created, 
+            entryEdits.createdTZOffset, 
+            entryEdits.latitude, 
+            entryEdits.longitude, 
+            entryEdits.title, 
+            entryEdits.entry, 
+            entryEdits.label, 
+            entryEdits.agentData
+        FROM entryEdits, entries
+        WHERE entries.id = ${self.id}
+            AND entryEdits.entryId = entries.id
+            AND entries.user = ${auth.id}
+        ORDER BY entryEdits.created DESC
+    `;
 
     const { err, val: edits } = await Result.collectAsync(
         rawEdits.map(e => Entry.Server.fromRawEdit(auth, labels, e))

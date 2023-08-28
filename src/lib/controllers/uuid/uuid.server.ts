@@ -37,7 +37,6 @@ export namespace UId.Server {
 
     async function getSingleUniqueId(): Promise<string> {
         let id = generateId();
-
         while (await uuidExists(id)) {
             id = generateId();
         }
@@ -47,9 +46,10 @@ export namespace UId.Server {
     }
 
     export async function generate(): Promise<UId> {
+        console.log({ buffer });
         const fromBuffer = buffer.pop();
         if (fromBuffer) return fromBuffer;
         await repopulateBuffer();
-        return getSingleUniqueId();
+        return await getSingleUniqueId();
     }
 }

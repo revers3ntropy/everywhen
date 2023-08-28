@@ -19,11 +19,10 @@ import { Entry as _Entry, type EntryEdit, type RawEntryEdit, type Streaks } from
 
 namespace EntryServer {
     type Entry = _Entry;
-    const Entry = _Entry;
 
     export async function del(auth: Auth, id: string, restore: boolean): Promise<Result<null>> {
-        const entries = await query<{ flags: number }[]>`
-            SELECT flags
+        const entries = await query<{ deleted: number | null }[]>`
+            SELECT deleted
             FROM entries
             WHERE id = ${id}
               AND user = ${auth.id}
@@ -35,11 +34,9 @@ namespace EntryServer {
             return Result.err(restore ? 'Entry is not deleted' : 'Entry already deleted');
         }
 
-        const newFlags = Entry.Flags.setDeleted(entries[0].flags, !restore);
-
         await query`
             UPDATE entries
-            SET flags = ${newFlags},
+            SET deleted = ${restore ? null : nowUtc()},
                 label = ${null}
             WHERE entries.id = ${id}
               AND user = ${auth.id}
@@ -70,7 +67,8 @@ namespace EntryServer {
         entry: string,
         created: TimestampSecs,
         createdTZOffset: Hours,
-        flags: number,
+        pinned: number | null,
+        deleted: number | null,
         latitude: number | null,
         longitude: number | null,
         label: string | null,
@@ -99,7 +97,7 @@ namespace EntryServer {
 
         await query`
             INSERT INTO entries
-                (id, user, title, entry, created, createdTZOffset, flags,
+                (id, user, title, entry, created, createdTZOffset, deleted, pinned,
                  label, latitude, longitude, agentData, wordCount)
             VALUES (${id},
                     ${auth.id},
@@ -107,7 +105,8 @@ namespace EntryServer {
                     ${encryptedEntry},
                     ${created},
                     ${createdTZOffset},
-                    ${flags},
+                    ${deleted ?? null},
+                    ${pinned ?? null},
                     ${label ?? null},
                     ${latitude ?? null},
                     ${longitude ?? null},
@@ -120,11 +119,13 @@ namespace EntryServer {
             const encryptedEditEntry = encrypt(edit.entry, auth.key);
             const encryptedAgentData = encrypt(edit.agentData || '', auth.key);
 
+            const editId = await UId.Server.generate();
+
             await query`
                 INSERT INTO entryEdits
                     (id, entryId, title, entry,
                      created, createdTZOffset, label, latitude, longitude, agentData)
-                VALUES (${edit.id},
+                VALUES (${editId},
                         ${id},
                         ${encryptedEditTitle},
                         ${encryptedEditEntry},
@@ -143,7 +144,8 @@ namespace EntryServer {
             entry,
             created,
             createdTZOffset,
-            flags,
+            deleted,
+            pinned,
             latitude,
             longitude,
             label: label ? labels.find(l => l.id === label) || null : null,
@@ -162,22 +164,22 @@ namespace EntryServer {
         self: Entry,
         pinned: boolean
     ): Promise<Result<Entry>> {
-        if (_Entry.isPinned(self) === pinned) {
+        if (Entry.isPinned(self) === pinned) {
             return Result.ok(self);
         }
 
-        const newFlags = _Entry.Flags.setPinned(self.flags, pinned);
+        const newPinnedValue = pinned ? nowUtc() : null;
 
         await query`
             UPDATE entries
-            SET flags = ${newFlags}
+            SET pinned = ${newPinnedValue}
             WHERE id = ${self.id}
               AND user = ${auth.id}
         `;
 
         return Result.ok({
             ...self,
-            flags: newFlags
+            pinned: newPinnedValue
         });
     }
 
@@ -277,7 +279,7 @@ namespace EntryServer {
         const entries = await query<{ created: number; createdTZOffset: number }[]>`
             SELECT created, createdTZOffset
             FROM entries
-            WHERE (flags & ${_Entry.Flags.DELETED}) = 0
+            WHERE deleted IS NULL
               AND user = ${auth.id}
             ORDER BY created DESC, id
         `;

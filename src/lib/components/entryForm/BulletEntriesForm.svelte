@@ -5,7 +5,7 @@
     import LocationToggle from '$lib/components/location/LocationToggle.svelte';
     import LabelSelect from '$lib/components/label/LabelSelect.svelte';
     import TextBoxOutline from 'svelte-material-icons/TextBoxOutline.svelte';
-    import { Entry } from '$lib/controllers/entry/entry';
+    import type { Entry } from '$lib/controllers/entry/entry';
     import type { Label } from '$lib/controllers/label/label';
     import { dispatch, listen } from '$lib/dataChangeEvents';
     import { notify } from '$lib/components/notifications/notifications';
@@ -59,7 +59,8 @@
         const newEntry: Mutable<Entry> = {
             ...body,
             id: res.id,
-            flags: Entry.Flags.NONE,
+            deleted: null,
+            pinned: null,
             edits: [],
             label: null
         };

@@ -1,5 +1,4 @@
 import type { Auth } from '$lib/controllers/auth/auth.server';
-import { Entry as _Entry } from '$lib/controllers/entry/entry';
 import type { EntryEdit, EntryFilter, RawEntry } from '$lib/controllers/entry/entry';
 import { Entry } from '$lib/controllers/entry/entry.server';
 import { Label } from '$lib/controllers/label/label';
@@ -32,7 +31,8 @@ export async function all(auth: Auth, filter: EntryFilter = {}): Promise<Result<
                created,
                createdTZOffset,
                title,
-               flags,
+               deleted,
+               pinned,
                label,
                entry,
                latitude,
@@ -40,20 +40,29 @@ export async function all(auth: Auth, filter: EntryFilter = {}): Promise<Result<
                agentData,
                wordCount
         FROM entries
-        WHERE ((flags & ${Entry.Flags.DELETED}) = ${filter.deleted ? Entry.Flags.DELETED : 0} OR ${
-            filter.deleted === 'both'
-        })
-          AND (label = ${filter.labelId || ''} OR ${filter.labelId === undefined})
-          AND (${!filter.onlyWithLocation} OR (latitude IS NOT NULL AND longitude IS NOT NULL))
-          AND (${!location} OR (
-                latitude IS NOT NULL
-                AND longitude IS NOT NULL
-                AND SQRT(
+        WHERE (
+                (deleted IS NULL = ${!filter.deleted})
+                OR ${filter.deleted === 'both'}
+            )
+            AND (
+                (label = ${filter.labelId || ''})
+                OR ${filter.labelId === undefined}
+            )
+            AND (
+              ${!filter.onlyWithLocation} 
+              OR (latitude IS NOT NULL AND longitude IS NOT NULL)
+            )
+            AND (
+                ${!location} OR (
+                    latitude IS NOT NULL
+                    AND longitude IS NOT NULL
+                    AND SQRT(
                             POW(latitude - ${location?.latitude || 0}, 2)
                             + POW(longitude - ${location?.longitude || 0}, 2)
                     ) <= ${(location?.radius || 0) * 2}
-            ))
-          AND user = ${auth.id}
+                )
+            )
+            AND user = ${auth.id}
         ORDER BY created DESC, id
     `;
 
@@ -85,7 +94,8 @@ export async function getPage(
                    created,
                    createdTZOffset,
                    title,
-                   flags,
+                   pinned,
+                   deleted,
                    label,
                    entry,
                    latitude,
@@ -93,10 +103,11 @@ export async function getPage(
                    agentData,
                    wordCount
             FROM entries
-            WHERE ((flags & ${Entry.Flags.DELETED}) = ${
-                filter.deleted ? Entry.Flags.DELETED : 0
-            } OR ${filter.deleted === 'both'})
-                  AND (label = ${filter.labelId || ''} OR ${filter.labelId === undefined})
+            WHERE (           
+                (deleted IS NULL = ${!filter.deleted})
+                OR ${filter.deleted === 'both'}
+              )
+              AND (label = ${filter.labelId || ''} OR ${filter.labelId === undefined})
               AND user = ${auth.id}
             ORDER BY created DESC, id
             LIMIT ${count}
@@ -107,12 +118,13 @@ export async function getPage(
         if (err) return Result.err(err);
 
         const [{ totalCount }] = await query<{ totalCount: number }[]>`
-           SELECT COUNT(*) as totalCount 
+            SELECT COUNT(*) as totalCount 
             FROM entries
-            WHERE ((flags & ${Entry.Flags.DELETED}) = ${
-                filter.deleted ? Entry.Flags.DELETED : 0
-            } OR ${filter.deleted === 'both'})
-                    AND (label = ${filter.labelId || ''} OR ${filter.labelId === undefined})
+            WHERE (
+                (deleted IS NULL = ${!filter.deleted})
+                OR ${filter.deleted === 'both'}
+                )
+                AND (label = ${filter.labelId || ''} OR ${filter.labelId === undefined})
                 AND user = ${auth.id}
         `;
 
@@ -136,29 +148,31 @@ export async function near(
     deleted: boolean | 'both' = false
 ): Promise<Result<Entry[]>> {
     const raw = await query<RawEntry[]>`
-            SELECT id,
-                   created,
-                   createdTZOffset,
-                   flags,
-                   latitude,
-                   longitude,
-                   title,
-                   entry,
-                   label,
-                   agentData,
-                   wordCount
-            FROM entries
-            WHERE ((flags & ${_Entry.Flags.DELETED}) = ${deleted ? _Entry.Flags.DELETED : 0} OR ${
-                deleted === 'both'
-            })
-            AND user = ${auth.id}
-            AND latitude IS NOT NULL
-            AND longitude IS NOT NULL
-            AND SQRT(
-                POW(latitude - ${location.latitude}, 2)
-                + POW(longitude - ${location.longitude}, 2)
-            ) <= ${location.radius}
-        `;
+        SELECT id,
+               created,
+               createdTZOffset,
+               deleted,
+               pinned,
+               latitude,
+               longitude,
+               title,
+               entry,
+               label,
+               agentData,
+               wordCount
+        FROM entries
+        WHERE (
+            (deleted IS NULL = ${!deleted})
+            OR ${deleted === 'both'}
+        )
+        AND user = ${auth.id}
+        AND latitude IS NOT NULL
+        AND longitude IS NOT NULL
+        AND SQRT(
+            POW(latitude - ${location.latitude}, 2)
+            + POW(longitude - ${location.longitude}, 2)
+        ) <= ${location.radius}
+    `;
     return await fromRawMulti(auth, raw);
 }
 
@@ -174,20 +188,20 @@ function filterEntriesBySearchTerm(entries: Entry[], searchTerm: string): Entry[
 
 async function fromRawMulti(auth: Auth, raw: RawEntry[]): Promise<Result<Entry[]>> {
     const rawEdits = await query<(RawEntry & { entryId: string })[]>`
-            SELECT entryEdits.created,
-                   entryEdits.entryId,
-                   entryEdits.createdTZOffset,
-                   entryEdits.latitude,
-                   entryEdits.longitude,
-                   entryEdits.title,
-                   entryEdits.entry,
-                   entryEdits.label,
-                   entryEdits.agentData
-            FROM entryEdits,
-                 entries
-            WHERE entries.user = ${auth.id}
-              AND entries.id = entryEdits.entryId
-        `;
+        SELECT entryEdits.created,
+               entryEdits.entryId,
+               entryEdits.createdTZOffset,
+               entryEdits.latitude,
+               entryEdits.longitude,
+               entryEdits.title,
+               entryEdits.entry,
+               entryEdits.label,
+               entryEdits.agentData
+        FROM entryEdits,
+             entries
+        WHERE entries.user = ${auth.id}
+          AND entries.id = entryEdits.entryId
+    `;
 
     const { err, val: labels } = await Label.all(query, auth);
     if (err) return Result.err(err);
@@ -233,7 +247,8 @@ async function fromRawMulti(auth: Auth, raw: RawEntry[]): Promise<Result<Entry[]
                 entry: decryptedEntry,
                 created: rawEntry.created,
                 createdTZOffset: rawEntry.createdTZOffset,
-                flags: rawEntry.flags,
+                deleted: rawEntry.deleted,
+                pinned: rawEntry.pinned,
                 latitude: rawEntry.latitude,
                 longitude: rawEntry.longitude,
                 agentData: decryptedAgentData,

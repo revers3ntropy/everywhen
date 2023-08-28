@@ -23,7 +23,8 @@ CREATE TABLE entries
     title           text         NULL,
     entry           longtext     NOT NULL,
     label           char(32)     DEFAULT NULL,
-    flags           int(8)       DEFAULT 0,
+    deleted         int(64)      DEFAULT NULL,
+    pinned          int(64)      DEFAULT NULL,
     agentData       longtext     NOT NULL,
     wordCount       int(32)      NOT NULL DEFAULT -1,
     PRIMARY KEY (id)
