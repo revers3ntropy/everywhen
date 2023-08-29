@@ -4,7 +4,7 @@
     import Synced from 'svelte-material-icons/CloudCheckOutline.svelte';
     import Bin from 'svelte-material-icons/Delete.svelte';
     import type { ChangeEventHandler } from 'svelte/elements';
-    import { Location } from '$lib/controllers/location/location.client';
+    import { Location } from '$lib/controllers/location/location';
     import { popup } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';

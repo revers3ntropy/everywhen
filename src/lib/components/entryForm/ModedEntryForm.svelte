@@ -1,7 +1,7 @@
 <script lang="ts">
     import BookSpinner from '$lib/components/BookSpinner.svelte';
     import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
-    import type { SettingsKey } from '$lib/controllers/settings/settings';
+    import type { SettingsKey } from '$lib/controllers/settings/settings.server';
     import { api } from '$lib/utils/apiRequest';
     import EntryForm from './EntryForm.svelte';
     import BulletEntriesForm from '$lib/components/entryForm/BulletEntriesForm.svelte';

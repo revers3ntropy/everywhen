@@ -1,7 +1,6 @@
 import { GITHUB_AUTH_CLIENT_SECRET } from '$env/static/private';
 import { PUBLIC_GITHUB_AUTH_CLIENT_ID } from '$env/static/public';
-import { Settings } from '$lib/controllers/settings/settings';
-import type { QueryFunc } from '$lib/db/mysql.server';
+import { Settings } from '$lib/controllers/settings/settings.server';
 import { errorLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 import type { Auth } from '$lib/controllers/auth/auth';
@@ -78,7 +77,6 @@ export namespace ghAPI {
     }
 
     export async function linkToGitHubOAuth(
-        query: QueryFunc,
         auth: Auth,
         code: string,
         state: string
@@ -86,8 +84,7 @@ export namespace ghAPI {
         const { err, val: accessToken } = await getGitHubOAuthAccessToken(code, state);
         if (err) return Result.err(err);
 
-        const { err: saveErr } = await Settings.update(
-            query,
+        const { err: saveErr } = await Settings.Server.update(
             auth,
             'gitHubAccessToken',
             accessToken
@@ -97,8 +94,8 @@ export namespace ghAPI {
         return Result.ok(accessToken);
     }
 
-    export async function unlinkToGitHubOAuth(query: QueryFunc, auth: Auth): Promise<Result<null>> {
-        const { err: saveErr } = await Settings.update(query, auth, 'gitHubAccessToken', '');
+    export async function unlinkToGitHubOAuth(auth: Auth): Promise<Result<null>> {
+        const { err: saveErr } = await Settings.Server.update(auth, 'gitHubAccessToken', '');
         if (saveErr) return Result.err(saveErr);
         return Result.ok(null);
     }
@@ -111,7 +108,9 @@ export namespace ghAPI {
         if (!gitHubAccessToken) {
             return Result.err('No GitHub account is linked');
         }
-        if (path[0] !== '/') throw new Error('Path must start with /');
+        if (!path.startsWith('/')) {
+            throw new Error('GH API request path must start with /');
+        }
 
         let res;
         try {

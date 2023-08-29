@@ -1,18 +1,16 @@
 import { v4 as UUIdv4 } from 'uuid';
 import { query } from '$lib/db/mysql.server';
 
-export type UId = string;
-
 export namespace UId.Server {
     const BUFFER_SIZE = 10;
 
-    const buffer: UId[] = [];
+    const buffer: string[] = [];
 
     function generateId(): string {
         return UUIdv4().replace(/-/g, '');
     }
 
-    async function uuidExists(id: UId): Promise<boolean> {
+    async function uuidExists(id: string): Promise<boolean> {
         const res = await query.unlogged<{ id: string }[]>`
             SELECT id FROM ids WHERE id = ${id}
         `;
@@ -45,7 +43,7 @@ export namespace UId.Server {
         return id;
     }
 
-    export async function generate(): Promise<UId> {
+    export async function generate(): Promise<string> {
         const fromBuffer = buffer.pop();
         if (fromBuffer) return fromBuffer;
         await repopulateBuffer();

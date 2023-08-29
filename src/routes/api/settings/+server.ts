@@ -1,6 +1,6 @@
+import type { SettingsKey } from '$lib/controllers/settings/settings';
 import { error } from '@sveltejs/kit';
-import { Settings, type SettingsKey } from '$lib/controllers/settings/settings';
-import { query } from '$lib/db/mysql.server';
+import { Settings } from '$lib/controllers/settings/settings.server';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
@@ -8,7 +8,7 @@ import type { RequestHandler } from './$types';
 import { Auth } from '$lib/controllers/auth/auth.server';
 
 export const GET = cachedApiRoute(async auth => {
-    const { err, val: settings } = await Settings.allAsMap(query, auth);
+    const { err, val: settings } = await Settings.Server.allAsMap(auth);
     if (err) throw error(500, err);
     return {
         settings: Settings.fillWithDefaults(settings)
@@ -31,8 +31,7 @@ export const PUT = (async ({ request, cookies }) => {
         throw error(400, 'Invalid key');
     }
 
-    const { val: setting, err } = await Settings.update(
-        query,
+    const { val: setting, err } = await Settings.Server.update(
         auth,
         key as SettingsKey,
         body.value

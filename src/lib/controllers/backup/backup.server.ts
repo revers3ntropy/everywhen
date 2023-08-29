@@ -1,18 +1,17 @@
-import { Location } from '$lib/controllers/location/location';
-import { query } from '$lib/db/mysql.server';
+import { z } from 'zod';
+import schemion from 'schemion';
 import { SemVer } from '$lib/utils/semVer';
 import { wordCount } from '$lib/utils/text';
-import schemion from 'schemion';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
 import { nowUtc } from '$lib/utils/time';
-import { z } from 'zod';
 import { Entry } from '../entry/entry.server';
 import { Event } from '../event/event.server';
 import { Label } from '../label/label.server';
+import { Asset } from '$lib/controllers/asset/asset.server';
+import { Location } from '$lib/controllers/location/location.server';
 import { Backup as _Backup } from './backup';
 import type { Auth } from '$lib/controllers/auth/auth';
-import { Asset } from '$lib/controllers/asset/asset.server';
 
 export namespace BackupServer {
     type Backup = _Backup;
@@ -32,7 +31,7 @@ export namespace BackupServer {
         if (labelsErr) return Result.err(labelsErr);
         const { err: assetsErr, val: assets } = await Asset.Server.all(auth);
         if (assetsErr) return Result.err(assetsErr);
-        const { err: locationsErr, val: locations } = await Location.all(query, auth);
+        const { err: locationsErr, val: locations } = await Location.Server.all(auth);
         if (locationsErr) return Result.err(locationsErr);
 
         return Result.ok({
@@ -264,15 +263,14 @@ export namespace BackupServer {
             if (err) return Result.err(err);
         }
 
-        await Location.purgeAll(query, auth);
+        await Location.Server.purgeAll(auth);
 
         for (const location of locations) {
             if (!Location.jsonIsRawLocation(location)) {
                 return Result.err('Invalid location format in JSON');
             }
 
-            const { err } = await Location.create(
-                query,
+            const { err } = await Location.Server.create(
                 auth,
                 location.created,
                 location.createdTZOffset,

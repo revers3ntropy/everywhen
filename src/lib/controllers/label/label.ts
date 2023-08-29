@@ -5,7 +5,7 @@ export interface Label {
     created: number;
 }
 
-export type LabelWithCount = Label & {
+export interface LabelWithCount extends Label {
     entryCount: number;
     eventCount: number;
-};
+}

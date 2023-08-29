@@ -1,6 +1,5 @@
 import { ghAPI } from '$lib/controllers/ghAPI/ghAPI.server';
 import { Settings } from '$lib/controllers/settings/settings.server';
-import { query } from '$lib/db/mysql.server';
 import { apiRes404 } from '$lib/utils/apiResponse.server';
 import { cachedApiRoute } from '$lib/utils/cache.server';
 import { error } from '@sveltejs/kit';
@@ -9,7 +8,7 @@ import type { RequestHandler } from './$types';
 // TODO think about a better caching strategy for this,
 // as it could change externally
 export const GET = cachedApiRoute(async auth => {
-    const { val: settings, err: getSettingsErr } = await Settings.allAsMapWithDefaults(query, auth);
+    const { val: settings, err: getSettingsErr } = await Settings.Server.allAsMapWithDefaults(auth);
     if (getSettingsErr) throw error(500, getSettingsErr);
 
     if (!settings.gitHubAccessToken.value) {

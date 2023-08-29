@@ -1,5 +1,4 @@
 import { ghAPI } from '$lib/controllers/ghAPI/ghAPI.server';
-import { query } from '$lib/db/mysql.server';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 import { invalidateCache } from '$lib/utils/cache.server';
 import { errorLogger } from '$lib/utils/log.server';
@@ -17,12 +16,7 @@ export const POST = (async ({ request, cookies }) => {
         code: 'string'
     });
 
-    const { val: accessToken, err } = await ghAPI.linkToGitHubOAuth(
-        query,
-        auth,
-        body.code,
-        body.state
-    );
+    const { val: accessToken, err } = await ghAPI.linkToGitHubOAuth(auth, body.code, body.state);
     if (err) {
         await errorLogger.error(err);
         throw error(500, 'Internal server error');
@@ -35,7 +29,7 @@ export const DELETE = (async ({ cookies }) => {
     const auth = Auth.Server.getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
-    await ghAPI.unlinkToGitHubOAuth(query, auth);
+    await ghAPI.unlinkToGitHubOAuth(auth);
 
     return apiResponse(auth, {});
 }) satisfies RequestHandler;

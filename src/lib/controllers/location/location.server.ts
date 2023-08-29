@@ -1,16 +1,15 @@
 import { MAXIMUM_ENTITIES } from '$lib/constants';
 import { query } from '$lib/db/mysql.server';
 import type { ResultSetHeader } from 'mysql2';
-import type { QueryFunc } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
 import { Location as _Location } from './location';
 import type { Auth } from '$lib/controllers/auth/auth.server';
 import { UId } from '$lib/controllers/uuid/uuid.server';
 
-export type Location = _Location;
+namespace LocationServer {
+    type Location = _Location;
 
-namespace LocationUtils {
     async function canCreateWithName(auth: Auth, name: string): Promise<true | string> {
         if (!name) return 'Location name too short';
         if (name.length > 100) return 'Location name too long (> 100 characters)';
@@ -30,8 +29,8 @@ namespace LocationUtils {
 
         return true;
     }
+
     export async function create(
-        query: QueryFunc,
         auth: Auth,
         created: number,
         createdTZOffset: number,
@@ -64,7 +63,7 @@ namespace LocationUtils {
         return Result.ok({ id, created, createdTZOffset, name, latitude, longitude, radius });
     }
 
-    export async function all(query: QueryFunc, auth: Auth): Promise<Result<Location[]>> {
+    export async function all(auth: Auth): Promise<Result<Location[]>> {
         return fromRaw(
             auth,
             await query<Location[]>`
@@ -95,7 +94,6 @@ namespace LocationUtils {
     }
 
     export async function search(
-        query: QueryFunc,
         auth: Auth,
         lat: number,
         lng: number
@@ -140,11 +138,7 @@ namespace LocationUtils {
         return Result.ok({ locations, nearby });
     }
 
-    export async function fromId(
-        query: QueryFunc,
-        auth: Auth,
-        id: string
-    ): Promise<Result<Location>> {
+    export async function fromId(auth: Auth, id: string): Promise<Result<Location>> {
         const { val, err } = fromRaw(
             auth,
             await query<Location[]>`
@@ -160,7 +154,6 @@ namespace LocationUtils {
     }
 
     export async function updateName(
-        query: QueryFunc,
         auth: Auth,
         location: Location,
         newName: string
@@ -186,7 +179,6 @@ namespace LocationUtils {
     }
 
     export async function updateRadius(
-        query: QueryFunc,
         auth: Auth,
         location: Location,
         newRadius: number
@@ -206,7 +198,6 @@ namespace LocationUtils {
     }
 
     export async function updateLocation(
-        query: QueryFunc,
         auth: Auth,
         location: Location,
         newLatitude: number,
@@ -233,7 +224,7 @@ namespace LocationUtils {
         });
     }
 
-    export async function purge(query: QueryFunc, auth: Auth, id: string): Promise<Result<null>> {
+    export async function purge(auth: Auth, id: string): Promise<Result<null>> {
         const res = await query<ResultSetHeader>`
             DELETE
             FROM locations
@@ -246,7 +237,7 @@ namespace LocationUtils {
         return Result.ok(null);
     }
 
-    export async function purgeAll(query: QueryFunc, auth: Auth): Promise<Result<null>> {
+    export async function purgeAll(auth: Auth): Promise<Result<null>> {
         await query`
             DELETE
             FROM locations
@@ -256,4 +247,9 @@ namespace LocationUtils {
     }
 }
 
-export const Location = LocationUtils;
+export const Location = {
+    ..._Location,
+    Server: LocationServer
+};
+
+export type Location = _Location;

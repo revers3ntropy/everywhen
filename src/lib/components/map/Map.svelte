@@ -20,7 +20,7 @@
     import Overlay from 'ol/Overlay';
     import { fromLonLat, toLonLat } from 'ol/proj';
     import ContextMenu from 'ol-contextmenu';
-    import { Location } from '$lib/controllers/location/location.client';
+    import { Location } from '$lib/controllers/location/location';
     import { popup, settingsStore } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { showPopup } from '$lib/utils/popups';

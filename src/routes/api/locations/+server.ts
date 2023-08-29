@@ -1,6 +1,5 @@
 import { error } from '@sveltejs/kit';
-import { Location } from '$lib/controllers/location/location';
-import { query } from '$lib/db/mysql.server';
+import { Location } from '$lib/controllers/location/location.server';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
@@ -22,12 +21,12 @@ export const GET = cachedApiRoute(async (auth, { url }) => {
     }
 
     if (!lat || !lng) {
-        const { err, val: locations } = await Location.all(query, auth);
+        const { err, val: locations } = await Location.Server.all(auth);
         if (err) throw error(500, err);
         return { locations };
     }
 
-    const { err, val: locations } = await Location.search(query, auth, lat, lng);
+    const { err, val: locations } = await Location.Server.search(auth, lat, lng);
     if (err) throw error(500, err);
     return { ...locations };
 }) satisfies RequestHandler;
@@ -54,8 +53,7 @@ export const POST = (async ({ request, cookies }) => {
         }
     );
 
-    const { val, err } = await Location.create(
-        query,
+    const { val, err } = await Location.Server.create(
         auth,
         body.created,
         body.timezoneUtcOffset,

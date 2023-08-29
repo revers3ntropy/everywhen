@@ -6,13 +6,14 @@
     import LockOutline from 'svelte-material-icons/LockOutline.svelte';
     import Skull from 'svelte-material-icons/Skull.svelte';
     import ChangePasswordDialog from '$lib/components/dialogs/ChangePasswordDialog.svelte';
-    import type { SettingConfig, SettingValue } from '$lib/controllers/settings/settings';
     import { showPopup } from '$lib/utils/popups';
     import BackupOptions from '$lib/components/BackupOptions.svelte';
     import {
         type SettingsKey,
+        type SettingConfig,
+        type SettingValue,
         Settings as SettingsController
-    } from '$lib/controllers/settings/settings.client';
+    } from '$lib/controllers/settings/settings';
     import Settings from './Settings.svelte';
     import type { PageData } from './$types';
     import { settingsStore } from '$lib/stores';

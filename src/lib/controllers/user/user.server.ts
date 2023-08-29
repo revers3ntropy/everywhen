@@ -1,6 +1,5 @@
 import { Backup } from '$lib/controllers/backup/backup.server';
 import { query } from '$lib/db/mysql.server';
-import type { QueryFunc } from '$lib/db/mysql.server';
 import { Result } from '$lib/utils/result';
 import { currentVersion } from '$lib/utils/semVer';
 import { nowUtc } from '$lib/utils/time';
@@ -8,7 +7,7 @@ import crypto from 'crypto';
 import { Entry } from '../entry/entry.server';
 import { Event } from '../event/event.server';
 import { Label } from '../label/label.server';
-import { Settings } from '../settings/settings';
+import { Settings } from '../settings/settings.server';
 import type { User as _User } from './user';
 import { UId } from '$lib/controllers/uuid/uuid.server';
 import { Auth } from '$lib/controllers/auth/auth.server';
@@ -54,7 +53,7 @@ export namespace UserServer {
         const { err } = await newUserIsValid(username, password);
         if (err) return Result.err(err);
 
-        const salt = await generateSalt(query);
+        const salt = await generateSalt();
         const id = await UId.Server.generate();
 
         await query`
@@ -76,7 +75,7 @@ export namespace UserServer {
         await Entry.Server.purgeAll(auth);
         await Asset.Server.purgeAll(auth);
         await Event.Server.purgeAll(auth);
-        await Settings.purgeAll(query, auth);
+        await Settings.Server.purgeAll(auth);
         Auth.Server.invalidateAllSessionsForUser(auth.id);
 
         await query`
@@ -86,7 +85,7 @@ export namespace UserServer {
         `;
     }
 
-    async function generateSalt(query: QueryFunc): Promise<string> {
+    async function generateSalt(): Promise<string> {
         let salt = '';
         let existingSalts: { salt: string }[];
         do {
@@ -145,7 +144,7 @@ export namespace UserServer {
         const { err } = await Backup.Server.restore(newAuth, encryptedBackup, auth.key);
         if (err) return Result.err(err);
 
-        return await Settings.changeEncryptionKeyInDB(query, auth, newKey);
+        return await Settings.Server.changeEncryptionKeyInDB(auth, newKey);
     }
 }
 

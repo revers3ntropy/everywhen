@@ -1,5 +1,4 @@
-import * as server from './settings.server';
-import * as client from './settings.client';
+import { settingsConfig } from './settingsConfig';
 
 export type SettingValue = string | boolean | number;
 
@@ -19,10 +18,23 @@ export interface Settings<T = unknown> {
     value: T;
 }
 
-export type SettingsKey = client.SettingsKey;
-export type SettingsConfig = client.SettingsConfig;
-
-export const Settings = {
-    ...server.Settings,
-    ...client.Settings
+export type SettingsKey = keyof typeof settingsConfig;
+export type SettingsConfig = {
+    [key in SettingsKey]: Settings<(typeof settingsConfig)[key]['defaultValue']>;
 };
+
+export namespace Settings {
+    export function convertToMap(settings: Settings[]): SettingsConfig {
+        return Object.fromEntries(settings.map(s => [s.key, s])) as SettingsConfig;
+    }
+
+    export function fillWithDefaults(map: Record<string, Settings>): SettingsConfig {
+        const newMap = { ...map };
+        for (const [key, config] of Object.entries(settingsConfig)) {
+            newMap[key] ||= { id: '', created: 0, key, value: config.defaultValue };
+        }
+        return newMap as SettingsConfig;
+    }
+
+    export const config = settingsConfig;
+}

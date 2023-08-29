@@ -1,21 +1,22 @@
-import type { QueryFunc } from '$lib/db/mysql.server';
+import { query } from '$lib/db/mysql.server';
 import { roundNDP } from '$lib/utils/text';
 
-namespace PageLoadLogUtils {
-    export async function createLog(
-        query: QueryFunc,
-        created: TimestampSecs,
-        method: string,
-        url: string,
-        route: string,
-        responseTimeMs: Milliseconds,
-        responseCode: number,
-        userId: string,
-        userAgent: string,
-        requestSize: number,
-        resultSize: number,
-        ipAddress: string
-    ) {
+export interface PageLoadLog {
+    created: TimestampSecs;
+    method: string;
+    url: string;
+    route: string;
+    responseTimeMs: Milliseconds;
+    responseCode: number;
+    userId: string;
+    userAgent: string;
+    requestSize: number;
+    resultSize: number;
+    ipAddress: string;
+}
+
+export namespace PageLoadLog {
+    export async function createLog(log: PageLoadLog) {
         await query`
             INSERT INTO pageLoads (
                 user, created, method, url, 
@@ -23,22 +24,18 @@ namespace PageLoadLogUtils {
                 userAgent, requestSize, responseSize,
                 ipAddress
             ) VALUES (
-                      ${userId},
-                      ${created},
-                      ${method},
-                      ${url},
-                      ${route},
-                      ${roundNDP(responseTimeMs, 3)},
-                      ${responseCode},
-                      ${userAgent},
-                      ${requestSize},
-                      ${resultSize},
-                      ${ipAddress}
+                      ${log.userId},
+                      ${log.created},
+                      ${log.method},
+                      ${log.url},
+                      ${log.route},
+                      ${roundNDP(log.responseTimeMs, 3)},
+                      ${log.responseCode},
+                      ${log.userAgent},
+                      ${log.requestSize},
+                      ${log.resultSize},
+                      ${log.ipAddress}
           )
         `;
     }
 }
-
-export const PageLoadLog = {
-    PageLoadLog: PageLoadLogUtils
-};

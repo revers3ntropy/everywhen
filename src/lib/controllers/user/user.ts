@@ -6,5 +6,3 @@ export interface User {
     key: string;
     versionLastLoggedIn: SemVer;
 }
-
-export namespace User {}

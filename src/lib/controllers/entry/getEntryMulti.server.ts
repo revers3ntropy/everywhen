@@ -8,7 +8,7 @@ import type {
 } from '$lib/controllers/entry/entry';
 import { Entry } from '$lib/controllers/entry/entry.server';
 import { Label } from '$lib/controllers/label/label.server';
-import { Location } from '$lib/controllers/location/location';
+import { Location } from '$lib/controllers/location/location.server';
 import { query } from '$lib/db/mysql.server';
 import { decrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
@@ -54,7 +54,7 @@ export async function getTitles(
 export async function all(auth: Auth, filter: EntryFilter = {}): Promise<Result<Entry[]>> {
     let location = null as Location | null;
     if (filter.locationId) {
-        const locationResult = await Location.fromId(query, auth, filter.locationId);
+        const locationResult = await Location.Server.fromId(auth, filter.locationId);
         if (locationResult.err) return Result.err(locationResult.err);
         location = locationResult.val;
     }

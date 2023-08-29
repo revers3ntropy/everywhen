@@ -3,7 +3,7 @@ import Feature from 'ol/Feature';
 import { Circle, type Geometry, Polygon, Point } from 'ol/geom';
 import { fromLonLat, toLonLat } from 'ol/proj';
 import { Style } from 'ol/style';
-import { Location } from '$lib/controllers/location/location.client';
+import { Location } from '$lib/controllers/location/location';
 import LayerVector from 'ol/layer/Vector';
 import SourceVector from 'ol/source/Vector';
 import type VectorLayer from 'ol/layer/Vector';

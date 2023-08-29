@@ -1,7 +1,7 @@
 <script lang="ts">
     import { tooltip } from '@svelte-plugins/tooltips';
     import MapMarker from 'svelte-material-icons/MapMarkerOutline.svelte';
-    import { Location } from '$lib/controllers/location/location.client';
+    import { Location } from '$lib/controllers/location/location';
     import { obfuscate } from '$lib/utils/text';
     import Dot from '../Dot.svelte';
 

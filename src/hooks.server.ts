@@ -1,14 +1,13 @@
 import { COOKIE_KEYS } from '$lib/constants';
-import { Log } from '$lib/controllers/log/log';
+import { PageLoadLog } from '$lib/controllers/log/log.server';
 import { sessionCookieOptions } from '$lib/utils/cookies';
 import { nowUtc } from '$lib/utils/time';
 import type { Cookies, Handle, RequestEvent } from '@sveltejs/kit';
 import chalk from 'chalk';
-import { connect, dbConnection, query } from '$lib/db/mysql.server';
+import { connect, dbConnection } from '$lib/db/mysql.server';
 import { cleanupCache } from '$lib/utils/cache.server';
 import { errorLogger, FileLogger } from '$lib/utils/log.server';
 import { Auth } from '$lib/controllers/auth/auth.server';
-import '$lib/controllers/auth/auth.server';
 
 const reqLogger = new FileLogger('REQ', chalk.bgWhite.black);
 
@@ -69,40 +68,39 @@ function getIp(req: RequestEvent): string {
 }
 
 async function logReq(
-    duration: Milliseconds,
-    now: TimestampSecs,
+    responseTimeMs: Milliseconds,
+    created: TimestampSecs,
     req: RequestEvent,
     res: Response,
     auth: Auth | null
 ): Promise<void> {
-    const path = req.route.id || '[unknown]';
+    const route = req.route.id || '[unknown]';
 
     void reqLogger.log(
         req.request.method,
         req.url.href,
         '=>',
         res.status,
-        ` ${duration.toPrecision(3)}ms`
+        ` ${responseTimeMs.toPrecision(3)}ms`
     );
 
     const userId = (auth?.id || '').toString();
 
-    const ip = getIp(req);
+    const ipAddress = getIp(req);
 
-    await Log.PageLoadLog.createLog(
-        query.unlogged,
-        now,
-        req.request.method,
-        req.url.href,
-        path,
-        duration,
-        res.status,
+    await PageLoadLog.createLog({
+        created,
+        method: req.request.method,
+        url: req.url.href,
+        route,
+        responseTimeMs,
+        responseCode: res.status,
         userId,
-        req.request.headers.get('user-agent') || '',
-        (await req.request.text()).length,
-        (await res.text()).length,
-        ip
-    );
+        userAgent: req.request.headers.get('user-agent') || '',
+        requestSize: (await req.request.text()).length,
+        resultSize: (await res.text()).length,
+        ipAddress
+    });
 }
 
 function getCookieWritableCookies(cookies: Cookies): App.Locals['__cookieWritables'] {

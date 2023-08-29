@@ -1,7 +1,6 @@
 import { MAXIMUM_ENTITIES } from '$lib/constants';
 import type { SettingsConfig } from '$lib/controllers/settings/settings';
 import { query } from '$lib/db/mysql.server';
-import type { QueryFunc } from '$lib/db/mysql.server';
 import { Result } from '$lib/utils/result';
 import {
     Dataset as _Dataset,
@@ -22,13 +21,13 @@ namespace DatasetServer {
 
     const thirdPartyDatasetProviders: Record<
         ThirdPartyDatasetIds,
-        (query: QueryFunc, auth: Auth, settings: SettingsConfig) => MaybePromise<DatasetData | null>
+        (auth: Auth, settings: SettingsConfig) => MaybePromise<DatasetData | null>
     > = {
-        githubCommits(_query, _user, settings) {
+        githubCommits(_user, settings) {
             if (!settings.gitHubAccessToken.value) return null;
             return [];
         },
-        githubLoC(_query, _user, settings) {
+        githubLoC(_user, settings) {
             if (!settings.gitHubAccessToken.value) return null;
             return [];
         }
@@ -36,12 +35,11 @@ namespace DatasetServer {
 
     const thirdPartyDatasetMetadataProviders: {
         [k in ThirdPartyDatasetIds]: (
-            query: QueryFunc,
             auth: Auth,
             settings: SettingsConfig
         ) => DatasetMetadata | null;
     } = {
-        githubCommits(_query, _user, settings) {
+        githubCommits(_user, settings) {
             if (!settings.gitHubAccessToken.value) return null;
             return {
                 id: 'githubCommits',
@@ -50,7 +48,7 @@ namespace DatasetServer {
                 columns: []
             };
         },
-        githubLoC(_query, _user, settings) {
+        githubLoC(_user, settings) {
             if (!settings.gitHubAccessToken.value) return null;
             return {
                 id: 'githubLoC',
@@ -61,7 +59,7 @@ namespace DatasetServer {
         }
     };
 
-    async function allTypes(query: QueryFunc, auth: Auth): Promise<Result<DatasetColumnType[]>> {
+    async function allTypes(auth: Auth): Promise<Result<DatasetColumnType[]>> {
         const types = await query<
             { id: string; name: string; created: TimestampSecs; unit: string }[]
         >`
@@ -91,12 +89,8 @@ namespace DatasetServer {
         ]);
     }
 
-    async function allColumns(
-        query: QueryFunc,
-        auth: Auth,
-        datasetId?: string
-    ): Promise<Result<DatasetColumn[]>> {
-        const { val: types, err: typesErr } = await allTypes(query, auth);
+    async function allColumns(auth: Auth, datasetId?: string): Promise<Result<DatasetColumn[]>> {
+        const { val: types, err: typesErr } = await allTypes(auth);
         if (typesErr) return Result.err(typesErr);
 
         const columns = await query<
@@ -131,14 +125,12 @@ namespace DatasetServer {
     }
 
     export async function allMetaData(
-        query: QueryFunc,
         auth: Auth,
         settings: SettingsConfig
     ): Promise<Result<DatasetMetadata[]>> {
         const metadatas = [] as DatasetMetadata[];
         for (const dataset of Object.keys(thirdPartyDatasetProviders)) {
             const metadata = thirdPartyDatasetMetadataProviders[dataset as ThirdPartyDatasetIds](
-                query,
                 auth,
                 settings
             );
@@ -153,7 +145,7 @@ namespace DatasetServer {
             WHERE user = ${auth.id}
         `;
 
-        const { err: columnsRes, val: columns } = await allColumns(query, auth);
+        const { err: columnsRes, val: columns } = await allColumns(auth);
         if (columnsRes) return Result.err(columnsRes);
 
         for (const dataset of datasets) {
@@ -171,7 +163,6 @@ namespace DatasetServer {
     }
 
     export async function fetchWholeDataset(
-        query: QueryFunc,
         auth: Auth,
         settings: SettingsConfig,
         datasetId: string
@@ -180,7 +171,7 @@ namespace DatasetServer {
         if (!provider) {
             return Result.err('Invalid dataset ID');
         }
-        const res = await provider(query, auth, settings);
+        const res = await provider(auth, settings);
         if (res === null) {
             return Result.err('User has not connected to this dataset');
         }
@@ -220,7 +211,6 @@ namespace DatasetServer {
     }
 
     export async function create(
-        query: QueryFunc,
         auth: Auth,
         name: string,
         created: TimestampSecs,
@@ -236,7 +226,7 @@ namespace DatasetServer {
             VALUES (${id}, ${auth.id}, ${encrypt(name, auth.key)}, ${created})
         `;
 
-        const { val: types, err: getTypesErr } = await allTypes(query, auth);
+        const { val: types, err: getTypesErr } = await allTypes(auth);
         if (getTypesErr) return Result.err(getTypesErr);
 
         for (let i = 0; i < columns.length; i++) {
@@ -260,7 +250,6 @@ namespace DatasetServer {
     }
 
     export async function appendRows(
-        query: QueryFunc,
         auth: Auth,
         datasetId: string,
         rows: {
@@ -270,7 +259,7 @@ namespace DatasetServer {
             timestampTzOffset?: Hours;
         }[]
     ): Promise<Result<null>> {
-        const { val: columns, err: getColumnsErr } = await allColumns(query, auth);
+        const { val: columns, err: getColumnsErr } = await allColumns(auth);
         if (getColumnsErr) return Result.err(getColumnsErr);
 
         const newRows = [] as {
