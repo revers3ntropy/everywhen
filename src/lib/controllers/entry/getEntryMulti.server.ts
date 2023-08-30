@@ -174,10 +174,9 @@ export async function getPage(
     const { val: entries, err } = await all(auth, filter);
     if (err) return Result.err(err);
 
-    return Result.ok([
-        filterEntriesBySearchTerm(entries, filter.search || '').slice(start, end),
-        entries.length
-    ]);
+    const filtered = filterEntriesBySearchTerm(entries, filter.search || '');
+
+    return Result.ok([filtered.slice(start, end), filtered.length]);
 }
 
 export async function near(

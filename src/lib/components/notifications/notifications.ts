@@ -64,19 +64,26 @@ notify.error = (text: string | string[], timeout: Milliseconds = 5000) => {
     }
     notify(text, NotificationType.ERROR, timeout);
 };
-notify.onErr = <T>(
-    { err, val }: Result<T>,
+notify.onErr = <T, E>(
+    result: Result<T, E>,
     onErr: (err: string | null) => unknown = () => 0
 ): T => {
-    if (err) {
-        try {
-            err = (JSON.parse(err) as Record<string, string>)?.['message'] || err;
-        } catch (e) {
-            /* empty */
+    return result.match(
+        val => val,
+        err => {
+            let errFmt = JSON.stringify(err);
+            if (typeof err === 'string') {
+                try {
+                    errFmt =
+                        (JSON.parse(err as string) as Record<string, string>)?.['message'] || err;
+                } catch (e) {
+                    errFmt = err;
+                }
+            }
+
+            onErr(errFmt);
+            notify(errFmt || 'Unknown error', NotificationType.ERROR, 4000);
+            throw err;
         }
-        onErr(err);
-        notify(err || 'Unknown error', NotificationType.ERROR, 4000);
-        throw err;
-    }
-    return val;
+    );
 };

@@ -37,11 +37,14 @@ export class Result<T, E = ErrorDefault> {
         );
     }
 
-    public unwrap(): T {
+    public unwrap<F = E>(mapErr?: (error: E) => F): T {
         return this.match(
             value => value,
             error => {
-                throw `Got error when unwrapping Result: ${JSON.stringify(error)}`;
+                if (mapErr) {
+                    throw mapErr(error);
+                }
+                throw error;
             }
         );
     }
@@ -145,13 +148,11 @@ export class Result<T, E = ErrorDefault> {
         }
     }
 
-    public static wrapAsync<T>(op: () => Promise<T>): Promise<Result<T, unknown>> {
+    public static async wrapAsync<T>(op: () => Promise<T>): Promise<Result<T, unknown>> {
         try {
-            return op()
-                .then(val => Result.ok(val))
-                .catch(e => Result.err(e));
+            return Result.ok(await op());
         } catch (e) {
-            return Promise.resolve(Result.err(e));
+            return Result.err(e);
         }
     }
 }

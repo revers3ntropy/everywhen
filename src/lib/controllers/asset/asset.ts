@@ -73,43 +73,36 @@ export namespace Asset {
             [...files].map(async file => {
                 const { val: content, err: readErr } = await getFileContents(file, 'b64');
 
-                if (readErr) {
-                    return void finishedUpload(Result.err(readErr));
-                }
+                if (readErr) return void finishedUpload(Result.err(readErr));
 
-                if (content.length > 1024 * 1024 * 32) {
+                if (content.length > 1024 * 1024 * 32)
                     return void finishedUpload(Result.err('Image is too large'));
-                }
 
-                if (!content) {
-                    return void finishedUpload(Result.err('Failed to read file'));
-                }
+                if (!content) return void finishedUpload(Result.err('Failed to read file'));
 
                 const { val: contentAsWebP, err: webPConvertErr } =
                     await imageToWebpUsingCanvas(content);
 
-                if (webPConvertErr) {
-                    return void finishedUpload(Result.err(webPConvertErr));
-                }
+                if (webPConvertErr) return void finishedUpload(Result.err(webPConvertErr));
 
-                if (contentAsWebP.length > MAX_IMAGE_SIZE) {
+                if (contentAsWebP.length > MAX_IMAGE_SIZE)
                     return void finishedUpload(Result.err('Image is too large'));
-                }
 
-                (
-                    await api.post('/assets', {
-                        fileName: file.name,
-                        content: contentAsWebP
-                    })
-                ).match(
-                    val =>
-                        Result.ok<UploadImageResult>({
-                            publicId: val.publicId,
+                finishedUpload(
+                    (
+                        await api.post('/assets', {
                             fileName: file.name,
-                            id: val.id
-                        }),
-                    err => Result.err<UploadImageResult>(err),
-                    (_, r) => finishedUpload(r)
+                            content: contentAsWebP
+                        })
+                    ).match(
+                        val =>
+                            Result.ok<UploadImageResult>({
+                                publicId: val.publicId,
+                                fileName: file.name,
+                                id: val.id
+                            }),
+                        err => Result.err<UploadImageResult>(err)
+                    )
                 );
             })
         );

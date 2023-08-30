@@ -10,7 +10,8 @@ CREATE TABLE users
     versionLastLoggedIn varchar(32)  NOT NULL DEFAULT '0.5.86',
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE utf8mb4_bin;
 
 CREATE TABLE entries
 (
@@ -29,7 +30,8 @@ CREATE TABLE entries
     wordCount       int(32)      NOT NULL DEFAULT -1,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE utf8mb4_bin;
 
 CREATE TABLE entryEdits
 (
@@ -45,7 +47,8 @@ CREATE TABLE entryEdits
     agentData       longtext     NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE utf8mb4_bin;
 
 CREATE TABLE events
 (
@@ -58,7 +61,8 @@ CREATE TABLE events
     created int(64)      NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE utf8mb4_bin;
 
 CREATE TABLE labels
 (
@@ -69,7 +73,8 @@ CREATE TABLE labels
     created int(64)      NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE utf8mb4_bin;
 
 CREATE TABLE assets
 (
@@ -87,7 +92,8 @@ CREATE TABLE assets
     content     longtext     NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE utf8mb4_bin;
 
 CREATE TABLE settings
 (
@@ -98,7 +104,8 @@ CREATE TABLE settings
     value   longtext     NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE utf8mb4_bin;
 
 CREATE TABLE locations
 (
@@ -112,7 +119,8 @@ CREATE TABLE locations
     radius          double       NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE utf8mb4_bin;
 
 CREATE TABLE pageLoads
 (
@@ -128,7 +136,8 @@ CREATE TABLE pageLoads
     responseSize int(64)      NOT NULL,
     ipAddress    varchar(64)  DEFAULT NULL
 ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE utf8mb4_bin;
 
 CREATE TABLE datasets
 (
@@ -138,7 +147,8 @@ CREATE TABLE datasets
     name    varchar(256) NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE utf8mb4_bin;
 
 CREATE TABLE datasetColumnTypes
 (
@@ -149,7 +159,8 @@ CREATE TABLE datasetColumnTypes
     unit    varchar(32)  NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE utf8mb4_bin;
 
 CREATE TABLE datasetColumns
 (
@@ -160,7 +171,8 @@ CREATE TABLE datasetColumns
     type    char(32)     NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE utf8mb4_bin;
 
 CREATE TABLE datasetRows
 (
@@ -171,7 +183,8 @@ CREATE TABLE datasetRows
     timestampTzOffset double       NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE utf8mb4_bin;
 
 CREATE TABLE datasetElements
 (
@@ -180,14 +193,16 @@ CREATE TABLE datasetElements
     `row`    int(32)       NOT NULL,
     data     varchar(2048) NOT NULL
 ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE utf8mb4_bin;
 
 CREATE TABLE ids
 (
     id char(32) NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4;
+  DEFAULT CHARSET = utf8mb4
+  COLLATE utf8mb4_bin;
 
 CREATE UNIQUE INDEX uidx_users_username
     ON users (username);

@@ -39,14 +39,13 @@ module.exports = {
     },
     rules: {
         'prettier/prettier': 'error',
-        '@typescript-eslint/strict-boolean-expressions': ['off', {
-            allowString: false,
-            allowNumber: false,
-            allowNullableObject: true,
-            allowNullableBoolean: true,
-            allowNullableString: false,
-            allowNullableNumber: false,
-        }],
+        "@typescript-eslint/consistent-type-imports": [
+            "error",
+            {
+                "prefer": "type-imports",
+                "disallowTypeAnnotations": false
+            }
+        ],
         // so I can do `while (true)`
         'no-constant-condition': 'off',
         // treats <script> tags as functions or something and complains

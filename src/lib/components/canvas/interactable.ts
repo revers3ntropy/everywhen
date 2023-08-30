@@ -1,13 +1,7 @@
 import { getContext, onMount } from 'svelte';
 import { DEBUG_RENDER_COLLIDERS } from '$lib/constants';
-import {
-    type CanvasContext,
-    CanvasState,
-    type ContextMenuOptions,
-    key,
-    type Listener
-} from './canvasState';
-import type { RenderProps } from './canvasState';
+import { type CanvasContext, type ContextMenuOptions, key, type Listener } from './canvasState';
+import type { RenderProps, CanvasState } from './canvasState';
 import type { Collider } from './collider';
 
 export interface Interactable extends Listener {

@@ -10,13 +10,10 @@ import { Auth } from '$lib/controllers/auth/auth.server';
 
 export const GET = cachedApiRoute(async (auth, { params }) => {
     const { datasetId } = params;
-    const { val: settings, err: getSettingsErr } = await Settings.Server.allAsMapWithDefaults(auth);
-    if (getSettingsErr) throw error(500, getSettingsErr);
-    const { val, err } = await Dataset.Server.fetchWholeDataset(auth, settings, datasetId);
-    if (err) throw error(400, err);
-    return {
-        rows: val
-    };
+    const settings = (await Settings.Server.allAsMapWithDefaults(auth)).unwrap(e => error(500, e));
+    return (await Dataset.Server.fetchWholeDataset(auth, settings, datasetId)).unwrap(e =>
+        error(400, e)
+    );
 }) satisfies RequestHandler;
 
 export const POST = (async ({ cookies, request, params }) => {
@@ -39,8 +36,7 @@ export const POST = (async ({ cookies, request, params }) => {
     const res = rowsValidator.safeParse(body.rows);
     if (!res.success) throw error(400, res.error);
 
-    const { err } = await Dataset.Server.appendRows(auth, params.datasetId, res.data);
-    if (err) throw error(400, err);
+    (await Dataset.Server.appendRows(auth, params.datasetId, res.data)).unwrap(e => error(400, e));
 
     return apiResponse(auth, {});
 }) satisfies RequestHandler;

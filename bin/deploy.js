@@ -81,6 +81,10 @@ async function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function utcSeconds() {
+    return Math.floor(Date.now() / 1000);
+}
+
 class Version {
     major = 0;
     minor = 0;
@@ -206,18 +210,24 @@ async function uploadPath(localPath, remotePath, args = '') {
 
 /**
  * @param {string} command
- * @param {boolean} failOnError
+ * @param {{ failOnError?: boolean, hideLogs?: boolean }} options
  * @returns {Promise<*>}
  */
-async function runRemoteCommand(command, failOnError = true) {
-    return await $`sshpass -f './secrets/${env}/sshpass.txt' ssh ${remoteSshAddress()} ${command}`.catch(
-        err => {
-            if (failOnError) {
-                throw err;
-            }
-            console.error(err);
-        }
-    );
+async function runRemoteCommand(command, { failOnError = true, hideLogs = false } = {}) {
+    const wasVerbose = $.verbose;
+    if (hideLogs) $.verbose = false;
+
+    let result;
+    try {
+        result =
+            await $`sshpass -f './secrets/${env}/sshpass.txt' ssh ${remoteSshAddress()} ${command}`;
+    } catch (err) {
+        if (failOnError) throw err;
+        console.error(err);
+    }
+
+    $.verbose = wasVerbose;
+    return result;
 }
 
 async function upload() {
@@ -474,10 +484,25 @@ async function build() {
     }
 }
 
+/**
+ * @param {Version} localVersion
+ * @returns {Promise<void>}
+ */
+async function backupDatabase(localVersion) {
+    console.log(c.yellow(`Backing up database...`));
+    // not under remoteDir because it gets deleted on every deploy
+    const backupFile = `~/hl-${env}-${localVersion.str()}-${utcSeconds()}.sql`;
+    await runRemoteCommand(
+        `mysqldump -u ${remoteEnv.DB_USER} -p"${remoteEnv.DB_PASS}" ${remoteEnv.DB} > ${backupFile}`,
+        { hideLogs: true }
+    );
+    console.log(c.green(`Database backed up to '${backupFile}'`));
+}
+
 async function tearDownRemote() {
     console.log(c.yellow(`Tearing down remote server...`));
-    await runRemoteCommand(`cd ~/${remoteDir()} && npm run stop`, false);
-    await runRemoteCommand(`rm -rf ~/${remoteDir()}`, false);
+    await runRemoteCommand(`cd ~/${remoteDir()} && npm run stop`, { failOnError: false });
+    await runRemoteCommand(`rm -rf ~/${remoteDir()}`, { failOnError: false });
 }
 
 async function standardDeploy() {
@@ -492,6 +517,8 @@ async function standardDeploy() {
     const serverDownStart = now();
 
     await tearDownRemote();
+
+    await backupDatabase(localVersion);
 
     // must do between stopping the server and deleting remote dir
     await doMigrations(migrations);
