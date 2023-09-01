@@ -1,94 +1,50 @@
+import { builtInTypes as _builtInTypes } from '$lib/controllers/dataset/columnTypes';
+import type { DatasetPreset } from '$lib/controllers/dataset/presets';
+import { datasetPresets as _datasetPresets } from '$lib/controllers/dataset/presets';
+
 export interface Dataset {
     id: string;
     created: TimestampSecs;
     name: string;
+    preset: null | DatasetPreset;
 }
 
-export type ThirdPartyDatasetIds = 'githubCommits' | 'githubLoC';
+export interface DatasetMetadata extends Dataset {
+    columns: DatasetColumn<unknown>[];
+}
 
 export type DatasetData = DatasetRow[];
 
-export interface DatasetColumnType {
+export interface DatasetColumnType<T> {
     id: string;
     created: TimestampSecs | null;
     name: string;
     unit: string;
-    validate: (value: unknown) => boolean;
-    serialize: (value: unknown) => string;
-    deserialize: (value: string) => unknown;
+    validate: (value: T) => boolean;
+    serialize: (value: T) => string;
+    deserialize: (value: string) => T;
 }
 
-export interface DatasetColumn {
+export interface DatasetColumn<T> {
     id: number;
-    dataset: string; // dataset Id
+    datasetId: string;
     created: TimestampSecs;
     name: string;
-    type: DatasetColumnType;
+    type: DatasetColumnType<T>;
 }
 
 export interface DatasetRow {
     id: number;
-    created: TimestampSecs;
     timestamp: TimestampSecs;
     timestampTzOffset: Hours;
-    elements: string[];
+    elements: unknown[];
 }
 
-export interface DatasetMetadata extends Dataset {
-    columns: DatasetColumn[];
-}
+export interface DatasetDataFilter {}
 
 export namespace Dataset {
-    export const builtInTypes: DatasetColumnType[] = [
-        {
-            id: 'number',
-            created: null,
-            name: 'Number',
-            unit: '',
-            validate: (value: unknown) => typeof value === 'number',
-            serialize: JSON.stringify,
-            deserialize: JSON.parse
-        },
-        {
-            id: 'weight_kg',
-            created: null,
-            name: 'Weight (KG)',
-            unit: 'kg',
-            validate: (value: unknown) => typeof value === 'number',
-            serialize: JSON.stringify,
-            deserialize: JSON.parse
-        },
-        {
-            id: 'text',
-            created: null,
-            name: 'Text',
-            unit: '',
-            validate: (value: unknown) => typeof value === 'string',
-            serialize: t => t as string,
-            deserialize: t => t
-        },
-        {
-            id: 'boolean',
-            created: null,
-            name: 'Boolean',
-            unit: '',
-            validate: (value: unknown) => typeof value === 'boolean',
-            serialize: (value: unknown) => (value ? '1' : '0'),
-            deserialize: (value: string) => value === '1'
-        }
-    ];
-
-    type Preset = { columns: { name: string; type: string }[] };
-    export const dataSetPresets = {
-        Weight: {
-            columns: [{ name: 'Weight', type: 'weight_kg' }]
-        }
-    } satisfies { [name: string]: Preset };
-
-    export const thirdPartyDatasetIdsToNames: Record<ThirdPartyDatasetIds, string> = {
-        githubCommits: 'GitHub Commits',
-        githubLoC: 'GitHub LoC'
-    };
+    export const datasetPresets = _datasetPresets;
+    export const builtInTypes = _builtInTypes;
 }
 
-export type DatasetPresetName = keyof typeof Dataset.dataSetPresets;
+export type DatasetPresetName = keyof typeof Dataset.datasetPresets;

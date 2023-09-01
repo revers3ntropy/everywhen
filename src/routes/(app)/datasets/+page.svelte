@@ -6,7 +6,7 @@
 
     export let data: PageData;
 
-    $: unusedPresetNames = Object.keys(Dataset.dataSetPresets).filter(
+    $: unusedPresetNames = Object.keys(Dataset.datasetPresets).filter(
         name => data.datasets.filter(dataset => dataset.name === name).length < 1
     ) as DatasetPresetName[];
 
@@ -14,7 +14,7 @@
         notify.onErr(
             await api.post('/datasets', {
                 name: presetName,
-                columns: Dataset.dataSetPresets[presetName].columns
+                columns: Dataset.datasetPresets[presetName].columns
             })
         );
         location.reload();

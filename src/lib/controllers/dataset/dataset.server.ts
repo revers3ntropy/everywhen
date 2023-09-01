@@ -19,91 +19,31 @@ namespace DatasetServer {
     const Dataset = _Dataset;
     type Dataset = _Dataset;
 
-    const thirdPartyDatasetProviders: Record<
-        ThirdPartyDatasetIds,
-        (auth: Auth, settings: SettingsConfig) => MaybePromise<DatasetData | null>
-    > = {
-        githubCommits(_user, settings) {
-            if (!settings.gitHubAccessToken.value) return null;
-            return [];
-        },
-        githubLoC(_user, settings) {
-            if (!settings.gitHubAccessToken.value) return null;
-            return [];
-        }
-    };
-
-    const thirdPartyDatasetMetadataProviders: {
-        [k in ThirdPartyDatasetIds]: (
-            auth: Auth,
-            settings: SettingsConfig
-        ) => DatasetMetadata | null;
-    } = {
-        githubCommits(_user, settings) {
-            if (!settings.gitHubAccessToken.value) return null;
-            return {
-                id: 'githubCommits',
-                created: 0,
-                name: Dataset.thirdPartyDatasetIdsToNames.githubCommits,
-                columns: []
-            };
-        },
-        githubLoC(_user, settings) {
-            if (!settings.gitHubAccessToken.value) return null;
-            return {
-                id: 'githubLoC',
-                created: 0,
-                name: Dataset.thirdPartyDatasetIdsToNames.githubLoC,
-                columns: []
-            };
-        }
-    };
-
-    async function allTypes(auth: Auth): Promise<Result<DatasetColumnType[]>> {
-        const types = await query<
-            { id: string; name: string; created: TimestampSecs; unit: string }[]
-        >`
-            SELECT id, name, created, unit
-            FROM datasetColumnTypes
-            WHERE user = ${auth.id}
-        `;
-
-        for (const type of types) {
-            const { val: decryptedName, err: decryptedNameErr } = decrypt(type.name, auth.key);
-            if (decryptedNameErr) return Result.err(decryptedNameErr);
-            type.name = decryptedName;
-
-            const { val: decryptedUnit, err: decryptedUnitErr } = decrypt(type.unit, auth.key);
-            if (decryptedUnitErr) return Result.err(decryptedUnitErr);
-            type.unit = decryptedUnit;
-        }
-
-        return Result.ok([
-            ...types.map(t => ({
-                ...t,
-                validate: () => true,
-                serialize: JSON.stringify,
-                deserialize: JSON.parse
-            })),
-            ...Dataset.builtInTypes
-        ]);
+    function allTypes(): Result<Record<string, DatasetColumnType<unknown>>> {
+        return Result.ok(Dataset.builtInTypes);
     }
 
     async function allColumns(auth: Auth, datasetId?: string): Promise<Result<DatasetColumn[]>> {
-        const { val: types, err: typesErr } = await allTypes(auth);
+        const { val: types, err: typesErr } = allTypes();
         if (typesErr) return Result.err(typesErr);
 
         const columns = await query<
-            { id: number; name: string; dataset: string; created: TimestampSecs; type: string }[]
+            {
+                id: number;
+                name: string;
+                datasetId: string;
+                created: TimestampSecs;
+                typeId: string;
+            }[]
         >`
             SELECT datasetColumns.id,
-                   datasetColumns.dataset,
+                   datasetColumns.datasetId,
                    datasetColumns.name,
                    datasetColumns.created,
-                   datasetColumns.type
+                   datasetColumns.typeId
             FROM   datasetColumns, datasets
-            WHERE  datasets.user = ${auth.id}
-               AND datasets.id = datasetColumns.dataset
+            WHERE  datasets.userId = ${auth.id}
+               AND datasets.id = datasetColumns.datasetId
                AND ((datasets.id = ${datasetId || ''}) OR ${!datasetId})
         `;
 
@@ -226,7 +166,7 @@ namespace DatasetServer {
             VALUES (${id}, ${auth.id}, ${encrypt(name, auth.key)}, ${created})
         `;
 
-        const { val: types, err: getTypesErr } = await allTypes(auth);
+        const { val: types, err: getTypesErr } = allTypes();
         if (getTypesErr) return Result.err(getTypesErr);
 
         for (let i = 0; i < columns.length; i++) {
@@ -254,7 +194,6 @@ namespace DatasetServer {
         datasetId: string,
         rows: {
             elements: unknown[];
-            created?: TimestampSecs;
             timestamp?: TimestampSecs;
             timestampTzOffset?: Hours;
         }[]
@@ -273,9 +212,9 @@ namespace DatasetServer {
         const maxRowId = await query<{ id: number }[]>`
             SELECT MAX(datasetRows.id) AS id
             FROM datasetRows, datasets
-            WHERE datasetRows.dataset = ${datasetId} 
-                AND datasets.user = ${auth.id}
-                AND datasets.id = datasetRows.dataset
+            WHERE datasetRows.datasetId = ${datasetId} 
+                AND datasets.userId = ${auth.id}
+                AND datasets.id = datasetRows.datasetId
         `;
 
         let nextRowId = maxRowId.length > 0 ? maxRowId[0].id + 1 : 0;
@@ -302,7 +241,6 @@ namespace DatasetServer {
 
             newRows.push({
                 id: rowId,
-                created: row.created || nowUtc(),
                 timestamp: row.timestamp || nowUtc(),
                 timestampTzOffset: row.timestampTzOffset || 0
             });

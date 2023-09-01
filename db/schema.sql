@@ -141,22 +141,11 @@ CREATE TABLE pageLoads
 
 CREATE TABLE datasets
 (
-    id      char(32)     NOT NULL,
-    user    char(32)     NOT NULL,
-    created int(64)      NOT NULL,
-    name    varchar(256) NOT NULL,
-    PRIMARY KEY (id)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE utf8mb4_bin;
-
-CREATE TABLE datasetColumnTypes
-(
-    id      char(32)     NOT NULL,
-    user    char(32)     NOT NULL,
-    created int(64)      NOT NULL,
-    name    varchar(256) NOT NULL,
-    unit    varchar(32)  NOT NULL,
+    id       char(32)     NOT NULL,
+    userId   char(32)     NOT NULL,
+    created  int(64)      NOT NULL,
+    name     varchar(256) NOT NULL,
+    presetId char(32)     DEFAULT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
@@ -164,11 +153,12 @@ CREATE TABLE datasetColumnTypes
 
 CREATE TABLE datasetColumns
 (
-    id      int(32)      NOT NULL,
-    dataset char(32)     NOT NULL,
-    created int(64)      NOT NULL,
-    name    varchar(256) NOT NULL,
-    type    char(32)     NOT NULL,
+    id        int(32)      NOT NULL,
+    userId    char(32)     NOT NULL,
+    datasetId char(32)     NOT NULL,
+    created   int(64)      NOT NULL,
+    name      varchar(256) NOT NULL,
+    typeId    char(32)     NOT NULL,
     PRIMARY KEY (id)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
@@ -176,22 +166,13 @@ CREATE TABLE datasetColumns
 
 CREATE TABLE datasetRows
 (
-    id                int(32)     NOT NULL,
-    dataset           char(32)     NOT NULL,
-    created           int(64)      NOT NULL,
+    id                int(32)      NOT NULL,
+    userId            char(32)     NOT NULL,
+    datasetId         char(32)     NOT NULL,
     timestamp         int(64)      NOT NULL,
     timestampTzOffset double       NOT NULL,
+    rowJson           longtext     NOT NULL,
     PRIMARY KEY (id)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE utf8mb4_bin;
-
-CREATE TABLE datasetElements
-(
-    dataset  char(32)      NOT NULL,
-    `column` int(32)       NOT NULL,
-    `row`    int(32)       NOT NULL,
-    data     varchar(2048) NOT NULL
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE utf8mb4_bin;
@@ -207,13 +188,15 @@ CREATE TABLE ids
 CREATE UNIQUE INDEX uidx_users_username
     ON users (username);
 
-ALTER TABLE assets ADD INDEX `idx_assets_user` (`user`);
-ALTER TABLE assets ADD INDEX `idx_assets_publicId` (`publicId`);
-ALTER TABLE entries ADD INDEX `idx_entries_user` (`user`);
-ALTER TABLE datasets ADD INDEX `idx_datasets_user` (`user`);
-ALTER TABLE events ADD INDEX `idx_events_user` (`user`);
-ALTER TABLE labels ADD INDEX `idx_labels_user` (`user`);
-ALTER TABLE locations ADD INDEX `idx_locations_user` (`user`);
-ALTER TABLE settings ADD INDEX `idx_settings_user` (`user`);
+ALTER TABLE assets              ADD INDEX `idx_assets_user`             (`user`);
+ALTER TABLE assets              ADD INDEX `idx_assets_publicId`         (`publicId`);
+ALTER TABLE entries             ADD INDEX `idx_entries_user`            (`user`);
+ALTER TABLE datasets            ADD INDEX `idx_datasets_user`           (`userId`);
+ALTER TABLE datasetColumns      ADD INDEX `idx_datasetColumns_user`     (`userId`);
+ALTER TABLE datasetRows         ADD INDEX `idx_datasetRows_user`        (`userId`);
+ALTER TABLE events              ADD INDEX `idx_events_user`             (`user`);
+ALTER TABLE labels              ADD INDEX `idx_labels_user`             (`user`);
+ALTER TABLE locations           ADD INDEX `idx_locations_user`          (`user`);
+ALTER TABLE settings            ADD INDEX `idx_settings_user`           (`user`);
 
 COMMIT;
