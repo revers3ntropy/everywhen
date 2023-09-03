@@ -4,6 +4,7 @@ import { Settings } from '$lib/controllers/settings/settings.server';
 import { errorLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 import type { Auth } from '$lib/controllers/auth/auth';
+import { z } from 'zod';
 
 export interface GitHubUser {
     id: number;
@@ -15,9 +16,7 @@ export namespace ghAPI {
         code: string,
         state: string
     ): Promise<Result<string>> {
-        if (!state || !code) {
-            return Result.err('Invalid state or code');
-        }
+        if (!state || !code) return Result.err('Invalid state or code');
 
         let accessTokenRes: Response;
         try {
@@ -52,28 +51,31 @@ export namespace ghAPI {
             await errorLogger.error(`Invalid response from github`, accessTokenData);
             return Result.err('Invalid response from gitHub');
         }
-
         if ('error' in accessTokenData && accessTokenData.error) {
             return Result.err(JSON.stringify(accessTokenData.error));
         }
-        if (
-            !('token_type' in accessTokenData) ||
-            typeof accessTokenData.token_type !== 'string' ||
-            accessTokenData.token_type.toLowerCase() !== 'bearer'
-        ) {
+
+        const parseResult = z
+            .object({
+                token_type: z.string(),
+                access_token: z.string()
+            })
+            .safeParse(accessTokenData);
+
+        if (!parseResult.success) {
+            await errorLogger.error(`Invalid response from github`, {
+                parseResult,
+                accessTokenData
+            });
+            return Result.err('Invalid response from GitHub');
+        }
+
+        if (parseResult.data.token_type.toLowerCase() !== 'bearer') {
             await errorLogger.error(`Invalid token type from github`, accessTokenData);
             return Result.err('Invalid response from gitHub');
         }
 
-        if (
-            !('access_token' in accessTokenData) ||
-            typeof accessTokenData.access_token !== 'string'
-        ) {
-            await errorLogger.error(`No access token from github`, accessTokenData);
-            return Result.err('Invalid response from GitHub');
-        }
-
-        return Result.ok(accessTokenData.access_token);
+        return Result.ok(parseResult.data.access_token);
     }
 
     export async function linkToGitHubOAuth(

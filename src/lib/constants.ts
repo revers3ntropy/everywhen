@@ -1,3 +1,5 @@
+import type { Bytes, Milliseconds, Pixels } from '../types';
+
 export const NORMAL_COOKIE_TIMEOUT_DAYS = 1;
 export const REMEMBER_ME_COOKIE_TIMEOUT_DAYS = 365;
 
@@ -69,11 +71,41 @@ export const DEV_USE_TZ_OFFSET_0 = false;
 
 export const FILE_INPUT_ACCEPT_TYPES = 'image/png,image/jpeg,image/jpg,image/webp,image/svg+xml';
 
-export const MAXIMUM_ENTITIES = {
-    asset: 1000,
-    dataset: 100,
-    entry: 100_000,
-    event: 1000,
-    label: 100,
-    location: 100
-};
+// all limits are inclusive
+export const LIMITS = {
+    asset: {
+        maxCount: 1000,
+        contentLenMax: 64,
+        nameLenMin: 1,
+        nameLenMax: 128
+    },
+    dataset: {
+        maxCount: 100,
+        nameLenMax: 32,
+        nameLenMin: 1
+    },
+    entry: {
+        maxCount: 100_000
+    },
+    event: {
+        maxCount: 1000,
+        nameLenMax: 64,
+        nameLenMin: 1
+    },
+    label: {
+        maxCount: 100,
+        nameLenMax: 64,
+        nameLenMin: 1
+    },
+    location: {
+        maxCount: 100,
+        nameLenMax: 64,
+        nameLenMin: 1
+    },
+    user: {
+        passwordLenMin: 8,
+        passwordLenMax: 128,
+        usernameLenMin: 3,
+        usernameLenMax: 64
+    }
+} as const;

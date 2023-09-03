@@ -35,6 +35,9 @@ export namespace Auth {
     export function requireAuthUrl(currentUrl: string): string {
         const url = new URL(currentUrl);
         const returnPath = encodeURIComponent(url.pathname.substring(1) + url.search);
+        if (returnPath === 'login') {
+            return '/login';
+        }
         return `/login?redirect=${returnPath}`;
     }
 

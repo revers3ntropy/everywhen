@@ -1,9 +1,10 @@
+import type { EntrySummary } from '$lib/controllers/entry/entry';
 import { error } from '@sveltejs/kit';
 import { Entry } from '$lib/controllers/entry/entry.server';
 import { cachedPageRoute } from '$lib/utils/cache.server';
 import { daysSince, nowUtc } from '$lib/utils/time';
 import type { PageServerLoad } from './$types';
-import { commonWordsFromText, type EntryWithWordCount } from './helpers';
+import { commonWordsFromText } from './helpers';
 
 export const load = cachedPageRoute(async auth => {
     const { val: entries, err } = await Entry.Server.all(auth, { deleted: false });
@@ -11,7 +12,7 @@ export const load = cachedPageRoute(async auth => {
 
     let earliestEntryTimeStamp = nowUtc();
 
-    const entriesWithWordCount: EntryWithWordCount[] = [];
+    const entriesWithWordCount: EntrySummary[] = [];
     let wordCount = 0;
     let charCount = 0;
     let commonWords: Record<string, number> = {};
@@ -21,16 +22,13 @@ export const load = cachedPageRoute(async auth => {
         }
 
         wordCount += entry.wordCount;
-        charCount += entry.entry.length + entry.title.length;
+        charCount += entry.body.length + entry.title.length;
 
-        commonWords = commonWordsFromText(entry.entry, commonWords);
+        commonWords = commonWordsFromText(entry.body, commonWords);
 
         commonWords = commonWordsFromText(entry.title, commonWords);
 
-        const e: EntryWithWordCount = entry as EntryWithWordCount;
-        delete e.entry;
-        delete e.title;
-        entriesWithWordCount.push(e);
+        entriesWithWordCount.push(Entry.summaryFromEntry(entry));
     }
 
     const commonWordsArray = Object.entries(commonWords)

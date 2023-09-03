@@ -1,19 +1,14 @@
-import { MAXIMUM_ENTITIES } from '$lib/constants';
+import { LIMITS } from '$lib/constants';
 import { entryFromId } from '$lib/controllers/entry/getEntrySingle.server';
-import {
-    all as _all,
-    getTitles as _getTitles,
-    getPage as _getPage,
-    near as _near,
-    getTitlesNYearsAgo as _getTitlesNYearsAgo,
-    getTitlesPinned as _getTitlesPinned
-} from '$lib/controllers/entry/getEntryMulti.server';
+import * as getMulti from '$lib/controllers/entry/getEntryMulti.server';
+import * as getSummary from '$lib/controllers/entry/getEntrySummaries.server';
 import { query } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import { errorLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 import { wordCount } from '$lib/utils/text';
 import { fmtUtc, nowUtc } from '$lib/utils/time';
+import type { Hours, TimestampSecs } from '../../../types';
 import type { Auth } from '../auth/auth.server';
 import type { Label } from '../label/label';
 import { UId } from '$lib/controllers/uuid/uuid.server';
@@ -27,7 +22,7 @@ namespace EntryServer {
             SELECT deleted
             FROM entries
             WHERE id = ${id}
-              AND user = ${auth.id}
+              AND userId = ${auth.id}
         `;
         if (!entries.length) {
             return Result.err('Entry not found');
@@ -39,9 +34,9 @@ namespace EntryServer {
         await query`
             UPDATE entries
             SET deleted = ${restore ? null : nowUtc()},
-                label = ${null}
+                labelId = ${null}
             WHERE entries.id = ${id}
-              AND user = ${auth.id}
+              AND userId = ${auth.id}
         `;
 
         return Result.ok(null);
@@ -49,16 +44,8 @@ namespace EntryServer {
 
     export async function purgeAll(auth: Auth): Promise<void> {
         await query`
-            DELETE
-            FROM entryEdits
-            WHERE entry IN (SELECT id
-                            FROM entries
-                            WHERE user = ${auth.id})
-        `;
-        await query`
-            DELETE
-            FROM entries
-            WHERE user = ${auth.id}
+            DELETE FROM entryEdits WHERE userId = ${auth.id};
+            DELETE FROM entries WHERE userId = ${auth.id};
         `;
     }
 
@@ -66,63 +53,58 @@ namespace EntryServer {
         auth: Auth,
         labels: Label[],
         title: string,
-        entry: string,
+        body: string,
         created: TimestampSecs,
-        createdTZOffset: Hours,
+        createdTzOffset: Hours,
         pinned: number | null,
         deleted: number | null,
         latitude: number | null,
         longitude: number | null,
-        label: string | null,
-        agentData: string | null,
+        labelId: string | null,
+        agentData: string,
         wordCount: number,
-        edits: (Omit<EntryEdit, 'id' | 'entryId' | 'label'> & { label?: string })[]
+        edits: Omit<RawEntryEdit, 'id' | 'entryId'>[]
     ): Promise<Result<Entry>> {
         const numEntries = await query<{ count: number }[]>`
             SELECT COUNT(*) as count
             FROM entries
-            WHERE user = ${auth.id}
+            WHERE userId = ${auth.id}
         `;
-        if (numEntries[0].count >= MAXIMUM_ENTITIES.entry) {
-            return Result.err(`Maximum number of entries (${MAXIMUM_ENTITIES.entry}) reached`);
+        if (numEntries[0].count >= LIMITS.entry.maxCount) {
+            return Result.err(`Maximum number of entries (${LIMITS.entry.maxCount}) reached`);
         }
 
-        if (label && !labels.find(l => l.id === label)) {
-            await errorLogger.error('Label not found', { label, username: auth.username });
+        if (labelId && !labels.find(l => l.id === labelId)) {
+            await errorLogger.error('Label not found', { labelId, username: auth.username });
             return Result.err('Label not found');
         }
 
-        const encryptedTitle = encrypt(title, auth.key);
-        const encryptedEntry = encrypt(entry, auth.key);
-        const encryptedAgent = encrypt(agentData || '', auth.key);
         const id = await UId.Server.generate();
 
         await query`
             INSERT INTO entries
-                (id, user, title, entry, created, createdTZOffset, deleted, pinned,
-                 label, latitude, longitude, agentData, wordCount)
-            VALUES (${id},
-                    ${auth.id},
-                    ${encryptedTitle},
-                    ${encryptedEntry},
-                    ${created},
-                    ${createdTZOffset},
-                    ${deleted ?? null},
-                    ${pinned ?? null},
-                    ${label ?? null},
-                    ${latitude ?? null},
-                    ${longitude ?? null},
-                    ${encryptedAgent || ''},
-                    ${wordCount})
+                (id, userId, title, body, created, createdTzOffset, deleted, pinned,
+                 labelId, latitude, longitude, agentData, wordCount)
+            VALUES (
+                ${id},
+                ${auth.id},
+                ${encrypt(title, auth.key)},
+                ${encrypt(body, auth.key)},
+                ${created},
+                ${createdTzOffset},
+                ${deleted},
+                ${pinned},
+                ${labelId},
+                ${latitude},
+                ${longitude},
+                ${encrypt(agentData || '', auth.key) || ''},
+                ${wordCount}
+            )
         `;
 
-        const editsWithIds: (Omit<EntryEdit, 'label'> & { label?: string })[] = [];
+        const editsWithIds: (RawEntryEdit & { id: string })[] = [];
 
         for (const edit of edits) {
-            const encryptedEditTitle = encrypt(edit.title, auth.key);
-            const encryptedEditEntry = encrypt(edit.entry, auth.key);
-            const encryptedAgentData = encrypt(edit.agentData || '', auth.key);
-
             const editId = await UId.Server.generate();
 
             editsWithIds.push({
@@ -133,38 +115,48 @@ namespace EntryServer {
 
             await query`
                 INSERT INTO entryEdits
-                    (id, entryId, title, entry,
-                     created, createdTZOffset, label, latitude, longitude, agentData)
-                VALUES (${editId},
-                        ${id},
-                        ${encryptedEditTitle},
-                        ${encryptedEditEntry},
-                        ${edit.created},
-                        ${edit.createdTZOffset ?? 0},
-                        ${edit.label ?? null},
-                        ${edit.latitude ?? null},
-                        ${edit.longitude ?? null},
-                        ${encryptedAgentData || ''})
+                    (id, userId, entryId, oldTitle, oldBody,
+                     created, createdTzOffset, oldLabelId, latitude, longitude, agentData)
+                VALUES (
+                    ${editId},
+                    ${auth.id},
+                    ${id},
+                    ${encrypt(edit.oldTitle, auth.key)},
+                    ${encrypt(edit.oldBody, auth.key)},
+                    ${edit.created},
+                    ${edit.createdTzOffset ?? 0},
+                    ${edit.oldLabelId ?? null},
+                    ${edit.latitude ?? null},
+                    ${edit.longitude ?? null},
+                    ${encrypt(edit.agentData || '', auth.key) || ''}
+                )
             `;
         }
 
         return Result.ok({
             id,
             title,
-            entry,
+            body,
             created,
-            createdTZOffset,
+            createdTzOffset,
             deleted,
             pinned,
             latitude,
             longitude,
-            label: label ? labels.find(l => l.id === label) || null : null,
+            label: labelId ? labels.find(l => l.id === labelId) || null : null,
             agentData,
             wordCount,
             edits: editsWithIds.map(edit => ({
-                ...edit,
+                id: edit.id,
                 entryId: id,
-                label: label ? labels.find(l => l.id === label) || null : null
+                created: edit.created,
+                createdTzOffset: edit.createdTzOffset,
+                latitude: edit.latitude,
+                longitude: edit.longitude,
+                agentData: edit.agentData,
+                oldTitle: edit.oldTitle,
+                oldBody: edit.oldBody,
+                oldLabel: labelId ? labels.find(l => l.id === labelId) || null : null
             }))
         });
     }
@@ -184,7 +176,7 @@ namespace EntryServer {
             UPDATE entries
             SET pinned = ${newPinnedValue}
             WHERE id = ${self.id}
-              AND user = ${auth.id}
+              AND userId = ${auth.id}
         `;
 
         return Result.ok({
@@ -196,46 +188,41 @@ namespace EntryServer {
     export async function edit(
         auth: Auth,
         entry: Entry,
-        newTitle: string,
-        newEntry: string,
-        newLatitude: number | undefined,
-        newLongitude: number | undefined,
-        newLabel: string,
-        tzOffset: number,
-        agentData: string
+        editTitle: string,
+        editBody: string,
+        editLatitude: number | null,
+        editLongitude: number | null,
+        editLabel: string,
+        editTzOffset: number,
+        editAgentData: string
     ): Promise<Result<null>> {
-        const encryptedNewTitle = encrypt(newTitle, auth.key);
-        const encryptedNewEntry = encrypt(newEntry, auth.key);
-        const encryptedEditAgentData = encrypt(agentData, auth.key);
-        const encryptedOldTitle = encrypt(entry.title, auth.key);
-        const encryptedOldEntry = encrypt(entry.entry, auth.key);
-
         const editId = await UId.Server.generate();
 
         await query`
             INSERT INTO entryEdits
-            (id, entryId, created, createdTZOffset, latitude, longitude, title, entry,
-             label, agentData)
-            VALUES (${editId},
-                    ${entry.id},
-                    ${nowUtc()},
-                    ${tzOffset},
-                    ${newLatitude ?? null},
-                    ${newLongitude ?? null},
-                    ${encryptedOldTitle},
-                    ${encryptedOldEntry},
-                    ${entry.label?.id ?? null},
-                    ${encryptedEditAgentData || ''})
-        `;
+                (id, userId, entryId, created, createdTzOffset, latitude, longitude,
+                    oldTitle, oldBody, oldLabelId, agentData)
+            VALUES (
+                ${editId},
+                ${auth.id},
+                ${entry.id},
+                ${nowUtc()},
+                ${editTzOffset},
+                ${editLatitude ?? null},
+                ${editLongitude ?? null},
+                ${encrypt(entry.title, auth.key)},
+                ${encrypt(entry.body, auth.key)},
+                ${entry.label?.id ?? null},
+                ${encrypt(editAgentData || '', auth.key)}
+            );
 
-        await query`
             UPDATE entries
-            SET title     = ${encryptedNewTitle},
-                entry     = ${encryptedNewEntry},
-                label     = ${newLabel ?? null},
-                wordCount = ${wordCount(newEntry)}
+            SET title     = ${encrypt(editTitle, auth.key)},
+                body      = ${encrypt(editBody, auth.key)},
+                labelId   = ${editLabel ?? null},
+                wordCount = ${wordCount(editBody)}
             WHERE id = ${entry.id}
-              AND user = ${auth.id}
+              AND userId = ${auth.id}
         `;
 
         return Result.ok(null);
@@ -243,54 +230,45 @@ namespace EntryServer {
 
     export async function reassignAllLabels(
         auth: Auth,
-        oldLabel: string,
-        newLabel: string
+        oldLabelId: string,
+        newLabelId: string
     ): Promise<Result<null>> {
         await query`
             UPDATE entryEdits
-            SET label = ${newLabel}
-            WHERE entryId IN (SELECT id
-                              FROM entries
-                              WHERE user = ${auth.id})
-              AND label = ${oldLabel}
-        `;
+            SET oldLabelId = ${newLabelId}
+            WHERE userId = ${auth.id}
+              AND oldLabelId = ${oldLabelId};
 
-        await query`
             UPDATE entries
-            SET label = ${newLabel}
-            WHERE user = ${auth.id}
-              AND label = ${oldLabel}
+            SET labelId = ${newLabelId}
+            WHERE userId = ${auth.id}
+              AND labelId = ${oldLabelId};
         `;
-
         return Result.ok(null);
     }
 
     export async function removeAllLabel(auth: Auth, labelId: string): Promise<Result<null>> {
         await query`
             UPDATE entryEdits
-            SET label = ${null}
-            WHERE entryId IN (SELECT id
-                              FROM entries
-                              WHERE user = ${auth.id})
-              AND label = ${labelId}
-        `;
+            SET oldLabelId = ${null}
+            WHERE userId = ${auth.id}
+              AND oldLabelId = ${labelId};
 
-        await query`
             UPDATE entries
-            SET label = ${null}
-            WHERE user = ${auth.id}
-              AND label = ${labelId}
+            SET labelId = ${null}
+            WHERE userId = ${auth.id}
+              AND labelId = ${labelId}
         `;
 
         return Result.ok(null);
     }
 
     export async function getStreaks(auth: Auth, clientTzOffset: Hours): Promise<Result<Streaks>> {
-        const entries = await query<{ created: number; createdTZOffset: number }[]>`
-            SELECT created, createdTZOffset
+        const entries = await query<{ created: number; createdTzOffset: number }[]>`
+            SELECT created, createdTzOffset
             FROM entries
             WHERE deleted IS NULL
-              AND user = ${auth.id}
+              AND userId = ${auth.id}
             ORDER BY created DESC, id
         `;
 
@@ -310,7 +288,7 @@ namespace EntryServer {
         // group entries by day
         const entriesOnDay: Record<string, true | undefined> = {};
         for (const entry of entries) {
-            entriesOnDay[fmtUtc(entry.created, entry.createdTZOffset, 'YYYY-MM-DD')] = true;
+            entriesOnDay[fmtUtc(entry.created, entry.createdTzOffset, 'YYYY-MM-DD')] = true;
         }
 
         // streaks are running out when we made an entry yesterday but not today
@@ -331,7 +309,7 @@ namespace EntryServer {
         let currentStreak = 0;
 
         const firstEntry = entries[entries.length - 1];
-        const firstDay = fmtUtc(firstEntry.created, firstEntry.createdTZOffset, 'YYYY-MM-DD');
+        const firstDay = fmtUtc(firstEntry.created, firstEntry.createdTzOffset, 'YYYY-MM-DD');
 
         currentDay = today;
         // find the longest streak by counting forwards from first entry
@@ -355,52 +333,51 @@ namespace EntryServer {
         });
     }
 
-    export function fromRawEdit(
+    export function editFromRaw(
         auth: Auth,
-        labels: Label[],
+        labels: Record<string, Label>,
         rawEdit: RawEntryEdit
     ): Result<EntryEdit> {
-        const { err: titleErr, val: decryptedTitle } = decrypt(rawEdit.title, auth.key);
+        const { err: titleErr, val: oldTitle } = decrypt(rawEdit.oldTitle, auth.key);
         if (titleErr) return Result.err(titleErr);
 
-        const { err: entryErr, val: decryptedEntry } = decrypt(rawEdit.entry, auth.key);
+        const { err: entryErr, val: oldBody } = decrypt(rawEdit.oldBody, auth.key);
         if (entryErr) return Result.err(entryErr);
 
-        let decryptedAgent = '';
-        if (rawEdit.agentData) {
-            const { err: agentErr, val } = decrypt(rawEdit.agentData, auth.key);
-            if (agentErr) return Result.err(agentErr);
-            decryptedAgent = val;
+        const { err: agentErr, val: agentData } = decrypt(rawEdit.agentData, auth.key);
+        if (agentErr) return Result.err(agentErr);
+
+        let oldLabel = null as Label | null;
+        if (rawEdit.oldLabelId) {
+            const label = labels[rawEdit.oldLabelId];
+            if (!label) {
+                void errorLogger.error('Label not found', { rawEdit, labels });
+                return Result.err('Label not found');
+            }
+            oldLabel = label;
         }
 
-        const edit: EntryEdit = {
+        return Result.ok({
             id: rawEdit.id,
             entryId: rawEdit.entryId,
-            title: decryptedTitle,
-            entry: decryptedEntry,
+            oldTitle,
+            oldBody,
+            oldLabel,
             created: rawEdit.created,
-            createdTZOffset: rawEdit.createdTZOffset,
+            createdTzOffset: rawEdit.createdTzOffset,
             latitude: rawEdit.latitude,
             longitude: rawEdit.longitude,
-            agentData: decryptedAgent,
-            label: labels.find(l => l.id === rawEdit.label) ?? null
-        };
-
-        if (rawEdit.label && !edit.label) {
-            void errorLogger.error('Label not found', { rawEdit, labels });
-            return Result.err('Label not found');
-        }
-
-        return Result.ok(edit);
+            agentData
+        });
     }
 
     export const getFromId = entryFromId;
-    export const getTitles = _getTitles;
-    export const all = _all;
-    export const getPage = _getPage;
-    export const near = _near;
-    export const getTitlesNYearsAgo = _getTitlesNYearsAgo;
-    export const getTitlesPinned = _getTitlesPinned;
+    export const all = getMulti.all;
+    export const getPage = getMulti.getPage;
+    export const near = getMulti.near;
+    export const getSummariesNYearsAgo = getSummary.getSummariesNYearsAgo;
+    export const getPinnedSummaries = getSummary.getPinnedSummaries;
+    export const getPageOfSummaries = getSummary.getPageOfSummaries;
 }
 
 export const Entry = {

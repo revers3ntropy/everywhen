@@ -31,17 +31,18 @@
 
     export let id: string;
     export let title: string;
-    export let entry: string;
+    export let body: string;
     export let created: number;
-    export let createdTZOffset = 0;
-    export let label = null as LabelController | null;
-    export let latitude = null as number | null;
-    export let longitude = null as number | null;
+    export let createdTzOffset: number;
+    export let label: LabelController | null;
+    export let latitude: number | null;
+    export let longitude: number | null;
     export let deleted: null | number;
     export let pinned: null | number;
     export let wordCount: number;
-    export let agentData = null as string | null;
-    export let edits = [] as EntryEdit[];
+    export let agentData: string;
+    export let edits: EntryEdit[];
+
     export let isEdit = false;
     export let showFullDate = false;
 
@@ -51,15 +52,6 @@
     export let isInDialog = false;
 
     export let locations: Location[] | null;
-
-    // show random string instead of text content if obfuscated
-    export let showLabel = label;
-    $: if (showLabels && label) {
-        showLabel = {
-            ...label,
-            name: obfuscated ? obfuscate(label.name) : label.name
-        };
-    }
 
     async function deleteSelf() {
         const thisIsDeleted = Entry.isDeleted({ deleted });
@@ -79,32 +71,43 @@
         await dispatch.delete('entry', id);
     }
 
-    async function pinSelf() {
+    async function togglePinned() {
         notify.onErr(
             await api.put(apiPath('/entries/?/pinned', id), {
                 pinned: !Entry.isPinned({ pinned })
             })
         );
 
-        notify.success(`Entry ${!Entry.isPinned({ pinned }) ? 'favorited' : 'unfavorited'}`);
+        const actionFmt = !Entry.isPinned({ pinned }) ? 'favorited' : 'unfavorited';
+        notify.success(`Entry ${actionFmt}`);
 
         pinned = Entry.isPinned({ pinned }) ? null : nowUtc();
 
-        await dispatch.update('entry', {
+        const changed: Entry = {
             id,
             title,
-            entry,
+            body,
             created,
-            createdTZOffset,
-            deleted,
+            createdTzOffset,
             pinned,
+            deleted,
             latitude,
             longitude,
-            label,
             agentData,
             wordCount,
+            label,
             edits
-        });
+        };
+        await dispatch.update('entry', changed);
+    }
+
+    // show random string instead of text content if obfuscated
+    let showLabel = label;
+    $: if (showLabels && label) {
+        showLabel = {
+            ...label,
+            name: obfuscated ? obfuscate(label.name) : label.name
+        };
     }
 
     function toggleObfuscation() {
@@ -113,7 +116,7 @@
 
     let showingMap = false;
 
-    $: entryHtml = browser ? rawMdToHtml(entry, obfuscated) : '';
+    $: entryHtml = browser ? rawMdToHtml(body, obfuscated) : '';
     // doesn't set reactively on tooltip content if in props???
     $: restoreDeleteTooltip = Entry.isDeleted({ deleted }) ? 'Restore Entry' : 'Move Entry to Bin';
     $: pinTooltip = Entry.isPinned({ pinned }) ? 'Unpin Entry' : 'Pin Entry';
@@ -126,7 +129,7 @@
                 fmt={'ddd DD MMM YYYY, h:mma'}
                 timestamp={created}
                 tooltipPosition="right"
-                tzOffset={createdTZOffset}
+                tzOffset={createdTzOffset}
             />
         </div>
     {/if}
@@ -141,7 +144,7 @@
                         fmt={'h:mma'}
                         timestamp={created}
                         tooltipPosition="right"
-                        tzOffset={createdTZOffset}
+                        tzOffset={createdTzOffset}
                     />
                 </span>
             {/if}
@@ -198,7 +201,7 @@
 
                         <div class="options-dropdown">
                             <button
-                                on:click={pinSelf}
+                                on:click={togglePinned}
                                 class="with-icon icon-gradient-on-hover"
                                 aria-label={pinTooltip}
                             >

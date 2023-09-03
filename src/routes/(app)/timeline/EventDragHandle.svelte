@@ -4,6 +4,7 @@
     import { interactable } from '$lib/components/canvas/interactable';
     import { Event as EventController } from '$lib/controllers/event/event';
     import type { Label } from '$lib/controllers/label/label';
+    import type { TimestampSecs } from '../../../types';
 
     const WIDTH = 8;
 

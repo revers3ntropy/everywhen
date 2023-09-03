@@ -35,7 +35,7 @@ export async function migrateUser(user: User): Promise<Result<User>> {
 const migrators: Record<string, (user: User) => Promise<Result<User>>> = {
     async '0.5.88'(user: User): Promise<Result<User>> {
         const entries = await query<{ id: string; entry: string }[]>`
-            SELECT id, entry FROM entries WHERE user = ${user.id}
+            SELECT id, body FROM entries WHERE userId = ${user.id}
         `;
 
         for (const { id, entry } of entries) {

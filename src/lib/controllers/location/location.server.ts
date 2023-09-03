@@ -1,4 +1,4 @@
-import { MAXIMUM_ENTITIES } from '$lib/constants';
+import { LIMITS } from '$lib/constants';
 import { query } from '$lib/db/mysql.server';
 import type { ResultSetHeader } from 'mysql2';
 import { decrypt, encrypt } from '$lib/utils/encryption';
@@ -12,7 +12,8 @@ namespace LocationServer {
 
     async function canCreateWithName(auth: Auth, name: string): Promise<true | string> {
         if (!name) return 'Location name too short';
-        if (name.length > 100) return 'Location name too long (> 100 characters)';
+        if (name.length > LIMITS.location.nameLenMax)
+            return `Location name too long (> ${LIMITS.location.nameLenMax} characters)`;
 
         const encryptedName = encrypt(name, auth.key);
         if (encryptedName.length > 256) return 'Location name too long';
@@ -20,10 +21,10 @@ namespace LocationServer {
         const numLocations = await query<{ count: number }[]>`
             SELECT COUNT(*) as count
             FROM locations
-            WHERE user = ${auth.id}
+            WHERE userId = ${auth.id}
         `;
 
-        if (numLocations[0].count >= MAXIMUM_ENTITIES.location) {
+        if (numLocations[0].count >= LIMITS.location.maxCount) {
             return 'Maximum number of locations reached';
         }
 
@@ -33,7 +34,6 @@ namespace LocationServer {
     export async function create(
         auth: Auth,
         created: number,
-        createdTZOffset: number,
         name: string,
         latitude: number,
         longitude: number,
@@ -54,24 +54,33 @@ namespace LocationServer {
         }
 
         await query`
-            INSERT INTO locations (id, user, created, createdTZOffset, name,
+            INSERT INTO locations (id, userId, created, name,
                                    latitude, longitude, radius)
-            VALUES (${id}, ${auth.id}, ${created}, ${createdTZOffset}, ${encryptedName},
+            VALUES (${id}, ${auth.id}, ${created}}, ${encryptedName},
                     ${latitude}, ${longitude}, ${radius})
         `;
 
-        return Result.ok({ id, created, createdTZOffset, name, latitude, longitude, radius });
+        return Result.ok({ id, created, name, latitude, longitude, radius });
     }
 
     export async function all(auth: Auth): Promise<Result<Location[]>> {
         return fromRaw(
             auth,
-            await query<Location[]>`
-            SELECT id, created, createdTZOffset, name, latitude, longitude, radius
-            FROM locations
-            WHERE user = ${auth.id}
-            ORDER BY created DESC
-        `
+            await query<
+                {
+                    id: string;
+                    created: number;
+                    name: string;
+                    latitude: number;
+                    longitude: number;
+                    radius: number;
+                }[]
+            >`
+                SELECT id, created, name, latitude, longitude, radius
+                FROM locations
+                WHERE userId = ${auth.id}
+                ORDER BY created DESC
+            `
         );
     }
 
@@ -83,7 +92,6 @@ namespace LocationServer {
                 return Result.ok({
                     id: row.id,
                     created: row.created,
-                    createdTZOffset: row.createdTZOffset,
                     name,
                     latitude: row.latitude,
                     longitude: row.longitude,
@@ -101,10 +109,19 @@ namespace LocationServer {
         const { err, val: locations } = fromRaw(
             auth,
             _Location.filterByDynCirclePrecise(
-                await query<Location[]>`
-                    SELECT id, created, createdTZOffset, name, latitude, longitude, radius
+                await query<
+                    {
+                        id: string;
+                        created: number;
+                        name: string;
+                        latitude: number;
+                        longitude: number;
+                        radius: number;
+                    }[]
+                >`
+                    SELECT id, created, name, latitude, longitude, radius
                     FROM locations
-                    WHERE user = ${auth.id}
+                    WHERE userId = ${auth.id}
                       AND SQRT(POW(latitude - ${lat}, 2) + POW(longitude - ${lng}, 2)) <= radius * 2
                     ORDER BY radius, created DESC
                 `,
@@ -120,10 +137,19 @@ namespace LocationServer {
         const { err: nearbyErr, val: nearby } = fromRaw(
             auth,
             _Location.filterByDynCirclePrecise(
-                await query<Location[]>`
-                SELECT id, created, createdTZOffset, name, latitude, longitude, radius
+                await query<
+                    {
+                        id: string;
+                        created: number;
+                        name: string;
+                        latitude: number;
+                        longitude: number;
+                        radius: number;
+                    }[]
+                >`
+                SELECT id, created, name, latitude, longitude, radius
                 FROM locations
-                WHERE user = ${auth.id}
+                WHERE userId = ${auth.id}
                   AND SQRT(POW(latitude - ${lat}, 2) + POW(longitude - ${lng}, 2)) <=
                       radius * 4
                 ORDER BY radius, created DESC
@@ -141,15 +167,24 @@ namespace LocationServer {
     export async function fromId(auth: Auth, id: string): Promise<Result<Location>> {
         const { val, err } = fromRaw(
             auth,
-            await query<Location[]>`
-                SELECT id, created, createdTZOffset, name, latitude, longitude, radius
+            await query<
+                {
+                    id: string;
+                    created: number;
+                    name: string;
+                    latitude: number;
+                    longitude: number;
+                    radius: number;
+                }[]
+            >`
+                SELECT id, created, name, latitude, longitude, radius
                 FROM locations
-                WHERE user = ${auth.id}
+                WHERE userId = ${auth.id}
                   AND id = ${id}
             `
         );
         if (err) return Result.err(err);
-        if (val.length === 0) return Result.err('Location not found');
+        if (val.length !== 1) return Result.err('Location not found');
         return Result.ok(val[0]);
     }
 
@@ -162,14 +197,13 @@ namespace LocationServer {
 
         const encryptedName = encrypt(newName, auth.key);
 
-        if (encryptedName.length > 256) {
-            return Result.err('Name too long');
-        }
+        if (newName.length > LIMITS.location.nameLenMax) return Result.err('Name too long');
+        if (newName.length < LIMITS.location.nameLenMin) return Result.err('Name too short');
 
         await query`
             UPDATE locations
             SET name = ${encryptedName}
-            WHERE user = ${auth.id}
+            WHERE userId = ${auth.id}
               AND id = ${location.id}
         `;
         return Result.ok({
@@ -188,7 +222,7 @@ namespace LocationServer {
         await query`
             UPDATE locations
             SET radius = ${newRadius}
-            WHERE user = ${auth.id}
+            WHERE userId = ${auth.id}
               AND id = ${location.id}
         `;
         return Result.ok({
@@ -203,18 +237,17 @@ namespace LocationServer {
         newLatitude: number,
         newLongitude: number
     ): Promise<Result<Location>> {
-        if (newLatitude < -90 || newLatitude > 90) {
+        if (newLatitude < -90 || newLatitude > 90)
             return Result.err('Latitude must be between -90 and 90');
-        }
-        if (newLongitude < -180 || newLongitude > 180) {
+
+        if (newLongitude < -180 || newLongitude > 180)
             return Result.err('Longitude must be between -180 and 180');
-        }
 
         await query`
             UPDATE locations
             SET latitude  = ${newLatitude},
                 longitude = ${newLongitude}
-            WHERE user = ${auth.id}
+            WHERE userId = ${auth.id}
               AND id = ${location.id}
         `;
         return Result.ok({
@@ -228,7 +261,7 @@ namespace LocationServer {
         const res = await query<ResultSetHeader>`
             DELETE
             FROM locations
-            WHERE user = ${auth.id}
+            WHERE userId = ${auth.id}
               AND id = ${id}
         `;
         if (!res.affectedRows) {
@@ -241,7 +274,7 @@ namespace LocationServer {
         await query`
             DELETE
             FROM locations
-            WHERE user = ${auth.id}
+            WHERE userId = ${auth.id}
         `;
         return Result.ok(null);
     }

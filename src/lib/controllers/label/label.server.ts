@@ -1,9 +1,10 @@
-import { MAXIMUM_ENTITIES } from '$lib/constants';
+import { LIMITS } from '$lib/constants';
 import { query } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/utils/encryption';
+import { errorLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 import { nowUtc } from '$lib/utils/time';
-import { z } from 'zod';
+import type { PickOptional } from '../../../types';
 import type { Auth } from '../auth/auth.server';
 import type { Label as _Label, LabelWithCount } from './label';
 import { UId } from '$lib/controllers/uuid/uuid.server';
@@ -12,11 +13,11 @@ namespace LabelServer {
     type Label = _Label;
 
     export async function fromId(auth: Auth, id: string): Promise<Result<Label>> {
-        const res = await query<Required<Label>[]>`
+        const res = await query<{ id: string; color: string; name: string; created: number }[]>`
             SELECT id, color, name, created
             FROM labels
             WHERE id = ${id}
-              AND user = ${auth.id}
+              AND userId = ${auth.id}
         `;
 
         if (res.length !== 1) {
@@ -34,37 +35,23 @@ namespace LabelServer {
         });
     }
 
-    export async function getIdFromName(
-        auth: Auth,
-        nameDecrypted: string
-    ): Promise<Result<string>> {
-        const encryptedName = encrypt(nameDecrypted, auth.key);
-
-        const res = await query<Required<Label>[]>`
-            SELECT id
-            FROM labels
-            WHERE name = ${encryptedName}
-              AND user = ${auth.id}
-        `;
-
-        if (res.length !== 1) {
-            return Result.err('No Label with that name');
-        }
-
-        return Result.ok(res[0].id);
-    }
-
     export async function fromName(auth: Auth, nameDecrypted: string): Promise<Result<Label>> {
         const encryptedName = encrypt(nameDecrypted, auth.key);
 
-        const res = await query<Required<Label>[]>`
+        const res = await query<{ id: string; color: string; name: string; created: number }[]>`
             SELECT id, color, name, created
             FROM labels
             WHERE name = ${encryptedName}
-              AND user = ${auth.id}
+              AND userId = ${auth.id}
         `;
-
         if (res.length !== 1) {
+            if (res.length !== 0) {
+                await errorLogger.error(`Got ${res.length} rows for label name`, {
+                    nameDecrypted,
+                    res,
+                    userId: auth.id
+                });
+            }
             return Result.err('Label not found');
         }
 
@@ -77,10 +64,10 @@ namespace LabelServer {
     }
 
     export async function all(auth: Auth): Promise<Result<Label[]>> {
-        const res = await query<Required<Label>[]>`
+        const res = await query<{ id: string; color: string; name: string; created: number }[]>`
             SELECT id, color, name, created
             FROM labels
-            WHERE user = ${auth.id}
+            WHERE userId = ${auth.id}
         `;
 
         return Result.collect(
@@ -94,6 +81,18 @@ namespace LabelServer {
                     created: label.created
                 });
             })
+        );
+    }
+
+    export async function allIndexedById(auth: Auth): Promise<Result<Record<string, Label>>> {
+        return (await Label.Server.all(auth)).map(labels =>
+            labels.reduce(
+                (prev, label) => {
+                    prev[label.id] = label;
+                    return prev;
+                },
+                {} as Record<string, Label>
+            )
         );
     }
 
@@ -113,7 +112,7 @@ namespace LabelServer {
             DELETE
             FROM labels
             WHERE id = ${id}
-              AND user = ${auth.id}
+              AND userId = ${auth.id}
         `;
     }
 
@@ -121,23 +120,26 @@ namespace LabelServer {
         await query`
             DELETE
             FROM labels
-            WHERE user = ${auth.id}
+            WHERE userId = ${auth.id}
         `;
     }
 
     async function canCreateWithName(auth: Auth, name: string): Promise<string | true> {
-        if (await userHasLabelWithName(auth, name)) {
-            return 'Label with that name already exists';
-        }
+        if (await userHasLabelWithName(auth, name)) return 'Label with that name already exists';
+
+        if (name.length > LIMITS.label.nameLenMax)
+            return `Name too long (> ${LIMITS.label.nameLenMax} characters)`;
+
+        if (name.length < LIMITS.label.nameLenMin) return `Name too short`;
 
         const numLabels = await query<{ count: number }[]>`
             SELECT COUNT(*) as count    
             FROM labels
-            WHERE user = ${auth.id}
+            WHERE userId = ${auth.id}
         `;
-        if (numLabels[0].count >= MAXIMUM_ENTITIES.label) {
-            return `Maximum number of labels (${MAXIMUM_ENTITIES.label}) reached`;
-        }
+
+        if (numLabels[0].count >= LIMITS.label.maxCount)
+            return `Maximum number of labels (${LIMITS.label.maxCount}) reached`;
 
         return true;
     }
@@ -159,7 +161,7 @@ namespace LabelServer {
         }
 
         await query`
-            INSERT INTO labels (id, user, name, color, created)
+            INSERT INTO labels (id, userId, name, color, created)
             VALUES (${id},
                     ${auth.id},
                     ${encryptedName},
@@ -221,25 +223,25 @@ namespace LabelServer {
             await Promise.all(
                 labels.map(async label => {
                     const entryCount = await query<{ count: number }[]>`
-                SELECT COUNT(*) as count
-                FROM entries
-                WHERE user = ${auth.id}
-                  AND label = ${label.id}
-            `;
+                        SELECT COUNT(*) as count
+                        FROM entries
+                        WHERE userId = ${auth.id}
+                          AND labelId = ${label.id}
+                    `;
                     const eventCount = await query<{ count: number }[]>`
-                SELECT COUNT(*) as count
-                FROM events
-                WHERE user = ${auth.id}
-                  AND label = ${label.id}
-            `;
+                        SELECT COUNT(*) as count
+                        FROM events
+                        WHERE userId = ${auth.id}
+                          AND labelId = ${label.id}
+                    `;
                     const editCount = await query<{ count: number }[]>`
-                SELECT COUNT(*) as count
-                FROM entryEdits,
-                     entries
-                WHERE entryEdits.entry = entries.id
-                  AND entries.user = ${auth.id}
-                  AND entryEdits.label = ${label.id}
-            `;
+                        SELECT COUNT(*) as count
+                        FROM entryEdits,
+                             entries
+                        WHERE entryEdits.entryId = entries.id
+                          AND entries.userId = ${auth.id}
+                          AND entryEdits.oldLabelId = ${label.id}
+                    `;
 
                     return {
                         ...label,
@@ -249,18 +251,6 @@ namespace LabelServer {
                 })
             )
         );
-    }
-
-    export function jsonIsRawLabel(
-        json: unknown
-    ): json is { name: string; color: string; created?: number } {
-        const schema = z.object({
-            name: z.string(),
-            color: z.string(),
-            created: z.number().optional()
-        });
-
-        return schema.safeParse(json).success;
     }
 }
 

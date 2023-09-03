@@ -4,17 +4,18 @@
     import Plus from 'svelte-material-icons/Plus.svelte';
     import Dot from '$lib/components/Dot.svelte';
     import Select from '$lib/components/Select.svelte';
-    import { Event as EventController } from '$lib/controllers/event/event';
+    import { Event } from '$lib/controllers/event/event';
     import { eventsSortKey, obfuscated } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
     import { nowUtc } from '$lib/utils/time';
-    import Event from '$lib/components/event/Event.svelte';
+    import EventComponent from '$lib/components/event/Event.svelte';
+    import type { EventsSortKey } from '../../../types';
     import type { PageData } from './$types';
 
     export let data: PageData;
 
-    function sortEvents<T extends EventController | EventData>(
+    function sortEvents<T extends Event | EventData>(
         events: T[],
         key: EventsSortKey & keyof T
     ): T[] {
@@ -36,27 +37,28 @@
 
         const { id } = notify.onErr(
             await api.post('/events', {
-                name: EventController.NEW_EVENT_NAME,
+                name: Event.NEW_EVENT_NAME,
                 start: now,
                 end: now
             })
         );
 
-        const event = {
+        const event: Event = {
             id,
-            name: EventController.NEW_EVENT_NAME,
+            name: Event.NEW_EVENT_NAME,
             start: now,
             end: now,
-            created: now
+            created: now,
+            label: null
         };
 
         await dispatch.create('event', event);
         events = sortEvents([...events, event], $eventsSortKey || 'created');
     }
 
-    type EventData = EventController & { deleted?: true };
+    type EventData = Event & { deleted?: true };
 
-    let events: EventData[] = data.events;
+    let { events, labels } = data;
     $: if ($eventsSortKey) events = sortEvents(events, $eventsSortKey);
 
     let eventCount: number;
@@ -64,8 +66,7 @@
 
     let selectNameId: string;
     $: selectNameId =
-        events[events.findIndex(e => e.name === EventController.NEW_EVENT_NAME && !e.deleted)]
-            ?.id || '';
+        events[events.findIndex(e => e.name === Event.NEW_EVENT_NAME && !e.deleted)]?.id || '';
 
     const sortEventsKeys = {
         created: 'created',
@@ -113,7 +114,7 @@
     <ul>
         {#each events as event}
             <li>
-                <Event {event} {selectNameId} labels={data.labels} obfuscated={$obfuscated} />
+                <EventComponent {event} {selectNameId} {labels} obfuscated={$obfuscated} />
             </li>
         {/each}
     </ul>

@@ -67,8 +67,8 @@ export const PUT = (async ({ request, params, cookies }) => {
         entry,
         body.title,
         body.entry,
-        body.latitude || undefined,
-        body.longitude || undefined,
+        body.latitude || null,
+        body.longitude || null,
         body.label,
         body.timezoneUtcOffset,
         body.agentData

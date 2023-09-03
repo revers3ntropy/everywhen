@@ -1,10 +1,10 @@
+import { errorLogger } from '$lib/utils/log.server';
 import { z } from 'zod';
-import schemion from 'schemion';
-import { SemVer } from '$lib/utils/semVer';
-import { wordCount } from '$lib/utils/text';
+import { currentVersion, SemVer } from '$lib/utils/semVer';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
 import { nowUtc } from '$lib/utils/time';
+import type { ArrayElement } from '../../../types';
 import { Entry } from '../entry/entry.server';
 import { Event } from '../event/event.server';
 import { Label } from '../label/label.server';
@@ -13,6 +13,71 @@ import { Location } from '$lib/controllers/location/location.server';
 import { Backup as _Backup } from './backup';
 import type { Auth } from '$lib/controllers/auth/auth';
 
+export const backupSchema = z.object({
+    entries: z.array(
+        z.object({
+            title: z.string(),
+            body: z.string(),
+            labelName: z.string().nullable().optional(),
+            created: z.number(),
+            createdTzOffset: z.number(),
+            latitude: z.number().nullable().optional(),
+            longitude: z.number().nullable().optional(),
+            agentData: z.string(),
+            pinned: z.number().nullable().optional(),
+            deleted: z.number().nullable().optional(),
+            wordCount: z.number(),
+            edits: z.array(
+                z.object({
+                    oldTitle: z.string(),
+                    oldBody: z.string(),
+                    oldLabelName: z.string().nullable().optional(),
+                    created: z.number(),
+                    createdTzOffset: z.number(),
+                    latitude: z.number().nullable().optional(),
+                    longitude: z.number().nullable().optional(),
+                    agentData: z.string()
+                })
+            )
+        })
+    ),
+    labels: z.array(
+        z.object({
+            name: z.string(),
+            color: z.string(),
+            created: z.number()
+        })
+    ),
+    assets: z.array(
+        z.object({
+            publicId: z.string(),
+            fileName: z.string(),
+            content: z.string(),
+            created: z.number()
+        })
+    ),
+    events: z.array(
+        z.object({
+            name: z.string(),
+            labelName: z.string().nullable().optional(),
+            start: z.number(),
+            end: z.number(),
+            created: z.number()
+        })
+    ),
+    locations: z.array(
+        z.object({
+            created: z.number(),
+            name: z.string(),
+            latitude: z.number(),
+            longitude: z.number(),
+            radius: z.number()
+        })
+    ),
+    created: z.number(),
+    appVersion: z.string()
+});
+
 export namespace BackupServer {
     type Backup = _Backup;
 
@@ -20,7 +85,7 @@ export namespace BackupServer {
         return encrypt(JSON.stringify(self), key);
     }
 
-    export async function generate(auth: Auth, created?: number): Promise<Result<Backup>> {
+    export async function generate(auth: Auth): Promise<Result<Backup>> {
         const { err: entryErr, val: entries } = await Entry.Server.all(auth, {
             deleted: 'both'
         });
@@ -34,60 +99,71 @@ export namespace BackupServer {
         const { err: locationsErr, val: locations } = await Location.Server.all(auth);
         if (locationsErr) return Result.err(locationsErr);
 
+        // TODO datasets, columns and rows in backups
+
         return Result.ok({
-            entries: entries.map(entry => ({
-                // replace the label with the label's name
-                // can't use ID as will change when labels are restored
-                label: entry.label?.name,
-                entry: entry.entry,
-                created: entry.created,
-                createdTZOffset: entry.createdTZOffset,
-                latitude: entry.latitude ?? undefined,
-                longitude: entry.longitude ?? undefined,
-                title: entry.title,
-                agentData: entry.agentData ?? undefined,
-                pinned: entry.pinned ?? undefined,
-                deleted: entry.deleted ?? undefined,
-                wordCount: entry.wordCount,
-                edits:
-                    entry.edits?.map(edit => ({
-                        entry: edit.entry,
-                        created: edit.created,
-                        createdTZOffset: edit.createdTZOffset,
-                        label: edit.label?.name,
-                        latitude: edit.latitude ?? undefined,
-                        longitude: edit.longitude ?? undefined,
-                        title: edit.title,
-                        agentData: edit.agentData ?? undefined
-                    })) || []
-            })),
-            labels: labels.map(label => ({
-                name: label.name,
-                color: label.color,
-                created: label.created
-            })),
-            assets: assets.map(asset => ({
-                publicId: asset.publicId,
-                fileName: asset.fileName,
-                content: asset.content,
-                created: asset.created
-            })),
-            events: events.map(event => ({
-                name: event.name,
-                label: event.label?.name,
-                start: event.start,
-                end: event.end,
-                created: event.created
-            })),
-            locations: locations.map(location => ({
-                created: location.created,
-                createdTZOffset: location.createdTZOffset,
-                name: location.name,
-                latitude: location.latitude,
-                longitude: location.longitude,
-                radius: location.radius
-            })),
-            created: created ?? nowUtc(),
+            entries: entries.map(
+                (entry): ArrayElement<Backup['entries']> => ({
+                    title: entry.title,
+                    body: entry.body,
+                    labelName: entry.label?.name,
+                    created: entry.created,
+                    createdTzOffset: entry.createdTzOffset,
+                    latitude: entry.latitude ?? undefined,
+                    longitude: entry.longitude ?? undefined,
+                    agentData: entry.agentData,
+                    pinned: entry.pinned ?? undefined,
+                    deleted: entry.deleted ?? undefined,
+                    wordCount: entry.wordCount,
+                    edits:
+                        entry.edits?.map(
+                            (edit): ArrayElement<ArrayElement<Backup['entries']>['edits']> => ({
+                                oldTitle: edit.oldTitle,
+                                oldBody: edit.oldBody,
+                                oldLabelName: edit.oldLabel?.name ?? undefined,
+                                created: edit.created,
+                                createdTzOffset: edit.createdTzOffset,
+                                latitude: edit.latitude ?? undefined,
+                                longitude: edit.longitude ?? undefined,
+                                agentData: edit.agentData ?? undefined
+                            })
+                        ) || []
+                })
+            ),
+            labels: labels.map(
+                (label): ArrayElement<Backup['labels']> => ({
+                    name: label.name,
+                    color: label.color,
+                    created: label.created
+                })
+            ),
+            assets: assets.map(
+                (asset): ArrayElement<Backup['assets']> => ({
+                    publicId: asset.publicId,
+                    fileName: asset.fileName,
+                    content: asset.content,
+                    created: asset.created
+                })
+            ),
+            events: events.map(
+                (event): ArrayElement<Backup['events']> => ({
+                    name: event.name,
+                    labelName: event.label?.name,
+                    start: event.start,
+                    end: event.end,
+                    created: event.created
+                })
+            ),
+            locations: locations.map(
+                (location): ArrayElement<Backup['locations']> => ({
+                    created: location.created,
+                    name: location.name,
+                    latitude: location.latitude,
+                    longitude: location.longitude,
+                    radius: location.radius
+                })
+            ),
+            created: nowUtc(),
             appVersion: __VERSION__
         });
     }
@@ -110,147 +186,74 @@ export namespace BackupServer {
             }
         }
 
-        if (typeof decryptedData !== 'object' || decryptedData === null) {
-            return Result.err('data must be a non-null object');
+        const parseRes = backupSchema.safeParse(decryptedData);
+        if (!parseRes.success) {
+            await errorLogger.error('Invalid backup data', {
+                parseRes
+            });
+            return Result.err('Backup data is invalid');
         }
-
-        const { err: migrateErr, val: migratedData } = migrate(
-            decryptedData as Record<string, unknown>
-        );
-        if (migrateErr) return Result.err(migrateErr);
-
-        if (
-            !schemion.matches(migratedData, {
-                entries: 'object',
-                labels: 'object',
-                assets: 'object',
-                events: 'object',
-                locations: 'object',
-                created: 'number',
-                appVersion: 'string'
-            })
-        ) {
-            return Result.err('Invalid backup format');
-        }
-
-        const { entries, labels, assets, events, locations } = migratedData;
-        if (
-            !Array.isArray(entries) ||
-            !Array.isArray(labels) ||
-            !Array.isArray(assets) ||
-            !Array.isArray(events) ||
-            !Array.isArray(locations)
-        ) {
-            return Result.err('data must be an object with entries and labels properties');
-        }
+        const backup: Backup = parseRes.data;
 
         // set up labels first
+
+        // keep around for later
+        const labelsIndexedByName: Record<string, Label> = {};
+        const labels: Label[] = [];
+
         await Label.Server.purgeAll(auth);
-
-        const createdLabels = [] as Label[];
-
-        for (const label of labels) {
-            if (!Label.Server.jsonIsRawLabel(label)) {
-                return Result.err('Invalid label format in JSON');
-            }
-
+        for (const label of backup.labels) {
             const { err, val } = await Label.Server.create(auth, label);
             if (err) return Result.err(err);
-            createdLabels.push(val);
+            labelsIndexedByName[val.name] = val;
+            labels.push(val);
         }
 
         await Entry.Server.purgeAll(auth);
-
-        const editSchemaShape = {
-            title: z.string().optional(),
-            entry: z.string(),
-            created: z.number().optional(),
-            createdTZOffset: z.number().optional(),
-            latitude: z.number().nullable().optional(),
-            longitude: z.number().nullable().optional(),
-            label: z.string().nullable().optional(),
-            agentData: z.string().optional()
-        };
-        const entrySchema = z.object({
-            ...editSchemaShape,
-            deleted: z.number().nullable().optional(),
-            pinned: z.number().nullable().optional(),
-            edits: z.array(z.object(editSchemaShape)).optional()
-        });
-
-        for (const entry of entries) {
-            if (!entrySchema.safeParse(entry).success) {
-                return Result.err('Invalid entry format in JSON');
-            }
-
-            if (entry.label) {
-                const { err, val } = await Label.Server.getIdFromName(auth, entry.label);
-                if (err) return Result.err(err);
-                entry.label = val;
-            }
-
+        for (const entry of backup.entries) {
             const { err } = await Entry.Server.create(
                 auth,
-                createdLabels,
+                labels,
                 entry.title || '',
-                entry.entry,
+                entry.body,
                 entry.created || 0,
-                entry.createdTZOffset || 0,
+                entry.createdTzOffset || 0,
                 entry.pinned ?? null,
                 entry.deleted ?? null,
                 entry.latitude ?? null,
                 entry.longitude ?? null,
-                entry.label || null,
-                entry.agentData || '',
-                entry.wordCount || wordCount(entry.entry || ''),
-                (entry.edits || []).map(edit => ({
-                    ...edit,
+                labelsIndexedByName[entry.labelName || '']?.id ?? null,
+                entry.agentData,
+                entry.wordCount,
+                entry.edits.map(edit => ({
+                    oldTitle: edit.oldTitle,
+                    oldBody: edit.oldBody,
+                    oldLabelId: labelsIndexedByName[edit.oldLabelName || '']?.id ?? null,
+                    created: edit.created,
+                    createdTzOffset: edit.createdTzOffset,
                     latitude: edit.latitude ?? null,
                     longitude: edit.longitude ?? null,
-                    agentData: edit.agentData || ''
+                    agentData: edit.agentData
                 }))
             );
             if (err) return Result.err(err);
         }
 
         await Event.Server.purgeAll(auth);
-
-        for (const event of events) {
-            if (!Event.jsonIsRawEvent(event)) {
-                return Result.err('Invalid event format in JSON');
-            }
-
-            if (event.label) {
-                const { err, val } = await Label.Server.getIdFromName(auth, event.label);
-                if (err) return Result.err(err);
-                event.label = val;
-            }
-
+        for (const event of backup.events) {
             const { err } = await Event.Server.create(
                 auth,
                 event.name,
                 event.start,
                 event.end,
-                event.label,
+                labelsIndexedByName[event.labelName || '']?.id ?? null,
                 event.created
             );
             if (err) return Result.err(err);
         }
 
         await Asset.Server.purgeAll(auth);
-
-        const assetSchema = z.object({
-            publicId: z.string().optional(),
-            content: z.string(),
-            fileName: z.string().optional(),
-            created: z.number().optional()
-        });
-
-        for (const asset of assets) {
-            if (!assetSchema.safeParse(asset).success) {
-                return Result.err('Invalid asset format in JSON');
-            }
-
+        for (const asset of backup.assets) {
             const { err } = await Asset.Server.create(
                 auth,
                 asset.content,
@@ -264,16 +267,10 @@ export namespace BackupServer {
         }
 
         await Location.Server.purgeAll(auth);
-
-        for (const location of locations) {
-            if (!Location.jsonIsRawLocation(location)) {
-                return Result.err('Invalid location format in JSON');
-            }
-
+        for (const location of backup.locations) {
             const { err } = await Location.Server.create(
                 auth,
                 location.created,
-                location.createdTZOffset,
                 location.name,
                 location.latitude,
                 location.longitude,
@@ -285,65 +282,20 @@ export namespace BackupServer {
         return Result.ok(null);
     }
 
-    export function migrate(json: Partial<Backup> & Record<string, unknown>): Result<Backup> {
+    export function migrate(json: Backup): Result<Backup> {
         json.appVersion ||= '0.0.0';
         const { val: version, err } = SemVer.fromString(json.appVersion);
         if (err) return Result.err(err);
 
-        if (version.isGreaterThan(SemVer.fromString('1.0.0').unwrap(), true)) {
-            return Result.err(`Cannot time travel to version 1`);
+        if (version.isGreaterThan(currentVersion)) {
+            return Result.err(`Cannot time travel - backup is from the future`);
         }
 
-        if (version.isLessThan(SemVer.fromString('0.4.72').unwrap())) {
-            // entry.deleted -> entry.flags
-            if (json.entries) {
-                for (const entry of json.entries) {
-                    const e = entry as unknown as typeof entry & {
-                        deleted?: boolean;
-                        flags?: number;
-                    };
-                    e.flags ??= 0;
-                    if (e.deleted) {
-                        e.flags |= 1;
-                    }
-                    delete e.deleted;
-                }
-            }
+        if (version.isLessThan(SemVer.fromString('0.5.97').unwrap())) {
+            return Result.err(`Cannot use backup created before v0.5.97, sorry :/`);
         }
 
-        if (version.isLessThan(SemVer.fromString('0.5.88').unwrap())) {
-            // add entry.wordCount
-            if (json.entries) {
-                for (const entry of json.entries) {
-                    entry.wordCount = wordCount(entry.entry);
-                }
-            }
-        }
-
-        if (version.isLessThan(SemVer.fromString('0.5.94').unwrap())) {
-            // entry.flags -> entry.deleted, entry.pinned
-            if (json.entries) {
-                for (const entry of json.entries) {
-                    const e: typeof entry & { flags?: number } = entry;
-                    e.flags ??= 0;
-                    if (e.flags === 0) {
-                        delete e.deleted;
-                        delete e.pinned;
-                    } else if (e.flags === 1) {
-                        e.deleted = nowUtc();
-                        delete e.pinned;
-                    } else if (e.flags === 2) {
-                        delete e.deleted;
-                        e.pinned = nowUtc();
-                    } else if (e.flags === 3) {
-                        e.deleted = nowUtc();
-                        e.pinned = nowUtc();
-                    }
-                }
-            }
-        }
-
-        return Result.ok(json as Backup);
+        return Result.ok(json);
     }
 }
 

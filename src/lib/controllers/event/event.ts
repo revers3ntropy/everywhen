@@ -1,11 +1,5 @@
+import type { Seconds, TimestampSecs } from '../../../types';
 import type { Label } from '../label/label';
-
-// RawEvent is the raw data from the database,
-// Event is the data after decryption and links to labels
-export type RawEvent = Omit<Event, 'label' | 'decrypted'> & {
-    label?: string;
-    decrypted: false;
-};
 
 export interface Event {
     id: string;
@@ -13,33 +7,12 @@ export interface Event {
     start: TimestampSecs;
     end: TimestampSecs;
     created: TimestampSecs;
-    label?: Label;
+    label: Label | null;
 }
 
 export namespace Event {
     export const NEW_EVENT_NAME = 'New Event';
     export const DEFAULT_COLOR = '#666666';
-
-    export function jsonIsRawEvent(json: unknown): json is Omit<Event, 'id' | 'label'> & {
-        label?: string;
-    } {
-        return (
-            typeof json === 'object' &&
-            json !== null &&
-            'name' in json &&
-            typeof json.name === 'string' &&
-            'start' in json &&
-            typeof json.start === 'number' &&
-            'end' in json &&
-            typeof json.end === 'number' &&
-            'created' in json &&
-            typeof json.created === 'number' &&
-            (!('label' in json) ||
-                typeof json.label === 'string' ||
-                json.label === null ||
-                json.label === undefined)
-        );
-    }
 
     export function duration(evt: { start: TimestampSecs; end: TimestampSecs }): Seconds {
         return evt.end - evt.start;

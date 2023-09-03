@@ -10,9 +10,10 @@
     import TimelineOutline from 'svelte-material-icons/TimelineOutline.svelte';
     import type { ChangeEventHandler } from 'svelte/elements';
     import LabelSelect from '$lib/components/label/LabelSelect.svelte';
+    import type { TimestampSecs } from '../../../types';
     import UtcTime from '../UtcTime.svelte';
     import { Event } from '$lib/controllers/event/event';
-    import type { Label as LabelController } from '../../controllers/label/label';
+    import type { Label } from '$lib/controllers/label/label';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
     import { obfuscate } from '$lib/utils/text';
@@ -24,7 +25,7 @@
     } from '$lib/utils/time';
     import { slide, fly } from 'svelte/transition';
 
-    export let labels: LabelController[];
+    export let labels: Label[];
     export let obfuscated = true;
 
     export let bordered = true;
@@ -39,20 +40,19 @@
         name?: string;
         start?: TimestampSecs;
         end?: TimestampSecs;
-        label?: LabelController['id'];
+        label?: Label['id'];
     }) {
         notify.onErr(await api.put(apiPath('/events/?', event.id), changes));
 
-        const label = changes.label ? labels?.find(l => l.id === changes.label) : event.label;
+        const label = changes.label
+            ? labels?.find(l => l.id === changes.label) || null
+            : event.label;
 
         event = {
-            ...{
-                id: event.id,
-                name: changes.name || event.name,
-                start: changes.start || event.start,
-                end: changes.end || event.end,
-                created: event.created
-            },
+            ...event,
+            name: changes.name || event.name,
+            start: changes.start || event.start,
+            end: changes.end || event.end,
             label
         };
         await dispatch.update('event', event);
@@ -138,7 +138,7 @@
         if (id === (event.label?.id || '')) return;
         if (!labels) return;
 
-        event.label = labels.find(l => l.id === id) || undefined;
+        event.label = labels.find(l => l.id === id) || null;
         await updateEvent({
             label: id
         });

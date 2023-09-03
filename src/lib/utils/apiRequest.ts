@@ -31,80 +31,44 @@ export type ResType<T> = T extends typeof apiRes404
     ? R
     : 'not an API route';
 
-export type GET<T extends { GET: unknown }> = ResType<T['GET']>;
-export type POST<T extends { POST: unknown }> = ResType<T['POST']>;
-export type PUT<T extends { PUT: unknown }> = ResType<T['PUT']>;
-export type DELETE<T extends { DELETE: unknown }> = ResType<T['DELETE']>;
+type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
-interface ApiResponse {
-    GET: {
-        '/labels': GET<typeof import('../../routes/api/labels/+server')>;
-        '/labels/?': GET<typeof import('../../routes/api/labels/[labelId]/+server')>;
-        '/events': GET<typeof import('../../routes/api/events/+server')>;
-        '/entries': GET<typeof import('../../routes/api/entries/+server')>;
-        '/entries/titles': GET<typeof import('../../routes/api/entries/titles/+server')>;
-        '/entries/streaks': GET<typeof import('../../routes/api/entries/streaks/+server')>;
-        '/entries/?': GET<typeof import('../../routes/api/entries/[entryId]/+server')>;
-        '/entries/?/pinned': GET<
-            typeof import('../../routes/api/entries/[entryId]/pinned/+server')
-        >;
-        '/backups': GET<typeof import('../../routes/api/backups/+server')>;
-        '/auth': GET<typeof import('../../routes/api/auth/+server')>;
-        '/assets/?': GET<typeof import('../../routes/api/assets/[asset]/+server')>;
-        '/settings': GET<typeof import('../../routes/api/settings/+server')>;
-        '/version': GET<typeof import('../../routes/api/version/+server')>;
-        '/locations': GET<typeof import('../../routes/api/locations/+server')>;
-        '/assets': GET<typeof import('../../routes/api/assets/+server')>;
-        '/oauth/gh/user': GET<typeof import('../../routes/api/oauth/gh/user/+server')>;
-        '/datasets': GET<typeof import('../../routes/api/datasets/+server')>;
-        '/datasets/?': GET<typeof import('../../routes/api/datasets/[datasetId]/+server')>;
-    };
-    POST: {
-        '/users': POST<typeof import('../../routes/api/users/+server')>;
-        '/labels': POST<typeof import('../../routes/api/labels/+server')>;
-        '/events': POST<typeof import('../../routes/api/events/+server')>;
-        '/entries': POST<typeof import('../../routes/api/entries/+server')>;
-        '/backups': POST<typeof import('../../routes/api/backups/+server')>;
-        '/assets': POST<typeof import('../../routes/api/assets/+server')>;
-        '/locations': POST<typeof import('../../routes/api/locations/+server')>;
-        '/oauth/gh': POST<typeof import('../../routes/api/oauth/gh/+server')>;
-        '/datasets': POST<typeof import('../../routes/api/datasets/+server')>;
-        '/datasets/?': POST<typeof import('../../routes/api/datasets/[datasetId]/+server')>;
-    };
-    DELETE: {
-        '/users': DELETE<typeof import('../../routes/api/users/+server')>;
-        '/labels/?': DELETE<typeof import('../../routes/api/labels/[labelId]/+server')>;
-        '/events/?': DELETE<typeof import('../../routes/api/events/[eventId]/+server')>;
-        '/entries/?': DELETE<typeof import('../../routes/api/entries/[entryId]/+server')>;
-        '/assets/?': DELETE<typeof import('../../routes/api/assets/[asset]/+server')>;
-        '/locations/?': DELETE<typeof import('../../routes/api/locations/[locationId]/+server')>;
-        '/auth': DELETE<typeof import('../../routes/api/auth/+server')>;
-        '/oauth/gh': DELETE<typeof import('../../routes/api/oauth/gh/+server')>;
-    };
-    PUT: {
-        '/labels/?': PUT<typeof import('../../routes/api/labels/[labelId]/+server')>;
-        '/events/?': PUT<typeof import('../../routes/api/events/[eventId]/+server')>;
-        '/settings': PUT<typeof import('../../routes/api/settings/+server')>;
-        '/entries/?': PUT<typeof import('../../routes/api/entries/[entryId]/+server')>;
-        '/entries/?/pinned': PUT<
-            typeof import('../../routes/api/entries/[entryId]/pinned/+server')
-        >;
-        '/locations/?': PUT<typeof import('../../routes/api/locations/[locationId]/+server')>;
-        '/auth': PUT<typeof import('../../routes/api/auth/+server')>;
-    };
+interface ApiRoutes extends Record<string, Record<Method, unknown>> {
+    '/labels': typeof import('../../routes/api/labels/+server');
+    '/labels/?': typeof import('../../routes/api/labels/[labelId]/+server');
+    '/events': typeof import('../../routes/api/events/+server');
+    '/entries': typeof import('../../routes/api/entries/+server');
+    '/entries/titles': typeof import('../../routes/api/entries/titles/+server');
+    '/entries/streaks': typeof import('../../routes/api/entries/streaks/+server');
+    '/entries/?': typeof import('../../routes/api/entries/[entryId]/+server');
+    '/entries/?/pinned': typeof import('../../routes/api/entries/[entryId]/pinned/+server');
+    '/backups': typeof import('../../routes/api/backups/+server');
+    '/auth': typeof import('../../routes/api/auth/+server');
+    '/assets/?': typeof import('../../routes/api/assets/[asset]/+server');
+    '/settings': typeof import('../../routes/api/settings/+server');
+    '/version': typeof import('../../routes/api/version/+server');
+    '/locations': typeof import('../../routes/api/locations/+server');
+    '/assets': typeof import('../../routes/api/assets/+server');
+    '/oauth/gh/user': typeof import('../../routes/api/oauth/gh/user/+server');
+    '/datasets': typeof import('../../routes/api/datasets/+server');
+    '/datasets/?': typeof import('../../routes/api/datasets/[datasetId]/+server');
+    '/users': typeof import('../../routes/api/users/+server');
+    '/oauth/gh': typeof import('../../routes/api/oauth/gh/+server');
+    '/events/?': typeof import('../../routes/api/events/[eventId]/+server');
+    '/locations/?': typeof import('../../routes/api/locations/[locationId]/+server');
 }
 
 export async function makeApiReq<
-    Verb extends keyof ApiResponse,
-    Path extends keyof ApiResponse[Verb],
+    Verb extends Method,
+    Path extends keyof ApiRoutes,
     Body extends ReqBody
 >(
     method: Verb,
-    path: string,
+    path: Path,
     body: Body | null = null,
     options: Partial<Options> = {}
-): Promise<Result<Expand<ApiResponse[Verb][Path]>>> {
-    if (!browser) return Result.err(`Cannot make API request on server`);
+): Promise<Result<Expand<ResType<ApiRoutes[Path][Verb]>>>> {
+    if (!browser) throw new Error(`Cannot make API request on server`);
     const url = `/api${path}`;
 
     if (method !== 'GET') {
@@ -143,7 +107,7 @@ export async function makeApiReq<
     const response = await fetch(url, init);
 
     if (response.ok) {
-        return await handleOkResponse<Expand<ApiResponse[Verb][Path]>>(
+        return await handleOkResponse<Expand<ResType<ApiRoutes[Path][Verb]>>>(
             response,
             method,
             url,
@@ -245,25 +209,31 @@ async function handleErrorResponse(
 }
 
 export const api = {
-    get: async <Path extends keyof ApiResponse['GET'], Body extends ReqBody>(
+    get: async <Path extends keyof ApiRoutes, Body extends ReqBody>(
         path: Path,
         args: Record<string, string | number | boolean | undefined> = {},
         options: Partial<Options> = {}
-    ) => await makeApiReq<'GET', Path, Body>('GET', path + serializeGETArgs(args), null, options),
+    ) =>
+        await makeApiReq<'GET', Path, Body>(
+            'GET',
+            (path + serializeGETArgs(args)) as Path,
+            null,
+            options
+        ),
 
-    post: async <Path extends keyof ApiResponse['POST'], Body extends ReqBody>(
+    post: async <Path extends keyof ApiRoutes, Body extends ReqBody>(
         path: Path,
         body: Body = {} as Body,
         options: Partial<Options> = {}
     ) => await makeApiReq<'POST', Path, Body>('POST', path, body, options),
 
-    put: async <Path extends keyof ApiResponse['PUT'], Body extends ReqBody>(
+    put: async <Path extends keyof ApiRoutes, Body extends ReqBody>(
         path: Path,
         body: Body = {} as Body,
         options: Partial<Options> = {}
     ) => await makeApiReq<'PUT', Path, Body>('PUT', path, body, options),
 
-    delete: async <Path extends keyof ApiResponse['DELETE'], Body extends ReqBody>(
+    delete: async <Path extends keyof ApiRoutes, Body extends ReqBody>(
         path: Path,
         body: Body = {} as Body,
         options: Partial<Options> = {}

@@ -8,7 +8,7 @@
 
     $: unusedPresetNames = Object.keys(Dataset.datasetPresets).filter(
         name => data.datasets.filter(dataset => dataset.name === name).length < 1
-    ) as DatasetPresetName[];
+    );
 
     async function makeFromPreset(presetName: DatasetPresetName) {
         notify.onErr(

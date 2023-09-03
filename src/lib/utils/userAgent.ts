@@ -56,7 +56,7 @@ export function userAgentFromEntry(entry: { agentData: string | null }): string 
     try {
         parsed = JSON.parse(entry.agentData);
     } catch (e) {
-        /* empty */
+        // empty
     }
 
     if (typeof parsed !== 'object' || parsed === null) return '';

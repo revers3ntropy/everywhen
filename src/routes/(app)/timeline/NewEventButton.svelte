@@ -31,7 +31,8 @@
             name: EventController.NEW_EVENT_NAME,
             start,
             end,
-            created: nowUtc() // not precise but fine
+            created: nowUtc(), // not precise but fine
+            label: null
         };
         await dispatch.create('event', event);
 

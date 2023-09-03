@@ -3,7 +3,9 @@ import moment from 'moment/moment';
 import { capitalise } from '$lib/utils/text';
 import { dayUtcFromTimestamp, fmtUtc, nowUtc } from '$lib/utils/time';
 import { deviceDataFromEntry, type OsGroup, osGroups } from '$lib/utils/userAgent';
-import { Bucket, By, type EntryWithWordCount } from './helpers';
+import type { Seconds, TimestampSecs } from '../../../types';
+import { Bucket, By } from './helpers';
+import type { EntrySummary } from '$lib/controllers/entry/entry';
 import { Entry } from '$lib/controllers/entry/entry';
 import { cssVarValue } from '$lib/utils/getCssVar';
 
@@ -60,7 +62,7 @@ const generateLabels: Record<
 
 function datasetFactoryForStandardBuckets(
     selectedBucket: Bucket
-): (entries: EntryWithWordCount[], by: By) => Record<string | number, number> {
+): (entries: EntrySummary[], by: By) => Record<string | number, number> {
     function bucketSize(bucket: Bucket): Seconds {
         switch (bucket) {
             case Bucket.Year:
@@ -90,7 +92,7 @@ function datasetFactoryForStandardBuckets(
         throw new Error(`Invalid bucket ${time} ${bucket}`);
     }
 
-    return (sortedEntries: EntryWithWordCount[], by: By): Record<string | number, number> => {
+    return (sortedEntries: EntrySummary[], by: By): Record<string | number, number> => {
         const start = Entry.localTime(sortedEntries[0]);
 
         const buckets: Record<string, number> = {};
@@ -126,18 +128,15 @@ function datasetFactoryForStandardBuckets(
 
 const generateDataset: Record<
     Bucket,
-    (entries: EntryWithWordCount[], by: By) => Record<string | number, number>
+    (entries: EntrySummary[], by: By) => Record<string | number, number>
 > = {
-    [Bucket.Hour]: (
-        sortedEntries: EntryWithWordCount[],
-        by: By
-    ): Record<string | number, number> => {
+    [Bucket.Hour]: (sortedEntries: EntrySummary[], by: By): Record<string | number, number> => {
         // Entries at 3pm on different days go in the same bucket
 
         const buckets = Array<number>(24).fill(0);
 
         for (const entry of sortedEntries) {
-            const bucket = parseInt(fmtUtc(entry.created, entry.createdTZOffset, 'H'));
+            const bucket = parseInt(fmtUtc(entry.created, entry.createdTzOffset, 'H'));
             buckets[bucket] += by === By.Entries ? 1 : entry.wordCount;
         }
 
@@ -148,7 +147,7 @@ const generateDataset: Record<
     [Bucket.Month]: datasetFactoryForStandardBuckets(Bucket.Month),
     [Bucket.Year]: datasetFactoryForStandardBuckets(Bucket.Year),
     [Bucket.OperatingSystem]: (
-        sortedEntries: EntryWithWordCount[],
+        sortedEntries: EntrySummary[],
         by: By
     ): Record<string | number, number> => {
         // Entries at 3pm on different days go in the same bucket
@@ -171,7 +170,7 @@ const generateDataset: Record<
 };
 
 export function getGraphData(
-    entries: EntryWithWordCount[],
+    entries: EntrySummary[],
     selectedBucket: Bucket,
     by: By,
     style: {
@@ -181,7 +180,7 @@ export function getGraphData(
         borderRadius?: number;
     } = {}
 ): ChartData {
-    const sortedEntries = entries.sort((a, b) => a.created - b.created);
+    const sortedEntries = [...entries].sort((a, b) => a.created - b.created);
     const start = sortedEntries[0].created;
 
     const bucketsMap = generateDataset[selectedBucket](sortedEntries, by);

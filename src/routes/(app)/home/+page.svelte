@@ -38,17 +38,17 @@
         // if no recent entries,
         // create a new group with the new entry
         if (Object.keys(recentTitles).length < 1) {
-            recentTitles = Entry.groupEntriesByDay([entry]);
+            recentTitles = Entry.groupEntriesByDay([Entry.summaryFromEntry(entry)]);
         }
 
         // if no pinned entries already, face to force the pinned entries to be shown
         if (Entry.isPinned(entry) && !pinnedEntriesList.length) {
-            pinnedEntriesList = [entry];
+            pinnedEntriesList = [Entry.summaryFromEntry(entry)];
         }
     });
     listen.entry.onUpdate(entry => {
         if (Entry.isPinned(entry) && !pinnedEntriesList.length) {
-            pinnedEntriesList = [entry];
+            pinnedEntriesList = [Entry.summaryFromEntry(entry)];
         }
     });
 </script>

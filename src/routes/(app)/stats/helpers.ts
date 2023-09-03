@@ -1,9 +1,4 @@
-import type { Entry } from '$lib/controllers/entry/entry';
 import { wordsFromText } from '$lib/utils/text';
-
-export type EntryWithWordCount = PickOptionalAndMutable<Entry, 'entry' | 'title'> & {
-    wordCount: number;
-};
 
 export enum By {
     Words,

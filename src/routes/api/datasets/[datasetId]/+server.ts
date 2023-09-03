@@ -11,7 +11,7 @@ import { Auth } from '$lib/controllers/auth/auth.server';
 export const GET = cachedApiRoute(async (auth, { params }) => {
     const { datasetId } = params;
     const settings = (await Settings.Server.allAsMapWithDefaults(auth)).unwrap(e => error(500, e));
-    return (await Dataset.Server.fetchWholeDataset(auth, settings, datasetId)).unwrap(e =>
+    return (await Dataset.Server.getDatasetRows(auth, settings, datasetId, {})).unwrap(e =>
         error(400, e)
     );
 }) satisfies RequestHandler;

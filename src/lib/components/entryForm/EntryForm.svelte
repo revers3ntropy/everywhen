@@ -13,7 +13,7 @@
     import Send from 'svelte-material-icons/Send.svelte';
     import LabelSelect from '$lib/components/label/LabelSelect.svelte';
     import { LS_KEYS } from '$lib/constants';
-    import type { Entry, RawEntry } from '$lib/controllers/entry/entry';
+    import type { Entry } from '$lib/controllers/entry/entry';
     import type { Label } from '$lib/controllers/label/label';
     import {
         currentlyUploadingAssets,
@@ -68,7 +68,7 @@
         // check for unsaved changes
         return (
             entry.title !== newEntryTitle ||
-            entry.entry !== newEntryBody ||
+            entry.body !== newEntryBody ||
             (entry.label?.id || '') !== newEntryLabel
         );
     }
@@ -116,41 +116,58 @@
         };
     }
 
-    async function onEntryCreation(body: RawEntry) {
-        const res = notify.onErr(await api.post('/entries', { ...body }));
+    interface EntryPostPayload {
+        created: number;
+        latitude: number | null;
+        longitude: number | null;
+        title: string;
+        body: string;
+        labelId: string | null;
+        agentData: string;
+        wordCount: number;
+    }
+
+    async function onEntryCreation(body: EntryPostPayload) {
+        const { id } = notify.onErr(await api.post('/entries', { ...body }));
         submitted = false;
-        if (res.id) {
+        if (id) {
             // make really sure it's saved before resetting
             resetEntryForm();
         } else {
-            clientLogger.error(res);
-            notify.error(`Failed to create entry: ${JSON.stringify(res)}`);
+            clientLogger.error('failed to make entry', { id, body });
+            notify.error(`Failed to create entry`);
+            return;
         }
 
-        const entry: Mutable<Entry> = {
-            ...body,
-            id: res.id,
-            deleted: null,
-            pinned: null,
-            edits: [],
-            label: null
-        };
-
-        if (body.label && labels) {
-            entry.label = labels.find(l => l.id === body.label) ?? null;
-            if (!entry.label) {
-                notify.error('label not found');
-                clientLogger.log('label not found');
+        let label: null | Label = null;
+        if (body.labelId) {
+            label = labels?.find(l => l.id === body.labelId) ?? null;
+            if (!label) {
+                clientLogger.error('label not found');
             }
         }
 
         await dispatch.create('entry', {
-            entry,
+            entry: {
+                id,
+                title: body.title,
+                body: body.body,
+                created: body.created,
+                createdTzOffset: currentTzOffset(),
+                pinned: null,
+                deleted: null,
+                latitude: body.latitude,
+                longitude: body.longitude,
+                agentData: body.agentData,
+                wordCount: body.wordCount,
+                label,
+                edits: []
+            },
             entryMode: EntryFormMode.Standard
         });
     }
 
-    async function onEntryEdit(body: RawEntry) {
+    async function onEntryEdit(body: EntryPostPayload) {
         if (!entry) {
             clientLogger.error('entry must be set when action is edit');
             return;
@@ -178,15 +195,15 @@
 
         const body = {
             title: newEntryTitle,
-            entry: newEntryBody,
-            label: newEntryLabel,
+            body: newEntryBody,
+            labelId: newEntryLabel,
             latitude: currentLocation[0],
             longitude: currentLocation[1],
             created: nowUtc(),
             agentData: serializedAgentData(),
-            createdTZOffset: currentTzOffset(),
+            createdTzOffset: currentTzOffset(),
             wordCount: wordCount(newEntryBody)
-        } as RawEntry;
+        };
 
         switch (action) {
             case 'create':
@@ -293,23 +310,15 @@
     let mounted = false;
 
     let newEntryInputElement: HTMLTextAreaElement;
-    let labels = null as Label[] | null;
+    let labels: Label[];
 
     listen.label.onCreate(label => {
-        labels = [...(labels || []), label];
+        labels = [...labels, label];
     });
     listen.label.onUpdate(label => {
-        if (labels === null) {
-            clientLogger.error('labels should not be null');
-            return;
-        }
         labels = labels.map(l => (l.id === label.id ? label : l));
     });
     listen.label.onDelete(id => {
-        if (labels === null) {
-            clientLogger.error('labels should not be null');
-            return;
-        }
         labels = labels.filter(l => l.id !== id);
     });
 

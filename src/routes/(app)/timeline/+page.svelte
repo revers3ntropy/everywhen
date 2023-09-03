@@ -20,61 +20,42 @@
 
     export let data: PageData;
 
-    let selectedLabels = [...(data.labels.map(l => l.id) || []), ''];
+    let { labels, events, entries } = data;
+
+    let selectedLabels = [...(labels.map(l => l.id) || []), ''];
 
     let instantEvents: EventWithYLevel[];
     let durationEvents: EventWithYLevel[];
     $: [instantEvents, durationEvents] = addYToEvents(
-        data.events.filter(event => selectedLabels.includes(event.label?.id || ''))
+        events.filter(event => selectedLabels.includes(event.label?.id || ''))
     );
 
     onMount(() => {
-        const [zoom, offset] = getInitialZoomAndPos($canvasState, data.entries, data.events);
+        const [zoom, offset] = getInitialZoomAndPos($canvasState, entries, events);
         $canvasState.zoom = zoom;
         $canvasState.cameraOffset = offset;
     });
 
     listen.event.onCreate(event => {
-        data = {
-            ...data,
-            events: [...data.events, event]
-        };
+        events = [...events, event];
     });
     listen.event.onDelete(id => {
-        data = {
-            ...data,
-            events: [...data.events.filter(e => e.id !== id)]
-        };
+        events = [...events.filter(e => e.id !== id)];
     });
     listen.event.onUpdate(changedEvent => {
-        data = {
-            ...data,
-            events: [...data.events.filter(e => e.id !== changedEvent.id), changedEvent]
-        };
+        events = [...events.filter(e => e.id !== changedEvent.id), changedEvent];
     });
     listen.entry.onDelete(id => {
-        data = {
-            ...data,
-            entries: [...data.entries.filter(e => e.id !== id)]
-        };
+        entries = [...entries.filter(e => e.id !== id)];
     });
     listen.label.onCreate(label => {
-        data = {
-            ...data,
-            labels: [...(data.labels || []), label]
-        };
+        labels = [...(labels || []), label];
     });
     listen.label.onUpdate(label => {
-        data = {
-            ...data,
-            labels: data.labels.map(l => (l.id === label.id ? label : l))
-        };
+        labels = labels.map(l => (l.id === label.id ? label : l));
     });
     listen.label.onDelete(id => {
-        data = {
-            ...data,
-            labels: data.labels.filter(l => l.id !== id)
-        };
+        labels = labels.filter(l => l.id !== id);
     });
 </script>
 
@@ -127,17 +108,17 @@
 
 <main>
     <Canvas>
-        <Controls labels={data.labels} />
-        <MobileZoom labels={data.labels} />
+        <Controls {labels} />
+        <MobileZoom {labels} />
         <Background />
 
         <TimeMarkers startYear={$settingsStore.yearOfBirth.value} />
 
         <NowLine />
 
-        {#each data.entries as entry, i}
+        {#each entries as entry, i}
             {#if selectedLabels.includes(entry.label?.id || '')}
-                <EntryInTimeline {...entry} entryTextParityHeight={i % 2 === 0} />
+                <EntryInTimeline {entry} entryTextParityHeight={i % 2 === 0} />
             {/if}
         {/each}
 
@@ -145,26 +126,22 @@
             {#key durationEvents}
                 {#each durationEvents as event (event.id)}
                     <EventInTimeline
-                        labels={data.labels}
+                        {labels}
                         {...event}
                         yLevel={1 + event.yLevel}
                         eventTextParityHeight
                     />
                 {/each}
                 {#each instantEvents as event, i (event.id)}
-                    <EventInTimeline
-                        labels={data.labels}
-                        {...event}
-                        eventTextParityHeight={i % 2 === 0}
-                    />
+                    <EventInTimeline {labels} {...event} eventTextParityHeight={i % 2 === 0} />
                 {/each}
             {/key}
         {/key}
 
         <CenterLine />
-        <TimeCursor labels={data.labels} />
+        <TimeCursor {labels} />
     </Canvas>
 
     <Filters labels={data.labels} bind:selectedLabels />
-    <NewEventButton labels={data.labels} />
+    <NewEventButton {labels} />
 </main>

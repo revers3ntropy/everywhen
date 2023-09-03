@@ -15,15 +15,9 @@
     import ToggleSwitchOff from 'svelte-material-icons/ToggleSwitchOff.svelte';
     import Select from '$lib/components/Select.svelte';
     import { getGraphData, type ChartData } from './bucketiseEntriesForBarChart';
-    import {
-        Bucket,
-        bucketNames,
-        By,
-        type EntryWithWordCount,
-        initialBucket,
-        initialBucketName
-    } from './helpers';
+    import { Bucket, bucketNames, By, initialBucket, initialBucketName } from './helpers';
     import { cssVarValue } from '$lib/utils/getCssVar';
+    import type { EntrySummary } from '$lib/controllers/entry/entry';
     import { Entry } from '$lib/controllers/entry/entry';
 
     Chart.register(
@@ -37,7 +31,7 @@
         LineElement
     );
 
-    export let entries: EntryWithWordCount[];
+    export let entries: EntrySummary[];
     export let by: By;
     export let days = 0;
 
@@ -83,6 +77,7 @@
     });
 
     const optionsForMainChart = { ...bucketNames };
+    // separate graphs for these metrics
     delete optionsForMainChart['Operating System'];
     delete optionsForMainChart['Hour'];
 </script>

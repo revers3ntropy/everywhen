@@ -8,6 +8,7 @@ import { connect, dbConnection } from '$lib/db/mysql.server';
 import { cleanupCache } from '$lib/utils/cache.server';
 import { errorLogger, FileLogger } from '$lib/utils/log.server';
 import { Auth } from '$lib/controllers/auth/auth.server';
+import type { Milliseconds, Mutable, TimestampSecs } from './types';
 
 const reqLogger = new FileLogger('REQ', chalk.bgWhite.black);
 

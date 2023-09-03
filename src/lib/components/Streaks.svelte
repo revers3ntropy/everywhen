@@ -63,9 +63,11 @@
     let tooltipContent = 'Loading...';
     $: if (streaks) {
         tooltipContent =
-            (streaks.longest > 0 ? `Longest: ${streaks.longest} days` : '') +
-            (streaks.runningOut ? '<br> Make an entry today to continue the Streak!' : '') +
-            (streaks.current < 1 ? 'Make an entry to start a Streak!' : '');
+            (streaks.longest > 0
+                ? `<div class="oneline">Longest: ${streaks.longest} days</div>`
+                : '') +
+            (streaks.runningOut ? '<div>Make an entry today to continue the Streak!</div>' : '') +
+            (streaks.current < 1 ? '<div>Make an entry to start a Streak!</div>' : '');
     }
 </script>
 

@@ -1,5 +1,6 @@
 <script lang="ts">
     import { tooltip } from '@svelte-plugins/tooltips';
+    import type { Hours, Seconds, TooltipPosition } from '../../types';
     import { numberAsSignedStr } from '../utils/text';
     import { currentTzOffset, fmtUtc, fmtUtcRelative } from '../utils/time';
 
@@ -8,7 +9,7 @@
     export let fmt = 'h:mma';
     export let relative = false;
     export let noTooltip = false;
-    export let tooltipPosition = 'top' as TooltipPosition;
+    export let tooltipPosition: TooltipPosition = 'top';
 </script>
 
 {#if !noTooltip}

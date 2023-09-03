@@ -1,4 +1,5 @@
 import type { SettingConfig, SettingValue } from '$lib/controllers/settings/settings';
+import type { Seconds } from '../../../types';
 
 export const settingsConfig = {
     hideEntriesByDefault: {

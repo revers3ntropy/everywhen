@@ -9,6 +9,7 @@
     import type { PageData } from './$types';
 
     export let data: PageData;
+    let { entry, showHistory } = data;
 
     let locations = null as Location[] | null;
 
@@ -26,47 +27,56 @@
 </svelte:head>
 
 <main>
-    {#if EntryController.isDeleted(data.entry)}
+    {#if EntryController.isDeleted(entry)}
         <i>This entry has been deleted. </i>
-    {:else if data.history}
+    {:else if showHistory}
         <i>Current Version</i>
     {/if}
 
     <Entry
-        {...data.entry}
+        {...entry}
         obfuscated={$obfuscated}
         on:updated={() => location.reload()}
         showFullDate={true}
         {locations}
     />
 
-    {#if !data.history}
-        {#if data.entry.edits?.length}
+    {#if !showHistory}
+        {#if entry.edits?.length}
             <div class="flex-center">
-                <a href="/journal/{data.entry.id}?history=on">
-                    Show History ({data.entry.edits?.length} edits)
+                <a href="/journal/{entry.id}?history=on">
+                    Show History ({entry.edits?.length} edits)
                 </a>
             </div>
         {/if}
     {:else}
         <div class="flex-center">
-            <a href="/journal/{data.entry.id}">
-                Hide History ({data.entry.edits?.length} edits)
+            <a href="/journal/{entry.id}">
+                Hide History ({entry.edits?.length} edits)
             </a>
         </div>
-        {#if !data.entry.edits?.length}
+        {#if !entry.edits?.length}
             <div class="flex-center"> No edits have been made to this entry </div>
         {:else}
             <i>Older Versions</i>
-            {#each (data.entry.edits || []).sort((a, b) => b.created - a.created) as edit}
+            {#each (entry.edits || []).sort((a, b) => b.created - a.created) as edit}
                 <Entry
-                    {...edit}
+                    id={edit.id}
+                    title={edit.oldTitle}
+                    body={edit.oldBody}
+                    created={edit.created}
+                    createdTzOffset={edit.createdTzOffset}
+                    label={edit.oldLabel}
+                    latitude={edit.latitude}
+                    longitude={edit.longitude}
                     deleted={null}
                     pinned={null}
                     wordCount={-1}
+                    agentData={edit.agentData}
+                    edits={[]}
+                    isEdit
+                    showFullDate
                     obfuscated={$obfuscated}
-                    isEdit={true}
-                    showFullDate={true}
                     {locations}
                 />
             {/each}

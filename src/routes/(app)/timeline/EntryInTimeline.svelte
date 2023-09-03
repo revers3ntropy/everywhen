@@ -3,34 +3,26 @@
     import { RectCollider } from '$lib/components/canvas/collider';
     import { interactable } from '$lib/components/canvas/interactable';
     import EntryDialog from '$lib/components/dialogs/EntryDialog.svelte';
-    import type { EntryEdit } from '$lib/controllers/entry/entry';
-    import type { Label } from '$lib/controllers/label/label';
+    import type { Entry, EntrySummary } from '$lib/controllers/entry/entry';
     import { obfuscated } from '$lib/stores';
     import { showPopup } from '$lib/utils/popups';
     import { limitStrLen } from '$lib/utils/text';
 
-    export let id: string;
-    export let created: number;
-    export let title: string;
-    export let wordCount: number;
+    export let entry: Entry | EntrySummary;
     export let entryTextParityHeight: boolean;
-    export let deleted: number | null;
-    export let pinned: number | null;
-    export let label = null as Label | null;
-    export let edits = [] as EntryEdit[];
-    export let createdTZOffset = 0;
-    export let agentData = null as string | null;
-    export let latitude = null as number | null;
-    export let longitude = null as number | null;
+
+    let title = '';
+    if ('title' in entry) title = entry.title;
+    else if ('titleShortened' in entry) title = entry.titleShortened;
 
     const WIDTH = 4;
-    const height = 0.2 * wordCount + 20;
+    const height = 0.2 * entry.wordCount + 20;
 
     interactable({
         cursorOnHover: 'pointer',
         hovering: false,
         render(state) {
-            const renderPos = state.timeToX(created);
+            const renderPos = state.timeToX(entry.created);
             if (renderPos < 0 || renderPos > state.width) return;
 
             state.rect(renderPos - WIDTH / 2, state.centerLnY(), WIDTH, height, {
@@ -39,13 +31,13 @@
                 zIndex: this.hovering ? 1 : 0
             });
 
-            if (label) {
+            if (entry.label) {
                 state.rect(renderPos - WIDTH / 2, state.centerLnY() + height - 1, WIDTH, 2, {
-                    color: label.color
+                    color: entry.label.color
                 });
             }
 
-            if ((this.hovering || state.zoom > START_ZOOM * 2) && !$obfuscated && title) {
+            if (!$obfuscated && title && (this.hovering || state.zoom > START_ZOOM * 2)) {
                 let y = state.centerLnY();
 
                 if (height < 10) {
@@ -66,7 +58,7 @@
 
         collider(state) {
             return new RectCollider(
-                state.timeToX(created) - WIDTH / 2 - 1,
+                state.timeToX(entry.created) - WIDTH / 2 - 1,
                 state.centerLnY(),
                 WIDTH + 2,
                 state.height - state.centerLnY()
@@ -75,7 +67,7 @@
 
         onMouseDown() {
             showPopup(EntryDialog, {
-                id,
+                id: entry.id,
                 obfuscated: false
             });
         }

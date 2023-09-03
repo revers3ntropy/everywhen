@@ -2,6 +2,7 @@ import type { SettingsConfig } from '$lib/controllers/settings/settings';
 import { cookieWritable } from '$lib/cookieWritable';
 import type { SvelteComponent } from 'svelte';
 import { writable } from 'svelte/store';
+import type { EventsSortKey } from '../types';
 import { COOKIE_KEYS, LS_KEYS, SESSION_KEYS, Theme } from './constants';
 import { persisted } from 'svelte-local-storage-store';
 

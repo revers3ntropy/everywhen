@@ -1,14 +1,14 @@
-import type { ContextMenuOptions } from '$lib/components/canvas/canvasState';
-import Event from '$lib/components/event/Event.svelte';
+import type { ContextMenuOptions, CanvasState } from '$lib/components/canvas/canvasState';
+import EventComponent from '$lib/components/event/Event.svelte';
 import { notify } from '$lib/components/notifications/notifications';
-import { Event as EventController } from '$lib/controllers/event/event';
+import { Event } from '$lib/controllers/event/event';
 import type { Label } from '$lib/controllers/label/label';
 import { dispatch } from '$lib/dataChangeEvents';
 import { api } from '$lib/utils/apiRequest';
 import { showPopup } from '$lib/utils/popups';
 import { nowUtc } from '$lib/utils/time';
-import type { CanvasState } from '$lib/components/canvas/canvasState';
 import type { Writable } from 'svelte/store';
+import type { TimestampSecs } from '../../../types';
 
 export function makeStandardContextMenu(
     labels: Label[],
@@ -20,21 +20,22 @@ export function makeStandardContextMenu(
     async function newEvent(start: TimestampSecs, end: TimestampSecs) {
         const { id } = notify.onErr(
             await api.post('/events', {
-                name: EventController.NEW_EVENT_NAME,
+                name: Event.NEW_EVENT_NAME,
                 start,
                 end
             })
         );
-        const event: EventController = {
+        const event: Event = {
             id,
-            name: EventController.NEW_EVENT_NAME,
+            name: Event.NEW_EVENT_NAME,
             start,
             end,
-            created: nowUtc() // not precise but fine
+            created: nowUtc(), // not precise but fine,
+            label: null
         };
         await dispatch.create('event', event);
 
-        showPopup(Event, {
+        showPopup(EventComponent, {
             obfuscated: false,
             event,
             labels,

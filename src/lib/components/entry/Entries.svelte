@@ -13,6 +13,7 @@
     import { notify } from '$lib/components/notifications/notifications';
     import type { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
     import { Entry } from '$lib/controllers/entry/entry';
+    import type { Mutable } from '../../../types';
     import Spinner from '../BookSpinner.svelte';
     import EntryGroup from '$lib/components/entry/EntryGroup.svelte';
     import Sidebar from './EntriesSidebar.svelte';

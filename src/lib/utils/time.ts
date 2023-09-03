@@ -2,6 +2,7 @@ import moment from 'moment';
 import { PUBLIC_ENV } from '$env/static/public';
 import { DEV_USE_TZ_OFFSET_0 } from '$lib/constants';
 import { browser } from '$app/environment';
+import type { Hours, Seconds, TimestampSecs } from '../../types';
 
 moment.updateLocale('en', {
     relativeTime: {

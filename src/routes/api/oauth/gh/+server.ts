@@ -34,4 +34,5 @@ export const DELETE = (async ({ cookies }) => {
     return apiResponse(auth, {});
 }) satisfies RequestHandler;
 
+export const GET = apiRes404;
 export const PUT = apiRes404;

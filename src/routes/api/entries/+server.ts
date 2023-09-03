@@ -54,15 +54,15 @@ export const POST = (async ({ request, cookies }) => {
             latitude: 'number',
             longitude: 'number',
             title: 'string',
-            entry: 'string',
-            label: 'string',
+            body: 'string',
+            labelId: 'string',
             timezoneUtcOffset: 'number',
             agentData: 'string',
             wordCount: 'number'
         },
         {
             title: '',
-            label: '',
+            labelId: '',
             latitude: 0,
             longitude: 0,
             created: nowUtc(),
@@ -79,16 +79,16 @@ export const POST = (async ({ request, cookies }) => {
         auth,
         labels,
         body.title,
-        body.entry,
+        body.body,
         body.created,
         body.timezoneUtcOffset,
         null,
         null,
         body.latitude || null,
         body.longitude || null,
-        body.label,
+        body.labelId || null,
         body.agentData,
-        body.wordCount > -1 ? body.wordCount : wordCount(body.entry),
+        body.wordCount > -1 ? body.wordCount : wordCount(body.body),
         []
     );
     if (err) throw error(400, err);

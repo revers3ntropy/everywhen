@@ -1,7 +1,8 @@
+import type { Degrees, Meters, TimestampSecs } from '../../../types';
+
 export interface Location {
     id: string;
     created: TimestampSecs;
-    createdTZOffset: number;
     name: string;
     latitude: Degrees;
     longitude: Degrees;
@@ -9,24 +10,6 @@ export interface Location {
 }
 
 export namespace Location {
-    export function jsonIsRawLocation(json: unknown): json is Omit<Location, 'id'> {
-        return (
-            typeof json === 'object' &&
-            json !== null &&
-            'created' in json &&
-            typeof json.created === 'number' &&
-            (!('createdTZOffset' in json) || typeof json.createdTZOffset === 'number') &&
-            'name' in json &&
-            typeof json.name === 'string' &&
-            'latitude' in json &&
-            typeof json.latitude === 'number' &&
-            'longitude' in json &&
-            typeof json.longitude === 'number' &&
-            'radius' in json &&
-            typeof json.radius === 'number'
-        );
-    }
-
     export function metersToDegrees(m: Meters): Degrees {
         return m / 111_111;
     }

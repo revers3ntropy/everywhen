@@ -1,3 +1,4 @@
+import type { Pixels, Seconds, TimestampSecs } from '../../../types';
 import type { RenderProps } from './canvasState';
 
 export interface Collider {

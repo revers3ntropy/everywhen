@@ -5,6 +5,8 @@
     import EntryForm from '$lib/components/entryForm/EntryForm.svelte';
 
     export let data: PageData;
+
+    let { entry } = data;
 </script>
 
 <svelte:head>
@@ -14,7 +16,7 @@
 <main>
     <div class="header">
         <div>
-            <a href="/journal/{data.entry.id}">
+            <a href="/journal/{entry.id}">
                 <Close size="30" />
             </a>
         </div>
@@ -23,11 +25,11 @@
     </div>
     <EntryForm
         action="edit"
-        entry={data.entry}
+        {entry}
         loadFromLS={false}
-        newEntryBody={data.entry.entry}
-        newEntryLabel={data.entry?.label?.id || ''}
-        newEntryTitle={data.entry.title}
+        newEntryBody={entry.body}
+        newEntryLabel={entry?.label?.id || ''}
+        newEntryTitle={entry.title}
         obfuscated={$obfuscated}
     />
 </main>

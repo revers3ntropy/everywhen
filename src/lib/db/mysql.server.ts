@@ -3,7 +3,7 @@ import chalk from 'chalk';
 import '../require';
 import { DB, DB_HOST, DB_PASS, DB_PORT, DB_USER } from '$env/static/private';
 import { collapseWhitespace, recursivelyTrimAndStringify } from '$lib/utils/text';
-import type { Expand } from '../../types';
+import type { Expand, Milliseconds, NonFunctionProperties } from '../../types';
 import { FileLogger } from '../utils/log.server';
 
 export type QueryResult =
@@ -36,7 +36,9 @@ export function getConfig(): mysql.ConnectionOptions {
         user: DB_USER,
         password: DB_PASS,
         database: DB,
-        port
+        port,
+        multipleStatements: true,
+        charset: 'utf8mb4_bin'
     };
 }
 
@@ -71,6 +73,8 @@ function buildQuery(queryParts: TemplateStringsArray, params: QueryParam[]): [st
         if (p === undefined) {
             return str;
         } else if (Array.isArray(p)) {
+            if (p.length === 0) throw new Error('Empty array passed to query');
+            if (p.length === 1) return str + '?';
             // so you have ?,?,...?,? in your query for each array element
             return str + '?,'.repeat(p.length - 1) + '?';
         } else {
@@ -91,7 +95,16 @@ function buildQuery(queryParts: TemplateStringsArray, params: QueryParam[]): [st
     return [query, params];
 }
 
-export type QueryParam = string | number | null | boolean | undefined;
+export type QueryParam =
+    | string
+    | number
+    | null
+    | boolean
+    | undefined
+    | string[]
+    | number[]
+    | boolean[];
+
 type QueryExecutor = <Res extends QueryResult = never>(
     queryParts: TemplateStringsArray,
     ...params: QueryParam[]

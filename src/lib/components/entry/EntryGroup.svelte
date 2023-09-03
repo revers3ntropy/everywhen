@@ -137,19 +137,25 @@
             }}
         >
             {#if isToday && $currentlyUploadingEntries}
-                {#each { length: $currentlyUploadingEntries } as i}
+                {#each { length: $currentlyUploadingEntries } as i (i)}
                     <Entry
                         id="temp-{i}"
                         title=""
-                        entry="..."
+                        body="..."
                         created={nowUtc()}
+                        createdTzOffset={currentTzOffset()}
+                        label={null}
+                        latitude={null}
+                        longitude={null}
+                        deleted={null}
+                        pinned={null}
+                        wordCount={-1}
+                        agentData=""
+                        edits={[]}
                         {obfuscated}
                         {showLabels}
                         {showLocations}
                         {locations}
-                        deleted={null}
-                        pinned={null}
-                        wordCount={0}
                     />
                 {/each}
             {/if}

@@ -3,7 +3,7 @@
     import { listen } from '$lib/dataChangeEvents';
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
-    import { Entry, type EntryTitle } from '$lib/controllers/entry/entry';
+    import { Entry, type EntrySummary } from '$lib/controllers/entry/entry';
     import { showPopup } from '$lib/utils/popups';
     import { obfuscate } from '$lib/utils/text';
     import { currentTzOffset, fmtUtc, nowUtc, utcEq } from '$lib/utils/time';
@@ -11,7 +11,7 @@
     import Dot from '../Dot.svelte';
     import UtcTime from '../UtcTime.svelte';
 
-    export let titles = null as Record<string, EntryTitle[]> | null;
+    export let titles: Record<string, EntrySummary[]>;
     export let obfuscated = true;
     export let showTimeAgo = true;
     export let blurToggleOnLeft = false;
@@ -30,17 +30,17 @@
         if (!onCreateFilter(entry)) return;
         if (!titles) titles = {};
 
-        const localDate = fmtUtc(entry.created, entry.createdTZOffset, 'YYYY-MM-DD');
+        const localDate = fmtUtc(entry.created, entry.createdTzOffset, 'YYYY-MM-DD');
 
         titles = {
             ...titles,
-            [localDate]: [Entry.entryToTitleEntry(entry), ...(titles?.[localDate] || [])]
+            [localDate]: [Entry.summaryFromEntry(entry), ...(titles?.[localDate] || [])]
         };
     });
     listen.entry.onUpdate(entry => {
         if (!titles) titles = {};
 
-        const localDate = fmtUtc(entry.created, entry.createdTZOffset, 'YYYY-MM-DD');
+        const localDate = fmtUtc(entry.created, entry.createdTzOffset, 'YYYY-MM-DD');
 
         if (!(titles[localDate] || []).find(e => e.id === entry.id)) {
             if (!showOnUpdateAndNotAlreadyShownFilter(entry)) {
@@ -51,7 +51,7 @@
         titles = {
             ...titles,
             [localDate]: [
-                Entry.entryToTitleEntry(entry),
+                Entry.summaryFromEntry(entry),
                 ...(titles[localDate] || []).filter(e => e.id !== entry.id)
             ]
         };
@@ -120,7 +120,7 @@
                             <UtcTime
                                 timestamp={entry.created}
                                 fmt="h:mma"
-                                tzOffset={entry.createdTZOffset}
+                                tzOffset={entry.createdTzOffset}
                                 tooltipPosition="right"
                             />
                         </span>
@@ -128,13 +128,15 @@
                         <LabelDot name={entry.label?.name} color={entry.label?.color || null} />
 
                         <span class="title {obfuscated ? 'obfuscated' : ''}">
-                            {#if entry.title}
-                                {obfuscated ? obfuscate(entry.title) : entry.title}
+                            {#if entry.titleShortened}
+                                {obfuscated
+                                    ? obfuscate(entry.titleShortened)
+                                    : entry.titleShortened}
                             {:else}
                                 <i class="text-light">
                                     {obfuscated
-                                        ? obfuscate(entry.entry)
-                                        : entry.entry}{#if entry.entry.length >= Entry.TITLE_LENGTH_CUTOFF}...
+                                        ? obfuscate(entry.bodyShortened)
+                                        : entry.bodyShortened}{#if entry.bodyShortened.length >= Entry.TITLE_LENGTH_CUTOFF}...
                                     {/if}
                                 </i>
                             {/if}

@@ -1,14 +1,18 @@
-import { MAXIMUM_ENTITIES } from '$lib/constants';
+import { LIMITS } from '$lib/constants';
+import type { PresetId } from '$lib/controllers/dataset/presets';
+import { datasetPresets } from '$lib/controllers/dataset/presets';
 import type { SettingsConfig } from '$lib/controllers/settings/settings';
+import { errorLogger } from '$lib/utils/log.server';
 import { query } from '$lib/db/mysql.server';
 import { Result } from '$lib/utils/result';
+import type { Hours, TimestampSecs } from '../../../types';
+import type { DatasetDataFilter } from './dataset';
 import {
     Dataset as _Dataset,
     type DatasetColumn,
     type DatasetColumnType,
     type DatasetData,
-    type DatasetMetadata,
-    type ThirdPartyDatasetIds
+    type DatasetMetadata
 } from './dataset';
 import { nowUtc } from '$lib/utils/time';
 import { decrypt, encrypt } from '$lib/utils/encryption';
@@ -23,7 +27,10 @@ namespace DatasetServer {
         return Result.ok(Dataset.builtInTypes);
     }
 
-    async function allColumns(auth: Auth, datasetId?: string): Promise<Result<DatasetColumn[]>> {
+    async function allUserDefinedColumns(
+        auth: Auth,
+        datasetId?: string
+    ): Promise<Result<DatasetColumn<unknown>[]>> {
         const { val: types, err: typesErr } = allTypes();
         if (typesErr) return Result.err(typesErr);
 
@@ -49,14 +56,16 @@ namespace DatasetServer {
 
         return Result.collect(
             columns.map(column => {
-                const type = types.find(type => type.id === column.type);
+                const type = types[column.typeId];
                 if (!type) return Result.err('Invalid column type found');
 
                 const { val: name, err: decryptNameErr } = decrypt(column.name, auth.key);
                 if (decryptNameErr) return Result.err(decryptNameErr);
 
                 return Result.ok({
-                    ...column,
+                    id: column.id,
+                    datasetId: column.datasetId,
+                    created: column.created,
                     name,
                     type
                 });
@@ -64,61 +73,121 @@ namespace DatasetServer {
         );
     }
 
-    export async function allMetaData(
-        auth: Auth,
-        settings: SettingsConfig
-    ): Promise<Result<DatasetMetadata[]>> {
+    export async function allMetaData(auth: Auth): Promise<Result<DatasetMetadata[]>> {
         const metadatas = [] as DatasetMetadata[];
-        for (const dataset of Object.keys(thirdPartyDatasetProviders)) {
-            const metadata = thirdPartyDatasetMetadataProviders[dataset as ThirdPartyDatasetIds](
-                auth,
-                settings
-            );
-            if (metadata) {
-                metadatas.push(metadata);
-            }
-        }
 
-        const datasets = await query<{ id: string; name: string; created: TimestampSecs }[]>`
-            SELECT id, name, created
+        const datasets = await query<
+            { id: string; name: string; created: TimestampSecs; presetId: string }[]
+        >`
+            SELECT id, name, created, presetId
             FROM datasets
-            WHERE user = ${auth.id}
+            WHERE userId = ${auth.id}
         `;
 
-        const { err: columnsRes, val: columns } = await allColumns(auth);
+        const { err: columnsRes, val: usersColumns } = await allUserDefinedColumns(auth);
         if (columnsRes) return Result.err(columnsRes);
 
         for (const dataset of datasets) {
             const { val: decryptedName, err: decryptedNameErr } = decrypt(dataset.name, auth.key);
             if (decryptedNameErr) return Result.err(decryptedNameErr);
+            const preset = datasetPresets[dataset.presetId] || null;
+            if (!preset && dataset.presetId) {
+                await errorLogger.error('Invalid preset ID', { dataset });
+                return Result.err('Invalid preset ID');
+            }
+
+            let columns: DatasetColumn<unknown>[];
+            if (preset) {
+                columns = preset.columns;
+            } else {
+                columns = usersColumns.filter(c => c.datasetId === dataset.id);
+            }
+
             metadatas.push({
                 id: dataset.id,
                 name: decryptedName,
                 created: dataset.created,
-                columns: columns.filter(column => column.dataset === dataset.id)
+                columns,
+                preset
             });
         }
 
         return Result.ok(metadatas);
     }
 
-    export async function fetchWholeDataset(
+    export async function getDatasetRows(
         auth: Auth,
         settings: SettingsConfig,
-        datasetId: string
+        datasetId: string,
+        filter: DatasetDataFilter
     ): Promise<Result<DatasetData>> {
-        const provider = thirdPartyDatasetProviders[datasetId as ThirdPartyDatasetIds];
-        if (!provider) {
-            return Result.err('Invalid dataset ID');
+        const datasetRes = await query<
+            { id: string; name: string; created: TimestampSecs; presetId: string }[]
+        >`
+            SELECT id, name, created, presetId
+            FROM datasets
+            WHERE userId = ${auth.id}
+                AND id = ${datasetId}
+        `;
+        if (datasetRes.length !== 1) {
+            return Result.err('Dataset not found');
         }
-        const res = await provider(auth, settings);
-        if (res === null) {
-            return Result.err('User has not connected to this dataset');
+        const [dataset] = datasetRes;
+
+        const preset = datasetPresets[dataset.presetId] || null;
+
+        if (preset?.thirdPartyProvider) {
+            return await preset.thirdPartyProvider.fetchDataset(auth, settings, filter);
         }
-        return Result.ok(res);
+
+        const rows = await query<
+            {
+                id: number;
+                created: number;
+                timestamp: number;
+                timestampTzOffset: number;
+                rowJson: string;
+            }[]
+        >`
+            SELECT
+                id,
+                created,
+                timestamp,
+                timestampTzOffset,
+                rowJson
+            FROM datasetRows
+            WHERE datasetId = ${datasetId}
+            ORDER BY timestamp DESC
+        `;
+
+        return Result.collect(
+            rows.map(row => {
+                let elements: unknown[];
+                try {
+                    const parsedRowData = JSON.parse(row.rowJson);
+                    if (!Array.isArray(parsedRowData)) {
+                        return Result.err('Invalid row JSON');
+                    }
+                    elements = parsedRowData;
+                } catch (e) {
+                    return Result.err('Invalid row JSON');
+                }
+                return Result.ok({
+                    id: row.id,
+                    created: row.created,
+                    timestamp: row.timestamp,
+                    timestampTzOffset: row.timestampTzOffset,
+                    elements
+                });
+            })
+        );
     }
 
-    async function canCreateWithName(auth: Auth, namePlaintext: string): Promise<string | true> {
+    async function canCreateWithName(
+        auth: Auth,
+        namePlaintext: string,
+        presetId: PresetId | null
+    ): Promise<string | true> {
         if (namePlaintext.length < 1) {
             return 'Name must be at least 1 character long';
         }
@@ -129,10 +198,10 @@ namespace DatasetServer {
         const numDatasets = await query<{ count: number }[]>`
             SELECT COUNT(*) AS count
             FROM datasets
-            WHERE datasets.user = ${auth.id}
+            WHERE datasets.userId = ${auth.id}
         `;
-        if (numDatasets[0].count >= MAXIMUM_ENTITIES.dataset) {
-            return `Maximum number of datasets (${MAXIMUM_ENTITIES.dataset}) reached`;
+        if (numDatasets[0].count >= LIMITS.dataset.maxCount) {
+            return `Maximum number of datasets (${LIMITS.dataset.maxCount}) reached`;
         }
 
         const encryptedName = encrypt(namePlaintext, auth.key);
@@ -141,10 +210,28 @@ namespace DatasetServer {
             SELECT name
             FROM datasets
             WHERE name = ${encryptedName}
-              AND datasets.user = ${auth.id}
+              AND datasets.userId = ${auth.id}
         `;
         if (existingWithName.length > 0) {
             return 'Dataset with that name already exists';
+        }
+
+        if (presetId) {
+            if (!(presetId in datasetPresets)) {
+                await errorLogger.error('Invalid preset ID', { presetId });
+                return 'Invalid preset ID';
+            }
+            const existingWithPreset = await query<{ name: string }[]>`
+                SELECT name
+                FROM datasets
+                WHERE presetId = ${presetId}
+                  AND datasets.userId = ${auth.id}
+            `;
+            if (existingWithPreset.length > 0) {
+                const presetName = datasetPresets[presetId].defaultName;
+                const fromPresetName = existingWithPreset[0].name;
+                return `Dataset already created from preset '${presetName}': '${fromPresetName}`;
+            }
         }
 
         return true;
@@ -157,13 +244,14 @@ namespace DatasetServer {
         columns: { name: string; type: string }[]
     ): Promise<Result<Dataset>> {
         const id = await UId.Server.generate();
+        const presetId = null;
 
-        const canCreate = await canCreateWithName(auth, name);
+        const canCreate = await canCreateWithName(auth, name, presetId);
         if (canCreate !== true) return Result.err(canCreate);
 
         await query`
-            INSERT INTO datasets (id, user, name, created)
-            VALUES (${id}, ${auth.id}, ${encrypt(name, auth.key)}, ${created})
+            INSERT INTO datasets (id, userId, name, created, presetId)
+            VALUES (${id}, ${auth.id}, ${encrypt(name, auth.key)}, ${created}, ${presetId})
         `;
 
         const { val: types, err: getTypesErr } = allTypes();
@@ -171,21 +259,22 @@ namespace DatasetServer {
 
         for (let i = 0; i < columns.length; i++) {
             const column = columns[i];
-            const type = types.find(type => type.id === column.type);
+            const type = types[column.type];
             if (!type) return Result.err('Invalid column type');
 
             const nameEncrypted = encrypt(column.name, auth.key);
 
             await query`
-                INSERT INTO datasetColumns (id, dataset, name, created, type)
-                VALUES (${i}, ${id}, ${nameEncrypted}, ${created}, ${type.id})
+                INSERT INTO datasetColumns (id, userId, datasetId, name, created, typeId)
+                VALUES (${i}, ${auth.id}, ${id}, ${nameEncrypted}, ${created}, ${type.id})
             `;
         }
 
         return Result.ok({
             id,
             name,
-            created
+            created,
+            preset: presetId ? datasetPresets[presetId] : null
         });
     }
 
@@ -198,16 +287,8 @@ namespace DatasetServer {
             timestampTzOffset?: Hours;
         }[]
     ): Promise<Result<null>> {
-        const { val: columns, err: getColumnsErr } = await allColumns(auth);
+        const { val: columns, err: getColumnsErr } = await allUserDefinedColumns(auth);
         if (getColumnsErr) return Result.err(getColumnsErr);
-
-        const newRows = [] as {
-            id: number;
-            created: TimestampSecs;
-            timestamp: TimestampSecs;
-            timestampTzOffset: Hours;
-        }[];
-        const newElements = [] as { row: number; column: number; data: string }[];
 
         const maxRowId = await query<{ id: number }[]>`
             SELECT MAX(datasetRows.id) AS id
@@ -230,48 +311,28 @@ namespace DatasetServer {
                 const column = columns[i];
                 const value = row.elements[i];
                 if (!column.type.validate(value)) {
-                    return Result.err(
-                        `Invalid value for column ${column.name}: ${JSON.stringify(value)}`
-                    );
+                    return Result.err(`Invalid value for '${column.name}'`);
                 }
             }
 
             const rowId = nextRowId;
             nextRowId++;
 
-            newRows.push({
-                id: rowId,
-                timestamp: row.timestamp || nowUtc(),
-                timestampTzOffset: row.timestampTzOffset || 0
-            });
-
-            for (let i = 0; i < columns.length; i++) {
-                const column = columns[i];
-                const value = row.elements[i];
-                const data = columns[i].type.serialize(value);
-                if (data.length > 1000) {
-                    return Result.err(`Value for column ${column.name} is too long`);
-                }
-                newElements.push({
-                    row: rowId,
-                    column: column.id,
-                    data
-                });
-            }
-        }
-
-        for (const row of newRows) {
-            await query`
-                INSERT INTO datasetRows (id, dataset, created, timestamp, timestampTzOffset)
-                VALUES (${row.id}, ${datasetId}, ${row.created}, ${row.timestamp}, ${row.timestampTzOffset})
-            `;
-        }
-        for (const element of newElements) {
-            const dataEncrypted = encrypt(element.data, auth.key);
+            const rowTimestamp = row.timestamp ?? nowUtc();
+            const rowTimestampTzOffset = row.timestampTzOffset ?? 0;
+            const rowJson = JSON.stringify(row.elements);
 
             await query`
-                INSERT INTO datasetElements (dataset, \`row\`, \`column\`, data)
-                VALUES (${datasetId}, ${element.row}, ${element.column}, ${dataEncrypted})
+                INSERT INTO datasetRows (id, userId, datasetId, created, timestamp, timestampTzOffset, rowJson)
+                VALUES (
+                    ${rowId},
+                    ${auth.id},
+                    ${datasetId},
+                    ${nowUtc()},
+                    ${rowTimestamp},
+                    ${rowTimestampTzOffset},
+                    ${rowJson}
+                )
             `;
         }
 
@@ -284,10 +345,4 @@ export const Dataset = {
     Server: DatasetServer
 };
 export type Dataset = _Dataset;
-export type {
-    DatasetColumn,
-    DatasetColumnType,
-    DatasetData,
-    DatasetMetadata,
-    ThirdPartyDatasetIds
-} from './dataset';
+export type { DatasetColumn, DatasetColumnType, DatasetData, DatasetMetadata } from './dataset';

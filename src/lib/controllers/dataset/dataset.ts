@@ -1,12 +1,13 @@
 import { builtInTypes as _builtInTypes } from '$lib/controllers/dataset/columnTypes';
 import type { DatasetPreset } from '$lib/controllers/dataset/presets';
 import { datasetPresets as _datasetPresets } from '$lib/controllers/dataset/presets';
+import type { Hours, TimestampSecs } from '../../../types';
 
 export interface Dataset {
     id: string;
     created: TimestampSecs;
     name: string;
-    preset: null | DatasetPreset;
+    preset: DatasetPreset | null;
 }
 
 export interface DatasetMetadata extends Dataset {
@@ -21,20 +22,19 @@ export interface DatasetColumnType<T> {
     name: string;
     unit: string;
     validate: (value: T) => boolean;
-    serialize: (value: T) => string;
-    deserialize: (value: string) => T;
 }
 
 export interface DatasetColumn<T> {
     id: number;
     datasetId: string;
-    created: TimestampSecs;
+    created: TimestampSecs | null;
     name: string;
     type: DatasetColumnType<T>;
 }
 
 export interface DatasetRow {
     id: number;
+    created: TimestampSecs;
     timestamp: TimestampSecs;
     timestampTzOffset: Hours;
     elements: unknown[];

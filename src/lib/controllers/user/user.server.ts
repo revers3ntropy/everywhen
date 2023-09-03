@@ -1,3 +1,4 @@
+import { LIMITS } from '$lib/constants';
 import { Backup } from '$lib/controllers/backup/backup.server';
 import { query } from '$lib/db/mysql.server';
 import { Result } from '$lib/utils/result';
@@ -30,28 +31,27 @@ export namespace UserServer {
     export async function newUserIsValid(
         username: string,
         password: string
-    ): Promise<Result<null>> {
-        if (username.length < 3) {
-            return Result.err('Username must be at least 3 characters');
-        }
-        if (password.length < 8) {
-            return Result.err('Password must be at least 8 characters');
-        }
+    ): Promise<string | true> {
+        if (username.length < LIMITS.user.usernameLenMin)
+            return `Username must be at least ${LIMITS.user.usernameLenMin} characters`;
 
-        if (username.length > 128) {
-            return Result.err('Username must be less than 128 characters');
-        }
+        if (password.length < LIMITS.user.passwordLenMin)
+            return `Password must be at least ${LIMITS.user.usernameLenMin} characters`;
 
-        if (await userExistsWithUsername(username)) {
-            return Result.err('Username already in use');
-        }
+        if (username.length > LIMITS.user.usernameLenMax)
+            return `Username must be at most ${LIMITS.user.usernameLenMax} characters`;
 
-        return Result.ok(null);
+        if (password.length > LIMITS.user.passwordLenMax)
+            return `Password must be at most ${LIMITS.user.usernameLenMax} characters`;
+
+        if (await userExistsWithUsername(username)) return 'Username already in use';
+
+        return true;
     }
 
     export async function create(username: string, password: string): Promise<Result<User>> {
-        const { err } = await newUserIsValid(username, password);
-        if (err) return Result.err(err);
+        const newUserValid = await newUserIsValid(username, password);
+        if (newUserValid !== true) return Result.err(newUserValid);
 
         const salt = await generateSalt();
         const id = await UId.Server.generate();

@@ -1,9 +1,10 @@
 <script lang="ts">
+    import type { EntrySummary } from '$lib/controllers/entry/entry';
     import moment from 'moment';
     import SvelteHeatmap from 'svelte-heatmap';
-    import { By, type EntryWithWordCount } from './helpers';
+    import { By } from './helpers';
 
-    export let entries: EntryWithWordCount[];
+    export let entries: EntrySummary[];
     export let by: By;
     let data: { date: Date; value: number }[] = [];
 

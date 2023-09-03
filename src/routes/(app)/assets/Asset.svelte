@@ -10,6 +10,7 @@
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
     import { Asset } from '$lib/controllers/asset/asset';
+    import type { TimestampSecs } from '../../../types';
 
     const dispatch = createEventDispatcher();
 

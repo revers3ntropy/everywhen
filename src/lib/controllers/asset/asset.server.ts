@@ -1,8 +1,11 @@
-import { MAXIMUM_ENTITIES } from '$lib/constants';
+import { LIMITS } from '$lib/constants';
 import { decrypt, encrypt } from '$lib/utils/encryption';
+import { errorLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
+import { fmtBytes } from '$lib/utils/text';
 import { nowUtc } from '$lib/utils/time';
 import type { ResultSetHeader } from 'mysql2';
+import type { TimestampSecs } from '../../../types';
 import { Asset as _Asset, type AssetMetadata } from './asset';
 import { UId } from '$lib/controllers/uuid/uuid.server';
 import type { Auth } from '$lib/controllers/auth/auth';
@@ -11,6 +14,33 @@ import { query } from '$lib/db/mysql.server';
 namespace AssetServer {
     type Asset = _Asset;
 
+    async function canCreateAssetWithNameAndContent(
+        auth: Auth,
+        contentsPlainText: string,
+        fileNamePlainText: string
+    ): Promise<string | true> {
+        if (contentsPlainText.length > LIMITS.asset.contentLenMax) {
+            return `Too big (max ${fmtBytes(LIMITS.asset.contentLenMax)})`;
+        }
+
+        if (fileNamePlainText.length < LIMITS.asset.nameLenMin) {
+            return `File name too short`;
+        }
+
+        if (fileNamePlainText.length < LIMITS.asset.nameLenMax) {
+            return `File name too long (max ${LIMITS.asset.nameLenMax})`;
+        }
+        const numEntries = await query<{ count: number }[]>`
+            SELECT COUNT(*) as count
+            FROM assets
+            WHERE userId = ${auth.id}
+        `;
+        if (numEntries[0].count >= LIMITS.asset.maxCount) {
+            return `Maximum number of assets (${LIMITS.asset.maxCount}) reached`;
+        }
+        return true;
+    }
+
     export async function create(
         auth: Auth,
         contentsPlainText: string,
@@ -18,24 +48,23 @@ namespace AssetServer {
         created?: TimestampSecs,
         publicId?: string
     ): Promise<Result<{ publicId: string; id: string }>> {
-        const numEntries = await query<{ count: number }[]>`
-            SELECT COUNT(*) as count
-            FROM assets
-            WHERE user = ${auth.id}
-        `;
-        if (numEntries[0].count >= MAXIMUM_ENTITIES.asset) {
-            return Result.err(`Maximum number of assets (${MAXIMUM_ENTITIES.asset}) reached`);
-        }
+        fileNamePlainText ??= `${publicId}`;
+
+        const canCreate = await canCreateAssetWithNameAndContent(
+            auth,
+            contentsPlainText,
+            fileNamePlainText
+        );
+        if (canCreate !== true) return Result.err(canCreate);
 
         publicId ??= await UId.Server.generate();
         const id = await UId.Server.generate();
-        fileNamePlainText ??= `${publicId}`;
 
         const encryptedContents = encrypt(contentsPlainText, auth.key);
         const encryptedFileName = encrypt(fileNamePlainText, auth.key);
 
         await query`
-            INSERT INTO assets (id, publicId, user, created, fileName, content)
+            INSERT INTO assets (id, publicId, userId, created, fileName, content)
             VALUES (${id},
                     ${publicId},
                     ${auth.id},
@@ -48,7 +77,9 @@ namespace AssetServer {
     }
 
     export async function fromPublicId(auth: Auth, publicId: string): Promise<Result<Asset>> {
-        const res = await query<Asset[]>`
+        const res = await query<
+            { id: string; publicId: string; content: string; created: number; fileName: string }[]
+        >`
             SELECT id,
                    publicId,
                    content,
@@ -56,27 +87,35 @@ namespace AssetServer {
                    fileName
             FROM assets
             WHERE publicId = ${publicId}
-              AND user = ${auth.id}
+              AND userId = ${auth.id}
         `;
-
         if (res.length !== 1) {
+            if (res.length !== 0) {
+                await errorLogger.error(
+                    `Expected 1 asset with publicId ${publicId} but found ${res.length}`,
+                    {
+                        publicId,
+                        userId: auth.id
+                    }
+                );
+            }
             return Result.err('Asset not found');
         }
 
-        const [row] = res;
+        const [asset] = res;
 
-        const { err: contentsErr, val: content } = decrypt(row.content, auth.key);
+        const { err: contentsErr, val: content } = decrypt(asset.content, auth.key);
         if (contentsErr) return Result.err(contentsErr);
 
-        const { err: fileNameErr, val: fileName } = decrypt(row.fileName, auth.key);
+        const { err: fileNameErr, val: fileName } = decrypt(asset.fileName, auth.key);
         if (fileNameErr) return Result.err(fileNameErr);
 
         return Result.ok({
-            id: row.id,
-            publicId: row.publicId,
+            id: asset.id,
+            publicId: asset.publicId,
             content,
             fileName,
-            created: row.created
+            created: asset.created
         });
     }
 
@@ -88,7 +127,7 @@ namespace AssetServer {
                    created,
                    fileName
             FROM assets
-            WHERE user = ${auth.id}
+            WHERE userId = ${auth.id}
         `;
 
         return Result.collect(
@@ -125,7 +164,7 @@ namespace AssetServer {
                    created,
                    fileName
             FROM assets
-            WHERE user = ${auth.id}
+            WHERE userId = ${auth.id}
             ORDER BY created DESC
             LIMIT ${count}
             OFFSET ${offset}
@@ -150,7 +189,7 @@ namespace AssetServer {
         const [assetCount] = await query<{ count: number }[]>`
             SELECT COUNT(*) as count
             FROM assets
-            WHERE user = ${auth.id}
+            WHERE userId = ${auth.id}
         `;
 
         return Result.ok([metadata, assetCount.count]);
@@ -160,7 +199,7 @@ namespace AssetServer {
         await query`
             DELETE
             FROM assets
-            WHERE user = ${auth.id}
+            WHERE userId = ${auth.id}
         `;
     }
 
@@ -168,7 +207,7 @@ namespace AssetServer {
         const res = await query<ResultSetHeader>`
             DELETE
             FROM assets
-            WHERE user = ${auth.id}
+            WHERE userId = ${auth.id}
               AND publicId = ${publicId}
         `;
 

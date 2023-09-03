@@ -7,6 +7,7 @@
     import Windows from 'svelte-material-icons/MicrosoftWindows.svelte';
     import Television from 'svelte-material-icons/Television.svelte';
     import Watch from 'svelte-material-icons/Watch.svelte';
+    import type { Pixels, TooltipPosition } from '../../../types';
 
     export let data = null as string | null;
     export let size: Pixels = 20;

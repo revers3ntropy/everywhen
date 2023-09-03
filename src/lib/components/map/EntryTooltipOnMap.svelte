@@ -32,26 +32,26 @@
                 timestamp={entry.created}
                 fmt="ddd Do MMMM YYYY, h:mm a"
                 noTooltip={true}
-                tzOffset={entry.createdTZOffset}
+                tzOffset={entry.createdTzOffset}
             />
             <Dot />
             <UtcTime
                 timestamp={entry.created}
                 relative={true}
                 noTooltip={true}
-                tzOffset={entry.createdTZOffset}
+                tzOffset={entry.createdTzOffset}
             />
         </div>
         {#if !$obfuscated}
             {#if entry.title}
                 <h3 class="ellipsis">{entry.title}</h3>
             {/if}
-            <p>{entry.entry}</p>
+            <p>{entry.body}</p>
         {:else}
             {#if entry.title}
                 <h3 class="ellipsis obfuscated">{obfuscate(entry.title)}</h3>
             {/if}
-            <p class="obfuscated">{obfuscate(entry.entry)}</p>
+            <p class="obfuscated">{obfuscate(entry.body)}</p>
         {/if}
     {:else if error}
         <h2 class="text-warning">Error</h2>

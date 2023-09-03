@@ -12,6 +12,7 @@ import { Modify } from 'ol/interaction';
 import { Collection } from 'ol';
 import { clientLogger } from '$lib/utils/log';
 import type View from 'ol/View';
+import type { Degrees, Meters } from '../../../types';
 
 export interface LocationFeature extends Feature<Circle> {
     location: Location;

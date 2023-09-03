@@ -3,6 +3,7 @@ import { ENABLE_CACHING } from '$lib/constants';
 import { error, redirect } from '@sveltejs/kit';
 import type { RequestEvent, ServerLoadEvent } from '@sveltejs/kit';
 import chalk from 'chalk';
+import type { Bytes, MaybePromise, Seconds } from '../../types';
 import type { GenericResponse } from './apiResponse.server';
 import { FileLogger } from './log.server';
 import { fmtBytes } from './text';
@@ -56,7 +57,7 @@ export function cacheResponse<T>(url: string, userId: string, response: T): void
     (cache[userId] as Record<string, T>)[url] = response;
 }
 
-export function getCachedResponse<T>(url: string, userId: string): T | undefined {
+export function getCachedResponse<T>(url: string, userId: string): T | void {
     if (!doCache) return;
 
     cacheLastUsed[userId] = nowUtc();
@@ -66,7 +67,6 @@ export function getCachedResponse<T>(url: string, userId: string): T | undefined
         return userCache[url] as T;
     }
     logCacheReq(false, new URL(url));
-    return;
 }
 
 export function invalidateCache(userId: string): void {

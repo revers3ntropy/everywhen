@@ -33,7 +33,7 @@ namespace SettingsServer {
 
         const alreadyInDb = await query<{ id: string }[]>`
             SELECT id from settings
-            WHERE user = ${auth.id}
+            WHERE userId = ${auth.id}
                 AND \`key\` = ${key}
         `;
 
@@ -52,7 +52,7 @@ namespace SettingsServer {
         const id = await UId.Server.generate();
 
         await query`
-            INSERT INTO settings (id, user, created, \`key\`, value)
+            INSERT INTO settings (id, userId, created, \`key\`, value)
             VALUES (${id}, ${auth.id}, ${now}, ${key}, ${valEncrypted})
         `;
 
@@ -68,7 +68,7 @@ namespace SettingsServer {
         for (const key of duplicated) {
             await query`
                 DELETE FROM settings
-                WHERE user = ${auth.id}
+                WHERE userId = ${auth.id}
                     AND \`key\` = ${key}
                 ORDER BY created
                 LIMIT 1
@@ -87,7 +87,7 @@ namespace SettingsServer {
         >`
             SELECT created, id, \`key\`, value
             FROM settings
-            WHERE user = ${auth.id}
+            WHERE userId = ${auth.id}
         `;
 
         // check for duplicates
@@ -100,6 +100,7 @@ namespace SettingsServer {
             seenKeys.add(setting.key);
         });
         if (duplicateKeys.size > 0) {
+            await errorLogger.error('Duplicate settings keys found', [...duplicateKeys]);
             await clearDuplicateKeys(auth, duplicateKeys);
         }
 
@@ -131,7 +132,7 @@ namespace SettingsServer {
         >`
             SELECT created, id, \`key\`, value
             FROM settings
-            WHERE user = ${auth.id}
+            WHERE userId = ${auth.id}
                 AND \`key\` = ${key}
         `;
 
@@ -168,7 +169,7 @@ namespace SettingsServer {
         await query`
             DELETE
             FROM settings
-            WHERE user = ${auth.id}
+            WHERE userId = ${auth.id}
         `;
         return Result.ok(null);
     }

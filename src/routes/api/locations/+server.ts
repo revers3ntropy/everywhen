@@ -43,20 +43,17 @@ export const POST = (async ({ request, cookies }) => {
             longitude: 'number',
             radius: 'number',
             created: 'number',
-            name: 'string',
-            timezoneUtcOffset: 'number'
+            name: 'string'
         },
         {
             radius: 0.0001,
-            created: nowUtc(),
-            timezoneUtcOffset: 0
+            created: nowUtc()
         }
     );
 
     const { val, err } = await Location.Server.create(
         auth,
         body.created,
-        body.timezoneUtcOffset,
         body.name,
         body.latitude,
         body.longitude,

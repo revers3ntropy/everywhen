@@ -5,8 +5,9 @@
     import MapMarkerOffOutline from 'svelte-material-icons/MapMarkerOffOutline.svelte';
     import MapMarkerOutline from 'svelte-material-icons/MapMarkerOutline.svelte';
     import { enabledLocation } from '$lib/stores';
+    import type { Pixels, TooltipPosition } from '../../../types';
 
-    export let tooltipPosition = 'bottom' as TooltipPosition;
+    export let tooltipPosition: TooltipPosition = 'bottom';
     export let size = 25 as Pixels;
 
     async function watchLocationPermissions() {

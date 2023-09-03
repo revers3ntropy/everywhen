@@ -6,24 +6,24 @@
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import Menu from 'svelte-material-icons/Menu.svelte';
-    import { Entry, type EntryTitle } from '$lib/controllers/entry/entry';
+    import { Entry, type EntrySummary } from '$lib/controllers/entry/entry';
     import EntryTitles from './EntryTitles.svelte';
 
     export let obfuscated = false;
 
     async function loadMoreTitles(offset: number, count: number): Promise<string[]> {
-        const { titles: newTitles, totalEntryCount } = notify.onErr(
+        const { summaries: newEntrySummaries, totalCount } = notify.onErr(
             await api.get('/entries/titles', { offset, count })
         );
-        numTitles = totalEntryCount;
+        numTitles = totalCount;
 
-        titles = Entry.groupEntriesByDay(newTitles, titles);
+        summaries = Entry.groupEntriesByDay(newEntrySummaries, summaries);
 
-        return newTitles.map(t => t.id);
+        return newEntrySummaries.map(t => t.id);
     }
 
     let showing = false;
-    let titles = {} as Record<string, EntryTitle[]>;
+    let summaries = {} as Record<string, EntrySummary[]>;
     let numTitles = -1;
     let titleIds: string[] = [];
 </script>
@@ -61,7 +61,7 @@
             loadItems={loadMoreTitles}
             margin="500px"
         >
-            <EntryTitles {obfuscated} {titles} hideBlurToggle />
+            <EntryTitles {obfuscated} titles={summaries} hideBlurToggle />
         </InfiniteScroller>
     </div>
 </div>

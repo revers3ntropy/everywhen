@@ -2,6 +2,7 @@ import { browser } from '$app/environment';
 import { clientLogger } from '$lib/utils/log';
 import { writable } from 'svelte/store';
 import type { Result } from '$lib/utils/result';
+import type { Milliseconds, TimestampMilliseconds } from '../../../types';
 
 export enum NotificationType {
     ERROR = 'error',

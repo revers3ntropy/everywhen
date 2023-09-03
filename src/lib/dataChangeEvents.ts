@@ -3,6 +3,7 @@ import type { Entry } from '$lib/controllers/entry/entry';
 import type { Label } from '$lib/controllers/label/label';
 import type { Event } from '$lib/controllers/event/event';
 import { onDestroy } from 'svelte';
+import type { MaybePromise } from '../types';
 
 type Entities = 'entry' | 'label' | 'event';
 

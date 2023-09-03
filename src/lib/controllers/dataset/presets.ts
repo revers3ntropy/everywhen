@@ -1,14 +1,35 @@
-import { Dataset } from '$lib/controllers/dataset/dataset';
-import type { DatasetColumnType } from '$lib/controllers/dataset/dataset';
+import { builtInTypes } from '$lib/controllers/dataset/columnTypes';
+import type { DatasetColumn } from '$lib/controllers/dataset/dataset';
+import { githubCommitsProvider } from '$lib/controllers/dataset/thirdPartyDatasets.server';
+import type { ThirdPartyDatasetProvider } from '$lib/controllers/dataset/thirdPartyDatasets.server';
 
 export interface DatasetPreset {
     id: string;
-    columns: { name: string; type: DatasetColumnType<unknown> }[];
+    defaultName: string;
+    columns: DatasetColumn<unknown>[];
+    thirdPartyProvider?: ThirdPartyDatasetProvider;
 }
 
-export const datasetPresets = {
+export const datasetPresets: Record<string, DatasetPreset> = {
     weight: {
         id: 'weight',
-        columns: [{ name: 'Weight', type: Dataset.builtInTypes.number }]
+        defaultName: 'Weight',
+        columns: [
+            {
+                id: 0,
+                name: 'Weight',
+                created: null,
+                type: builtInTypes.number,
+                datasetId: ''
+            }
+        ]
+    },
+    gitHubCommits: {
+        id: 'gitHubCommits',
+        defaultName: 'GitHub Commits',
+        columns: [],
+        thirdPartyProvider: githubCommitsProvider
     }
-} satisfies { [name: string]: DatasetPreset };
+};
+
+export type PresetId = keyof typeof datasetPresets;

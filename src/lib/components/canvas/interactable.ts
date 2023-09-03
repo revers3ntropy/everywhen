@@ -1,5 +1,6 @@
 import { getContext, onMount } from 'svelte';
 import { DEBUG_RENDER_COLLIDERS } from '$lib/constants';
+import type { CursorStyle, TimestampSecs } from '../../../types';
 import { type CanvasContext, type ContextMenuOptions, key, type Listener } from './canvasState';
 import type { RenderProps, CanvasState } from './canvasState';
 import type { Collider } from './collider';

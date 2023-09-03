@@ -5,14 +5,10 @@ import { cachedPageRoute } from '$lib/utils/cache.server';
 import type { PageServerLoad } from './$types';
 
 export const load = cachedPageRoute(async auth => {
-    const { val: events, err } = await Event.Server.all(auth);
-    if (err) throw error(400, err);
-
-    const { err: labelsErr, val: labels } = await Label.Server.all(auth);
-    if (labelsErr) throw error(400, labelsErr);
-
     return {
-        events,
-        labels
+        events: (await Event.Server.all(auth)).unwrap(e => error(400, e)) as (Event & {
+            deleted?: boolean;
+        })[],
+        labels: (await Label.Server.all(auth)).unwrap(e => error(400, e))
     };
 }) satisfies PageServerLoad;

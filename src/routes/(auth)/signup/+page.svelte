@@ -140,7 +140,7 @@
             />
         </label>
         <div class="flex-center" style="justify-content: space-between">
-            <a href="/login">Log In</a>
+            <a href="/login?redirect={data.redirect}">Log In</a>
             <button
                 aria-label="Create Account"
                 disabled={actionPending}

@@ -15,7 +15,6 @@
     export let name: string;
     export let radius: number;
     export let created: number;
-    export let createdTZOffset: number;
     export let latitude: number;
     export let longitude: number;
 
@@ -32,7 +31,7 @@
             })
         );
         if (onChange !== null) {
-            await onChange({ id, created, createdTZOffset, name, latitude, longitude, radius });
+            await onChange({ id, created, name, latitude, longitude, radius });
         }
         synced = true;
     }

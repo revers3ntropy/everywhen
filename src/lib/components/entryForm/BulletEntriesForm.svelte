@@ -17,6 +17,7 @@
     import { serializedAgentData } from '$lib/utils/userAgent';
     import { onMount } from 'svelte';
     import Send from 'svelte-material-icons/Send.svelte';
+    import type { Mutable } from '../../../types';
 
     export let obfuscated = true;
     export let setEntryFormMode = null as null | ((mode: EntryFormMode) => Promise<void>);
@@ -30,7 +31,7 @@
         entry.value = '';
 
         const agentData = serializedAgentData();
-        const createdTZOffset = currentTzOffset();
+        const createdTzOffset = currentTzOffset();
 
         entry?.focus();
 
@@ -38,13 +39,13 @@
 
         const body = {
             title: '',
-            entry: entryVal,
+            body: entryVal,
             label,
             latitude: currentLocation[0],
             longitude: currentLocation[1],
             created: nowUtc(),
             agentData,
-            createdTZOffset,
+            createdTzOffset,
             wordCount: wordCount(entryVal)
         };
 

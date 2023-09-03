@@ -1,6 +1,7 @@
 import { Auth as _Auth } from '$lib/controllers/auth/auth';
 import { migrateUser } from '$lib/controllers/user/accountMigration.server';
 import type { User } from '$lib/controllers/user/user';
+import { errorLogger } from '$lib/utils/log.server';
 import { SemVer } from '$lib/utils/semVer';
 import { type Cookies, error } from '@sveltejs/kit';
 import { COOKIE_KEYS } from '$lib/constants';
@@ -8,6 +9,7 @@ import { query } from '$lib/db/mysql.server';
 import { Result } from '$lib/utils/result';
 import { UId } from '$lib/controllers/uuid/uuid.server';
 import { nowUtc } from '$lib/utils/time';
+import type { Seconds, TimestampSecs } from '../../../types';
 
 namespace AuthServer {
     type Auth = _Auth;
@@ -20,7 +22,7 @@ namespace AuthServer {
         expires: TimestampSecs;
     }
 
-    const sessions = new Map<string, Session>();
+    const sessions = new Map<string, Readonly<Session>>();
 
     setInterval(() => {
         const now = nowUtc();
@@ -75,6 +77,9 @@ namespace AuthServer {
               AND password = SHA2(CONCAT(${key}, salt), 256)
         `;
         if (res.length !== 1) {
+            if (res.length !== 0) {
+                await errorLogger.error(`Got ${res.length} rows for login`, { username, res });
+            }
             return Result.err('Invalid login');
         }
         return Result.ok(res[0].id);
@@ -101,6 +106,10 @@ namespace AuthServer {
         });
     }
 
+    async function generateSessionId() {
+        return `hl-${await UId.Server.generate()}-session-${await UId.Server.generate()}`;
+    }
+
     export async function authenticateUserFromLogIn(
         username: string,
         key: string,
@@ -109,17 +118,17 @@ namespace AuthServer {
         const { val: userDetails, err } = await userIdAndLastVersionFromLogIn(username, key);
         if (err) return Result.err(err);
 
-        const sessionId = await UId.Server.generate();
+        const sessionId = await generateSessionId();
 
         const now = nowUtc();
 
-        const session: Session = {
+        const session: Readonly<Session> = Object.freeze({
             id: userDetails.id,
             username,
             key,
             created: now,
             expires: now + expireAfter
-        };
+        });
 
         const user: User = {
             id: session.id,

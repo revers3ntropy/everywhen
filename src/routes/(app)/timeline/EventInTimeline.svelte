@@ -12,18 +12,19 @@
     import { clientLogger } from '$lib/utils/log';
     import { showPopup } from '$lib/utils/popups';
     import { limitStrLen } from '$lib/utils/text';
+    import type { Pixels, TimestampSecs } from '../../../types';
     import EventDragHandle from './EventDragHandle.svelte';
 
     export let labels: Label[];
 
     export let id: string;
+    export let created: number;
     export let start: number;
     export let end: number;
     export let name: string;
-    export let label = null as Label | null;
+    export let label: Label | null;
     export let yLevel = 0;
     export let eventTextParityHeight: boolean;
-    export let created: number;
 
     function yRenderPos(centerLineY: number): number {
         const y = isInstantEvent ? 0 : yLevel;
@@ -41,7 +42,7 @@
             start: changes.start || start,
             end: changes.end || end,
             created,
-            label: label || undefined
+            label: label || null
         };
         start = event.start || start;
         end = event.end || end;

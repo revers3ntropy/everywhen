@@ -1,5 +1,6 @@
 import { query } from '$lib/db/mysql.server';
 import { roundNDP } from '$lib/utils/text';
+import type { Milliseconds, TimestampSecs } from '../../../types';
 
 export interface PageLoadLog {
     created: TimestampSecs;
@@ -19,7 +20,7 @@ export namespace PageLoadLog {
     export async function createLog(log: PageLoadLog) {
         await query`
             INSERT INTO pageLoads (
-                user, created, method, url, 
+                userId, created, method, url, 
                 route, loadTimeMs, responseCode,
                 userAgent, requestSize, responseSize,
                 ipAddress

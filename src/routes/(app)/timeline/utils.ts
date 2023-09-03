@@ -1,8 +1,8 @@
 // src: https://awik.io/determine-color-bright-dark-using-javascript/
 import type { CanvasState } from '$lib/components/canvas/canvasState';
+import type { EntrySummary } from '$lib/controllers/entry/entry';
 import { Event } from '$lib/controllers/event/event';
 import { nowUtc } from '$lib/utils/time';
-import type { EntryWithWordCount } from '../stats/helpers';
 
 const monthNames = [
     'Jan',
@@ -25,10 +25,8 @@ export function monthIdxToName(idx: number): string {
 
 export type EventWithYLevel = { yLevel: number } & Event;
 
-export function addYToEvents(
-    rawEvents: Event[]
-): [({ yLevel: number } & Event)[], ({ yLevel: number } & Event)[]] {
-    const evts: EventWithYLevel[] = rawEvents
+export function addYToEvents(rawEvents: Event[]): [EventWithYLevel[], EventWithYLevel[]] {
+    const evts: EventWithYLevel[] = [...rawEvents]
         .sort((e1, e2) => (Event.compare(e1, e2) ? 1 : -1))
         .map(e => ({ ...e, yLevel: 0 }));
 
@@ -57,7 +55,7 @@ export function addYToEvents(
 
 export function getInitialZoomAndPos(
     state: CanvasState,
-    entries: EntryWithWordCount[],
+    entries: EntrySummary[],
     events: Event[]
 ): [number, number] {
     const earliestTimestamp = Math.min(...entries.map(e => e.created), ...events.map(e => e.start));

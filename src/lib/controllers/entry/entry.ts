@@ -1,6 +1,8 @@
 import { fmtUtc } from '$lib/utils/time';
+import type { Hours, TimestampSecs } from '../../../types';
 import type { Label } from '../label/label';
 
+// assumed not deleted
 export interface EntryAsLocation {
     id: string;
     created: number;
@@ -22,30 +24,30 @@ export interface Streaks {
     runningOut: boolean;
 }
 
-export interface EntryEdit {
-    id: string;
-    entryId: string;
-    created: TimestampSecs;
-    createdTZOffset: Hours;
-    latitude: number | null;
-    longitude: number | null;
-    title: string;
-    entry: string;
-    agentData: string | null;
-    label: Label | null;
-}
-
 export interface RawEntryEdit {
     id: string;
     entryId: string;
     created: TimestampSecs;
-    createdTZOffset: Hours;
+    createdTzOffset: Hours;
     latitude: number | null;
     longitude: number | null;
-    title: string;
-    entry: string;
-    agentData: string | null;
-    label: string | null;
+    agentData: string;
+    oldTitle: string;
+    oldBody: string;
+    oldLabelId: string | null;
+}
+
+export interface EntryEdit {
+    id: string;
+    entryId: string;
+    created: TimestampSecs;
+    createdTzOffset: Hours;
+    latitude: number | null;
+    longitude: number | null;
+    agentData: string;
+    oldTitle: string;
+    oldBody: string;
+    oldLabel: Label | null;
 }
 
 // RawEntry is the raw data from the database,
@@ -53,52 +55,64 @@ export interface RawEntryEdit {
 export interface RawEntry {
     id: string;
     title: string;
-    entry: string;
+    body: string;
     created: TimestampSecs;
-    createdTZOffset: Hours;
+    createdTzOffset: Hours;
     pinned: number | null;
     deleted: number | null;
     latitude: number | null;
     longitude: number | null;
-    agentData: string | null;
+    agentData: string;
     wordCount: number;
-    label: string | null;
+    labelId: string | null;
 }
 
 export interface Entry {
     id: string;
     title: string;
-    entry: string;
+    body: string;
     created: TimestampSecs;
-    createdTZOffset: Hours;
+    createdTzOffset: Hours;
     pinned: number | null;
     deleted: number | null;
     latitude: number | null;
     longitude: number | null;
-    agentData: string | null;
+    agentData: string;
     wordCount: number;
     label: Label | null;
     edits: EntryEdit[];
 }
 
-export interface EntryTitle {
+// assumed not deleted
+export interface EntrySummary {
     id: string;
-    title: string;
-    // shortened
-    entry: string;
+    titleShortened: string;
+    bodyShortened: string;
     created: TimestampSecs;
-    createdTZOffset: Hours;
+    createdTzOffset: Hours;
+    pinned: number | null;
+    latitude: number | null;
+    longitude: number | null;
+    agentData: string;
+    wordCount: number;
     label: Label | null;
+    editCount: number;
 }
 
-export interface RawEntryTitle {
+// assumed not deleted
+export interface RawEntrySummary {
     id: string;
     title: string;
-    // shortened
-    entry: string;
+    body: string;
     created: TimestampSecs;
-    createdTZOffset: Hours;
-    label: string | null;
+    createdTzOffset: Hours;
+    pinned: number | null;
+    latitude: number | null;
+    longitude: number | null;
+    agentData: string;
+    wordCount: number;
+    labelId: string | null;
+    editCount: number;
 }
 
 export namespace Entry {
@@ -115,11 +129,11 @@ export namespace Entry {
     export function groupEntriesByDay<
         T extends {
             created: TimestampSecs;
-            createdTZOffset: Hours;
+            createdTzOffset: Hours;
         }
     >(entries: T[], grouped: Record<string, T[]> = {}): Record<string, T[]> {
         entries.forEach(entry => {
-            const localDate = fmtUtc(entry.created, entry.createdTZOffset, 'YYYY-MM-DD');
+            const localDate = fmtUtc(entry.created, entry.createdTzOffset, 'YYYY-MM-DD');
             grouped[localDate] ??= [];
             grouped[localDate].push(entry);
         });
@@ -134,21 +148,31 @@ export namespace Entry {
         return grouped;
     }
 
-    function stringToShortTitle(str: string): string {
+    export function stringToShortTitle(str: string): string {
         return str.replace(/\s+/gi, ' ').substring(0, TITLE_LENGTH_CUTOFF);
     }
 
-    export function entryToTitleEntry(entry: Entry): Entry {
+    export function summaryFromEntry(entry: Entry): EntrySummary {
         return {
-            ...entry,
-            entry: stringToShortTitle(entry.entry)
+            id: entry.id,
+            titleShortened: stringToShortTitle(entry.title),
+            bodyShortened: stringToShortTitle(entry.body),
+            created: entry.created,
+            createdTzOffset: entry.createdTzOffset,
+            pinned: entry.pinned,
+            latitude: entry.latitude,
+            longitude: entry.longitude,
+            agentData: entry.agentData,
+            wordCount: entry.wordCount,
+            label: entry.label,
+            editCount: entry.edits.length
         };
     }
 
     export function localTime(entry: {
         created: TimestampSecs;
-        createdTZOffset: Hours;
+        createdTzOffset: Hours;
     }): TimestampSecs {
-        return entry.created + entry.createdTZOffset * 60 * 60;
+        return entry.created + entry.createdTzOffset * 60 * 60;
     }
 }

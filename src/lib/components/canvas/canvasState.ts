@@ -5,6 +5,7 @@ import { clientLogger } from '$lib/utils/log';
 import { currentTzOffset, nowUtc } from '$lib/utils/time';
 import type { Interactable } from './interactable';
 import { cssVarValue } from '$lib/utils/getCssVar';
+import type { CursorStyle, Pixels, TimestampSecs } from '../../../types';
 
 export const START_ZOOM = 1 / (60 * 60);
 
@@ -332,11 +333,11 @@ export class CanvasState implements CanvasListeners {
         return (this.height * 3) / 4;
     }
 
-    public zoomScaledPosition(pos: number, zoom: number, center: number): number {
+    public zoomScaledPosition(pos: Pixels, zoom: number, center: Pixels): Pixels {
         return (pos - center) * zoom + center;
     }
 
-    public timeToX(t: TimestampSecs): number {
+    public timeToX(t: TimestampSecs): Pixels {
         t -= currentTzOffset();
         t = nowUtc(false) - t + this.cameraOffset;
         t = this.zoomScaledPosition(t, this.zoom, this.cameraOffset);
@@ -355,7 +356,7 @@ export class CanvasState implements CanvasListeners {
         return this.timeToX(t);
     }
 
-    public xToTime(pos: number): TimestampSecs {
+    public xToTime(pos: Pixels): TimestampSecs {
         pos = this.width - pos;
         pos = this.zoomScaledPosition(pos, 1 / this.zoom, this.cameraOffset);
         return nowUtc(false) - pos + this.cameraOffset + currentTzOffset();
