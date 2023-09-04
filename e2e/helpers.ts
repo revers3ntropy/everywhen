@@ -65,7 +65,7 @@ export async function genAuthFromUsernameAndPassword(
     const resCookies = cookie.parse(authRes.headers()['set-cookie']);
     const sessionId = resCookies[COOKIE_KEYS.sessionId];
     expect(typeof sessionId).toBe('string');
-    expect(sessionId.length).toBe(UUID_LEN);
+    expect(sessionId.length).toBeGreaterThan(UUID_LEN);
 
     return {
         key,

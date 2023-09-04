@@ -1,6 +1,8 @@
 import { LIMITS } from '$lib/constants';
-import type { PresetId } from '$lib/controllers/dataset/presets';
+import type { DatasetPreset, PresetId } from '$lib/controllers/dataset/presets';
 import { datasetPresets } from '$lib/controllers/dataset/presets';
+import { thirdPartyDatasetProviders } from '$lib/controllers/dataset/thirdPartyDatasets.server';
+import type { ThirdPartyDatasetProvider } from '$lib/controllers/dataset/thirdPartyDatasets.server';
 import type { SettingsConfig } from '$lib/controllers/settings/settings';
 import { errorLogger } from '$lib/utils/log.server';
 import { query } from '$lib/db/mysql.server';
@@ -77,7 +79,7 @@ namespace DatasetServer {
         const metadatas = [] as DatasetMetadata[];
 
         const datasets = await query<
-            { id: string; name: string; created: TimestampSecs; presetId: string }[]
+            { id: string; name: string; created: TimestampSecs; presetId: PresetId | null }[]
         >`
             SELECT id, name, created, presetId
             FROM datasets
@@ -90,10 +92,13 @@ namespace DatasetServer {
         for (const dataset of datasets) {
             const { val: decryptedName, err: decryptedNameErr } = decrypt(dataset.name, auth.key);
             if (decryptedNameErr) return Result.err(decryptedNameErr);
-            const preset = datasetPresets[dataset.presetId] || null;
-            if (!preset && dataset.presetId) {
-                await errorLogger.error('Invalid preset ID', { dataset });
-                return Result.err('Invalid preset ID');
+            let preset: DatasetPreset | null = null;
+            if (dataset.presetId) {
+                preset = datasetPresets[dataset.presetId];
+                if (!preset) {
+                    await errorLogger.error('Invalid preset ID', { dataset });
+                    return Result.err('Invalid preset ID');
+                }
             }
 
             let columns: DatasetColumn<unknown>[];
@@ -122,7 +127,7 @@ namespace DatasetServer {
         filter: DatasetDataFilter
     ): Promise<Result<DatasetData>> {
         const datasetRes = await query<
-            { id: string; name: string; created: TimestampSecs; presetId: string }[]
+            { id: string; name: string; created: TimestampSecs; presetId: PresetId | null }[]
         >`
             SELECT id, name, created, presetId
             FROM datasets
@@ -134,10 +139,22 @@ namespace DatasetServer {
         }
         const [dataset] = datasetRes;
 
-        const preset = datasetPresets[dataset.presetId] || null;
+        let preset: DatasetPreset | null = null;
+        if (dataset.presetId) {
+            preset = datasetPresets[dataset.presetId];
+            if (!preset) {
+                await errorLogger.error('Invalid preset ID', { dataset });
+                return Result.err('Invalid preset ID');
+            }
+        }
 
-        if (preset?.thirdPartyProvider) {
-            return await preset.thirdPartyProvider.fetchDataset(auth, settings, filter);
+        let thirdPartyProvider: ThirdPartyDatasetProvider | null = null;
+        if (dataset.presetId) {
+            thirdPartyProvider = thirdPartyDatasetProviders[dataset.presetId];
+        }
+
+        if (thirdPartyProvider) {
+            return await thirdPartyProvider.fetchDataset(auth, settings, filter);
         }
 
         const rows = await query<

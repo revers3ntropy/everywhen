@@ -1,16 +1,13 @@
 import { builtInTypes } from '$lib/controllers/dataset/columnTypes';
 import type { DatasetColumn } from '$lib/controllers/dataset/dataset';
-import { githubCommitsProvider } from '$lib/controllers/dataset/thirdPartyDatasets.server';
-import type { ThirdPartyDatasetProvider } from '$lib/controllers/dataset/thirdPartyDatasets.server';
 
 export interface DatasetPreset {
     id: string;
     defaultName: string;
     columns: DatasetColumn<unknown>[];
-    thirdPartyProvider?: ThirdPartyDatasetProvider;
 }
 
-export const datasetPresets: Record<string, DatasetPreset> = {
+export const datasetPresets = {
     weight: {
         id: 'weight',
         defaultName: 'Weight',
@@ -27,9 +24,8 @@ export const datasetPresets: Record<string, DatasetPreset> = {
     gitHubCommits: {
         id: 'gitHubCommits',
         defaultName: 'GitHub Commits',
-        columns: [],
-        thirdPartyProvider: githubCommitsProvider
+        columns: []
     }
-};
+} satisfies Record<string, DatasetPreset>;
 
 export type PresetId = keyof typeof datasetPresets;

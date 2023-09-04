@@ -1,5 +1,6 @@
 import type { Auth } from '$lib/controllers/auth/auth';
 import type { DatasetDataFilter, DatasetRow } from '$lib/controllers/dataset/dataset';
+import type { PresetId } from '$lib/controllers/dataset/presets';
 import type { SettingsConfig } from '$lib/controllers/settings/settings';
 import { Result } from '$lib/utils/result';
 
@@ -16,3 +17,8 @@ export const githubCommitsProvider = {
         return Promise.resolve(Result.err('Not implemented'));
     }
 } satisfies ThirdPartyDatasetProvider;
+
+export const thirdPartyDatasetProviders: Record<PresetId, ThirdPartyDatasetProvider | null> = {
+    weight: null,
+    gitHubCommits: githubCommitsProvider
+};

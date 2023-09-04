@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type { PresetId } from '$lib/controllers/dataset/presets';
     import type { PageData } from './$types';
     import { Dataset, type DatasetPresetName } from '$lib/controllers/dataset/dataset';
     import { notify } from '$lib/components/notifications/notifications';
@@ -6,9 +7,11 @@
 
     export let data: PageData;
 
+    let { datasets } = data;
+
     $: unusedPresetNames = Object.keys(Dataset.datasetPresets).filter(
-        name => data.datasets.filter(dataset => dataset.name === name).length < 1
-    );
+        name => datasets.filter(dataset => dataset.name === name).length < 1
+    ) as PresetId[];
 
     async function makeFromPreset(presetName: DatasetPresetName) {
         notify.onErr(
@@ -30,11 +33,11 @@
 
     {#each unusedPresetNames as presetName}
         <button on:click={() => makeFromPreset(presetName)}>
-            Start Recording {presetName}
+            Start Recording '{presetName}'
         </button>
     {/each}
 
-    {#each data.datasets as dataset}
+    {#each datasets as dataset}
         <div class="dataset">
             {dataset.name}
         </div>

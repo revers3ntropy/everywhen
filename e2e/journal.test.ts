@@ -58,10 +58,10 @@ test.describe('/journal', () => {
     test('Can mark entry as favourite and unfavourite', async ({ page }) => {
         const { api, auth } = await generateUserAndSignIn(page);
 
-        const entry = LONG_TEXT;
+        const entryBody = LONG_TEXT;
         const makeEntryRes = await (
             await api.post('./entries', {
-                data: JSON.stringify({ entry })
+                data: JSON.stringify({ body: entryBody })
             })
         ).text();
         const { id } = JSON.parse(decrypt(makeEntryRes, auth.key).val) as Record<string, unknown>;
@@ -72,7 +72,7 @@ test.describe('/journal', () => {
         await page.goto('/journal');
         // must scroll entries into view to load them
         await page.mouse.wheel(0, 1000);
-        await expect(page.getByText(entry)).toBeAttached();
+        await expect(page.getByText(entryBody)).toBeAttached();
 
         // can pin entry
         await page.locator(`[id="${id}"]`).getByRole('button', { name: 'Open popup' }).click();
