@@ -1,5 +1,5 @@
 import type { Auth } from '$lib/controllers/auth/auth.server';
-import type { EntryEdit, EntryFilter, RawEntry, RawEntryEdit } from '$lib/controllers/entry/entry';
+import type { EntryEdit, EntryFilter, RawEntry } from '$lib/controllers/entry/entry';
 import { Entry } from '$lib/controllers/entry/entry.server';
 import { Label } from '$lib/controllers/label/label.server';
 import { Location } from '$lib/controllers/location/location.server';
@@ -224,20 +224,33 @@ function filterEntriesBySearchTerm(entries: Entry[], searchTerm: string): Entry[
 }
 
 async function entriesFromRaw(auth: Auth, raw: RawEntry[]): Promise<Result<Entry[]>> {
-    const rawEdits = await query<RawEntryEdit[]>`
-        SELECT entryEdits.created,
-               entryEdits.entryId,
-               entryEdits.createdTzOffset,
-               entryEdits.latitude,
-               entryEdits.longitude,
-               entryEdits.agentData,
-               entryEdits.oldTitle,
-               entryEdits.oldBody,
-               entryEdits.oldLabelId
-        FROM entryEdits,
-             entries
-        WHERE entries.userId = ${auth.id}
-          AND entries.id = entryEdits.entryId
+    const rawEdits = await query<
+        {
+            id: string;
+            entryId: string;
+            created: number;
+            createdTzOffset: number;
+            latitude: number | null;
+            longitude: number | null;
+            agentData: string;
+            oldTitle: string;
+            oldBody: string;
+            oldLabelId: string | null;
+        }[]
+    >`
+        SELECT
+            id,
+            entryId,
+            created,
+            createdTzOffset,
+            latitude,
+            longitude,
+            agentData,
+            oldTitle,
+            oldBody,
+            oldLabelId
+        FROM entryEdits
+        WHERE entryEdits.userId = ${auth.id}
     `;
 
     const { err, val: labels } = await Label.Server.allIndexedById(auth);
@@ -286,7 +299,7 @@ async function entriesFromRaw(auth: Auth, raw: RawEntry[]): Promise<Result<Entry
                 agentData: decryptedAgentData,
                 wordCount: rawEntry.wordCount,
                 label: labels[rawEntry?.labelId || ''] || null,
-                edits: groupedEdits[rawEntry.id]
+                edits: groupedEdits[rawEntry.id] ?? []
             });
         })
     );

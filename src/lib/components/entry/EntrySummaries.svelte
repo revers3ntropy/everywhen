@@ -34,7 +34,9 @@
 
         titles = {
             ...titles,
-            [localDate]: [Entry.summaryFromEntry(entry), ...(titles?.[localDate] || [])]
+            [localDate]: [Entry.summaryFromEntry(entry), ...(titles?.[localDate] || [])].sort(
+                (a, b) => b.created - a.created
+            )
         };
     });
     listen.entry.onUpdate(entry => {
@@ -53,7 +55,7 @@
             [localDate]: [
                 Entry.summaryFromEntry(entry),
                 ...(titles[localDate] || []).filter(e => e.id !== entry.id)
-            ]
+            ].sort((a, b) => b.created - a.created)
         };
     });
     listen.entry.onDelete(id => {

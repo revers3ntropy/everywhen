@@ -7,7 +7,7 @@
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import Menu from 'svelte-material-icons/Menu.svelte';
     import { Entry, type EntrySummary } from '$lib/controllers/entry/entry';
-    import EntryTitles from './EntryTitles.svelte';
+    import EntrySummaries from './EntrySummaries.svelte';
 
     export let obfuscated = false;
 
@@ -61,7 +61,7 @@
             loadItems={loadMoreTitles}
             margin="500px"
         >
-            <EntryTitles {obfuscated} titles={summaries} hideBlurToggle />
+            <EntrySummaries {obfuscated} titles={summaries} hideBlurToggle />
         </InfiniteScroller>
     </div>
 </div>

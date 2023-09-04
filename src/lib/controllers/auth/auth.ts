@@ -1,11 +1,16 @@
 import { browser } from '$app/environment';
+import { notify } from '$lib/components/notifications/notifications';
 import {
     COOKIES_TO_CLEAR_ON_LOGOUT,
     LS_TO_CLEAR_ON_LOGOUT,
     SESSION_KEYS,
     SESSION_TO_CLEAR_ON_LOGOUT
 } from '$lib/constants';
-import { currentlyUploadingAssets, currentlyUploadingEntries } from '$lib/stores';
+import {
+    currentlyUploadingAssets,
+    currentlyUploadingEntries,
+    populateCookieWritablesWithCookies
+} from '$lib/stores';
 import { decrypt } from '$lib/utils/encryption';
 import Cookie from 'js-cookie';
 import { api } from '$lib/utils/apiRequest';
@@ -96,5 +101,11 @@ export namespace Auth {
 
     export function randomInt(min: number, max: number): number {
         return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    export async function populateCookiesAndSettingsAfterAuth(onErr: () => void): Promise<void> {
+        const cookies = Cookie.get() as RawCookies;
+        const { settings } = notify.onErr(await api.get('/settings'), onErr);
+        populateCookieWritablesWithCookies(cookies, settings);
     }
 }

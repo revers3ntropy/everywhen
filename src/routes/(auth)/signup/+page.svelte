@@ -6,7 +6,6 @@
     import { tooltip } from '@svelte-plugins/tooltips';
     import ArrowRightThinCircleOutline from 'svelte-material-icons/ArrowRightThinCircleOutline.svelte';
     import InformationOutline from 'svelte-material-icons/InformationOutline.svelte';
-    import { populateCookiesAndSettingsAfterAuth } from '../actions.client';
     import type { PageData } from './$types';
     import { api } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
@@ -45,7 +44,7 @@
             passcodeLastEntered.set(nowUtc());
         }
 
-        await populateCookiesAndSettingsAfterAuth(() => (actionPending = false));
+        await Auth.populateCookiesAndSettingsAfterAuth(() => (actionPending = false));
 
         await goto('/' + data.redirect);
     }

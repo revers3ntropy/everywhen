@@ -200,20 +200,20 @@
                         <hr />
 
                         <div class="options-dropdown">
-                            <button
-                                on:click={togglePinned}
-                                class="with-icon icon-gradient-on-hover"
-                                aria-label={pinTooltip}
-                            >
-                                {#if Entry.isPinned({ pinned })}
-                                    <HeartOffOutline size="25" />
-                                    Un-favourite
-                                {:else}
-                                    <Heart size="25" />
-                                    Favourite
-                                {/if}
-                            </button>
                             {#if !Entry.isDeleted({ deleted })}
+                                <button
+                                    on:click={togglePinned}
+                                    class="with-icon icon-gradient-on-hover"
+                                    aria-label={pinTooltip}
+                                >
+                                    {#if Entry.isPinned({ pinned })}
+                                        <HeartOffOutline size="25" />
+                                        Un-favourite
+                                    {:else}
+                                        <Heart size="25" />
+                                        Favourite
+                                    {/if}
+                                </button>
                                 <a
                                     href="/journal/{id}/edit"
                                     class="with-icon"

@@ -7,8 +7,7 @@ import type { PageServerLoad } from './$types';
 import { commonWordsFromText } from './helpers';
 
 export const load = cachedPageRoute(async auth => {
-    const { val: entries, err } = await Entry.Server.all(auth, { deleted: false });
-    if (err) throw error(400, err);
+    const entries = (await Entry.Server.all(auth, { deleted: false })).unwrap(e => error(400, e));
 
     let earliestEntryTimeStamp = nowUtc();
 

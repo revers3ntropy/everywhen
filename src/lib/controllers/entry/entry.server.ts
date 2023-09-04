@@ -34,7 +34,8 @@ namespace EntryServer {
         await query`
             UPDATE entries
             SET deleted = ${restore ? null : nowUtc()},
-                labelId = ${null}
+                labelId = ${null},
+                pinned = ${null}
             WHERE entries.id = ${id}
               AND userId = ${auth.id}
         `;

@@ -1,5 +1,5 @@
 import { query } from '$lib/db/mysql.server';
-import { roundNDP } from '$lib/utils/text';
+import { roundToDecimalPlaces } from '$lib/utils/text';
 import type { Milliseconds, TimestampSecs } from '../../../types';
 
 export interface PageLoadLog {
@@ -18,24 +18,22 @@ export interface PageLoadLog {
 
 export namespace PageLoadLog {
     export async function createLog(log: PageLoadLog) {
-        await query`
+        await query.unlogged`
             INSERT INTO pageLoads (
-                userId, created, method, url, 
-                route, loadTimeMs, responseCode,
-                userAgent, requestSize, responseSize,
-                ipAddress
+                userId, created, method, url, route, loadTimeMs, responseCode,
+                userAgent, requestSize, responseSize, ipAddress
             ) VALUES (
-                      ${log.userId},
-                      ${log.created},
-                      ${log.method},
-                      ${log.url},
-                      ${log.route},
-                      ${roundNDP(log.responseTimeMs, 3)},
-                      ${log.responseCode},
-                      ${log.userAgent},
-                      ${log.requestSize},
-                      ${log.resultSize},
-                      ${log.ipAddress}
+                ${log.userId},
+                ${log.created},
+                ${log.method},
+                ${log.url},
+                ${log.route},
+                ${roundToDecimalPlaces(log.responseTimeMs, 3)},
+                ${log.responseCode},
+                ${log.userAgent},
+                ${log.requestSize},
+                ${log.resultSize},
+                ${log.ipAddress}
           )
         `;
     }

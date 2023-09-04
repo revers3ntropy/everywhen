@@ -6,7 +6,6 @@
     import { api } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
     import InformationOutline from 'svelte-material-icons/InformationOutline.svelte';
-    import { populateCookiesAndSettingsAfterAuth } from '../actions.client';
     import type { PageData } from './$types';
     import { tooltip } from '@svelte-plugins/tooltips';
     import { encryptionKey, username as usernameStore } from '$lib/stores';
@@ -28,13 +27,13 @@
                     username: username.value,
                     rememberMe: rememberMeInput.checked
                 },
-                { doNotEncryptBody: true }
+                { doNotEncryptBody: true, doNotLogoutOn401: true }
             ),
             () => (actionPending = false)
         );
 
         $usernameStore = username.value;
-        await populateCookiesAndSettingsAfterAuth(() => (actionPending = false));
+        await Auth.populateCookiesAndSettingsAfterAuth(() => (actionPending = false));
 
         await goto('/' + data.redirect);
     }

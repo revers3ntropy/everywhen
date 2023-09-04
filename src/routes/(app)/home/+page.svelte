@@ -14,7 +14,7 @@
     import { Entry } from '$lib/controllers/entry/entry';
     import { obfuscated } from '$lib/stores';
     import type { PageData } from './$types';
-    import EntryTitles from '$lib/components/entry/EntryTitles.svelte';
+    import EntrySummaries from '$lib/components/entry/EntrySummaries.svelte';
     import DatasetShortcutWidgets from '$lib/components/dataset/DatasetShortcutWidgets.svelte';
 
     export let data: PageData;
@@ -104,7 +104,7 @@
         />
         <div style="margin: 1rem">
             {#if Object.keys(recentTitles).length}
-                <EntryTitles titles={recentTitles} obfuscated={$obfuscated} hideBlurToggle />
+                <EntrySummaries titles={recentTitles} obfuscated={$obfuscated} hideBlurToggle />
             {:else}
                 <p class="text-light"> No recent entries </p>
             {/if}
@@ -120,7 +120,7 @@
                         Favourited
                     </h1>
                     <div>
-                        <EntryTitles
+                        <EntrySummaries
                             titles={pinnedEntries}
                             obfuscated={$obfuscated}
                             onCreateFilter={Entry.isPinned}
@@ -150,7 +150,7 @@
                         <!-- bit of a hack... -->
                         {fmtUtcRelative(entries[0].created, 'en-full')} since...
                     </h1>
-                    <EntryTitles
+                    <EntrySummaries
                         titles={{
                             [date]: entries
                         }}
