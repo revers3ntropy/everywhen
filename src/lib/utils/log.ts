@@ -1,34 +1,24 @@
 import chalk, { type ChalkInstance } from 'chalk';
 
-// to make log lines line up
-let maxLogNameLen = 0;
-
 export class Logger {
     logger = console;
     nameLength: number;
     coloredName: string;
 
-    public constructor(name: string, color: ChalkInstance) {
-        if (name.length > maxLogNameLen) {
-            maxLogNameLen = name.length;
-        }
-        this.coloredName = color(name);
-        this.nameLength = name.length;
+    public constructor(groupName: string, color: ChalkInstance | null = null) {
+        this.coloredName = color ? color(groupName) : groupName;
+        this.nameLength = groupName.length;
     }
 
     protected fmt(useUTC: boolean, ...args: unknown[]): string {
         const time = chalk.dim(new Date()[useUTC ? 'toUTCString' : 'toLocaleTimeString']());
-        const padding = ' '.repeat(maxLogNameLen - this.nameLength || 0);
         return (
             `${time} [${this.coloredName}] ` +
-            padding +
             args
                 .map(arg => {
                     if (typeof arg === 'object') {
-                        if (arg instanceof Error) {
-                            return arg.stack;
-                        }
-                        return JSON.stringify(arg, null, 4);
+                        if (arg instanceof Error) return arg.stack;
+                        else return JSON.stringify(arg, null, 4);
                     } else {
                         return arg;
                     }
@@ -37,20 +27,20 @@ export class Logger {
         );
     }
 
-    public log(...args: unknown[]): void {
-        this.logger.log(this.fmt(false, ...args));
+    public log(msg: string, context?: Record<string, unknown>): void {
+        this.logger.log(this.fmt(false, msg), context || '');
     }
 
-    public trace(...args: unknown[]): void {
-        this.logger.trace(this.fmt(false, ...args));
+    public trace(msg: string, context?: Record<string, unknown>): void {
+        this.logger.trace(this.fmt(false, msg), context || '');
     }
 
-    public warn(...args: unknown[]): void {
-        this.logger.warn(this.fmt(false, ...args));
+    public warn(msg: string, context?: Record<string, unknown>): void {
+        this.logger.warn(this.fmt(false, msg), context || '');
     }
 
-    public error(...args: unknown[]): void {
-        this.logger.error(this.fmt(false, ...args));
+    public error(msg: string, context?: Record<string, unknown>): void {
+        this.logger.error(this.fmt(false, msg), context || '');
     }
 }
 

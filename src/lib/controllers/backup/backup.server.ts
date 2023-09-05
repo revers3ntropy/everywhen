@@ -1,4 +1,4 @@
-import { errorLogger } from '$lib/utils/log.server';
+import { FileLogger } from '$lib/utils/log.server';
 import { z } from 'zod';
 import { currentVersion, SemVer } from '$lib/utils/semVer';
 import { decrypt, encrypt } from '$lib/utils/encryption';
@@ -12,6 +12,8 @@ import { Asset } from '$lib/controllers/asset/asset.server';
 import { Location } from '$lib/controllers/location/location.server';
 import { Backup as _Backup } from './backup';
 import type { Auth } from '$lib/controllers/auth/auth';
+
+const logger = new FileLogger('Backup');
 
 export const backupSchema = z.object({
     entries: z.array(
@@ -188,7 +190,7 @@ export namespace BackupServer {
 
         const parseRes = backupSchema.safeParse(decryptedData);
         if (!parseRes.success) {
-            await errorLogger.error('Invalid backup data', {
+            await logger.error('Invalid backup data', {
                 parseRes
             });
             return Result.err('Backup data is invalid');

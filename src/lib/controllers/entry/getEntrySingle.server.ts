@@ -4,8 +4,10 @@ import { Entry } from '$lib/controllers/entry/entry.server';
 import { Label } from '$lib/controllers/label/label.server';
 import { query } from '$lib/db/mysql.server';
 import { decrypt } from '$lib/utils/encryption';
-import { errorLogger } from '$lib/utils/log.server';
+import { FileLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
+
+const logger = new FileLogger('1Entry');
 
 /**
  * Returns a decrypted `Entry` with (optional) decrypted `Label`.
@@ -48,13 +50,10 @@ export async function entryFromId(
           AND userId = ${auth.id}
     `;
 
-    if (entries.length !== 1) {
-        return Result.err('Entry not found');
-    }
+    if (entries.length !== 1) return Result.err('Entry not found');
+
     const [entry] = entries;
-    if (mustNotBeDeleted && Entry.isDeleted(entry)) {
-        return Result.err('Entry is deleted');
-    }
+    if (mustNotBeDeleted && Entry.isDeleted(entry)) return Result.err('Entry is deleted');
 
     const { val: labels, err: labelErr } = await Label.Server.allIndexedById(auth);
     if (labelErr) return Result.err(labelErr);
@@ -84,7 +83,7 @@ async function fromRaw(
     if (rawEntry.labelId) {
         label = labels[rawEntry.labelId];
         if (!label) {
-            await errorLogger.error('Label not found', rawEntry);
+            void logger.error('Label not found', { rawEntry, label, labels });
             return Result.err('Label not found');
         }
     }

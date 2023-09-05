@@ -4,13 +4,14 @@ import { sessionCookieOptions } from '$lib/utils/cookies';
 import { nowUtc } from '$lib/utils/time';
 import type { Cookies, Handle, RequestEvent } from '@sveltejs/kit';
 import chalk from 'chalk';
-import { connect, dbConnection } from '$lib/db/mysql.server';
+import { connect, dbConnection, dbLogger } from '$lib/db/mysql.server';
 import { cleanupCache } from '$lib/utils/cache.server';
-import { errorLogger, FileLogger } from '$lib/utils/log.server';
+import { FileLogger } from '$lib/utils/log.server';
 import { Auth } from '$lib/controllers/auth/auth.server';
 import type { Milliseconds, Mutable, TimestampSecs } from './types';
 
 const reqLogger = new FileLogger('REQ', chalk.bgWhite.black);
+const processLogger = new FileLogger('PROC', chalk.black.bgRedBright);
 
 // keep connection to database alive
 // so it's not re-connected on API request
@@ -20,17 +21,17 @@ setInterval(() => {
             void connect();
             return;
         }
-        void dbConnection?.ping().catch(e => errorLogger.error(e));
-    } catch (e) {
-        void errorLogger.log('Failed to ping db', e);
+        void dbConnection?.ping();
+    } catch (error) {
+        void dbLogger.error('Failed to ping db', { error, dbConnection });
     }
 }, 1000 * 60);
 
 setInterval(() => {
     try {
         cleanupCache();
-    } catch (e) {
-        void errorLogger.log('Failed to cleanup cache', e);
+    } catch (error) {
+        void processLogger.log('Failed to cleanup cache', { error });
     }
 }, 1000 * 60);
 
@@ -42,7 +43,7 @@ process.on('SIGUSR2', exitHandler);
 process.on('uncaughtException', exitHandler);
 
 function exitHandler(...args: unknown[]) {
-    void errorLogger.log(`Exited!`, ...args).then(() => {
+    void processLogger.log(`Exited!`, { args }).then(() => {
         process.exit();
     });
 }
@@ -78,11 +79,7 @@ async function logReq(
     const route = req.route.id || '[unknown]';
 
     void reqLogger.log(
-        req.request.method,
-        req.url.href,
-        '=>',
-        res.status,
-        ` ${responseTimeMs.toPrecision(3)}ms`
+        `${req.request.method} ${req.url.href} => ${res.status} ${responseTimeMs.toPrecision(3)}ms`
     );
 
     const userId = (auth?.id || '').toString();
@@ -147,15 +144,15 @@ export const handle = (async ({ event, resolve }) => {
     let result: Response;
     try {
         result = await resolve(event);
-    } catch (e) {
-        void errorLogger.error(e);
+    } catch (error) {
+        void reqLogger.error('Uncaught error when resolving response', { error, event });
         result = new Response('An Error has Occurred', {
             status: 500
         });
     }
 
     void logReq(performance.now() - start, now, eventClone, result.clone(), auth).catch(
-        (...args: unknown[]) => void errorLogger.error(...args)
+        (...args: unknown[]) => reqLogger.error('Failed to log request', { args }).catch(() => {})
     );
 
     return result;

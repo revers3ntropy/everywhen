@@ -11,6 +11,7 @@
     import { encryptionKey, username as usernameStore } from '$lib/stores';
 
     export let data: PageData;
+    const { redirect } = data;
 
     async function login(): Promise<void> {
         actionPending = true;
@@ -29,17 +30,24 @@
                 },
                 { doNotEncryptBody: true, doNotLogoutOn401: true }
             ),
-            () => (actionPending = false)
+            () => {
+                actionPending = false;
+                $encryptionKey = '';
+            }
         );
 
         $usernameStore = username.value;
         await Auth.populateCookiesAndSettingsAfterAuth(() => (actionPending = false));
 
-        await goto('/' + data.redirect);
+        await goto('/' + redirect);
     }
 
     function usernameInputKeypress(event: { code: string }) {
         if (event.code === 'Enter') {
+            if (password.value) {
+                void login();
+                return;
+            }
             password.focus();
         }
     }
@@ -55,6 +63,10 @@
     let username: HTMLInputElement;
     let rememberMeInput: HTMLInputElement;
     let actionPending = false;
+
+    $: if ($encryptionKey && $usernameStore) {
+        void goto('/' + redirect);
+    }
 </script>
 
 <svelte:head>

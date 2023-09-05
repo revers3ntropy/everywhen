@@ -13,17 +13,16 @@ export type QueryResult =
     | Record<string, unknown>[]
     | object[];
 
-const dbLogger = new FileLogger('DB', chalk.yellow);
+export const dbLogger = new FileLogger('DB', chalk.yellow);
 
 export let dbConnection: mysql.Connection | null = null;
 
 export async function connect() {
     const config = getConfig();
-    dbConnection = await mysql.createConnection(config).catch((e: unknown) => {
+    dbConnection = await mysql.createConnection(config).catch((error: unknown) => {
         dbConnection = null;
-        void dbLogger.log(`Error connecting to mysql db '${config.database || '?'}'`);
-        void dbLogger.log(e);
-        throw e;
+        void dbLogger.log(`Error connecting to mysql db '${config.database || '?'}'`, { error });
+        throw error;
     });
     void dbLogger.log(`Connected`);
 }
@@ -128,14 +127,13 @@ export const query = (async <Res extends QueryResult = never>(
 
     const [query, queryParams] = buildQuery(queryParts, params);
 
-    const result = ((await dbConnection?.query(query, queryParams).catch((e: unknown) => {
+    const result = ((await dbConnection?.query(query, queryParams).catch((error: unknown) => {
         const end = performance.now();
         void (async () => {
             await logQuery(query, queryParams, null, end - start);
-            await dbLogger.log(`Error querying mysql db '${DB}'`);
-            await dbLogger.error(e);
+            await dbLogger.error(`Error querying mysql db '${DB}'`, { error });
         })();
-        throw e;
+        throw error;
     })) || [])[0] as Res;
 
     const end = performance.now();
@@ -153,13 +151,12 @@ query.unlogged = (async <Res extends QueryResult = never>(
 
     const [query, queryParams] = buildQuery(queryParts, params);
 
-    return ((await dbConnection?.query(query, queryParams).catch((e: unknown) => {
+    return ((await dbConnection?.query(query, queryParams).catch((error: unknown) => {
         void (async () => {
             await logQuery(query, queryParams, null, 0);
-            await dbLogger.log(`Error querying mysql db '${DB}'`);
-            await dbLogger.error(e);
+            await dbLogger.log(`Error querying mysql db '${DB}'`, { error });
         })();
-        throw e;
+        throw error;
     })) || [])[0] as Res;
 }) as QueryFunc;
 

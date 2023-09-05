@@ -12,10 +12,6 @@
     export let tooltipPosition: 'top' | 'bottom' | 'left' | 'right' = 'bottom';
     export let condensed = false;
 
-    let streaks = null as Streaks | null;
-    let loaded = false;
-    let error: string | null;
-
     function madeEntry() {
         // only update when streaks are loaded,
         // and when the streak is running out or is 0
@@ -43,7 +39,7 @@
             x: fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD')
         });
         if (err) {
-            clientLogger.error('Failed to get streaks', err);
+            clientLogger.error('Failed to get streaks', { err });
             error = err;
         } else {
             streaks = val;
@@ -59,6 +55,10 @@
         // if we should change the streaks when one entry is deleted
         await loadStreaks();
     });
+
+    let streaks = null as Streaks | null;
+    let loaded = false;
+    let error: string | null;
 
     let tooltipContent = 'Loading...';
     $: if (streaks) {

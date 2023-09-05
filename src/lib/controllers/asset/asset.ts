@@ -42,8 +42,7 @@ export namespace Asset {
                 resolve(Result.ok(imageWebpNoHeader));
             };
             image.onerror = e => {
-                clientLogger.error(e);
-                clientLogger.error('Failed to load image');
+                clientLogger.error('Failed to load image', { e });
                 resolve(Result.err('Failed to load image'));
             };
             image.src = imageFileContentB64;

@@ -12,10 +12,13 @@ import {
     populateCookieWritablesWithCookies
 } from '$lib/stores';
 import { decrypt } from '$lib/utils/encryption';
+import { Logger } from '$lib/utils/log';
 import Cookie from 'js-cookie';
 import { api } from '$lib/utils/apiRequest';
 import { goto } from '$app/navigation';
 import { sha256 } from 'js-sha256';
+
+const logger = new Logger('AuthC');
 
 export interface Auth {
     id: string;
@@ -37,12 +40,10 @@ export namespace Auth {
         );
     }
 
-    export function requireAuthUrl(currentUrl: string): string {
+    export function wantsToStayLoggedInAuthUrl(currentUrl: string): string {
         const url = new URL(currentUrl);
         const returnPath = encodeURIComponent(url.pathname.substring(1) + url.search);
-        if (returnPath === 'login') {
-            return '/login';
-        }
+        if (returnPath.startsWith('login')) return '/login';
         return `/login?redirect=${returnPath}`;
     }
 
@@ -73,7 +74,7 @@ export namespace Auth {
         localStorage.removeItem(SESSION_KEYS.encryptionKey);
 
         if (wantsToStay) {
-            await goto(requireAuthUrl(location.href));
+            await goto(wantsToStayLoggedInAuthUrl(location.href));
         } else {
             await goto('/');
         }
@@ -82,8 +83,8 @@ export namespace Auth {
     export function decryptOrLogOut(ciphertext: string, key: string | null): string {
         const { err, val } = decrypt(ciphertext, key);
         if (err) {
+            logger.error('Could not decrypt', { err });
             void logOut();
-            console.error(err);
             throw new Error('Could not decrypt');
         }
         return val;

@@ -8,6 +8,7 @@
 <script lang="ts">
     import { page } from '$app/stores';
     import { currentlyUploadingEntries } from '$lib/stores';
+    import { clientLogger } from '$lib/utils/log';
     import { fly, slide } from 'svelte/transition';
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
@@ -39,7 +40,7 @@
         setTimeout(() => {
             const el = document.getElementById(id);
             if (!el) {
-                console.error('Could not find new entry element');
+                clientLogger.error('Could not find new entry element');
                 return;
             }
             el.tabIndex = -1;

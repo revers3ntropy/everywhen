@@ -94,9 +94,7 @@
 
     let intervalId: number | null = null;
     $: if ($page && browser) {
-        if (intervalId !== null) {
-            window.clearInterval(intervalId);
-        }
+        if (intervalId !== null) window.clearInterval(intervalId);
         intervalId = window.setInterval(() => {
             checkObfuscatedTimeout();
             checkPasscode($passcodeLastEntered);
@@ -110,10 +108,11 @@
         }
     });
 
-    $: if (!$username) void Auth.logOut(true);
-    $: if (!$encryptionKey) void Auth.logOut(true);
+    $: if (!$username || !$encryptionKey) {
+        void Auth.logOut(true);
+    }
 
-    passcodeLastEntered.subscribe(v => void checkPasscode(v));
+    passcodeLastEntered.subscribe(checkPasscode);
 
     $: currentlyShowPasscodeModal =
         $settingsStore.passcode.value &&

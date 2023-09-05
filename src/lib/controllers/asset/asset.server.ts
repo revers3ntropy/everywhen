@@ -1,6 +1,6 @@
 import { LIMITS } from '$lib/constants';
 import { decrypt, encrypt } from '$lib/utils/encryption';
-import { errorLogger } from '$lib/utils/log.server';
+import { FileLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 import { fmtBytes } from '$lib/utils/text';
 import { nowUtc } from '$lib/utils/time';
@@ -10,6 +10,8 @@ import { Asset as _Asset, type AssetMetadata } from './asset';
 import { UId } from '$lib/controllers/uuid/uuid.server';
 import type { Auth } from '$lib/controllers/auth/auth';
 import { query } from '$lib/db/mysql.server';
+
+const logger = new FileLogger('Asset');
 
 namespace AssetServer {
     type Asset = _Asset;
@@ -88,12 +90,9 @@ namespace AssetServer {
         `;
         if (res.length !== 1) {
             if (res.length !== 0) {
-                await errorLogger.error(
+                await logger.error(
                     `Expected 1 asset with publicId ${publicId} but found ${res.length}`,
-                    {
-                        publicId,
-                        userId: auth.id
-                    }
+                    { publicId, userId: auth.id }
                 );
             }
             return Result.err('Asset not found');

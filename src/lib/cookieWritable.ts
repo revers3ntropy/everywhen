@@ -32,8 +32,8 @@ export function cookieWritable<T>(
         if (lsVal !== undefined) {
             try {
                 initialValue = JSON.parse(lsVal) as T;
-            } catch (e) {
-                clientLogger.error('Error parsing cookie value', e);
+            } catch (error) {
+                clientLogger.error('Error parsing cookie value', { error, lsVal, cookieKey });
             }
         }
 

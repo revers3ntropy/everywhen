@@ -1,9 +1,11 @@
 import type { Auth } from '$lib/controllers/auth/auth';
 import { decrypt } from '$lib/utils/encryption';
+import { FileLogger } from '$lib/utils/log.server';
 import { error } from '@sveltejs/kit';
 import schemion, { type Schema, type SchemaResult } from 'schemion';
-import { errorLogger } from './log.server';
 import { Result } from './result';
+
+const reqLogger = new FileLogger('RQBODY');
 
 export async function bodyFromReq<T extends Schema & Record<string, unknown>>(
     key: Auth | string | null,
@@ -12,7 +14,7 @@ export async function bodyFromReq<T extends Schema & Record<string, unknown>>(
     defaults: { [P in keyof T]?: SchemaResult<T[P]> | undefined } = {}
 ): Promise<Result<Readonly<SchemaResult<T>>>> {
     if (request.method === 'GET') {
-        void errorLogger.log('GET requests are not supported in bodyFromReq()');
+        void reqLogger.log('GET requests are not supported in bodyFromReq()');
         return Result.err('Something went wrong');
     }
 

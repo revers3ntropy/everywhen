@@ -1,10 +1,12 @@
 import { GITHUB_AUTH_CLIENT_SECRET } from '$env/static/private';
 import { PUBLIC_GITHUB_AUTH_CLIENT_ID } from '$env/static/public';
 import { Settings } from '$lib/controllers/settings/settings.server';
-import { errorLogger } from '$lib/utils/log.server';
+import { FileLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 import type { Auth } from '$lib/controllers/auth/auth';
 import { z } from 'zod';
+
+const logger = new FileLogger('GHOAuth');
 
 export interface GitHubUser {
     id: number;
@@ -16,7 +18,10 @@ export namespace ghAPI {
         code: string,
         state: string
     ): Promise<Result<string>> {
-        if (!state || !code) return Result.err('Invalid state or code');
+        if (!state || !code) {
+            void logger.warn('Invalid state or code', { state, code });
+            return Result.err('Invalid state or code');
+        }
 
         let accessTokenRes: Response;
         try {
@@ -33,22 +38,32 @@ export namespace ghAPI {
                     Accept: 'application/json'
                 }
             });
-        } catch (e) {
-            await errorLogger.error(e);
+        } catch (error) {
+            await logger.error('Error connecting to GitHub /login/oauth/access_token', { error });
             return Result.err('Error connecting to GitHub');
         }
 
         let accessTokenData: unknown;
         try {
             accessTokenData = await accessTokenRes.json();
-        } catch (e) {
-            await errorLogger.error(e);
-            await errorLogger.error(await accessTokenRes.text());
+        } catch (error) {
+            await logger.error('Invalid response from gitHub /login/oauth/access_token', {
+                accessTokenRes,
+                accessTokenData,
+                accessTokenResText: await accessTokenRes.text(),
+                code,
+                state
+            });
             return Result.err('Invalid response from gitHub');
         }
 
         if (typeof accessTokenData !== 'object' || !accessTokenData) {
-            await errorLogger.error(`Invalid response from github`, accessTokenData);
+            await logger.error(`Invalid response from github`, {
+                accessTokenData,
+                accessTokenRes,
+                state,
+                code
+            });
             return Result.err('Invalid response from gitHub');
         }
         if ('error' in accessTokenData && accessTokenData.error) {
@@ -62,17 +77,14 @@ export namespace ghAPI {
             })
             .safeParse(accessTokenData);
 
-        if (!parseResult.success) {
-            await errorLogger.error(`Invalid response from github`, {
+        if (!parseResult.success || parseResult.data.token_type.toLowerCase() !== 'bearer') {
+            await logger.error(`Invalid response from github`, {
                 parseResult,
-                accessTokenData
+                accessTokenData,
+                code,
+                state
             });
             return Result.err('Invalid response from GitHub');
-        }
-
-        if (parseResult.data.token_type.toLowerCase() !== 'bearer') {
-            await errorLogger.error(`Invalid token type from github`, accessTokenData);
-            return Result.err('Invalid response from gitHub');
         }
 
         return Result.ok(parseResult.data.access_token);
@@ -111,7 +123,7 @@ export namespace ghAPI {
             return Result.err('No GitHub account is linked');
         }
         if (!path.startsWith('/')) {
-            throw new Error('GH API request path must start with /');
+            throw new Error('makeGhApiReq: GH API request path must start with /');
         }
 
         let res;
@@ -123,27 +135,41 @@ export namespace ghAPI {
                     Accept: 'application/json'
                 }
             });
-        } catch (e) {
-            await errorLogger.error(e);
+        } catch (error) {
+            await logger.warn('makeGhApiReq: Error connecting to GitHub', {
+                error,
+                gitHubAccessToken,
+                path,
+                method
+            });
             return Result.err('Error connecting to GitHub');
         }
 
         let data;
         try {
             data = await res.json();
-        } catch (e) {
-            await errorLogger.error(e);
-            await errorLogger.error(await res.text());
+        } catch (error) {
+            await logger.error('makeGhApiReq: Invalid response from gitHub', {
+                res,
+                textRes: await res.text(),
+                error
+            });
             return Result.err('Invalid response from gitHub');
         }
 
         if (typeof data !== 'object' || !data) {
-            await errorLogger.error(`Invalid response from github`, data);
+            await logger.error(`makeGhApiReq: Invalid response from github`, {
+                data,
+                path,
+                method,
+                gitHubAccessToken
+            });
             return Result.err('Invalid response from gitHub');
         }
 
         if ('error' in data && data.error) {
-            return Result.err(JSON.stringify(data.error));
+            void logger.error('Error from GitHub', { data, path, method, gitHubAccessToken });
+            return Result.err('Invalid response from gitHub');
         }
 
         return Result.ok(data);
@@ -159,7 +185,7 @@ export namespace ghAPI {
             !('id' in val) ||
             typeof val.id !== 'number'
         ) {
-            await errorLogger.error(`Invalid response from github`, val);
+            await logger.error(`getGhUserInfo: Invalid response from github`, { val });
             return Result.err('Invalid response from GitHub');
         }
 

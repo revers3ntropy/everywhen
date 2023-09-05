@@ -1,7 +1,7 @@
 import { Auth as _Auth } from '$lib/controllers/auth/auth';
 import { migrateUser } from '$lib/controllers/user/accountMigration.server';
 import type { User } from '$lib/controllers/user/user';
-import { errorLogger } from '$lib/utils/log.server';
+import { FileLogger } from '$lib/utils/log.server';
 import { SemVer } from '$lib/utils/semVer';
 import { type Cookies, error } from '@sveltejs/kit';
 import { COOKIE_KEYS } from '$lib/constants';
@@ -10,6 +10,8 @@ import { Result } from '$lib/utils/result';
 import { UId } from '$lib/controllers/uuid/uuid.server';
 import { nowUtc } from '$lib/utils/time';
 import type { Seconds, TimestampSecs } from '../../../types';
+
+const logger = new FileLogger('Auth');
 
 namespace AuthServer {
     type Auth = _Auth;
@@ -78,7 +80,7 @@ namespace AuthServer {
         `;
         if (res.length !== 1) {
             if (res.length !== 0) {
-                await errorLogger.error(`Got ${res.length} rows for login`, { username, res });
+                await logger.error(`Got ${res.length} rows for login`, { username, res });
             }
             return Result.err('Invalid login');
         }

@@ -1,5 +1,6 @@
 <script lang="ts">
     import { listen } from '$lib/dataChangeEvents';
+    import { clientLogger } from '$lib/utils/log';
     import { createEventDispatcher } from 'svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import LabelOffOutline from 'svelte-material-icons/LabelOffOutline.svelte';
@@ -34,7 +35,7 @@
     });
     listen.label.onUpdate(label => {
         if (!labels) {
-            console.error('Labels not loaded but being updated');
+            clientLogger.error('Labels not loaded but being updated');
             return;
         }
 
@@ -42,7 +43,7 @@
     });
     listen.label.onDelete(id => {
         if (!labels) {
-            console.error('Labels not loaded but being deleted');
+            clientLogger.error('Labels not loaded but being deleted');
             return;
         }
 

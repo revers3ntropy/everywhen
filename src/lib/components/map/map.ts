@@ -68,7 +68,7 @@ export function olLayerFromLocations(
                     const ctx = state.context;
 
                     if (typeof x !== 'number' || typeof y !== 'number') {
-                        clientLogger.error('x or y is not a number', x, y);
+                        clientLogger.error('x or y is not a number', { state, x, y });
                         return;
                     }
 

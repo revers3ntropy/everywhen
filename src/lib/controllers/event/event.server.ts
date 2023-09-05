@@ -1,7 +1,7 @@
 import { LIMITS } from '$lib/constants';
 import { query } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/utils/encryption';
-import { errorLogger } from '$lib/utils/log.server';
+import { FileLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 import { nowUtc } from '$lib/utils/time';
 import type { TimestampSecs } from '../../../types';
@@ -9,6 +9,8 @@ import type { Auth } from '../auth/auth.server';
 import { Label } from '../label/label.server';
 import { Event as _Event } from './event';
 import { UId } from '$lib/controllers/uuid/uuid.server';
+
+const logger = new FileLogger('Event');
 
 namespace EventServer {
     interface RawEvent {
@@ -61,10 +63,12 @@ namespace EventServer {
         `;
         if (events.length !== 1) {
             if (events.length !== 0) {
-                await errorLogger.log(
-                    `Expected 1 event with id ${id}, got ${events.length} instead`,
-                    { userId: auth.id, username: auth.username, id, events }
-                );
+                await logger.log(`Expected 1 event with id ${id}, got ${events.length} instead`, {
+                    userId: auth.id,
+                    username: auth.username,
+                    id,
+                    events
+                });
             }
             return Result.err(`Event not found`);
         }

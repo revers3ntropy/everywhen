@@ -9,7 +9,6 @@
     import { dispatch, listen } from '$lib/dataChangeEvents';
     import { obfuscated } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
-    import { clientLogger } from '$lib/utils/log';
     import { showPopup } from '$lib/utils/popups';
     import { limitStrLen } from '$lib/utils/text';
     import type { Pixels, TimestampSecs } from '../../../types';
@@ -70,11 +69,6 @@
     }
 
     let thisIsDeleted = false;
-
-    if (typeof start !== 'number' || typeof end !== 'number') {
-        clientLogger.error(start, end);
-        throw 'Missing required props';
-    }
 
     $: duration = end - start;
     $: isInstantEvent = duration < 60;

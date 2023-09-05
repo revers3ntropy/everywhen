@@ -1,11 +1,13 @@
 import { query } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/utils/encryption';
+import { FileLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 import { nowUtc } from '$lib/utils/time';
-import { errorLogger } from '$lib/utils/log.server';
 import { Settings as _Settings, type SettingsConfig, type SettingsKey } from './settings';
 import { UId } from '$lib/controllers/uuid/uuid.server';
 import type { Auth } from '$lib/controllers/auth/auth';
+
+const logger = new FileLogger('Stngs');
 
 namespace SettingsServer {
     const Settings = _Settings;
@@ -64,7 +66,7 @@ namespace SettingsServer {
      * only as an error correction measure
      */
     export async function clearDuplicateKeys(auth: Auth, duplicated: Set<string>): Promise<void> {
-        void errorLogger.error('Clearing duplicate settings keys: ', [...duplicated]);
+        void logger.error('Clearing duplicate settings keys: ', { duplicated });
         for (const key of duplicated) {
             await query`
                 DELETE FROM settings
@@ -100,7 +102,7 @@ namespace SettingsServer {
             seenKeys.add(setting.key);
         });
         if (duplicateKeys.size > 0) {
-            await errorLogger.error('Duplicate settings keys found', [...duplicateKeys]);
+            void logger.error('Duplicate settings keys found', { duplicateKeys });
             await clearDuplicateKeys(auth, duplicateKeys);
         }
 

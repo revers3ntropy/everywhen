@@ -1,11 +1,13 @@
 import { ghAPI } from '$lib/controllers/ghAPI/ghAPI.server';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 import { invalidateCache } from '$lib/utils/cache.server';
-import { errorLogger } from '$lib/utils/log.server';
+import { FileLogger } from '$lib/utils/log.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { Auth } from '$lib/controllers/auth/auth.server';
+
+const logger = new FileLogger('GHCB');
 
 export const POST = (async ({ request, cookies }) => {
     const auth = Auth.Server.getAuthFromCookies(cookies);
@@ -18,7 +20,7 @@ export const POST = (async ({ request, cookies }) => {
 
     const { val: accessToken, err } = await ghAPI.linkToGitHubOAuth(auth, body.code, body.state);
     if (err) {
-        await errorLogger.error(err);
+        await logger.error('Failed on ghAPI.linkToGitHubOAuth', { err });
         throw error(500, 'Internal server error');
     }
 

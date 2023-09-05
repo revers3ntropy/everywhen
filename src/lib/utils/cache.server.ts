@@ -44,7 +44,7 @@ function roughSizeOfObject(object: unknown): number {
 }
 
 function logCacheReq(hit: boolean, url: URL) {
-    void cacheLogger.log(hit ? chalk.green('HIT ') : chalk.red('MISS'), url.pathname);
+    void cacheLogger.log(hit ? chalk.green('HIT ') : chalk.red('MISS'), { path: url.pathname });
 }
 
 export function cacheResponse<T>(url: string, userId: string, response: T): void {
@@ -83,7 +83,6 @@ export function cleanupCache(): number {
     const cacheSize = roughSizeOfObject(cache);
     const timeout = cacheTimeout(cacheSize);
 
-    const bytesFmt = chalk.yellow(fmtBytes(cacheSize));
     let cleared = 0;
 
     for (const userId of Object.keys(cacheLastUsed)) {
@@ -95,14 +94,13 @@ export function cleanupCache(): number {
     }
 
     const cacheSizeAfter = roughSizeOfObject(cache);
-    const changeFmt = chalk.yellow(fmtBytes(cacheSizeAfter - cacheSize));
-    void cacheLogger.log(
-        chalk.yellow('CLEANUP'),
-        `size=${bytesFmt}`,
-        `timeout=${timeout}s`,
-        `change=${changeFmt}`,
-        `(${cleared})`
-    );
+
+    void cacheLogger.log(chalk.yellow('CLEANUP'), {
+        cacheSize: chalk.yellow(fmtBytes(cacheSize)),
+        timeout,
+        changeSize: chalk.yellow(fmtBytes(cacheSizeAfter - cacheSize)),
+        cleared
+    });
     return cacheSizeAfter;
 }
 
@@ -176,7 +174,7 @@ export function cachedPageRoute<
         const url = props.url.href;
         let auth = props.locals.auth as Auth | (MustHaveAuth extends true ? Auth : null);
         if (requireAuth) {
-            if (!auth) throw redirect(301, Auth.requireAuthUrl(url));
+            if (!auth) throw redirect(301, Auth.wantsToStayLoggedInAuthUrl(url));
         } else {
             auth = null as unknown as Auth;
         }

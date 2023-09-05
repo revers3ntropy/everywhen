@@ -52,7 +52,7 @@
         const res = notify.onErr(await api.post('/entries', { ...body }));
 
         if (!res.id) {
-            clientLogger.error(res);
+            clientLogger.error(`Failed to create entry`, { res });
             notify.error(`Failed to create entry`);
             return;
         }

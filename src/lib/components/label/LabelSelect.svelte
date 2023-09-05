@@ -42,7 +42,7 @@
     });
     listen.label.onUpdate(label => {
         if (!labels) {
-            console.error('Labels not loaded but being updated');
+            clientLogger.error('Labels not loaded but being updated');
             return;
         }
 
@@ -50,7 +50,7 @@
     });
     listen.label.onDelete(id => {
         if (!labels) {
-            console.error('Labels not loaded but being deleted');
+            clientLogger.error('Labels not loaded but being deleted');
             return;
         }
 

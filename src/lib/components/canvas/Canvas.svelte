@@ -87,10 +87,10 @@
                     void entity.render($canvasState.asRenderProps(), dt);
                 }
             } catch (err) {
-                clientLogger.error(err);
+                clientLogger.error('Animation loop stopped due to an error', { err });
                 if (killLoopOnError) {
                     cancelAnimationFrame(frame);
-                    console.warn('Animation loop stopped due to an error');
+                    clientLogger.warn('killed loop due to error');
                 }
             }
         }

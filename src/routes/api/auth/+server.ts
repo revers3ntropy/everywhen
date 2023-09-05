@@ -48,12 +48,17 @@ export const PUT = (async ({ request, cookies }) => {
 }) satisfies RequestHandler;
 
 export const DELETE = (({ cookies }) => {
-    const auth = Auth.Server.getAuthFromCookies(cookies);
-    invalidateCache(auth.id);
+    const auth = Auth.Server.tryGetAuthFromCookies(cookies);
 
-    cookies.delete(COOKIE_KEYS.sessionId, sessionCookieOptions(false));
+    if (!auth) {
+        cookies.delete(COOKIE_KEYS.sessionId, sessionCookieOptions(false));
+        return apiResponse(null, {});
+    }
+
+    invalidateCache(auth.id);
     Auth.Server.invalidateAllSessionsForUser(auth.id);
 
+    cookies.delete(COOKIE_KEYS.sessionId, sessionCookieOptions(false));
     return apiResponse(null, {});
 }) satisfies RequestHandler;
 

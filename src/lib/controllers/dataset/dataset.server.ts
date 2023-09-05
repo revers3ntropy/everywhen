@@ -4,8 +4,8 @@ import { datasetPresets } from '$lib/controllers/dataset/presets';
 import { thirdPartyDatasetProviders } from '$lib/controllers/dataset/thirdPartyDatasets.server';
 import type { ThirdPartyDatasetProvider } from '$lib/controllers/dataset/thirdPartyDatasets.server';
 import type { SettingsConfig } from '$lib/controllers/settings/settings';
-import { errorLogger } from '$lib/utils/log.server';
 import { query } from '$lib/db/mysql.server';
+import { FileLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 import type { Hours, TimestampSecs } from '../../../types';
 import type { DatasetDataFilter } from './dataset';
@@ -20,6 +20,8 @@ import { nowUtc } from '$lib/utils/time';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import type { Auth } from '$lib/controllers/auth/auth';
 import { UId } from '$lib/controllers/uuid/uuid.server';
+
+const logger = new FileLogger('Dataset');
 
 namespace DatasetServer {
     const Dataset = _Dataset;
@@ -96,7 +98,7 @@ namespace DatasetServer {
             if (dataset.presetId) {
                 preset = datasetPresets[dataset.presetId];
                 if (!preset) {
-                    await errorLogger.error('Invalid preset ID', { dataset });
+                    await logger.error('Invalid preset ID', { dataset });
                     return Result.err('Invalid preset ID');
                 }
             }
@@ -143,7 +145,7 @@ namespace DatasetServer {
         if (dataset.presetId) {
             preset = datasetPresets[dataset.presetId];
             if (!preset) {
-                await errorLogger.error('Invalid preset ID', { dataset });
+                await logger.error('Invalid preset ID', { dataset });
                 return Result.err('Invalid preset ID');
             }
         }
@@ -235,7 +237,7 @@ namespace DatasetServer {
 
         if (presetId) {
             if (!(presetId in datasetPresets)) {
-                await errorLogger.error('Invalid preset ID', { presetId });
+                await logger.error('Invalid preset ID', { presetId });
                 return 'Invalid preset ID';
             }
             const existingWithPreset = await query<{ name: string }[]>`

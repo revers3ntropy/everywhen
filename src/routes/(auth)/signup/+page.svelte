@@ -12,6 +12,7 @@
     import Dot from '$lib/components/Dot.svelte';
 
     export let data: PageData;
+    const { redirect } = data;
 
     async function create(): Promise<void> {
         actionPending = true;
@@ -46,7 +47,7 @@
 
         await Auth.populateCookiesAndSettingsAfterAuth(() => (actionPending = false));
 
-        await goto('/' + data.redirect);
+        await goto('/' + redirect);
     }
 
     function usernameInputKeypress(event: { code: string }) {
@@ -73,6 +74,10 @@
     let passcode: HTMLInputElement;
 
     let actionPending = false;
+
+    $: if ($encryptionKey && $usernameStore) {
+        void goto('/' + redirect);
+    }
 </script>
 
 <svelte:head>

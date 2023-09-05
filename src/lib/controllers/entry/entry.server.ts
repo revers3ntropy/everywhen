@@ -4,7 +4,7 @@ import * as getMulti from '$lib/controllers/entry/getEntryMulti.server';
 import * as getSummary from '$lib/controllers/entry/getEntrySummaries.server';
 import { query } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/utils/encryption';
-import { errorLogger } from '$lib/utils/log.server';
+import { FileLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 import { wordCount } from '$lib/utils/text';
 import { fmtUtc, nowUtc } from '$lib/utils/time';
@@ -13,6 +13,8 @@ import type { Auth } from '../auth/auth.server';
 import type { Label } from '../label/label';
 import { UId } from '$lib/controllers/uuid/uuid.server';
 import { Entry as _Entry, type EntryEdit, type RawEntryEdit, type Streaks } from './entry';
+
+const logger = new FileLogger('Entry');
 
 namespace EntryServer {
     type Entry = _Entry;
@@ -76,7 +78,7 @@ namespace EntryServer {
         }
 
         if (labelId && !labels.find(l => l.id === labelId)) {
-            await errorLogger.error('Label not found', { labelId, username: auth.username });
+            await logger.error('Label not found', { labelId, username: auth.username });
             return Result.err('Label not found');
         }
 
@@ -352,7 +354,7 @@ namespace EntryServer {
         if (rawEdit.oldLabelId) {
             const label = labels[rawEdit.oldLabelId];
             if (!label) {
-                void errorLogger.error('Label not found', { rawEdit, labels });
+                void logger.error('Label not found', { rawEdit, labels });
                 return Result.err('Label not found');
             }
             oldLabel = label;

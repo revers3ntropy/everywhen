@@ -57,11 +57,11 @@
     </p>
     <p>
         Please disclose any security vulnerabilities to me at
-        <a href="mailto:joseph.coppin+halcyon@gmail.com"> joseph.coppin+halcyon@gmail.com </a>
+        <a href="mailto:joseph@halcyon.land"> joseph@halcyon.land </a>
         , rather than publicly on the GitHub issues.
     </p>
 
-    <h2>Entries</h2>
+    <h2> Entries </h2>
 
     <p>
         Record your entries in the <a href="/journal">journal</a>. Each entry stores a title, a

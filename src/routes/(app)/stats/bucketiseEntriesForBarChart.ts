@@ -109,10 +109,8 @@ function datasetFactoryForStandardBuckets(
             buckets[bucket] += by === By.Entries ? 1 : entry.wordCount;
         }
 
-        if (isNaN(Object.values(buckets).reduce((a, b) => a + b, 0))) {
-            clientLogger.error(buckets);
-            clientLogger.error('NaN in buckets');
-        }
+        if (isNaN(Object.values(buckets).reduce((a, b) => a + b, 0)))
+            clientLogger.error('NaN in buckets', { buckets, start, end, selectedBucket });
 
         const lastBucket = Object.keys(buckets)
             .map(a => parseInt(a))

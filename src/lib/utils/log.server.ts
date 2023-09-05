@@ -1,26 +1,35 @@
 import { LOG_FILE_NAME } from '$lib/constants';
-import { removeAnsi } from '$lib/utils/text';
-import chalk from 'chalk';
+import { recursivelyTrimAndStringify, removeAnsi } from '$lib/utils/text';
 import { Logger } from './log';
 import fs from 'fs/promises';
 
 const logFile = fs.open(LOG_FILE_NAME, 'a');
+const writeStream = logFile.then(f => f.createWriteStream({}));
 
-export class FileLogger extends Logger {
-    public override async log(...args: unknown[]): Promise<void> {
-        super.log(...args);
-        await (await logFile).write(removeAnsi(this.fmt(true, ...args)) + '\n');
-    }
-
-    public override async warn(...args: unknown[]): Promise<void> {
-        super.warn(...args);
-        await (await logFile).write(removeAnsi(this.fmt(true, ...args)) + '\n');
-    }
-
-    public override async error(...args: unknown[]): Promise<void> {
-        super.error(...args);
-        await (await logFile).write(removeAnsi(this.fmt(true, ...args)) + '\n');
-    }
+async function write(text: string): Promise<void> {
+    return new Promise(resolve => {
+        void writeStream.then(ws => ws.write(text, () => resolve()));
+    });
 }
 
-export const errorLogger = new FileLogger('ERR', chalk.red);
+export class FileLogger extends Logger {
+    private fmtContext(context?: Record<string, unknown>): string {
+        if (!context) return '';
+        return ` ${recursivelyTrimAndStringify(context)}`;
+    }
+
+    public override async log(msg: string, context?: Record<string, unknown>): Promise<void> {
+        super.log(msg, context);
+        await write(removeAnsi(this.fmt(true, msg + this.fmtContext(context))) + '\n');
+    }
+
+    public override async warn(msg: string, context?: Record<string, unknown>): Promise<void> {
+        super.warn(msg, context);
+        await write(removeAnsi(this.fmt(true, msg + this.fmtContext(context))) + '\n');
+    }
+
+    public override async error(msg: string, context?: Record<string, unknown>): Promise<void> {
+        super.error(msg, context);
+        await write(removeAnsi(this.fmt(true, msg + this.fmtContext(context))) + '\n');
+    }
+}

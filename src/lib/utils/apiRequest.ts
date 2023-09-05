@@ -3,13 +3,15 @@ import { notify } from '$lib/components/notifications/notifications';
 import { Auth } from '$lib/controllers/auth/auth';
 import { encryptionKey } from '$lib/stores';
 import { encrypt } from '$lib/utils/encryption';
+import { Logger } from '$lib/utils/log';
 import { get } from 'svelte/store';
 import type { apiRes404, GenericResponse } from './apiResponse.server';
 import { serializeGETArgs } from './GETArgs';
-import { clientLogger } from './log';
 import { Result } from './result';
 import { currentTzOffset, nowUtc } from './time';
 import type { Expand } from '../../types';
+
+const logger = new Logger('ApiRq');
 
 export interface ReqBody {
     timezoneUtcOffset?: number;
@@ -94,8 +96,8 @@ export async function makeApiReq<
     if (body) {
         if (!options.doNotEncryptBody) {
             if (!latestEncryptionKey) {
+                logger.error('no encryption key found', { latestEncryptionKey });
                 notify.error('Failed to make API call');
-                clientLogger.error('no encryption key found', latestEncryptionKey);
                 throw new Error();
             }
             init.body = encrypt(JSON.stringify(body), latestEncryptionKey);
@@ -130,7 +132,7 @@ async function handleOkResponse<T>(
     try {
         textResult = await response.text();
     } catch (e) {
-        clientLogger.error(`Error getting text from fetch (${method} ${url})`, response);
+        logger.error(`Error getting text from fetch`, { response, method, url });
         return Result.err('Invalid response from server');
     }
 
@@ -139,14 +141,11 @@ async function handleOkResponse<T>(
         jsonRes = JSON.parse(textResult);
     } catch (e) {
         if (options.doNotTryToDecryptResponse) {
-            notify.error('invalid response from server');
-            clientLogger.error('Response is not JSON: ', textResult);
+            logger.error('Response is not JSON: ', { textResult });
             return Result.err('Invalid response from server');
         }
         if (!key) {
-            if (!options.doNotLogoutOn401) {
-                await Auth.logOut();
-            }
+            if (!options.doNotLogoutOn401) await Auth.logOut();
             return Result.err('Something went wrong, please log in again');
         }
 
@@ -154,15 +153,21 @@ async function handleOkResponse<T>(
 
         try {
             jsonRes = JSON.parse(decryptedRes);
-        } catch (e) {
-            clientLogger.log({ key, textResult, decryptedRes });
-            clientLogger.error(`Can't parse response (${method} ${url})`);
+        } catch (error) {
+            logger.error(`Can't parse response`, {
+                method,
+                url,
+                key,
+                textResult,
+                decryptedRes,
+                error
+            });
             return Result.err('Invalid response from server');
         }
     }
 
     if (typeof jsonRes !== 'object' || jsonRes === null) {
-        clientLogger.error(`non-object returned (${method} ${url})`, jsonRes);
+        logger.error(`non-object returned`, { jsonRes, method, url });
         return Result.err('Invalid response from server');
     }
     return Result.ok(jsonRes as T);
@@ -178,12 +183,10 @@ async function handleErrorResponse(
         return 'Server is down for maintenance';
     }
     if (response.status === 401) {
-        if (!options.doNotLogoutOn401) {
-            await Auth.logOut(true);
-        }
+        if (!options.doNotLogoutOn401) await Auth.logOut(true);
         return 'Invalid log in';
     }
-    clientLogger.error(`Error on api fetch  (${method} ${url})`, response);
+    logger.error(`Error on api fetch`, { response, url, method, options });
 
     try {
         const resTxt = await response.text();
