@@ -56,7 +56,7 @@ namespace LocationServer {
         await query`
             INSERT INTO locations (id, userId, created, name,
                                    latitude, longitude, radius)
-            VALUES (${id}, ${auth.id}, ${created}}, ${encryptedName},
+            VALUES (${id}, ${auth.id}, ${created}, ${encryptedName},
                     ${latitude}, ${longitude}, ${radius})
         `;
 

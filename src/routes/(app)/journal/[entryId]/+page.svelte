@@ -1,4 +1,7 @@
 <script lang="ts">
+    import { fmtUtcRelative } from '$lib/utils/time';
+    import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
+    import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
     import type { Location } from '$lib/controllers/location/location';
     import { notify } from '$lib/components/notifications/notifications';
     import { api } from '$lib/utils/apiRequest';
@@ -27,33 +30,37 @@
 </svelte:head>
 
 <main>
-    {#if EntryController.isDeleted(entry)}
-        <i>This entry has been deleted. </i>
-    {:else if showHistory}
-        <i>Current Version</i>
-    {/if}
+    <div style="font-style: italic; padding: 1rem 0;" class="text-light">
+        {#if EntryController.isDeleted(entry)}
+            This entry was deleted {fmtUtcRelative(entry.deleted ?? 0)}
+        {:else if showHistory}
+            Current Version
+        {/if}
+    </div>
 
-    <Entry
-        {...entry}
-        obfuscated={$obfuscated}
-        on:updated={() => location.reload()}
-        showFullDate={true}
-        {locations}
-    />
+    <div style="padding: 0 0 1rem 0">
+        <Entry
+            {...entry}
+            obfuscated={$obfuscated}
+            on:updated={() => location.reload()}
+            showFullDate={true}
+            {locations}
+        />
+    </div>
 
     {#if !showHistory}
         {#if entry.edits?.length}
             <div class="flex-center">
-                <a href="/journal/{entry.id}?history=on">
-                    Show History ({entry.edits?.length} edits)
-                </a>
+                <button on:click={() => (showHistory = true)}>
+                    <ChevronDown /> Show History ({entry.edits?.length} edits)
+                </button>
             </div>
         {/if}
     {:else}
         <div class="flex-center">
-            <a href="/journal/{entry.id}">
-                Hide History ({entry.edits?.length} edits)
-            </a>
+            <button on:click={() => (showHistory = false)}>
+                <ChevronUp /> Hide History ({entry.edits?.length} edits)
+            </button>
         </div>
         {#if !entry.edits?.length}
             <div class="flex-center"> No edits have been made to this entry </div>

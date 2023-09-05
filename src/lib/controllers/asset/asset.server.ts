@@ -19,25 +19,22 @@ namespace AssetServer {
         contentsPlainText: string,
         fileNamePlainText: string
     ): Promise<string | true> {
-        if (contentsPlainText.length > LIMITS.asset.contentLenMax) {
+        if (contentsPlainText.length > LIMITS.asset.contentLenMax)
             return `Too big (max ${fmtBytes(LIMITS.asset.contentLenMax)})`;
-        }
 
-        if (fileNamePlainText.length < LIMITS.asset.nameLenMin) {
-            return `File name too short`;
-        }
+        if (fileNamePlainText.length < LIMITS.asset.nameLenMin) return `File name too short`;
 
-        if (fileNamePlainText.length < LIMITS.asset.nameLenMax) {
+        if (fileNamePlainText.length > LIMITS.asset.nameLenMax)
             return `File name too long (max ${LIMITS.asset.nameLenMax})`;
-        }
-        const numEntries = await query<{ count: number }[]>`
+
+        const [{ count }] = await query<{ count: number }[]>`
             SELECT COUNT(*) as count
             FROM assets
             WHERE userId = ${auth.id}
         `;
-        if (numEntries[0].count >= LIMITS.asset.maxCount) {
+        if (count >= LIMITS.asset.maxCount)
             return `Maximum number of assets (${LIMITS.asset.maxCount}) reached`;
-        }
+
         return true;
     }
 

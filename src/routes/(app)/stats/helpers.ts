@@ -25,9 +25,9 @@ export const bucketNames: Record<string, Bucket> = {
 };
 
 export function initialBucket(days: number): Bucket {
-    if (days < 10) return Bucket.Day;
-    if (days < 100) return Bucket.Week;
-    if (days < 5000) return Bucket.Month;
+    if (days < 7 + 3) return Bucket.Day;
+    if (days < 7 * 14) return Bucket.Week;
+    if (days < 365 * 10) return Bucket.Month;
     return Bucket.Year;
 }
 
@@ -39,10 +39,10 @@ export function commonWordsFromText(
     txt: string,
     words: Record<string, number> = {}
 ): Record<string, number> {
-    for (let word of wordsFromText(txt)) {
-        word = word.toLowerCase();
-        words[word] ??= 0;
-        words[word]++;
+    for (const word of wordsFromText(txt)) {
+        const lowercase = word.toLowerCase();
+        words[lowercase] ??= 0;
+        words[lowercase]++;
     }
     return words;
 }

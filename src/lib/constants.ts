@@ -75,7 +75,7 @@ export const FILE_INPUT_ACCEPT_TYPES = 'image/png,image/jpeg,image/jpg,image/web
 export const LIMITS = {
     asset: {
         maxCount: 1000,
-        contentLenMax: 64,
+        contentLenMax: 8 * 1024 * 1024,
         nameLenMin: 1,
         nameLenMax: 128
     },
