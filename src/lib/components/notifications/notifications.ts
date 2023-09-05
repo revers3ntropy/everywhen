@@ -60,7 +60,9 @@ notify.info = (text: string | string[], timeout: Milliseconds = 4000) =>
 notify.success = (text: string | string[], timeout: Milliseconds = 2000) =>
     notify(text, NotificationType.SUCCESS, timeout);
 notify.error = (text: string | string[], timeout: Milliseconds = 5000) => {
-    clientLogger.error('error', { text, timeout });
+    if (text.length) {
+        clientLogger.error('error', { text, timeout });
+    }
     notify(text, NotificationType.ERROR, timeout);
 };
 notify.onErr = <T, E>(
