@@ -121,6 +121,7 @@ function getCookieWritableCookies(cookies: Cookies): App.Locals['__cookieWritabl
 }
 
 export const handle = (async ({ event, resolve }) => {
+    console.log(`handling ${event.url.href}`);
     const start = performance.now();
     const now = nowUtc();
 

@@ -81,7 +81,7 @@ namespace DatasetServer {
         const metadatas = [] as DatasetMetadata[];
 
         const datasets = await query<
-            { id: string; name: string; created: TimestampSecs; presetId: PresetId | null }[]
+            { id: string; name: string; created: number; presetId: string | null }[]
         >`
             SELECT id, name, created, presetId
             FROM datasets
@@ -96,7 +96,7 @@ namespace DatasetServer {
             if (decryptedNameErr) return Result.err(decryptedNameErr);
             let preset: DatasetPreset | null = null;
             if (dataset.presetId) {
-                preset = datasetPresets[dataset.presetId];
+                preset = datasetPresets[dataset.presetId as PresetId];
                 if (!preset) {
                     await logger.error('Invalid preset ID', { dataset });
                     return Result.err('Invalid preset ID');
@@ -205,7 +205,7 @@ namespace DatasetServer {
     async function canCreateWithName(
         auth: Auth,
         namePlaintext: string,
-        presetId: PresetId | null
+        presetId: string | null
     ): Promise<string | true> {
         if (namePlaintext.length < 1) {
             return 'Name must be at least 1 character long';
@@ -235,7 +235,7 @@ namespace DatasetServer {
             return 'Dataset with that name already exists';
         }
 
-        if (presetId) {
+        if (typeof presetId === 'string') {
             if (!(presetId in datasetPresets)) {
                 await logger.error('Invalid preset ID', { presetId });
                 return 'Invalid preset ID';
@@ -247,7 +247,7 @@ namespace DatasetServer {
                   AND datasets.userId = ${auth.id}
             `;
             if (existingWithPreset.length > 0) {
-                const presetName = datasetPresets[presetId].defaultName;
+                const presetName = datasetPresets[presetId as PresetId].defaultName;
                 const fromPresetName = existingWithPreset[0].name;
                 return `Dataset already created from preset '${presetName}': '${fromPresetName}`;
             }
@@ -260,10 +260,9 @@ namespace DatasetServer {
         auth: Auth,
         name: string,
         created: TimestampSecs,
-        columns: { name: string; type: string }[]
+        presetId: string | null
     ): Promise<Result<Dataset>> {
         const id = await UId.Server.generate();
-        const presetId = null;
 
         const canCreate = await canCreateWithName(auth, name, presetId);
         if (canCreate !== true) return Result.err(canCreate);
@@ -273,27 +272,11 @@ namespace DatasetServer {
             VALUES (${id}, ${auth.id}, ${encrypt(name, auth.key)}, ${created}, ${presetId})
         `;
 
-        const { val: types, err: getTypesErr } = allTypes();
-        if (getTypesErr) return Result.err(getTypesErr);
-
-        for (let i = 0; i < columns.length; i++) {
-            const column = columns[i];
-            const type = types[column.type];
-            if (!type) return Result.err('Invalid column type');
-
-            const nameEncrypted = encrypt(column.name, auth.key);
-
-            await query`
-                INSERT INTO datasetColumns (id, userId, datasetId, name, created, typeId)
-                VALUES (${i}, ${auth.id}, ${id}, ${nameEncrypted}, ${created}, ${type.id})
-            `;
-        }
-
         return Result.ok({
             id,
             name,
             created,
-            preset: presetId ? datasetPresets[presetId] : null
+            preset: presetId ? datasetPresets[presetId as PresetId] : null
         });
     }
 
@@ -304,9 +287,10 @@ namespace DatasetServer {
             elements: unknown[];
             timestamp?: TimestampSecs;
             timestampTzOffset?: Hours;
+            created?: TimestampSecs;
         }[]
     ): Promise<Result<null>> {
-        const { val: columns, err: getColumnsErr } = await allUserDefinedColumns(auth);
+        const { val: allColumns, err: getColumnsErr } = await allUserDefinedColumns(auth);
         if (getColumnsErr) return Result.err(getColumnsErr);
 
         const maxRowId = await query<{ id: number }[]>`
@@ -316,6 +300,27 @@ namespace DatasetServer {
                 AND datasets.userId = ${auth.id}
                 AND datasets.id = datasetRows.datasetId
         `;
+
+        const datasets = await query<{ presetId: string | null }[]>`
+            SELECT presetId
+            FROM datasets
+            WHERE id = ${datasetId}
+            AND userId = ${auth.id}
+        `;
+        if (datasets.length !== 1) {
+            if (datasets.length !== 0) {
+                void logger.error('Multiple datasets found with same ID', { datasetId });
+            }
+            return Result.err('Dataset not found');
+        }
+        const [{ presetId }] = datasets;
+
+        let columns: DatasetColumn<unknown>[];
+        if (presetId) {
+            columns = datasetPresets[presetId as PresetId].columns;
+        } else {
+            columns = allColumns.filter(c => c.datasetId === datasetId);
+        }
 
         let nextRowId = maxRowId.length > 0 ? maxRowId[0].id + 1 : 0;
 
@@ -338,6 +343,7 @@ namespace DatasetServer {
             nextRowId++;
 
             const rowTimestamp = row.timestamp ?? nowUtc();
+            const rowCreated = row.created ?? nowUtc();
             const rowTimestampTzOffset = row.timestampTzOffset ?? 0;
             const rowJson = JSON.stringify(row.elements);
 
@@ -347,7 +353,7 @@ namespace DatasetServer {
                     ${rowId},
                     ${auth.id},
                     ${datasetId},
-                    ${nowUtc()},
+                    ${rowCreated},
                     ${rowTimestamp},
                     ${rowTimestampTzOffset},
                     ${rowJson}

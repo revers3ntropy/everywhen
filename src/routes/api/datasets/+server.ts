@@ -24,41 +24,19 @@ export const POST = (async ({ request, cookies }) => {
         {
             created: 'number',
             name: 'string',
-            columns: 'object'
+            presetId: 'string'
         },
         {
             created: nowUtc(),
-            columns: []
+            presetId: ''
         }
     );
 
-    const rawColumns = body.columns;
-    if (!Array.isArray(rawColumns)) throw error(400, `Columns must be an array`);
-    const columns = rawColumns.map((c, i) => {
-        if (typeof c !== 'object' || c === null) {
-            throw error(400, `Column ${i} must be an object`);
-        }
-        if (!('name' in c) || typeof c.name !== 'string') {
-            throw error(400, `Column ${i} must have a name`);
-        }
-        if (!('type' in c) || typeof c.type !== 'string') {
-            throw error(400, `Column ${i} must have a type`);
-        }
-        return {
-            name: c.name,
-            type: c.type
-        };
-    });
+    const { id } = (
+        await Dataset.Server.create(auth, body.name, body.created, body.presetId || null)
+    ).unwrap(e => error(400, e));
 
-    const { val: dataset, err } = await Dataset.Server.create(
-        auth,
-        body.name,
-        body.created,
-        columns
-    );
-    if (err) throw error(400, err);
-
-    return apiResponse(auth, { id: dataset.id });
+    return apiResponse(auth, { id });
 }) satisfies RequestHandler;
 
 export const DELETE = apiRes404;

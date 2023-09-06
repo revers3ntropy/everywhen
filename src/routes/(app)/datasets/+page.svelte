@@ -1,23 +1,23 @@
 <script lang="ts">
+    import { datasetPresets } from '$lib/controllers/dataset/presets';
     import type { PresetId } from '$lib/controllers/dataset/presets';
     import type { PageData } from './$types';
-    import { Dataset, type DatasetPresetName } from '$lib/controllers/dataset/dataset';
     import { notify } from '$lib/components/notifications/notifications';
     import { api } from '$lib/utils/apiRequest';
 
     export let data: PageData;
+    const { datasets } = data;
 
-    let { datasets } = data;
-
-    $: unusedPresetNames = Object.keys(Dataset.datasetPresets).filter(
-        name => datasets.filter(dataset => dataset.name === name).length < 1
+    const usedPresetIds = datasets.map(({ preset }) => preset?.id).filter(Boolean);
+    const unusedPresetIds = Object.keys(datasetPresets).filter(
+        presetId => !usedPresetIds.includes(presetId)
     ) as PresetId[];
 
-    async function makeFromPreset(presetName: DatasetPresetName) {
+    async function makeFromPreset(presetId: PresetId) {
         notify.onErr(
             await api.post('/datasets', {
-                name: presetName,
-                columns: Dataset.datasetPresets[presetName].columns
+                name: datasetPresets[presetId].defaultName,
+                presetId
             })
         );
         location.reload();
@@ -31,10 +31,12 @@
 <main>
     <h1>Datasets</h1>
 
-    {#each unusedPresetNames as presetName}
-        <button on:click={() => makeFromPreset(presetName)}>
-            Start Recording '{presetName}'
-        </button>
+    {#each unusedPresetIds as presetId}
+        <div>
+            <button on:click={() => makeFromPreset(presetId)}>
+                Start Recording '{datasetPresets[presetId].defaultName}'
+            </button>
+        </div>
     {/each}
 
     {#each datasets as dataset}

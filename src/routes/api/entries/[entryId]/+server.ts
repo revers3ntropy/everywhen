@@ -41,7 +41,7 @@ export const PUT = (async ({ request, params, cookies }) => {
         request,
         {
             title: 'string',
-            entry: 'string',
+            body: 'string',
             label: 'string',
             latitude: 'number',
             longitude: 'number',
@@ -50,7 +50,7 @@ export const PUT = (async ({ request, params, cookies }) => {
         },
         {
             title: '',
-            entry: '',
+            body: '',
             label: '',
             latitude: 0,
             longitude: 0,
@@ -59,22 +59,23 @@ export const PUT = (async ({ request, params, cookies }) => {
         }
     );
 
-    const { err: entryErr, val: entry } = await Entry.Server.getFromId(auth, params.entryId, true);
-    if (entryErr) throw error(400, entryErr);
-
-    const { err } = await Entry.Server.edit(
-        auth,
-        entry,
-        body.title,
-        body.entry,
-        body.latitude || null,
-        body.longitude || null,
-        body.label,
-        body.timezoneUtcOffset,
-        body.agentData
+    const entry = (await Entry.Server.getFromId(auth, params.entryId, true)).unwrap(e =>
+        error(400, e)
     );
 
-    if (err) throw error(400, err);
+    (
+        await Entry.Server.edit(
+            auth,
+            entry,
+            body.title,
+            body.body,
+            body.latitude || null,
+            body.longitude || null,
+            body.label,
+            body.timezoneUtcOffset,
+            body.agentData
+        )
+    ).unwrap(e => error(400, e));
 
     return apiResponse(auth, { id: entry.id });
 }) satisfies RequestHandler;
