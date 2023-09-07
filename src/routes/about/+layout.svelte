@@ -7,7 +7,7 @@
     </div>
 </main>
 
-<style lang="less">
+<style lang="scss">
     main {
         padding: 1rem;
         display: flex;

@@ -8,17 +8,9 @@ import type { RequestHandler } from './$types';
 // TODO think about a better caching strategy for this,
 // as it could change externally
 export const GET = cachedApiRoute(async auth => {
-    const { val: settings, err: getSettingsErr } = await Settings.Server.allAsMapWithDefaults(auth);
-    if (getSettingsErr) throw error(500, getSettingsErr);
-
-    if (!settings.gitHubAccessToken.value) {
-        throw error(404, 'No GitHub account is linked');
-    }
-
-    const { val: userInfo, err } = await ghAPI.getGhUserInfo(settings.gitHubAccessToken.value);
-    if (err) throw error(500, err);
-
-    return userInfo;
+    const settings = (await Settings.Server.allAsMapWithDefaults(auth)).unwrap(e => error(500, e));
+    if (!settings.gitHubAccessToken.value) throw error(404, 'No GitHub account is linked');
+    return (await ghAPI.getGhUserInfo(settings.gitHubAccessToken.value)).unwrap(e => error(500, e));
 }) satisfies RequestHandler;
 
 export const POST = apiRes404;

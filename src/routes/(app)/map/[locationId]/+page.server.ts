@@ -7,8 +7,9 @@ export const load = cachedPageRoute(async (auth, { params }) => {
     const labelId = params.locationId;
     if (!labelId) throw error(404, 'Location not found');
 
-    const { val: location, err } = await Location.Server.fromId(auth, labelId);
-    if (err) throw error(404, err);
+    const locations = (await Location.Server.all(auth)).unwrap(e => error(500, e));
+    const location = locations.find(l => l.id === labelId);
+    if (!location) throw error(404, 'Location not found');
 
-    return { location };
+    return { location, locations };
 }) satisfies PageServerLoad;

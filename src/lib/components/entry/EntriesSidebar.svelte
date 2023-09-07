@@ -88,7 +88,10 @@
         {#key [pinnedEntriesSummaries, showingAllPinned]}
             {#if Object.keys(pinnedEntries).length}
                 <section class="container" style="padding: 1rem">
-                    <h3 class="gradient-icon flex-center" style="justify-content: start; gap: 8px;">
+                    <h3
+                        class="gradient-icon flex-center"
+                        style="justify-content: flex-start; gap: 8px;"
+                    >
                         <Heart size="25" />
                         Favourites
                     </h3>
@@ -147,7 +150,7 @@
     </div>
 </div>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/variables';
 
     .sidebar {
@@ -155,7 +158,7 @@
         overflow-y: auto;
         padding: 0 0 0 0.5rem;
 
-        @media @not-mobile {
+        @media #{$not-mobile} {
             position: sticky;
             top: 1rem;
             height: calc(100vh - 2rem);
@@ -164,11 +167,11 @@
             background: none;
         }
 
-        @media @mobile {
+        @media #{$mobile} {
             background: var(--v-light-accent);
             height: 100vh;
             z-index: 10;
-            transition: @transition;
+            transition: #{$transition};
             transform: translateX(-100%);
             position: fixed;
             top: 0;

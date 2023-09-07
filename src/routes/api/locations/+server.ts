@@ -8,27 +8,16 @@ import type { RequestHandler } from './$types';
 import { Auth } from '$lib/controllers/auth/auth.server';
 
 export const GET = cachedApiRoute(async (auth, { url }) => {
-    let lat: number, lng: number;
-    try {
-        lat = parseFloat(url.searchParams.get('lat') || '');
-    } catch (e) {
-        lat = 0;
-    }
-    try {
-        lng = parseFloat(url.searchParams.get('lon') || '');
-    } catch (e) {
-        lng = 0;
+    const lat = parseFloat(url.searchParams.get('lat') || '');
+    const lng = parseFloat(url.searchParams.get('lon') || '');
+
+    if ((!lat && lat !== 0) || (!lng && lng !== 0)) {
+        return { locations: (await Location.Server.all(auth)).unwrap(e => error(500, e)) };
     }
 
-    if (!lat || !lng) {
-        const { err, val: locations } = await Location.Server.all(auth);
-        if (err) throw error(500, err);
-        return { locations };
-    }
-
-    const { err, val: locations } = await Location.Server.search(auth, lat, lng);
-    if (err) throw error(500, err);
-    return { ...locations };
+    return {
+        ...(await Location.Server.search(auth, lat, lng)).unwrap(e => error(500, e))
+    };
 }) satisfies RequestHandler;
 
 export const POST = (async ({ request, cookies }) => {
@@ -51,17 +40,18 @@ export const POST = (async ({ request, cookies }) => {
         }
     );
 
-    const { val, err } = await Location.Server.create(
-        auth,
-        body.created,
-        body.name,
-        body.latitude,
-        body.longitude,
-        body.radius
-    );
-    if (err) throw error(400, err);
-
-    return apiResponse(auth, { ...val });
+    return apiResponse(auth, {
+        ...(
+            await Location.Server.create(
+                auth,
+                body.created,
+                body.name,
+                body.latitude,
+                body.longitude,
+                body.radius
+            )
+        ).unwrap(e => error(400, e))
+    });
 }) satisfies RequestHandler;
 
 export const PUT = apiRes404;

@@ -77,12 +77,12 @@
     </div>
 </main>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/layout';
     @import '../../../styles/variables';
 
     h1 {
-        .flex-center();
+        @extend .flex-center;
         margin: 0 0 1rem 0;
         font-size: 40px;
 

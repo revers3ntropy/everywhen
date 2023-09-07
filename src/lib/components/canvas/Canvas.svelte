@@ -189,18 +189,18 @@
 <svelte:window on:resize|passive={() => $canvasState.handleResize()} />
 <slot />
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/variables';
     @import '../../../styles/layout';
 
     .context-menu {
-        .container-shadow();
+        @extend .container-shadow;
         position: absolute;
         top: 0;
         left: 0;
         width: fit-content;
         min-width: 200px;
-        border-radius: @border-radius;
+        border-radius: $border-radius;
         z-index: 10;
         background: var(--light-accent);
         padding: 1rem 0;

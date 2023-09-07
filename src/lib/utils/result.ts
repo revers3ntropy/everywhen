@@ -1,116 +1,71 @@
-type ErrorDefault = string;
+export type Result<T, E = string> = Ok<T, E> | Err<T, E>;
 
-export class Result<T, E = ErrorDefault> {
-    protected constructor(
-        public readonly ok: boolean,
-        private readonly valOrErr: T | E
-    ) {}
+interface ResultOption<T, E = string> {
+    ok: boolean;
 
-    public match<U, V>(
-        ok: (value: T) => U,
-        err: (error: E) => V,
-        either: (valOrErr: T | E, piped: U | V) => void = () => void 0
-    ): U | V {
-        const res = this.ok ? ok(this.valOrErr as T) : err(this.valOrErr as E);
-        either(this.valOrErr, res);
-        return res;
+    // `maps` the value if there is one, but leaves the error along
+    map<R>(fn: (val: T) => R): Result<R, E>;
+
+    // other way round: applies a function to the error is there is one
+    mapErr<R>(fn: (err: E) => R): Result<T, R>;
+
+    // convert from `Result`s to `throw`s
+    // (convert the other way round with static `Result.wrap`)
+    unwrap(mapErr?: (err: E) => unknown): T;
+
+    // returns the value if it has one, or the argument otherwise
+    or(_fallback: T): T;
+
+    // returns whatever data it holds, be it error or value
+    merge(): T | E;
+}
+
+export namespace Result {
+    // Create new `Ok` variant.
+    // The reason the Ok variant is not exposed directly is that
+    // `Result.ok(value)` is just a little clearer than `new Ok(value)` in my opinion,
+    // although both are very reasonable.
+    export function ok<T, E = string>(value: T = null as T): Result<T, E> {
+        return new Ok(value);
     }
 
-    public get err(): E | null {
-        return this.match(
-            () => null,
-            err => err
-        );
+    // Create new `Err` variant.
+    export function err<T, E = string>(error: E): Result<T, E> {
+        return new Err<T, E>(error);
     }
 
-    public get val(): T {
-        return this.match(
-            val => val,
-            () => undefined as unknown as T
-        );
+    // convert from traditional JS `throw` to `Result`
+    export function wrap<T>(fn: () => T): Result<T, unknown> {
+        try {
+            return Result.ok(fn());
+        } catch (e: unknown) {
+            return Result.err(e);
+        }
     }
 
-    public get tuple(): [T | undefined, E | undefined] {
-        return this.match(
-            val => [val, undefined],
-            err => [undefined, err]
-        );
+    // Async equivalent for `wrap`
+    export async function wrapAsync<T>(promise: Promise<T>): Promise<Result<T, unknown>> {
+        try {
+            return Result.ok(await promise);
+        } catch (e: unknown) {
+            return Result.err(e);
+        }
     }
 
-    public unwrap<F = E>(mapErr?: (error: E) => F): T {
-        return this.match(
-            value => value,
-            error => {
-                if (mapErr) {
-                    throw mapErr(error);
-                }
-                throw error;
-            }
-        );
-    }
-
-    public or(other: T): T {
-        return this.match(
-            val => val,
-            () => other
-        );
-    }
-
-    public expect(message?: string): T {
-        return this.match(
-            val => val,
-            err => {
-                throw message || JSON.stringify(err);
-            }
-        );
-    }
-
-    public map<U>(f: (value: T) => U): Result<U, E> {
-        return this.match(
-            val => Result.ok(f(val)),
-            err => Result.err(err)
-        );
-    }
-
-    public mapErr<F = ErrorDefault>(f: (error: E) => F): Result<T, F> {
-        return this.match(
-            val => Result.ok(val),
-            err => Result.err(f(err))
-        );
-    }
-
-    public static ok<T, E = ErrorDefault>(value: T = null as T): Result<T, E> {
-        return new Result<T, E>(true, value);
-    }
-
-    public static err<T, E = ErrorDefault>(error: E): Result<T, E> {
-        return new Result<T, E>(false, error);
-    }
-
-    public static collect<T, E = ErrorDefault>(iter: Iterable<Result<T, E>>): Result<T[], E> {
+    // Extracts the first Err variant if there is one, and otherwise returns the array as the `val`s of each element,
+    // Especially useful if you are `map`ing over an array and need to return a `Result` inside the map.
+    export function collect<T, E>(iter: Iterable<Result<T, E>>): Result<T[], E> {
         const results: T[] = [];
         for (const result of iter) {
-            if (result.err) {
+            if (!result.ok) {
                 return Result.err(result.err);
             }
-            results.push(result.unwrap());
+            results.push(result.val);
         }
         return Result.ok(results);
     }
 
-    public static filter<T, E = ErrorDefault>(iter: Iterable<Result<T, E>>): [T[], E[]] {
-        const results: T[] = [];
-        const errors: E[] = [];
-        for (const result of iter) {
-            result.match(
-                val => results.push(val),
-                err => errors.push(err)
-            );
-        }
-        return [results, errors];
-    }
-
-    public static async collectAsync<T, E = ErrorDefault>(
+    export async function collectAsync<T, E = string>(
         iter: Iterable<Promise<Result<T, E>>>
     ): Promise<Result<T[], E>> {
         return Result.collect(
@@ -124,35 +79,92 @@ export class Result<T, E = ErrorDefault> {
         );
     }
 
-    public static async fromAsync<T>(op: () => Promise<T>): Promise<Result<T, unknown>> {
-        try {
-            return Result.ok(await op());
-        } catch (e: unknown) {
-            return Result.err(e);
+    // Converts an array of `Result`s into two arrays of the combined `val`s and `err`s.
+    export function filter<T, E = string>(iter: Iterable<Result<T, E>>): [T[], E[]] {
+        const results: T[] = [];
+        const errors: E[] = [];
+        for (const result of iter) {
+            result.match(
+                val => results.push(val),
+                err => errors.push(err)
+            );
         }
+        return [results, errors];
+    }
+}
+
+class Ok<T, E> implements ResultOption<T, E> {
+    // The `as const` part is the real magic:
+    // Typescript will now know that if `myResult.ok` is true, then it must be the `Ok` variant
+    // of a `Result` and not the `Err` variant.
+    public ok = true as const;
+    public constructor(public readonly val: T) {}
+
+    public map<R = T>(fn: (_val: T) => R): Result<R, E> {
+        return Result.ok(fn(this.val));
     }
 
-    public static from<T>(op: () => T): Result<T, unknown> {
-        try {
-            return Result.ok(op());
-        } catch (e: unknown) {
-            return Result.err(e);
-        }
+    public mapErr<R = E>(_fn: (_err: E) => R): Result<T, R> {
+        return this as unknown as Result<T, R>;
     }
 
-    public static wrap<T>(f: () => T): Result<T, unknown> {
-        try {
-            return Result.ok(f());
-        } catch (e: unknown) {
-            return Result.err(e);
-        }
+    public match<U = T, V = E>(mapVal: (_val: T) => U, _: (_err: E) => V): U {
+        return mapVal(this.val);
     }
 
-    public static async wrapAsync<T>(op: () => Promise<T>): Promise<Result<T, unknown>> {
-        try {
-            return Result.ok(await op());
-        } catch (e) {
-            return Result.err(e);
-        }
+    public transform<U = T, V = E>(mapVal: (_val: T) => U, _?: (_err: E) => V): Result<U, V> {
+        return Result.ok(mapVal(this.val));
+    }
+
+    public async transformAsync<U = T, V = E>(
+        mapVal: (_val: T) => Promise<U>,
+        _?: (_err: E) => Promise<V>
+    ): Promise<Result<U, V>> {
+        return Result.ok(await mapVal(this.val));
+    }
+
+    public unwrap(_mapErr?: (err: E) => unknown): T {
+        return this.val;
+    }
+
+    public or(_: T): T {
+        return this.val;
+    }
+
+    public merge(): T | E {
+        return this.val;
+    }
+}
+
+class Err<T, E> implements ResultOption<unknown, E> {
+    public ok = false as const;
+    public constructor(public readonly err: E) {}
+
+    public map<R>(_fn: (_val: T) => R): Result<R, E> {
+        return this as unknown as Result<R, E>;
+    }
+
+    public mapErr<R>(fn: (_err: E) => R): Result<T, R> {
+        return Result.err(fn(this.err));
+    }
+
+    public match<U, V>(_: (_val: T) => U, mapErr: (_err: E) => V): V {
+        return mapErr(this.err);
+    }
+
+    public unwrap(map?: (err: E) => unknown): T {
+        throw map ? map(this.err) : this.err;
+    }
+
+    public or(fallback: T): T {
+        return fallback;
+    }
+
+    public merge(): T | E {
+        return this.err;
+    }
+
+    public as<T>(): Result<T, E> {
+        return new Err<T, E>(this.err);
     }
 }

@@ -342,13 +342,13 @@
     </div>
 {/if}
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/variables';
     @import '../../../styles/layout';
 
     .restore-event {
-        .container();
-        border-radius: @border-radius;
+        @extend .container;
+        border-radius: $border-radius;
         display: flex;
         flex-direction: row;
         justify-content: space-around;
@@ -358,7 +358,7 @@
     }
 
     .event {
-        .container();
+        @extend .container;
         margin: 8px;
 
         .created-datetime {
@@ -377,7 +377,7 @@
             }
         }
 
-        @media @mobile {
+        @media #{$mobile} {
             margin: 1rem 0;
             border-radius: 0;
             background: none;
@@ -392,7 +392,7 @@
 
                 margin: 0.5rem 0.8rem;
 
-                @media @mobile {
+                @media #{$mobile} {
                     margin: 0.5rem 0;
                 }
             }

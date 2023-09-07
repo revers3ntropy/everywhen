@@ -87,12 +87,12 @@ namespace LocationServer {
     function fromRaw(auth: Auth, rows: Location[]): Result<Location[]> {
         return Result.collect(
             rows.map(row => {
-                const { err, val: name } = decrypt(row.name, auth.key);
-                if (err) return Result.err(err);
+                const name = decrypt(row.name, auth.key);
+                if (!name.ok) return name.as();
                 return Result.ok({
                     id: row.id,
                     created: row.created,
-                    name,
+                    name: name.val,
                     latitude: row.latitude,
                     longitude: row.longitude,
                     radius: row.radius
@@ -106,7 +106,7 @@ namespace LocationServer {
         lat: number,
         lng: number
     ): Promise<Result<{ locations: Location[]; nearby?: Location[] }>> {
-        const { err, val: locations } = fromRaw(
+        const locations = fromRaw(
             auth,
             _Location.filterByDynCirclePrecise(
                 await query<
@@ -131,10 +131,12 @@ namespace LocationServer {
             )
         );
 
-        if (err) return Result.err(err);
-        if (locations.length > 0) return Result.ok({ locations });
+        if (!locations.ok) return locations.as();
+        if (locations.val.length > 0) {
+            return Result.ok({ locations: locations.val });
+        }
 
-        const { err: nearbyErr, val: nearby } = fromRaw(
+        const nearby = fromRaw(
             auth,
             _Location.filterByDynCirclePrecise(
                 await query<
@@ -159,13 +161,16 @@ namespace LocationServer {
                 r => _Location.degreesToMeters(r) * 2
             )
         );
-        if (nearbyErr) return Result.err(nearbyErr);
+        if (!nearby.ok) return nearby.as();
 
-        return Result.ok({ locations, nearby });
+        return Result.ok({
+            locations: locations.val,
+            nearby: nearby.val
+        });
     }
 
     export async function fromId(auth: Auth, id: string): Promise<Result<Location>> {
-        const { val, err } = fromRaw(
+        const location = fromRaw(
             auth,
             await query<
                 {
@@ -183,9 +188,9 @@ namespace LocationServer {
                   AND id = ${id}
             `
         );
-        if (err) return Result.err(err);
-        if (val.length !== 1) return Result.err('Location not found');
-        return Result.ok(val[0]);
+        if (!location.ok) return location.as();
+        if (location.val.length !== 1) return Result.err('Location not found');
+        return Result.ok(location.val[0]);
     }
 
     export async function updateName(

@@ -37,7 +37,7 @@
     <span> Donate <OpenInNew size="15" /> </span>
 </a>
 
-<style lang="less">
+<style lang="scss">
     a {
         display: inline-grid;
         grid-template-columns: auto 1fr;

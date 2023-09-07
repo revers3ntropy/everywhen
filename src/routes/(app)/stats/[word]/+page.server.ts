@@ -1,4 +1,5 @@
 import type { EntrySummary } from '$lib/controllers/entry/entry';
+import { Location } from '$lib/controllers/location/location.server';
 import { decrypt } from '$lib/utils/encryption';
 import { error } from '@sveltejs/kit';
 import { Entry } from '$lib/controllers/entry/entry.server';
@@ -8,6 +9,7 @@ import type { PageServerLoad } from './$types';
 
 export const load = cachedPageRoute(async (auth, { params }) => {
     const entries = (await Entry.Server.all(auth, { deleted: false })).unwrap(e => error(400, e));
+    const locations = (await Location.Server.all(auth)).unwrap(e => error(400, e));
 
     const theWord = decrypt(params.word, auth.key)
         .map(w => w.toLowerCase())
@@ -42,6 +44,7 @@ export const load = cachedPageRoute(async (auth, { params }) => {
         wordCount,
         wordInstances,
         theWord,
-        totalEntries: entries.length
+        totalEntries: entries.length,
+        locations
     };
 }) satisfies PageServerLoad;

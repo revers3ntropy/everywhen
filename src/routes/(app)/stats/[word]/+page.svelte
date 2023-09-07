@@ -14,6 +14,7 @@
     let by: By = By.Words;
 
     export let data: PageData;
+    const { locations, theWord, wordInstances, totalEntries, entries } = data;
 </script>
 
 <svelte:head>
@@ -34,12 +35,12 @@
                     <Counter size="40" />
                 </span>
                 <span class="the-word-with-quotes">
-                    '<span class="the-word">{data.theWord}</span>'
+                    '<span class="the-word">{theWord}</span>'
                 </span>
             </h1>
         </div>
         <div class="search-for-word">
-            <SearchForWord value={data.theWord} />
+            <SearchForWord value={theWord} />
         </div>
     </div>
     {#if data.wordInstances === 0}
@@ -54,41 +55,37 @@
     {:else}
         <section class="container invisible">
             <div class="stats">
-                <StatPill primary beforeLabel="appears" value={data.wordInstances} label="times" />
+                <StatPill primary beforeLabel="appears" value={wordInstances} label="times" />
                 <StatPill
                     beforeLabel="in"
-                    value={data.entries.length}
-                    label="({((data.entries.length / data.totalEntries) * 100).toFixed(
-                        1
-                    )}%) entries"
+                    value={entries.length}
+                    label="({((entries.length / totalEntries) * 100).toFixed(1)}%) entries"
                 />
-                <StatPill
-                    value={(data.wordInstances / data.totalEntries).toFixed(1)}
-                    label="times / entry"
-                />
+                <StatPill value={(wordInstances / totalEntries).toFixed(1)} label="times / entry" />
             </div>
         </section>
 
         <section class="charts">
             <div class="container" style="margin: 0; padding: 1rem;">
-                <EntryHeatMap {by} entries={data.entries} />
+                <EntryHeatMap {by} {entries} />
             </div>
             <div class="container" style="margin: 1rem 0; padding: 1rem;">
-                <EntryBarChart {by} entries={data.entries} />
+                <EntryBarChart {by} {entries} />
             </div>
         </section>
 
         <section class="entries">
             <Entries
                 options={{
-                    search: encrypt(data.theWord, $encryptionKey, true)
+                    search: encrypt(theWord, $encryptionKey, true)
                 }}
+                {locations}
             />
         </section>
     {/if}
 </main>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../../styles/layout';
     @import '../../../../styles/variables';
     @import '../../../../styles/text';
@@ -102,7 +99,7 @@
             text-align: right;
         }
 
-        @media @mobile {
+        @media #{$mobile} {
             margin: 1rem;
             grid-template-columns: 10px 1fr;
 
@@ -119,7 +116,7 @@
     }
 
     h1 {
-        .flex-center();
+        @extend .flex-center;
         font-size: 40px;
         margin: 0;
         padding: 0;
@@ -137,7 +134,7 @@
     }
 
     .the-word-with-quotes {
-        .ellipsis();
+        @extend .ellipsis;
         max-width: calc(100vw - 400px);
     }
 </style>

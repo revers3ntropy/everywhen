@@ -13,7 +13,7 @@ svg.gradient-icon * {
 
 .icon-gradient-on-hover {
     &:hover {
-        .gradient-icon();
+        @extend .gradient-icon;
     }
 }
 
@@ -63,7 +63,7 @@ input {
     }
 
     &:focus {
-        border-radius: @border-radius;
+        border-radius: $border-radius;
         color: var(--text-color);
         background: var(--light-accent);
         border-bottom-color: transparent;
@@ -93,7 +93,7 @@ input {
             color: var(--text-color);
             border-bottom: 1px solid transparent;
             background: var(--v-light-accent);
-            border-radius: @border-radius;
+            border-radius: $border-radius;
         }
     }
 
@@ -136,7 +136,7 @@ select {
 a,
 button {
     &.primary {
-        border-radius: @border-radius;
+        border-radius: $border-radius;
         padding: 0.4em 0.8em 0.4em 0.4em;
         margin: 0.5em;
         background: var(--accent-gradient);
@@ -146,7 +146,7 @@ button {
         }
 
         &:hover {
-            .glow();
+            @extend .glow;
         }
 
         &:after {
@@ -159,7 +159,7 @@ button {
         // assumed one svg icon and then text
         grid-template-columns: auto 1fr;
         align-items: center;
-        justify-content: start;
+        justify-content: flex-start;
         margin: 0 0.2rem;
         gap: 0.4rem;
 
@@ -172,7 +172,7 @@ button {
     }
 
     &.with-circled-icon {
-        .icon-gradient-on-hover();
+        @extend .icon-gradient-on-hover;
 
         display: grid;
         // assumed one svg icon and then text
@@ -219,14 +219,14 @@ button {
     }
 
     &.icon-button {
-        border-radius: @border-radius;
+        border-radius: $border-radius;
         aspect-ratio: 1/1;
         display: inline-grid;
         place-items: center;
 
         &:hover {
             background: var(--light-accent);
-            .gradient-icon();
+            @extend .gradient-icon;
         }
     }
 
@@ -237,10 +237,10 @@ button {
 }
 
 .dropzone {
-    .bordered();
+    @extend .bordered;
 
     border-style: dashed;
-    border-radius: @border-radius;
+    border-radius: $border-radius;
 
     padding: 2em;
     margin: 2em;

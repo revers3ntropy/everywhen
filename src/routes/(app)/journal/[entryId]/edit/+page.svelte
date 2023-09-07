@@ -34,11 +34,11 @@
     />
 </main>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../../../styles/layout.less';
 
     .header {
-        .flex-center();
+        @extend .flex-center;
         justify-content: space-between;
     }
 </style>

@@ -329,13 +329,13 @@
     {/if}
 </div>
 
-<style lang="less">
+<style lang="scss">
     @import 'ol-contextmenu/ol-contextmenu.css';
     @import '../../../styles/variables';
     @import '../../../styles/layout';
 
     .map {
-        .container();
+        @extend .container;
         padding: 0;
         margin: 0;
         border: none;
@@ -345,7 +345,7 @@
         width: var(--width);
         height: var(--height);
 
-        @media @mobile {
+        @media #{$mobile} {
             width: var(--mobile-width);
             height: var(--mobile-height);
             padding: 0;

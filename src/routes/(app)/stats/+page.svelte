@@ -101,7 +101,7 @@
     {/if}
 </main>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/layout';
     @import '../../../styles/variables';
 
@@ -113,13 +113,13 @@
         .search-for-word {
             text-align: right;
 
-            @media @mobile {
+            @media #{$mobile} {
                 text-align: center;
                 margin: 2rem 0 0 0;
             }
         }
 
-        @media @mobile {
+        @media #{$mobile} {
             display: block;
 
             & > * {
@@ -129,7 +129,7 @@
     }
 
     h1 {
-        .flex-center();
+        @extend .flex-center;
         font-size: 40px;
         margin: 0;
         padding: 0;

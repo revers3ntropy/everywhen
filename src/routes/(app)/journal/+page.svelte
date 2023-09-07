@@ -41,8 +41,6 @@
         {#key search}
             <Entries
                 showLabels
-                showSearch
-                showSidebar
                 showEntryForm
                 {locations}
                 options={{ search: encrypt(search, $encryptionKey, true) }}
@@ -51,7 +49,7 @@
     </section>
 </main>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/variables';
     @import '../../../styles/layout';
 
@@ -71,7 +69,7 @@
             width: min(100%, 732px);
         }
 
-        @media @mobile {
+        @media #{$mobile} {
             display: block;
         }
     }

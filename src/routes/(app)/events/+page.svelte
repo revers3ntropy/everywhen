@@ -120,7 +120,7 @@
     </ul>
 </main>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/variables';
     @import '../../../styles/layout';
 
@@ -129,7 +129,7 @@
     @mobile: ~'only screen and (max-width: 750px)';
 
     h1 {
-        .flex-center();
+        @extend .flex-center;
         margin: 0;
         font-size: 40px;
 
@@ -147,15 +147,15 @@
         list-style: none;
         padding: 0;
         display: grid;
-        grid-template-columns: 50% 50%;
+        grid-template-columns: 1fr 1fr;
 
-        @media @mobile {
-            grid-template-columns: 100%;
+        @media #{$mobile} {
+            grid-template-columns: 1fr;
             margin: 0;
         }
 
-        @media @large {
-            grid-template-columns: 33% 33% 33%;
+        @media #{$large} {
+            grid-template-columns: 1fr 1fr 1fr;
         }
     }
 
@@ -164,26 +164,26 @@
         grid-template-columns: 1fr 1fr 1fr;
         margin-bottom: 1em;
 
-        @media @mobile {
+        @media #{$mobile} {
             display: block;
         }
 
         button {
             margin: 0 1rem 0 0;
-            @media @mobile {
+            @media #{$mobile} {
                 margin-bottom: 1em;
             }
         }
     }
 
     .sort-by {
-        .flex-center();
+        @extend .flex-center;
         padding: 0 0 0 1rem;
-        justify-content: end;
+        justify-content: flex-end;
 
-        @media @mobile {
+        @media #{$mobile} {
             padding: 1rem 0 0 1rem;
-            justify-content: start;
+            justify-content: flex-start;
         }
 
         .sort-by-select {

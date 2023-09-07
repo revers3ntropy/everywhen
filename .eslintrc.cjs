@@ -38,6 +38,22 @@ module.exports = {
         node: true
     },
     rules: {
+        'no-unused-vars': [
+            "error",
+            {
+                "args": "none",
+                "vars": "all",
+                "varsIgnorePattern": "^_",
+            }
+        ],
+        '@typescript-eslint/no-unused-vars': [
+            "error",
+            {
+                "args": "none",
+                "vars": "all",
+                "varsIgnorePattern": "^_",
+            }
+        ],
         'prettier/prettier': 'error',
         "@typescript-eslint/consistent-type-imports": [
             "error",

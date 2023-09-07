@@ -141,7 +141,7 @@
     </Dropdown>
 </span>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/variables';
     @import '../../../styles/text';
     @import '../../../styles/layout';
@@ -163,7 +163,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        border-radius: @border-radius;
+        border-radius: $border-radius;
         border: none;
 
         &:hover {
@@ -173,7 +173,7 @@
         .icon-button {
             background: transparent;
             padding: 0.2em;
-            border-radius: @border-radius;
+            border-radius: $border-radius;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -224,10 +224,10 @@
     }
 
     .label-name {
-        .ellipsis();
-        .flex-center();
+        @extend .ellipsis;
+        @extend .flex-center;
         max-width: 100%;
         text-align: left;
-        justify-content: start;
+        justify-content: flex-start;
     }
 </style>

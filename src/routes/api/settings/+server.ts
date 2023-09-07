@@ -8,10 +8,8 @@ import type { RequestHandler } from './$types';
 import { Auth } from '$lib/controllers/auth/auth.server';
 
 export const GET = cachedApiRoute(async auth => {
-    const { err, val: settings } = await Settings.Server.allAsMap(auth);
-    if (err) throw error(500, err);
     return {
-        settings: Settings.fillWithDefaults(settings)
+        settings: (await Settings.Server.allAsMapWithDefaults(auth)).unwrap(e => error(400, e))
     };
 }) satisfies RequestHandler;
 
@@ -19,24 +17,18 @@ export const PUT = (async ({ request, cookies }) => {
     const auth = Auth.Server.getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
-    const body = await getUnwrappedReqBody(auth, request, {
+    const { key, value } = await getUnwrappedReqBody(auth, request, {
         key: 'string',
         value: 'any'
     });
 
-    const key = body.key;
-
-    const possibleKeys = Object.keys(Settings.config);
-    if (!possibleKeys.includes(key)) {
+    if (!(key in Settings.config)) {
         throw error(400, 'Invalid key');
     }
 
-    const { val: setting, err } = await Settings.Server.update(
-        auth,
-        key as SettingsKey,
-        body.value
+    const setting = (await Settings.Server.update(auth, key as SettingsKey, value)).unwrap(e =>
+        error(400, e)
     );
-    if (err) throw error(400, err);
 
     return apiResponse(auth, { id: setting.id });
 }) satisfies RequestHandler;

@@ -25,16 +25,16 @@
     </div>
 </div>
 
-<style lang="less">
+<style lang="scss">
     @import '../../styles/variables';
     @import '../../styles/layout';
 
     .content {
-        .container-shadow();
+        @extend .container-shadow;
         margin: 1rem;
         padding: 1rem;
         background: var(--light-accent);
-        border-radius: @border-radius;
+        border-radius: $border-radius;
     }
 
     .wrapper {

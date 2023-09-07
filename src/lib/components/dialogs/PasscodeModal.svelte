@@ -93,7 +93,7 @@
     {/if}
 </div>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/layout';
 
     h1 {
@@ -101,7 +101,7 @@
     }
 
     .modal-container {
-        .flex-center();
+        @extend .flex-center;
 
         position: fixed;
         top: 0;
@@ -123,13 +123,13 @@
         }
 
         .content {
-            .container-shadow();
+            @extend .container-shadow;
             background: var(--transluscent-bg);
             backdrop-filter: blur(30px);
             padding: 2rem 3rem 3rem 3rem;
-            border-radius: @border-radius;
+            border-radius: $border-radius;
 
-            @media @mobile {
+            @media #{$mobile} {
                 padding: 2rem 4px 3rem 1rem;
                 width: 100%;
                 border-radius: 0;

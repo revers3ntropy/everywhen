@@ -48,7 +48,6 @@
 
     export let obfuscated = true;
     export let showLabels = true;
-    export let showLocations = true;
     export let isInDialog = false;
 
     export let locations: Location[] | null;
@@ -164,7 +163,7 @@
                 <AgentWidget data={agentData} />
             {/if}
 
-            {#if latitude && longitude && showLocations}
+            {#if latitude && longitude}
                 <button on:click={() => (showingMap = !showingMap)} aria-label="Expand map">
                     <LocationWidget {locations} entryId={id} {latitude} {longitude} {obfuscated} />
                 </button>
@@ -289,7 +288,7 @@
     </p>
 </div>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/text';
     @import '../../../styles/variables';
 
@@ -314,10 +313,10 @@
 
         &:focus {
             border: 1px solid var(--primary);
-            border-radius: @border-radius;
+            border-radius: $border-radius;
         }
 
-        @media @mobile {
+        @media #{$mobile} {
             padding: 0;
         }
 
@@ -336,7 +335,7 @@
             width: 100%;
             max-width: 100%;
 
-            @media @mobile {
+            @media #{$mobile} {
                 margin: 0;
                 padding: 0;
             }
@@ -347,11 +346,11 @@
         }
 
         .title {
-            .ellipsis();
+            @extend .ellipsis;
             font-size: 1.1em;
             font-weight: 500;
 
-            @media @mobile {
+            @media #{$mobile} {
                 display: none;
             }
         }
@@ -367,7 +366,7 @@
             word-break: break-word;
             max-width: 700px;
 
-            @media @mobile {
+            @media #{$mobile} {
                 margin: 0 0.5rem;
             }
 
@@ -426,7 +425,7 @@
             font-size: 1.1em;
             text-align: center;
 
-            @media @mobile {
+            @media #{$mobile} {
                 display: block;
             }
         }
@@ -451,7 +450,7 @@
 
         button,
         a {
-            .oneline();
+            @extend .oneline;
             display: grid;
             grid-template-columns: auto 1fr;
             text-align: left;
@@ -467,7 +466,7 @@
     .map-container {
         margin: 0.5rem 1rem 1rem 1rem;
 
-        @media @mobile {
+        @media #{$mobile} {
             margin: 0.5rem 0;
         }
     }

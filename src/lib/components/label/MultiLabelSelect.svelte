@@ -61,7 +61,10 @@
                 style="--label-color: var(--text-color)"
             />
         </span>
-        <span class="flex-center" style="justify-content: start; width: 100%; padding: 0 0.5rem">
+        <span
+            class="flex-center"
+            style="justify-content: flex-start; width: 100%; padding: 0 0.5rem"
+        >
             <span class="flex-center">
                 <LabelOffOutline size="25" />
             </span>
@@ -96,7 +99,7 @@
     {/if}
 </span>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/variables';
     @import '../../../styles/text';
 
@@ -119,14 +122,14 @@
             }
 
             .label-name {
-                .ellipsis();
+                @extend .ellipsis;
                 width: 100%;
                 text-align: left;
                 padding: 0 0.5rem;
             }
 
             .entry-color {
-                border-radius: @border-radius;
+                border-radius: $border-radius;
                 width: 20px;
                 height: 20px;
                 border: 3px solid var(--label-color);

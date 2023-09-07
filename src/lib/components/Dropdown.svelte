@@ -73,7 +73,7 @@
     </span>
 </span>
 
-<style lang="less">
+<style lang="scss">
     @import '../../styles/variables';
     @import '../../styles/layout';
 
@@ -86,7 +86,7 @@
         position: relative;
 
         .popup {
-            .flex-center();
+            @extend .flex-center;
             position: absolute;
             z-index: 15;
             display: none;
@@ -108,7 +108,7 @@
 
         &.fill-width-mobile {
             .popup {
-                @media @mobile {
+                @media #{$mobile} {
                     left: 0;
                     right: 0;
                     width: 100vw;

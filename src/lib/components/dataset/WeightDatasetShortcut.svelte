@@ -88,7 +88,7 @@
     </div>
 {/if}
 
-<style lang="less">
+<style lang="scss">
     .container {
         width: fit-content;
         padding: 1rem;

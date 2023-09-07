@@ -4,6 +4,7 @@
     import type { PageData } from './$types';
 
     export let data: PageData;
+    const { locations } = data;
 
     let numberOfEntries: number;
 </script>
@@ -25,10 +26,11 @@
             deleted: true
         }}
         bind:numberOfEntries
+        {locations}
     />
 </main>
 
-<style lang="less">
+<style lang="scss">
     h2 {
         width: 100%;
         text-align: center;

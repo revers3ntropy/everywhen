@@ -12,19 +12,20 @@
     import type { PageData } from './$types';
 
     export let data: PageData;
+    const { label, locations, entryCount, events } = data;
 
     async function updateName() {
         notify.onErr(
-            await api.put(apiPath('/labels/?', data.label.id), {
-                name: data.label.name
+            await api.put(apiPath('/labels/?', label.id), {
+                name: label.name
             })
         );
     }
 
     async function updateColor() {
         notify.onErr(
-            await api.put(apiPath('/labels/?', data.label.id), {
-                color: data.label.color
+            await api.put(apiPath('/labels/?', label.id), {
+                color: label.color
             })
         );
     }
@@ -34,8 +35,8 @@
         // label, deleting it easy, but if there are then
         // a more complex approach is required to clear the
         // label from the entries and events
-        if (data.entryCount + eventCount < 1) {
-            notify.onErr(await api.delete(apiPath(`/labels/?`, data.label.id)));
+        if (entryCount + eventCount < 1) {
+            notify.onErr(await api.delete(apiPath(`/labels/?`, label.id)));
             await goto('../');
             return;
         }
@@ -43,10 +44,9 @@
         showPopup(
             DeleteLabelDialog,
             {
-                auth: data,
-                id: data.label.id,
-                color: data.label.color,
-                name: data.label.name,
+                id: label.id,
+                color: label.color,
+                name: label.name,
                 reloadOnDelete: false
             },
             () => {
@@ -55,23 +55,23 @@
         );
     }
 
-    let eventCount = data.events.length;
+    let eventCount = events.length;
 
     listen.event.onDelete(id => {
-        if (data.events.find(e => e.id === id)) {
+        if (events.find(e => e.id === id)) {
             eventCount -= 1;
         }
     });
-    listen.event.onCreate(({ label }) => {
-        if (label?.id === data.label.id) {
+    listen.event.onCreate(({ label: l }) => {
+        if (l?.id === label.id) {
             eventCount += 1;
         }
     });
-    listen.event.onUpdate(({ label }) => {
+    listen.event.onUpdate(({ label: l }) => {
         // As all events on this page have this label already,
         // they could only be removed from this label, not added
         // TODO: but what about changed twice...
-        if (label?.id !== data.label.id) {
+        if (l?.id !== label.id) {
             eventCount -= 1;
         }
     });
@@ -108,11 +108,11 @@
 
     <section>
         <h1>{data.entryCount} Entr{data.entryCount === 1 ? 'y' : 'ies'}</h1>
-        <Entries options={{ labelId: data.label.id }} showLabels={false} />
+        <Entries options={{ labelId: data.label.id }} showLabels={false} {locations} />
     </section>
 </main>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../../styles/layout';
 
     h1 {
@@ -125,7 +125,7 @@
         justify-content: space-between;
         align-items: center;
 
-        @media @mobile {
+        @media #{$mobile} {
             display: block;
             justify-content: left;
             overflow-x: hidden;
@@ -152,7 +152,7 @@
         display: grid;
         grid-template-columns: 50% 50%;
 
-        @media @mobile {
+        @media #{$mobile} {
             grid-template-columns: 100%;
             margin: 0;
         }

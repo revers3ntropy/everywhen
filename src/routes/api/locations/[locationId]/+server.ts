@@ -30,30 +30,26 @@ export const PUT = (async ({ cookies, request, params }) => {
         }
     );
 
-    const { val, err } = await Location.Server.fromId(auth, params.locationId);
-    if (err) throw error(400, err);
-    let location = val;
+    let location = (await Location.Server.fromId(auth, params.locationId)).unwrap(e =>
+        error(400, e)
+    );
 
     if (body.name) {
-        const { err, val } = await Location.Server.updateName(auth, location, body.name);
-        if (err) throw error(400, err);
-        location = val;
+        location = (await Location.Server.updateName(auth, location, body.name)).unwrap(e =>
+            error(400, e)
+        );
     }
 
     if (body.radius > 0) {
-        const { err, val } = await Location.Server.updateRadius(auth, location, body.radius);
-        if (err) throw error(400, err);
-        location = val;
+        location = (await Location.Server.updateRadius(auth, location, body.radius)).unwrap(e =>
+            error(400, e)
+        );
     }
 
     if (body.latitude !== 0 && body.longitude !== 0) {
-        const { err } = await Location.Server.updateLocation(
-            auth,
-            location,
-            body.latitude,
-            body.longitude
-        );
-        if (err) throw error(400, err);
+        (
+            await Location.Server.updateLocation(auth, location, body.latitude, body.longitude)
+        ).unwrap(e => error(400, e));
     }
 
     return apiResponse(auth, {});
@@ -64,8 +60,7 @@ export const DELETE = (async ({ params, cookies }) => {
     if (!params.locationId) throw error(400, 'invalid location id');
     invalidateCache(auth.id);
 
-    const { err: deleteErr } = await Location.Server.purge(auth, params.locationId);
-    if (deleteErr) throw error(400, deleteErr);
+    (await Location.Server.purge(auth, params.locationId)).unwrap(e => error(400, e));
 
     return apiResponse(auth, {});
 }) satisfies RequestHandler;

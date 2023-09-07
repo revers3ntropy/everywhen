@@ -41,7 +41,7 @@
     </span>
 {/if}
 
-<style lang="less">
+<style lang="scss">
     * {
         color: inherit;
         font-style: inherit;

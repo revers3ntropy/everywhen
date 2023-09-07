@@ -1,28 +1,25 @@
 <script lang="ts">
     import { browser } from '$app/environment';
     import { inview } from 'svelte-inview';
-    import type { EntryFilter } from '$lib/controllers/entry/entry';
     import { obfuscated } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
     import { notify } from '$lib/components/notifications/notifications';
-    import { Entry } from '$lib/controllers/entry/entry';
+    import { Entry, type EntryFilter } from '$lib/controllers/entry/entry';
+    import type { Location } from '$lib/controllers/location/location';
     import type { Mutable } from '../../../types';
     import Spinner from '../BookSpinner.svelte';
     import EntryGroup from '$lib/components/entry/EntryGroup.svelte';
 
-    interface IOptions extends EntryFilter, Record<string, number | string | boolean | undefined> {
+    interface IOptions extends EntryFilter {
         readonly count?: number;
         readonly offset?: number;
     }
 
-    export let showLabels = true;
-    export let showLocations = true;
-    export let showEntryForm = false;
-
-    export let numberOfEntries = Infinity;
     export let locations: Location[];
-
+    export let showLabels = true;
+    export let showEntryForm = false;
+    export let numberOfEntries = Infinity;
     export let options: IOptions = {};
 
     function getEntriesOptions(): IOptions {
@@ -62,7 +59,9 @@
 
         const entriesOptions = getEntriesOptions();
 
-        const res = notify.onErr(await api.get(`/entries`, entriesOptions));
+        const res = notify.onErr(
+            await api.get(`/entries`, entriesOptions as Record<string, string | number>)
+        );
 
         numberOfEntries = res.totalEntries;
 
@@ -117,7 +116,6 @@
         entries={entries[day]}
         obfuscated={$obfuscated}
         {showLabels}
-        {showLocations}
         day={new Date(day).getTime() / 1000}
         {locations}
         {showEntryForm}

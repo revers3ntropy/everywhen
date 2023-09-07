@@ -19,7 +19,7 @@
     />
 {/if}
 
-<style lang="less">
+<style lang="scss">
     span {
         background: var(--color);
         border: 1px solid var(--border);

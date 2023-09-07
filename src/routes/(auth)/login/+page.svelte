@@ -138,11 +138,11 @@
     </div>
 </main>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/layout';
 
     main {
-        .flex-center();
+        @extend .flex-center;
         height: 100vh;
     }
 

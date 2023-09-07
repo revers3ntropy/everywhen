@@ -159,12 +159,12 @@
     </div>
 </main>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/layout';
     @import '../../../styles/text';
 
     main {
-        .flex-center();
+        @extend .flex-center;
         height: 100vh;
     }
 
@@ -190,12 +190,12 @@
         & > span {
             display: flex;
             align-items: center;
-            justify-content: start;
+            justify-content: flex-start;
             gap: 0.3rem;
         }
 
         i {
-            .text-light();
+            @extend .text-light;
             display: flex;
             flex-direction: row;
             gap: 0.3rem;

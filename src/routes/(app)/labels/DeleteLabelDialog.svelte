@@ -109,7 +109,7 @@
     {/if}
 </div>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/variables';
 
     h1 {
@@ -127,12 +127,12 @@
             align-items: center;
             justify-content: center;
             border: 1px solid var(--border-color);
-            border-radius: @border-radius;
+            border-radius: $border-radius;
             padding: 0.6em;
             margin: 0.5em;
 
             button {
-                border-radius: @border-radius;
+                border-radius: $border-radius;
                 margin: 0.5rem;
                 padding: 0.3rem;
 

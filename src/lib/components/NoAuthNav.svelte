@@ -2,7 +2,7 @@
     <a href="/static"> Log In </a>
 </div>
 
-<style lang="less">
+<style lang="scss">
     div {
         padding: 1rem;
     }

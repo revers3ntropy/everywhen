@@ -35,11 +35,11 @@ export async function bodyFromReq<T extends Schema & Record<string, unknown>>(
         if (!key) {
             return Result.err('Invalid request body');
         }
-        const { err, val: decryptedRes } = decrypt(bodyText, key);
-        if (err) return Result.err(err);
+        const decryptedRes = decrypt(bodyText, key);
+        if (!decryptedRes.ok) return decryptedRes.as();
 
         try {
-            body = JSON.parse(decryptedRes);
+            body = JSON.parse(decryptedRes.val);
         } catch (e) {
             return Result.err('Invalid request body');
         }
@@ -76,9 +76,5 @@ export async function getUnwrappedReqBody<
     valueType: T,
     defaults: { [P in keyof T]?: SchemaResult<T[P]> } = {}
 ): Promise<Readonly<SchemaResult<T>>> {
-    const res = await bodyFromReq(key, request, valueType, defaults);
-    if (res.err) {
-        throw error(400, res.err);
-    }
-    return res.val;
+    return (await bodyFromReq(key, request, valueType, defaults)).unwrap(e => error(400, e));
 }

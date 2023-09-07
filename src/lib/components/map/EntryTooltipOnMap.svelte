@@ -61,7 +61,7 @@
     {/if}
 </div>
 
-<style lang="less">
+<style lang="scss">
     .wrapper {
         min-width: 200px;
         max-width: min(40vw, 700px);

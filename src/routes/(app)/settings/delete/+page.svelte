@@ -77,11 +77,11 @@
     </section>
 </main>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../../styles/layout';
 
     h1 {
-        .flex-center();
+        @extend .flex-center;
         margin: 1rem 0 0 0;
         font-size: 38px;
 
@@ -89,7 +89,7 @@
             margin-left: 0.2em;
         }
 
-        @media @mobile {
+        @media #{$mobile} {
             font-size: 30px;
         }
     }

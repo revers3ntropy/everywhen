@@ -9,9 +9,7 @@ import type { RequestHandler } from './$types';
 import { Auth } from '$lib/controllers/auth/auth.server';
 
 export const GET = cachedApiRoute(async (auth, { params }) => {
-    const { val: label, err } = await Label.Server.fromId(auth, params.labelId);
-    if (err) throw error(404, err);
-    return label;
+    return (await Label.Server.fromId(auth, params.labelId)).unwrap(e => error(404, e));
 }) satisfies RequestHandler;
 
 export const PUT = (async ({ cookies, request, params }) => {
@@ -31,19 +29,14 @@ export const PUT = (async ({ cookies, request, params }) => {
         }
     );
 
-    const { val, err } = await Label.Server.fromId(auth, params.labelId);
-    if (err) throw error(400, err);
-    let label = val;
+    let label = (await Label.Server.fromId(auth, params.labelId)).unwrap(e => error(400, e));
 
     if (body.name) {
-        const { err, val } = await Label.Server.updateName(auth, label, body.name);
-        if (err) throw error(400, err);
-        label = val;
+        label = (await Label.Server.updateName(auth, label, body.name)).unwrap(e => error(400, e));
     }
 
     if (body.color) {
-        const { err } = await Label.Server.updateColor(label, body.color);
-        if (err) throw error(400, err);
+        (await Label.Server.updateColor(label, body.color)).unwrap(e => error(400, e));
     }
 
     return apiResponse(auth, {});

@@ -3,15 +3,15 @@
 
 .popup-background.window {
     padding: 0.3em 0;
-    border-radius: @border-radius;
+    border-radius: $border-radius;
     background: var(--v-light-accent) !important;
 
-    @media @mobile {
+    @media #{$mobile} {
         margin: 0.2em;
         padding: 0.2rem;
     }
 
-    @media @not-mobile {
+    @media #{$not-mobile} {
         & > button.close {
             display: none;
         }
@@ -37,7 +37,7 @@
 
 
 .bg .wrap {
-    @media @mobile {
+    @media #{$mobile} {
         margin: 0 2px !important;
     }
 }

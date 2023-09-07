@@ -46,7 +46,7 @@
     {/each}
 </div>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/variables';
     @import '../../../styles/layout';
 
@@ -62,7 +62,7 @@
         pointer-events: none;
 
         .notification {
-            .container-shadow();
+            @extend .container-shadow;
 
             background: var(--light-accent);
 
@@ -75,7 +75,7 @@
             padding: 0.5rem;
             grid-gap: 0.5rem;
 
-            border-radius: @border-radius;
+            border-radius: $border-radius;
 
             pointer-events: all;
 

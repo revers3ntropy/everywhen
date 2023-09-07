@@ -62,10 +62,10 @@
     </div>
 </div>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/variables';
 
-    @media @mobile {
+    @media #{$mobile} {
         .outer {
             overflow-x: auto;
             direction: rtl;

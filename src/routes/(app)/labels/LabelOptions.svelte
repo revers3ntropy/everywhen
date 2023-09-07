@@ -73,12 +73,12 @@
     </div>
 </div>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/variables';
     @import '../../../styles/layout';
 
     .label {
-        .container();
+        @extend .container;
         margin: 0.5em;
         display: grid;
         grid-template-columns: 25px 1fr 1fr 35px;
@@ -89,7 +89,7 @@
             grid-template-columns: 60px 1fr 1fr 35px;
         }
 
-        @media @mobile {
+        @media #{$mobile} {
             max-width: 100vw;
             grid-template-columns: 15px 1fr 1fr 35px;
 

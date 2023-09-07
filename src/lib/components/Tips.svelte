@@ -55,7 +55,7 @@
     {/if}
 </div>
 
-<style lang="less">
+<style lang="scss">
     @import '../../styles/variables';
 
     .wrapper {
@@ -64,7 +64,7 @@
         }
 
         p {
-            @media @not-mobile {
+            @media #{$not-mobile} {
                 // constant height: very important
                 // stops layout shifts when the tip changes
                 height: 3rem;

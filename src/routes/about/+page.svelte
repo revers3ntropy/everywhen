@@ -176,7 +176,7 @@
     </p>
 </section>
 
-<style lang="less">
+<style lang="scss">
     p {
         padding: 3px;
     }

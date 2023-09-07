@@ -33,7 +33,7 @@ function genEntries() {
     for (let i = 0; i < num.entries.incrementing; i++) {
         entries.push({
             title: '',
-            entry: `entry ${i}`,
+            body: `entry ${i}`,
             created: today - i * 60 * 60 * 6
         });
     }
@@ -42,7 +42,7 @@ function genEntries() {
     for (let i = 0; i < num.entries.long.count; i++) {
         entries.push({
             title: '',
-            entry: longText,
+            body: longText,
             created: yesterday - i * 60
         });
     }

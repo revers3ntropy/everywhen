@@ -123,7 +123,7 @@
     {#if setEntryFormMode || showLocationToggle}
         <div
             class="flex-center"
-            style="justify-content: start; width: 100%; gap: 3px; margin: 0 0 1rem 0"
+            style="justify-content: flex-start; width: 100%; gap: 3px; margin: 0 0 1rem 0"
         >
             {#if setEntryFormMode}
                 <button
@@ -163,14 +163,14 @@
     </div>
 </div>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/variables';
 
     .wrapper {
         margin: 1rem 1rem;
         width: calc(100% - 2rem);
 
-        @media @mobile {
+        @media #{$mobile} {
             margin: 1rem 0;
             width: 100%;
         }
@@ -181,7 +181,7 @@
             grid-template-columns: 1fr auto;
             margin: 0;
 
-            @media @mobile {
+            @media #{$mobile} {
                 gap: 0.5rem;
                 grid-template-columns: 1fr;
             }
@@ -190,7 +190,7 @@
                 display: flex;
 
                 input {
-                    border-radius: @border-radius;
+                    border-radius: $border-radius;
                     border: 1px solid transparent;
                     margin-right: 4px;
                     &:hover {
@@ -220,7 +220,7 @@
     }
 
     .submit-button {
-        border-radius: @border-radius;
+        border-radius: $border-radius;
         &:hover {
             background: var(--light-accent);
         }

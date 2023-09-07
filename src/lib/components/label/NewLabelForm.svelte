@@ -55,7 +55,7 @@
     </div>
 </div>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/variables';
     @import '../../../styles/text';
 
@@ -63,7 +63,7 @@
         margin-left: 10vw;
 
         label {
-            .text-light();
+            @extend .text-light;
 
             display: block;
             margin: 1rem;
@@ -80,7 +80,7 @@
 
         button {
             border: 1px solid var(--border-color);
-            border-radius: @border-radius;
+            border-radius: $border-radius;
             padding: 1em;
             margin: 1em;
 

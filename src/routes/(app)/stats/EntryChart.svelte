@@ -122,7 +122,7 @@
     </div>
 </div>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/variables';
 
     .toggle-by-button {
@@ -141,7 +141,7 @@
         grid-gap: 1rem;
         margin: 1rem 0 0 0;
 
-        @media @mobile {
+        @media #{$mobile} {
             grid-template-columns: 1fr;
         }
 

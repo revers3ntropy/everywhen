@@ -1,7 +1,7 @@
 @import 'variables';
 
 :root {
-    --nav-height: @nav-height;
+    --nav-height: $nav-height;
 }
 
 [data-theme='light'], :root {

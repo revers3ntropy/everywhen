@@ -62,7 +62,7 @@
 <svelte:head>
     <title>Timeline</title>
 
-    <style lang="less">
+    <style lang="scss">
         /*
             put the style here because the styles should all be global,
             however when switching pages the styles get leaked and cause
@@ -97,7 +97,7 @@
         nav {
             // make navbar visible when hovering to stop unexpected
             // behaviour when hovering on navbar
-            transition: background-color @transition;
+            transition: background-color #{$transition};
 
             &:hover {
                 background-color: var(--v-light-accent);

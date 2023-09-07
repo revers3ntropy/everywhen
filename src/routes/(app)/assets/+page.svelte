@@ -103,7 +103,7 @@
     {/if}
 </main>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/variables';
     @import '../../../styles/layout';
 

@@ -339,7 +339,7 @@
     </div>
 </nav>
 
-<style lang="less">
+<style lang="scss">
     @import '../../styles/variables';
     @import '../../styles/layout';
     @import '../../styles/input';
@@ -358,8 +358,8 @@
 
         padding: 0 5px;
 
-        @media @mobile {
-            justify-content: end;
+        @media #{$mobile} {
+            justify-content: flex-end;
         }
 
         & > div {
@@ -407,13 +407,13 @@
     }
 
     .account-button {
-        .container();
+        @extend .container;
         display: grid;
         grid-template-columns: 1fr auto;
         align-items: center;
         justify-content: center;
         gap: 0.5rem;
-        border-radius: @border-radius;
+        border-radius: $border-radius;
         padding: 0.4rem 1rem;
         margin: 0;
 
@@ -421,14 +421,14 @@
             background-color: var(--light-accent);
         }
 
-        @media @mobile {
+        @media #{$mobile} {
             padding: 0.4rem 1rem;
             margin: 0;
         }
     }
 
     .nav-buttons {
-        @media @mobile {
+        @media #{$mobile} {
             position: fixed;
             bottom: 0;
             left: 0;
@@ -455,7 +455,7 @@
             display: grid;
             grid-template-columns: 35px 1fr;
             align-items: center;
-            justify-content: start;
+            justify-content: flex-start;
             text-align: left;
 
             &:hover {
@@ -500,7 +500,7 @@
             border-radius: 0;
             text-align: left;
             color: var(--text-color);
-            transition: @transition;
+            transition: #{$transition};
         }
 
         .record-entry:hover {

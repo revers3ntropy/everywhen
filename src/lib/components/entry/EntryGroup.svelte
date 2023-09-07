@@ -27,7 +27,6 @@
     export let obfuscated = true;
     export let entries: EntryController[];
     export let showLabels = true;
-    export let showLocations = true;
     export let showEntryForm = false;
     export let day: number;
 
@@ -151,19 +150,18 @@
                         edits={[]}
                         {obfuscated}
                         {showLabels}
-                        {showLocations}
                         {locations}
                     />
                 {/each}
             {/if}
             {#each entries as entry (entry.id)}
-                <Entry {...entry} {obfuscated} {showLabels} {showLocations} {locations} />
+                <Entry {...entry} {obfuscated} {showLabels} {locations} />
             {/each}
         </div>
     {/if}
 </div>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/variables';
     @import '../../../styles/layout';
 
@@ -172,10 +170,11 @@
         margin: 0;
         padding: 0;
 
-        transition: height @transition;
+        transition: height #{$transition};
 
-        @media @not-mobile {
-            .container();
+        @media #{$not-mobile} {
+            border-radius: $border-radius;
+            background: var(--v-light-accent);
             margin: 1rem 0;
             padding: 7px 0;
 
@@ -193,8 +192,8 @@
             align-items: center;
             padding: 0.4rem 0.8rem;
 
-            @media @mobile {
-                border-radius: @border-radius;
+            @media #{$mobile} {
+                border-radius: $border-radius;
                 background: var(--v-light-accent);
                 border: 1px solid var(--border-color);
                 margin: 0.5rem 0;
@@ -214,7 +213,7 @@
             }
         }
 
-        @media @mobile {
+        @media #{$mobile} {
             margin: 0;
             border: none;
             border-radius: 0;

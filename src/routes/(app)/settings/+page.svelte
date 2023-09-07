@@ -83,12 +83,12 @@
     </section>
 </main>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/layout';
 
     h1 {
-        .flex-center();
-        justify-content: start;
+        @extend .flex-center;
+        justify-content: flex-start;
         padding: 1rem 0 2rem 3rem;
         font-size: 24px;
 
@@ -96,7 +96,7 @@
             margin-left: 0.2em;
         }
 
-        @media @mobile {
+        @media #{$mobile} {
             font-size: 30px;
             padding: 1rem 0 1rem 1rem;
         }
@@ -117,7 +117,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
 
-            @media @mobile {
+            @media #{$mobile} {
                 grid-template-columns: 1fr;
             }
 
@@ -126,12 +126,12 @@
             // with the other buttons
             a,
             :global(button) {
-                border-radius: @border-radius;
+                border-radius: $border-radius;
                 padding: 0.8rem;
                 margin: 0.5rem;
                 display: grid;
                 align-items: center;
-                justify-content: start;
+                justify-content: flex-start;
                 text-align: left;
                 grid-template-columns: 35px 1fr;
                 color: var(--text-color-accent);
@@ -151,7 +151,7 @@
         gap: 1rem;
         max-width: 1200px;
 
-        @media @mobile {
+        @media #{$mobile} {
             gap: 3rem;
         }
     }

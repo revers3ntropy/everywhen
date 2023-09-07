@@ -125,7 +125,7 @@
     </div>
 </main>
 
-<style lang="less">
+<style lang="scss">
     h1 {
         margin: 1rem;
     }

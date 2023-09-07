@@ -46,12 +46,12 @@
     {/each}
 </main>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/variables';
     @import '../../../styles/layout';
 
     .dataset {
-        .container();
+        @extend .container;
         width: 100px;
         padding: 1rem;
     }

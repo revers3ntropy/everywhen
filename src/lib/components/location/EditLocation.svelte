@@ -109,7 +109,7 @@
     </div>
 </div>
 
-<style lang="less">
+<style lang="scss">
     .nav {
         position: relative;
         display: flex;

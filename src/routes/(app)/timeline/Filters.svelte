@@ -20,13 +20,13 @@
     </Dropdown>
 </div>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/layout';
 
     .filter-button {
-        .flex-center();
+        @extend .flex-center;
         background-color: var(--light-accent);
-        border-radius: calc(@border-radius * 2);
+        border-radius: calc($border-radius * 2);
         aspect-ratio: 1/1;
         padding: 8px;
         margin: 0;

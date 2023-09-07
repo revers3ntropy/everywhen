@@ -132,7 +132,7 @@
     {/if}
 {/key}
 
-<style lang="less">
+<style lang="scss">
     .full {
         display: grid;
         grid-template-columns: 35px 1fr;

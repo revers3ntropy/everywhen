@@ -91,7 +91,7 @@
     </div>
 </div>
 
-<style lang="less">
+<style lang="scss">
     .content {
         margin: 1rem 0 0 2rem;
     }

@@ -73,12 +73,12 @@
         </div>
     </div>
 
-    <div class="flex-center text-light" style="padding-top: 2rem">
+    <div class="flex-center text-light pt-4">
         Halcyon.Land version {version} ({PUBLIC_ENV})
     </div>
 </footer>
 
-<style lang="less">
+<style lang="scss">
     @import '../../styles/variables';
     @import '../../styles/layout';
 
@@ -95,7 +95,7 @@
         .logo {
             display: flex;
             align-items: center;
-            justify-content: end;
+            justify-content: flex-end;
         }
 
         .info {
@@ -106,7 +106,7 @@
             }
         }
 
-        @media @mobile {
+        @media #{$mobile} {
             margin-bottom: 10rem;
             grid-template-columns: 1fr;
 

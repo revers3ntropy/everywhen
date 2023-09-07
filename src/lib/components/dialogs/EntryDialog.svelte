@@ -36,7 +36,7 @@
     {/if}
 </div>
 
-<style lang="less">
+<style lang="scss">
     div {
         min-height: calc(100vh - 100px);
     }

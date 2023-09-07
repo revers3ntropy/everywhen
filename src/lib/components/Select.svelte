@@ -39,7 +39,7 @@
     </div>
 </Dropdown>
 
-<style lang="less">
+<style lang="scss">
     @import '../../styles/variables';
     @import '../../styles/layout';
 
@@ -53,7 +53,7 @@
         display: flex;
         flex-direction: column;
         padding: 0.5rem 0;
-        border-radius: @border-radius;
+        border-radius: $border-radius;
         background: var(--light-accent);
         min-width: 100px;
 

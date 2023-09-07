@@ -10,22 +10,22 @@ import { User } from '$lib/controllers/user/user.server';
 import { Auth } from '$lib/controllers/auth/auth.server';
 
 export const POST = (async ({ request, cookies, locals: { auth } }) => {
-    if (auth && auth.key) throw error(401, 'Invalid authentication');
+    if (auth?.key) throw error(401, 'Invalid authentication');
 
     const body = await getUnwrappedReqBody(null, request, {
         username: 'string',
         encryptionKey: 'string'
     });
 
-    const { err } = await User.Server.create(body.username, body.encryptionKey);
-    if (err) throw error(400, err);
+    (await User.Server.create(body.username, body.encryptionKey)).unwrap(e => error(400, e));
 
-    const { err: authErr, val: sessionId } = await Auth.Server.authenticateUserFromLogIn(
-        body.username,
-        body.encryptionKey,
-        maxAgeFromShouldRememberMe(false)
-    );
-    if (authErr) throw error(401, authErr);
+    const sessionId = (
+        await Auth.Server.authenticateUserFromLogIn(
+            body.username,
+            body.encryptionKey,
+            maxAgeFromShouldRememberMe(false)
+        )
+    ).unwrap(e => error(401, e));
 
     cookies.set(COOKIE_KEYS.sessionId, sessionId, sessionCookieOptions(false));
 
@@ -41,11 +41,9 @@ export const DELETE = (async ({ cookies, request, locals: { auth } }) => {
         encryptionKey: 'string'
     });
 
-    const { val: userIdFromLogIn, err: authErr } = await Auth.Server.userIdFromLogIn(
-        body.username,
-        body.encryptionKey
-    );
-    if (authErr) throw error(401, authErr);
+    const userIdFromLogIn = (
+        await Auth.Server.userIdFromLogIn(body.username, body.encryptionKey)
+    ).unwrap(e => error(401, e));
     if (userIdFromLogIn !== auth.id) throw error(401, 'Invalid authentication');
 
     const backup = (await Backup.Server.generate(auth)).unwrap(e => error(400, e));

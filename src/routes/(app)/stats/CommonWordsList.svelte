@@ -33,7 +33,7 @@
     <p class="text-light">No words yet</p>
 {/if}
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/variables';
     @import '../../../styles/text';
 
@@ -44,7 +44,7 @@
         grid-row-gap: 0.3rem;
         max-width: 750px;
 
-        @media @mobile {
+        @media #{$mobile} {
             margin: 10px 0;
             padding: 10px 2px;
             grid-template-columns: 3rem 1fr 1fr;
@@ -60,7 +60,7 @@
         }
 
         .word {
-            .ellipsis();
+            @extend .ellipsis;
         }
 
         hr {

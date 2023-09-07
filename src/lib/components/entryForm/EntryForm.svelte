@@ -434,7 +434,7 @@
     </div>
 </div>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/variables';
     @import '../../../styles/layout';
     @import '../../../styles/input';
@@ -443,7 +443,7 @@
         margin: 1rem;
         width: calc(100% - 2rem);
 
-        @media @mobile {
+        @media #{$mobile} {
             margin: 1rem 0;
             width: 100%;
         }
@@ -453,7 +453,7 @@
             min-width: 200px;
         }
 
-        @media @mobile {
+        @media #{$mobile} {
             border: none;
         }
     }
@@ -464,14 +464,14 @@
         display: grid;
         grid-template-columns: 1fr 1fr;
 
-        @media @mobile {
+        @media #{$mobile} {
             border: none;
         }
 
         .left-options {
-            .flex-center();
+            @extend .flex-center;
             height: 100%;
-            justify-content: start;
+            justify-content: flex-start;
             gap: 3px;
 
             .title {
@@ -480,7 +480,7 @@
                 width: calc(100% - 50px);
                 margin: 0 0 0.2rem 0.3em;
 
-                @media @mobile {
+                @media #{$mobile} {
                     width: calc(100vw - 70px);
                     margin: 0.3em;
                     border-bottom: 1px solid var(--border-light);
@@ -492,7 +492,7 @@
             height: 100%;
             display: grid;
             grid-template-columns: 1fr auto;
-            justify-content: end;
+            justify-content: flex-end;
             align-items: center;
 
             &.blur {
@@ -501,7 +501,7 @@
 
             .label-select-container {
                 display: grid;
-                justify-content: end;
+                justify-content: flex-end;
                 align-items: center;
             }
         }
@@ -510,16 +510,16 @@
     .send-mobile {
         display: none;
 
-        @media @mobile {
+        @media #{$mobile} {
             display: flex;
         }
     }
 
     .entry-title-container {
-        .flex-center();
+        @extend .flex-center;
         padding: 0;
 
-        @media @mobile {
+        @media #{$mobile} {
             padding: 0;
         }
 
@@ -530,11 +530,11 @@
             border: none;
             font-size: 20px;
             background: var(--light-accent);
-            border-radius: @border-radius @border-radius 0 0;
+            border-radius: $border-radius $border-radius 0 0;
             border-bottom: 2px solid var(--background-color);
             width: 100%;
 
-            @media @mobile {
+            @media #{$mobile} {
                 background: transparent;
                 border-bottom: 1px solid var(--border-color);
             }
@@ -542,11 +542,11 @@
     }
 
     .entry-container {
-        .flex-center();
+        @extend .flex-center;
         padding: 0 0 1rem 0;
         width: 100%;
 
-        @media @mobile {
+        @media #{$mobile} {
             padding: 0;
         }
 
@@ -559,10 +559,10 @@
             border: none;
             font-size: 20px;
             background: var(--light-accent);
-            border-radius: 0 0 @border-radius @border-radius;
+            border-radius: 0 0 $border-radius $border-radius;
             overflow: hidden;
 
-            @media @mobile {
+            @media #{$mobile} {
                 width: calc(100% - 0.8em);
                 margin: 0;
                 background: none;

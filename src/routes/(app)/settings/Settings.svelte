@@ -133,7 +133,7 @@
     </div>
 </div>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/layout';
     @import '../../../styles/variables';
 
@@ -142,21 +142,21 @@
         grid-template-columns: 1fr 25rem;
         padding: 0.8rem;
 
-        @media @mobile {
+        @media #{$mobile} {
             display: block;
         }
 
         border: 1px solid transparent;
         &:target {
             border: 1px solid var(--border-light);
-            border-radius: @border-radius;
+            border-radius: $border-radius;
         }
 
         .left,
         .right {
             margin: 0.5em;
 
-            @media @mobile {
+            @media #{$mobile} {
                 margin: 0;
             }
         }
@@ -179,7 +179,7 @@
             height: 25px;
             width: 25px;
             background-color: var(--light-accent);
-            border-radius: @border-radius;
+            border-radius: $border-radius;
 
             &:after {
                 margin: 1px;
@@ -229,9 +229,9 @@
 
     input {
         margin: 0 0 0.5rem 0;
-        border-radius: @border-radius;
+        border-radius: $border-radius;
 
-        @media @mobile {
+        @media #{$mobile} {
             margin-top: 0.5rem;
         }
 
@@ -252,7 +252,7 @@
         flex-direction: row;
         margin: 0.1em 0;
 
-        @media @mobile {
+        @media #{$mobile} {
             flex-direction: column;
         }
 
@@ -263,7 +263,7 @@
             display: grid;
             place-items: center;
 
-            @media @mobile {
+            @media #{$mobile} {
                 display: block;
                 text-align: left;
                 border-right: none;

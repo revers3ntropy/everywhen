@@ -156,7 +156,7 @@
     {/if}
 </div>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/variables';
     @import '../../../styles/text';
 
@@ -214,7 +214,7 @@
     }
 
     .title {
-        .ellipsis();
+        @extend .ellipsis;
         max-width: 350px;
     }
 </style>

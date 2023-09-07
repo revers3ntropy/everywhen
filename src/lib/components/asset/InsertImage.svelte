@@ -117,7 +117,7 @@
     </Dropdown>
 </div>
 
-<style lang="less">
+<style lang="scss">
     .asset {
         &:hover {
             filter: brightness(0.85);

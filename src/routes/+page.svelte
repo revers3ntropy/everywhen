@@ -22,7 +22,7 @@
     </div>
 </main>
 
-<style lang="less">
+<style lang="scss">
     @import '../styles/variables';
 
     main {
@@ -30,7 +30,7 @@
         height: 100vh;
         padding: 1rem;
 
-        @media @mobile {
+        @media #{$mobile} {
             display: grid;
             text-align: center;
             align-items: start;

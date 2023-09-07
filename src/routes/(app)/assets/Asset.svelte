@@ -102,16 +102,16 @@
     </div>
 </div>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/variables';
     @import '../../../styles/layout';
 
     .img-wrapper {
-        .container();
-        .flex-center();
+        @extend .container;
+        @extend .flex-center;
 
         position: relative;
-        border-radius: @border-radius;
+        border-radius: $border-radius;
         margin: 0.5rem;
         padding: 0;
         height: 50vh;
@@ -139,12 +139,11 @@
             background: var(--transluscent-bg);
             justify-content: space-between;
             align-items: center;
-
-            transition: opacity @transition;
+            transition: opacity #{$transition};
             opacity: 0;
 
             & > * {
-                .flex-center();
+                @extend .flex-center;
             }
         }
 

@@ -115,6 +115,8 @@
         if (browser) checkPasscode(value);
     });
 
+    $: console.log($settingsStore);
+
     $: currentlyShowPasscodeModal =
         $settingsStore.passcode.value &&
         nowUtc() - ($passcodeLastEntered || 0) > $settingsStore.passcodeTimeout.value &&
@@ -142,14 +144,14 @@
     <slot />
 </div>
 
-<style lang="less">
+<style lang="scss">
     @import '../../styles/variables';
 
     .page-content {
         min-height: calc(100vh - var(--nav-height));
         margin: 0 1rem 200px 1rem;
 
-        @media @mobile {
+        @media #{$mobile} {
             margin: 0 5px 200px 5px;
         }
     }

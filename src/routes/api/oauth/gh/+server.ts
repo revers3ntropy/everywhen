@@ -18,13 +18,13 @@ export const POST = (async ({ request, cookies }) => {
         code: 'string'
     });
 
-    const { val: accessToken, err } = await ghAPI.linkToGitHubOAuth(auth, body.code, body.state);
-    if (err) {
-        await logger.error('Failed on ghAPI.linkToGitHubOAuth', { err });
+    const accessToken = await ghAPI.linkToGitHubOAuth(auth, body.code, body.state);
+    if (!accessToken.ok) {
+        await logger.error('Failed on ghAPI.linkToGitHubOAuth', { accessToken });
         throw error(500, 'Internal server error');
     }
 
-    return apiResponse(auth, { accessToken });
+    return apiResponse(auth, { accessToken: accessToken.val });
 }) satisfies RequestHandler;
 
 export const DELETE = (async ({ cookies }) => {

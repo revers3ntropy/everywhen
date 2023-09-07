@@ -22,7 +22,7 @@
 
 .bordered {
     border: 1px solid var(--border-color);
-    border-radius: @border-radius;
+    border-radius: $border-radius;
 }
 
 .container-shadow {
@@ -34,10 +34,10 @@
 
 .container {
     padding: 0.3em 0;
-    border-radius: @border-radius;
+    border-radius: $border-radius;
     background: var(--v-light-accent);
 
-    @media @mobile {
+    @media #{$mobile} {
         padding: 0.2rem;
     }
 
@@ -53,18 +53,18 @@
     }
 
     &.shadowed {
-        .container-shadow();
+        @extend .container-shadow;
     }
 }
 
 .hide-mobile {
-    @media @mobile {
+    @media #{$mobile} {
         display: none !important;
     }
 }
 
 .only-mobile {
-    @media @not-mobile {
+    @media #{$not-mobile} {
         display: none !important;
     }
 }

@@ -22,7 +22,7 @@
     </div>
 {/if}
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/variables';
     @import '../../../styles/layout';
 
@@ -42,7 +42,7 @@
             background: var(--accent-gradient);
             color: var(--text-colour-on-gradient);
             border: 1px solid var(--border-light);
-            .glow();
+            @extend .glow;
 
             span {
                 color: var(--text-colour-on-gradient);

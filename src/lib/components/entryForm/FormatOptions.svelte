@@ -68,7 +68,7 @@
     </div>
 </Dropdown>
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/variables';
 
     .format-options {

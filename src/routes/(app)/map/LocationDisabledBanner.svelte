@@ -61,7 +61,7 @@
     </button>
 {/if}
 
-<style lang="less">
+<style lang="scss">
     @import '../../../styles/variables';
 
     button.outer {
@@ -71,7 +71,7 @@
         position: fixed;
         z-index: 1;
         background: var(--transluscent-bg);
-        border-radius: @border-radius @border-radius 0 0;
+        border-radius: $border-radius $border-radius 0 0;
         display: flex;
         justify-content: center;
         align-items: center;
