@@ -7,7 +7,7 @@
 
 <script lang="ts">
     import { page } from '$app/stores';
-    import { currentlyUploadingEntries } from '$lib/stores';
+    import { currentlyUploadingEntries, settingsStore } from '$lib/stores';
     import { clientLogger } from '$lib/utils/log';
     import { fly, slide } from 'svelte/transition';
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
@@ -29,7 +29,6 @@
     export let showLabels = true;
     export let showLocations = true;
     export let showEntryForm = false;
-    export let entryFormMode = null as null | EntryFormMode;
     export let day: number;
 
     function toggleCollapse() {
@@ -46,14 +45,6 @@
             el.tabIndex = -1;
             el.focus({ preventScroll: false });
         }, 10);
-    }
-
-    if (entryFormMode === null && showEntryForm) {
-        throw new Error('entryFormMode must be set if showEntryForm is true');
-    }
-    let formMode: EntryFormMode;
-    $: if (showEntryForm) {
-        formMode = entryFormMode as EntryFormMode;
     }
 
     $: isToday = utcEq(nowUtc(), day, currentTzOffset(), 0, 'YYYY-MM-DD');
@@ -128,7 +119,12 @@
     </div>
     {#if !$collapsed[day]}
         {#if showEntryForm && isToday}
-            <ModedEntryForm {obfuscated} entryFormMode={formMode} />
+            <ModedEntryForm
+                {obfuscated}
+                entryFormMode={$settingsStore.entryFormMode.value
+                    ? EntryFormMode.Bullet
+                    : EntryFormMode.Standard}
+            />
         {/if}
         <div
             class="contents"
@@ -210,11 +206,7 @@
 
             .entry-count {
                 font-size: 1rem;
-
-                &,
-                & * {
-                    color: var(--text-color-light);
-                }
+                color: var(--text-color-light);
             }
 
             h3 {

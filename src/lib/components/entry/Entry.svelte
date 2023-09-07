@@ -189,9 +189,9 @@
         <div class="flex-center">
             {#if !isEdit}
                 <Dropdown fromRight>
-                    <div slot="button" class="options-dropdown-button">
+                    <span slot="button" class="options-dropdown-button">
                         <DotsVertical size="22" />
-                    </div>
+                    </span>
                     <div>
                         <div class="text-light flex-center" style="padding: 6px">
                             {wordCount} words

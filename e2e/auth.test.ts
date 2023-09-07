@@ -1,13 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { COOKIE_KEYS } from '../src/lib/constants';
-import {
-    deleteUser,
-    encryptionKeyFromPassword,
-    expectDeleteUser,
-    generateApiCtx,
-    generateUser,
-    randStr
-} from './helpers';
+import { ApiClient } from './lib/apiClient';
+import { encryptionKeyFromPassword, expectDeleteUser, generateUser, randStr } from './lib/helpers';
 
 test.describe('/signup', () => {
     test('Has title', async ({ page }) => {
@@ -65,14 +59,16 @@ test.describe('/signup', () => {
 
         expect(await page.isVisible('a[aria-label="Delete Account"]')).toBe(true);
 
-        const api = await generateApiCtx((await page.context().cookies())[sessionCookieIdx].value);
+        const api = await ApiClient.fromSessionId(
+            (await page.context().cookies())[sessionCookieIdx].value,
+            encryptionKeyFromPassword(auth.password)
+        );
 
         await expectDeleteUser(api, {
             username: auth.username,
             key: encryptionKeyFromPassword(auth.password)
         });
 
-        await page.waitForLoadState();
         await page.goto('/login', { waitUntil: 'networkidle' });
         await expect(page).toHaveURL('/login');
 
@@ -97,8 +93,7 @@ test.describe('/signup', () => {
 
         await page.waitForURL('/home', { waitUntil: 'networkidle' });
 
-        const { err } = await deleteUser(api, auth);
-        expect(err).toBe(null);
+        await expectDeleteUser(api, auth);
 
         await page.goto('/home', { waitUntil: 'networkidle' });
         await expect(page).toHaveURL('/login?redirect=home');

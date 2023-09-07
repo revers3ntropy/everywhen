@@ -75,8 +75,8 @@
         submit an entry, there is no way to delete it permanently.
     </p>
     <p>
-        Your recent entries will appear on the home page, as well as entries from the same day in
-        previous years.
+        Your recent entries will appear in your journal page, as well as entries from the same day
+        in previous years.
     </p>
     <p>
         You can write in MarkDown/HTML in your entries. For example

@@ -1,14 +1,16 @@
 <script lang="ts">
-    import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
+    import DatasetShortcutWidgets from '$lib/components/dataset/DatasetShortcutWidgets.svelte';
     import Entries from '$lib/components/entry/Entries.svelte';
+    import EntriesSidebar from '$lib/components/entry/EntriesSidebar.svelte';
+    import { encryptionKey, obfuscated } from '$lib/stores';
+    import { encrypt } from '$lib/utils/encryption';
+    import Search from 'svelte-material-icons/Magnify.svelte';
     import type { PageData } from './$types';
-    import { settingsStore } from '$lib/stores';
 
     export let data: PageData;
+    let { pinnedEntriesList, datasets, nYearsAgo, locations } = data;
 
-    $: entryFormMode = $settingsStore.entryFormMode.value
-        ? EntryFormMode.Bullet
-        : EntryFormMode.Standard;
+    let search: string;
 </script>
 
 <svelte:head>
@@ -16,5 +18,61 @@
 </svelte:head>
 
 <main>
-    <Entries showBin showLabels showSearch showSidebar showEntryForm {entryFormMode} />
+    <section class="sidebar">
+        <EntriesSidebar
+            obfuscated={$obfuscated}
+            {nYearsAgo}
+            pinnedEntriesSummaries={pinnedEntriesList}
+        />
+    </section>
+
+    <section class="feed">
+        <div>
+            <DatasetShortcutWidgets {datasets} />
+        </div>
+
+        <div style="padding: 1rem 0 0 0.5rem;">
+            <input bind:value={search} placeholder="Search in entries..." type="text" />
+            <button aria-label="search">
+                <Search />
+            </button>
+        </div>
+
+        {#key search}
+            <Entries
+                showLabels
+                showSearch
+                showSidebar
+                showEntryForm
+                {locations}
+                options={{ search: encrypt(search, $encryptionKey, true) }}
+            />
+        {/key}
+    </section>
 </main>
+
+<style lang="less">
+    @import '../../../styles/variables';
+    @import '../../../styles/layout';
+
+    main {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+
+        .sidebar {
+            width: 300px;
+        }
+
+        .feed {
+            // put the sidebar button above on mobile,
+            // but have the sidebar on the right for desktop
+            order: -1;
+            width: min(100%, 732px);
+        }
+
+        @media @mobile {
+            display: block;
+        }
+    }
+</style>

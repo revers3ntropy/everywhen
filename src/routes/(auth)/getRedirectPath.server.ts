@@ -1,5 +1,5 @@
 const authRoutes = ['login', 'signup'];
-const defaultPath = 'home';
+const defaultPath = 'journal';
 
 export function redirectPath(url: URL): string {
     let redirect = url.searchParams.get('redirect');

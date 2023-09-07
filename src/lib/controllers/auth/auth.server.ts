@@ -62,7 +62,7 @@ namespace AuthServer {
     export function tryGetAuthFromCookies(cookie: Cookies): Auth | null {
         const session = cookie.get(COOKIE_KEYS.sessionId);
         if (!session) return null;
-        return getSession(session) ?? null;
+        return getSession(session);
     }
 
     export function getAuthFromCookies(cookie: Cookies): Auth {

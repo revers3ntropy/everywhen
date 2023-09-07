@@ -1,38 +1,27 @@
 <script lang="ts">
-    import { onMount } from 'svelte';
     import { browser } from '$app/environment';
     import { inview } from 'svelte-inview';
-    import Bin from 'svelte-material-icons/Delete.svelte';
-    import Search from 'svelte-material-icons/Magnify.svelte';
-    import type { Location } from '$lib/controllers/location/location';
     import type { EntryFilter } from '$lib/controllers/entry/entry';
-    import { encryptionKey, obfuscated } from '$lib/stores';
+    import { obfuscated } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
-    import { encrypt } from '$lib/utils/encryption';
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
     import { notify } from '$lib/components/notifications/notifications';
-    import type { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
     import { Entry } from '$lib/controllers/entry/entry';
     import type { Mutable } from '../../../types';
     import Spinner from '../BookSpinner.svelte';
     import EntryGroup from '$lib/components/entry/EntryGroup.svelte';
-    import Sidebar from './EntriesSidebar.svelte';
 
     interface IOptions extends EntryFilter, Record<string, number | string | boolean | undefined> {
         readonly count?: number;
         readonly offset?: number;
     }
 
-    export let entryFormMode = null as null | EntryFormMode;
-
-    export let showSidebar = false;
-    export let showBin = false;
-    export let showSearch = true;
     export let showLabels = true;
     export let showLocations = true;
     export let showEntryForm = false;
 
     export let numberOfEntries = Infinity;
+    export let locations: Location[];
 
     export let options: IOptions = {};
 
@@ -102,38 +91,17 @@
         return entries;
     }
 
-    function updateSearch() {
-        const searchEncrypted = encrypt(searchInput.value, $encryptionKey);
-
-        options = {
-            ...options,
-            search: searchEncrypted
-        };
-    }
-
-    async function loadLocations() {
-        locations = notify.onErr(await api.get('/locations')).locations;
-    }
-
     function emptyEntries(): Record<string, Entry[]> {
         return {
             [fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD')]: []
         };
     }
 
-    let searchInput: HTMLInputElement;
-
     const batchSize = 10;
     let pageEndInView = false;
     let entries = emptyEntries();
     let currentOffset = 0;
     let loadingAt = null as number | null;
-
-    let locations = null as Location[] | null;
-
-    onMount(() => {
-        void loadLocations();
-    });
 
     $: if (options.search !== undefined && browser) void reloadEntries();
     $: sortedEntryKeys = Object.keys(entries).sort(
@@ -144,149 +112,22 @@
     $: entries[fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD')] ??= [];
 </script>
 
-<div class="flex-center">
-    <div style="width: 100%; max-width: {showSidebar ? 1400 : 800}px">
-        <div class:sidebar-and-entries={showSidebar}>
-            {#if showSidebar}
-                <div class="sidebar-container">
-                    <Sidebar obfuscated={$obfuscated} />
-                </div>
-            {/if}
-
-            <div>
-                <div>
-                    {#if showBin || showSearch}
-                        <div class="entries-menu">
-                            <div class="hide-mobile">
-                                {#if showBin}
-                                    <a class="with-circled-icon" href="/journal/deleted">
-                                        <Bin size="30" />
-                                        Bin
-                                    </a>
-                                {/if}
-                            </div>
-
-                            <div />
-
-                            <div>
-                                {#if showSearch}
-                                    <input
-                                        bind:this={searchInput}
-                                        on:change={updateSearch}
-                                        placeholder="Search in entries..."
-                                        type="text"
-                                    />
-                                    <button on:click={updateSearch} aria-label="search">
-                                        <Search />
-                                    </button>
-                                {/if}
-                            </div>
-                        </div>
-                    {/if}
-                </div>
-
-                <div class="entries">
-                    {#each sortedEntryKeys as day (day)}
-                        <EntryGroup
-                            entries={entries[day]}
-                            obfuscated={$obfuscated}
-                            {showLabels}
-                            {showLocations}
-                            day={new Date(day).getTime() / 1000}
-                            {locations}
-                            {showEntryForm}
-                            {entryFormMode}
-                        />
-                    {/each}
-                    {#if loadingAt !== null && loadingAt < numberOfEntries}
-                        <Spinner />
-                    {/if}
-                </div>
-                <div
-                    use:inview={{ rootMargin: '200px' }}
-                    on:inview_enter={() => loadMoreEntries()}
-                    on:inview_leave={() => (pageEndInView = false)}
-                />
-            </div>
-        </div>
-    </div>
-</div>
-
-<style lang="less">
-    @import '../../../styles/variables';
-    @import '../../../styles/layout';
-
-    .sidebar-and-entries {
-        width: 100%;
-        display: grid;
-
-        // bit hacky but I couldn't get it to not overflow otherwise
-        grid-template-columns: minmax(0, 3fr) 1fr;
-        grid-gap: 1rem;
-
-        & > :first-child {
-            order: 1;
-        }
-        & > :last-child {
-            order: -1;
-        }
-
-        @media @mobile {
-            display: block;
-        }
-    }
-
-    .entries-menu {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
-        margin: 2rem 0 0 0;
-
-        @media @not-mobile {
-            margin: 2rem 0;
-        }
-
-        & > div {
-            width: 100%;
-            display: flex;
-            align-items: center;
-
-            &:first-child {
-                justify-content: start;
-            }
-
-            &:nth-child(2) {
-                justify-content: center;
-            }
-
-            &:last-child {
-                justify-content: end;
-            }
-        }
-
-        a.primary {
-            margin: 0 1em;
-        }
-
-        @media @mobile {
-            display: block;
-            margin: 0;
-
-            & > div {
-                margin: 1em 0;
-                justify-content: center !important;
-
-                &:first-child {
-                    justify-content: space-around !important;
-                }
-            }
-        }
-    }
-
-    .sidebar-container {
-        margin-top: 85px;
-
-        @media @mobile {
-            margin-top: 0;
-        }
-    }
-</style>
+{#each sortedEntryKeys as day (day)}
+    <EntryGroup
+        entries={entries[day]}
+        obfuscated={$obfuscated}
+        {showLabels}
+        {showLocations}
+        day={new Date(day).getTime() / 1000}
+        {locations}
+        {showEntryForm}
+    />
+{/each}
+<div
+    use:inview={{ rootMargin: '200px' }}
+    on:inview_enter={() => loadMoreEntries()}
+    on:inview_leave={() => (pageEndInView = false)}
+/>
+{#if loadingAt !== null && loadingAt < numberOfEntries}
+    <Spinner />
+{/if}

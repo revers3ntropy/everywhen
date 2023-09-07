@@ -4,19 +4,9 @@ import { error } from '@sveltejs/kit';
 import { cachedPageRoute } from '$lib/utils/cache.server';
 import type { PageServerLoad } from './$types';
 import { Dataset } from '$lib/controllers/dataset/dataset.server';
-
-const NUMBER_OF_RECENT_TITLES = 6;
+import { Location } from '$lib/controllers/location/location.server';
 
 export const load = cachedPageRoute(async (auth, { parent, locals }) => {
-    const { val: summaries, err } = await Entry.Server.getPageOfSummaries(
-        auth,
-        NUMBER_OF_RECENT_TITLES,
-        0
-    );
-    if (err) throw error(400, err);
-
-    const firstNTitles = Entry.groupEntriesByDay(summaries.summaries);
-
     await parent();
 
     const { settings } = locals;
@@ -32,11 +22,12 @@ export const load = cachedPageRoute(async (auth, { parent, locals }) => {
     );
 
     const datasets = (await Dataset.Server.allMetaData(auth)).unwrap(err => error(400, err));
+    const locations = (await Location.Server.all(auth)).unwrap(err => error(400, err));
 
     return {
-        recentTitles: firstNTitles,
         nYearsAgo,
         pinnedEntriesList,
-        datasets
+        datasets,
+        locations
     };
 }) satisfies PageServerLoad;

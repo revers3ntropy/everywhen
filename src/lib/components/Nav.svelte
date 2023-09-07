@@ -11,7 +11,6 @@
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import Lock from 'svelte-material-icons/Lock.svelte';
-    import HomeOutline from 'svelte-material-icons/HomeOutline.svelte';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
     import Lightbulb from 'svelte-material-icons/Lightbulb.svelte';
     import Logout from 'svelte-material-icons/Logout.svelte';
@@ -190,13 +189,6 @@
 
 <nav>
     <div class="nav-buttons">
-        <a
-            aria-label="home"
-            class="icon {$page.url.pathname === '/home' ? 'current' : ''}"
-            href="/home"
-        >
-            <HomeOutline size="35" />
-        </a>
         <a
             aria-label="journal"
             class="icon {$page.url.pathname === '/journal' ? 'current' : ''}"

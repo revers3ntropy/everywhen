@@ -1,20 +1,23 @@
 <script lang="ts">
-    import type { Dataset } from '$lib/controllers/dataset/dataset';
+    import type { Dataset, DatasetMetadata } from '$lib/controllers/dataset/dataset';
+    import type { PresetId } from '$lib/controllers/dataset/presets';
     import WeightDatasetShortcut from './WeightDatasetShortcut.svelte';
 
-    export let datasets: Dataset[];
+    export let datasets: DatasetMetadata[];
 
-    $: datasetsByName = datasets.reduce(
+    $: datasetsByPresetId = datasets.reduce(
         (acc, dataset) => {
-            acc[dataset.name] = dataset;
+            if (dataset.preset) {
+                acc[dataset.preset.id] = dataset;
+            }
             return acc;
         },
-        {} as Record<string, Dataset>
+        {} as Record<PresetId, Dataset>
     );
 </script>
 
 <div class="wrapper">
-    <WeightDatasetShortcut dataset={datasetsByName['Weight'] || null} />
+    <WeightDatasetShortcut dataset={datasetsByPresetId['weight'] || null} />
 </div>
 
 <style lang="less">

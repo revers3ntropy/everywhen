@@ -30,7 +30,7 @@
             })
         );
 
-        await goto('/home');
+        await goto('/journal');
     });
 </script>
 

@@ -1,17 +1,19 @@
 import { describe, it, expect } from 'vitest';
 import { redirectPath } from './getRedirectPath.server';
 
+const defaultPath = 'journal';
+
 describe('redirectPath', () => {
     it('works', () => {
         const cases: [string, string][] = [
-            ['/login', 'home'],
-            ['/login?a=b', 'home'],
-            ['login', 'home'],
-            ['login?a=b', 'home'],
-            ['/', 'home'],
-            ['', 'home'],
-            ['home', 'home'],
-            ['/home', 'home'],
+            ['/login', defaultPath],
+            ['/login?a=b', defaultPath],
+            ['login', defaultPath],
+            ['login?a=b', defaultPath],
+            ['/', defaultPath],
+            ['', defaultPath],
+            ['journal', 'journal'],
+            ['/journal', 'journal'],
             ['/something', 'something'],
             ['a/b', 'a/b'],
             ['/a/b/c', 'a/b/c'],

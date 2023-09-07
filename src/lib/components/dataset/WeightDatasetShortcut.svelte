@@ -24,8 +24,8 @@
                 rows: [
                     {
                         elements: [value],
-                        timestamp: nowUtc(),
                         created: nowUtc(),
+                        timestamp: nowUtc(),
                         timestampTzOffset: currentTzOffset()
                     }
                 ]
@@ -62,9 +62,15 @@
                 bind:value
                 min="0"
                 disabled={submitting}
+                aria-label="enter your weight"
             />
             kg
-            <button on:click={submit} class="with-circled-icon no-text" disabled={submitting}>
+            <button
+                on:click={submit}
+                class="with-circled-icon no-text"
+                disabled={submitting}
+                aria-label="Submit Weight"
+            >
                 <Plus size="25" />
             </button>
         </div>
@@ -85,7 +91,6 @@
 <style lang="less">
     .container {
         width: fit-content;
-        margin: 0 1rem;
         padding: 1rem;
     }
 

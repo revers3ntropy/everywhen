@@ -12,7 +12,7 @@
         `Right click on the <a href="/map">map</a> and 'Add Named Location' to group entries by their location`,
         `Drag the three dots on the right side of events in the <a href="/timeline">timeline</a> to change their duration`,
         `Drag the right side of the screen in the <a href="/timeline">timeline</a> to zoom in and out on mobile`,
-        `'Favourite' an entry under the <code>⋮</code> on an entry, and it will appear right here on the <a href="/home">home</a> page`,
+        `'Favourite' an entry under the <code>⋮</code> on an entry, and it will appear right here at the top of your <a href="/journal">journal</a>`,
         `Set a passcode in the <a href="/settings#passcode">settings</a> as an additional layer of security`,
         `All your data is encrypted, and only you have the key: no matter what, no-one can read your data without knowing your password`,
         `Learn more about Halcyon.Land on the <a href="/about">about</a> page`,

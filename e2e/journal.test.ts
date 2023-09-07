@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { UUID_LEN } from '../src/lib/constants';
-import { decrypt, expectDeleteUser, generateUserAndSignIn } from './helpers';
+import { expectDeleteUser, generateUserAndSignIn } from './lib/helpers';
 
 const LONG_TEXT =
     'The very long body of the entry which is too long' +
@@ -56,15 +56,12 @@ test.describe('/journal', () => {
     });
 
     test('Can mark entry as favourite and unfavourite', async ({ page }) => {
-        const { api, auth } = await generateUserAndSignIn(page);
+        const { api } = await generateUserAndSignIn(page);
 
         const entryBody = LONG_TEXT;
-        const makeEntryRes = await (
-            await api.post('./entries', {
-                data: JSON.stringify({ body: entryBody })
-            })
-        ).text();
-        const { id } = JSON.parse(decrypt(makeEntryRes, auth.key).val) as Record<string, unknown>;
+        const makeEntryRes = await api.post('/entries', { body: entryBody });
+        expect(makeEntryRes.ok).toBe(true);
+        const { id } = makeEntryRes.val;
         expect(typeof id === 'string').toBe(true);
         if (typeof id !== 'string') throw id;
         expect(id).toHaveLength(UUID_LEN);

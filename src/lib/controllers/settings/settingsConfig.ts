@@ -59,7 +59,7 @@ export const settingsConfig = {
         type: 'boolean',
         defaultValue: true,
         name: 'Show "On this Day" Entries',
-        description: `Show entries which happened on this day some number of years ago on the home page.`,
+        description: `Show entries which happened on this day some number of years ago in your journal.`,
         showInSettings: true
     } as SettingConfig<boolean>,
     preferLocationOn: {

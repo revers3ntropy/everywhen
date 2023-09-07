@@ -83,7 +83,6 @@
                 options={{
                     search: encrypt(data.theWord, $encryptionKey, true)
                 }}
-                showSearch={false}
             />
         </section>
     {/if}

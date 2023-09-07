@@ -37,7 +37,6 @@
 
     function checkPasscode(lastEntered: number | null) {
         if (lastEntered === null) return;
-
         const secondsSinceLastEntered = nowUtc() - lastEntered;
         showPasscodeModal = secondsSinceLastEntered > $settingsStore.passcodeTimeout.value;
     }
@@ -112,7 +111,9 @@
         void Auth.logOut(true);
     }
 
-    passcodeLastEntered.subscribe(checkPasscode);
+    passcodeLastEntered.subscribe(value => {
+        if (browser) checkPasscode(value);
+    });
 
     $: currentlyShowPasscodeModal =
         $settingsStore.passcode.value &&

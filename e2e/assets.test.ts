@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { expectDeleteUser, generateUserAndSignIn } from './helpers';
+import { expectDeleteUser, generateUserAndSignIn } from './lib/helpers';
 
 test.describe('/assets', () => {
     test('Cannot visit page without authentication', async ({ page }) => {

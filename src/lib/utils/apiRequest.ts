@@ -35,7 +35,7 @@ export type ResType<T> = T extends typeof apiRes404
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
-interface ApiRoutes extends Record<string, Record<Method, unknown>> {
+export interface ApiRoutes extends Record<string, Record<Method, unknown>> {
     '/labels': typeof import('../../routes/api/labels/+server');
     '/labels/?': typeof import('../../routes/api/labels/[labelId]/+server');
     '/events': typeof import('../../routes/api/events/+server');
@@ -141,7 +141,7 @@ async function handleOkResponse<T>(
         jsonRes = JSON.parse(textResult);
     } catch (e) {
         if (options.doNotTryToDecryptResponse) {
-            logger.error('Response is not JSON: ', { textResult });
+            logger.error('Response is not JSON: ', { textResult, e });
             return Result.err('Invalid response from server');
         }
         if (!key) {
@@ -157,10 +157,9 @@ async function handleOkResponse<T>(
             logger.error(`Can't parse response`, {
                 method,
                 url,
-                key,
                 textResult,
-                decryptedRes,
-                error
+                error,
+                e
             });
             return Result.err('Invalid response from server');
         }

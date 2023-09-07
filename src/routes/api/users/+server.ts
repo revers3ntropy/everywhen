@@ -48,8 +48,7 @@ export const DELETE = (async ({ cookies, request, locals: { auth } }) => {
     if (authErr) throw error(401, authErr);
     if (userIdFromLogIn !== auth.id) throw error(401, 'Invalid authentication');
 
-    const { err, val: backup } = await Backup.Server.generate(auth);
-    if (err) throw error(400, err);
+    const backup = (await Backup.Server.generate(auth)).unwrap(e => error(400, e));
 
     await User.Server.purge(auth);
 
