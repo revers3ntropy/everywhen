@@ -1,9 +1,10 @@
 <script lang="ts">
+    import { afterNavigate, beforeNavigate } from '$app/navigation';
     import AllowCookies from '$lib/components/AllowCookies.svelte';
     import { Auth } from '$lib/controllers/auth/auth';
     import { Backup } from '$lib/controllers/backup/backup';
     import type { LayoutData } from './$types';
-    import { onDestroy } from 'svelte';
+    import { onDestroy, onMount } from 'svelte';
     import { browser } from '$app/environment';
     import { page } from '$app/stores';
     import {
@@ -91,8 +92,9 @@
 
     let downloadingBackup = false;
 
+    let mounted = false;
     let intervalId: number | null = null;
-    $: if ($page && browser) {
+    $: if ($page && browser && mounted) {
         if (intervalId !== null) window.clearInterval(intervalId);
         intervalId = window.setInterval(() => {
             checkObfuscatedTimeout();
@@ -101,21 +103,38 @@
         }, 1000);
     }
 
+    onMount(() => {
+        mounted = true;
+    });
+
     onDestroy(() => {
         if (intervalId !== null) {
             window.clearInterval(intervalId);
         }
     });
 
-    $: if (!$username || !$encryptionKey) {
+    let navigating = false;
+    let finishedNavigation = false;
+    beforeNavigate(() => {
+        navigating = true;
+        finishedNavigation = false;
+    });
+    afterNavigate(() => {
+        navigating = false;
+        finishedNavigation = true;
+
+        setTimeout(() => {
+            finishedNavigation = false;
+        }, 100);
+    });
+
+    $: if (browser && (!$username || !$encryptionKey)) {
         void Auth.logOut(true);
     }
 
     passcodeLastEntered.subscribe(value => {
         if (browser) checkPasscode(value);
     });
-
-    $: console.log($settingsStore);
 
     $: currentlyShowPasscodeModal =
         $settingsStore.passcode.value &&
@@ -130,8 +149,6 @@
     on:scroll|passive={activity}
 />
 
-<Nav />
-
 {#if currentlyShowPasscodeModal}
     <PasscodeModal bind:show={showPasscodeModal} passcode={$settingsStore.passcode.value} />
 {/if}
@@ -139,6 +156,16 @@
 {#if !$allowedCookies}
     <AllowCookies />
 {/if}
+
+<span class="nav-loader-wrapper">
+    <span
+        class="nav-loader {navigating ? 'navigating' : ''} {finishedNavigation
+            ? 'finished-navigation'
+            : ''}"
+    />
+</span>
+
+<Nav />
 
 <div class="page-content">
     <slot />
@@ -149,10 +176,32 @@
 
     .page-content {
         min-height: calc(100vh - var(--nav-height));
-        margin: 0 1rem 200px 1rem;
+        padding: 1rem 1rem 12rem 12rem;
 
         @media #{$mobile} {
-            margin: 0 5px 200px 5px;
+            padding: 5px 5px 200px 5px;
+        }
+    }
+
+    .nav-loader-wrapper {
+        width: 100%;
+
+        .nav-loader {
+            width: 0;
+            height: 3px;
+            position: fixed;
+            top: 0;
+            background: var(--primary);
+            transition: width 12s cubic-bezier(0, 1, 0.5, 0.5);
+            z-index: 10000;
+
+            &.navigating {
+                width: 100%;
+            }
+
+            &.finished-navigation {
+                display: none;
+            }
         }
     }
 </style>

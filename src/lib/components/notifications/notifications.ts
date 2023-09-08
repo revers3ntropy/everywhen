@@ -69,22 +69,18 @@ notify.onErr = <T, E>(
     result: Result<T, E>,
     onErr: (err: string | null) => unknown = () => 0
 ): T => {
-    return result.match(
-        val => val,
-        err => {
-            let errFmt = JSON.stringify(err);
-            if (typeof err === 'string') {
-                try {
-                    errFmt =
-                        (JSON.parse(err as string) as Record<string, string>)?.['message'] || err;
-                } catch (e) {
-                    errFmt = err;
-                }
+    return result.unwrap(err => {
+        let errFmt = JSON.stringify(err);
+        if (typeof err === 'string') {
+            try {
+                errFmt = (JSON.parse(err as string) as Record<string, string>)?.['message'] || err;
+            } catch (e) {
+                errFmt = err;
             }
-
-            onErr(errFmt);
-            notify(errFmt || 'Unknown error', NotificationType.ERROR, 4000);
-            throw err;
         }
-    );
+
+        onErr(errFmt);
+        notify(errFmt || 'Unknown error', NotificationType.ERROR, 4000);
+        return err;
+    });
 };

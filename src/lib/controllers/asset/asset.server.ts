@@ -100,17 +100,17 @@ namespace AssetServer {
 
         const [asset] = res;
 
-        const { err: contentsErr, val: content } = decrypt(asset.content, auth.key);
-        if (contentsErr) return Result.err(contentsErr);
+        const decryptedContent = decrypt(asset.content, auth.key);
+        if (!decryptedContent.ok) return decryptedContent.as();
 
-        const { err: fileNameErr, val: fileName } = decrypt(asset.fileName, auth.key);
-        if (fileNameErr) return Result.err(fileNameErr);
+        const decryptedFileName = decrypt(asset.fileName, auth.key);
+        if (!decryptedFileName.ok) return decryptedFileName.as();
 
         return Result.ok({
             id: asset.id,
             publicId: asset.publicId,
-            content,
-            fileName,
+            content: decryptedContent.val,
+            fileName: decryptedFileName.val,
             created: asset.created
         });
     }
@@ -128,17 +128,17 @@ namespace AssetServer {
 
         return Result.collect(
             res.map(row => {
-                const { err: contentErr, val: content } = decrypt(row.content, auth.key);
-                if (contentErr) return Result.err(contentErr);
+                const decryptedContent = decrypt(row.content, auth.key);
+                if (!decryptedContent.ok) return decryptedContent.as();
 
-                const { err: fileNameErr, val: fileName } = decrypt(row.fileName, auth.key);
-                if (fileNameErr) return Result.err(fileNameErr);
+                const decryptedFileName = decrypt(row.fileName, auth.key);
+                if (!decryptedFileName.ok) return decryptedFileName.as();
 
                 return Result.ok({
                     id: row.id,
                     publicId: row.publicId,
-                    content,
-                    fileName,
+                    content: decryptedContent.val,
+                    fileName: decryptedFileName.val,
                     created: row.created
                 });
             })
@@ -154,7 +154,9 @@ namespace AssetServer {
             return Result.err('Count must be positive');
         }
 
-        const res = await query<AssetMetadata[]>`
+        const res = await query<
+            { id: string; publicId: string; created: number; fileName: string }[]
+        >`
             SELECT id,
                    publicId,
                    created,
@@ -166,21 +168,20 @@ namespace AssetServer {
             OFFSET ${offset}
         `;
 
-        const { err, val: metadata } = Result.collect(
-            res.map((row): Result<Asset> => {
-                const { err: fileNameErr, val: fileName } = decrypt(row.fileName, auth.key);
-                if (fileNameErr) return Result.err(fileNameErr);
+        const metadata = Result.collect(
+            res.map((row): Result<AssetMetadata> => {
+                const decryptedFileName = decrypt(row.fileName, auth.key);
+                if (!decryptedFileName.ok) return decryptedFileName.as();
 
                 return Result.ok({
                     id: row.id,
                     publicId: row.publicId,
-                    content: undefined as unknown as string,
-                    fileName,
+                    fileName: decryptedFileName.val,
                     created: row.created
                 });
             })
         );
-        if (err) return Result.err(err);
+        if (!metadata.ok) return metadata.as();
 
         const [assetCount] = await query<{ count: number }[]>`
             SELECT COUNT(*) as count
@@ -188,7 +189,7 @@ namespace AssetServer {
             WHERE userId = ${auth.id}
         `;
 
-        return Result.ok([metadata, assetCount.count]);
+        return Result.ok([metadata.val, assetCount.count]);
     }
 
     export async function purgeAll(auth: Auth): Promise<void> {

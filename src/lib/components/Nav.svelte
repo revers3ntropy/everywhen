@@ -1,9 +1,7 @@
 <script lang="ts">
-    import { afterNavigate, beforeNavigate, goto } from '$app/navigation';
     import { page } from '$app/stores';
     import { Backup } from '$lib/controllers/backup/backup';
     import { tooltip } from '@svelte-plugins/tooltips';
-    import Brain from 'svelte-material-icons/Brain.svelte';
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
     import Cog from 'svelte-material-icons/Cog.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
@@ -11,30 +9,15 @@
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import Lock from 'svelte-material-icons/Lock.svelte';
-    import Calendar from 'svelte-material-icons/Calendar.svelte';
-    import Lightbulb from 'svelte-material-icons/Lightbulb.svelte';
     import Logout from 'svelte-material-icons/Logout.svelte';
     import MapMarkerOutline from 'svelte-material-icons/MapMarkerOutline.svelte';
-    import Moon from 'svelte-material-icons/MoonWaningCrescent.svelte';
     import Notebook from 'svelte-material-icons/Notebook.svelte';
-    import Pencil from 'svelte-material-icons/Pencil.svelte';
-    import BulletPoints from 'svelte-material-icons/FormatListBulleted.svelte';
     import LightTheme from 'svelte-material-icons/WhiteBalanceSunny.svelte';
     import DarkTheme from 'svelte-material-icons/WeatherNight.svelte';
-    import Plus from 'svelte-material-icons/Plus.svelte';
     import Dropdown from '$lib/components/Dropdown.svelte';
     import Streaks from '$lib/components/Streaks.svelte';
-    import { LS_KEYS, Theme } from '$lib/constants';
-    import { Event as EventController } from '$lib/controllers/event/event';
-    import { nowUtc } from '$lib/utils/time';
-    import {
-        eventsSortKey,
-        obfuscated,
-        passcodeLastEntered,
-        settingsStore,
-        theme,
-        username
-    } from '$lib/stores';
+    import { Theme } from '$lib/constants';
+    import { obfuscated, passcodeLastEntered, settingsStore, theme, username } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
     import { Auth } from '$lib/controllers/auth/auth';
@@ -47,93 +30,6 @@
         isDownloadingBackup = false;
     }
 
-    async function makeLabelFromNameIfDoesntExist(
-        name: string,
-        defaultColor: string
-    ): Promise<string> {
-        const { labels } = notify.onErr(await api.get('/labels'));
-        const label = labels.find(label => label.name === name);
-        if (label) {
-            return label.id;
-        }
-        const res = notify.onErr(
-            await api.post('/labels', {
-                name,
-                color: defaultColor
-            })
-        );
-        return res.id;
-    }
-
-    async function gotoIfNotAt(path: string) {
-        if ($page.url.pathname === path) {
-            location.reload();
-        } else {
-            await goto(path);
-        }
-    }
-
-    async function goToEntryFormWithLabel(name: string, defaultColor: string) {
-        await api.put('/settings', {
-            key: 'entryFormMode',
-            value: false
-        });
-        const labelId = await makeLabelFromNameIfDoesntExist(name, defaultColor);
-        localStorage.setItem(LS_KEYS.newEntryLabel, labelId);
-        await gotoIfNotAt('/journal');
-    }
-
-    async function makeDream() {
-        await goToEntryFormWithLabel('Dream', '#7730ce');
-    }
-
-    async function makeIdea() {
-        await goToEntryFormWithLabel('Idea', '#ffff65');
-    }
-
-    async function makeThought() {
-        await goToEntryFormWithLabel('Thought', '#735820');
-    }
-
-    async function makeEntry() {
-        await api.put('/settings', {
-            key: 'entryFormMode',
-            value: false
-        });
-        $settingsStore.entryFormMode.value = false;
-        localStorage.removeItem(LS_KEYS.newEntryLabel);
-        await gotoIfNotAt('/journal');
-    }
-
-    async function makeBullet() {
-        await api.put('/settings', {
-            key: 'entryFormMode',
-            value: true
-        });
-        $settingsStore.entryFormMode.value = true;
-        if ($page.url.pathname !== '/journal') {
-            await goto('/journal');
-        } else {
-            location.reload();
-        }
-    }
-
-    async function makeEvent() {
-        // put the new event at the top of the list
-        eventsSortKey.set('created');
-
-        const now = nowUtc();
-        notify.onErr(
-            await api.post('/events', {
-                name: EventController.NEW_EVENT_NAME,
-                start: now,
-                end: now
-            })
-        );
-
-        await gotoIfNotAt('/events');
-    }
-
     function lock() {
         passcodeLastEntered.set(0);
     }
@@ -143,160 +39,19 @@
     }
 
     let isDownloadingBackup = false;
-
-    let navigating = false;
-    let finishedNavigation = false;
-    beforeNavigate(() => {
-        navigating = true;
-        finishedNavigation = false;
-    });
-    afterNavigate(() => {
-        navigating = false;
-        finishedNavigation = true;
-
-        setTimeout(() => {
-            finishedNavigation = false;
-        }, 100);
-    });
 </script>
 
-<svg class="accent-gradient-svg" height={0} width={0}>
-    <linearGradient id="dream-gradient" x1={1} x2={1} y1={0} y2={1}>
-        <stop offset={0} stop-color="rgb(252,233,255)" />
-        <stop offset={1} stop-color="rgb(196,197,255)" />
-    </linearGradient>
-</svg>
-<svg class="accent-gradient-svg" height={0} width={0}>
-    <linearGradient id="idea-gradient" x1={1} x2={1} y1={0} y2={1}>
-        <stop offset={0} stop-color="white" />
-        <stop offset={1} stop-color="yellow" />
-    </linearGradient>
-</svg>
-<svg class="accent-gradient-svg" height={0} width={0}>
-    <linearGradient id="thought-gradient" x1={1} x2={1} y1={0} y2={1}>
-        <stop offset={0} stop-color="rgb(155,208,198)" />
-        <stop offset={1} stop-color="rgb(213,231,227)" />
-    </linearGradient>
-</svg>
-
-<span class="nav-loader-wrapper">
-    <span
-        class="nav-loader {navigating ? 'navigating' : ''} {finishedNavigation
-            ? 'finished-navigation'
-            : ''}"
-    />
-</span>
-
 <nav>
-    <div class="nav-buttons">
-        <a
-            aria-label="journal"
-            class="icon {$page.url.pathname === '/journal' ? 'current' : ''}"
-            href="/journal"
-        >
-            <Notebook size="35" />
-        </a>
-        <a
-            aria-label="timeline"
-            class="icon {$page.url.pathname === '/timeline' ? 'current' : ''}"
-            href="/timeline"
-        >
-            <ChartTimeline size="35" />
-        </a>
-        <a
-            aria-label="map"
-            class="icon {$page.url.pathname === '/map' ? 'current' : ''}"
-            href="/map"
-        >
-            <MapMarkerOutline size="35" />
-        </a>
-        <a
-            aria-label="statistics"
-            class="icon {$page.url.pathname === '/stats' ? 'current' : ''}"
-            href="/stats"
-        >
-            <Counter size="35" />
-        </a>
-    </div>
-
-    <div class="right-options">
-        {#if $settingsStore.passcode.value}
-            <button
-                on:click={lock}
-                class="danger lock-button"
-                use:tooltip={{
-                    content: '<span class="oneline">Lock (require passcode)</span>',
-                    position: 'bottom'
-                }}
-                aria-label="Lock"
-            >
-                <Lock size="25" />
-            </button>
-        {/if}
-
-        <button
-            aria-label={$obfuscated ? 'Show all' : 'Hide all'}
-            on:click={() => obfuscated.set(!$obfuscated)}
-        >
-            {#if $obfuscated}
-                <Eye size="25" />
-            {:else}
-                <EyeOff size="25" />
-            {/if}
-        </button>
-
-        <Dropdown openOnHover fromRight width="170px">
-            <span class="create-button" slot="button">
-                <Plus size="25" />
-            </span>
-
-            <div class="record-something-buttons">
-                <button class="with-icon oneline record-entry" on:click={makeEntry}>
-                    <Pencil size="30" />
-                    Record Entry
-                </button>
-                <button class="with-icon oneline record-bullet" on:click={makeBullet}>
-                    <BulletPoints size="30" />
-                    Record Bullet
-                </button>
-
-                <button class="with-icon oneline record-dream" on:click={makeDream}>
-                    <Moon size="30" />
-                    Record Dream
-                </button>
-
-                <button class="with-icon oneline record-idea" on:click={makeIdea}>
-                    <Lightbulb size="30" />
-                    Record Idea
-                </button>
-
-                <button class="with-icon oneline record-thought" on:click={makeThought}>
-                    <Brain size="30" />
-                    Record Thought
-                </button>
-
-                <button class="with-icon oneline new-event" on:click={makeEvent}>
-                    <Calendar size="30" />
-                    New Event
-                </button>
-            </div>
-        </Dropdown>
-
-        <Dropdown fromRight width="200px">
+    <div class="top-options">
+        <span class="streaks">
+            <Streaks condensed />
+        </span>
+        <Dropdown width="200px">
             <span class="account-button" slot="button">
-                <span class="username">
-                    {$username || '...'}
-                </span>
-                <span class="streaks">
-                    <Streaks condensed />
-                </span>
+                {$username || '...'}
             </span>
 
             <div class="account-dropdown-options">
-                <Streaks tooltipPosition="left" />
-
-                <hr />
-
                 <button
                     aria-label="download encrypted backup"
                     class="account-dropdown-button"
@@ -336,7 +91,73 @@
                 </button>
             </div>
         </Dropdown>
+
+        <button
+            aria-label={$obfuscated ? 'Show all' : 'Hide all'}
+            on:click={() => obfuscated.set(!$obfuscated)}
+        >
+            {#if $obfuscated}
+                <Eye size="25" />
+            {:else}
+                <EyeOff size="25" />
+            {/if}
+        </button>
+
+        {#if $settingsStore.passcode.value}
+            <button
+                on:click={lock}
+                class="danger lock-button"
+                use:tooltip={{
+                    content: '<span class="oneline">Lock (require passcode)</span>',
+                    position: 'bottom'
+                }}
+                aria-label="Lock"
+            >
+                <Lock size="25" />
+            </button>
+        {/if}
     </div>
+
+    <div class="nav-buttons">
+        <a
+            href="/journal"
+            aria-label="journal"
+            class="with-circled-icon"
+            class:current={$page.url.pathname.startsWith('/journal')}
+        >
+            <Notebook size="35" />
+            <span class="hide-mobile"> Journal </span>
+        </a>
+        <a
+            href="/timeline"
+            aria-label="timeline"
+            class="with-circled-icon"
+            class:current={$page.url.pathname.startsWith('/timeline')}
+        >
+            <ChartTimeline size="35" />
+            <span class="hide-mobile"> Timeline </span>
+        </a>
+        <a
+            href="/map"
+            aria-label="map"
+            class="with-circled-icon"
+            class:current={$page.url.pathname.startsWith('/map')}
+        >
+            <MapMarkerOutline size="35" />
+            <span class="hide-mobile"> Map </span>
+        </a>
+        <a
+            href="/stats"
+            aria-label="statistics"
+            class="with-circled-icon"
+            class:current={$page.url.pathname.startsWith('/stats')}
+        >
+            <Counter size="35" />
+            <span class="hide-mobile"> Insights </span>
+        </a>
+    </div>
+
+    <div />
 </nav>
 
 <style lang="scss">
@@ -346,59 +167,26 @@
     @import '../../styles/text';
 
     nav {
-        position: relative;
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        height: var(--nav-height);
+        height: 100%;
+        width: 10rem;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
         // increased to 5 so that on mobile the nav buttons are not cut off
         // by entry group titles
         z-index: 5;
-
-        padding: 0 5px;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background: var(--nav-bg);
 
         @media #{$mobile} {
-            justify-content: flex-end;
-        }
-
-        & > div {
-            display: flex;
-            align-items: center;
-            height: 100%;
-        }
-    }
-
-    .nav-loader-wrapper {
-        width: 100%;
-
-        .nav-loader {
-            width: 0;
-            height: 3px;
-            position: fixed;
-            top: 0;
-            background: var(--primary);
-            transition: width 12s cubic-bezier(0, 1, 0.5, 0.5);
-            z-index: 10000;
-
-            &.navigating {
-                width: 100%;
-            }
-
-            &.finished-navigation {
-                display: none;
-            }
-        }
-    }
-
-    a,
-    button {
-        margin: 0 4px;
-
-        &.current {
-            &:after {
-                background: var(--primary);
-            }
+            display: block;
+            height: var(--nav-height);
+            width: 100%;
+            position: static;
         }
     }
 
@@ -406,25 +194,13 @@
         background: var(--light-accent);
     }
 
-    .account-button {
-        @extend .container;
-        display: grid;
-        grid-template-columns: 1fr auto;
+    .top-options {
+        display: flex;
+        flex-direction: column;
         align-items: center;
-        justify-content: center;
+        justify-content: space-between;
         gap: 0.5rem;
-        border-radius: $border-radius;
-        padding: 0.4rem 1rem;
-        margin: 0;
-
-        &:hover {
-            background-color: var(--light-accent);
-        }
-
-        @media #{$mobile} {
-            padding: 0.4rem 1rem;
-            margin: 0;
-        }
+        padding: 0.5rem 0;
     }
 
     .nav-buttons {

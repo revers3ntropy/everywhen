@@ -3,10 +3,6 @@ import { Auth } from '$lib/controllers/auth/auth.server';
 import type { RequestHandler } from '@sveltejs/kit';
 
 export class GenericResponse<T> extends Response {
-    constructor(val: string, init: ResponseInit) {
-        super(val, init);
-    }
-
     protected _(): T {
         throw new Error('This method should never be called');
     }

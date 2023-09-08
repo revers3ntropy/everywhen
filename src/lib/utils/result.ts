@@ -134,6 +134,10 @@ class Ok<T, E> implements ResultOption<T, E> {
     public merge(): T | E {
         return this.val;
     }
+
+    public as<E>(): Result<T, E> {
+        return new Ok<T, E>(this.val);
+    }
 }
 
 class Err<T, E> implements ResultOption<unknown, E> {

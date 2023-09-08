@@ -1,6 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { encrypt, decrypt } from './encryption';
 
+function expectFalse(val: boolean): asserts val is false {
+    expect(val).toBe(false);
+}
+
 describe('encryption', () => {
     it('encrypts and decrypts', () => {
         const key = 'k'.repeat(32);
@@ -27,17 +31,17 @@ describe('encryption', () => {
         const key2 = 'l'.repeat(32);
         const plaintext = 'plaintext';
         const ciphertext = encrypt(plaintext, key1);
-        const { err, val } = decrypt(ciphertext, key2);
-        expect(val).toBeUndefined();
-        expect(typeof err).toBe('string');
+        const decryptRes = decrypt(ciphertext, key2);
+        expectFalse(decryptRes.ok);
+        expect(typeof decryptRes.err).toBe('string');
     });
 
     it('fails to decrypt random string', () => {
         const key1 = 'k'.repeat(32);
         const ciphertext = 'this is not a valid ciphertext';
-        const { err, val } = decrypt(ciphertext, key1);
-        expect(val).toBeUndefined();
-        expect(typeof err).toBe('string');
+        const decryptRes = decrypt(ciphertext, key1);
+        expectFalse(decryptRes.ok);
+        expect(typeof decryptRes.err).toBe('string');
     });
 
     it('decrypts empty ciphertext as empty plaintext', () => {

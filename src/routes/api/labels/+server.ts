@@ -7,9 +7,9 @@ import type { RequestHandler } from './$types';
 import { Auth } from '$lib/controllers/auth/auth.server';
 
 export const GET = cachedApiRoute(async auth => {
-    const { err, val: labels } = await Label.Server.all(auth);
-    if (err) throw error(400, err);
-    return { labels };
+    return {
+        labels: (await Label.Server.all(auth)).unwrap(e => error(400, e))
+    };
 }) satisfies RequestHandler;
 
 export const POST = (async ({ request, cookies }) => {
@@ -28,10 +28,9 @@ export const POST = (async ({ request, cookies }) => {
         }
     );
 
-    const { val: label, err } = await Label.Server.create(auth, body);
-    if (err) throw error(400, err);
+    const { id } = (await Label.Server.create(auth, body)).unwrap(e => error(400, e));
 
-    return apiResponse(auth, { id: label.id });
+    return apiResponse(auth, { id });
 }) satisfies RequestHandler;
 
 export const DELETE = apiRes404;
