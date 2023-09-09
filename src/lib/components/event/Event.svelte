@@ -16,7 +16,6 @@
     import type { Label } from '$lib/controllers/label/label';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
-    import { obfuscate } from '$lib/utils/text';
     import {
         currentTzOffset,
         fmtDuration,
@@ -216,7 +215,7 @@
             <div>
                 {#if obfuscated}
                     <p class="event-name-inp obfuscated">
-                        {obfuscate(event.name)}
+                        {event.name}
                     </p>
                 {:else}
                     <input
@@ -330,12 +329,7 @@
                     </button>
                 </div>
                 <div class="created-datetime">
-                    <i>
-                        Created
-                        <!-- TODO use tz from db -->
-                        <UtcTime timestamp={event.created} fmt="MMMM Do YYYY, h:mma" />
-                        (<UtcTime timestamp={event.created} relative />)
-                    </i>
+                    <i> Created <UtcTime timestamp={event.created} relative /> </i>
                 </div>
             </div>
         {/if}

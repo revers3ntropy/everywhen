@@ -21,7 +21,7 @@
     import { ANIMATION_DURATION } from '$lib/constants';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
-    import { obfuscate, rawMdToHtml } from '$lib/utils/text';
+    import { rawMdToHtml } from '$lib/utils/text';
     import UtcTime from '$lib/components/UtcTime.svelte';
     import Dropdown from '$lib/components/Dropdown.svelte';
     import AgentWidget from './AgentWidget.svelte';
@@ -100,22 +100,13 @@
         await dispatch.update('entry', changed);
     }
 
-    // show random string instead of text content if obfuscated
-    let showLabel = label;
-    $: if (showLabels && label) {
-        showLabel = {
-            ...label,
-            name: obfuscated ? obfuscate(label.name) : label.name
-        };
-    }
-
     function toggleObfuscation() {
         obfuscated = !obfuscated;
     }
 
     let showingMap = false;
 
-    $: entryHtml = browser ? rawMdToHtml(body, obfuscated) : '';
+    $: entryHtml = browser ? rawMdToHtml(body) : '';
     // doesn't set reactively on tooltip content if in props???
     $: restoreDeleteTooltip = Entry.isDeleted({ deleted }) ? 'Restore Entry' : 'Move Entry to Bin';
     $: pinTooltip = Entry.isPinned({ pinned }) ? 'Unpin Entry' : 'Pin Entry';
@@ -133,7 +124,7 @@
         </div>
     {/if}
     <p class="mobile-title" class:obfuscated>
-        {obfuscated ? obfuscate(title) : title}
+        {title}
     </p>
     <div class="header">
         <div style="display: flex; align-items: center; max-width: calc(100% - 60px); gap: 0.5rem;">
@@ -177,11 +168,11 @@
             {/if}
 
             {#if showLabels}
-                <Label label={showLabel} {obfuscated} />
+                <Label {label} {obfuscated} />
             {/if}
 
-            <div class="title {obfuscated ? 'obfuscated' : ''}">
-                {obfuscated ? obfuscate(title) : title}
+            <div class="title" class:obfuscated>
+                {title}
             </div>
         </div>
 
@@ -207,10 +198,10 @@
                                 >
                                     {#if Entry.isPinned({ pinned })}
                                         <HeartOffOutline size="25" />
-                                        Un-favourite
+                                        Remove from Favourites
                                     {:else}
                                         <Heart size="25" />
-                                        Favourite
+                                        Add to Favourites
                                     {/if}
                                 </button>
                                 <a

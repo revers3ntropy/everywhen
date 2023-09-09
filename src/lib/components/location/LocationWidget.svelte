@@ -2,7 +2,6 @@
     import { tooltip } from '@svelte-plugins/tooltips';
     import MapMarker from 'svelte-material-icons/MapMarkerOutline.svelte';
     import { Location } from '$lib/controllers/location/location';
-    import { obfuscate } from '$lib/utils/text';
     import Dot from '../Dot.svelte';
 
     const MAX_LOCATIONS_SHOWN = 2;
@@ -34,15 +33,10 @@
         <span class="multi-locations-container">
             {#each touching as location, i}
                 {#if i < MAX_LOCATIONS_SHOWN}
-                    {#if obfuscated}
-                        <span class="text-light ellipsis obfuscated">
-                            {obfuscate(location.name)}
-                        </span>
-                    {:else}
-                        <a href="/map/{location.id}" class="ellipsis">
-                            {location.name}
-                        </a>
-                    {/if}
+                    <a href="/map/{location.id}" class="ellipsis" class:obfuscated>
+                        {location.name}
+                    </a>
+
                     {#if i < touching.length - 1}
                         <Dot />
                     {/if}
@@ -65,15 +59,9 @@
     {:else if nearby && nearby?.length}
         <span class="flex-center ellipsis" style="gap: 0.2rem">
             <span class="text-light">near</span>
-            {#if obfuscated}
-                <span class="text-light ellipsis obfuscated">
-                    {obfuscate(nearby[0].name)}
-                </span>
-            {:else}
-                <a href="/map/{nearby[0].id}" class="ellipsis">
-                    {nearby[0].name}
-                </a>
-            {/if}
+            <a href="/map/{nearby[0].id}" class="ellipsis" class:obfuscated>
+                {nearby[0].name}
+            </a>
         </span>
     {/if}
 </span>

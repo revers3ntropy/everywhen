@@ -1,5 +1,5 @@
 <svelte:head>
-    <title>Privacy | Halcyon.Land</title>
+    <title>Privacy | Everywhen</title>
 </svelte:head>
 
 <main class="flex-center">
@@ -10,10 +10,10 @@
             Responsible for Data Protection (DPO): Joseph Coppin (josephcoppin@gmail.com)
         </p>
         <p>
-            This privacy policy applies between you, the User of this Website, and Halcyon.Land, the
-            owner and provider of this Website. Halcyon.Land takes the privacy of your information
-            very seriously. This privacy policy applies to our use of any and all Data collected by
-            us or provided by you in relation to your use of the Website.
+            This privacy policy applies between you, the User of this Website, and Everywhen, the
+            owner and provider of this Website. Everywhen takes the privacy of your information very
+            seriously. This privacy policy applies to our use of any and all Data collected by us or
+            provided by you in relation to your use of the Website.
         </p>
         <p> Please read this privacy policy carefully. </p>
 
@@ -21,7 +21,7 @@
         <p> In this privacy policy, the following definitions are used: </p>
         <h3> Data </h3>
         <p>
-            collectively all information that you submit to Halcyon.Land via the Website. This
+            collectively all information that you submit to Everywhen via the Website. This
             definition incorporates, where applicable, the definitions provided in the Data
             Protection Laws;
         </p>
@@ -39,7 +39,7 @@
         </p>
         <h3> GDPR </h3>
         <p> the UK General Data Protection Regulation; </p>
-        <h3> Halcyon.Land, we or us</h3>
+        <h3> Everywhen, we or us</h3>
         <p> Joseph Coppin of 5a Barton Road, Cambridgeshire, CB7 4HZ; </p>
         <h3> UK and EU Cookie Law </h3>
         <p>
@@ -49,10 +49,10 @@
         </p>
         <h3> User or you </h3>
         <p>
-            any third party that accesses the Website and is not either (i) employed by Halcyon.Land
+            any third party that accesses the Website and is not either (i) employed by Everywhen
             and acting in the course of their employment or (ii) engaged as a consultant or
-            otherwise providing services to Halcyon.Land and accessing the Website in connection
-            with the provision of such services; and
+            otherwise providing services to Everywhen and accessing the Website in connection with
+            the provision of such services; and
         </p>
         <h3> Website </h3>
         <p>
@@ -79,15 +79,14 @@
 
         <h2> Scope of this privacy policy </h2>
         <p>
-            This privacy policy applies only to the actions of Halcyon.Land and Users with respect
-            to this Website. It does not extend to any websites that can be accessed from this
-            Website including, but not limited to, any links we may provide to social media
-            websites.
+            This privacy policy applies only to the actions of Everywhen and Users with respect to
+            this Website. It does not extend to any websites that can be accessed from this Website
+            including, but not limited to, any links we may provide to social media websites.
         </p>
         <p>
-            For purposes of the applicable Data Protection Laws, Halcyon.Land is the "data
-            controller". This means that Halcyon.Land determines the purposes for which, and the
-            manner in which, your Data is processed.
+            For purposes of the applicable Data Protection Laws, Everywhen is the "data controller".
+            This means that Everywhen determines the purposes for which, and the manner in which,
+            your Data is processed.
         </p>
 
         <h2> Data collected </h2>
@@ -108,7 +107,7 @@
 
         <h3> Data that is given to us by you </h3>
         <p>
-            Halcyon.Land will collect your Data in a number of ways, for example when you contact us
+            Everywhen will collect your Data in a number of ways, for example when you contact us
             through the Website, by telephone, post, e-mail or through any other means, in
             accordance with this privacy policy.
         </p>
@@ -239,10 +238,10 @@
 
         <h2> Cookies </h2>
         <p>
-            This Website may place and access certain Cookies on your computer. Halcyon.Land uses
-            Cookies to improve your experience of using the Website. Halcyon.Land has carefully
-            chosen these Cookies and has taken steps to ensure that your privacy is protected and
-            respected at all times.
+            This Website may place and access certain Cookies on your computer. Everywhen uses
+            Cookies to improve your experience of using the Website. Everywhen has carefully chosen
+            these Cookies and has taken steps to ensure that your privacy is protected and respected
+            at all times.
         </p>
         <p>
             All Cookies used by this Website are used in accordance with current UK and EU Cookie
@@ -251,7 +250,7 @@
         <p>
             Before the Website places Cookies on your computer, you will be presented with a message
             bar requesting your consent to set those Cookies. By giving your consent to the placing
-            of Cookies, you are enabling Halcyon.Land to provide a better experience and service to
+            of Cookies, you are enabling Everywhen to provide a better experience and service to
             you. You may, if you wish, deny consent to the placing of Cookies; however certain
             features of the Website may not function fully or as intended.
         </p>
@@ -332,11 +331,11 @@
 
         <h2> Changes to this Privacy Policy </h2>
         <p>
-            Halcyon.Land reserves the right to change this privacy policy as we may deem necessary
-            from time to time or as may be required by law. Any changes will be immediately posted
-            on the Website and you are deemed to have accepted the terms of the privacy policy on
-            your first use of the Website following the alterations. You may contact Halcyon.Land by
-            email at 'joseph.coppin@gmail.com'.
+            Everywhen reserves the right to change this privacy policy as we may deem necessary from
+            time to time or as may be required by law. Any changes will be immediately posted on the
+            Website and you are deemed to have accepted the terms of the privacy policy on your
+            first use of the Website following the alterations. You may contact Everywhen by email
+            at 'joseph.coppin@gmail.com'.
         </p>
         <p> This privacy policy was created on <b>03 July 2023</b>. </p>
 

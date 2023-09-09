@@ -5,7 +5,7 @@ export const REMEMBER_ME_COOKIE_TIMEOUT_DAYS = 365;
 
 export const UUID_LEN = 32;
 
-const KEY_PREFIX = '__halcyon_land_' as const;
+const KEY_PREFIX = '__everywhen_' as const;
 
 export const LS_KEYS = {
     newEntryBody: `${KEY_PREFIX}new_entry_body`,

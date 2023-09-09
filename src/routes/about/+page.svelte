@@ -6,14 +6,14 @@
 </script>
 
 <svelte:head>
-    <title>About | Halcyon.Land</title>
+    <title>About | Everywhen</title>
 </svelte:head>
 
 <h1> About </h1>
 
 <section>
     <p>
-        Halcyon.Land is an
+        Everywhen is an
         <a
             aria-label="Source code"
             href="http://github.com/revers3ntropy/halcyon.land"
@@ -42,7 +42,7 @@
 
     <h2>Your Data</h2>
     <p>
-        The core of Halcyon.Land is making you feel safe to write anything. Everything, even your
+        The core of Everywhen is making you feel safe to write anything. Everything, even your
         settings, are encrypted before being stored, using your password. As your password is not
         stored on the server, even if the entire server was leaked, no-one could read your entries.
     </p>

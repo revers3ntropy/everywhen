@@ -5,7 +5,7 @@ const outputFile = 'testBackup.json';
 /** @type {{ version: string }} */
 const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 
-const num = {
+const MAX = {
     entries: {
         incrementing: 10_000,
         long: {
@@ -18,6 +18,22 @@ const num = {
     events: 1000,
     locations: 100
 };
+
+const SIMPLE = {
+    entries: {
+        incrementing: 5,
+        long: {
+            count: 5,
+            chars: 10
+        }
+    },
+    labels: 5,
+    assets: 5,
+    events: 5,
+    locations: 5
+};
+
+const num = MAX;
 
 function now() {
     return Math.floor(Date.now() / 1000);
@@ -32,7 +48,6 @@ function genEntries() {
 
     for (let i = 0; i < num.entries.incrementing; i++) {
         entries.push({
-            title: '',
             body: `entry ${i}`,
             created: today - i * 60 * 60 * 6
         });
@@ -41,7 +56,6 @@ function genEntries() {
     const longText = '.'.repeat(num.entries.long.chars);
     for (let i = 0; i < num.entries.long.count; i++) {
         entries.push({
-            title: '',
             body: longText,
             created: yesterday - i * 60
         });
@@ -71,6 +85,8 @@ function genAssets() {
 
     for (let i = 0; i < num.assets; i++) {
         assets.push({
+            fileName: `image-${i}.png`,
+            created: now(),
             content:
                 'UklGRsgCAABXRUJQVlA4WAoAAAAwAAAAFwAAFwAASUNDUMgBAAAAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADZBTFBIrAAAAAFHIBBI4SYXEREMwLWtPZVyrrfpZkrDSpfSISUO5aSC0iH13Mj33vgbRPR/AvjXg3S78I2TpMEXezot1159/SlYwAQLGJUmnDLyJczumEkdoYO+ox8+reBWINSE5syyZyFWzJefdhk9QC5wUovxX5hwCghSyZerdxBqzOFGyaqFebeXJV8/7oKzyR9fy8cWjHwFo6wS6C1AtAD7Oi3HQfUnnCQN+NKsv90v8K9WUDggJgAAANACAJ0BKhgAGAA+bTSWR6QjIiEoCACADYlpAAA9o6AA/vucwAAA'
         });

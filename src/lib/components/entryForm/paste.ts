@@ -17,8 +17,7 @@ export function paste(element: HTMLInputElement | HTMLTextAreaElement, options: 
             .filter(Boolean);
 
         if (files.length && options.handleFiles) {
-            void options.handleFiles(files);
-            return;
+            return void options.handleFiles(files);
         }
 
         const text = event.clipboardData?.getData('text/plain');

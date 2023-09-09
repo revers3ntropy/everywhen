@@ -9,7 +9,7 @@
     import type { Streaks } from '../controllers/entry/entry';
     import { api } from '../utils/apiRequest';
 
-    export let tooltipPosition: 'top' | 'bottom' | 'left' | 'right' = 'bottom';
+    export let tooltipPosition: 'top' | 'bottom' | 'left' | 'right' = 'right';
     export let condensed = false;
 
     function madeEntry() {
@@ -63,6 +63,9 @@
     let tooltipContent = 'Loading...';
     $: if (streaks) {
         tooltipContent =
+            (!streaks.runningOut && !(streaks.current < 1)
+                ? '<div>Come back tomorrow to continue your streak!</div>'
+                : '') +
             (streaks.runningOut ? '<div>Make an entry today to continue the Streak!</div>' : '') +
             (streaks.current < 1 ? '<div>Make an entry to start a Streak!</div>' : '');
     }
@@ -83,13 +86,11 @@
                         <Fire size="25" />
                     {/if}
                     <span class="flex-center" style="height: 100%;">
-                        <b>
-                            {streaks.current}
-                        </b>
+                        <b>{streaks.current}</b>
                     </span>
                 </span>
             {:else}
-                <span
+                <div
                     class="flex-center full"
                     use:tooltip={{
                         content: tooltipContent,
@@ -104,20 +105,16 @@
                         <Fire size="25" />
                     {/if}
                     <div class="py-1">
-                        <div class="oneline">
-                            <b>
-                                {streaks.current}
-                            </b>
+                        <div class="oneline pb-1">
+                            <b>{streaks.current}</b>
                             day streak
                         </div>
                         <div class="oneline">
-                            <b>
-                                {streaks.longest}
-                            </b>
+                            <b>{streaks.longest}</b>
                             longest
                         </div>
                     </div>
-                </span>
+                </div>
             {/if}
         {/if}
     {:else}

@@ -20,7 +20,7 @@
         <div class="info">
             <div>
                 <a aria-label="about" href="/about" class="with-icon icon-gradient-on-hover">
-                    <InformationOutline size="25" /> About Halcyon.Land
+                    <InformationOutline size="25" /> About Everywhen
                 </a>
             </div>
             <div>
@@ -50,22 +50,21 @@
                     class="with-icon icon-gradient-on-hover"
                 >
                     <BugOutline size="25" />
-                    <span>
-                        Report Bugs / Request Features
-                        <OpenInNew size="12" />
+                    <span class="flex-center gap-2">
+                        Report Bugs / Request Features <OpenInNew />
                     </span>
                 </a>
             </div>
             <div>
                 <a
                     aria-label="Github"
-                    class="with-icon icon-gradient-on-hover"
+                    class="with-icon"
                     href="https://github.com/revers3ntropy/halcyon.land"
                     rel="noreferrer"
                     target="_blank"
                 >
                     <Github size="25" />
-                    <span> Source Code <OpenInNew size="12" /> </span>
+                    <span class="flex-center gap-2"> Source Code <OpenInNew /> </span>
                 </a>
             </div>
 
@@ -74,7 +73,8 @@
     </div>
 
     <div class="flex-center text-light pt-4">
-        Halcyon.Land version {version} ({PUBLIC_ENV})
+        Everywhen v{version}
+        {PUBLIC_ENV === 'prod' ? `` : `(${PUBLIC_ENV})`}
     </div>
 </footer>
 

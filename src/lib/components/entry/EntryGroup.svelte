@@ -7,12 +7,12 @@
 
 <script lang="ts">
     import { page } from '$app/stores';
+    import EntryForm from '$lib/components/entryForm/EntryForm.svelte';
     import { currentlyUploadingEntries, settingsStore } from '$lib/stores';
     import { clientLogger } from '$lib/utils/log';
     import { fly, slide } from 'svelte/transition';
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
-    import ModedEntryForm from '$lib/components/entryForm/ModedEntryForm.svelte';
     import { ANIMATION_DURATION } from '$lib/constants';
     import { listen } from '$lib/dataChangeEvents';
     import Entry from '$lib/components/entry/Entry.svelte';
@@ -118,7 +118,7 @@
     </div>
     {#if !$collapsed[day]}
         {#if showEntryForm && isToday}
-            <ModedEntryForm
+            <EntryForm
                 {obfuscated}
                 entryFormMode={$settingsStore.entryFormMode.value
                     ? EntryFormMode.Bullet

@@ -1,6 +1,7 @@
 import { COOKIE_KEYS } from '$lib/constants';
 import { PageLoadLog } from '$lib/controllers/log/log.server';
 import { sessionCookieOptions } from '$lib/utils/cookies';
+import { fmtTimePrecise } from '$lib/utils/text';
 import { nowUtc } from '$lib/utils/time';
 import type { Cookies, Handle, RequestEvent } from '@sveltejs/kit';
 import chalk from 'chalk';
@@ -79,7 +80,7 @@ async function logReq(
     const route = req.route.id || '[unknown]';
 
     void reqLogger.log(
-        `${req.request.method} ${req.url.href} => ${res.status} ${responseTimeMs.toPrecision(3)}ms`
+        `${req.request.method} ${req.url.href} => ${res.status} ${fmtTimePrecise(responseTimeMs)}`
     );
 
     const userId = (auth?.id || '').toString();

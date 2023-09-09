@@ -2,7 +2,7 @@ import mysql from 'mysql2/promise';
 import chalk from 'chalk';
 import '../require';
 import { DB, DB_HOST, DB_PASS, DB_PORT, DB_USER } from '$env/static/private';
-import { collapseWhitespace, recursivelyTrimAndStringify } from '$lib/utils/text';
+import { collapseWhitespace, fmtTimePrecise, recursivelyTrimAndStringify } from '$lib/utils/text';
 import type { Expand, Milliseconds, NonFunctionProperties } from '../../types';
 import { FileLogger } from '../utils/log.server';
 
@@ -54,13 +54,10 @@ async function logQuery(query: string, params: unknown[], result: unknown, time:
         resultStr = result.info;
     }
 
-    const durationFmt =
-        time > 1000 ? `${(time / 1000).toPrecision(3)}s` : `${time.toPrecision(3)}ms`;
-
     await dbLogger.log(
         `\`${collapseWhitespace(query)}\`` +
             `\n     ${paramsFmt}` +
-            `\n     (${durationFmt}) => ${resultStr}`
+            `\n     (${fmtTimePrecise(time)}) => ${resultStr}`
     );
 }
 
@@ -152,10 +149,8 @@ query.unlogged = (async <Res extends QueryResult = never>(
     const [query, queryParams] = buildQuery(queryParts, params);
 
     return ((await dbConnection?.query(query, queryParams).catch((error: unknown) => {
-        void (async () => {
-            await logQuery(query, queryParams, null, 0);
-            await dbLogger.log(`Error querying mysql db '${DB}'`, { error });
-        })();
+        void logQuery(query, queryParams, error, -1);
+        void dbLogger.log(`Error querying mysql db '${DB}'`, { error });
         throw error;
     })) || [])[0] as Res;
 }) as QueryFunc;

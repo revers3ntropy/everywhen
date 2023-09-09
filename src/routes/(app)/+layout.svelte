@@ -39,7 +39,7 @@
     function checkPasscode(lastEntered: number | null) {
         if (lastEntered === null) return;
         const secondsSinceLastEntered = nowUtc() - lastEntered;
-        showPasscodeModal = secondsSinceLastEntered > $settingsStore.passcodeTimeout.value;
+        showPasscodeModal = secondsSinceLastEntered > $settingsStore?.passcodeTimeout?.value;
     }
 
     function activity() {
@@ -137,10 +137,10 @@
     });
 
     $: currentlyShowPasscodeModal =
-        $settingsStore.passcode.value &&
-        nowUtc() - ($passcodeLastEntered || 0) > $settingsStore.passcodeTimeout.value &&
+        $settingsStore?.passcode?.value &&
+        nowUtc() - ($passcodeLastEntered || 0) > $settingsStore?.passcodeTimeout?.value &&
         showPasscodeModal &&
-        ($settingsStore.passcodeTimeout.value > 0 || !$passcodeLastEntered || !browser);
+        ($settingsStore?.passcodeTimeout?.value > 0 || !$passcodeLastEntered || !browser);
 </script>
 
 <svelte:window

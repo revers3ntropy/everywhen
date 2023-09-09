@@ -1,12 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { obfuscate, recursivelyTrimAndStringify, wordCount } from './text';
-
-describe('obfuscate', () => {
-    it('changes the string', () => {
-        const text = 'hello world';
-        expect(obfuscate(text)).not.toBe(text);
-    });
-});
+import { recursivelyTrimAndStringify, roundToDecimalPlaces, wordCount } from './text';
 
 describe('wordCount', () => {
     it('Splits words correctly', () => {
@@ -37,5 +30,12 @@ describe('recursivelyTrimAndStringify', () => {
         expect(s([[1, 2, 3]], 2, 2)).toBe(`[[1, 2, ..1]]`);
         expect(s({})).toBe('{ }');
         expect(s({ a: { b: 1, c: 2, d: 3 } }, 2, 2)).toBe('{ a: { b: 1, c: 2, ..1 } }');
+    });
+});
+
+describe('roundToDecimalPlaces', () => {
+    it('works', () => {
+        expect(roundToDecimalPlaces(1.2345)).toBe(1.2);
+        expect(roundToDecimalPlaces(1)).toBe(1.0);
     });
 });

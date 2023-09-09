@@ -15,7 +15,7 @@
         `'Favourite' an entry under the <code>⋮</code> on an entry, and it will appear right here at the top of your <a href="/journal">journal</a>`,
         `Set a passcode in the <a href="/settings#passcode">settings</a> as an additional layer of security`,
         `All your data is encrypted, and only you have the key: no matter what, no-one can read your data without knowing your password`,
-        `Learn more about Halcyon.Land on the <a href="/about">about</a> page`,
+        `Learn more about Everywhen on the <a href="/about">about</a> page`,
         `You can view all the images you have uploaded in the <a href="/assets">gallery</a> page`,
         `Scroll to zoom the <a href="/timeline">timeline</a> in and out`,
         `You can view what words you use the most on the <a href="/stats">analytics</a> page`,

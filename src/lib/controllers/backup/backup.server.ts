@@ -1,4 +1,5 @@
 import { FileLogger } from '$lib/utils/log.server';
+import { wordCount } from '$lib/utils/text';
 import { z } from 'zod';
 import { currentVersion, SemVer } from '$lib/utils/semVer';
 import { decrypt, encrypt } from '$lib/utils/encryption';
@@ -18,29 +19,31 @@ const logger = new FileLogger('Backup');
 export const backupSchema = z.object({
     entries: z.array(
         z.object({
-            title: z.string(),
+            title: z.string().default(''),
             body: z.string(),
             labelName: z.string().nullable().optional(),
             created: z.number(),
-            createdTzOffset: z.number(),
+            createdTzOffset: z.number().default(0),
             latitude: z.number().nullable().optional(),
             longitude: z.number().nullable().optional(),
-            agentData: z.string(),
+            agentData: z.string().default(''),
             pinned: z.number().nullable().optional(),
             deleted: z.number().nullable().optional(),
-            wordCount: z.number(),
-            edits: z.array(
-                z.object({
-                    oldTitle: z.string(),
-                    oldBody: z.string(),
-                    oldLabelName: z.string().nullable().optional(),
-                    created: z.number(),
-                    createdTzOffset: z.number(),
-                    latitude: z.number().nullable().optional(),
-                    longitude: z.number().nullable().optional(),
-                    agentData: z.string()
-                })
-            )
+            wordCount: z.number().optional(),
+            edits: z
+                .array(
+                    z.object({
+                        oldTitle: z.string().default(''),
+                        oldBody: z.string(),
+                        oldLabelName: z.string().nullable().optional(),
+                        created: z.number(),
+                        createdTzOffset: z.number().default(0),
+                        latitude: z.number().nullable().optional(),
+                        longitude: z.number().nullable().optional(),
+                        agentData: z.string().default('')
+                    })
+                )
+                .optional()
         })
     ),
     labels: z.array(
@@ -52,8 +55,8 @@ export const backupSchema = z.object({
     ),
     assets: z.array(
         z.object({
-            publicId: z.string(),
-            fileName: z.string(),
+            publicId: z.string().optional(),
+            fileName: z.string().optional(),
             content: z.string(),
             created: z.number()
         })
@@ -119,7 +122,11 @@ export namespace BackupServer {
                     wordCount: entry.wordCount,
                     edits:
                         entry.edits?.map(
-                            (edit): ArrayElement<ArrayElement<Backup['entries']>['edits']> => ({
+                            (
+                                edit
+                            ): ArrayElement<
+                                NonNullable<ArrayElement<Backup['entries']>['edits']>
+                            > => ({
                                 oldTitle: edit.oldTitle,
                                 oldBody: edit.oldBody,
                                 oldLabelName: edit.oldLabel?.name ?? undefined,
@@ -191,7 +198,7 @@ export namespace BackupServer {
         const parseRes = backupSchema.safeParse(decryptedData);
         if (!parseRes.success) {
             await logger.error('Invalid backup data', {
-                parseRes
+                error: parseRes.error
             });
             return Result.err('Backup data is invalid');
         }
@@ -217,7 +224,7 @@ export namespace BackupServer {
                 return await Entry.create(
                     auth,
                     labels,
-                    entry.title || '',
+                    entry.title,
                     entry.body,
                     entry.created || 0,
                     entry.createdTzOffset || 0,
@@ -227,8 +234,8 @@ export namespace BackupServer {
                     entry.longitude ?? null,
                     labelsIndexedByName[entry.labelName || '']?.id ?? null,
                     entry.agentData,
-                    entry.wordCount,
-                    entry.edits.map(edit => ({
+                    entry.wordCount ?? wordCount(entry.body),
+                    entry.edits?.map(edit => ({
                         oldTitle: edit.oldTitle,
                         oldBody: edit.oldBody,
                         oldLabelId: labelsIndexedByName[edit.oldLabelName || '']?.id ?? null,
@@ -237,7 +244,7 @@ export namespace BackupServer {
                         latitude: edit.latitude ?? null,
                         longitude: edit.longitude ?? null,
                         agentData: edit.agentData
-                    }))
+                    })) ?? []
                 );
             })
         );

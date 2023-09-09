@@ -68,7 +68,7 @@
     <div>
         <h1>Enable JavaScript</h1>
         <p>
-            Halcyon.Land requires JavaScript to be enabled to function. Please enable JavaScript and
+            Everywhen requires JavaScript to be enabled to function. Please enable JavaScript and
             refresh the page.
         </p>
     </div>

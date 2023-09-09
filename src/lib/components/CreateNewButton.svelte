@@ -1,5 +1,6 @@
 <script lang="ts">
     import Calendar from 'svelte-material-icons/Calendar.svelte';
+    import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import BulletPoints from 'svelte-material-icons/FormatListBulleted.svelte';
     import Pencil from 'svelte-material-icons/Pencil.svelte';
     import Moon from 'svelte-material-icons/MoonWaningCrescent.svelte';
@@ -122,10 +123,12 @@
         <stop offset={1} stop-color="rgb(213,231,227)" />
     </linearGradient>
 </svg>
+
 <Dropdown openOnHover width="170px">
-    <div class="with-icon w-full" slot="button">
+    <div class="open-button" slot="button">
         <Plus size="25" />
         New
+        <ChevronDown />
     </div>
 
     <div class="record-something-buttons">
@@ -161,6 +164,15 @@
 </Dropdown>
 
 <style lang="scss">
+    .open-button {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        width: 100%;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
     .record-something-buttons {
         display: block;
         padding: 0.8rem 0 0.8rem 0;

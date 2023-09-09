@@ -3,7 +3,7 @@
 </script>
 
 <svelte:head>
-    <title>{$page.status} | Halcyon.Land</title>
+    <title>{$page.status} | Everywhen</title>
 </svelte:head>
 
 <main>

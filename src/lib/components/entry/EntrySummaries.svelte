@@ -5,7 +5,6 @@
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import { Entry, type EntrySummary } from '$lib/controllers/entry/entry';
     import { showPopup } from '$lib/utils/popups';
-    import { obfuscate } from '$lib/utils/text';
     import { currentTzOffset, fmtUtc, nowUtc, utcEq } from '$lib/utils/time';
     import EntryDialog from '$lib/components/dialogs/EntryDialog.svelte';
     import Dot from '../Dot.svelte';
@@ -129,16 +128,12 @@
 
                         <LabelDot name={entry.label?.name} color={entry.label?.color || null} />
 
-                        <span class="title {obfuscated ? 'obfuscated' : ''}">
+                        <span class="title" class:obfuscated>
                             {#if entry.titleShortened}
-                                {obfuscated
-                                    ? obfuscate(entry.titleShortened)
-                                    : entry.titleShortened}
+                                {entry.titleShortened}
                             {:else}
                                 <i class="text-light">
-                                    {obfuscated
-                                        ? obfuscate(entry.bodyShortened)
-                                        : entry.bodyShortened}{#if entry.bodyShortened.length >= Entry.TITLE_LENGTH_CUTOFF}...
+                                    {entry.bodyShortened}{#if entry.bodyShortened.length >= Entry.TITLE_LENGTH_CUTOFF}...
                                     {/if}
                                 </i>
                             {/if}

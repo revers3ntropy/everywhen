@@ -1,16 +1,5 @@
 import DomPurify from 'dompurify';
 import { marked } from 'marked';
-import { OBFUSCATE_CHARS } from '../constants';
-
-export function obfuscate(str: string, _alphabet = OBFUSCATE_CHARS): string {
-    return str;
-    // return str.replace(/./g, char => {
-    //     if (char === '\n') {
-    //         return char;
-    //     }
-    //     return alphabet[Math.floor(Math.random() * alphabet.length)];
-    // });
-}
 
 function intlSegmenterSupported() {
     return typeof Intl !== 'undefined' && typeof Intl.Segmenter !== 'undefined';
@@ -54,7 +43,7 @@ export function roundToDecimalPlaces(num: number, n: number = 1): number {
     return Math.round(num * 10 ** n) / 10 ** n;
 }
 
-export function rawMdToHtml(md: string, obfuscated = false): string {
+export function rawMdToHtml(md: string): string {
     // this is pretty dumb...
     // https://github.com/markedjs/marked/issues/2793
     marked.use({
@@ -62,7 +51,7 @@ export function rawMdToHtml(md: string, obfuscated = false): string {
         headerIds: false
     });
 
-    return DomPurify.sanitize(marked.parse(obfuscated ? obfuscate(md) : md));
+    return DomPurify.sanitize(marked.parse(md));
 }
 
 export function limitStrLen(str: string, len: number, append = '..'): string {
@@ -72,20 +61,39 @@ export function limitStrLen(str: string, len: number, append = '..'): string {
     return `${str.substring(0, len - 1)}${append}`;
 }
 
-export function fmtBytes(bytes: number): string {
+export function fmtBytes(bytes: number, precision = 3): string {
     if (bytes < 0) {
         return `-${fmtBytes(-bytes)}`;
     }
-    if (bytes < 1000) {
+    if (bytes < 100) {
         return `${bytes}B`;
     }
+    if (bytes < 1000) {
+        return `${bytes.toPrecision(precision)}B`;
+    }
     if (bytes < 1000 * 1000) {
-        return `${roundToDecimalPlaces(bytes / 1000)}KB`;
+        return `${(bytes / 1000).toPrecision(precision)}KB`;
     }
     if (bytes < 1000 * 1000 * 1000) {
-        return `${roundToDecimalPlaces(bytes / 1000 / 1000)}MB`;
+        return `${(bytes / 1000 / 1000).toPrecision(precision)}MB`;
     }
-    return `${roundToDecimalPlaces(bytes / 1000 / 1000 / 1000)}GB`;
+    return `${(bytes / 1000 / 1000 / 1000).toPrecision(precision)}GB`;
+}
+
+export function fmtTimePrecise(ms: number, precision = 3): string {
+    if (ms < 100) {
+        return `${ms.toPrecision(2)}ms`;
+    }
+    if (ms < 1000) {
+        return `${ms.toPrecision(precision)}ms`;
+    }
+    if (ms < 1000 * 60) {
+        return `${(ms / 1000).toPrecision(precision)}s`;
+    }
+    if (ms < 1000 * 60 * 60) {
+        return `${(ms / 1000 / 60).toPrecision(precision)}m`;
+    }
+    return `${(ms / 1000 / 60 / 60).toPrecision(precision)}h`;
 }
 
 export function removeAnsi(str: string): string {

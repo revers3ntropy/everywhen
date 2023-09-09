@@ -1,10 +1,10 @@
 <script lang="ts">
     import Logo from '$lib/components/Logo.svelte';
-    import ArrowRightThinCircleOutline from 'svelte-material-icons/ArrowRightThinCircleOutline.svelte';
+    import ArrowRightThinCircleOutline from 'svelte-material-icons/ArrowRight.svelte';
 </script>
 
 <svelte:head>
-    <title>Halcyon.Land</title>
+    <title>Everywhen</title>
     <meta content="Journaling and Life Logging App" name="description" />
 </svelte:head>
 
@@ -13,10 +13,10 @@
         <Logo />
     </div>
     <div>
-        <h1> Halcyon.Land <span class="beta"> beta </span> </h1>
+        <h1> <span class="serif">Everywhen</span> <span class="beta"> beta </span> </h1>
         <p> YOUR JOURNAL AND LIFE LOG </p>
 
-        <a href="./login" class="primary with-icon">
+        <a href="./login" class="primary with-icon serif">
             Start Writing <ArrowRightThinCircleOutline size="20" />
         </a>
     </div>

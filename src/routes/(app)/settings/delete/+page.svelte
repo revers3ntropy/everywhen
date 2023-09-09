@@ -34,7 +34,7 @@
 
 <svelte:head>
     <title>Delete Account</title>
-    <meta content="Delete halcyon.Land account" name="description" />
+    <meta content="Delete Everywhen account" name="description" />
 </svelte:head>
 
 <main>

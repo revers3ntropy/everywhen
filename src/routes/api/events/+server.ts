@@ -24,7 +24,7 @@ export const POST = (async ({ request, cookies }) => {
         name: z.string(),
         start: z.number(),
         end: z.number(),
-        label: z.string().nullable()
+        label: z.string().nullable().default(null)
     });
 
     // check label exists

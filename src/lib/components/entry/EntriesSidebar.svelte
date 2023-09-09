@@ -123,8 +123,7 @@
             <section class="container" style="padding: 1rem">
                 {#each Object.entries(nYearsAgo) as [date, entries] (date)}
                     <h3>
-                        <!-- bit of a hack... -->
-                        {fmtUtcRelative(entries[0].created, 'en-full')} since...
+                        {fmtUtcRelative(new Date(date), 'en-full')} since...
                     </h3>
                     <EntrySummaries
                         titles={{

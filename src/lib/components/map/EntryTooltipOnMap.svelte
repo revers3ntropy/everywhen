@@ -6,7 +6,6 @@
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { obfuscated } from '$lib/stores';
     import UtcTime from '../UtcTime.svelte';
-    import { obfuscate } from '$lib/utils/text';
 
     export let id: string;
     export let entry: Entry | null = null;
@@ -37,17 +36,10 @@
                 tzOffset={entry.createdTzOffset}
             />
         </div>
-        {#if !$obfuscated}
-            {#if entry.title}
-                <h3 class="ellipsis">{entry.title}</h3>
-            {/if}
-            <p>{entry.body}</p>
-        {:else}
-            {#if entry.title}
-                <h3 class="ellipsis obfuscated">{obfuscate(entry.title)}</h3>
-            {/if}
-            <p class="obfuscated">{obfuscate(entry.body)}</p>
+        {#if entry.title}
+            <h3 class="ellipsis" class:obfuscated>{entry.title}</h3>
         {/if}
+        <p class:obfuscated>{entry.body}</p>
     {:else}
         <p>Loading...</p>
     {/if}

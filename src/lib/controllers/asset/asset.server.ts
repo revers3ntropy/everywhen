@@ -47,6 +47,7 @@ namespace AssetServer {
         created?: TimestampSecs,
         publicId?: string
     ): Promise<Result<{ publicId: string; id: string }>> {
+        publicId ??= await UId.generate();
         fileNamePlainText ??= `${publicId}`;
 
         const canCreate = await canCreateAssetWithNameAndContent(
@@ -56,7 +57,6 @@ namespace AssetServer {
         );
         if (canCreate !== true) return Result.err(canCreate);
 
-        publicId ??= await UId.generate();
         const id = await UId.generate();
 
         const encryptedContents = encrypt(contentsPlainText, auth.key);

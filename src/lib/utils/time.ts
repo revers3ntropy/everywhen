@@ -67,7 +67,10 @@ export function fmtDuration(time: Seconds): string {
     return moment.duration(time, 's').humanize();
 }
 
-export function fmtUtcRelative(timestamp: TimestampSecs, locale = 'en'): string {
+export function fmtUtcRelative(timestamp: TimestampSecs | Date, locale = 'en'): string {
+    if (timestamp instanceof Date) {
+        timestamp = Math.floor(timestamp.getTime() / 1000);
+    }
     return moment(timestamp * 1000)
         .utc()
         .locale(locale)

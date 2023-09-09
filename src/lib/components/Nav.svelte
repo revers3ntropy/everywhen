@@ -4,6 +4,7 @@
     import { Backup } from '$lib/controllers/backup/backup';
     import { tooltip } from '@svelte-plugins/tooltips';
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
+    import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import Cog from 'svelte-material-icons/Cog.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
     import DownloadLock from 'svelte-material-icons/DownloadLock.svelte';
@@ -46,8 +47,9 @@
     <div>
         <Dropdown width="200px">
             <div class="account-button" slot="button">
-                <span> <Streaks condensed /> </span>
-                <span> {$username || '...'} </span>
+                <p> {$username || '...'} </p>
+                <Streaks condensed />
+                <ChevronDown />
             </div>
 
             <div class="account-dropdown-options">
@@ -95,7 +97,11 @@
             </div>
         </Dropdown>
 
-        <div class="p-2">
+        <div class="w-fit p-2 border-r bordered ml-2 mt-3">
+            <CreateNewButton />
+        </div>
+
+        <div class="p-3 pt-3">
             <button
                 class="with-icon"
                 aria-label={$obfuscated ? 'Show all' : 'Hide all'}
@@ -109,10 +115,6 @@
                     Hide all
                 {/if}
             </button>
-        </div>
-
-        <div class="p-2">
-            <CreateNewButton />
         </div>
 
         {#if $settingsStore.passcode.value}
@@ -160,16 +162,16 @@
         </a>
         <a
             href="/stats"
-            aria-label="statistics"
             class="nav-link"
             class:current={$page.url.pathname.startsWith('/stats')}
+            aria-label="statistics"
         >
             <Counter size="35" />
             <span class="hide-mobile"> Insights </span>
         </a>
     </div>
 
-    <div class="text-3xl tracking-wide text-center flex justify-center items-end">
+    <div class="text-2xl tracking-wide text-center flex justify-center items-end">
         <p class="serif pb-2">Everywhen</p>
     </div>
 </nav>
@@ -206,14 +208,18 @@
     .account-button {
         width: $nav-width;
         display: grid;
-        grid-template-columns: auto 1fr;
-        gap: 1rem;
+        grid-template-columns: 1fr auto auto;
+        gap: 0.25rem;
         align-items: center;
         justify-content: flex-start;
         background: var(--v-light-accent);
-        padding: 0.5rem;
+        padding: 0.75rem;
         text-align: left;
         border-radius: 0 0 $border-radius 0;
+
+        &:hover {
+            background: var(--light-accent);
+        }
     }
 
     .account-dropdown {

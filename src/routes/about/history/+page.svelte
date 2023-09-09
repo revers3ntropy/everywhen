@@ -3,7 +3,7 @@
 </script>
 
 <svelte:head>
-    <title>Version History | Halcyon.Land</title>
+    <title>Version History | Everywhen</title>
 </svelte:head>
 
 <main class="flex-center">
@@ -27,6 +27,13 @@
                 <li>Tags with '#' in entry</li>
                 <li>Opt in to sharing stats with other users - Leaderboards</li>
                 <li>'Hidden Tab' mode</li>
+            </ul>
+        </section>
+        <section>
+            <h2>0.6</h2>
+            <ul>
+                <li>Move to everywhen.me from halcyon.land</li>
+                <li>Merge Home and Journal</li>
             </ul>
         </section>
         <section>

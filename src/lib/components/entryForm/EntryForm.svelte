@@ -1,9 +1,10 @@
 <script lang="ts">
     import { browser } from '$app/environment';
     import { beforeNavigate, goto } from '$app/navigation';
-    import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
     import InsertImage from '$lib/components/asset/InsertImage.svelte';
+    import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
     import { Asset } from '$lib/controllers/asset/asset';
+    import type { SettingsKey } from '$lib/controllers/settings/settings';
     import { dispatch, listen } from '$lib/dataChangeEvents';
     import { Result } from '$lib/utils/result';
     import { serializedAgentData } from '$lib/utils/userAgent';
@@ -18,13 +19,14 @@
     import {
         currentlyUploadingAssets,
         currentlyUploadingEntries,
-        enabledLocation
+        enabledLocation,
+        settingsStore
     } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { getLocation } from '$lib/utils/geolocation';
     import { clientLogger } from '$lib/utils/log';
     import { notify } from '$lib/components/notifications/notifications';
-    import { obfuscate, wordCount } from '$lib/utils/text';
+    import { wordCount } from '$lib/utils/text';
     import { currentTzOffset, nowUtc } from '$lib/utils/time';
     import FormatOptions from './FormatOptions.svelte';
     import LocationToggle from '../location/LocationToggle.svelte';
@@ -45,7 +47,20 @@
     export let newEntryLabel = '';
 
     export let obfuscated = true;
-    export let setEntryFormMode = null as null | ((mode: EntryFormMode) => Promise<void>);
+
+    export let entryFormMode: EntryFormMode;
+
+    async function setEntryFormMode(mode: EntryFormMode) {
+        const newSetting = {
+            key: 'entryFormMode' as SettingsKey,
+            value: mode !== EntryFormMode.Standard
+        };
+        $settingsStore.entryFormMode = {
+            ...$settingsStore.entryFormMode,
+            value: newSetting.value
+        };
+        await api.put('/settings', newSetting);
+    }
 
     function resetEntryForm() {
         newEntryTitle = '';
@@ -54,17 +69,15 @@
     }
 
     function saveToLS() {
-        if (loadFromLS) {
-            localStorage.setItem(LS_KEYS.newEntryTitle, newEntryTitle);
-            localStorage.setItem(LS_KEYS.newEntryBody, newEntryBody);
-            localStorage.setItem(LS_KEYS.newEntryLabel, newEntryLabel);
-        }
+        if (!loadFromLS) return;
+        localStorage.setItem(LS_KEYS.newEntryTitle, newEntryTitle);
+        localStorage.setItem(LS_KEYS.newEntryBody, newEntryBody);
+        localStorage.setItem(LS_KEYS.newEntryLabel, newEntryLabel);
     }
 
     function areUnsavedChanges() {
-        if (!entry || loadFromLS) {
-            return false;
-        }
+        if (!entry || loadFromLS) return false;
+
         // check for unsaved changes
         return (
             entry.title !== newEntryTitle ||
@@ -223,27 +236,6 @@
         insertAtCursor(newEntryInputElement, `\n${md}\n`);
     }
 
-    async function stopSpaceAndEnterBeingInterceptedByFileDrop() {
-        // TODO do this properly
-        while (!document.getElementsByClassName('entry-file-drop').length) {
-            await new Promise(r => setTimeout(r, 50));
-        }
-        // https://stackoverflow.com/questions/19469881
-        for (const el of document.getElementsByClassName('entry-file-drop')) {
-            el.addEventListener(
-                'keydown',
-                (event: Event) => {
-                    const e = event as KeyboardEvent;
-                    // same check as lib uses
-                    if (e.key === ' ' || e.key === 'Enter') {
-                        e.stopImmediatePropagation();
-                    }
-                },
-                true
-            );
-        }
-    }
-
     async function loadLabels() {
         labels = notify.onErr(await api.get('/labels')).labels;
     }
@@ -255,9 +247,23 @@
     }
 
     function handleEntryInputKeydown(event: KeyboardEvent) {
-        if (event.key !== 'Tab') return;
-        event.preventDefault();
-        insertAtCursor(newEntryInputElement, '\t');
+        switch (event.key) {
+            case 'Tab': {
+                event.preventDefault();
+                insertAtCursor(newEntryInputElement, '\t');
+                break;
+            }
+            case 'Enter': {
+                if (event.shiftKey) {
+                    event.preventDefault();
+                    insertAtCursor(newEntryInputElement, '\n');
+                } else if (event.ctrlKey || entryFormMode === EntryFormMode.Bullet) {
+                    event.preventDefault();
+                    void submit();
+                }
+                break;
+            }
+        }
     }
 
     function pasteText(text: string) {
@@ -279,13 +285,9 @@
         // after editing something in LS, for example making 'Dream' entry from navbar
         // in which case saving would override anything we set there.
 
-        if (submitted || !areUnsavedChanges()) {
-            return;
-        }
+        if (submitted || !areUnsavedChanges()) return;
         const shouldProceed = confirm('You have unsaved changes, are you sure you want to leave?');
-        if (!shouldProceed) {
-            cancel();
-        }
+        if (!shouldProceed) cancel();
     });
 
     onMount(() => {
@@ -303,8 +305,6 @@
         resizeTextAreaToFitContent();
 
         mounted = true;
-
-        void stopSpaceAndEnterBeingInterceptedByFileDrop();
     });
 
     let mounted = false;
@@ -385,40 +385,26 @@
         </div>
     </div>
     <div class="entry-title-container">
-        {#if obfuscated}
-            <input
-                aria-label="Entry Title"
-                value={obfuscate(newEntryTitle)}
-                class="title obfuscated"
-                disabled
-                placeholder="..."
-            />
-        {:else}
-            <input
-                aria-label="Entry Title"
-                bind:value={newEntryTitle}
-                class="title"
-                placeholder="Title (optional)"
-                disabled={submitted}
-            />
-        {/if}
+        <input
+            aria-label="Entry Title"
+            bind:value={newEntryTitle}
+            class="title"
+            class:obfuscated
+            placeholder={obfuscated ? '' : 'Title (optional)'}
+            disabled={obfuscated || submitted}
+        />
     </div>
     <div class="entry-container">
-        {#if obfuscated}
-            <textarea placeholder="..." aria-label="Entry Body" disabled class="obfuscated"
-                >{obfuscate(newEntryBody)}</textarea
-            >
-        {:else}
-            <textarea
-                bind:this={newEntryInputElement}
-                bind:value={newEntryBody}
-                on:keydown={handleEntryInputKeydown}
-                use:paste={{ handleText: pasteText, handleFiles: pasteFiles }}
-                disabled={submitted}
-                aria-label="Entry Body"
-                placeholder="Start writing here..."
-            />
-        {/if}
+        <textarea
+            bind:this={newEntryInputElement}
+            bind:value={newEntryBody}
+            on:keydown={handleEntryInputKeydown}
+            use:paste={{ handleText: pasteText, handleFiles: pasteFiles }}
+            disabled={obfuscated || submitted}
+            aria-label="Entry Body"
+            placeholder={obfuscated ? '' : 'Start writing here...'}
+            class:obfuscated
+        />
     </div>
 
     <div class="send-mobile flex-center">

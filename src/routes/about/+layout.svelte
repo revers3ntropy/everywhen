@@ -1,6 +1,6 @@
 <main>
     <div>
-        <a href="/"> Halcyon.Land </a>
+        <a href="/"> Everywhen </a>
         <div class="content">
             <slot />
         </div>
