@@ -1,5 +1,20 @@
 @import 'variables';
 
+.serif {
+    font-family: 'DM Serif Display', serif;
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
+}
+
+.redacted {
+    font-family: 'Redacted Script', 'Redacted', cursive;
+}
+
+.mono {
+    font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo,
+    Consolas, Liberation Mono, monospace;
+}
+
 h1, h2, p {
     font-weight: 400;
 }
@@ -45,13 +60,12 @@ h2 {
 }
 
 code {
+    @extend .mono;
     background-color: var(--light-accent);
     border-radius: 5px;
     padding: 0.3em;
     overflow-x: auto;
     color: var(--text-color);
-    font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo,
-                 Consolas, Liberation Mono, monospace;
     font-size: 0.95rem;
 }
 
@@ -71,7 +85,8 @@ pre {
 .obfuscated {
     &, * {
         color: transparent !important;
-        text-shadow: 0 0 4px var(--text-color-light) !important;
+        text-shadow: 0 0 2px var(--text-color-light) !important;
+        @extend .redacted;
     }
 }
 

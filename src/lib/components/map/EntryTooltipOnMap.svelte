@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { notify } from '$lib/components/notifications/notifications.js';
     import { onMount } from 'svelte';
     import Dot from '$lib/components/Dot.svelte';
     import type { Entry } from '$lib/controllers/entry/entry';
@@ -9,17 +10,11 @@
 
     export let id: string;
     export let entry: Entry | null = null;
-    let error: string | null = null;
 
     async function getEntry() {
         if (entry) return;
 
-        const { err, val } = await api.get(apiPath('/entries/?', id));
-        if (err) {
-            error = err;
-            return;
-        }
-        entry = val;
+        entry = notify.onErr(await api.get(apiPath('/entries/?', id)));
     }
 
     onMount(getEntry);
@@ -53,9 +48,6 @@
             {/if}
             <p class="obfuscated">{obfuscate(entry.body)}</p>
         {/if}
-    {:else if error}
-        <h2 class="text-warning">Error</h2>
-        <p>{error}</p>
     {:else}
         <p>Loading...</p>
     {/if}

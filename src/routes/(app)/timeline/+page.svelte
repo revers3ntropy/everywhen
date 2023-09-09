@@ -87,20 +87,10 @@
         body,
         .root {
             max-height: 100vh;
-            background: var(--light-accent);
+            background: var(--light-accent) !important;
 
             &::-webkit-scrollbar {
                 display: none;
-            }
-        }
-
-        nav {
-            // make navbar visible when hovering to stop unexpected
-            // behaviour when hovering on navbar
-            transition: background-color #{$transition};
-
-            &:hover {
-                background-color: var(--v-light-accent);
             }
         }
     </style>

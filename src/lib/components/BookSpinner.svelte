@@ -149,14 +149,14 @@
         $delay: $i * 1.86;
         $delay-after: $i * 1.74;
         @keyframes page-#{$i} {
-            #{4 + $delay}% {
+            #{4 + $delay}#{'%'} {
                 transform: rotateZ(0deg) translateX(-18px);
             }
-            #{13 + $delay-after}%,
-            #{54 + $delay}% {
+            #{13 + $delay-after}#{'%'},
+            #{54 + $delay}#{'%'} {
                 transform: rotateZ(180deg) translateX(-18px);
             }
-            #{63 + $delay-after}% {
+            #{63 + $delay-after}#{'%'} {
                 transform: rotateZ(0deg) translateX(-18px);
             }
         }

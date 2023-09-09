@@ -7,30 +7,25 @@ interface ResultOption<T, E = string> {
 
     mapErr<R>(fn: (err: E) => R): Result<T, R>;
 
-    mapToResult<R>(fn: (val: T) => Result<R, E>): Result<R, E>;
+    pipe<R>(fn: (val: T) => Result<R, E>): Result<R, E>;
+    pipeAsync<R>(fn: (val: T) => Promise<Result<R, E>>): Promise<Result<R, E>>;
 
     unwrap(mapErr?: (err: E) => unknown): T;
 
-    or(_fallback: T): T;
+    or(fallback: T): T;
 
     merge(): T | E;
 }
 
 export namespace Result {
-    // Create new `Ok` variant.
-    // The reason the Ok variant is not exposed directly is that
-    // `Result.ok(value)` is just a little clearer than `new Ok(value)` in my opinion,
-    // although both are very reasonable.
     export function ok<T, E = string>(value: T = null as T): Result<T, E> {
         return new Ok(value);
     }
 
-    // Create new `Err` variant.
     export function err<T, E = string>(error: E): Result<T, E> {
         return new Err<T, E>(error);
     }
 
-    // convert from traditional JS `throw` to `Result`
     export function wrap<T>(fn: () => T): Result<T, unknown> {
         try {
             return Result.ok(fn());
@@ -39,8 +34,7 @@ export namespace Result {
         }
     }
 
-    // Async equivalent for `wrap`
-    export async function wrapAsync<T>(promise: Promise<T>): Promise<Result<T, unknown>> {
+    export async function wrapPromise<T>(promise: Promise<T>): Promise<Result<T, unknown>> {
         try {
             return Result.ok(await promise);
         } catch (e: unknown) {
@@ -48,8 +42,6 @@ export namespace Result {
         }
     }
 
-    // Extracts the first Err variant if there is one, and otherwise returns the array as the `val`s of each element,
-    // Especially useful if you are `map`ing over an array and need to return a `Result` inside the map.
     export function collect<T, E>(iter: Iterable<Result<T, E>>): Result<T[], E> {
         const results: T[] = [];
         for (const result of iter) {
@@ -75,7 +67,6 @@ export namespace Result {
         );
     }
 
-    // Converts an array of `Result`s into two arrays of the combined `val`s and `err`s.
     export function filter<T, E = string>(iter: Iterable<Result<T, E>>): [T[], E[]] {
         const results: T[] = [];
         const errors: E[] = [];
@@ -90,9 +81,6 @@ export namespace Result {
 }
 
 class Ok<T, E> implements ResultOption<T, E> {
-    // The `as const` part is the real magic:
-    // Typescript will now know that if `myResult.ok` is true, then it must be the `Ok` variant
-    // of a `Result` and not the `Err` variant.
     public ok = true as const;
     public constructor(public readonly val: T) {}
 
@@ -104,23 +92,16 @@ class Ok<T, E> implements ResultOption<T, E> {
         return this as unknown as Result<T, R>;
     }
 
-    public mapToResult<R = T>(fn: (_val: T) => Result<R, E>): Result<R, E> {
+    public pipe<R>(fn: (_val: T) => Result<R, E>): Result<R, E> {
+        return fn(this.val);
+    }
+
+    public pipeAsync<R>(fn: (_val: T) => Promise<Result<R, E>>): Promise<Result<R, E>> {
         return fn(this.val);
     }
 
     public match<U = T, V = E>(mapVal: (_val: T) => U, _: (_err: E) => V): U {
         return mapVal(this.val);
-    }
-
-    public transform<U = T, V = E>(mapVal: (_val: T) => U, _?: (_err: E) => V): Result<U, V> {
-        return Result.ok(mapVal(this.val));
-    }
-
-    public async transformAsync<U = T, V = E>(
-        mapVal: (_val: T) => Promise<U>,
-        _?: (_err: E) => Promise<V>
-    ): Promise<Result<U, V>> {
-        return Result.ok(await mapVal(this.val));
     }
 
     public unwrap(_mapErr?: (err: E) => unknown): T {
@@ -152,8 +133,12 @@ class Err<T, E> implements ResultOption<unknown, E> {
         return Result.err(fn(this.err));
     }
 
-    public mapToResult<R = T>(_fn: (_val: T) => Result<R, E>): Result<R, E> {
+    public pipe<R = T>(_fn: (_val: T) => Result<R, E>): Result<R, E> {
         return this as unknown as Result<R, E>;
+    }
+
+    public pipeAsync<R>(_fn: (_val: T) => Promise<Result<R, E>>): Promise<Result<R, E>> {
+        return Promise.resolve(this as unknown as Result<R, E>);
     }
 
     public match<U, V>(_: (_val: T) => U, mapErr: (_err: E) => V): V {

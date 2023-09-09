@@ -158,11 +158,7 @@
 {/if}
 
 <span class="nav-loader-wrapper">
-    <span
-        class="nav-loader {navigating ? 'navigating' : ''} {finishedNavigation
-            ? 'finished-navigation'
-            : ''}"
-    />
+    <span class="nav-loader" class:navigating class:finished-navigation={finishedNavigation} />
 </span>
 
 <Nav />
@@ -174,10 +170,10 @@
 <style lang="scss">
     .page-content {
         min-height: calc(100vh - var(--nav-height));
-        padding: 1rem 1rem 12rem 12rem;
+        padding: 0 0 12rem 12rem;
 
         @media #{$mobile} {
-            padding: 5px 5px 200px 5px;
+            padding: 0 0 200px 5px;
         }
     }
 

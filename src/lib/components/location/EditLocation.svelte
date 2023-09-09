@@ -8,7 +8,7 @@
     import { popup } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
-    import { round1DP } from '$lib/utils/text';
+    import { roundToDecimalPlaces } from '$lib/utils/text';
 
     export let isInDialog = false;
     export let id: string;
@@ -96,7 +96,7 @@
             on:change={onRadiusChange}
             step="0.1"
             type="number"
-            value={round1DP(Location.degreesToMetersPrecise(radius, 1, 1, latitude))}
+            value={roundToDecimalPlaces(Location.degreesToMetersPrecise(radius, 1, 1, latitude))}
             style="width: 100px"
         />
         m

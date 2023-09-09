@@ -8,7 +8,7 @@
     $: datasetsByPresetId = datasets.reduce(
         (acc, dataset) => {
             if (dataset.preset) {
-                acc[dataset.preset.id] = dataset;
+                acc[dataset.preset.id as PresetId] = dataset;
             }
             return acc;
         },

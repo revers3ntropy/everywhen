@@ -35,8 +35,8 @@ namespace DatasetServer {
         auth: Auth,
         datasetId?: string
     ): Promise<Result<DatasetColumn<unknown>[]>> {
-        const { val: types, err: typesErr } = allTypes();
-        if (typesErr) return Result.err(typesErr);
+        const typesRes = allTypes();
+        if (!typesRes.ok) return typesRes.cast();
 
         const columns = await query<
             {
@@ -60,17 +60,17 @@ namespace DatasetServer {
 
         return Result.collect(
             columns.map(column => {
-                const type = types[column.typeId];
+                const type = typesRes.val[column.typeId];
                 if (!type) return Result.err('Invalid column type found');
 
-                const { val: name, err: decryptNameErr } = decrypt(column.name, auth.key);
-                if (decryptNameErr) return Result.err(decryptNameErr);
+                const decryptedName = decrypt(column.name, auth.key);
+                if (!decryptedName.ok) return decryptedName.cast();
 
                 return Result.ok({
                     id: column.id,
                     datasetId: column.datasetId,
                     created: column.created,
-                    name,
+                    name: decryptedName.val,
                     type
                 });
             })
@@ -88,12 +88,12 @@ namespace DatasetServer {
             WHERE userId = ${auth.id}
         `;
 
-        const { err: columnsRes, val: usersColumns } = await allUserDefinedColumns(auth);
-        if (columnsRes) return Result.err(columnsRes);
+        const usersColumnsRes = await allUserDefinedColumns(auth);
+        if (!usersColumnsRes.ok) return usersColumnsRes.cast();
 
         for (const dataset of datasets) {
-            const { val: decryptedName, err: decryptedNameErr } = decrypt(dataset.name, auth.key);
-            if (decryptedNameErr) return Result.err(decryptedNameErr);
+            const decryptedName = decrypt(dataset.name, auth.key);
+            if (!decryptedName.ok) return decryptedName.cast();
             let preset: DatasetPreset | null = null;
             if (dataset.presetId) {
                 preset = datasetPresets[dataset.presetId as PresetId];
@@ -107,12 +107,12 @@ namespace DatasetServer {
             if (preset) {
                 columns = preset.columns;
             } else {
-                columns = usersColumns.filter(c => c.datasetId === dataset.id);
+                columns = usersColumnsRes.val.filter(c => c.datasetId === dataset.id);
             }
 
             metadatas.push({
                 id: dataset.id,
-                name: decryptedName,
+                name: decryptedName.val,
                 created: dataset.created,
                 columns,
                 preset
@@ -290,8 +290,8 @@ namespace DatasetServer {
             created?: TimestampSecs;
         }[]
     ): Promise<Result<null>> {
-        const { val: allColumns, err: getColumnsErr } = await allUserDefinedColumns(auth);
-        if (getColumnsErr) return Result.err(getColumnsErr);
+        const allColumnsRes = await allUserDefinedColumns(auth);
+        if (!allColumnsRes.ok) return allColumnsRes.cast();
 
         const maxRowId = await query<{ id: number }[]>`
             SELECT MAX(datasetRows.id) AS id
@@ -319,7 +319,7 @@ namespace DatasetServer {
         if (presetId) {
             columns = datasetPresets[presetId as PresetId].columns;
         } else {
-            columns = allColumns.filter(c => c.datasetId === datasetId);
+            columns = allColumnsRes.val.filter(c => c.datasetId === datasetId);
         }
 
         let nextRowId = maxRowId.length > 0 ? maxRowId[0].id + 1 : 0;

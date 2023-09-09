@@ -2,13 +2,14 @@ import DomPurify from 'dompurify';
 import { marked } from 'marked';
 import { OBFUSCATE_CHARS } from '../constants';
 
-export function obfuscate(str: string, alphabet = OBFUSCATE_CHARS): string {
-    return str.replace(/./g, char => {
-        if (char === '\n') {
-            return char;
-        }
-        return alphabet[Math.floor(Math.random() * alphabet.length)];
-    });
+export function obfuscate(str: string, _alphabet = OBFUSCATE_CHARS): string {
+    return str;
+    // return str.replace(/./g, char => {
+    //     if (char === '\n') {
+    //         return char;
+    //     }
+    //     return alphabet[Math.floor(Math.random() * alphabet.length)];
+    // });
 }
 
 function intlSegmenterSupported() {
@@ -49,11 +50,7 @@ export function numberAsSignedStr(num: number): string {
     return num >= 0 ? `+${num}` : `${num}`;
 }
 
-export function round1DP(num: number): number {
-    return Math.round(num * 10) / 10;
-}
-
-export function roundToDecimalPlaces(num: number, n: number): number {
+export function roundToDecimalPlaces(num: number, n: number = 1): number {
     return Math.round(num * 10 ** n) / 10 ** n;
 }
 
@@ -83,12 +80,12 @@ export function fmtBytes(bytes: number): string {
         return `${bytes}B`;
     }
     if (bytes < 1000 * 1000) {
-        return `${round1DP(bytes / 1000)}KB`;
+        return `${roundToDecimalPlaces(bytes / 1000)}KB`;
     }
     if (bytes < 1000 * 1000 * 1000) {
-        return `${round1DP(bytes / 1000 / 1000)}MB`;
+        return `${roundToDecimalPlaces(bytes / 1000 / 1000)}MB`;
     }
-    return `${round1DP(bytes / 1000 / 1000 / 1000)}GB`;
+    return `${roundToDecimalPlaces(bytes / 1000 / 1000 / 1000)}GB`;
 }
 
 export function removeAnsi(str: string): string {

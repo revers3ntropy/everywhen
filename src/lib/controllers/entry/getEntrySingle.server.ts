@@ -50,15 +50,17 @@ export async function entryFromId(
           AND userId = ${auth.id}
     `;
 
-    if (entries.length !== 1) return Result.err('Entry not found');
+    if (entries.length !== 1) {
+        if (entries.length !== 0) {
+            void logger.error('Multiple entries found', { entries });
+        }
+        return Result.err('Entry not found');
+    }
 
     const [entry] = entries;
     if (mustNotBeDeleted && Entry.isDeleted(entry)) return Result.err('Entry is deleted');
 
-    const { val: labels, err: labelErr } = await Label.allIndexedById(auth);
-    if (labelErr) return Result.err(labelErr);
-
-    return await fromRaw(auth, entry, labels);
+    return (await Label.allIndexedById(auth)).pipeAsync(labels => fromRaw(auth, entry, labels));
 }
 
 async function fromRaw(
@@ -66,17 +68,17 @@ async function fromRaw(
     rawEntry: RawEntry,
     labels: Record<string, Label>
 ): Promise<Result<Entry>> {
-    const { err: titleErr, val: decryptedTitle } = decrypt(rawEntry.title, auth.key);
-    if (titleErr) return Result.err(titleErr);
+    const decryptedTitle = decrypt(rawEntry.title, auth.key);
+    if (!decryptedTitle.ok) return decryptedTitle.cast();
 
-    const { err: entryErr, val: decryptedEntry } = decrypt(rawEntry.body, auth.key);
-    if (entryErr) return Result.err(entryErr);
+    const decryptedBody = decrypt(rawEntry.body, auth.key);
+    if (!decryptedBody.ok) return decryptedBody.cast();
 
     let decryptedAgent = '';
     if (rawEntry.agentData) {
-        const { err: agentErr, val } = decrypt(rawEntry.agentData, auth.key);
-        if (agentErr) return Result.err(agentErr);
-        decryptedAgent = val;
+        const res = decrypt(rawEntry.agentData, auth.key);
+        if (!res.ok) return res.cast();
+        decryptedAgent = res.val;
     }
 
     let label: null | Label = null;
@@ -93,8 +95,8 @@ async function fromRaw(
 
     return Result.ok({
         id: rawEntry.id,
-        title: decryptedTitle,
-        body: decryptedEntry,
+        title: decryptedTitle.val,
+        body: decryptedBody.val,
         created: rawEntry.created,
         createdTzOffset: rawEntry.createdTzOffset,
         pinned: rawEntry.pinned,

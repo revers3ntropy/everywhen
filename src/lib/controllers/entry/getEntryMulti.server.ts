@@ -8,10 +8,10 @@ import { decrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
 
 export async function all(auth: Auth, filter: EntryFilter = {}): Promise<Result<Entry[]>> {
-    let location = null as Location | null;
+    let location: Location | null = null;
     if (filter.locationId) {
         const locationResult = await Location.fromId(auth, filter.locationId);
-        if (locationResult.err) return Result.err(locationResult.err);
+        if (!locationResult.ok) return locationResult.cast();
         location = locationResult.val;
     }
     if (filter.onlyWithLocation && location) {
@@ -138,9 +138,6 @@ export async function getPage(
             OFFSET ${offset}
         `;
 
-        const { val: entries, err } = await entriesFromRaw(auth, rawEntries);
-        if (err) return Result.err(err);
-
         const [{ totalCount }] = await query<{ totalCount: number }[]>`
             SELECT COUNT(*) as totalCount
             FROM entries
@@ -152,17 +149,15 @@ export async function getPage(
               AND userId = ${auth.id}
         `;
 
-        return Result.ok([entries, totalCount]);
+        return (await entriesFromRaw(auth, rawEntries)).map(entries => [entries, totalCount]);
     }
 
     const start = offset;
     const end = start + count;
-    const { val: entries, err } = await all(auth, filter);
-    if (err) return Result.err(err);
-
-    const filtered = filterEntriesBySearchTerm(entries, filter.search || '');
-
-    return Result.ok([filtered.slice(start, end), filtered.length]);
+    return (await all(auth, filter)).map(entries => {
+        const filtered = filterEntriesBySearchTerm(entries, filter.search || '');
+        return [filtered.slice(start, end), filtered.length];
+    });
 }
 
 export async function near(
@@ -253,15 +248,13 @@ async function entriesFromRaw(auth: Auth, raw: RawEntry[]): Promise<Result<Entry
         WHERE entryEdits.userId = ${auth.id}
     `;
 
-    const { err, val: labels } = await Label.allIndexedById(auth);
-    if (err) return Result.err(err);
+    const labels = await Label.allIndexedById(auth);
+    if (!labels.ok) return labels.cast();
 
-    const { err: editsErr, val: edits } = Result.collect(
-        rawEdits.map(e => Entry.editFromRaw(auth, labels, e))
-    );
-    if (editsErr) return Result.err(editsErr);
+    const edits = Result.collect(rawEdits.map(e => Entry.editFromRaw(auth, labels.val, e)));
+    if (!edits.ok) return edits.cast();
 
-    const groupedEdits = edits.reduce(
+    const groupedEdits = edits.val.reduce(
         (prev, edit) => {
             if (!edit.entryId) return prev;
             prev[edit.entryId] ??= [];
@@ -273,23 +266,23 @@ async function entriesFromRaw(auth: Auth, raw: RawEntry[]): Promise<Result<Entry
 
     return Result.collect(
         raw.map(rawEntry => {
-            const { err: titleErr, val: decryptedTitle } = decrypt(rawEntry.title, auth.key);
-            if (titleErr) return Result.err(titleErr);
+            const decryptedTitle = decrypt(rawEntry.title, auth.key);
+            if (!decryptedTitle.ok) return decryptedTitle.cast();
 
-            const { err: bodyErr, val: decryptedBody } = decrypt(rawEntry.body, auth.key);
-            if (bodyErr) return Result.err(bodyErr);
+            const decryptedBody = decrypt(rawEntry.body, auth.key);
+            if (!decryptedBody.ok) return decryptedBody.cast();
 
             let decryptedAgentData = '';
             if (rawEntry.agentData) {
-                const { err: agentErr, val } = decrypt(rawEntry.agentData, auth.key);
-                if (agentErr) return Result.err(agentErr);
-                decryptedAgentData = val;
+                const res = decrypt(rawEntry.agentData, auth.key);
+                if (!res.ok) return res.cast();
+                decryptedAgentData = res.val;
             }
 
             return Result.ok({
                 id: rawEntry.id,
-                title: decryptedTitle,
-                body: decryptedBody,
+                title: decryptedTitle.val,
+                body: decryptedBody.val,
                 created: rawEntry.created,
                 createdTzOffset: rawEntry.createdTzOffset,
                 deleted: rawEntry.deleted,
@@ -298,7 +291,7 @@ async function entriesFromRaw(auth: Auth, raw: RawEntry[]): Promise<Result<Entry
                 longitude: rawEntry.longitude,
                 agentData: decryptedAgentData,
                 wordCount: rawEntry.wordCount,
-                label: labels[rawEntry?.labelId || ''] || null,
+                label: labels.val[rawEntry?.labelId || ''] || null,
                 edits: groupedEdits[rawEntry.id] ?? []
             });
         })

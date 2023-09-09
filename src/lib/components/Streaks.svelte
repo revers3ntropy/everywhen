@@ -33,16 +33,16 @@
     async function loadStreaks() {
         loaded = false;
 
-        const { err, val } = await api.get('/entries/streaks', {
+        const streaksRes = await api.get('/entries/streaks', {
             tz: currentTzOffset(),
             // cache busting - otherwise streaks are static through day changes
             x: fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD')
         });
-        if (err) {
-            clientLogger.error('Failed to get streaks', { err });
-            error = err;
+        if (!streaksRes.ok) {
+            clientLogger.error('Failed to get streaks', { streaksRes });
+            error = streaksRes.err;
         } else {
-            streaks = val;
+            streaks = streaksRes.val;
         }
         loaded = true;
     }
@@ -63,9 +63,6 @@
     let tooltipContent = 'Loading...';
     $: if (streaks) {
         tooltipContent =
-            (streaks.longest > 0
-                ? `<div class="oneline">Longest: ${streaks.longest} days</div>`
-                : '') +
             (streaks.runningOut ? '<div>Make an entry today to continue the Streak!</div>' : '') +
             (streaks.current < 1 ? '<div>Make an entry to start a Streak!</div>' : '');
     }
@@ -74,7 +71,7 @@
 {#key streaks}
     {#if loaded}
         {#if error}
-            ???
+            Error
         {:else if streaks}
             {#if condensed}
                 <span class="flex-center">
@@ -106,15 +103,20 @@
                     {:else}
                         <Fire size="25" />
                     {/if}
-                    <span class="flex-center" style="justify-content: start">
-                        <span style="height: 100%;">
-                            Streak:
+                    <div class="py-1">
+                        <div class="oneline">
                             <b>
                                 {streaks.current}
                             </b>
-                            days
-                        </span>
-                    </span>
+                            day streak
+                        </div>
+                        <div class="oneline">
+                            <b>
+                                {streaks.longest}
+                            </b>
+                            longest
+                        </div>
+                    </div>
                 </span>
             {/if}
         {/if}

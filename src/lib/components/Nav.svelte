@@ -12,7 +12,7 @@
     import Lock from 'svelte-material-icons/Lock.svelte';
     import Logout from 'svelte-material-icons/Logout.svelte';
     import MapMarkerOutline from 'svelte-material-icons/MapMarkerOutline.svelte';
-    import Notebook from 'svelte-material-icons/Notebook.svelte';
+    import Notebook from 'svelte-material-icons/NotebookOutline.svelte';
     import LightTheme from 'svelte-material-icons/WhiteBalanceSunny.svelte';
     import DarkTheme from 'svelte-material-icons/WeatherNight.svelte';
     import Dropdown from '$lib/components/Dropdown.svelte';
@@ -51,6 +51,10 @@
             </div>
 
             <div class="account-dropdown-options">
+                <Streaks />
+
+                <hr />
+
                 <button
                     aria-label="download encrypted backup"
                     class="account-dropdown-button"
@@ -164,6 +168,10 @@
             <span class="hide-mobile"> Insights </span>
         </a>
     </div>
+
+    <div class="text-3xl tracking-wide text-center flex justify-center items-end">
+        <p class="serif pb-2">Everywhen</p>
+    </div>
 </nav>
 
 <style lang="scss">
@@ -183,8 +191,9 @@
         // increased to 5 so that on mobile the nav buttons are not cut off
         // by entry group titles
         z-index: 5;
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-rows: 1fr 1fr 1fr;
+        background-color: var(--background-color);
 
         @media #{$mobile} {
             display: block;
@@ -201,7 +210,7 @@
         gap: 1rem;
         align-items: center;
         justify-content: flex-start;
-        background: var(--light-accent);
+        background: var(--v-light-accent);
         padding: 0.5rem;
         text-align: left;
         border-radius: 0 0 $border-radius 0;
@@ -215,8 +224,9 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: space-between;
+        justify-content: center;
         gap: 4px;
+        padding: 0 0.5rem 0 0;
 
         @media #{$mobile} {
             position: fixed;
@@ -244,8 +254,8 @@
             padding: 0.25rem;
             text-decoration: none;
 
-            :global(*) {
-                transition: $transition;
+            & {
+                transition: background $transition;
             }
 
             &:hover {
@@ -254,6 +264,7 @@
 
             &.current {
                 background: var(--primary-light);
+                font-weight: 600;
             }
         }
     }

@@ -74,9 +74,7 @@ namespace EventServer {
         }
         const [event] = events;
 
-        return (await Label.allIndexedById(auth)).mapToResult(labels =>
-            fromRaw(auth, event, labels)
-        );
+        return (await Label.allIndexedById(auth)).pipe(labels => fromRaw(auth, event, labels));
     }
 
     export function fromRaw(

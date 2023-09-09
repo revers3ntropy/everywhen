@@ -44,7 +44,7 @@
     export let locations = [] as Location[];
     export let entriesInteractable = true;
     export let width = '100%';
-    export let height = 'calc(100vh - 1rem)';
+    export let height = '100vh';
     export let mobileWidth = '100%';
     export let mobileHeight = 'calc(100vh - 5rem)';
 
@@ -68,14 +68,11 @@
         );
     }
 
-    async function addNamedLocation(object: CallbackObject) {
-        const coordinate = object.coordinate;
-        const [long, lat] = toLonLat(coordinate);
-
+    async function addNamedLocation(lat: number, lng: number) {
         notify.onErr(
             await api.post('/locations', {
                 latitude: lat,
-                longitude: long,
+                longitude: lng,
                 name: 'New Location',
                 radius: Location.metersToDegrees(50)
             })
@@ -218,7 +215,11 @@
                     {
                         text: 'Add Named Location',
                         classname: 'context-menu-option',
-                        callback: (o: CallbackObject) => void addNamedLocation(o)
+                        callback: (o: CallbackObject) => {
+                            const coordinate = o.coordinate;
+                            const [lng, lat] = toLonLat(coordinate);
+                            void addNamedLocation(lat, lng);
+                        }
                     }
                 ]
             })

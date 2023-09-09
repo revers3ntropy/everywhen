@@ -4,7 +4,8 @@ $border-radius: 8px;
 
 $mobile-nav-height: 60px;
 
-$transition: 200ms ease;
+$transition: 200ms ease-in-out;
+$transition-long: 400ms ease-in-out;
 
 $mobile: "only screen and (max-width: 750px)";
 $not-mobile: "only screen and (min-width: 750px)";
