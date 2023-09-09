@@ -5,6 +5,6 @@ import { Dataset } from '$lib/controllers/dataset/dataset.server';
 
 export const load = cachedPageRoute(async auth => {
     return {
-        datasets: (await Dataset.Server.allMetaData(auth)).unwrap(e => error(400, e))
+        datasets: (await Dataset.allMetaData(auth)).unwrap(e => error(400, e))
     };
 }) satisfies PageServerLoad;

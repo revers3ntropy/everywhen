@@ -289,8 +289,7 @@
 </div>
 
 <style lang="scss">
-    @import '../../../styles/text';
-    @import '../../../styles/variables';
+    @import '$lib/styles/text';
 
     hr {
         margin: -16px 0 -10px 0;

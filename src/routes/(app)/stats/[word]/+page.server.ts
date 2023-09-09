@@ -8,8 +8,8 @@ import { wordsFromText } from '$lib/utils/text';
 import type { PageServerLoad } from './$types';
 
 export const load = cachedPageRoute(async (auth, { params }) => {
-    const entries = (await Entry.Server.all(auth, { deleted: false })).unwrap(e => error(400, e));
-    const locations = (await Location.Server.all(auth)).unwrap(e => error(400, e));
+    const entries = (await Entry.all(auth, { deleted: false })).unwrap(e => error(400, e));
+    const locations = (await Location.all(auth)).unwrap(e => error(400, e));
 
     const theWord = decrypt(params.word, auth.key)
         .map(w => w.toLowerCase())

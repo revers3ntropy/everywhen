@@ -5,28 +5,29 @@ import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import type { RequestHandler } from './$types';
+import { z } from 'zod';
 import { Auth } from '$lib/controllers/auth/auth.server';
 
 export const GET = cachedApiRoute(async auth => {
     return {
-        settings: (await Settings.Server.allAsMapWithDefaults(auth)).unwrap(e => error(400, e))
+        settings: (await Settings.allAsMapWithDefaults(auth)).unwrap(e => error(400, e))
     };
 }) satisfies RequestHandler;
 
 export const PUT = (async ({ request, cookies }) => {
-    const auth = Auth.Server.getAuthFromCookies(cookies);
+    const auth = Auth.getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
     const { key, value } = await getUnwrappedReqBody(auth, request, {
-        key: 'string',
-        value: 'any'
+        key: z.string(),
+        value: z.unknown()
     });
 
     if (!(key in Settings.config)) {
         throw error(400, 'Invalid key');
     }
 
-    const setting = (await Settings.Server.update(auth, key as SettingsKey, value)).unwrap(e =>
+    const setting = (await Settings.update(auth, key as SettingsKey, value)).unwrap(e =>
         error(400, e)
     );
 

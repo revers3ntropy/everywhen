@@ -56,8 +56,8 @@ namespace AssetServer {
         );
         if (canCreate !== true) return Result.err(canCreate);
 
-        publicId ??= await UId.Server.generate();
-        const id = await UId.Server.generate();
+        publicId ??= await UId.generate();
+        const id = await UId.generate();
 
         const encryptedContents = encrypt(contentsPlainText, auth.key);
         const encryptedFileName = encrypt(fileNamePlainText, auth.key);
@@ -101,10 +101,10 @@ namespace AssetServer {
         const [asset] = res;
 
         const decryptedContent = decrypt(asset.content, auth.key);
-        if (!decryptedContent.ok) return decryptedContent.as();
+        if (!decryptedContent.ok) return decryptedContent.cast();
 
         const decryptedFileName = decrypt(asset.fileName, auth.key);
-        if (!decryptedFileName.ok) return decryptedFileName.as();
+        if (!decryptedFileName.ok) return decryptedFileName.cast();
 
         return Result.ok({
             id: asset.id,
@@ -129,10 +129,10 @@ namespace AssetServer {
         return Result.collect(
             res.map(row => {
                 const decryptedContent = decrypt(row.content, auth.key);
-                if (!decryptedContent.ok) return decryptedContent.as();
+                if (!decryptedContent.ok) return decryptedContent.cast();
 
                 const decryptedFileName = decrypt(row.fileName, auth.key);
-                if (!decryptedFileName.ok) return decryptedFileName.as();
+                if (!decryptedFileName.ok) return decryptedFileName.cast();
 
                 return Result.ok({
                     id: row.id,
@@ -150,9 +150,10 @@ namespace AssetServer {
         offset: number,
         count: number
     ): Promise<Result<[AssetMetadata[], number]>> {
-        if (count < 1) {
-            return Result.err('Count must be positive');
-        }
+        if (count < 1) return Result.err('Count must be greater than 0');
+        if (isNaN(count)) return Result.err('Count must be a number');
+        if (offset < 0) return Result.err('Offset must be positive');
+        if (isNaN(offset)) return Result.err('Offset must be a number');
 
         const res = await query<
             { id: string; publicId: string; created: number; fileName: string }[]
@@ -171,7 +172,7 @@ namespace AssetServer {
         const metadata = Result.collect(
             res.map((row): Result<AssetMetadata> => {
                 const decryptedFileName = decrypt(row.fileName, auth.key);
-                if (!decryptedFileName.ok) return decryptedFileName.as();
+                if (!decryptedFileName.ok) return decryptedFileName.cast();
 
                 return Result.ok({
                     id: row.id,
@@ -181,7 +182,7 @@ namespace AssetServer {
                 });
             })
         );
-        if (!metadata.ok) return metadata.as();
+        if (!metadata.ok) return metadata.cast();
 
         const [assetCount] = await query<{ count: number }[]>`
             SELECT COUNT(*) as count
@@ -217,6 +218,6 @@ namespace AssetServer {
 
 export const Asset = {
     ..._Asset,
-    Server: AssetServer
+    ...AssetServer
 };
 export type Asset = _Asset;

@@ -46,7 +46,7 @@ export interface ApiRoutes extends Record<string, Record<Method, unknown>> {
     '/entries/?/pinned': typeof import('../../routes/api/entries/[entryId]/pinned/+server');
     '/backups': typeof import('../../routes/api/backups/+server');
     '/auth': typeof import('../../routes/api/auth/+server');
-    '/assets/?': typeof import('../../routes/api/assets/[asset]/+server');
+    '/assets/?': typeof import('../../routes/api/assets/[assetPublicId]/+server');
     '/settings': typeof import('../../routes/api/settings/+server');
     '/version': typeof import('../../routes/api/version/+server');
     '/locations': typeof import('../../routes/api/locations/+server');

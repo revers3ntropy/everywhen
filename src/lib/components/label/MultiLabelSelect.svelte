@@ -100,8 +100,7 @@
 </span>
 
 <style lang="scss">
-    @import '../../../styles/variables';
-    @import '../../../styles/text';
+    @import '$lib/styles/text';
 
     .select-label {
         display: flex;

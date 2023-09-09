@@ -121,12 +121,7 @@
 </main>
 
 <style lang="scss">
-    @import '../../../styles/variables';
-    @import '../../../styles/layout';
-
-    // Layout doesn't really work below 750px, so say that
-    // 'mobile' is anything below that
-    @mobile: ~'only screen and (max-width: 750px)';
+    @import '$lib/styles/layout';
 
     h1 {
         @extend .flex-center;

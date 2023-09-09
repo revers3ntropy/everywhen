@@ -1,44 +1,39 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
-import {
-    apiRes404,
-    apiResponse,
-    type GenericResponse,
-    rawApiResponse
-} from '$lib/utils/apiResponse.server';
+import { apiRes404, apiResponse, type GenericResponse } from '$lib/utils/apiResponse.server';
 import { cacheResponse, getCachedResponse, invalidateCache } from '$lib/utils/cache.server';
 import { Auth } from '$lib/controllers/auth/auth.server';
 import { Asset } from '$lib/controllers/asset/asset.server';
 
 export const GET = (async ({ params, url, cookies }) => {
-    const auth = Auth.Server.getAuthFromCookies(cookies);
+    const auth = Auth.getAuthFromCookies(cookies);
 
     const cached = getCachedResponse<Response>(url.href, auth.id);
     if (cached) return cached.clone() as GenericResponse<Buffer>;
 
-    const { err, val: asset } = await Asset.Server.fromPublicId(auth, params['asset'] || '');
-    if (err) throw error(404, err);
+    const asset = (await Asset.fromPublicId(auth, params['asset'] || '')).unwrap(e =>
+        error(404, e)
+    );
 
     const img = Buffer.from(asset.content, 'base64');
-    const response = rawApiResponse(img, {
+    const response = new Response(img, {
         status: 200,
         headers: {
             'Content-Type': 'image/webp',
             'Cache-Control': 'max-age=31536000, immutable',
             'Content-Length': `${img.length}`
         }
-    });
+    }) as GenericResponse<Buffer>;
 
     cacheResponse(url.href, auth.id, response.clone());
     return response;
 }) satisfies RequestHandler;
 
 export const DELETE = (async ({ params, cookies }) => {
-    const auth = Auth.Server.getAuthFromCookies(cookies);
+    const auth = Auth.getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
-    const { err } = await Asset.Server.purgeWithPublicId(auth, params['asset'] || '');
-    if (err) throw error(404, err);
+    (await Asset.purgeWithPublicId(auth, params['asset'] || '')).unwrap(e => error(404, e));
 
     return apiResponse(auth, {});
 }) satisfies RequestHandler;

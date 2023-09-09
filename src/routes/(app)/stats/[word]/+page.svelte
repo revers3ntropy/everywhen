@@ -86,9 +86,9 @@
 </main>
 
 <style lang="scss">
-    @import '../../../../styles/layout';
-    @import '../../../../styles/variables';
-    @import '../../../../styles/text';
+    @import '$lib/styles/layout';
+
+    @import '$lib/styles/text';
 
     .title-line {
         display: grid;

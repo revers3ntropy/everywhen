@@ -4,63 +4,52 @@ import { Location } from '$lib/controllers/location/location.server';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 import { invalidateCache } from '$lib/utils/cache.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
+import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { Auth } from '$lib/controllers/auth/auth.server';
 
 export const GET = apiRes404;
 
 export const PUT = (async ({ cookies, request, params }) => {
-    const auth = Auth.Server.getAuthFromCookies(cookies);
+    const auth = Auth.getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
-    const body = await getUnwrappedReqBody(
-        auth,
-        request,
-        {
-            name: 'string',
-            radius: 'number',
-            latitude: 'number',
-            longitude: 'number'
-        },
-        {
-            name: '',
-            radius: 0,
-            latitude: 0,
-            longitude: 0
-        }
-    );
+    const body = await getUnwrappedReqBody(auth, request, {
+        name: z.string().optional(),
+        radius: z.number().optional(),
+        latitude: z.number().optional(),
+        longitude: z.number().optional()
+    });
 
-    let location = (await Location.Server.fromId(auth, params.locationId)).unwrap(e =>
-        error(400, e)
-    );
+    let location = (await Location.fromId(auth, params.locationId)).unwrap(e => error(400, e));
 
     if (body.name) {
-        location = (await Location.Server.updateName(auth, location, body.name)).unwrap(e =>
+        location = (await Location.updateName(auth, location, body.name)).unwrap(e =>
             error(400, e)
         );
     }
 
-    if (body.radius > 0) {
-        location = (await Location.Server.updateRadius(auth, location, body.radius)).unwrap(e =>
+    if (body.radius && body.radius > 0) {
+        location = (await Location.updateRadius(auth, location, body.radius)).unwrap(e =>
             error(400, e)
         );
     }
 
-    if (body.latitude !== 0 && body.longitude !== 0) {
-        (
-            await Location.Server.updateLocation(auth, location, body.latitude, body.longitude)
-        ).unwrap(e => error(400, e));
+    if (body.latitude !== undefined && body.longitude !== undefined) {
+        (await Location.updateLocation(auth, location, body.latitude, body.longitude)).unwrap(e =>
+            error(400, e)
+        );
     }
 
     return apiResponse(auth, {});
 }) satisfies RequestHandler;
 
 export const DELETE = (async ({ params, cookies }) => {
-    const auth = Auth.Server.getAuthFromCookies(cookies);
+    const auth = Auth.getAuthFromCookies(cookies);
     if (!params.locationId) throw error(400, 'invalid location id');
     invalidateCache(auth.id);
 
-    (await Location.Server.purge(auth, params.locationId)).unwrap(e => error(400, e));
+    (await Location.purge(auth, params.locationId)).unwrap(e => error(400, e));
 
     return apiResponse(auth, {});
 }) satisfies RequestHandler;

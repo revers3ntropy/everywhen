@@ -74,13 +74,7 @@
 </span>
 
 <style lang="scss">
-    @import '../../styles/variables';
-    @import '../../styles/layout';
-
-    * {
-        margin: 0;
-        padding: 0;
-    }
+    @import '$lib/styles/layout';
 
     .dropdown {
         position: relative;

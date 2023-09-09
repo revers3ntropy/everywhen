@@ -123,8 +123,6 @@
 </div>
 
 <style lang="scss">
-    @import '../../../styles/variables';
-
     .toggle-by-button {
         display: flex;
         align-items: center;

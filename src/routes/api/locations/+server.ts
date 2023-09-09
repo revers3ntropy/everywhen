@@ -4,6 +4,7 @@ import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import { nowUtc } from '$lib/utils/time';
+import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { Auth } from '$lib/controllers/auth/auth.server';
 
@@ -12,43 +13,35 @@ export const GET = cachedApiRoute(async (auth, { url }) => {
     const lng = parseFloat(url.searchParams.get('lon') || '');
 
     if ((!lat && lat !== 0) || (!lng && lng !== 0)) {
-        return { locations: (await Location.Server.all(auth)).unwrap(e => error(500, e)) };
+        return { locations: (await Location.all(auth)).unwrap(e => error(500, e)) };
     }
 
     return {
-        ...(await Location.Server.search(auth, lat, lng)).unwrap(e => error(500, e))
+        ...(await Location.search(auth, lat, lng)).unwrap(e => error(500, e))
     };
 }) satisfies RequestHandler;
 
 export const POST = (async ({ request, cookies }) => {
-    const auth = Auth.Server.getAuthFromCookies(cookies);
+    const auth = Auth.getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
-    const body = await getUnwrappedReqBody(
-        auth,
-        request,
-        {
-            latitude: 'number',
-            longitude: 'number',
-            radius: 'number',
-            created: 'number',
-            name: 'string'
-        },
-        {
-            radius: 0.0001,
-            created: nowUtc()
-        }
-    );
+    const body = await getUnwrappedReqBody(auth, request, {
+        latitude: z.number(),
+        longitude: z.number(),
+        radius: z.number().optional(),
+        created: z.number().optional(),
+        name: z.string()
+    });
 
     return apiResponse(auth, {
         ...(
-            await Location.Server.create(
+            await Location.create(
                 auth,
-                body.created,
+                body.created ?? nowUtc(),
                 body.name,
                 body.latitude,
                 body.longitude,
-                body.radius
+                body.radius ?? 0.0001
             )
         ).unwrap(e => error(400, e))
     });

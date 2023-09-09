@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import './styles/themes';
+@import '$lib/styles/themes';
 
 // https://andy-bell.co.uk/a-modern-css-reset/
 *,
@@ -102,8 +102,8 @@ svg {
     border-radius: 3px;
 }
 
-@import './styles/variables';
-@import './styles/layout';
-@import './styles/text';
-@import './styles/input';
-@import './styles/overrides';
+
+@import '$lib/styles/layout';
+@import '$lib/styles/text';
+@import '$lib/styles/input';
+@import '$lib/styles/overrides';

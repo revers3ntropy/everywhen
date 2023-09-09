@@ -34,8 +34,7 @@
 {/if}
 
 <style lang="scss">
-    @import '../../../styles/variables';
-    @import '../../../styles/text';
+    @import '$lib/styles/text';
 
     .common-words {
         margin: 0.5em 0;

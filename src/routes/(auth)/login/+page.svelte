@@ -139,7 +139,7 @@
 </main>
 
 <style lang="scss">
-    @import '../../../styles/layout';
+    @import '$lib/styles/layout';
 
     main {
         @extend .flex-center;

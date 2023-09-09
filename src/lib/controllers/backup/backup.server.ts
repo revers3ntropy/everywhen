@@ -88,23 +88,23 @@ export namespace BackupServer {
     }
 
     export async function generate(auth: Auth): Promise<Result<Backup>> {
-        const { err: entryErr, val: entries } = await Entry.Server.all(auth, {
+        const entryRes = await Entry.all(auth, {
             deleted: 'both'
         });
-        if (entryErr) return Result.err(entryErr);
-        const { err: eventsErr, val: events } = await Event.Server.all(auth);
-        if (eventsErr) return Result.err(eventsErr);
-        const { err: labelsErr, val: labels } = await Label.Server.all(auth);
-        if (labelsErr) return Result.err(labelsErr);
-        const { err: assetsErr, val: assets } = await Asset.Server.all(auth);
-        if (assetsErr) return Result.err(assetsErr);
-        const { err: locationsErr, val: locations } = await Location.Server.all(auth);
-        if (locationsErr) return Result.err(locationsErr);
+        if (!entryRes.ok) return entryRes.cast();
+        const eventRes = await Event.all(auth);
+        if (!eventRes.ok) return eventRes.cast();
+        const labelRes = await Label.all(auth);
+        if (!labelRes.ok) return labelRes.cast();
+        const assetRes = await Asset.all(auth);
+        if (!assetRes.ok) return assetRes.cast();
+        const locationRes = await Location.all(auth);
+        if (!locationRes.ok) return locationRes.cast();
 
         // TODO datasets, columns and rows in backups
 
         return Result.ok({
-            entries: entries.map(
+            entries: entryRes.val.map(
                 (entry): ArrayElement<Backup['entries']> => ({
                     title: entry.title,
                     body: entry.body,
@@ -132,14 +132,14 @@ export namespace BackupServer {
                         ) || []
                 })
             ),
-            labels: labels.map(
+            labels: labelRes.val.map(
                 (label): ArrayElement<Backup['labels']> => ({
                     name: label.name,
                     color: label.color,
                     created: label.created
                 })
             ),
-            assets: assets.map(
+            assets: assetRes.val.map(
                 (asset): ArrayElement<Backup['assets']> => ({
                     publicId: asset.publicId,
                     fileName: asset.fileName,
@@ -147,7 +147,7 @@ export namespace BackupServer {
                     created: asset.created
                 })
             ),
-            events: events.map(
+            events: eventRes.val.map(
                 (event): ArrayElement<Backup['events']> => ({
                     name: event.name,
                     labelName: event.label?.name,
@@ -156,7 +156,7 @@ export namespace BackupServer {
                     created: event.created
                 })
             ),
-            locations: locations.map(
+            locations: locationRes.val.map(
                 (location): ArrayElement<Backup['locations']> => ({
                     created: location.created,
                     name: location.name,
@@ -179,10 +179,10 @@ export namespace BackupServer {
         try {
             decryptedData = JSON.parse(backupEncrypted);
         } catch (e) {
-            const { err, val: decryptedRaw } = decrypt(backupEncrypted, key);
-            if (err) return Result.err(err);
+            const decryptedRes = decrypt(backupEncrypted, key);
+            if (!decryptedRes.ok) return decryptedRes.cast();
             try {
-                decryptedData = JSON.parse(decryptedRaw);
+                decryptedData = JSON.parse(decryptedRes.val);
             } catch (e) {
                 return Result.err('data must be a valid JSON string');
             }
@@ -203,99 +203,105 @@ export namespace BackupServer {
         const labelsIndexedByName: Record<string, Label> = {};
         const labels: Label[] = [];
 
-        await Label.Server.purgeAll(auth);
+        await Label.purgeAll(auth);
         for (const label of backup.labels) {
-            const { err, val } = await Label.Server.create(auth, label);
-            if (err) return Result.err(err);
-            labelsIndexedByName[val.name] = val;
-            labels.push(val);
+            const createRes = await Label.create(auth, label);
+            if (!createRes.ok) return createRes.cast();
+            labelsIndexedByName[createRes.val.name] = createRes.val;
+            labels.push(createRes.val);
         }
 
-        await Entry.Server.purgeAll(auth);
-        for (const entry of backup.entries) {
-            const { err } = await Entry.Server.create(
-                auth,
-                labels,
-                entry.title || '',
-                entry.body,
-                entry.created || 0,
-                entry.createdTzOffset || 0,
-                entry.pinned ?? null,
-                entry.deleted ?? null,
-                entry.latitude ?? null,
-                entry.longitude ?? null,
-                labelsIndexedByName[entry.labelName || '']?.id ?? null,
-                entry.agentData,
-                entry.wordCount,
-                entry.edits.map(edit => ({
-                    oldTitle: edit.oldTitle,
-                    oldBody: edit.oldBody,
-                    oldLabelId: labelsIndexedByName[edit.oldLabelName || '']?.id ?? null,
-                    created: edit.created,
-                    createdTzOffset: edit.createdTzOffset,
-                    latitude: edit.latitude ?? null,
-                    longitude: edit.longitude ?? null,
-                    agentData: edit.agentData
-                }))
-            );
-            if (err) return Result.err(err);
-        }
+        await Entry.purgeAll(auth);
+        const entryCreateRes = await Result.collectAsync(
+            backup.entries.map(async entry => {
+                return await Entry.create(
+                    auth,
+                    labels,
+                    entry.title || '',
+                    entry.body,
+                    entry.created || 0,
+                    entry.createdTzOffset || 0,
+                    entry.pinned ?? null,
+                    entry.deleted ?? null,
+                    entry.latitude ?? null,
+                    entry.longitude ?? null,
+                    labelsIndexedByName[entry.labelName || '']?.id ?? null,
+                    entry.agentData,
+                    entry.wordCount,
+                    entry.edits.map(edit => ({
+                        oldTitle: edit.oldTitle,
+                        oldBody: edit.oldBody,
+                        oldLabelId: labelsIndexedByName[edit.oldLabelName || '']?.id ?? null,
+                        created: edit.created,
+                        createdTzOffset: edit.createdTzOffset,
+                        latitude: edit.latitude ?? null,
+                        longitude: edit.longitude ?? null,
+                        agentData: edit.agentData
+                    }))
+                );
+            })
+        );
+        if (!entryCreateRes.ok) return entryCreateRes.cast();
 
-        await Event.Server.purgeAll(auth);
-        for (const event of backup.events) {
-            const { err } = await Event.Server.create(
-                auth,
-                event.name,
-                event.start,
-                event.end,
-                labelsIndexedByName[event.labelName || '']?.id ?? null,
-                event.created
-            );
-            if (err) return Result.err(err);
-        }
+        await Event.purgeAll(auth);
+        const eventCreateRes = await Result.collectAsync(
+            backup.events.map(async event => {
+                return await Event.create(
+                    auth,
+                    event.name,
+                    event.start,
+                    event.end,
+                    labelsIndexedByName[event.labelName || '']?.id ?? null,
+                    event.created
+                );
+            })
+        );
+        if (!eventCreateRes.ok) return eventCreateRes.cast();
 
-        await Asset.Server.purgeAll(auth);
-        for (const asset of backup.assets) {
-            const { err } = await Asset.Server.create(
-                auth,
-                asset.content,
-                asset.fileName,
-                // make sure to preserve id as this is
-                // card coded into entries
-                asset.created,
-                asset.publicId
-            );
-            if (err) return Result.err(err);
-        }
+        await Asset.purgeAll(auth);
+        const assetCreateRes = await Result.collectAsync(
+            backup.assets.map(async asset => {
+                return await Asset.create(
+                    auth,
+                    asset.content,
+                    asset.fileName,
+                    // make sure to preserve id as this is
+                    // card coded into entries
+                    asset.created,
+                    asset.publicId
+                );
+            })
+        );
+        if (!assetCreateRes.ok) return assetCreateRes.cast();
 
-        await Location.Server.purgeAll(auth);
-        for (const location of backup.locations) {
-            const { err } = await Location.Server.create(
-                auth,
-                location.created,
-                location.name,
-                location.latitude,
-                location.longitude,
-                location.radius
-            );
-            if (err) return Result.err(err);
-        }
+        await Location.purgeAll(auth);
+        const locationCreateRes = await Result.collectAsync(
+            backup.locations.map(async location => {
+                return await Location.create(
+                    auth,
+                    location.created,
+                    location.name,
+                    location.latitude,
+                    location.longitude,
+                    location.radius
+                );
+            })
+        );
+        if (!locationCreateRes.ok) return locationCreateRes.cast();
 
         return Result.ok(null);
     }
 
     export function migrate(json: Backup): Result<Backup> {
         json.appVersion ||= '0.0.0';
-        const { val: version, err } = SemVer.fromString(json.appVersion);
-        if (err) return Result.err(err);
+        const versionRes = SemVer.fromString(json.appVersion);
+        if (!versionRes.ok) return versionRes.cast();
 
-        if (version.isGreaterThan(currentVersion)) {
+        if (versionRes.val.isGreaterThan(currentVersion))
             return Result.err(`Cannot time travel - backup is from the future`);
-        }
 
-        if (version.isLessThan(SemVer.fromString('0.5.97').unwrap())) {
-            return Result.err(`Cannot use backup created before v0.5.97, sorry :/`);
-        }
+        if (versionRes.val.isLessThan(SemVer.fromString('0.5.97').unwrap()))
+            return Result.err(`Cannot use backups created before v0.5.97, sorry :/`);
 
         return Result.ok(json);
     }
@@ -303,7 +309,7 @@ export namespace BackupServer {
 
 export const Backup = {
     ..._Backup,
-    Server: BackupServer
+    ...BackupServer
 };
 
 export type Backup = _Backup;

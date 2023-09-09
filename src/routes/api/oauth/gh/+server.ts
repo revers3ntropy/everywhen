@@ -6,29 +6,30 @@ import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { Auth } from '$lib/controllers/auth/auth.server';
+import { z } from 'zod';
 
 const logger = new FileLogger('GHCB');
 
 export const POST = (async ({ request, cookies }) => {
-    const auth = Auth.Server.getAuthFromCookies(cookies);
+    const auth = Auth.getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
     const body = await getUnwrappedReqBody(auth, request, {
-        state: 'string',
-        code: 'string'
+        state: z.string(),
+        code: z.string()
     });
 
-    const accessToken = await ghAPI.linkToGitHubOAuth(auth, body.code, body.state);
-    if (!accessToken.ok) {
-        await logger.error('Failed on ghAPI.linkToGitHubOAuth', { accessToken });
+    const accessTokenRes = await ghAPI.linkToGitHubOAuth(auth, body.code, body.state);
+    if (!accessTokenRes.ok) {
+        await logger.error('Failed on ghAPI.linkToGitHubOAuth', { accessToken: accessTokenRes });
         throw error(500, 'Internal server error');
     }
 
-    return apiResponse(auth, { accessToken: accessToken.val });
+    return apiResponse(auth, { accessToken: accessTokenRes.val });
 }) satisfies RequestHandler;
 
 export const DELETE = (async ({ cookies }) => {
-    const auth = Auth.Server.getAuthFromCookies(cookies);
+    const auth = Auth.getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
     await ghAPI.unlinkToGitHubOAuth(auth);

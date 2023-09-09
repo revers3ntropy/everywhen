@@ -5,42 +5,33 @@ import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import { Auth } from '$lib/controllers/auth/auth.server';
+import { z } from 'zod';
 
 export const GET = cachedApiRoute(async (auth, { url }) => {
-    let offset: number, count: number;
-    try {
-        count = parseInt(url.searchParams.get('count') || '4');
-    } catch (e) {
-        throw error(400, 'Invalid count');
-    }
-    try {
-        offset = parseInt(url.searchParams.get('offset') || '0');
-    } catch (e) {
-        throw error(400, 'Invalid offset');
-    }
+    const count = parseInt(url.searchParams.get('count') || '4');
+    const offset = parseInt(url.searchParams.get('offset') || '0');
 
-    const { err, val } = await Asset.Server.pageOfMetaData(auth, offset, count);
-    if (err) throw error(400, err);
+    const [assets, assetCount] = (await Asset.pageOfMetaData(auth, offset, count)).unwrap(e =>
+        error(400, e)
+    );
 
-    return {
-        assets: val[0],
-        assetCount: val[1]
-    };
+    return { assets, assetCount };
 }) satisfies RequestHandler;
 
 export const POST = (async ({ request, cookies }) => {
-    const auth = Auth.Server.getAuthFromCookies(cookies);
+    const auth = Auth.getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
     const body = await getUnwrappedReqBody(auth, request, {
-        content: 'string',
-        fileName: 'string'
+        content: z.string(),
+        fileName: z.string()
     });
 
-    const { err, val } = await Asset.Server.create(auth, body.content, body.fileName);
-    if (err) throw error(400, err);
+    const { id, publicId } = (await Asset.create(auth, body.content, body.fileName)).unwrap(e =>
+        error(400, e)
+    );
 
-    return apiResponse(auth, val);
+    return apiResponse(auth, { publicId, id });
 }) satisfies RequestHandler;
 
 export const DELETE = apiRes404;

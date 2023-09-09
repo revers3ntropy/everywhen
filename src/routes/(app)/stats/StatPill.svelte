@@ -23,8 +23,7 @@
 {/if}
 
 <style lang="scss">
-    @import '../../../styles/variables';
-    @import '../../../styles/layout';
+    @import '$lib/styles/layout';
 
     div {
         background: var(--light-accent);

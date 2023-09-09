@@ -262,7 +262,7 @@ namespace DatasetServer {
         created: TimestampSecs,
         presetId: string | null
     ): Promise<Result<Dataset>> {
-        const id = await UId.Server.generate();
+        const id = await UId.generate();
 
         const canCreate = await canCreateWithName(auth, name, presetId);
         if (canCreate !== true) return Result.err(canCreate);
@@ -367,7 +367,7 @@ namespace DatasetServer {
 
 export const Dataset = {
     ..._Dataset,
-    Server: DatasetServer
+    ...DatasetServer
 };
 export type Dataset = _Dataset;
 export type { DatasetColumn, DatasetColumnType, DatasetData, DatasetMetadata } from './dataset';

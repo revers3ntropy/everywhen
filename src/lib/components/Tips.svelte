@@ -56,8 +56,6 @@
 </div>
 
 <style lang="scss">
-    @import '../../styles/variables';
-
     .wrapper {
         h3 {
             margin: 0 0 0.5rem 0;

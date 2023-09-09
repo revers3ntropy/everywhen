@@ -34,5 +34,4 @@
 </section>
 
 <style lang="scss">
-    @import '../../../../styles/variables';
 </style>

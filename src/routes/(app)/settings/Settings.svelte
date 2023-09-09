@@ -134,8 +134,7 @@
 </div>
 
 <style lang="scss">
-    @import '../../../styles/layout';
-    @import '../../../styles/variables';
+    @import '$lib/styles/layout';
 
     .wrapper {
         display: grid;

@@ -113,7 +113,7 @@
 </main>
 
 <style lang="scss">
-    @import '../../../../styles/layout';
+    @import '$lib/styles/layout';
 
     h1 {
         margin: 2rem 0 1rem 0;

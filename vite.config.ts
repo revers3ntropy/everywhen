@@ -15,6 +15,13 @@ export default defineConfig({
     define: {
         __VERSION__
     },
+    css: {
+        preprocessorOptions: {
+            scss: {
+                additionalData: `@import '$lib/styles/variables';`
+            }
+        }
+    },
     test: {
         include: ['./src/**/*.spec.ts']
     }

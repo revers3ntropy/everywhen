@@ -10,6 +10,7 @@ import { Result } from '$lib/utils/result';
 import { UId } from '$lib/controllers/uuid/uuid.server';
 import { nowUtc } from '$lib/utils/time';
 import type { Seconds, TimestampSecs } from '../../../types';
+import crypto from 'crypto';
 
 const logger = new FileLogger('Auth');
 
@@ -100,16 +101,14 @@ namespace AuthServer {
         if (res.length !== 1) {
             return Result.err('Invalid login');
         }
-        const { val: lastVer, err } = SemVer.fromString(res[0].versionLastLoggedIn);
-        if (err) return Result.err(err);
-        return Result.ok({
+        return SemVer.fromString(res[0].versionLastLoggedIn).map(lastVer => ({
             id: res[0].id,
             lastVer
-        });
+        }));
     }
 
     async function generateSessionId() {
-        return `hl-${await UId.Server.generate()}-session-${await UId.Server.generate()}`;
+        return `${await UId.generate()}-${crypto.randomBytes(32).toString('hex')}-${Date.now()}`;
     }
 
     export async function authenticateUserFromLogIn(
@@ -117,15 +116,15 @@ namespace AuthServer {
         key: string,
         expireAfter: Seconds
     ): Promise<Result<string>> {
-        const { val: userDetails, err } = await userIdAndLastVersionFromLogIn(username, key);
-        if (err) return Result.err(err);
+        const userDetailsRes = await userIdAndLastVersionFromLogIn(username, key);
+        if (!userDetailsRes.ok) return userDetailsRes.cast();
 
         const sessionId = await generateSessionId();
 
         const now = nowUtc();
 
         const session: Readonly<Session> = Object.freeze({
-            id: userDetails.id,
+            id: userDetailsRes.val.id,
             username,
             key,
             created: now,
@@ -136,7 +135,7 @@ namespace AuthServer {
             id: session.id,
             username: session.username,
             key,
-            versionLastLoggedIn: userDetails.lastVer
+            versionLastLoggedIn: userDetailsRes.val.lastVer
         };
 
         // normally very quick, but might be very slow if they haven't logged in for ages...
@@ -152,7 +151,7 @@ namespace AuthServer {
 
 export const Auth = {
     ..._Auth,
-    Server: AuthServer
+    ...AuthServer
 };
 
 export type Auth = _Auth;

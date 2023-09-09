@@ -5,51 +5,45 @@ import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import { nowUtc } from '$lib/utils/time';
+import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { Auth } from '$lib/controllers/auth/auth.server';
 
 export const GET = cachedApiRoute(async auth => {
-    const { err, val: events } = await Event.Server.all(auth);
-    if (err) throw error(400, err);
-    return { events };
+    return {
+        events: (await Event.all(auth)).unwrap(e => error(400, e))
+    };
 }) satisfies RequestHandler;
 
 export const POST = (async ({ request, cookies }) => {
-    const auth = Auth.Server.getAuthFromCookies(cookies);
+    const auth = Auth.getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
-    const body = await getUnwrappedReqBody(
-        auth,
-        request,
-        {
-            created: 'number',
-            name: 'string',
-            start: 'number',
-            end: 'number',
-            label: 'string'
-        },
-        {
-            created: nowUtc(),
-            label: ''
-        }
-    );
+    const body = await getUnwrappedReqBody(auth, request, {
+        created: z.number().optional(),
+        name: z.string(),
+        start: z.number(),
+        end: z.number(),
+        label: z.string().nullable()
+    });
 
     // check label exists
     if (body.label) {
-        if (!(await Label.Server.userHasLabelWithId(auth, body.label))) {
+        if (!(await Label.userHasLabelWithId(auth, body.label))) {
             throw error(400, `Label doesn't exist`);
         }
     }
 
-    const { val: event, err } = await Event.Server.create(
-        auth,
-        body.name,
-        body.start,
-        body.end,
-        body.label,
-        body.created
-    );
-    if (err) throw error(400, err);
+    const event = (
+        await Event.create(
+            auth,
+            body.name,
+            body.start,
+            body.end,
+            body.label,
+            body.created ?? nowUtc()
+        )
+    ).unwrap(e => error(400, e));
 
     return apiResponse(auth, { id: event.id });
 }) satisfies RequestHandler;

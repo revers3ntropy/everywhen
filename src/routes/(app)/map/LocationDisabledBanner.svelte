@@ -62,8 +62,6 @@
 {/if}
 
 <style lang="scss">
-    @import '../../../styles/variables';
-
     button.outer {
         width: calc(100% - 2rem);
         padding: 0.5rem 0;

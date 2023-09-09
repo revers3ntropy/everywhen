@@ -79,8 +79,6 @@
 </span>
 
 <style lang="scss">
-    @import '../../../styles/variables';
-
     .outer {
         display: flex;
         align-items: center;

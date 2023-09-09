@@ -46,7 +46,7 @@ namespace LocationServer {
         const canCreate = await canCreateWithName(auth, name);
         if (canCreate !== true) return Result.err(canCreate);
 
-        const id = await UId.Server.generate();
+        const id = await UId.generate();
 
         const encryptedName = encrypt(name, auth.key);
         if (encryptedName.length > 256) {
@@ -88,7 +88,7 @@ namespace LocationServer {
         return Result.collect(
             rows.map(row => {
                 const name = decrypt(row.name, auth.key);
-                if (!name.ok) return name.as();
+                if (!name.ok) return name.cast();
                 return Result.ok({
                     id: row.id,
                     created: row.created,
@@ -131,7 +131,7 @@ namespace LocationServer {
             )
         );
 
-        if (!locations.ok) return locations.as();
+        if (!locations.ok) return locations.cast();
         if (locations.val.length > 0) {
             return Result.ok({ locations: locations.val });
         }
@@ -161,7 +161,7 @@ namespace LocationServer {
                 r => _Location.degreesToMeters(r) * 2
             )
         );
-        if (!nearby.ok) return nearby.as();
+        if (!nearby.ok) return nearby.cast();
 
         return Result.ok({
             locations: locations.val,
@@ -188,7 +188,7 @@ namespace LocationServer {
                   AND id = ${id}
             `
         );
-        if (!location.ok) return location.as();
+        if (!location.ok) return location.cast();
         if (location.val.length !== 1) return Result.err('Location not found');
         return Result.ok(location.val[0]);
     }
@@ -287,7 +287,7 @@ namespace LocationServer {
 
 export const Location = {
     ..._Location,
-    Server: LocationServer
+    ...LocationServer
 };
 
 export type Location = _Location;

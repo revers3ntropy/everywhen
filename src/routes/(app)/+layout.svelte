@@ -172,8 +172,6 @@
 </div>
 
 <style lang="scss">
-    @import '../../styles/variables';
-
     .page-content {
         min-height: calc(100vh - var(--nav-height));
         padding: 1rem 1rem 12rem 12rem;

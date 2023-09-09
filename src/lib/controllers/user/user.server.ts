@@ -54,7 +54,7 @@ export namespace UserServer {
         if (newUserValid !== true) return Result.err(newUserValid);
 
         const salt = await generateSalt();
-        const id = await UId.Server.generate();
+        const id = await UId.generate();
 
         await query`
             INSERT INTO users (id, username, password, salt, created, versionLastLoggedIn)
@@ -71,12 +71,12 @@ export namespace UserServer {
     }
 
     export async function purge(auth: Auth): Promise<void> {
-        await Label.Server.purgeAll(auth);
-        await Entry.Server.purgeAll(auth);
-        await Asset.Server.purgeAll(auth);
-        await Event.Server.purgeAll(auth);
-        await Settings.Server.purgeAll(auth);
-        Auth.Server.invalidateAllSessionsForUser(auth.id);
+        await Label.purgeAll(auth);
+        await Entry.purgeAll(auth);
+        await Asset.purgeAll(auth);
+        await Event.purgeAll(auth);
+        await Settings.purgeAll(auth);
+        Auth.invalidateAllSessionsForUser(auth.id);
 
         await query`
             DELETE
@@ -128,12 +128,11 @@ export namespace UserServer {
             key: newKey
         };
 
-        const { val: backup, err: generateErr } = await Backup.Server.generate(auth);
-        if (generateErr) return Result.err(generateErr);
+        const backupRes = await Backup.generate(auth);
+        if (!backupRes.ok) return backupRes.cast();
+        const encryptedBackup = Backup.asEncryptedString(backupRes.val, auth.key);
 
-        const encryptedBackup = Backup.Server.asEncryptedString(backup, auth.key);
-
-        Auth.Server.invalidateAllSessionsForUser(auth.id);
+        Auth.invalidateAllSessionsForUser(auth.id);
 
         await query`
             UPDATE users
@@ -141,15 +140,15 @@ export namespace UserServer {
             WHERE id = ${auth.id}
         `;
 
-        const { err } = await Backup.Server.restore(newAuth, encryptedBackup, auth.key);
-        if (err) return Result.err(err);
+        const restoreRes = await Backup.restore(newAuth, encryptedBackup, auth.key);
+        if (!restoreRes.ok) return restoreRes.cast();
 
-        return await Settings.Server.changeEncryptionKeyInDB(auth, newKey);
+        return await Settings.changeEncryptionKeyInDB(auth, newKey);
     }
 }
 
 export const User = {
-    Server: UserServer
+    ...UserServer
 };
 
 export type User = _User;

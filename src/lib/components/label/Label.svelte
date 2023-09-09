@@ -16,8 +16,7 @@
 {/if}
 
 <style lang="scss">
-    @import '../../../styles/variables';
-    @import '../../../styles/text';
+    @import '$lib/styles/text';
 
     .label {
         padding: 0 0.5rem 0 0;

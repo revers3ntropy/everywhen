@@ -164,8 +164,6 @@
 </div>
 
 <style lang="scss">
-    @import '../../../styles/variables';
-
     .wrapper {
         margin: 1rem 1rem;
         width: calc(100% - 2rem);

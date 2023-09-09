@@ -23,8 +23,6 @@
 </main>
 
 <style lang="scss">
-    @import '../styles/variables';
-
     main {
         width: 100vw;
         height: 100vh;

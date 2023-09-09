@@ -14,15 +14,13 @@ export const load = cachedPageRoute(async (auth, { parent, locals }) => {
 
     let nYearsAgo = {} as Record<string, EntrySummary[]>;
     if (settings.showNYearsAgoEntryTitles.value) {
-        nYearsAgo = (await Entry.Server.getSummariesNYearsAgo(auth)).unwrap(err => error(400, err));
+        nYearsAgo = (await Entry.getSummariesNYearsAgo(auth)).unwrap(err => error(400, err));
     }
 
-    const pinnedEntriesList = (await Entry.Server.getPinnedSummaries(auth)).unwrap(err =>
-        error(400, err)
-    );
+    const pinnedEntriesList = (await Entry.getPinnedSummaries(auth)).unwrap(err => error(400, err));
 
-    const datasets = (await Dataset.Server.allMetaData(auth)).unwrap(err => error(400, err));
-    const locations = (await Location.Server.all(auth)).unwrap(err => error(400, err));
+    const datasets = (await Dataset.allMetaData(auth)).unwrap(err => error(400, err));
+    const locations = (await Location.all(auth)).unwrap(err => error(400, err));
 
     return {
         nYearsAgo,

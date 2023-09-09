@@ -8,6 +8,7 @@ import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
 import { GETParamIsTruthy } from '$lib/utils/GETArgs';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import { nowUtc } from '$lib/utils/time';
+import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { Auth } from '$lib/controllers/auth/auth.server';
 
@@ -21,17 +22,18 @@ export const GET = cachedApiRoute(async (auth, { url }) => {
     if (offset < 0) throw error(400, 'Invalid page number');
     if (!count || count < 0) throw error(400, 'Invalid page size');
 
-    const { err: searchErr, val: searchDecrypted } = decrypt(search, auth.key);
-    if (searchErr) throw error(400, 'Invalid search query');
+    const searchDecrypted = decrypt(search, auth.key).unwrap(() =>
+        error(400, 'Invalid search query')
+    );
 
-    const { val, err } = await Entry.Server.getPage(auth, offset, count, {
-        deleted,
-        labelId,
-        search: searchDecrypted.toLowerCase(),
-        locationId
-    });
-    if (err) throw error(400, err);
-    const [entries, numEntries] = val;
+    const [entries, numEntries] = (
+        await Entry.getPage(auth, offset, count, {
+            deleted,
+            labelId,
+            search: searchDecrypted.toLowerCase(),
+            locationId
+        })
+    ).unwrap(e => error(400, e));
 
     return {
         entries,
@@ -43,55 +45,41 @@ export const GET = cachedApiRoute(async (auth, { url }) => {
 }) satisfies RequestHandler;
 
 export const POST = (async ({ request, cookies }) => {
-    const auth = Auth.Server.getAuthFromCookies(cookies);
+    const auth = Auth.getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
-    const body = await getUnwrappedReqBody(
-        auth,
-        request,
-        {
-            created: 'number',
-            latitude: 'number',
-            longitude: 'number',
-            title: 'string',
-            body: 'string',
-            labelId: 'string',
-            timezoneUtcOffset: 'number',
-            agentData: 'string',
-            wordCount: 'number'
-        },
-        {
-            title: '',
-            labelId: '',
-            latitude: 0,
-            longitude: 0,
-            created: nowUtc(),
-            timezoneUtcOffset: 0,
-            agentData: '',
-            wordCount: -1
-        }
-    );
+    const body = await getUnwrappedReqBody(auth, request, {
+        body: z.string(),
+        title: z.string().default(''),
+        created: z.number().default(nowUtc()),
+        latitude: z.number().optional().nullable(),
+        longitude: z.number().optional().nullable(),
+        labelId: z.string().optional().nullable(),
+        timezoneUtcOffset: z.number().default(0),
+        agentData: z.string().default(''),
+        wordCount: z.number().optional()
+    });
 
-    const { val: labels, err: labelsErr } = await Label.Server.all(auth);
-    if (labelsErr) throw error(400, labelsErr);
+    const labels = (await Label.all(auth)).unwrap(e => error(400, e));
 
-    const { val: entry, err } = await Entry.Server.create(
-        auth,
-        labels,
-        body.title,
-        body.body,
-        body.created,
-        body.timezoneUtcOffset,
-        null,
-        null,
-        body.latitude || null,
-        body.longitude || null,
-        body.labelId || null,
-        body.agentData,
-        body.wordCount > -1 ? body.wordCount : wordCount(body.body),
-        []
-    );
-    if (err) throw error(400, err);
+    const entry = (
+        await Entry.create(
+            auth,
+            labels,
+            body.title,
+            body.body,
+            body.created,
+            body.timezoneUtcOffset,
+            null,
+            null,
+            body.latitude || null,
+            body.longitude || null,
+            body.labelId || null,
+            body.agentData,
+            body.wordCount ?? wordCount(body.body),
+            []
+        )
+    ).unwrap(e => error(400, e));
 
     return apiResponse(auth, { id: entry.id });
 }) satisfies RequestHandler;

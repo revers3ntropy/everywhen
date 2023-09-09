@@ -41,18 +41,8 @@ export function apiResponse<T extends Record<string, unknown>>(
     }) as GenericResponse<T>;
 }
 
-export function rawApiResponse<T extends BodyInit | null>(
-    body: T,
-    init: ResponseInit = {}
-): GenericResponse<T> {
-    return new Response(body, {
-        status: 200,
-        ...init
-    }) as GenericResponse<T>;
-}
-
 export const apiRes404: RequestHandler & { isApi404: true } = ({ cookies }) => {
-    const auth = Auth.Server.tryGetAuthFromCookies(cookies);
+    const auth = Auth.tryGetAuthFromCookies(cookies);
     return apiResponse(auth, { status: 404 }, { status: 404 });
 };
 

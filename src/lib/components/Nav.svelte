@@ -1,5 +1,6 @@
 <script lang="ts">
     import { page } from '$app/stores';
+    import CreateNewButton from '$lib/components/CreateNewButton.svelte';
     import { Backup } from '$lib/controllers/backup/backup';
     import { tooltip } from '@svelte-plugins/tooltips';
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
@@ -42,14 +43,12 @@
 </script>
 
 <nav>
-    <div class="top-options">
-        <span class="streaks">
-            <Streaks condensed />
-        </span>
+    <div>
         <Dropdown width="200px">
-            <span class="account-button" slot="button">
-                {$username || '...'}
-            </span>
+            <div class="account-button" slot="button">
+                <span> <Streaks condensed /> </span>
+                <span> {$username || '...'} </span>
+            </div>
 
             <div class="account-dropdown-options">
                 <button
@@ -92,16 +91,25 @@
             </div>
         </Dropdown>
 
-        <button
-            aria-label={$obfuscated ? 'Show all' : 'Hide all'}
-            on:click={() => obfuscated.set(!$obfuscated)}
-        >
-            {#if $obfuscated}
-                <Eye size="25" />
-            {:else}
-                <EyeOff size="25" />
-            {/if}
-        </button>
+        <div class="p-2">
+            <button
+                class="with-icon"
+                aria-label={$obfuscated ? 'Show all' : 'Hide all'}
+                on:click={() => obfuscated.set(!$obfuscated)}
+            >
+                {#if $obfuscated}
+                    <Eye size="25" />
+                    Show all
+                {:else}
+                    <EyeOff size="25" />
+                    Hide all
+                {/if}
+            </button>
+        </div>
+
+        <div class="p-2">
+            <CreateNewButton />
+        </div>
 
         {#if $settingsStore.passcode.value}
             <button
@@ -122,7 +130,7 @@
         <a
             href="/journal"
             aria-label="journal"
-            class="with-circled-icon"
+            class="nav-link"
             class:current={$page.url.pathname.startsWith('/journal')}
         >
             <Notebook size="35" />
@@ -131,7 +139,7 @@
         <a
             href="/timeline"
             aria-label="timeline"
-            class="with-circled-icon"
+            class="nav-link"
             class:current={$page.url.pathname.startsWith('/timeline')}
         >
             <ChartTimeline size="35" />
@@ -140,7 +148,7 @@
         <a
             href="/map"
             aria-label="map"
-            class="with-circled-icon"
+            class="nav-link"
             class:current={$page.url.pathname.startsWith('/map')}
         >
             <MapMarkerOutline size="35" />
@@ -149,26 +157,25 @@
         <a
             href="/stats"
             aria-label="statistics"
-            class="with-circled-icon"
+            class="nav-link"
             class:current={$page.url.pathname.startsWith('/stats')}
         >
             <Counter size="35" />
             <span class="hide-mobile"> Insights </span>
         </a>
     </div>
-
-    <div />
 </nav>
 
 <style lang="scss">
-    @import '../../styles/variables';
-    @import '../../styles/layout';
-    @import '../../styles/input';
-    @import '../../styles/text';
+    @import '$lib/styles/layout';
+    @import '$lib/styles/input';
+    @import '$lib/styles/text';
+
+    $nav-width: 12rem;
 
     nav {
         height: 100%;
-        width: 10rem;
+        width: $nav-width;
         position: fixed;
         top: 0;
         left: 0;
@@ -176,34 +183,41 @@
         // increased to 5 so that on mobile the nav buttons are not cut off
         // by entry group titles
         z-index: 5;
-        padding: 1rem;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
-        background: var(--nav-bg);
 
         @media #{$mobile} {
             display: block;
-            height: var(--nav-height);
+            height: $mobile-nav-height;
             width: 100%;
             position: static;
         }
+    }
+
+    .account-button {
+        width: $nav-width;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 1rem;
+        align-items: center;
+        justify-content: flex-start;
+        background: var(--light-accent);
+        padding: 0.5rem;
+        text-align: left;
+        border-radius: 0 0 $border-radius 0;
     }
 
     .account-dropdown {
         background: var(--light-accent);
     }
 
-    .top-options {
+    .nav-buttons {
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: space-between;
-        gap: 0.5rem;
-        padding: 0.5rem 0;
-    }
+        gap: 4px;
 
-    .nav-buttons {
         @media #{$mobile} {
             position: fixed;
             bottom: 0;
@@ -218,6 +232,30 @@
             padding: 0.8rem 0;
             border-top: 1px solid var(--border-color);
         }
+
+        .nav-link {
+            width: 100%;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 1rem;
+            align-items: center;
+            justify-content: flex-start;
+            border-radius: 0 $border-radius $border-radius 0;
+            padding: 0.25rem;
+            text-decoration: none;
+
+            :global(*) {
+                transition: $transition;
+            }
+
+            &:hover {
+                background: var(--v-light-accent);
+            }
+
+            &.current {
+                background: var(--primary-light);
+            }
+        }
     }
 
     .account-dropdown-options {
@@ -229,7 +267,8 @@
             padding: 0.4em 0.8em 0.4em 0.4em;
             width: 100%;
             display: grid;
-            grid-template-columns: 35px 1fr;
+            grid-template-columns: auto 1fr;
+            gap: 1rem;
             align-items: center;
             justify-content: flex-start;
             text-align: left;
@@ -243,89 +282,6 @@
             margin: 10px 0;
             border: none;
             border-bottom: 1px solid var(--background-color);
-        }
-    }
-
-    .right-options {
-        gap: 0.5rem;
-
-        .create-button {
-            display: grid;
-            place-items: center;
-            padding: 0;
-            margin: 0 5px 0 2px;
-            border-radius: 50%;
-            background: var(--light-accent);
-            width: 30px;
-            height: 30px;
-
-            &:hover {
-                background: none;
-            }
-        }
-    }
-
-    .record-something-buttons {
-        display: block;
-        padding: 0.8rem 0 0.8rem 0;
-
-        button {
-            width: 100%;
-            padding: 0.4em 0.8em 0.4em 0.4em;
-            margin: 0;
-            border-radius: 0;
-            text-align: left;
-            color: var(--text-color);
-            transition: #{$transition};
-        }
-
-        .record-entry:hover {
-            background: var(--v-light-accent);
-
-            :global(svg),
-            :global(svg *) {
-                fill: url(#accent-gradient);
-            }
-        }
-
-        .record-bullet:hover {
-            background: var(--v-light-accent);
-
-            :global(svg),
-            :global(svg *) {
-                fill: url(#accent-gradient);
-            }
-        }
-
-        .record-dream:hover {
-            background: rgba(0, 0, 255, 0.1);
-
-            :global(svg),
-            :global(svg *) {
-                fill: url(#dream-gradient);
-            }
-        }
-
-        .record-idea:hover {
-            background: rgba(255, 255, 0, 0.1);
-
-            :global(svg),
-            :global(svg *) {
-                fill: url(#idea-gradient);
-            }
-        }
-
-        .record-thought:hover {
-            background: rgba(170, 212, 205, 0.1);
-
-            :global(svg),
-            :global(svg *) {
-                fill: url(#thought-gradient);
-            }
-        }
-
-        .new-event:hover {
-            background: var(--v-light-accent);
         }
     }
 </style>

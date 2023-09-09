@@ -11,7 +11,7 @@ export class SemVer {
         const v = new SemVer();
         const parts = version.split('.');
         if (parts.length !== 3) {
-            return Result.err('Invalid SemVer string: ' + version);
+            return Result.err('Invalid version string');
         }
         v.major = parseInt(parts[0]);
         v.minor = parseInt(parts[1]);

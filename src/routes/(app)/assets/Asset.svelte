@@ -103,8 +103,7 @@
 </div>
 
 <style lang="scss">
-    @import '../../../styles/variables';
-    @import '../../../styles/layout';
+    @import '$lib/styles/layout';
 
     .img-wrapper {
         @extend .container;

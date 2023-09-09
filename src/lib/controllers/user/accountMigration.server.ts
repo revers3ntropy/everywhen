@@ -18,9 +18,9 @@ export async function migrateUser(user: User): Promise<Result<User>> {
 
     for (const version of migratorVersions) {
         if (!user.versionLastLoggedIn.isLessThan(version)) continue;
-        const { err, val } = await migrators[version.str()](user);
-        if (err) return Result.err(err);
-        user = val;
+        const migrateRes = await migrators[version.str()](user);
+        if (!migrateRes.ok) return migrateRes.cast();
+        user = migrateRes.val;
     }
 
     await query`
@@ -39,9 +39,9 @@ const migrators: Record<string, (user: User) => Promise<Result<User>>> = {
         `;
 
         for (const { id, entry } of entries) {
-            const { val: decryptedEntry, err } = decrypt(entry, user.key);
-            if (err) return Result.err(err);
-            const entryWordCount = wordCount(decryptedEntry);
+            const decryptedEntry = decrypt(entry, user.key);
+            if (!decryptedEntry.ok) return decryptedEntry.cast();
+            const entryWordCount = wordCount(decryptedEntry.val);
             await query`
                 UPDATE entries
                 SET wordCount = ${entryWordCount}

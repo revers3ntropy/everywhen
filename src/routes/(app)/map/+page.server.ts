@@ -5,19 +5,15 @@ import { cachedPageRoute } from '$lib/utils/cache.server';
 import type { PageServerLoad } from './$types';
 
 export const load = cachedPageRoute(async auth => {
-    const { val: entries, err } = await Entry.Server.all(auth, { onlyWithLocation: true });
-    if (err) throw error(400, err);
-
-    const { err: locationErr, val: locations } = await Location.Server.all(auth);
-    if (locationErr) throw error(400, locationErr);
-
     return {
-        entries: entries.map(e => ({
-            created: e.created,
-            id: e.id,
-            latitude: e.latitude,
-            longitude: e.longitude
-        })),
-        locations
+        entries: (await Entry.all(auth, { onlyWithLocation: true }))
+            .unwrap(e => error(400, e))
+            .map(e => ({
+                created: e.created,
+                id: e.id,
+                latitude: e.latitude,
+                longitude: e.longitude
+            })),
+        locations: (await Location.all(auth)).unwrap(e => error(400, e))
     };
 }) satisfies PageServerLoad;

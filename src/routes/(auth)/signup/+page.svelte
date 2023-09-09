@@ -160,8 +160,8 @@
 </main>
 
 <style lang="scss">
-    @import '../../../styles/layout';
-    @import '../../../styles/text';
+    @import '$lib/styles/layout';
+    @import '$lib/styles/text';
 
     main {
         @extend .flex-center;

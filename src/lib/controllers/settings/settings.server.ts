@@ -51,7 +51,7 @@ namespace SettingsServer {
             return Result.ok({ id, created: now, key, value });
         }
 
-        const id = await UId.Server.generate();
+        const id = await UId.generate();
 
         await query`
             INSERT INTO settings (id, userId, created, \`key\`, value)
@@ -108,13 +108,13 @@ namespace SettingsServer {
 
         return Result.collect(
             settings.map(setting => {
-                const { err, val: unencryptedVal } = decrypt(setting.value, auth.key);
-                if (err) return Result.err(err);
+                const decryptRes = decrypt(setting.value, auth.key);
+                if (!decryptRes.ok) return decryptRes.cast();
                 return Result.ok({
                     id: setting.id,
                     created: setting.created,
                     key: setting.key,
-                    value: JSON.parse(unencryptedVal)
+                    value: JSON.parse(decryptRes.val)
                 });
             })
         );
@@ -141,30 +141,19 @@ namespace SettingsServer {
         if (settings.length < 1) {
             return Result.ok(Settings.config[key].defaultValue);
         }
-        const { err, val } = decrypt(settings[0].value, auth.key);
-        if (err) return Result.err(err);
-        return Result.ok(JSON.parse(val) as (typeof Settings.config)[T]['defaultValue']);
-    }
-
-    export async function allAsMap(auth: Auth): Promise<Result<Partial<SettingsConfig>>> {
-        const res = await all(auth);
-        if (res.err) {
-            return Result.err(res.err);
-        }
-        return Result.ok(
-            Object.fromEntries(res.val.map(s => [s.key, s])) as Partial<SettingsConfig>
-        );
+        const valueRes = decrypt(settings[0].value, auth.key);
+        if (!valueRes.ok) return valueRes.cast();
+        return Result.ok(JSON.parse(valueRes.val) as (typeof Settings.config)[T]['defaultValue']);
     }
 
     export async function allAsMapWithDefaults(auth: Auth): Promise<Result<SettingsConfig>> {
         const res = await all(auth);
-        if (res.err) {
-            return Result.err(res.err);
-        }
-        const settings = Object.fromEntries(
-            res.val.map(s => [s.key, s])
-        ) as Partial<SettingsConfig>;
-        return Result.ok(Settings.fillWithDefaults(settings));
+        if (!res.ok) return res.cast();
+        return Result.ok(
+            Settings.fillWithDefaults(
+                Object.fromEntries(res.val.map(s => [s.key, s])) as Partial<SettingsConfig>
+            )
+        );
     }
 
     export async function purgeAll(auth: Auth): Promise<Result<null>> {
@@ -180,9 +169,9 @@ namespace SettingsServer {
         auth: Auth,
         newKey: string
     ): Promise<Result<null>> {
-        const { val: unencryptedSettings, err } = await all(auth);
-        if (err) return Result.err(err);
-        for (const setting of unencryptedSettings) {
+        const unencryptedSettings = await all(auth);
+        if (!unencryptedSettings.ok) return unencryptedSettings.cast();
+        for (const setting of unencryptedSettings.val) {
             const newValue = encrypt(JSON.stringify(setting.value), newKey);
 
             await query`
@@ -197,7 +186,7 @@ namespace SettingsServer {
 
 export const Settings = {
     ..._Settings,
-    Server: SettingsServer
+    ...SettingsServer
 };
 
 export type Settings = _Settings;

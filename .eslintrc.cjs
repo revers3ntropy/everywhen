@@ -38,14 +38,8 @@ module.exports = {
         node: true
     },
     rules: {
-        'no-unused-vars': [
-            "error",
-            {
-                "args": "none",
-                "vars": "all",
-                "varsIgnorePattern": "^_",
-            }
-        ],
+        // https://github.com/typescript-eslint/typescript-eslint/issues/2621
+        "no-unused-vars": "off",
         '@typescript-eslint/no-unused-vars': [
             "error",
             {

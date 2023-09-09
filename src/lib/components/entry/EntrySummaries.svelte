@@ -157,8 +157,7 @@
 </div>
 
 <style lang="scss">
-    @import '../../../styles/variables';
-    @import '../../../styles/text';
+    @import '$lib/styles/text';
 
     .menu {
         display: flex;

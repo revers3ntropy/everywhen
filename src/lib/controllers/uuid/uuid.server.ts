@@ -1,7 +1,7 @@
 import { v4 as UUIdv4 } from 'uuid';
 import { query } from '$lib/db/mysql.server';
 
-export namespace UId.Server {
+export namespace UId {
     const BUFFER_SIZE = 10;
 
     const buffer: string[] = [];

@@ -343,8 +343,7 @@
 {/if}
 
 <style lang="scss">
-    @import '../../../styles/variables';
-    @import '../../../styles/layout';
+    @import '$lib/styles/layout';
 
     .restore-event {
         @extend .container;

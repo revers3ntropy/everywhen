@@ -94,7 +94,7 @@
 </div>
 
 <style lang="scss">
-    @import '../../../styles/layout';
+    @import '$lib/styles/layout';
 
     h1 {
         text-align: left;

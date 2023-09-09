@@ -142,9 +142,8 @@
 </span>
 
 <style lang="scss">
-    @import '../../../styles/variables';
-    @import '../../../styles/text';
-    @import '../../../styles/layout';
+    @import '$lib/styles/text';
+    @import '$lib/styles/layout';
 
     .entry-label-color {
         width: 20px;

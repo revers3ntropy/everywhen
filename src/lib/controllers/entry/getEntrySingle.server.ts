@@ -55,7 +55,7 @@ export async function entryFromId(
     const [entry] = entries;
     if (mustNotBeDeleted && Entry.isDeleted(entry)) return Result.err('Entry is deleted');
 
-    const { val: labels, err: labelErr } = await Label.Server.allIndexedById(auth);
+    const { val: labels, err: labelErr } = await Label.allIndexedById(auth);
     if (labelErr) return Result.err(labelErr);
 
     return await fromRaw(auth, entry, labels);
@@ -88,8 +88,8 @@ async function fromRaw(
         }
     }
 
-    const { err: editsErr, val: edits } = await getEditsForEntry(auth, rawEntry.id, labels);
-    if (editsErr) return Result.err(editsErr);
+    const editsRes = await getEditsForEntry(auth, rawEntry.id, labels);
+    if (!editsRes.ok) return editsRes.cast();
 
     return Result.ok({
         id: rawEntry.id,
@@ -104,7 +104,7 @@ async function fromRaw(
         agentData: decryptedAgent,
         wordCount: rawEntry.wordCount,
         label,
-        edits
+        edits: editsRes.val
     });
 }
 
@@ -144,5 +144,5 @@ async function getEditsForEntry(
         ORDER BY created DESC
     `;
 
-    return Result.collect(rawEdits.map(e => Entry.Server.editFromRaw(auth, labels, e)));
+    return Result.collect(rawEdits.map(e => Entry.editFromRaw(auth, labels, e)));
 }

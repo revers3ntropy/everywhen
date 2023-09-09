@@ -2,19 +2,19 @@ import type { Auth } from '$lib/controllers/auth/auth';
 import { decrypt } from '$lib/utils/encryption';
 import { FileLogger } from '$lib/utils/log.server';
 import { error } from '@sveltejs/kit';
-import schemion, { type Schema, type SchemaResult } from 'schemion';
+import { z } from 'zod';
+import type { ZodObject, ZodType } from 'zod';
 import { Result } from './result';
 
-const reqLogger = new FileLogger('RQBODY');
+const reqLogger = new FileLogger('RequestBody');
 
-export async function bodyFromReq<T extends Schema & Record<string, unknown>>(
+export async function bodyFromReq<T extends Record<string, ZodType>>(
     key: Auth | string | null,
     request: Request,
-    schema: T,
-    defaults: { [P in keyof T]?: SchemaResult<T[P]> | undefined } = {}
-): Promise<Result<Readonly<SchemaResult<T>>>> {
+    schema: T
+): Promise<Result<Readonly<z.infer<ZodObject<T>>>>> {
     if (request.method === 'GET') {
-        void reqLogger.log('GET requests are not supported in bodyFromReq()');
+        void reqLogger.error('GET requests are not supported in bodyFromReq()');
         return Result.err('Something went wrong');
     }
 
@@ -32,11 +32,10 @@ export async function bodyFromReq<T extends Schema & Record<string, unknown>>(
     try {
         body = JSON.parse(bodyText);
     } catch (e) {
-        if (!key) {
-            return Result.err('Invalid request body');
-        }
+        if (!key) return Result.err('Invalid request body');
+
         const decryptedRes = decrypt(bodyText, key);
-        if (!decryptedRes.ok) return decryptedRes.as();
+        if (!decryptedRes.ok) return decryptedRes.cast();
 
         try {
             body = JSON.parse(decryptedRes.val);
@@ -49,32 +48,17 @@ export async function bodyFromReq<T extends Schema & Record<string, unknown>>(
         return Result.err('Invalid request body');
     }
 
-    if (
-        !schemion.matches(
-            body,
-            schema,
-            defaults as T extends object
-                ? { [P in keyof T]?: SchemaResult<T[P]> | undefined } | null
-                : null
-        )
-    ) {
-        return Result.err(`Invalid body: does not match expected schema`);
+    const parsed = z.object(schema).safeParse(body);
+    if (!parsed.success) {
+        return Result.err(parsed.error.message);
     }
-
-    return Result.ok(Object.freeze(body as SchemaResult<T>));
+    return Result.ok(parsed.data);
 }
 
-export async function getUnwrappedReqBody<
-    T extends Schema &
-        Record<string, unknown> & {
-            timezoneUtcOffset?: 'number';
-            utcTimeS?: 'number';
-        }
->(
+export async function getUnwrappedReqBody<T extends Record<string, ZodType>>(
     key: Auth | string | null,
     request: Request,
-    valueType: T,
-    defaults: { [P in keyof T]?: SchemaResult<T[P]> } = {}
-): Promise<Readonly<SchemaResult<T>>> {
-    return (await bodyFromReq(key, request, valueType, defaults)).unwrap(e => error(400, e));
+    valueType: T
+): Promise<Readonly<z.infer<ZodObject<T>>>> {
+    return (await bodyFromReq(key, request, valueType)).unwrap(e => error(400, e));
 }

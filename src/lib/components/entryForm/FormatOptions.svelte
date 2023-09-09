@@ -69,8 +69,6 @@
 </Dropdown>
 
 <style lang="scss">
-    @import '../../../styles/variables';
-
     .format-options {
         padding: 0.5rem 0;
 

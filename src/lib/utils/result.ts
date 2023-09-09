@@ -3,20 +3,16 @@ export type Result<T, E = string> = Ok<T, E> | Err<T, E>;
 interface ResultOption<T, E = string> {
     ok: boolean;
 
-    // `maps` the value if there is one, but leaves the error along
     map<R>(fn: (val: T) => R): Result<R, E>;
 
-    // other way round: applies a function to the error is there is one
     mapErr<R>(fn: (err: E) => R): Result<T, R>;
 
-    // convert from `Result`s to `throw`s
-    // (convert the other way round with static `Result.wrap`)
+    mapToResult<R>(fn: (val: T) => Result<R, E>): Result<R, E>;
+
     unwrap(mapErr?: (err: E) => unknown): T;
 
-    // returns the value if it has one, or the argument otherwise
     or(_fallback: T): T;
 
-    // returns whatever data it holds, be it error or value
     merge(): T | E;
 }
 
@@ -66,7 +62,7 @@ export namespace Result {
     }
 
     export async function collectAsync<T, E = string>(
-        iter: Iterable<Promise<Result<T, E>>>
+        iter: Iterable<Promise<Result<T, E>>> | Promise<Result<T, E>>[]
     ): Promise<Result<T[], E>> {
         return Result.collect(
             (await Promise.allSettled(iter)).map(result => {
@@ -108,6 +104,10 @@ class Ok<T, E> implements ResultOption<T, E> {
         return this as unknown as Result<T, R>;
     }
 
+    public mapToResult<R = T>(fn: (_val: T) => Result<R, E>): Result<R, E> {
+        return fn(this.val);
+    }
+
     public match<U = T, V = E>(mapVal: (_val: T) => U, _: (_err: E) => V): U {
         return mapVal(this.val);
     }
@@ -135,7 +135,7 @@ class Ok<T, E> implements ResultOption<T, E> {
         return this.val;
     }
 
-    public as<E>(): Result<T, E> {
+    public cast<E>(): Result<T, E> {
         return new Ok<T, E>(this.val);
     }
 }
@@ -150,6 +150,10 @@ class Err<T, E> implements ResultOption<unknown, E> {
 
     public mapErr<R>(fn: (_err: E) => R): Result<T, R> {
         return Result.err(fn(this.err));
+    }
+
+    public mapToResult<R = T>(_fn: (_val: T) => Result<R, E>): Result<R, E> {
+        return this as unknown as Result<R, E>;
     }
 
     public match<U, V>(_: (_val: T) => U, mapErr: (_err: E) => V): V {
@@ -168,7 +172,7 @@ class Err<T, E> implements ResultOption<unknown, E> {
         return this.err;
     }
 
-    public as<T>(): Result<T, E> {
+    public cast<T>(): Result<T, E> {
         return new Err<T, E>(this.err);
     }
 }

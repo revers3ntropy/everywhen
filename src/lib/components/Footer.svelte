@@ -79,8 +79,7 @@
 </footer>
 
 <style lang="scss">
-    @import '../../styles/variables';
-    @import '../../styles/layout';
+    @import '$lib/styles/layout';
 
     footer {
         padding: 5rem 0 5rem 0;

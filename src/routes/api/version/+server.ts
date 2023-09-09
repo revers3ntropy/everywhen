@@ -11,8 +11,9 @@ const BODY_INIT = {
     status: 200
 };
 
-export const GET = (() =>
-    new Response(GET_RES, BODY_INIT) as GenericResponse<{ v: string }>) satisfies RequestHandler;
+export const GET = (() => {
+    return new Response(GET_RES, BODY_INIT) as GenericResponse<{ v: string }>;
+}) satisfies RequestHandler;
 
 export const POST = apiRes404;
 export const DELETE = apiRes404;

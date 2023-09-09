@@ -3,79 +3,60 @@ import { Entry } from '$lib/controllers/entry/entry.server';
 import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
 import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
+import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { Auth } from '$lib/controllers/auth/auth.server';
 
 export const GET = cachedApiRoute(async (auth, { params }) => {
     if (!params.entryId) throw error(400, 'invalid id');
 
-    const { err, val: entry } = await Entry.Server.getFromId(auth, params.entryId, true);
-
-    if (err) throw error(400, err);
+    const entry = (await Entry.getFromId(auth, params.entryId, true)).unwrap(e => error(400, e));
 
     return { ...entry };
 }) satisfies RequestHandler;
 
 export const DELETE = (async ({ request, params, cookies }) => {
-    const auth = Auth.Server.getAuthFromCookies(cookies);
+    const auth = Auth.getAuthFromCookies(cookies);
     if (!params.entryId) throw error(400, 'invalid id');
     invalidateCache(auth.id);
 
     const body = await getUnwrappedReqBody(auth, request, {
-        restore: 'boolean'
+        restore: z.boolean().default(false)
     });
 
-    const { err: deleteErr } = await Entry.Server.del(auth, params.entryId, body.restore);
-    if (deleteErr) throw error(400, deleteErr);
+    (await Entry.del(auth, params.entryId, body.restore)).unwrap(e => error(400, e));
 
     return apiResponse(auth, { id: params.entryId });
 }) satisfies RequestHandler;
 
 export const PUT = (async ({ request, params, cookies }) => {
-    const auth = Auth.Server.getAuthFromCookies(cookies);
+    const auth = Auth.getAuthFromCookies(cookies);
     if (!params.entryId) throw error(400, 'invalid id');
     invalidateCache(auth.id);
 
-    const body = await getUnwrappedReqBody(
+    const body = await getUnwrappedReqBody(auth, request, {
+        title: z.string().default(''),
+        body: z.string(),
+        label: z.string().nullable(),
+        latitude: z.number().nullable().default(null),
+        longitude: z.number().nullable().default(null),
+        timezoneUtcOffset: z.number().default(0),
+        agentData: z.string().default('')
+    });
+
+    const entry = (await Entry.getFromId(auth, params.entryId, true)).unwrap(e => error(400, e));
+
+    await Entry.edit(
         auth,
-        request,
-        {
-            title: 'string',
-            body: 'string',
-            label: 'string',
-            latitude: 'number',
-            longitude: 'number',
-            timezoneUtcOffset: 'number',
-            agentData: 'string'
-        },
-        {
-            title: '',
-            body: '',
-            label: '',
-            latitude: 0,
-            longitude: 0,
-            timezoneUtcOffset: 0,
-            agentData: ''
-        }
+        entry,
+        body.title,
+        body.body,
+        body.latitude,
+        body.longitude,
+        body.label,
+        body.timezoneUtcOffset,
+        body.agentData
     );
-
-    const entry = (await Entry.Server.getFromId(auth, params.entryId, true)).unwrap(e =>
-        error(400, e)
-    );
-
-    (
-        await Entry.Server.edit(
-            auth,
-            entry,
-            body.title,
-            body.body,
-            body.latitude || null,
-            body.longitude || null,
-            body.label,
-            body.timezoneUtcOffset,
-            body.agentData
-        )
-    ).unwrap(e => error(400, e));
 
     return apiResponse(auth, { id: entry.id });
 }) satisfies RequestHandler;

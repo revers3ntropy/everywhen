@@ -81,13 +81,13 @@ export async function getSummariesNYearsAgo(
         ORDER BY entries.created DESC, id
     `;
 
-    const { val: summaries, err } = await summariesFromRaw(auth, rawEntries);
-    if (err) return Result.err(err);
+    const summariesRes = await summariesFromRaw(auth, rawEntries);
+    if (!summariesRes.ok) return summariesRes.cast();
 
     return Result.ok(
         dates.reduce(
             (prev, date) => {
-                prev[date] = summaries.filter(
+                prev[date] = summariesRes.val.filter(
                     s => fmtUtc(s.created, s.createdTzOffset, 'YYYY-MM-DD') === date
                 );
                 return prev;
@@ -155,8 +155,8 @@ export async function getPageOfSummaries(
         OFFSET ${offset}
     `;
 
-    const { val: summaries, err } = await summariesFromRaw(auth, rawEntries);
-    if (err) return Result.err(err);
+    const summariesRes = await summariesFromRaw(auth, rawEntries);
+    if (!summariesRes.ok) return summariesRes.cast();
 
     const [{ totalCount }] = await query<{ totalCount: number }[]>`
         SELECT COUNT(*) as totalCount 
@@ -165,7 +165,7 @@ export async function getPageOfSummaries(
             AND entries.userId = ${auth.id}
     `;
 
-    return Result.ok({ summaries, totalCount });
+    return Result.ok({ summaries: summariesRes.val, totalCount });
 }
 
 export async function getPinnedSummaries(auth: Auth): Promise<Result<EntrySummary[]>> {
@@ -226,21 +226,21 @@ async function summariesFromRaw(
     auth: Auth,
     raw: RawEntrySummary[]
 ): Promise<Result<EntrySummary[]>> {
-    const { err, val: labels } = await Label.Server.allIndexedById(auth);
-    if (err) return Result.err(err);
+    const labelsRes = await Label.allIndexedById(auth);
+    if (!labelsRes.ok) return labelsRes.cast();
 
     return Result.collect(
         raw.map(rawEntry => {
-            const { err: titleErr, val: title } = decrypt(rawEntry.title, auth.key);
-            if (titleErr) return Result.err(titleErr);
-            const titleShortened = Entry.stringToShortTitle(title);
+            const titleRes = decrypt(rawEntry.title, auth.key);
+            if (!titleRes.ok) return titleRes.cast();
+            const titleShortened = Entry.stringToShortTitle(titleRes.val);
 
-            const { err: bodyErr, val: body } = decrypt(rawEntry.body, auth.key);
-            if (bodyErr) return Result.err(bodyErr);
-            const bodyShortened = Entry.stringToShortTitle(body);
+            const bodyRes = decrypt(rawEntry.body, auth.key);
+            if (!bodyRes.ok) return bodyRes.cast();
+            const bodyShortened = Entry.stringToShortTitle(bodyRes.val);
 
-            const { err: agentErr, val: agentData } = decrypt(rawEntry.agentData, auth.key);
-            if (agentErr) return Result.err(agentErr);
+            const agentDataRes = decrypt(rawEntry.agentData, auth.key);
+            if (!agentDataRes.ok) return agentDataRes.cast();
 
             return Result.ok({
                 id: rawEntry.id,
@@ -251,9 +251,9 @@ async function summariesFromRaw(
                 pinned: rawEntry.pinned,
                 latitude: rawEntry.latitude,
                 longitude: rawEntry.longitude,
-                agentData,
+                agentData: agentDataRes.val,
                 wordCount: rawEntry.wordCount,
-                label: rawEntry.labelId ? labels[rawEntry.labelId] : null,
+                label: rawEntry.labelId ? labelsRes.val[rawEntry.labelId] : null,
                 editCount: rawEntry.editCount
             });
         })

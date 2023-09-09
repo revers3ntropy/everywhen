@@ -43,10 +43,10 @@
     export let entries = [] as EntryAsLocation[];
     export let locations = [] as Location[];
     export let entriesInteractable = true;
-    export let width = 'calc(100vw - 2rem)';
-    export let height = 'calc(100vh - var(--nav-height) - 1rem)';
+    export let width = '100%';
+    export let height = 'calc(100vh - 1rem)';
     export let mobileWidth = '100%';
-    export let mobileHeight = 'calc(100vh - var(--nav-height) - 5rem)';
+    export let mobileHeight = 'calc(100vh - 5rem)';
 
     async function reloadLocations() {
         const res = notify.onErr(await api.get('/locations'));
@@ -331,8 +331,8 @@
 
 <style lang="scss">
     @import 'ol-contextmenu/ol-contextmenu.css';
-    @import '../../../styles/variables';
-    @import '../../../styles/layout';
+
+    @import '$lib/styles/layout';
 
     .map {
         @extend .container;

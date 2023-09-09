@@ -435,9 +435,8 @@
 </div>
 
 <style lang="scss">
-    @import '../../../styles/variables';
-    @import '../../../styles/layout';
-    @import '../../../styles/input';
+    @import '$lib/styles/layout';
+    @import '$lib/styles/input';
 
     .wrapper {
         margin: 1rem;

@@ -68,7 +68,6 @@
             however when switching pages the styles get leaked and cause
             weird issues (the bar chart not showing on the stats page)
          */
-        @import '../../../styles/variables';
 
         /*
             put the canvas behind everything,
@@ -88,6 +87,7 @@
         body,
         .root {
             max-height: 100vh;
+            background: var(--light-accent);
 
             &::-webkit-scrollbar {
                 display: none;

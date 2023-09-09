@@ -8,19 +8,20 @@ import { invalidateCache } from '$lib/utils/cache.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import { User } from '$lib/controllers/user/user.server';
 import { Auth } from '$lib/controllers/auth/auth.server';
+import { z } from 'zod';
 
 export const POST = (async ({ request, cookies, locals: { auth } }) => {
     if (auth?.key) throw error(401, 'Invalid authentication');
 
     const body = await getUnwrappedReqBody(null, request, {
-        username: 'string',
-        encryptionKey: 'string'
+        username: z.string(),
+        encryptionKey: z.string()
     });
 
-    (await User.Server.create(body.username, body.encryptionKey)).unwrap(e => error(400, e));
+    (await User.create(body.username, body.encryptionKey)).unwrap(e => error(400, e));
 
     const sessionId = (
-        await Auth.Server.authenticateUserFromLogIn(
+        await Auth.authenticateUserFromLogIn(
             body.username,
             body.encryptionKey,
             maxAgeFromShouldRememberMe(false)
@@ -37,18 +38,18 @@ export const DELETE = (async ({ cookies, request, locals: { auth } }) => {
     invalidateCache(auth.id);
 
     const body = await getUnwrappedReqBody(auth.key, request, {
-        username: 'string',
-        encryptionKey: 'string'
+        username: z.string(),
+        encryptionKey: z.string()
     });
 
-    const userIdFromLogIn = (
-        await Auth.Server.userIdFromLogIn(body.username, body.encryptionKey)
-    ).unwrap(e => error(401, e));
+    const userIdFromLogIn = (await Auth.userIdFromLogIn(body.username, body.encryptionKey)).unwrap(
+        e => error(401, e)
+    );
     if (userIdFromLogIn !== auth.id) throw error(401, 'Invalid authentication');
 
-    const backup = (await Backup.Server.generate(auth)).unwrap(e => error(400, e));
+    const backup = (await Backup.generate(auth)).unwrap(e => error(400, e));
 
-    await User.Server.purge(auth);
+    await User.purge(auth);
 
     cookies.delete(COOKIE_KEYS.sessionId, sessionCookieOptions(false));
 

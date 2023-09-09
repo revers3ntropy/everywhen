@@ -56,8 +56,7 @@
 </div>
 
 <style lang="scss">
-    @import '../../../styles/variables';
-    @import '../../../styles/text';
+    @import '$lib/styles/text';
 
     .content {
         margin-left: 10vw;

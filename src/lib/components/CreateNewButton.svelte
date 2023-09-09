@@ -123,9 +123,10 @@
     </linearGradient>
 </svg>
 <Dropdown openOnHover width="170px">
-    <span class="create-button" slot="button">
+    <div class="with-icon w-full" slot="button">
         <Plus size="25" />
-    </span>
+        New
+    </div>
 
     <div class="record-something-buttons">
         <button class="with-icon oneline record-entry" on:click={makeEntry}>
@@ -158,3 +159,69 @@
         </button>
     </div>
 </Dropdown>
+
+<style lang="scss">
+    .record-something-buttons {
+        display: block;
+        padding: 0.8rem 0 0.8rem 0;
+
+        button {
+            width: 100%;
+            padding: 0.4em 0.8em 0.4em 0.4em;
+            margin: 0;
+            border-radius: 0;
+            text-align: left;
+            color: var(--text-color);
+            transition: #{$transition};
+        }
+
+        .record-entry:hover {
+            background: var(--v-light-accent);
+
+            :global(svg),
+            :global(svg *) {
+                fill: url(#accent-gradient);
+            }
+        }
+
+        .record-bullet:hover {
+            background: var(--v-light-accent);
+
+            :global(svg),
+            :global(svg *) {
+                fill: url(#accent-gradient);
+            }
+        }
+
+        .record-dream:hover {
+            background: rgba(0, 0, 255, 0.1);
+
+            :global(svg),
+            :global(svg *) {
+                fill: url(#dream-gradient);
+            }
+        }
+
+        .record-idea:hover {
+            background: rgba(255, 255, 0, 0.1);
+
+            :global(svg),
+            :global(svg *) {
+                fill: url(#idea-gradient);
+            }
+        }
+
+        .record-thought:hover {
+            background: rgba(170, 212, 205, 0.1);
+
+            :global(svg),
+            :global(svg *) {
+                fill: url(#thought-gradient);
+            }
+        }
+
+        .new-event:hover {
+            background: var(--v-light-accent);
+        }
+    }
+</style>

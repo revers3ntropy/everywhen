@@ -124,7 +124,7 @@ export const handle = (async ({ event, resolve }) => {
     const start = performance.now();
     const now = nowUtc();
 
-    const auth = Auth.Server.tryGetAuthFromCookies(event.cookies);
+    const auth = Auth.tryGetAuthFromCookies(event.cookies);
     if (auth) {
         event.locals.auth = { ...auth };
     } else {

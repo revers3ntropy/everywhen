@@ -23,8 +23,8 @@ namespace EventServer {
     }
 
     export async function all(auth: Auth): Promise<Result<Event[]>> {
-        const { err, val: labels } = await Label.Server.allIndexedById(auth);
-        if (err) return Result.err(err);
+        const labelsRes = await Label.allIndexedById(auth);
+        if (!labelsRes.ok) return labelsRes.cast();
 
         const rawEvents = await query<
             {
@@ -47,7 +47,7 @@ namespace EventServer {
             ORDER BY created DESC
         `;
 
-        return Result.collect(rawEvents.map(e => fromRaw(auth, e, labels)));
+        return Result.collect(rawEvents.map(e => fromRaw(auth, e, labelsRes.val)));
     }
 
     export async function fromId(auth: Auth, id: string): Promise<Result<Event>> {
@@ -74,10 +74,9 @@ namespace EventServer {
         }
         const [event] = events;
 
-        const { err, val: labels } = await Label.Server.allIndexedById(auth);
-        if (err) return Result.err(err);
-
-        return fromRaw(auth, event, labels);
+        return (await Label.allIndexedById(auth)).mapToResult(labels =>
+            fromRaw(auth, event, labels)
+        );
     }
 
     export function fromRaw(
@@ -85,8 +84,8 @@ namespace EventServer {
         rawEvent: RawEvent,
         labels: Record<string, Label>
     ): Result<Event> {
-        const { err, val: nameDecrypted } = decrypt(rawEvent.name, auth.key);
-        if (err) return Result.err(err);
+        const nameDecrypted = decrypt(rawEvent.name, auth.key);
+        if (!nameDecrypted.ok) return nameDecrypted.cast();
 
         let label: Label | null = null;
         if (rawEvent.labelId) {
@@ -98,7 +97,7 @@ namespace EventServer {
 
         return Result.ok({
             id: rawEvent.id,
-            name: nameDecrypted,
+            name: nameDecrypted.val,
             start: rawEvent.start,
             end: rawEvent.end,
             created: rawEvent.created,
@@ -134,7 +133,7 @@ namespace EventServer {
         const canCreate = await canCreateEventWithName(auth, name);
         if (canCreate !== true) return Result.err(canCreate);
 
-        const id = await UId.Server.generate();
+        const id = await UId.generate();
         created ??= nowUtc();
 
         await query`
@@ -197,14 +196,9 @@ namespace EventServer {
         start: TimestampSecs
     ): Promise<Result<Event>> {
         if (start > self.end) {
-            const { err } = await updateEnd(
-                auth,
-                self,
-                // If trying to update start to be after end,
-                // update end to be 1 hour after start
-                start + 60 * 60
-            );
-            if (err) return Result.err(err);
+            // If trying to update start to be after end,
+            // update end to be 1 hour after start
+            return updateStartAndEnd(auth, self, start, start + 60 * 60);
         }
         self.start = start;
         await query`
@@ -222,14 +216,9 @@ namespace EventServer {
         end: TimestampSecs
     ): Promise<Result<Event>> {
         if (end < self.start) {
-            const { err } = await updateStart(
-                auth,
-                self,
-                // If trying to update end to be before start,
-                // update start to be 1 hour before end
-                end - 60 * 60
-            );
-            if (err) return Result.err(err);
+            // If trying to update end to be before start,
+            // update start to be 1 hour before end
+            return updateStartAndEnd(auth, self, end - 60 * 60, end);
         }
         self.end = end;
         await query`
@@ -247,9 +236,8 @@ namespace EventServer {
         start: TimestampSecs,
         end: TimestampSecs
     ): Promise<Result<Event>> {
-        if (start > end) {
-            return Result.err('Start time cannot be after end time');
-        }
+        if (start > end) return Result.err('Start time cannot be after end time');
+
         self.start = start;
         self.end = end;
         await query`
@@ -280,9 +268,6 @@ namespace EventServer {
             });
         }
 
-        const { err, val: label } = await Label.Server.fromId(auth, labelId);
-        if (err) return Result.err(err);
-
         await query`
             UPDATE events
             SET labelId = ${labelId}
@@ -290,10 +275,10 @@ namespace EventServer {
               AND userId = ${auth.id}
         `;
 
-        return Result.ok({
+        return (await Label.fromId(auth, labelId)).map(label => ({
             ...self,
             label
-        });
+        }));
     }
 
     export async function purge(auth: Auth, self: Event): Promise<Result<null>> {
@@ -307,42 +292,37 @@ namespace EventServer {
     }
 
     export async function withLabel(auth: Auth, labelId: string): Promise<Result<Event[]>> {
-        const { err } = await Label.Server.fromId(auth, labelId);
-        if (err) return Result.err(err);
+        const fromIdRes = await Label.fromId(auth, labelId);
+        if (!fromIdRes.ok) return fromIdRes.cast();
 
-        const { val: events, err: allErr } = await all(auth);
-        if (allErr) return Result.err(allErr);
-
-        return Result.ok(events.filter(evt => evt.label?.id === labelId));
+        return (await all(auth)).map(events => events.filter(evt => evt.label?.id === labelId));
     }
 
     export async function reassignAllLabels(
         auth: Auth,
         oldLabel: string,
         newLabel: string
-    ): Promise<Result<null>> {
+    ): Promise<void> {
         await query`
             UPDATE events
             SET labelId = ${newLabel}
             WHERE labelId = ${oldLabel}
               AND userId = ${auth.id}
         `;
-        return Result.ok(null);
     }
 
-    export async function removeAllLabel(auth: Auth, labelId: string): Promise<Result<null>> {
+    export async function removeAllLabel(auth: Auth, labelId: string): Promise<void> {
         await query`
             UPDATE events
             SET labelId = ${null}
             WHERE labelId = ${labelId}
               AND userId = ${auth.id}
         `;
-        return Result.ok(null);
     }
 }
 
 export const Event = {
     ..._Event,
-    Server: EventServer
+    ...EventServer
 };
 export type Event = _Event;

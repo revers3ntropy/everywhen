@@ -4,7 +4,7 @@ import { cachedPageRoute } from '$lib/utils/cache.server';
 import type { PageServerLoad } from './$types';
 
 export const load = cachedPageRoute(async auth => {
-    const { err, val: labels } = await Label.Server.allWithCounts(auth);
-    if (err) throw error(400, err);
-    return { labels };
+    return {
+        labels: (await Label.allWithCounts(auth)).unwrap(e => error(400, e))
+    };
 }) satisfies PageServerLoad;

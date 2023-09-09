@@ -95,22 +95,18 @@ export namespace ghAPI {
         code: string,
         state: string
     ): Promise<Result<string>> {
-        const { err, val: accessToken } = await getGitHubOAuthAccessToken(code, state);
-        if (err) return Result.err(err);
+        const accessToken = await getGitHubOAuthAccessToken(code, state);
+        if (!accessToken.ok) return accessToken.cast();
 
-        const { err: saveErr } = await Settings.Server.update(
-            auth,
-            'gitHubAccessToken',
-            accessToken
-        );
-        if (saveErr) return Result.err(saveErr);
+        const saveRes = await Settings.update(auth, 'gitHubAccessToken', accessToken);
+        if (!saveRes.ok) return saveRes.cast();
 
-        return Result.ok(accessToken);
+        return Result.ok(accessToken.val);
     }
 
     export async function unlinkToGitHubOAuth(auth: Auth): Promise<Result<null>> {
-        const { err: saveErr } = await Settings.Server.update(auth, 'gitHubAccessToken', '');
-        if (saveErr) return Result.err(saveErr);
+        const saveRes = await Settings.update(auth, 'gitHubAccessToken', '');
+        if (!saveRes.ok) return saveRes.cast();
         return Result.ok(null);
     }
 
@@ -176,19 +172,24 @@ export namespace ghAPI {
     }
 
     export async function getGhUserInfo(gitHubAccessToken?: string): Promise<Result<GitHubUser>> {
-        const { err, val } = await makeGhApiReq(gitHubAccessToken, '/user');
-        if (err) return Result.err(err);
+        const reqRes = await makeGhApiReq(gitHubAccessToken, '/user');
+        if (!reqRes.ok) return reqRes.cast();
 
-        if (
-            !('login' in val) ||
-            typeof val.login !== 'string' ||
-            !('id' in val) ||
-            typeof val.id !== 'number'
-        ) {
-            await logger.error(`getGhUserInfo: Invalid response from github`, { val });
+        const expectedSchema = z.object({
+            login: z.string(),
+            id: z.number()
+        });
+
+        const parseResult = expectedSchema.safeParse(reqRes.val);
+
+        if (!parseResult.success) {
+            await logger.error(`getGhUserInfo: Invalid response from github`, { reqRes });
             return Result.err('Invalid response from GitHub');
         }
 
-        return Result.ok({ username: val.login, id: val.id });
+        return Result.ok({
+            username: parseResult.data.login,
+            id: parseResult.data.id
+        });
     }
 }

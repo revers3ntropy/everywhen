@@ -74,8 +74,7 @@
 </div>
 
 <style lang="scss">
-    @import '../../../styles/variables';
-    @import '../../../styles/layout';
+    @import '$lib/styles/layout';
 
     .label {
         @extend .container;

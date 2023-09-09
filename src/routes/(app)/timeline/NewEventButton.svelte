@@ -55,7 +55,7 @@
 </div>
 
 <style lang="scss">
-    @import '../../../styles/layout';
+    @import '$lib/styles/layout';
 
     button {
         @extend .flex-center;
@@ -84,7 +84,7 @@
 
     .content {
         position: absolute;
-        bottom: calc(var(--nav-height) + 1rem);
+        bottom: calc($mobile-nav-height + 1rem);
         right: 1rem;
         z-index: 2;
     }

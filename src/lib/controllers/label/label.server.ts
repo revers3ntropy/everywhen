@@ -26,13 +26,13 @@ namespace LabelServer {
             return Result.err('Label not found');
         }
 
-        const { err, val: nameDecrypted } = decrypt(res[0].name, auth.key);
-        if (err) return Result.err(err);
+        const nameDecrypted = decrypt(res[0].name, auth.key);
+        if (!nameDecrypted.ok) return nameDecrypted.cast();
 
         return Result.ok({
             id: res[0].id,
             color: res[0].color,
-            name: nameDecrypted,
+            name: nameDecrypted.val,
             created: res[0].created
         });
     }
@@ -74,12 +74,12 @@ namespace LabelServer {
 
         return Result.collect(
             res.map(label => {
-                const { err, val: nameDecrypted } = decrypt(label.name, auth.key);
-                if (err) return Result.err(err);
+                const nameDecrypted = decrypt(label.name, auth.key);
+                if (!nameDecrypted.ok) return nameDecrypted.cast();
                 return Result.ok({
                     id: label.id,
                     color: label.color,
-                    name: nameDecrypted,
+                    name: nameDecrypted.val,
                     created: label.created
                 });
             })
@@ -87,7 +87,7 @@ namespace LabelServer {
     }
 
     export async function allIndexedById(auth: Auth): Promise<Result<Record<string, Label>>> {
-        return (await Label.Server.all(auth)).map(labels =>
+        return (await Label.all(auth)).map(labels =>
             labels.reduce(
                 (prev, label) => {
                     prev[label.id] = label;
@@ -153,7 +153,7 @@ namespace LabelServer {
         const canCreate = await canCreateWithName(auth, json.name);
         if (canCreate !== true) return Result.err(canCreate);
 
-        const id = await UId.Server.generate();
+        const id = await UId.generate();
         const created = json.created ?? nowUtc();
 
         const encryptedName = encrypt(json.name, auth.key);
@@ -218,45 +218,45 @@ namespace LabelServer {
     }
 
     export async function allWithCounts(auth: Auth): Promise<Result<LabelWithCount[]>> {
-        const { err, val: labels } = await all(auth);
-        if (err) return Result.err(err);
+        const allEntryLabelIds = (
+            await query<{ labelId: string }[]>`
+                SELECT labelId
+                FROM entries
+                WHERE userId = ${auth.id}
+            `
+        ).map(({ labelId }) => labelId);
+        const allEventLabelIds = (
+            await query<{ labelId: string }[]>`
+                SELECT labelId
+                FROM events
+                WHERE userId = ${auth.id}
+            `
+        ).map(({ labelId }) => labelId);
+        const allEditLabelIds = (
+            await query<{ labelId: string }[]>`
+                SELECT oldLabelId as labelId
+                FROM entryEdits
+                WHERE userId = ${auth.id}
+            `
+        ).map(({ labelId }) => labelId);
 
-        return Result.ok(
-            await Promise.all(
-                labels.map(async label => {
-                    const entryCount = await query<{ count: number }[]>`
-                        SELECT COUNT(*) as count
-                        FROM entries
-                        WHERE userId = ${auth.id}
-                          AND labelId = ${label.id}
-                    `;
-                    const eventCount = await query<{ count: number }[]>`
-                        SELECT COUNT(*) as count
-                        FROM events
-                        WHERE userId = ${auth.id}
-                          AND labelId = ${label.id}
-                    `;
-                    const editCount = await query<{ count: number }[]>`
-                        SELECT COUNT(*) as count
-                        FROM entryEdits,
-                             entries
-                        WHERE entryEdits.entryId = entries.id
-                          AND entries.userId = ${auth.id}
-                          AND entryEdits.oldLabelId = ${label.id}
-                    `;
-
-                    return {
-                        ...label,
-                        entryCount: entryCount[0].count + editCount[0].count,
-                        eventCount: eventCount[0].count
-                    };
-                })
-            )
-        );
+        return (await all(auth)).map(labels => {
+            return labels.map(label => {
+                // TODO: this is O(n^2) and should be optimized
+                const entryCount = allEntryLabelIds.filter(l => l === label.id).length;
+                const eventCount = allEventLabelIds.filter(l => l === label.id).length;
+                const editCount = allEditLabelIds.filter(l => l === label.id).length;
+                return {
+                    ...label,
+                    entryCount: entryCount + editCount,
+                    eventCount
+                };
+            });
+        });
     }
 }
 
 export const Label = {
-    Server: LabelServer
+    ...LabelServer
 };
 export type Label = _Label;

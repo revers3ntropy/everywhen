@@ -26,8 +26,7 @@
 </div>
 
 <style lang="scss">
-    @import '../../styles/variables';
-    @import '../../styles/layout';
+    @import '$lib/styles/layout';
 
     .content {
         @extend .container-shadow;

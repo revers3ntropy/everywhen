@@ -21,7 +21,7 @@
 </div>
 
 <style lang="scss">
-    @import '../../../styles/layout';
+    @import '$lib/styles/layout';
 
     .filter-button {
         @extend .flex-center;
@@ -51,7 +51,7 @@
 
     .content {
         position: absolute;
-        bottom: calc(var(--nav-height) + 1rem + 30px + 16px + 0.5rem);
+        bottom: calc($mobile-nav-height + 1rem + 30px + 16px + 0.5rem);
         right: 1rem;
         z-index: 2;
     }

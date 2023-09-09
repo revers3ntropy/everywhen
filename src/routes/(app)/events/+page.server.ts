@@ -6,9 +6,9 @@ import type { PageServerLoad } from './$types';
 
 export const load = cachedPageRoute(async auth => {
     return {
-        events: (await Event.Server.all(auth)).unwrap(e => error(400, e)) as (Event & {
+        events: (await Event.all(auth)).unwrap(e => error(400, e)) as (Event & {
             deleted?: boolean;
         })[],
-        labels: (await Label.Server.all(auth)).unwrap(e => error(400, e))
+        labels: (await Label.all(auth)).unwrap(e => error(400, e))
     };
 }) satisfies PageServerLoad;

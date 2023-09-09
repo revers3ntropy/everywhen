@@ -7,9 +7,7 @@ import { cachedApiRoute } from '$lib/utils/cache.server';
 export const GET = cachedApiRoute(async (auth, { url }) => {
     const count = parseInt(url.searchParams.get('count') || '100');
     const offset = parseInt(url.searchParams.get('offset') || '0');
-    return (await Entry.Server.getPageOfSummaries(auth, count, offset)).unwrap(err =>
-        error(400, err)
-    );
+    return (await Entry.getPageOfSummaries(auth, count, offset)).unwrap(err => error(400, err));
 }) satisfies RequestHandler;
 
 export const POST = apiRes404;

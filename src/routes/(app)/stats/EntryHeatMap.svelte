@@ -63,8 +63,6 @@
 </div>
 
 <style lang="scss">
-    @import '../../../styles/variables';
-
     @media #{$mobile} {
         .outer {
             overflow-x: auto;

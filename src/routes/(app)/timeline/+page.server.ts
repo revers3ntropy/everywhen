@@ -7,10 +7,10 @@ import { cachedPageRoute } from '$lib/utils/cache.server';
 
 export const load = cachedPageRoute(async auth => {
     return {
-        entries: (await Entry.Server.getPageOfSummaries(auth, LIMITS.entry.maxCount + 1, 0)).unwrap(
-            e => error(400, e)
+        entries: (await Entry.getPageOfSummaries(auth, LIMITS.entry.maxCount + 1, 0)).unwrap(e =>
+            error(400, e)
         ).summaries,
-        events: (await Event.Server.all(auth)).unwrap(e => error(400, e)),
-        labels: (await Label.Server.all(auth)).unwrap(e => error(400, e))
+        events: (await Event.all(auth)).unwrap(e => error(400, e)),
+        labels: (await Label.all(auth)).unwrap(e => error(400, e))
     };
 });

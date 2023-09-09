@@ -162,8 +162,7 @@
 </div>
 
 <style lang="scss">
-    @import '../../../styles/variables';
-    @import '../../../styles/layout';
+    @import '$lib/styles/layout';
 
     .entry-group {
         width: 100%;

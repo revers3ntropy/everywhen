@@ -78,8 +78,7 @@
 </main>
 
 <style lang="scss">
-    @import '../../../styles/layout';
-    @import '../../../styles/variables';
+    @import '$lib/styles/layout';
 
     h1 {
         @extend .flex-center;

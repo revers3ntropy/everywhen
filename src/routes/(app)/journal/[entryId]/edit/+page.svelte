@@ -35,7 +35,7 @@
 </main>
 
 <style lang="scss">
-    @import '../../../../../styles/layout.less';
+    @import '$lib/styles/layout';
 
     .header {
         @extend .flex-center;

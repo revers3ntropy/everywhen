@@ -10,9 +10,9 @@ export const load = (async ({ locals, parent }) => {
     await parent();
 
     if (locals.auth && !locals.settings) {
-        const { err: settingsErr, val: settings } = await Settings.Server.allAsMap(locals.auth);
-        if (settingsErr) throw error(500, settingsErr);
-        locals.settings = Settings.fillWithDefaults(settings);
+        locals.settings = (await Settings.allAsMapWithDefaults(locals.auth)).unwrap(e =>
+            error(500, e)
+        );
     }
 
     return {

@@ -19,7 +19,7 @@ CREATE TABLE entries
     createdTzOffset double   NOT NULL,
     latitude        double   DEFAULT NULL,
     longitude       double   DEFAULT NULL,
-    title           text     NULL,
+    title           text     NOT NULL,
     body            longtext NOT NULL,
     labelId         char(32) DEFAULT NULL,
     deleted         int      DEFAULT NULL,

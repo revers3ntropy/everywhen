@@ -110,8 +110,6 @@
 </div>
 
 <style lang="scss">
-    @import '../../../styles/variables';
-
     h1 {
         margin: 0 0 1rem 0;
     }

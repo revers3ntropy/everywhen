@@ -5,6 +5,6 @@ import type { PageServerLoad } from './$types';
 
 export const load = cachedPageRoute(async auth => {
     return {
-        locations: (await Location.Server.all(auth)).unwrap(e => error(500, e))
+        locations: (await Location.all(auth)).unwrap(e => error(500, e))
     };
 }) satisfies PageServerLoad;

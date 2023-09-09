@@ -81,13 +81,14 @@ export namespace Auth {
     }
 
     export function decryptOrLogOut(ciphertext: string, key: string | null): string {
-        const { err, val } = decrypt(ciphertext, key);
-        if (err) {
-            logger.error('Could not decrypt', { err });
+        const decryptRes = decrypt(ciphertext, key);
+        if (!decryptRes.ok) {
+            logger.error('Could not decrypt', { decryptRes });
             void logOut();
+            notify.error('Something went wrong. Please log in again.');
             throw new Error('Could not decrypt');
         }
-        return val;
+        return decryptRes.val;
     }
 
     export function encryptionKeyFromPassword(pass: string): string {

@@ -10,7 +10,7 @@ import { Result } from '$lib/utils/result';
 export async function all(auth: Auth, filter: EntryFilter = {}): Promise<Result<Entry[]>> {
     let location = null as Location | null;
     if (filter.locationId) {
-        const locationResult = await Location.Server.fromId(auth, filter.locationId);
+        const locationResult = await Location.fromId(auth, filter.locationId);
         if (locationResult.err) return Result.err(locationResult.err);
         location = locationResult.val;
     }
@@ -253,11 +253,11 @@ async function entriesFromRaw(auth: Auth, raw: RawEntry[]): Promise<Result<Entry
         WHERE entryEdits.userId = ${auth.id}
     `;
 
-    const { err, val: labels } = await Label.Server.allIndexedById(auth);
+    const { err, val: labels } = await Label.allIndexedById(auth);
     if (err) return Result.err(err);
 
     const { err: editsErr, val: edits } = Result.collect(
-        rawEdits.map(e => Entry.Server.editFromRaw(auth, labels, e))
+        rawEdits.map(e => Entry.editFromRaw(auth, labels, e))
     );
     if (editsErr) return Result.err(editsErr);
 

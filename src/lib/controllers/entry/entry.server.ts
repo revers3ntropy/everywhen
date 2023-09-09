@@ -82,7 +82,7 @@ namespace EntryServer {
             return Result.err('Label not found');
         }
 
-        const id = await UId.Server.generate();
+        const id = await UId.generate();
 
         await query`
             INSERT INTO entries
@@ -108,7 +108,7 @@ namespace EntryServer {
         const editsWithIds: (RawEntryEdit & { id: string })[] = [];
 
         for (const edit of edits) {
-            const editId = await UId.Server.generate();
+            const editId = await UId.generate();
 
             editsWithIds.push({
                 ...edit,
@@ -195,11 +195,11 @@ namespace EntryServer {
         editBody: string,
         editLatitude: number | null,
         editLongitude: number | null,
-        editLabel: string,
+        editLabel: string | null,
         editTzOffset: number,
         editAgentData: string
-    ): Promise<Result<null>> {
-        const editId = await UId.Server.generate();
+    ): Promise<void> {
+        const editId = await UId.generate();
 
         await query`
             INSERT INTO entryEdits
@@ -222,20 +222,18 @@ namespace EntryServer {
             UPDATE entries
             SET title     = ${encrypt(editTitle, auth.key)},
                 body      = ${encrypt(editBody, auth.key)},
-                labelId   = ${editLabel ?? null},
+                labelId   = ${editLabel},
                 wordCount = ${wordCount(editBody)}
             WHERE id = ${entry.id}
               AND userId = ${auth.id}
         `;
-
-        return Result.ok(null);
     }
 
     export async function reassignAllLabels(
         auth: Auth,
         oldLabelId: string,
         newLabelId: string
-    ): Promise<Result<null>> {
+    ): Promise<void> {
         await query`
             UPDATE entryEdits
             SET oldLabelId = ${newLabelId}
@@ -247,10 +245,9 @@ namespace EntryServer {
             WHERE userId = ${auth.id}
               AND labelId = ${oldLabelId};
         `;
-        return Result.ok(null);
     }
 
-    export async function removeAllLabel(auth: Auth, labelId: string): Promise<Result<null>> {
+    export async function removeAllLabel(auth: Auth, labelId: string): Promise<void> {
         await query`
             UPDATE entryEdits
             SET oldLabelId = ${null}
@@ -262,8 +259,6 @@ namespace EntryServer {
             WHERE userId = ${auth.id}
               AND labelId = ${labelId}
         `;
-
-        return Result.ok(null);
     }
 
     export async function getStreaks(auth: Auth, clientTzOffset: Hours): Promise<Result<Streaks>> {
@@ -341,14 +336,14 @@ namespace EntryServer {
         labels: Record<string, Label>,
         rawEdit: RawEntryEdit
     ): Result<EntryEdit> {
-        const { err: titleErr, val: oldTitle } = decrypt(rawEdit.oldTitle, auth.key);
-        if (titleErr) return Result.err(titleErr);
+        const oldTitleRes = decrypt(rawEdit.oldTitle, auth.key);
+        if (!oldTitleRes.ok) return oldTitleRes.cast();
 
-        const { err: entryErr, val: oldBody } = decrypt(rawEdit.oldBody, auth.key);
-        if (entryErr) return Result.err(entryErr);
+        const oldBodyRes = decrypt(rawEdit.oldBody, auth.key);
+        if (!oldBodyRes.ok) return oldBodyRes.cast();
 
-        const { err: agentErr, val: agentData } = decrypt(rawEdit.agentData, auth.key);
-        if (agentErr) return Result.err(agentErr);
+        const agentDataRes = decrypt(rawEdit.agentData, auth.key);
+        if (!agentDataRes.ok) return agentDataRes.cast();
 
         let oldLabel = null as Label | null;
         if (rawEdit.oldLabelId) {
@@ -363,14 +358,14 @@ namespace EntryServer {
         return Result.ok({
             id: rawEdit.id,
             entryId: rawEdit.entryId,
-            oldTitle,
-            oldBody,
+            oldTitle: oldTitleRes.val,
+            oldBody: oldBodyRes.val,
             oldLabel,
             created: rawEdit.created,
             createdTzOffset: rawEdit.createdTzOffset,
             latitude: rawEdit.latitude,
             longitude: rawEdit.longitude,
-            agentData
+            agentData: agentDataRes.val
         });
     }
 
@@ -385,7 +380,7 @@ namespace EntryServer {
 
 export const Entry = {
     ..._Entry,
-    Server: EntryServer
+    ...EntryServer
 };
 
 export type Entry = _Entry;
