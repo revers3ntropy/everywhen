@@ -10,7 +10,7 @@ export namespace UId {
         return UUIdv4().replace(/-/g, '');
     }
 
-    async function uuidExists(id: string): Promise<boolean> {
+    async function exists(id: string): Promise<boolean> {
         const res = await query.unlogged<{ id: string }[]>`
             SELECT id FROM ids WHERE id = ${id}
         `;
@@ -26,7 +26,7 @@ export namespace UId {
     async function repopulateBuffer(): Promise<void> {
         while (buffer.length < BUFFER_SIZE) {
             const id = generateId();
-            if (await uuidExists(id)) continue;
+            if (await exists(id)) continue;
 
             buffer.push(id);
             await idHasBeenUsed(id);
@@ -35,7 +35,7 @@ export namespace UId {
 
     async function getSingleUniqueId(): Promise<string> {
         let id = generateId();
-        while (await uuidExists(id)) {
+        while (await exists(id)) {
             id = generateId();
         }
 

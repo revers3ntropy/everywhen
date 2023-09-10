@@ -1,8 +1,8 @@
 {
     "type": "module",
     "scripts": {
-        "start": "screen -S halcyon_land_screen_%ENV% -d -m node -max-old-space-size=4096 -r dotenv/config server",
-        "stop": "screen -S halcyon_land_screen_%ENV% -X quit",
+        "start": "screen -S halcyon_land_screen_staging -d -m node -max-old-space-size=4096 -r dotenv/config server",
+        "stop": "screen -S halcyon_land_screen_staging -X quit",
         "restart": "npm run stop; npm run start",
         "setup": "bun i",
         "clear-logs": "rm *.log"

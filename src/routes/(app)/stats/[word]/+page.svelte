@@ -44,7 +44,7 @@
         </div>
     </div>
     {#if data.wordInstances === 0}
-        <section class="container invisible">
+        <section>
             <div class="flex-center">
                 <p>
                     You've never used that word before!
@@ -53,7 +53,7 @@
             </div>
         </section>
     {:else}
-        <section class="container invisible">
+        <section>
             <div class="stats">
                 <StatPill primary beforeLabel="appears" value={wordInstances} label="times" />
                 <StatPill

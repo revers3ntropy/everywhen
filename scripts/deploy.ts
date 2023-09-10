@@ -28,6 +28,7 @@ const remoteEnv = dotenv.parse<{
     HTTPS_PORT: string;
     BODY_SIZE_LIMIT: string;
 }>(remoteEnvFile);
+dotenv.config({ path: `./secrets/${env}/.env` });
 
 const replacerValues = {
     '%ENV%': env
@@ -228,7 +229,7 @@ async function upload() {
         fs.renameSync(path + '.tmp', path);
     }
 
-    await $`rm -r ./${remoteDir()}`;
+    //await $`rm -r ./${remoteDir()}`;
 }
 
 async function doMigrations(migrations: Version[]): Promise<void> {
@@ -365,7 +366,6 @@ async function restartServer(localVersion: Version): Promise<void> {
 }
 
 async function getAndCheckVersions(): Promise<{ localVersion: Version; remoteVersion: Version }> {
-    dotenv.config({ path: `./secrets/${env}/.env` });
     console.log(c.cyan(`Deploying to ${remoteSshAddress()} (${env})`));
 
     const localVersion = Version.fromPackageJson('./package.json');
@@ -405,6 +405,7 @@ async function getAndCheckVersions(): Promise<{ localVersion: Version; remoteVer
 
 async function checkAndTest() {
     await $`bin/precommit --reporter=line`;
+    await $`rm -r ./build`;
 }
 
 async function build() {
@@ -416,12 +417,19 @@ async function build() {
         await $`rm tmp.env`;
     }
 
+    // apparently SvelteKit first looks for env vars, then from .env???
+
+    const $env = $.env;
+    $.env = { ...$.env, ...remoteEnv };
+
     try {
         await $`bin/build`;
     } catch (e) {
         await cleanup();
         throw e;
     }
+
+    $.env = $env;
 
     await cleanup();
 

@@ -3,21 +3,6 @@ import type { COOKIE_KEYS } from '$lib/constants';
 import type { SettingsConfig } from '$lib/controllers/settings/settings';
 import type { Auth } from '$lib/controllers/auth/auth';
 
-declare module '$env/static/private' {
-    export const DB_HOST: string;
-    export const DB_USER: string;
-    export const DB_PASS: string;
-    export const DB: string;
-    export const DB_PORT: string;
-    export const GITHUB_AUTH_CLIENT_SECRET: string;
-}
-
-declare module '$env/static/public' {
-    export const PUBLIC_SVELTEKIT_PORT: string;
-    export const PUBLIC_INIT_VECTOR: string;
-    export const PUBLIC_GITHUB_AUTH_CLIENT_ID: string;
-}
-
 declare global {
     declare interface String {
         toLowerCase(): Lowercase<string>;

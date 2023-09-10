@@ -5,7 +5,7 @@ import { fmtTimePrecise } from '$lib/utils/text';
 import { nowUtc } from '$lib/utils/time';
 import type { Cookies, Handle, RequestEvent } from '@sveltejs/kit';
 import chalk from 'chalk';
-import { connect, dbConnection, dbLogger } from '$lib/db/mysql.server';
+import { connect, dbConnection, logger } from '$lib/db/mysql.server';
 import { cleanupCache } from '$lib/utils/cache.server';
 import { FileLogger } from '$lib/utils/log.server';
 import { Auth } from '$lib/controllers/auth/auth.server';
@@ -24,7 +24,7 @@ setInterval(() => {
         }
         void dbConnection?.ping();
     } catch (error) {
-        void dbLogger.error('Failed to ping db', { error, dbConnection });
+        void logger.error('Failed to ping db', { error, dbConnection });
     }
 }, 1000 * 60);
 

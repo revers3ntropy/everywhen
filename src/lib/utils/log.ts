@@ -1,5 +1,12 @@
 import chalk, { type ChalkInstance } from 'chalk';
 
+export enum LogLevel {
+    DEBUG = 'DEBUG',
+    INFO = 'INFO',
+    WARN = 'WARN',
+    ERROR = 'ERROR'
+}
+
 export class Logger {
     logger = console;
     nameLength: number;
@@ -10,10 +17,10 @@ export class Logger {
         this.nameLength = groupName.length;
     }
 
-    protected fmt(useUTC: boolean, ...args: unknown[]): string {
+    protected fmt(useUTC: boolean, logLvl: LogLevel, ...args: unknown[]): string {
         const time = chalk.dim(new Date()[useUTC ? 'toUTCString' : 'toLocaleTimeString']());
         return (
-            `${time} [${this.coloredName}] ` +
+            `${time} [${this.coloredName}:${logLvl}] ` +
             args
                 .map(arg => {
                     if (typeof arg === 'object') {
@@ -28,19 +35,19 @@ export class Logger {
     }
 
     public log(msg: string, context?: Record<string, unknown>): void {
-        this.logger.log(this.fmt(false, msg), context || '');
+        this.logger.log(this.fmt(false, LogLevel.INFO, msg), context || '');
     }
 
     public trace(msg: string, context?: Record<string, unknown>): void {
-        this.logger.trace(this.fmt(false, msg), context || '');
+        this.logger.trace(this.fmt(false, LogLevel.DEBUG, msg), context || '');
     }
 
     public warn(msg: string, context?: Record<string, unknown>): void {
-        this.logger.warn(this.fmt(false, msg), context || '');
+        this.logger.warn(this.fmt(false, LogLevel.WARN, msg), context || '');
     }
 
     public error(msg: string, context?: Record<string, unknown>): void {
-        this.logger.error(this.fmt(false, msg), context || '');
+        this.logger.error(this.fmt(false, LogLevel.ERROR, msg), context || '');
     }
 }
 

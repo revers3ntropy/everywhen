@@ -13,7 +13,7 @@ export type QueryResult =
     | Record<string, unknown>[]
     | object[];
 
-export const dbLogger = new FileLogger('DB', chalk.yellow);
+export const logger = new FileLogger('MySQL', chalk.yellow);
 
 export let dbConnection: mysql.Connection | null = null;
 
@@ -21,19 +21,29 @@ export async function connect() {
     const config = getConfig();
     dbConnection = await mysql.createConnection(config).catch((error: unknown) => {
         dbConnection = null;
-        void dbLogger.log(`Error connecting to mysql db '${config.database || '?'}'`, { error });
+        void logger.error(`Error connecting to mysql db '${config.database || '?'}'`, {
+            error,
+            config
+        });
         throw error;
     });
-    void dbLogger.log(`Connected`);
+    void logger.log(`Connected`);
 }
 
 export function getConfig(): mysql.ConnectionOptions {
     // define defaults from .env file
     const port = DB_PORT ? parseInt(DB_PORT) : 3306;
+
+    const password = DB_PASS || '';
+    // if (password === '""' || password === "''") {
+    //     // TODO: Why??? Seems to be a bug in SvelteKit... but only sometimes...
+    //     password = '';
+    // }
+
     return {
         host: DB_HOST,
         user: DB_USER,
-        password: DB_PASS,
+        password,
         database: DB,
         port,
         multipleStatements: true,
@@ -54,7 +64,7 @@ async function logQuery(query: string, params: unknown[], result: unknown, time:
         resultStr = result.info;
     }
 
-    await dbLogger.log(
+    await logger.log(
         `\`${collapseWhitespace(query)}\`` +
             `\n     ${paramsFmt}` +
             `\n     (${fmtTimePrecise(time)}) => ${resultStr}`
@@ -128,7 +138,7 @@ export const query = (async <Res extends QueryResult = never>(
         const end = performance.now();
         void (async () => {
             await logQuery(query, queryParams, null, end - start);
-            await dbLogger.error(`Error querying mysql db '${DB}'`, { error });
+            await logger.error(`Error querying mysql db '${DB}'`, { error });
         })();
         throw error;
     })) || [])[0] as Res;
@@ -150,7 +160,7 @@ query.unlogged = (async <Res extends QueryResult = never>(
 
     return ((await dbConnection?.query(query, queryParams).catch((error: unknown) => {
         void logQuery(query, queryParams, error, -1);
-        void dbLogger.log(`Error querying mysql db '${DB}'`, { error });
+        void logger.log(`Error querying mysql db '${DB}'`, { error });
         throw error;
     })) || [])[0] as Res;
 }) as QueryFunc;

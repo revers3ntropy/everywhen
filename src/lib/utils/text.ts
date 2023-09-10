@@ -44,13 +44,6 @@ export function roundToDecimalPlaces(num: number, n: number = 1): number {
 }
 
 export function rawMdToHtml(md: string): string {
-    // this is pretty dumb...
-    // https://github.com/markedjs/marked/issues/2793
-    marked.use({
-        mangle: false,
-        headerIds: false
-    });
-
     return DomPurify.sanitize(marked.parse(md));
 }
 
