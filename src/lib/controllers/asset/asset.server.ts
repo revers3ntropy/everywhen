@@ -57,10 +57,10 @@ namespace AssetServer {
         );
         if (canCreate !== true) return Result.err(canCreate);
 
-        const id = await UId.generate();
-
         const encryptedContents = encrypt(contentsPlainText, auth.key);
         const encryptedFileName = encrypt(fileNamePlainText, auth.key);
+
+        const id = await UId.generate();
 
         await query`
             INSERT INTO assets (id, publicId, userId, created, fileName, content)

@@ -228,8 +228,9 @@
 
     function resizeTextAreaToFitContent(self: HTMLTextAreaElement | null = newEntryInputElement) {
         if (!self) return;
-        self.style.height = '';
-        self.style.height = Math.max(self.scrollHeight + 5, 100) + 'px';
+        const minBodyTextareaHeight = entryFormMode === EntryFormMode.Bullet ? 0 : 100;
+        self.style.height = '0px';
+        self.style.height = Math.max(self.scrollHeight + 5, minBodyTextareaHeight) + 'px';
     }
 
     function handleEntryInputKeydown(event: KeyboardEvent) {
@@ -276,15 +277,18 @@
         if (!shouldProceed) cancel();
     });
 
-    async function setEntryFormMode(mode: EntryFormMode) {
+    async function switchEntryFormMode() {
+        const mode =
+            entryFormMode === EntryFormMode.Standard
+                ? EntryFormMode.Bullet
+                : EntryFormMode.Standard;
         const newSetting = {
             key: 'entryFormMode' as SettingsKey,
             value: mode !== EntryFormMode.Standard
         };
-        $settingsStore.entryFormMode = {
-            ...$settingsStore.entryFormMode,
-            value: newSetting.value
-        };
+        $settingsStore.entryFormMode.value = newSetting.value;
+        entryFormMode = mode;
+        resizeTextAreaToFitContent();
         await api.put('/settings', newSetting);
     }
 
@@ -309,7 +313,6 @@
     let entryFormMode = $settingsStore.entryFormMode.value
         ? EntryFormMode.Bullet
         : EntryFormMode.Standard;
-
     let mounted = false;
 
     let newEntryInputElement: HTMLTextAreaElement;
@@ -339,88 +342,93 @@
 </script>
 
 <div class="wrapper">
-    <div class="head">
-        <div class="left-options">
-            {#if setEntryFormMode}
+    {#key entryFormMode}
+        <div class="head">
+            <div class="left-options">
                 <button
                     aria-label="Switch to bullet journaling"
                     class="with-circled-icon"
-                    on:click={() => setEntryFormMode?.(EntryFormMode.Bullet)}
-                    style="margin: 0"
+                    on:click={() => switchEntryFormMode()}
                     use:tooltip={{
-                        content: 'Switch to Bullet Journaling',
+                        content: `Switch to ${
+                            entryFormMode === EntryFormMode.Standard ? 'bullet' : 'standard'
+                        } journaling`,
                         position: 'right'
                     }}
                 >
                     <FormatListBulleted size="30" />
                 </button>
-            {/if}
 
-            <LocationToggle />
+                <LocationToggle />
 
-            <FormatOptions {makeWrapper} />
+                <FormatOptions {makeWrapper} />
 
-            <InsertImage onInput={onNewImage} />
+                <InsertImage onInput={onNewImage} />
 
-            {#if $currentlyUploadingAssets > 0}
-                <div style="margin: 0 0 0 4px;">
-                    <i class="text-light">
-                        Uploading {$currentlyUploadingAssets} images...
-                    </i>
-                </div>
-            {/if}
-        </div>
-        <div class="right-options {obfuscated ? 'blur' : ''}">
-            <div class="label-select-container">
-                <LabelSelect bind:value={newEntryLabel} {labels} fromRight />
+                {#if $currentlyUploadingAssets > 0}
+                    <div style="margin: 0 0 0 4px;">
+                        <i class="text-light">
+                            Uploading {$currentlyUploadingAssets} images...
+                        </i>
+                    </div>
+                {/if}
             </div>
+            <div class="right-options {obfuscated ? 'blur' : ''}">
+                <div class="label-select-container">
+                    <LabelSelect bind:value={newEntryLabel} {labels} fromRight />
+                </div>
 
+                <button
+                    aria-label="Submit Entry"
+                    class="primary with-icon hide-mobile"
+                    disabled={submitted}
+                    on:click={submit}
+                    style="padding: 2px 5px; margin: 0 0 3px 0;"
+                >
+                    Submit
+                    <Send size="26" />
+                </button>
+            </div>
+        </div>
+        {#if entryFormMode === EntryFormMode.Standard}
+            <div class="entry-title-container">
+                <input
+                    aria-label="Entry Title"
+                    bind:value={newEntryTitle}
+                    class="title"
+                    class:obfuscated
+                    placeholder={obfuscated ? '' : 'Title (optional)'}
+                    disabled={obfuscated || submitted}
+                />
+            </div>
+        {/if}
+        <div class="entry-container">
+            <textarea
+                bind:this={newEntryInputElement}
+                bind:value={newEntryBody}
+                on:keydown={handleEntryInputKeydown}
+                use:paste={{ handleText: pasteText, handleFiles: pasteFiles }}
+                disabled={obfuscated || submitted}
+                aria-label="Entry Body"
+                placeholder={obfuscated ? '' : 'Start writing here...'}
+                class:obfuscated
+                class:border-r={entryFormMode === EntryFormMode.Bullet}
+                class:border-r-b={entryFormMode === EntryFormMode.Standard}
+            />
+        </div>
+
+        <div class="send-mobile flex-center">
             <button
                 aria-label="Submit Entry"
-                class="primary with-icon hide-mobile"
+                class="primary with-icon"
                 disabled={submitted}
                 on:click={submit}
-                style="padding: 2px 5px; margin: 0 0 3px 0;"
             >
-                Submit
-                <Send size="26" />
+                <Send size="30" />
+                Submit Entry
             </button>
         </div>
-    </div>
-    <div class="entry-title-container">
-        <input
-            aria-label="Entry Title"
-            bind:value={newEntryTitle}
-            class="title"
-            class:obfuscated
-            placeholder={obfuscated ? '' : 'Title (optional)'}
-            disabled={obfuscated || submitted}
-        />
-    </div>
-    <div class="entry-container">
-        <textarea
-            bind:this={newEntryInputElement}
-            bind:value={newEntryBody}
-            on:keydown={handleEntryInputKeydown}
-            use:paste={{ handleText: pasteText, handleFiles: pasteFiles }}
-            disabled={obfuscated || submitted}
-            aria-label="Entry Body"
-            placeholder={obfuscated ? '' : 'Start writing here...'}
-            class:obfuscated
-        />
-    </div>
-
-    <div class="send-mobile flex-center">
-        <button
-            aria-label="Submit Entry"
-            class="primary with-icon"
-            disabled={submitted}
-            on:click={submit}
-        >
-            <Send size="30" />
-            Submit Entry
-        </button>
-    </div>
+    {/key}
 </div>
 
 <style lang="scss">
@@ -547,7 +555,6 @@
             border: none;
             font-size: 20px;
             background: var(--light-accent);
-            border-radius: 0 0 $border-radius $border-radius;
             overflow: hidden;
 
             @media #{$mobile} {

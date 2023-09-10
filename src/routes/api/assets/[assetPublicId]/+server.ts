@@ -11,7 +11,7 @@ export const GET = (async ({ params, url, cookies }) => {
     const cached = getCachedResponse<Response>(url.href, auth.id);
     if (cached) return cached.clone() as GenericResponse<Buffer>;
 
-    const asset = (await Asset.fromPublicId(auth, params['asset'] || '')).unwrap(e =>
+    const asset = (await Asset.fromPublicId(auth, params['assetPublicId'] || '')).unwrap(e =>
         error(404, e)
     );
 

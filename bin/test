@@ -1,9 +1,4 @@
 #!/bin/bash
 
-bun x svelte-kit sync || exit 1
-
-bun x vitest run || exit 1
-
-bin/build || exit 1
-
-bun x playwright test "$@" || exit 1
+bin/test-spec || exit 1
+bin/test-e2e || exit 1

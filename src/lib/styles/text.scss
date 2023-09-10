@@ -85,7 +85,7 @@ pre {
 .obfuscated {
     &, * {
         color: transparent !important;
-        text-shadow: 0 0 2px var(--text-color-light) !important;
+        text-shadow: 0 0 1px var(--text-color-light) !important;
         @extend .redacted;
     }
 }

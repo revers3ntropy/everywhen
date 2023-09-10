@@ -45,7 +45,7 @@
 
 <nav>
     <div>
-        <div>
+        <div class="flex md:flex-col">
             <Dropdown width="200px">
                 <div class="account-button" slot="button">
                     <p> {$username || '...'} </p>
@@ -98,7 +98,7 @@
                 </div>
             </Dropdown>
 
-            <div class="w-fit p-2 border-r bordered ml-2 mt-3">
+            <div class="w-fit h-fit p-1 border-r bordered m-1">
                 <CreateNewButton />
             </div>
 
@@ -133,7 +133,7 @@
             {/if}
         </div>
 
-        <hr class="py-3" />
+        <hr class="py-3 hide-mobile" />
 
         <div class="nav-buttons">
             <a
@@ -142,8 +142,8 @@
                 class="nav-link"
                 class:current={$page.url.pathname.startsWith('/journal')}
             >
-                <Notebook size="35" />
-                <span class="hide-mobile"> Journal </span>
+                <Notebook size="30" />
+                <span> Journal </span>
             </a>
             <a
                 href="/timeline"
@@ -151,8 +151,8 @@
                 class="nav-link"
                 class:current={$page.url.pathname.startsWith('/timeline')}
             >
-                <ChartTimeline size="35" />
-                <span class="hide-mobile"> Timeline </span>
+                <ChartTimeline size="30" />
+                <span> Timeline </span>
             </a>
             <a
                 href="/map"
@@ -160,8 +160,8 @@
                 class="nav-link"
                 class:current={$page.url.pathname.startsWith('/map')}
             >
-                <MapMarkerOutline size="35" />
-                <span class="hide-mobile"> Map </span>
+                <MapMarkerOutline size="30" />
+                <span> Map </span>
             </a>
             <a
                 href="/stats"
@@ -169,15 +169,15 @@
                 class:current={$page.url.pathname.startsWith('/stats')}
                 aria-label="statistics"
             >
-                <Counter size="35" />
-                <span class="hide-mobile"> Insights </span>
+                <Counter size="30" />
+                <span> Insights </span>
             </a>
         </div>
     </div>
 
     <div></div>
 
-    <div class="text-2xl tracking-wide text-center flex justify-center items-end">
+    <div class="text-2xl tracking-wide text-center flex justify-center items-end hide-mobile">
         <p class="serif pb-2">Everywhen</p>
     </div>
 </nav>
@@ -202,7 +202,7 @@
         display: grid;
         grid-template-rows: 1fr 1fr 1fr;
         border-right: 1px solid var(--border-color);
-        background-color: var(--background-color);
+        background: var(--nav-bg);
 
         @media #{$mobile} {
             display: block;
@@ -251,7 +251,7 @@
             display: flex;
             flex-direction: row;
             background: var(--nav-bg);
-            padding: 0.8rem 0;
+            border: none;
             border-top: 1px solid var(--border-color);
         }
 
@@ -276,6 +276,15 @@
             &.current {
                 background: var(--primary-light);
                 font-weight: 600;
+            }
+
+            @media #{$mobile} {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.75rem;
+                gap: 0.5rem;
             }
         }
     }

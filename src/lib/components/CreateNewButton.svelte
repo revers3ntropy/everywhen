@@ -127,7 +127,7 @@
 <Dropdown openOnHover width="170px">
     <div class="open-button" slot="button">
         <Plus size="25" />
-        New
+        <span class="hide-mobile">New</span>
         <ChevronDown />
     </div>
 
@@ -171,6 +171,10 @@
         justify-content: center;
         align-items: center;
         gap: 0.5rem;
+
+        @media #{$mobile} {
+            padding: 0;
+        }
     }
 
     .record-something-buttons {

@@ -7,6 +7,6 @@ $mobile-nav-height: 60px;
 $transition: 200ms ease-in-out;
 $transition-long: 400ms ease-in-out;
 
-$mobile: "only screen and (max-width: 750px)";
-$not-mobile: "only screen and (min-width: 750px)";
-$large: "only screen and (min-width: 1650px)";
+$mobile: "only screen and (max-width: 768px)";
+$not-mobile: "only screen and (min-width: 768px)";
+$large: "only screen and (min-width: 1536px)";
