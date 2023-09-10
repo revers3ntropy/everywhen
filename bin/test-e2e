@@ -1,0 +1,7 @@
+#!/bin/bash
+
+bun x svelte-kit sync || exit 1
+
+bin/build || exit 1
+
+bun x playwright test "$@" || exit 1

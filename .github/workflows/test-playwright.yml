@@ -6,13 +6,14 @@ on:
     branches: [ main ]
 jobs:
   test:
-    timeout-minutes: 60
+    timeout-minutes: 20
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+
+      - uses: oven-sh/setup-bun@v1
         with:
-          node-version: 16
+          bun-version: latest
 
       - uses: mirromutth/mysql-action@v1.1
         with:
@@ -20,7 +21,7 @@ jobs:
           mysql root password: 'Pass'
 
       - name: Install dependencies
-        run: npm install && sudo apt update && sudo apt install mysql-server
+        run: bun i && sudo apt update && sudo apt install mysql-server
 
       - name: Set root password
         run: sudo mysql -h 127.0.0.1 -u root -pPass -e "ALTER USER 'root'@'%' IDENTIFIED BY ''"
@@ -29,13 +30,13 @@ jobs:
         run: sudo mysql -h 127.0.0.1 -u root halcyon_land_dev < ./db/schema.sql
 
       - name: Install Playwright browsers
-        run: npx playwright install msedge && npx playwright install chromium && npx playwright install firefox
+        run: bun x playwright install msedge && bun x playwright install chromium && bun x playwright install firefox
 
       - name: Install Playwright system dependencies
-        run: npx playwright install-deps
+        run: bun x playwright install-deps
 
       - name: Run Playwright tests
-        run: bin/test
+        run: bin/test-e2e
 
       - uses: actions/upload-artifact@v3
         if: always()

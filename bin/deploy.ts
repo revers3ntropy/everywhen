@@ -145,45 +145,28 @@ function remoteAddress() {
     return addr;
 }
 
-/**
- * @returns {string}
- */
-function remoteSshAddress() {
+function remoteSshAddress(): string {
     const addr = remoteAddress();
     const usr = process.env['REMOTE_USER'];
     if (!usr) throw new Error('REMOTE_USER not set');
     return `${usr}@${addr}`;
 }
 
-/**
- * @returns {string}
- */
 function remoteDir() {
     const dir = process.env['DIR'];
     if (!dir) throw new Error('DIR not set');
     return dir;
 }
 
-/**
- * @param {string} localPath
- * @param {string} remotePath
- * @param args
- * @returns {Promise<*>}
- */
-async function uploadPath(localPath: string, remotePath: string, args = '') {
-    return await $`sshpass -f './secrets/${env}/sshpass.txt' rsync ${args.split(
+function uploadPath(localPath: string, remotePath: string, args = ''): Promise<unknown> {
+    return $`sshpass -f './secrets/${env}/sshpass.txt' rsync ${args.split(
         ' '
     )} ${localPath} ${remoteSshAddress()}:${remotePath}`;
 }
 
-/**
- * @param {string} command
- * @param {{ failOnError?: boolean, hideLogs?: boolean }} options
- * @returns {Promise<*>}
- */
 async function runRemoteCommand(
     command: string,
-    { failOnError = true, hideLogs = false } = {}
+    { failOnError = true, hideLogs = false }: { failOnError?: boolean; hideLogs?: boolean } = {}
 ): Promise<unknown> {
     const wasVerbose = $.verbose;
     if (hideLogs) $.verbose = false;
@@ -287,8 +270,6 @@ async function getMigrations(remoteVersion: Version, localVersion: Version): Pro
         console.log(`    ${c.green(migration.str())}`);
     }
 
-    /**@type {{ value: boolean }} */
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment
     const response = await prompts({
         type: 'confirm',
         name: 'value',
@@ -309,9 +290,9 @@ async function getRemoteVersion(): Promise<Version | null> {
 
     if (!rawVersion.ok) return null;
 
-    let apiVersion;
+    let apiVersion: { v: string };
     try {
-        apiVersion = await rawVersion.json();
+        apiVersion = (await rawVersion.json()) as { v: string };
     } catch (e) {
         return null;
     }
@@ -362,8 +343,6 @@ async function restartServer(localVersion: Version): Promise<void> {
 
         console.log(c.red('Server restart seemed to fail...'));
 
-        /**@type {{ value: boolean }} */
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment
         const response = await prompts({
             type: 'confirm',
             name: 'value',
@@ -381,10 +360,7 @@ async function getAndCheckVersions(): Promise<{ localVersion: Version; remoteVer
     let remoteVersion = await getRemoteVersion();
     if (remoteVersion === null) {
         console.log(c.red('Failed to get remote version'));
-        remoteVersion = Version.fromString(
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-call
-            prompt({ sigint: true })('Enter remote version: ')
-        );
+        remoteVersion = Version.fromString(prompt({ sigint: true })('Enter remote version: '));
     }
 
     const localVersion = Version.fromPackageJson('./package.json');
@@ -405,9 +381,6 @@ async function checkAndTest() {
     await $`bin/precommit --reporter=line`;
 }
 
-/**
- * @returns {Promise<void>}
- */
 async function build() {
     await $`cp .env tmp.env`;
     await $`cp ./secrets/${env}/remote.env .env`;
