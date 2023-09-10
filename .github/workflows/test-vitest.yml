@@ -1,4 +1,4 @@
-name: Check code with svelte-check
+name: Vitest unit tests
 on:
   push:
     branches: [ main ]
