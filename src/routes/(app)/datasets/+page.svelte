@@ -20,7 +20,6 @@
                 presetId
             })
         );
-        location.reload();
     }
 </script>
 

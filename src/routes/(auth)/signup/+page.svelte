@@ -75,6 +75,7 @@
 
     let actionPending = false;
 
+    // stop the user getting stuck on this page if the redirect after account creation fails
     $: if ($encryptionKey && $usernameStore) {
         void goto('/' + redirect);
     }

@@ -64,6 +64,7 @@
     let rememberMeInput: HTMLInputElement;
     let actionPending = false;
 
+    // stop the user getting stuck on this page if the redirect after login fails
     $: if ($encryptionKey && $usernameStore) {
         void goto('/' + redirect);
     }

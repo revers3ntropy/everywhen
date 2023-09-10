@@ -1,12 +1,15 @@
 $font-mono: 'Fira Mono', monospace;
 
-$border-radius: 8px;
+$border-radius: 0.5rem;
 
+// size of bottom nav on mobile
 $mobile-nav-height: 60px;
 
 $transition: 200ms ease-in-out;
 $transition-long: 400ms ease-in-out;
 
+// Tailwind 'md:' breakpoint
 $mobile: "only screen and (max-width: 768px)";
 $not-mobile: "only screen and (min-width: 768px)";
+// Tailwind 'xl:'
 $large: "only screen and (min-width: 1536px)";

@@ -1,3 +1,4 @@
+import { Settings } from '$lib/controllers/settings/settings';
 import type { SettingsConfig } from '$lib/controllers/settings/settings';
 import { cookieWritable } from '$lib/cookieWritable';
 import type { SvelteComponent } from 'svelte';
@@ -8,7 +9,7 @@ import { persisted } from 'svelte-local-storage-store';
 
 // ephemeral
 export const popup = writable<typeof SvelteComponent | null | undefined>(null);
-export const settingsStore = writable<SettingsConfig>();
+export const settingsStore = writable<SettingsConfig>(Settings.fillWithDefaults({}));
 export const currentlyUploadingAssets = writable<number>(0);
 export const currentlyUploadingEntries = writable<number>(0);
 

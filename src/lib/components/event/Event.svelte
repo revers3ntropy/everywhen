@@ -178,7 +178,7 @@
 </script>
 
 {#if event.deleted}
-    <div class="restore-event" class:invisible={!bordered}>
+    <div class="restore-event">
         <div>
             <i>'{event.name}' has been deleted</i>
         </div>
@@ -188,11 +188,7 @@
         </button>
     </div>
 {:else}
-    <div
-        class="event"
-        class:invisible={!bordered}
-        transition:slide|local={{ axis: 'y', duration: 0 }}
-    >
+    <div class="event" transition:slide|local={{ axis: 'y', duration: 0 }}>
         <div class="header">
             <div class="flex-center">
                 {#if !expanded}

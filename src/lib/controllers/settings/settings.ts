@@ -24,10 +24,6 @@ export type SettingsConfig = {
 };
 
 export namespace Settings {
-    export function convertToMap(settings: Settings[]): SettingsConfig {
-        return Object.fromEntries(settings.map(s => [s.key, s])) as SettingsConfig;
-    }
-
     export function fillWithDefaults(map: Record<string, Settings>): SettingsConfig {
         const newMap = { ...map };
         for (const [key, config] of Object.entries(settingsConfig)) {

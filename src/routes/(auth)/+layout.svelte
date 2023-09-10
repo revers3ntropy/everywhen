@@ -3,6 +3,9 @@
     import { allowedCookies, encryptionKey, username } from '$lib/stores';
     import { onMount } from 'svelte';
 
+    $encryptionKey = null;
+    $username = null;
+
     onMount(() => {
         // assume valid auth has already been filtered out in ssr
         $encryptionKey = null;

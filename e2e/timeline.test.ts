@@ -21,8 +21,7 @@ test.describe('/timeline', () => {
         await page.getByRole('button', { name: 'New Event' }).click();
         await page.getByPlaceholder('Event Name').fill('xyz');
         await page.getByPlaceholder('End').press('Escape');
-        await page.getByRole('link', { name: 'home' }).click();
-        await page.getByRole('link', { name: 'Events' }).click();
+        await page.goto('/events', { waitUntil: 'networkidle' });
         expect(await page.getByRole('listitem').getByPlaceholder('Event Name').inputValue()).toBe(
             'xyz'
         );

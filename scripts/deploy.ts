@@ -6,7 +6,6 @@ import * as dotenv from 'dotenv';
 import prompts from 'prompts';
 import fs from 'fs';
 import fetch from 'node-fetch';
-import prompt from 'prompt-sync';
 
 const cliArgs = commandLineArgs;
 
@@ -87,7 +86,19 @@ class Version {
         v.major = parseInt(parts[0]);
         v.minor = parseInt(parts[1]);
         v.patch = parseInt(parts[2]);
+        if (isNaN(v.major) || isNaN(v.minor) || isNaN(v.patch)) {
+            console.error(c.red('Invalid SemVer string: ' + version));
+            throw new Error();
+        }
         return v;
+    }
+
+    public static tryFromString(version: string): Version | null {
+        try {
+            return Version.fromString(version);
+        } catch (_e) {
+            return null;
+        }
     }
 
     isGreaterThan(version: Version): boolean {
@@ -357,16 +368,31 @@ async function getAndCheckVersions(): Promise<{ localVersion: Version; remoteVer
     dotenv.config({ path: `./secrets/${env}/.env` });
     console.log(c.cyan(`Deploying to ${remoteSshAddress()} (${env})`));
 
+    const localVersion = Version.fromPackageJson('./package.json');
+
     let remoteVersion = await getRemoteVersion();
     if (remoteVersion === null) {
         console.log(c.red('Failed to get remote version'));
-        remoteVersion = Version.fromString(prompt({ sigint: true })('Enter remote version: '));
+        remoteVersion = Version.fromString(
+            (
+                await prompts({
+                    type: 'text',
+                    name: 'value',
+                    message: 'Enter remote version',
+                    initial: localVersion.str(),
+                    validate: (str: string) => {
+                        if (str === localVersion.str()) {
+                            return 'Remote version must be different from local';
+                        }
+                        return Version.tryFromString(str) === null ? 'Invalid version' : true;
+                    }
+                })
+            ).value as string
+        );
     }
 
-    const localVersion = Version.fromPackageJson('./package.json');
-
-    console.log(`Found remote version: ${c.yellow(remoteVersion.str())}`);
-    console.log(`Found local version: ${c.yellow(localVersion.str())}`);
+    console.log(`Using remote version: ${c.yellow(remoteVersion.str())}`);
+    console.log(`Using local version: ${c.yellow(localVersion.str())}`);
 
     if (remoteVersion.isEqual(localVersion) || remoteVersion.isGreaterThan(localVersion)) {
         console.log(c.red(`Remote version is equal to (or gt) local version`));
