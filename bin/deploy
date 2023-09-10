@@ -9,4 +9,4 @@ die () {
 
 [ -d "./secrets/$1" ] || die "Error: /secrets/$1 does not exists."
 
-node bin/deploy.js -v --env "$1" || die "upload failed";
+bun bin/deploy.ts -v --env "$1" || die "upload failed";

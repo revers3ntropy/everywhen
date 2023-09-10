@@ -1,39 +1,42 @@
 import fs from 'fs';
+import type { Backup } from '../src/lib/controllers/backup/backup';
+import type { Entry } from '../src/lib/controllers/entry/entry';
 
 const outputFile = 'testBackup.json';
 
-/** @type {{ version: string }} */
-const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+const packageJson: { version: string } = JSON.parse(fs.readFileSync('package.json', 'utf8'));
 
-const MAX = {
-    entries: {
-        incrementing: 10_000,
-        long: {
-            count: 0,
-            chars: 100_000
-        }
+const presets = {
+    MAX: {
+        entries: {
+            incrementing: 10_000,
+            long: {
+                count: 0,
+                chars: 100_000
+            }
+        },
+        labels: 100,
+        assets: 1000,
+        events: 1000,
+        locations: 100
     },
-    labels: 100,
-    assets: 1000,
-    events: 1000,
-    locations: 100
-};
 
-const SIMPLE = {
-    entries: {
-        incrementing: 5,
-        long: {
-            count: 5,
-            chars: 10
-        }
-    },
-    labels: 5,
-    assets: 5,
-    events: 5,
-    locations: 5
-};
+    SIMPLE: {
+        entries: {
+            incrementing: 5,
+            long: {
+                count: 5,
+                chars: 10
+            }
+        },
+        labels: 5,
+        assets: 5,
+        events: 5,
+        locations: 5
+    }
+} as const;
 
-const num = MAX;
+const num = presets.MAX;
 
 function now() {
     return Math.floor(Date.now() / 1000);
@@ -95,10 +98,10 @@ function genAssets() {
     return assets;
 }
 
-function gen() {
+function gen(): Backup {
     console.log('Starting...');
     return {
-        entries: genEntries(),
+        entries: genEntries() as Entry[],
         labels: genLabels(),
         assets: genAssets(),
         events: [],

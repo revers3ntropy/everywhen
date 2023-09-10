@@ -256,6 +256,7 @@
                 component={() => import('$lib/components/map/Map.svelte')}
                 props={{
                     entriesInteractable: false,
+                    roundedCorners: true,
                     width: '100%',
                     height: '300px',
                     mobileHeight: '200px',

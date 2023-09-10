@@ -2,8 +2,8 @@
 
 svelte-kit sync || exit 1
 
-npx vitest run || exit 1
+bun x vitest run || exit 1
 
 bin/build || exit 1
 
-npx playwright test "$@" || exit 1
+bun x playwright test "$@" || exit 1

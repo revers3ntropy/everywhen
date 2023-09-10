@@ -19,14 +19,14 @@ const logger = new FileLogger('Backup');
 export const backupSchema = z.object({
     entries: z.array(
         z.object({
-            title: z.string().default(''),
+            title: z.string().optional().default(''),
             body: z.string(),
             labelName: z.string().nullable().optional(),
             created: z.number(),
-            createdTzOffset: z.number().default(0),
+            createdTzOffset: z.number().optional().default(0),
             latitude: z.number().nullable().optional(),
             longitude: z.number().nullable().optional(),
-            agentData: z.string().default(''),
+            agentData: z.string().optional().default(''),
             pinned: z.number().nullable().optional(),
             deleted: z.number().nullable().optional(),
             wordCount: z.number().optional(),

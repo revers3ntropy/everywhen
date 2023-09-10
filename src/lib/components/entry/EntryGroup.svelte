@@ -8,7 +8,7 @@
 <script lang="ts">
     import { page } from '$app/stores';
     import EntryForm from '$lib/components/entryForm/EntryForm.svelte';
-    import { currentlyUploadingEntries, settingsStore } from '$lib/stores';
+    import { currentlyUploadingEntries } from '$lib/stores';
     import { clientLogger } from '$lib/utils/log';
     import { fly, slide } from 'svelte/transition';
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
@@ -118,12 +118,7 @@
     </div>
     {#if !$collapsed[day]}
         {#if showEntryForm && isToday}
-            <EntryForm
-                {obfuscated}
-                entryFormMode={$settingsStore.entryFormMode.value
-                    ? EntryFormMode.Bullet
-                    : EntryFormMode.Standard}
-            />
+            <EntryForm {obfuscated} />
         {/if}
         <div
             class="contents"

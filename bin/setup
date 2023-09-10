@@ -11,12 +11,7 @@ rm ./bin/package-lock.json
 rm ./general.log
 rm ./testBackup.json
 
-(
-  export PLAYWRIGHT_SKIP_BROWSER_GC=1
-  npm i -f
-) & (
-  cd ./bin || exit 1
-  npm i
-) & wait
+export PLAYWRIGHT_SKIP_BROWSER_GC=1
+bun i
 
 npx playwright install

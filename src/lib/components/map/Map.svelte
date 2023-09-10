@@ -47,6 +47,7 @@
     export let height = '100vh';
     export let mobileWidth = '100%';
     export let mobileHeight = 'calc(100vh - 5rem)';
+    export let roundedCorners = false;
 
     async function reloadLocations() {
         const res = notify.onErr(await api.get('/locations'));
@@ -318,6 +319,7 @@
 
 <div
     class="map"
+    class:border-r={roundedCorners}
     class:hovering={hoveringSomething}
     style="--width: {width}; --height: {height}; --mobile-width: {mobileWidth}; --mobile-height: {mobileHeight};"
     id="ol-map-{mapId}"
@@ -336,7 +338,6 @@
     @import '$lib/styles/layout';
 
     .map {
-        @extend .container;
         padding: 0;
         margin: 0;
         border: none;

@@ -1,5 +1,3 @@
-#!/usr/bin/env zx
-
 import { $ } from 'zx';
 import now from 'performance-now';
 import c from 'chalk';
@@ -10,35 +8,28 @@ import fs from 'fs';
 import fetch from 'node-fetch';
 import prompt from 'prompt-sync';
 
-/** @type {(options: *[]) => *} */
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const cliArgs = commandLineArgs;
 
-/** @type {{ verbose: boolean, env: string }} */
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 export const { verbose, env } = cliArgs([
     { name: 'verbose', type: Boolean, alias: 'v', defaultValue: false },
     { name: 'env', type: String, alias: 'e', defaultValue: 'prod' }
-]);
+]) as { verbose: boolean; env: string };
 
 const remoteEnvFile = fs.readFileSync(`./secrets/${env}/remote.env`, 'utf8');
-/**
- * @type {{
- *   PUBLIC_INIT_VECTOR: string,
- *   PUBLIC_SVELTEKIT_PORT: string,
- *   DB_HOST: string,
- *   DB_PORT: string,
- *   DB_USER: string,
- *   DB_PASS: string,
- *   DB: string,
- *   PORT: string,
- *   HTTPS_PORT: string,
- *   BODY_SIZE_LIMIT: string,
- * }}
- */
-const remoteEnv = dotenv.parse(remoteEnvFile);
 
-/** @type {Record<string, string>} */
+const remoteEnv = dotenv.parse<{
+    PUBLIC_INIT_VECTOR: string;
+    PUBLIC_SVELTEKIT_PORT: string;
+    DB_HOST: string;
+    DB_PORT: string;
+    DB_USER: string;
+    DB_PASS: string;
+    DB: string;
+    PORT: string;
+    HTTPS_PORT: string;
+    BODY_SIZE_LIMIT: string;
+}>(remoteEnvFile);
+
 const replacerValues = {
     '%ENV%': env
 };
@@ -73,11 +64,7 @@ console.error = (...args) => {
 
 $.verbose = verbose;
 
-/**
- * @param {number} ms
- * @returns {Promise<unknown>}
- */
-async function sleep(ms) {
+async function sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -90,11 +77,7 @@ class Version {
     minor = 0;
     patch = 0;
 
-    /**
-     * @param {string} version
-     * @returns {Version}
-     */
-    static fromString(version) {
+    static fromString(version: string): Version {
         const v = new Version();
         const parts = version.split('.');
         if (parts.length !== 3) {
@@ -107,11 +90,7 @@ class Version {
         return v;
     }
 
-    /**
-     * @param {Version | string} version
-     * @returns {boolean}
-     */
-    isGreaterThan(version) {
+    isGreaterThan(version: Version): boolean {
         if (typeof version === 'string') {
             version = Version.fromString(version);
         }
@@ -129,11 +108,7 @@ class Version {
         return false;
     }
 
-    /**
-     * @param {Version | string} version
-     * @returns {boolean}
-     */
-    isEqual(version) {
+    isEqual(version: Version): boolean {
         if (typeof version === 'string') {
             version = Version.fromString(version);
         }
@@ -144,18 +119,11 @@ class Version {
         );
     }
 
-    /**
-     * @returns {string}
-     */
-    str() {
+    str(): string {
         return `${this.major}.${this.minor}.${this.patch}`;
     }
 
-    /**
-     * @param {string} path
-     * @returns {Version}
-     */
-    static fromPackageJson(path) {
+    static fromPackageJson(path: string): Version {
         const pkg = JSON.parse(fs.readFileSync(path, 'utf8'));
         if (typeof pkg !== 'object' || pkg === null) {
             throw new Error('package.json is not an object');
@@ -172,7 +140,7 @@ class Version {
 }
 
 function remoteAddress() {
-    const addr = process.env.REMOTE_ADDRESS;
+    const addr = process.env['REMOTE_ADDRESS'];
     if (!addr) throw new Error('REMOTE_ADDRESS not set');
     return addr;
 }
@@ -182,7 +150,7 @@ function remoteAddress() {
  */
 function remoteSshAddress() {
     const addr = remoteAddress();
-    const usr = process.env.REMOTE_USER;
+    const usr = process.env['REMOTE_USER'];
     if (!usr) throw new Error('REMOTE_USER not set');
     return `${usr}@${addr}`;
 }
@@ -191,7 +159,7 @@ function remoteSshAddress() {
  * @returns {string}
  */
 function remoteDir() {
-    const dir = process.env.DIR;
+    const dir = process.env['DIR'];
     if (!dir) throw new Error('DIR not set');
     return dir;
 }
@@ -202,7 +170,7 @@ function remoteDir() {
  * @param args
  * @returns {Promise<*>}
  */
-async function uploadPath(localPath, remotePath, args = '') {
+async function uploadPath(localPath: string, remotePath: string, args = '') {
     return await $`sshpass -f './secrets/${env}/sshpass.txt' rsync ${args.split(
         ' '
     )} ${localPath} ${remoteSshAddress()}:${remotePath}`;
@@ -213,7 +181,10 @@ async function uploadPath(localPath, remotePath, args = '') {
  * @param {{ failOnError?: boolean, hideLogs?: boolean }} options
  * @returns {Promise<*>}
  */
-async function runRemoteCommand(command, { failOnError = true, hideLogs = false } = {}) {
+async function runRemoteCommand(
+    command: string,
+    { failOnError = true, hideLogs = false } = {}
+): Promise<unknown> {
     const wasVerbose = $.verbose;
     if (hideLogs) $.verbose = false;
 
@@ -231,7 +202,7 @@ async function runRemoteCommand(command, { failOnError = true, hideLogs = false 
 }
 
 async function upload() {
-    await $`mv ./build ./${process.env.DIR}`;
+    await $`mv ./build ./${process.env['DIR']}`;
     console.log(c.green('Uploading...'));
     await uploadPath(remoteDir(), '~/', '-r');
 
@@ -243,7 +214,7 @@ async function upload() {
                 .readFileSync(path + '.tmp', 'utf8')
                 .replace(
                     new RegExp(Object.keys(replacerValues).join('|'), 'gi'),
-                    matched => replacerValues[matched]
+                    matched => replacerValues[matched as keyof typeof replacerValues]
                 )
         );
     }
@@ -266,11 +237,7 @@ async function upload() {
     await $`rm -r ./${remoteDir()}`;
 }
 
-/**
- * @param {Version[]} migrations
- * @returns {Promise<void>}
- */
-async function doMigrations(migrations) {
+async function doMigrations(migrations: Version[]): Promise<void> {
     const start = now();
 
     for (const migration of migrations.map(m => m.str())) {
@@ -288,12 +255,7 @@ async function doMigrations(migrations) {
     console.log(c.green(`${migrations.length} migrations complete in ${time}ms`));
 }
 
-/**
- * @param {Version} remoteVersion
- * @param {Version} localVersion
- * @returns {Promise<Version[]>}
- */
-async function getMigrations(remoteVersion, localVersion) {
+async function getMigrations(remoteVersion: Version, localVersion: Version): Promise<Version[]> {
     const migrations = fs
         .readdirSync('./db/migrations')
         .map(file => Version.fromString(file.replace('.sql', '')));
@@ -341,10 +303,7 @@ async function getMigrations(remoteVersion, localVersion) {
     return migrationsToRun;
 }
 
-/**
- * @returns {Promise<Version | null>}
- */
-async function getRemoteVersion() {
+async function getRemoteVersion(): Promise<Version | null> {
     console.log(`Getting remote version from '${remoteAddress()}/api/version'...`);
     const rawVersion = await fetch(`https://${remoteAddress()}/api/version`);
 
@@ -371,19 +330,13 @@ async function getRemoteVersion() {
     return Version.fromString(apiVersion.v);
 }
 
-/**
- * @param {Version} localVersion
- */
-async function restartServer(localVersion) {
-    /**
-     * @returns {Promise<boolean>}
-     */
-    async function checkServerUp() {
+async function restartServer(localVersion: Version): Promise<void> {
+    async function checkServerUp(): Promise<boolean> {
         await sleep(500);
 
         try {
             const remoteVersion = await getRemoteVersion().catch(console.error);
-            if (remoteVersion && remoteVersion.isEqual(localVersion)) {
+            if (remoteVersion?.isEqual(localVersion)) {
                 console.log(c.green(`Complete: v${localVersion.str()} is live on ${env}`));
                 return true;
             } else {
@@ -417,16 +370,11 @@ async function restartServer(localVersion) {
             message: `Retry?`
         });
 
-        if (response.value !== true) {
-            return;
-        }
+        if (response.value !== true) return;
     }
 }
 
-/**
- * @returns {Promise<{localVersion: Version, remoteVersion: Version}>}
- */
-async function getAndCheckVersions() {
+async function getAndCheckVersions(): Promise<{ localVersion: Version; remoteVersion: Version }> {
     dotenv.config({ path: `./secrets/${env}/.env` });
     console.log(c.cyan(`Deploying to ${remoteSshAddress()} (${env})`));
 
@@ -484,11 +432,7 @@ async function build() {
     }
 }
 
-/**
- * @param {Version} localVersion
- * @returns {Promise<void>}
- */
-async function backupDatabase(localVersion) {
+async function backupDatabase(localVersion: Version): Promise<void> {
     console.log(c.yellow(`Backing up database...`));
     // not under remoteDir because it gets deleted on every deploy
     const backupFile = `~/hl-${env}-${localVersion.str()}-${utcSeconds()}.sql`;

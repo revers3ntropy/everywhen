@@ -30,29 +30,29 @@ test.describe('/signup', () => {
         // haven't been signed in with random credentials
         await expect(page).toHaveURL('/login');
 
-        await page.goto('/home', { waitUntil: 'networkidle' });
-        await expect(page).toHaveURL('/login?redirect=home');
+        await page.goto('/journal', { waitUntil: 'networkidle' });
+        await expect(page).toHaveURL('/login?redirect=journal');
         await page.goto('/login', { waitUntil: 'networkidle' });
         await expect(page).toHaveURL('/login');
 
         await page.goto('/signup', { waitUntil: 'networkidle' });
         await expect(page).toHaveURL('/signup');
 
-        // inputs are erased when checking that we can't go to /home
+        // inputs are erased when checking that we can't go to /journal
         // focus page before typing ??? TODO why, that is weird
         await page.getByLabel('Username').click();
         await page.getByLabel('Username').type(auth.username);
         await page.getByLabel('Password').fill(auth.password);
         await page.getByRole('button', { name: 'Create Account' }).click();
 
-        await page.waitForURL('/home');
+        await page.waitForURL('/journal');
 
         const sessionCookieIdx = (await page.context().cookies()).findIndex(
             c => c.name === COOKIE_KEYS.sessionId
         );
         expect(sessionCookieIdx).toBeGreaterThan(-1);
 
-        await expect(page).toHaveURL('/home');
+        await expect(page).toHaveURL('/journal');
 
         await page.goto('/settings', { waitUntil: 'networkidle' });
         await expect(page).toHaveURL('/settings');
@@ -78,8 +78,8 @@ test.describe('/signup', () => {
         await page.getByRole('button', { name: 'Log In' }).click();
 
         // account doesn't exist and wil be redirected if try to log in
-        await page.goto('/home', { waitUntil: 'networkidle' });
-        await expect(page).toHaveURL('/login?redirect=home');
+        await page.goto('/journal', { waitUntil: 'networkidle' });
+        await expect(page).toHaveURL('/login?redirect=journal');
     });
 
     test('Can log into account', async ({ page }) => {
@@ -90,12 +90,11 @@ test.describe('/signup', () => {
         await page.getByLabel('Password').fill(auth.password);
 
         await page.getByRole('button', { name: 'Log In' }).click();
-
-        await page.waitForURL('/home', { waitUntil: 'networkidle' });
+        await page.waitForURL('/journal', { waitUntil: 'networkidle' });
 
         await expectDeleteUser(api, auth);
 
-        await page.goto('/home', { waitUntil: 'networkidle' });
-        await expect(page).toHaveURL('/login?redirect=home');
+        await page.goto('/journal', { waitUntil: 'networkidle' });
+        await expect(page).toHaveURL('/login?redirect=journal');
     });
 });

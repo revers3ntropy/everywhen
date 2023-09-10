@@ -4,7 +4,7 @@
         "start": "screen -S halcyon_land_screen_%ENV% -d -m node -max-old-space-size=4096 -r dotenv/config server",
         "stop": "screen -S halcyon_land_screen_%ENV% -X quit",
         "restart": "npm run stop; npm run start",
-        "setup": "pnpm i",
+        "setup": "bun i",
         "clear-logs": "rm *.log"
     },
     "dependencies": {

@@ -45,131 +45,137 @@
 
 <nav>
     <div>
-        <Dropdown width="200px">
-            <div class="account-button" slot="button">
-                <p> {$username || '...'} </p>
-                <Streaks condensed />
-                <ChevronDown />
+        <div>
+            <Dropdown width="200px">
+                <div class="account-button" slot="button">
+                    <p> {$username || '...'} </p>
+                    <Streaks condensed />
+                    <ChevronDown />
+                </div>
+
+                <div class="account-dropdown-options">
+                    <Streaks />
+
+                    <hr />
+
+                    <button
+                        aria-label="download encrypted backup"
+                        class="account-dropdown-button"
+                        disabled={isDownloadingBackup}
+                        on:click={downloadBackup}
+                    >
+                        <DownloadLock size="30" />
+                        {#if isDownloadingBackup}
+                            Downloading...
+                        {:else}
+                            Download Backup
+                        {/if}
+                    </button>
+
+                    <button class="account-dropdown-button" on:click={switchTheme}>
+                        {#if $theme === Theme.light}
+                            <DarkTheme size="30" />
+                            Dark Mode
+                        {:else}
+                            <LightTheme size="30" />
+                            Light Mode
+                        {/if}
+                    </button>
+
+                    <a aria-label="settings" class="account-dropdown-button" href="/settings">
+                        <Cog size="30" />
+                        Settings
+                    </a>
+
+                    <button
+                        aria-label="log out"
+                        class="account-dropdown-button danger"
+                        on:click={() => void Auth.logOut()}
+                    >
+                        <Logout size="30" />
+                        Log Out
+                    </button>
+                </div>
+            </Dropdown>
+
+            <div class="w-fit p-2 border-r bordered ml-2 mt-3">
+                <CreateNewButton />
             </div>
 
-            <div class="account-dropdown-options">
-                <Streaks />
-
-                <hr />
-
+            <div class="p-3 py-4">
                 <button
-                    aria-label="download encrypted backup"
-                    class="account-dropdown-button"
-                    disabled={isDownloadingBackup}
-                    on:click={downloadBackup}
+                    class="with-icon"
+                    aria-label={$obfuscated ? 'Show all' : 'Hide all'}
+                    on:click={() => obfuscated.set(!$obfuscated)}
                 >
-                    <DownloadLock size="30" />
-                    {#if isDownloadingBackup}
-                        Downloading...
+                    {#if $obfuscated}
+                        <Eye size="25" />
+                        Show all
                     {:else}
-                        Download Backup
+                        <EyeOff size="25" />
+                        Hide all
                     {/if}
-                </button>
-
-                <button class="account-dropdown-button" on:click={switchTheme}>
-                    {#if $theme === Theme.light}
-                        <DarkTheme size="30" />
-                        Dark Mode
-                    {:else}
-                        <LightTheme size="30" />
-                        Light Mode
-                    {/if}
-                </button>
-
-                <a aria-label="settings" class="account-dropdown-button" href="/settings">
-                    <Cog size="30" />
-                    Settings
-                </a>
-
-                <button
-                    aria-label="log out"
-                    class="account-dropdown-button danger"
-                    on:click={() => void Auth.logOut()}
-                >
-                    <Logout size="30" />
-                    Log Out
                 </button>
             </div>
-        </Dropdown>
 
-        <div class="w-fit p-2 border-r bordered ml-2 mt-3">
-            <CreateNewButton />
+            {#if $settingsStore.passcode.value}
+                <button
+                    on:click={lock}
+                    class="danger lock-button"
+                    use:tooltip={{
+                        content: '<span class="oneline">Lock (require passcode)</span>',
+                        position: 'bottom'
+                    }}
+                    aria-label="Lock"
+                >
+                    <Lock size="25" />
+                </button>
+            {/if}
         </div>
 
-        <div class="p-3 pt-3">
-            <button
-                class="with-icon"
-                aria-label={$obfuscated ? 'Show all' : 'Hide all'}
-                on:click={() => obfuscated.set(!$obfuscated)}
+        <hr class="py-3" />
+
+        <div class="nav-buttons">
+            <a
+                href="/journal"
+                aria-label="journal"
+                class="nav-link"
+                class:current={$page.url.pathname.startsWith('/journal')}
             >
-                {#if $obfuscated}
-                    <Eye size="25" />
-                    Show all
-                {:else}
-                    <EyeOff size="25" />
-                    Hide all
-                {/if}
-            </button>
+                <Notebook size="35" />
+                <span class="hide-mobile"> Journal </span>
+            </a>
+            <a
+                href="/timeline"
+                aria-label="timeline"
+                class="nav-link"
+                class:current={$page.url.pathname.startsWith('/timeline')}
+            >
+                <ChartTimeline size="35" />
+                <span class="hide-mobile"> Timeline </span>
+            </a>
+            <a
+                href="/map"
+                aria-label="map"
+                class="nav-link"
+                class:current={$page.url.pathname.startsWith('/map')}
+            >
+                <MapMarkerOutline size="35" />
+                <span class="hide-mobile"> Map </span>
+            </a>
+            <a
+                href="/stats"
+                class="nav-link"
+                class:current={$page.url.pathname.startsWith('/stats')}
+                aria-label="statistics"
+            >
+                <Counter size="35" />
+                <span class="hide-mobile"> Insights </span>
+            </a>
         </div>
-
-        {#if $settingsStore.passcode.value}
-            <button
-                on:click={lock}
-                class="danger lock-button"
-                use:tooltip={{
-                    content: '<span class="oneline">Lock (require passcode)</span>',
-                    position: 'bottom'
-                }}
-                aria-label="Lock"
-            >
-                <Lock size="25" />
-            </button>
-        {/if}
     </div>
 
-    <div class="nav-buttons">
-        <a
-            href="/journal"
-            aria-label="journal"
-            class="nav-link"
-            class:current={$page.url.pathname.startsWith('/journal')}
-        >
-            <Notebook size="35" />
-            <span class="hide-mobile"> Journal </span>
-        </a>
-        <a
-            href="/timeline"
-            aria-label="timeline"
-            class="nav-link"
-            class:current={$page.url.pathname.startsWith('/timeline')}
-        >
-            <ChartTimeline size="35" />
-            <span class="hide-mobile"> Timeline </span>
-        </a>
-        <a
-            href="/map"
-            aria-label="map"
-            class="nav-link"
-            class:current={$page.url.pathname.startsWith('/map')}
-        >
-            <MapMarkerOutline size="35" />
-            <span class="hide-mobile"> Map </span>
-        </a>
-        <a
-            href="/stats"
-            class="nav-link"
-            class:current={$page.url.pathname.startsWith('/stats')}
-            aria-label="statistics"
-        >
-            <Counter size="35" />
-            <span class="hide-mobile"> Insights </span>
-        </a>
-    </div>
+    <div></div>
 
     <div class="text-2xl tracking-wide text-center flex justify-center items-end">
         <p class="serif pb-2">Everywhen</p>
@@ -195,6 +201,7 @@
         z-index: 5;
         display: grid;
         grid-template-rows: 1fr 1fr 1fr;
+        border-right: 1px solid var(--border-color);
         background-color: var(--background-color);
 
         @media #{$mobile} {
@@ -206,7 +213,8 @@
     }
 
     .account-button {
-        width: $nav-width;
+        // show the border line still
+        width: calc($nav-width - 1px);
         display: grid;
         grid-template-columns: 1fr auto auto;
         gap: 0.25rem;
@@ -215,7 +223,6 @@
         background: var(--v-light-accent);
         padding: 0.75rem;
         text-align: left;
-        border-radius: 0 0 $border-radius 0;
 
         &:hover {
             background: var(--light-accent);
@@ -232,7 +239,6 @@
         align-items: center;
         justify-content: center;
         gap: 4px;
-        padding: 0 0.5rem 0 0;
 
         @media #{$mobile} {
             position: fixed;
@@ -256,7 +262,6 @@
             gap: 1rem;
             align-items: center;
             justify-content: flex-start;
-            border-radius: 0 $border-radius $border-radius 0;
             padding: 0.25rem;
             text-decoration: none;
 
@@ -265,7 +270,7 @@
             }
 
             &:hover {
-                background: var(--v-light-accent);
+                background: var(--light-accent);
             }
 
             &.current {

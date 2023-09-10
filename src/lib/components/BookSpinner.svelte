@@ -51,6 +51,7 @@
     .spinner-container {
         box-sizing: border-box;
         -webkit-font-smoothing: antialiased;
+        display: block !important;
     }
 
     .book {

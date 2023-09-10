@@ -48,20 +48,6 @@
 
     export let obfuscated = true;
 
-    export let entryFormMode: EntryFormMode;
-
-    async function setEntryFormMode(mode: EntryFormMode) {
-        const newSetting = {
-            key: 'entryFormMode' as SettingsKey,
-            value: mode !== EntryFormMode.Standard
-        };
-        $settingsStore.entryFormMode = {
-            ...$settingsStore.entryFormMode,
-            value: newSetting.value
-        };
-        await api.put('/settings', newSetting);
-    }
-
     function resetEntryForm() {
         newEntryTitle = '';
         newEntryBody = '';
@@ -290,6 +276,18 @@
         if (!shouldProceed) cancel();
     });
 
+    async function setEntryFormMode(mode: EntryFormMode) {
+        const newSetting = {
+            key: 'entryFormMode' as SettingsKey,
+            value: mode !== EntryFormMode.Standard
+        };
+        $settingsStore.entryFormMode = {
+            ...$settingsStore.entryFormMode,
+            value: newSetting.value
+        };
+        await api.put('/settings', newSetting);
+    }
+
     onMount(() => {
         void loadLabels();
 
@@ -302,10 +300,15 @@
                 obfuscated = false;
             }
         }
+
         resizeTextAreaToFitContent();
 
         mounted = true;
     });
+
+    let entryFormMode = $settingsStore.entryFormMode.value
+        ? EntryFormMode.Bullet
+        : EntryFormMode.Standard;
 
     let mounted = false;
 

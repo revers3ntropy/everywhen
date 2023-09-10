@@ -6,6 +6,7 @@ ALTER TABLE entries RENAME COLUMN createdTZOffset TO createdTzOffset;
 ALTER TABLE entries RENAME COLUMN entry TO body;
 ALTER TABLE entries RENAME COLUMN label TO labelId;
 ALTER TABLE entries CHANGE `wordCount` `wordCount` INT NOT NULL;
+ALTER TABLE entries CHANGE `title` `title` text NOT NULL;
 ALTER TABLE entries ADD INDEX `idx_entries_userId`  (`userId`);
 ALTER TABLE entries ADD INDEX `idx_entries_labelId` (`userId`, `labelId`);
 

@@ -94,7 +94,7 @@ export async function generateUserAndSignIn(page: Page): Promise<{
     await page.getByLabel('Password').fill(auth.password);
     await page.getByRole('button', { name: 'Log In' }).click();
 
-    await page.waitForURL('/home');
+    await page.waitForURL('/journal');
 
     return { auth, api };
 }
@@ -103,9 +103,9 @@ export async function expectDeleteUser(
     api: ApiClient,
     user: { username: string; key: string }
 ): Promise<void> {
-    const { err } = await api.delete('/users', {
+    const res = await api.delete('/users', {
         username: user.username,
         encryptionKey: user.key
     });
-    expect(err).toBe(null);
+    expect(res.ok).toBe(true);
 }

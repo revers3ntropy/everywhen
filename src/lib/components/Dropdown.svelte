@@ -18,8 +18,7 @@
     export let fromTop = false;
     export let openOnHover = false;
     export let stayOpenWhenClicked = false;
-    export let fillWidth: boolean | 'mobile' = false;
-    export let buttonFillWidth: boolean | 'mobile' = false;
+    export let fillWidthMobile: boolean | 'mobile' = false;
 
     export let close = () => {
         open = false;
@@ -61,8 +60,7 @@
     class:from-right={fromRight}
     class:from-top={fromTop}
     class:open-on-hover={openOnHover}
-    class:fill-width-mobile={fillWidth === 'mobile'}
-    class:full-width={fillWidth}
+    class:fill-width-mobile={fillWidthMobile}
     {id}
 >
     <button aria-label={label} on:click={() => (open = !open)} class="dropdown-button">
