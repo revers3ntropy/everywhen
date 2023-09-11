@@ -3,7 +3,7 @@
     import { createEventDispatcher } from 'svelte';
     import Check from 'svelte-material-icons/Check.svelte';
     import ContentCopy from 'svelte-material-icons/ContentCopy.svelte';
-    import Delete from 'svelte-material-icons/Delete.svelte';
+    import Delete from 'svelte-material-icons/DeleteOutline.svelte';
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import UtcTime from '$lib/components/UtcTime.svelte';
@@ -47,7 +47,7 @@
     }
 </script>
 
-<div class="img-wrapper {deleted ? 'deleted' : ''}">
+<div class="flex-center m-1 relative overflow-hidden wrapper" class:invisible={deleted}>
     <img
         alt={fileName}
         class={obfuscated ? 'obfuscated' : ''}
@@ -67,29 +67,32 @@
                     <EyeOff size="25" />
                 {/if}
             </button>
-            {#if !obfuscated}
-                {#if recentlyCopied}
-                    <Check size="30" />
-                {:else}
-                    <button
-                        on:click={copyToClipBoard}
-                        class="icon-button"
-                        style="padding: 0.2rem"
-                        use:tooltip={{
-                            content: 'Copy link',
-                            // `overflow: hidden` so needs to show below
-                            position: 'bottom'
-                        }}
-                    >
-                        <ContentCopy size="30" />
-                    </button>
-                {/if}
+
+            {#if recentlyCopied}
+                <Check size="30" />
+            {:else}
+                <button
+                    on:click={copyToClipBoard}
+                    class="icon-button"
+                    style="padding: 0.2rem"
+                    use:tooltip={{
+                        content: 'Copy link',
+                        // `overflow: hidden` so needs to show below
+                        position: 'bottom'
+                    }}
+                >
+                    <ContentCopy size="30" />
+                </button>
             {/if}
         </div>
         <div>
             {#if !obfuscated}
-                <!-- TODO use tzOffset from db -->
-                <UtcTime timestamp={created} fmt="MMMM Do YYYY, h:mma" tooltipPosition="bottom" />
+                <UtcTime
+                    relative
+                    timestamp={created}
+                    fmt="MMMM Do YYYY, h:mma"
+                    tooltipPosition="bottom"
+                />
             {/if}
         </div>
         <div>
@@ -105,55 +108,43 @@
 <style lang="scss">
     @import '$lib/styles/layout';
 
-    .img-wrapper {
-        @extend .container;
-        @extend .flex-center;
+    .wrapper {
+        max-width: min(100%, 20rem);
+    }
 
-        position: relative;
-        border-radius: $border-radius;
-        margin: 0.5rem;
-        padding: 0;
-        height: 50vh;
-        aspect-ratio: 1/1;
-        overflow: hidden;
+    img {
+        max-height: 100%;
+        max-width: 100%;
 
-        img {
-            max-height: 100%;
-            max-width: 100%;
-
-            &.obfuscated {
-                filter: blur(30px);
-            }
+        &.obfuscated {
+            filter: blur(30px);
         }
+    }
 
+    .menu {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100%;
+        height: 50px;
+        border-radius: 0 0 $border-radius $border-radius;
+        padding: 5px;
+        background: var(--translucent-bg);
+        justify-content: center;
+        align-items: center;
+        transition: opacity #{$transition};
+        opacity: 0;
+
+        & > * {
+            @extend .flex-center;
+        }
+    }
+
+    :hover {
         .menu {
-            display: flex;
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 100%;
-            height: 50px;
-            border-radius: 5px;
-            padding: 5px;
-            background: var(--transluscent-bg);
-            justify-content: space-between;
-            align-items: center;
-            transition: opacity #{$transition};
-            opacity: 0;
-
-            & > * {
-                @extend .flex-center;
-            }
-        }
-
-        &:hover {
-            .menu {
-                opacity: 1;
-            }
-        }
-
-        &.deleted {
-            display: none;
+            opacity: 1;
         }
     }
 </style>

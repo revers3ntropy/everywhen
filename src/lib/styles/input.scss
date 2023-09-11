@@ -32,7 +32,6 @@ svg.gradient-icon * {
 
 input,
 button {
-    font-size: inherit;
     font-family: inherit;
     background: transparent;
     border: none;
@@ -41,11 +40,11 @@ button {
 }
 
 textarea {
-    font-size: inherit;
     font-family: inherit;
     background: transparent;
-    border: 1px solid var(--border-color);
+    border: none;
     outline: none;
+    overflow: hidden;
 }
 
 input {

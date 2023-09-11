@@ -18,7 +18,6 @@
     import Entry from '$lib/components/entry/Entry.svelte';
     import type { Entry as EntryController } from '$lib/controllers/entry/entry';
     import type { Location } from '$lib/controllers/location/location';
-    import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
     import { currentTzOffset, nowUtc, utcEq } from '$lib/utils/time';
     import Dot from '../Dot.svelte';
     import UtcTime from '../UtcTime.svelte';
@@ -34,7 +33,7 @@
         $collapsed[day] = !$collapsed[day];
     }
 
-    function scrollToEntry(id: string) {
+    function scrollToEntryIfExists(id: string) {
         setTimeout(() => {
             const el = document.getElementById(id);
             if (!el) {
@@ -49,11 +48,11 @@
     $: isToday = utcEq(nowUtc(), day, currentTzOffset(), 0, 'YYYY-MM-DD');
     $: $collapsed[day] = entries.length < 1 && (!isToday || !showEntryForm);
 
-    listen.entry.onCreate(({ entry, entryMode }) => {
+    listen.entry.onCreate(({ entry, isBullet }) => {
         if (!isToday) return;
         entries = [...entries, entry].sort((a, b) => b.created - a.created);
-        if (entryMode === EntryFormMode.Standard) {
-            scrollToEntry(entry.id);
+        if (!isBullet) {
+            scrollToEntryIfExists(entry.id);
         }
     });
     listen.entry.onDelete(id => {

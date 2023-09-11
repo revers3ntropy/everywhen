@@ -23,12 +23,12 @@
 
 <Dropdown openOnHover>
     <span slot="button">
-        <span class="icon-button">
+        <span>
             <FormatText size="25" />
         </span>
     </span>
 
-    <div class="format-options">
+    <div class="">
         <button class="with-icon icon-small" on:click={makeWrapper('**', '**', false)}>
             <FormatBold /> Bold
         </button>
@@ -69,21 +69,17 @@
 </Dropdown>
 
 <style lang="scss">
-    .format-options {
-        padding: 0.5rem 0;
+    button {
+        white-space: nowrap;
+        color: var(--text-color);
+        padding: 0.4rem 1rem;
+        margin: 0;
+        width: 100%;
+        text-align: left;
 
-        button {
-            white-space: nowrap;
-            color: var(--text-color);
-            padding: 0.4rem 1rem;
-            margin: 0;
-            width: 100%;
-            text-align: left;
-
-            &:hover,
-            &:focus {
-                background: var(--v-light-accent);
-            }
+        &:hover,
+        &:focus {
+            background: var(--v-light-accent);
         }
     }
 </style>

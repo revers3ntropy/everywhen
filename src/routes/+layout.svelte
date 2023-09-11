@@ -87,6 +87,18 @@
     <Modal classContent="popup-background" classWindow="popup-background" show={$popup} />
 
     <slot />
-
-    <Footer />
 </div>
+
+<Footer />
+
+<style lang="scss">
+    .root {
+        // scroll inside root so that the scrollbar is styled
+        // with correct theme
+        height: 100vh;
+        background: var(--background-color);
+        padding: 0;
+        overflow-y: scroll;
+        overflow-x: hidden;
+    }
+</style>

@@ -17,7 +17,7 @@
     <title>Journal</title>
 </svelte:head>
 
-<main>
+<main class="md:px-4">
     <section class="sidebar">
         <EntriesSidebar
             obfuscated={$obfuscated}

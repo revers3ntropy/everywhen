@@ -3,6 +3,7 @@
     import Lazy from '$lib/components/Lazy.svelte';
     import type { EntryEdit } from '$lib/controllers/entry/entry';
     import { fmtUtcRelative, nowUtc } from '$lib/utils/time';
+    import ContentCopy from 'svelte-material-icons/ContentCopy.svelte';
     import { slide } from 'svelte/transition';
     import { tooltip } from '@svelte-plugins/tooltips';
     import Bin from 'svelte-material-icons/Delete.svelte';
@@ -104,6 +105,11 @@
         obfuscated = !obfuscated;
     }
 
+    async function copyToClipBoard() {
+        await navigator.clipboard.writeText(`${location.host}/journal/${id}`);
+        notify.success('Copied link to clipboard');
+    }
+
     let showingMap = false;
 
     $: entryHtml = browser ? rawMdToHtml(body) : '';
@@ -190,6 +196,15 @@
                         <hr />
 
                         <div class="options-dropdown">
+                            <button
+                                class="with-icon icon-gradient-on-hover"
+                                aria-label="Copy link to entry"
+                                on:click={copyToClipBoard}
+                            >
+                                <ContentCopy size="25" />
+                                Copy link
+                            </button>
+
                             {#if !Entry.isDeleted({ deleted })}
                                 <button
                                     on:click={togglePinned}
@@ -237,9 +252,9 @@
                 style="margin: 0 0.3rem 0 0"
             >
                 {#if obfuscated}
-                    <Eye size="25" />
+                    <Eye size="20" />
                 {:else}
-                    <EyeOff size="25" />
+                    <EyeOff size="20" />
                 {/if}
             </button>
         </div>

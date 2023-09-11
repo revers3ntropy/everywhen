@@ -1,4 +1,3 @@
-import type { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
 import type { Entry } from '$lib/controllers/entry/entry';
 import type { Label } from '$lib/controllers/label/label';
 import type { Event } from '$lib/controllers/event/event';
@@ -10,7 +9,7 @@ type Entities = 'entry' | 'label' | 'event';
 type Create = {
     entry: {
         entry: Entry;
-        entryMode: EntryFormMode;
+        isBullet: boolean;
     };
     label: Label;
     event: Event;

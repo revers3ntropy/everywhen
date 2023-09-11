@@ -4,6 +4,17 @@
 
 @import '$lib/styles/themes';
 
+html,
+body {
+    width: 100%;
+    height: 100vh;
+    overflow-y: hidden;
+    line-height: 1;
+    font-size: 16px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial,
+            sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+}
+
 // https://andy-bell.co.uk/a-modern-css-reset/
 *,
 *::before,
@@ -16,26 +27,6 @@
     border: none;
     vertical-align: baseline;
     overflow-wrap: break-word;
-}
-
-html, body {
-    width: 100%;
-    height: 100vh;
-    overflow-y: hidden;
-    line-height: 1;
-    font-size: 16px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica,
-    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
-}
-
-.root {
-    // scroll inside root so that the scrollbar is styled
-    // with correct theme
-    height: 100vh;
-    background: var(--background-color);
-    padding: 0;
-    overflow-y: scroll;
-    overflow-x: hidden;
 }
 
 img, picture {
@@ -96,7 +87,7 @@ svg {
 }
 
 ::-webkit-scrollbar-thumb {
-    background-color: #666;
+    background-color: var(--text-color-light);
     border-radius: 3px;
 }
 

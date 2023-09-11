@@ -89,7 +89,7 @@ export namespace Asset {
                     (
                         await api.post('/assets', {
                             fileName: file.name,
-                            content: contentAsWebP
+                            content: contentAsWebP.val
                         })
                     ).match(
                         val =>

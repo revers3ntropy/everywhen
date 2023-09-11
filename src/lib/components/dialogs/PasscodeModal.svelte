@@ -124,7 +124,7 @@
 
         .content {
             @extend .container-shadow;
-            background: var(--transluscent-bg);
+            background: var(--translucent-bg);
             backdrop-filter: blur(30px);
             padding: 2rem 3rem 3rem 3rem;
             border-radius: $border-radius;

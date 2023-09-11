@@ -18,7 +18,7 @@
     import { api } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
-    import Nav from '$lib/components/Nav.svelte';
+    import Nav from '$lib/components/nav/Nav.svelte';
     import PasscodeModal from '$lib/components/dialogs/PasscodeModal.svelte';
 
     export let data: LayoutData;

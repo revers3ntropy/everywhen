@@ -45,7 +45,7 @@
 
     async function goToEntryFormWithLabel(name: string, defaultColor: string) {
         await api.put('/settings', {
-            key: 'entryFormMode',
+            key: 'useBulletEntryForm',
             value: false
         });
         const labelId = await makeLabelFromNameIfDoesntExist(name, defaultColor);
@@ -67,20 +67,20 @@
 
     async function makeEntry() {
         await api.put('/settings', {
-            key: 'entryFormMode',
+            key: 'useBulletEntryForm',
             value: false
         });
-        $settingsStore.entryFormMode.value = false;
+        $settingsStore.useBulletEntryForm.value = false;
         localStorage.removeItem(LS_KEYS.newEntryLabel);
         await gotoIfNotAt('/journal');
     }
 
     async function makeBullet() {
         await api.put('/settings', {
-            key: 'entryFormMode',
+            key: 'useBulletEntryForm',
             value: true
         });
-        $settingsStore.entryFormMode.value = true;
+        $settingsStore.useBulletEntryForm.value = true;
         if ($page.url.pathname !== '/journal') {
             await goto('/journal');
         } else {
@@ -124,8 +124,8 @@
     </linearGradient>
 </svg>
 
-<Dropdown openOnHover width="170px">
-    <div class="open-button" slot="button">
+<Dropdown>
+    <div class="flex-center gap-2 w-full border-r bordered p-2 hover:bg-lightAccent" slot="button">
         <Plus size="25" />
         <span class="hide-mobile">New</span>
         <ChevronDown />
@@ -164,19 +164,6 @@
 </Dropdown>
 
 <style lang="scss">
-    .open-button {
-        display: grid;
-        grid-template-columns: auto 1fr auto;
-        width: 100%;
-        justify-content: center;
-        align-items: center;
-        gap: 0.5rem;
-
-        @media #{$mobile} {
-            padding: 0;
-        }
-    }
-
     .record-something-buttons {
         display: block;
         padding: 0.8rem 0 0.8rem 0;

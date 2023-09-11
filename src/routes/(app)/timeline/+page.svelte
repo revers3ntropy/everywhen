@@ -87,7 +87,7 @@
         body,
         .root {
             max-height: 100vh;
-            background: var(--light-accent) !important;
+            background: var(--v-light-accent) !important;
 
             &::-webkit-scrollbar {
                 display: none;

@@ -82,12 +82,12 @@
     @import '$lib/styles/layout';
 
     footer {
-        padding: 5rem 0 5rem 0;
+        padding: 5rem 0 10rem 0;
         border-top: 1px solid var(--border-color);
+        background-color: var(--nav-bg);
     }
 
     .split {
-        background-color: var(--nav-bg);
         display: grid;
         grid-template-columns: 1fr 1fr;
 

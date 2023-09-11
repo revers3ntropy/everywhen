@@ -1,17 +1,17 @@
 <script lang="ts">
+    import { tooltip } from '@svelte-plugins/tooltips';
+    import FormatListBulleted from 'svelte-material-icons/FormatListBulleted.svelte';
+    import TextBoxEditOutline from 'svelte-material-icons/TextBoxEditOutline.svelte';
+    import Send from 'svelte-material-icons/Send.svelte';
     import { browser } from '$app/environment';
+    import { onMount } from 'svelte';
     import { beforeNavigate, goto } from '$app/navigation';
     import InsertImage from '$lib/components/asset/InsertImage.svelte';
-    import { EntryFormMode } from '$lib/components/entryForm/entryFormMode';
     import { Asset } from '$lib/controllers/asset/asset';
     import type { SettingsKey } from '$lib/controllers/settings/settings';
     import { dispatch, listen } from '$lib/dataChangeEvents';
     import { Result } from '$lib/utils/result';
     import { serializedAgentData } from '$lib/utils/userAgent';
-    import { tooltip } from '@svelte-plugins/tooltips';
-    import { onMount } from 'svelte';
-    import FormatListBulleted from 'svelte-material-icons/FormatListBulleted.svelte';
-    import Send from 'svelte-material-icons/Send.svelte';
     import LabelSelect from '$lib/components/label/LabelSelect.svelte';
     import { LS_KEYS } from '$lib/constants';
     import type { Entry } from '$lib/controllers/entry/entry';
@@ -162,7 +162,7 @@
                 label,
                 edits: []
             },
-            entryMode: EntryFormMode.Standard
+            isBullet: useBulletEntryForm
         });
     }
 
@@ -228,9 +228,9 @@
 
     function resizeTextAreaToFitContent(self: HTMLTextAreaElement | null = newEntryInputElement) {
         if (!self) return;
-        const minBodyTextareaHeight = entryFormMode === EntryFormMode.Bullet ? 0 : 100;
+        const minBodyTextareaHeight = useBulletEntryForm ? 0 : 100;
         self.style.height = '0px';
-        self.style.height = Math.max(self.scrollHeight + 5, minBodyTextareaHeight) + 'px';
+        self.style.height = `${Math.max(self.scrollHeight, minBodyTextareaHeight)}px`;
     }
 
     function handleEntryInputKeydown(event: KeyboardEvent) {
@@ -244,7 +244,7 @@
                 if (event.shiftKey) {
                     event.preventDefault();
                     insertAtCursor(newEntryInputElement, '\n');
-                } else if (event.ctrlKey || entryFormMode === EntryFormMode.Bullet) {
+                } else if (event.ctrlKey || useBulletEntryForm) {
                     event.preventDefault();
                     void submit();
                 }
@@ -278,18 +278,14 @@
     });
 
     async function switchEntryFormMode() {
-        const mode =
-            entryFormMode === EntryFormMode.Standard
-                ? EntryFormMode.Bullet
-                : EntryFormMode.Standard;
-        const newSetting = {
-            key: 'entryFormMode' as SettingsKey,
-            value: mode !== EntryFormMode.Standard
-        };
-        $settingsStore.entryFormMode.value = newSetting.value;
-        entryFormMode = mode;
+        const mode = !useBulletEntryForm;
+        $settingsStore.useBulletEntryForm.value = mode;
+        useBulletEntryForm = mode;
         resizeTextAreaToFitContent();
-        await api.put('/settings', newSetting);
+        await api.put('/settings', {
+            key: 'useBulletEntryForm' as SettingsKey,
+            value: mode
+        });
     }
 
     onMount(() => {
@@ -310,9 +306,7 @@
         mounted = true;
     });
 
-    let entryFormMode = $settingsStore.entryFormMode.value
-        ? EntryFormMode.Bullet
-        : EntryFormMode.Standard;
+    let useBulletEntryForm = $settingsStore.useBulletEntryForm.value;
     let mounted = false;
 
     let newEntryInputElement: HTMLTextAreaElement;
@@ -335,35 +329,41 @@
     }
     $: if (browser && newEntryInputElement) {
         newEntryBody;
-        setTimeout(() => {
-            resizeTextAreaToFitContent();
-        }, 0);
+        setTimeout(resizeTextAreaToFitContent, 0);
     }
 </script>
 
-<div class="wrapper">
-    {#key entryFormMode}
+<div class="mt-4 md:mx-4">
+    {#key useBulletEntryForm}
         <div class="head">
             <div class="left-options">
                 <button
                     aria-label="Switch to bullet journaling"
                     class="with-circled-icon"
-                    on:click={() => switchEntryFormMode()}
+                    on:click={switchEntryFormMode}
                     use:tooltip={{
                         content: `Switch to ${
-                            entryFormMode === EntryFormMode.Standard ? 'bullet' : 'standard'
+                            useBulletEntryForm ? 'standard' : 'bullet'
                         } journaling`,
                         position: 'right'
                     }}
                 >
-                    <FormatListBulleted size="30" />
+                    {#if useBulletEntryForm}
+                        <TextBoxEditOutline size="30" />
+                    {:else}
+                        <FormatListBulleted size="30" />
+                    {/if}
                 </button>
 
-                <LocationToggle />
-
-                <FormatOptions {makeWrapper} />
-
-                <InsertImage onInput={onNewImage} />
+                <div class="flex-center h-full">
+                    <LocationToggle size="23" />
+                </div>
+                <div class="flex-center h-full">
+                    <FormatOptions {makeWrapper} />
+                </div>
+                <div class="flex-center h-full">
+                    <InsertImage onInput={onNewImage} />
+                </div>
 
                 {#if $currentlyUploadingAssets > 0}
                     <div style="margin: 0 0 0 4px;">
@@ -390,12 +390,12 @@
                 </button>
             </div>
         </div>
-        {#if entryFormMode === EntryFormMode.Standard}
+        {#if !useBulletEntryForm}
             <div class="entry-title-container">
                 <input
                     aria-label="Entry Title"
                     bind:value={newEntryTitle}
-                    class="title"
+                    class="title text-lg"
                     class:obfuscated
                     placeholder={obfuscated ? '' : 'Title (optional)'}
                     disabled={obfuscated || submitted}
@@ -410,10 +410,18 @@
                 use:paste={{ handleText: pasteText, handleFiles: pasteFiles }}
                 disabled={obfuscated || submitted}
                 aria-label="Entry Body"
-                placeholder={obfuscated ? '' : 'Start writing here...'}
+                placeholder={obfuscated
+                    ? ''
+                    : useBulletEntryForm
+                    ? 'Write a bullet...'
+                    : 'Start writing here...'}
+                class="text-lg"
                 class:obfuscated
-                class:border-r={entryFormMode === EntryFormMode.Bullet}
-                class:border-r-b={entryFormMode === EntryFormMode.Standard}
+                class:border-r={useBulletEntryForm}
+                class:border-r-b={!useBulletEntryForm}
+                class:py-2={useBulletEntryForm}
+                class:px-4={useBulletEntryForm}
+                class:p-4={!useBulletEntryForm}
             />
         </div>
 
@@ -435,25 +443,6 @@
     @import '$lib/styles/layout';
     @import '$lib/styles/input';
 
-    .wrapper {
-        margin: 1rem;
-        width: calc(100% - 2rem);
-
-        @media #{$mobile} {
-            margin: 1rem 0;
-            width: 100%;
-        }
-
-        & > div {
-            width: 100%;
-            min-width: 200px;
-        }
-
-        @media #{$mobile} {
-            border: none;
-        }
-    }
-
     .head {
         margin: 0 0 4px 0;
         padding: 0;
@@ -469,19 +458,6 @@
             height: 100%;
             justify-content: flex-start;
             gap: 3px;
-
-            .title {
-                border: none;
-                font-size: 20px;
-                width: calc(100% - 50px);
-                margin: 0 0 0.2rem 0.3em;
-
-                @media #{$mobile} {
-                    width: calc(100vw - 70px);
-                    margin: 0.3em;
-                    border-bottom: 1px solid var(--border-light);
-                }
-            }
         }
 
         .right-options {
@@ -524,7 +500,6 @@
             margin: 0;
             outline: none;
             border: none;
-            font-size: 20px;
             background: var(--light-accent);
             border-radius: $border-radius $border-radius 0 0;
             border-bottom: 2px solid var(--background-color);
@@ -548,20 +523,12 @@
 
         textarea {
             resize: none;
-            padding: 1rem;
-            margin: 0;
             width: 100%;
-            outline: none;
-            border: none;
-            font-size: 20px;
             background: var(--light-accent);
-            overflow: hidden;
 
             @media #{$mobile} {
                 width: calc(100% - 0.8em);
-                margin: 0;
                 background: none;
-                padding: 0.8rem 0.5rem;
             }
         }
     }

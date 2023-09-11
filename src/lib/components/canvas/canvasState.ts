@@ -236,7 +236,7 @@ export class CanvasState implements CanvasListeners {
                 text: cssVarValue(this.canvas, '--text-color'),
                 accent: cssVarValue(this.canvas, '--timeline-accent'),
                 lightAccent: cssVarValue(this.canvas, '--border-light'),
-                vLightAccent: cssVarValue(this.canvas, '--v-light-accent')
+                vLightAccent: cssVarValue(this.canvas, '--background-color')
             };
         } else {
             this.colors = EMPTY_COLORS;

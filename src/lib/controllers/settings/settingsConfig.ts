@@ -9,7 +9,7 @@ export const settingsConfig = {
         description: 'Blur entries by default, and manually show them.',
         showInSettings: true
     } as SettingConfig<boolean>,
-    entryFormMode: {
+    useBulletEntryForm: {
         type: 'boolean',
         defaultValue: false,
         name: 'Use Bullet Mode',

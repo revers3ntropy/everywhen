@@ -1,15 +1,12 @@
 <script lang="ts">
     import { page } from '$app/stores';
-    import CreateNewButton from '$lib/components/CreateNewButton.svelte';
-    import { Backup } from '$lib/controllers/backup/backup';
+    import CreateNewButton from '$lib/components/nav/CreateNewButton.svelte';
     import { tooltip } from '@svelte-plugins/tooltips';
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
-    import Cog from 'svelte-material-icons/Cog.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
     import TrashCanOutline from 'svelte-material-icons/TrashCanOutline.svelte';
-    import DownloadLock from 'svelte-material-icons/DownloadLock.svelte';
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import Lock from 'svelte-material-icons/Lock.svelte';
@@ -27,18 +24,8 @@
     import ChartMultiple from 'svelte-material-icons/ChartMultiple.svelte';
     import { ANIMATION_DURATION, Theme } from '$lib/constants';
     import { obfuscated, passcodeLastEntered, settingsStore, theme, username } from '$lib/stores';
-    import { api } from '$lib/utils/apiRequest';
-    import { notify } from '$lib/components/notifications/notifications';
     import { Auth } from '$lib/controllers/auth/auth';
     import { slide } from 'svelte/transition';
-
-    async function downloadBackup() {
-        if (isDownloadingBackup) return;
-        isDownloadingBackup = true;
-        const { data: backupData } = notify.onErr(await api.get('/backups', { encrypted: 1 }));
-        Backup.download(backupData, $username, true);
-        isDownloadingBackup = false;
-    }
 
     function lock() {
         passcodeLastEntered.set(0);
@@ -47,8 +34,6 @@
     function switchTheme() {
         theme.set($theme === Theme.light ? Theme.dark : Theme.light);
     }
-
-    let isDownloadingBackup = false;
 </script>
 
 <nav>
@@ -66,20 +51,6 @@
 
                     <hr />
 
-                    <button
-                        aria-label="download encrypted backup"
-                        class="account-dropdown-button"
-                        disabled={isDownloadingBackup}
-                        on:click={downloadBackup}
-                    >
-                        <DownloadLock size="30" />
-                        {#if isDownloadingBackup}
-                            Downloading...
-                        {:else}
-                            Download Backup
-                        {/if}
-                    </button>
-
                     <button class="account-dropdown-button" on:click={switchTheme}>
                         {#if $theme === Theme.light}
                             <DarkTheme size="30" />
@@ -91,7 +62,7 @@
                     </button>
 
                     <a aria-label="settings" class="account-dropdown-button" href="/settings">
-                        <Cog size="30" />
+                        <CogOutline size="30" />
                         Settings
                     </a>
 
@@ -106,13 +77,13 @@
                 </div>
             </Dropdown>
 
-            <div class="w-fit h-fit p-1 border-r bordered m-1 md:m-2">
+            <div class="w-fit h-fit px-2 py-1 md:px-4 md:py-3">
                 <CreateNewButton />
             </div>
 
-            <div class="p-3 py-2">
+            <div class="p-2 md:py-2 md:mx-2">
                 <button
-                    class="with-icon"
+                    class="text-xs flex flex-col content-center items-center md:flex-row md:text-base md:gap-2"
                     aria-label={$obfuscated ? 'Show all' : 'Hide all'}
                     on:click={() => obfuscated.set(!$obfuscated)}
                 >
@@ -147,46 +118,73 @@
             <a
                 href="/journal"
                 aria-label="journal"
-                class="nav-link p-1"
+                class="nav-link"
                 class:current={$page.url.pathname.startsWith('/journal') &&
                     !$page.url.pathname.startsWith('/journal/deleted')}
             >
                 <Notebook size="30" />
-                <span class="flex">
-                    <span class="pr-2"> Journal </span>
-                    {#if $page.url.pathname.startsWith('/journal')}
-                        <ChevronUp />
-                    {:else}
-                        <ChevronDown />
-                    {/if}
-                </span>
+                Journal
+                {#if $page.url.pathname.startsWith('/journal')}
+                    <ChevronUp />
+                {:else}
+                    <ChevronDown />
+                {/if}
             </a>
-            {#if $page.url.pathname.startsWith('/journal')}
-                <a
-                    href="/journal/deleted"
-                    class="nav-link p-1 pl-4"
-                    class:current={$page.url.pathname.startsWith('/journal/deleted')}
-                    aria-label="events"
-                    transition:slide={{ duration: ANIMATION_DURATION }}
-                >
-                    <TrashCanOutline size="25" />
-                    <span> Bin </span>
-                </a>
+            {#if $page.url.pathname.startsWith('/journal') || $page.url.pathname.startsWith('/assets')}
+                <span transition:slide={{ duration: ANIMATION_DURATION }} class="nested-nav-links">
+                    <a
+                        href="/assets"
+                        class="nav-link"
+                        class:current={$page.url.pathname.startsWith('/assets')}
+                        aria-label="assets"
+                    >
+                        <ImageMultipleOutline size="25" />
+                        <span> Gallery </span>
+                    </a>
+                    <a
+                        href="/journal/deleted"
+                        class="nav-link"
+                        class:current={$page.url.pathname.startsWith('/journal/deleted')}
+                        aria-label="events"
+                    >
+                        <TrashCanOutline size="25" />
+                        <span> Bin </span>
+                    </a>
+                </span>
             {/if}
 
             <a
                 href="/timeline"
                 aria-label="timeline"
-                class="nav-link p-1"
+                class="nav-link"
                 class:current={$page.url.pathname.startsWith('/timeline')}
             >
                 <ChartTimeline size="30" />
-                <span> Timeline </span>
+                Timeline
+                {#if $page.url.pathname.startsWith('/timeline')}
+                    <ChevronUp />
+                {:else}
+                    <ChevronDown />
+                {/if}
             </a>
+            {#if $page.url.pathname.startsWith('/timeline') || $page.url.pathname.startsWith('/events')}
+                <span transition:slide={{ duration: ANIMATION_DURATION }} class="nested-nav-links">
+                    <a
+                        href="/events"
+                        class="nav-link"
+                        class:current={$page.url.pathname.startsWith('/events')}
+                        aria-label="events"
+                    >
+                        <CalendarMultiple size="25" />
+                        <span> Events </span>
+                    </a>
+                </span>
+            {/if}
+
             <a
                 href="/map"
                 aria-label="map"
-                class="nav-link p-1"
+                class="nav-link"
                 class:current={$page.url.pathname.startsWith('/map')}
             >
                 <MapMarkerOutline size="30" />
@@ -194,7 +192,7 @@
             </a>
             <a
                 href="/stats"
-                class="nav-link p-1"
+                class="nav-link"
                 class:current={$page.url.pathname.startsWith('/stats')}
                 aria-label="statistics"
             >
@@ -203,7 +201,7 @@
             </a>
             <a
                 href="/datasets"
-                class="nav-link p-1"
+                class="nav-link"
                 class:current={$page.url.pathname.startsWith('/datasets')}
                 aria-label="datasets"
             >
@@ -211,26 +209,8 @@
                 <span> Datasets </span>
             </a>
             <a
-                href="/events"
-                class="nav-link p-1"
-                class:current={$page.url.pathname.startsWith('/events')}
-                aria-label="events"
-            >
-                <CalendarMultiple size="30" />
-                <span> Events </span>
-            </a>
-            <a
-                href="/assets"
-                class="nav-link p-1"
-                class:current={$page.url.pathname.startsWith('/assets')}
-                aria-label="assets"
-            >
-                <ImageMultipleOutline size="30" />
-                <span> Gallery </span>
-            </a>
-            <a
                 href="/labels"
-                class="nav-link p-1"
+                class="nav-link"
                 class:current={$page.url.pathname.startsWith('/labels')}
                 aria-label="labels"
             >
@@ -239,7 +219,7 @@
             </a>
             <a
                 href="/settings"
-                class="nav-link p-1"
+                class="nav-link hide-mobile"
                 class:current={$page.url.pathname.startsWith('/settings')}
                 aria-label="settings"
             >
@@ -257,13 +237,10 @@
 </nav>
 
 <style lang="scss">
-    @import '$lib/styles/layout';
-    @import '$lib/styles/input';
-    @import '$lib/styles/text';
-
     $nav-width: 12rem;
 
     nav {
+        box-shadow: $shadow-light;
         height: 100%;
         width: $nav-width;
         position: fixed;
@@ -283,6 +260,7 @@
             height: $mobile-nav-height;
             width: 100%;
             position: static;
+            border: none;
         }
     }
 
@@ -300,6 +278,11 @@
 
         &:hover {
             background: var(--light-accent);
+        }
+
+        @media #{$mobile} {
+            padding: 0.5rem;
+            border-radius: 0 0 $border-radius 0;
         }
     }
 
@@ -328,14 +311,22 @@
             border-top: 1px solid var(--border-color);
         }
 
+        .nested-nav-links {
+            width: calc(100% - 1rem);
+            margin-left: 1rem;
+            border-left: 1px solid var(--border-color);
+        }
+
         .nav-link {
             width: 100%;
-            display: grid;
-            grid-template-columns: auto 1fr;
+            display: flex;
+            flex-direction: row;
             gap: 1rem;
             align-items: center;
             justify-content: flex-start;
             text-decoration: none;
+            padding: 0.5rem;
+            color: var(--text-color);
 
             & {
                 transition: background $transition;

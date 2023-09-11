@@ -68,7 +68,7 @@
         margin: 0;
         position: fixed;
         z-index: 1;
-        background: var(--transluscent-bg);
+        background: var(--translucent-bg);
         border-radius: $border-radius $border-radius 0 0;
         display: flex;
         justify-content: center;
