@@ -1,12 +1,10 @@
 <script lang="ts">
     import type { PageData } from './$types';
-    import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import { api } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
     import { nowUtc } from '$lib/utils/time';
     import { listen } from '$lib/dataChangeEvents';
-    import Dot from '$lib/components/Dot.svelte';
     import LabelOptions from './LabelOptions.svelte';
 
     export let data: PageData;

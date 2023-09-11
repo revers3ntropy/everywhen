@@ -1,8 +1,6 @@
 <script lang="ts">
     import { dispatch } from '$lib/dataChangeEvents';
-    import Calendar from 'svelte-material-icons/Calendar.svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
-    import Dot from '$lib/components/Dot.svelte';
     import Select from '$lib/components/Select.svelte';
     import { Event } from '$lib/controllers/event/event';
     import { eventsSortKey, obfuscated } from '$lib/stores';
@@ -60,9 +58,6 @@
 
     let { events, labels } = data;
     $: if ($eventsSortKey) events = sortEvents(events, $eventsSortKey);
-
-    let eventCount: number;
-    $: eventCount = events.filter(e => !e.deleted).length;
 
     let selectNameId: string;
     $: selectNameId =

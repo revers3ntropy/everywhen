@@ -3,7 +3,6 @@
     import { fade } from 'svelte/transition';
     import { ANIMATION_DURATION } from '$lib/constants';
     import { By } from './helpers';
-    import Counter from 'svelte-material-icons/Counter.svelte';
     import CommonWordsList from './CommonWordsList.svelte';
     import EntryBarChart from './EntryChart.svelte';
     import EntryHeatMap from './EntryHeatMap.svelte';
