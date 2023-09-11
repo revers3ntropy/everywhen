@@ -83,7 +83,7 @@
     </div>
 
     {#if assetCount === 0}
-        <div class="flex-center container invisible">
+        <div class="flex-center">
             <i>No images yet</i>
         </div>
     {:else}

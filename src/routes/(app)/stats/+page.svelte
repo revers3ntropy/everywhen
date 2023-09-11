@@ -45,7 +45,7 @@
             </div>
         </div>
 
-        <section class="container invisible">
+        <section>
             <div class="stats">
                 <StatPill primary value={entryCount} label="entries" />
                 <StatPill primary value={days} label="days" />

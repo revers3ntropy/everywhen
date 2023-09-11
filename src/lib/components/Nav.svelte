@@ -5,8 +5,10 @@
     import { tooltip } from '@svelte-plugins/tooltips';
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
+    import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
     import Cog from 'svelte-material-icons/Cog.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
+    import TrashCanOutline from 'svelte-material-icons/TrashCanOutline.svelte';
     import DownloadLock from 'svelte-material-icons/DownloadLock.svelte';
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
@@ -17,12 +19,18 @@
     import LightTheme from 'svelte-material-icons/WhiteBalanceSunny.svelte';
     import DarkTheme from 'svelte-material-icons/WeatherNight.svelte';
     import Dropdown from '$lib/components/Dropdown.svelte';
+    import CogOutline from 'svelte-material-icons/CogOutline.svelte';
     import Streaks from '$lib/components/Streaks.svelte';
-    import { Theme } from '$lib/constants';
+    import LabelMultipleOutline from 'svelte-material-icons/LabelMultipleOutline.svelte';
+    import ImageMultipleOutline from 'svelte-material-icons/ImageMultipleOutline.svelte';
+    import CalendarMultiple from 'svelte-material-icons/CalendarMultiple.svelte';
+    import ChartMultiple from 'svelte-material-icons/ChartMultiple.svelte';
+    import { ANIMATION_DURATION, Theme } from '$lib/constants';
     import { obfuscated, passcodeLastEntered, settingsStore, theme, username } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
     import { Auth } from '$lib/controllers/auth/auth';
+    import { slide } from 'svelte/transition';
 
     async function downloadBackup() {
         if (isDownloadingBackup) return;
@@ -98,11 +106,11 @@
                 </div>
             </Dropdown>
 
-            <div class="w-fit h-fit p-1 border-r bordered m-1">
+            <div class="w-fit h-fit p-1 border-r bordered m-1 md:m-2">
                 <CreateNewButton />
             </div>
 
-            <div class="p-3 py-4">
+            <div class="p-3 py-2">
                 <button
                     class="with-icon"
                     aria-label={$obfuscated ? 'Show all' : 'Hide all'}
@@ -133,22 +141,43 @@
             {/if}
         </div>
 
-        <hr class="py-3 hide-mobile" />
+        <hr class="py-3 mt-3 m-0 w-full hide-mobile" />
 
         <div class="nav-buttons">
             <a
                 href="/journal"
                 aria-label="journal"
-                class="nav-link"
-                class:current={$page.url.pathname.startsWith('/journal')}
+                class="nav-link p-1"
+                class:current={$page.url.pathname.startsWith('/journal') &&
+                    !$page.url.pathname.startsWith('/journal/deleted')}
             >
                 <Notebook size="30" />
-                <span> Journal </span>
+                <span class="flex">
+                    <span class="pr-2"> Journal </span>
+                    {#if $page.url.pathname.startsWith('/journal')}
+                        <ChevronUp />
+                    {:else}
+                        <ChevronDown />
+                    {/if}
+                </span>
             </a>
+            {#if $page.url.pathname.startsWith('/journal')}
+                <a
+                    href="/journal/deleted"
+                    class="nav-link p-1 pl-4"
+                    class:current={$page.url.pathname.startsWith('/journal/deleted')}
+                    aria-label="events"
+                    transition:slide={{ duration: ANIMATION_DURATION }}
+                >
+                    <TrashCanOutline size="25" />
+                    <span> Bin </span>
+                </a>
+            {/if}
+
             <a
                 href="/timeline"
                 aria-label="timeline"
-                class="nav-link"
+                class="nav-link p-1"
                 class:current={$page.url.pathname.startsWith('/timeline')}
             >
                 <ChartTimeline size="30" />
@@ -157,7 +186,7 @@
             <a
                 href="/map"
                 aria-label="map"
-                class="nav-link"
+                class="nav-link p-1"
                 class:current={$page.url.pathname.startsWith('/map')}
             >
                 <MapMarkerOutline size="30" />
@@ -165,12 +194,57 @@
             </a>
             <a
                 href="/stats"
-                class="nav-link"
+                class="nav-link p-1"
                 class:current={$page.url.pathname.startsWith('/stats')}
                 aria-label="statistics"
             >
                 <Counter size="30" />
                 <span> Insights </span>
+            </a>
+            <a
+                href="/datasets"
+                class="nav-link p-1"
+                class:current={$page.url.pathname.startsWith('/datasets')}
+                aria-label="datasets"
+            >
+                <ChartMultiple size="30" />
+                <span> Datasets </span>
+            </a>
+            <a
+                href="/events"
+                class="nav-link p-1"
+                class:current={$page.url.pathname.startsWith('/events')}
+                aria-label="events"
+            >
+                <CalendarMultiple size="30" />
+                <span> Events </span>
+            </a>
+            <a
+                href="/assets"
+                class="nav-link p-1"
+                class:current={$page.url.pathname.startsWith('/assets')}
+                aria-label="assets"
+            >
+                <ImageMultipleOutline size="30" />
+                <span> Gallery </span>
+            </a>
+            <a
+                href="/labels"
+                class="nav-link p-1"
+                class:current={$page.url.pathname.startsWith('/labels')}
+                aria-label="labels"
+            >
+                <LabelMultipleOutline size="30" />
+                <span> Labels </span>
+            </a>
+            <a
+                href="/settings"
+                class="nav-link p-1"
+                class:current={$page.url.pathname.startsWith('/settings')}
+                aria-label="settings"
+            >
+                <CogOutline size="30" />
+                <span> Settings </span>
             </a>
         </div>
     </div>
@@ -238,7 +312,6 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 4px;
 
         @media #{$mobile} {
             position: fixed;
@@ -262,7 +335,6 @@
             gap: 1rem;
             align-items: center;
             justify-content: flex-start;
-            padding: 0.25rem;
             text-decoration: none;
 
             & {
