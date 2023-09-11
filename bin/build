@@ -1,3 +1,4 @@
 #!/bin/bash
 
+bin i -g vite
 vite build -l warn --minify
