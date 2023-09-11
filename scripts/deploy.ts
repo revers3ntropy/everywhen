@@ -15,6 +15,7 @@ export const { verbose, env } = cliArgs([
 ]) as { verbose: boolean; env: string };
 
 const remoteEnvFile = fs.readFileSync(`./secrets/${env}/remote.env`, 'utf8');
+const deploymentEnvFile = fs.readFileSync(`./secrets/${env}/.env`, 'utf8');
 
 const remoteEnv = dotenv.parse<{
     PUBLIC_INIT_VECTOR: string;
@@ -28,7 +29,11 @@ const remoteEnv = dotenv.parse<{
     HTTPS_PORT: string;
     BODY_SIZE_LIMIT: string;
 }>(remoteEnvFile);
-dotenv.config({ path: `./secrets/${env}/.env` });
+const deploymentEnv = dotenv.parse<{
+    REMOTE_ADDRESS: string;
+    REMOTE_USER: string;
+    DIR: string;
+}>(deploymentEnvFile);
 
 const replacerValues = {
     '%ENV%': env
@@ -152,20 +157,20 @@ class Version {
 }
 
 function remoteAddress() {
-    const addr = process.env['REMOTE_ADDRESS'];
+    const addr = deploymentEnv['REMOTE_ADDRESS'];
     if (!addr) throw new Error('REMOTE_ADDRESS not set');
     return addr;
 }
 
 function remoteSshAddress(): string {
     const addr = remoteAddress();
-    const usr = process.env['REMOTE_USER'];
+    const usr = deploymentEnv['REMOTE_USER'];
     if (!usr) throw new Error('REMOTE_USER not set');
     return `${usr}@${addr}`;
 }
 
 function remoteDir() {
-    const dir = process.env['DIR'];
+    const dir = deploymentEnv['DIR'];
     if (!dir) throw new Error('DIR not set');
     return dir;
 }
@@ -197,16 +202,16 @@ async function runRemoteCommand(
 }
 
 async function upload() {
-    await $`mv ./build ./${process.env['DIR']}`;
+    await $`mv ./build ./${remoteDir()}`;
     console.log(c.green('Uploading...'));
     await uploadPath(remoteDir(), '~/', '-r');
 
     for (const path of pathsToUseReplacer) {
-        fs.copyFileSync(path, path + '.tmp');
+        fs.copyFileSync(path, `${path}.tmp`);
         fs.writeFileSync(
             path,
             fs
-                .readFileSync(path + '.tmp', 'utf8')
+                .readFileSync(`${path}.tmp`, 'utf8')
                 .replace(
                     new RegExp(Object.keys(replacerValues).join('|'), 'gi'),
                     matched => replacerValues[matched as keyof typeof replacerValues]
@@ -217,7 +222,7 @@ async function upload() {
     await Promise.all(
         Object.keys(uploadPaths).map(async path => {
             if (fs.existsSync(path)) {
-                await uploadPath(path, '~/' + remoteDir() + uploadPaths[path]);
+                await uploadPath(path, `~/${remoteDir()}` + uploadPaths[path]);
             } else {
                 console.warn(c.yellow(`File not found: ${path}`));
             }
@@ -226,10 +231,10 @@ async function upload() {
 
     for (const path of pathsToUseReplacer) {
         fs.unlinkSync(path);
-        fs.renameSync(path + '.tmp', path);
+        fs.renameSync(`${path}.tmp`, path);
     }
 
-    //await $`rm -r ./${remoteDir()}`;
+    await $`rm -r ./${remoteDir()}`;
 }
 
 async function doMigrations(migrations: Version[]): Promise<void> {
@@ -405,7 +410,6 @@ async function getAndCheckVersions(): Promise<{ localVersion: Version; remoteVer
 
 async function checkAndTest() {
     await $`bin/precommit --reporter=line`;
-    await $`rm -r ./build`;
 }
 
 async function build() {
@@ -418,7 +422,6 @@ async function build() {
     }
 
     // apparently SvelteKit first looks for env vars, then from .env???
-
     const $env = $.env;
     $.env = { ...$.env, ...remoteEnv };
 

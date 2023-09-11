@@ -8,7 +8,6 @@
 </script>
 
 <script lang="ts">
-    import 'ol-contextmenu/ol-contextmenu.css';
     import type { Control } from 'ol/control';
     import type { FeatureLike } from 'ol/Feature';
     import { writable } from 'svelte/store';
@@ -335,6 +334,7 @@
 </div>
 
 <style lang="scss">
+    @import 'ol-contextmenu/ol-contextmenu.css';
     @import '$lib/styles/layout';
 
     .map {

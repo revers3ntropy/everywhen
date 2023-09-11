@@ -34,16 +34,10 @@ export function getConfig(): mysql.ConnectionOptions {
     // define defaults from .env file
     const port = DB_PORT ? parseInt(DB_PORT) : 3306;
 
-    const password = DB_PASS || '';
-    // if (password === '""' || password === "''") {
-    //     // TODO: Why??? Seems to be a bug in SvelteKit... but only sometimes...
-    //     password = '';
-    // }
-
     return {
         host: DB_HOST,
         user: DB_USER,
-        password,
+        password: DB_PASS,
         database: DB,
         port,
         multipleStatements: true,
