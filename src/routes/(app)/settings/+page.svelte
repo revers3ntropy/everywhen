@@ -6,6 +6,7 @@
     import LockOutline from 'svelte-material-icons/LockOutline.svelte';
     import Skull from 'svelte-material-icons/Skull.svelte';
     import ChangePasswordDialog from '$lib/components/dialogs/ChangePasswordDialog.svelte';
+    import DatabaseCogOutline from 'svelte-material-icons/DatabaseCogOutline.svelte';
     import { showPopup } from '$lib/utils/popups';
     import BackupOptions from '$lib/components/BackupOptions.svelte';
     import {
@@ -43,12 +44,8 @@
     <section>
         <h1>
             <AccountCircleOutline size="35" />
-            <span> My Data and Account </span>
+            <span> My Account </span>
         </h1>
-
-        <div class="buttons">
-            <BackupOptions />
-        </div>
         <div class="buttons">
             <button aria-label="Change password" on:click={changePassword}>
                 <LockOutline size="30" />
@@ -65,6 +62,15 @@
         </div>
         <div class="buttons">
             <GitHubOauthWidget />
+        </div>
+    </section>
+    <section>
+        <h1>
+            <DatabaseCogOutline size="30" />
+            <span> My Data </span>
+        </h1>
+        <div class="buttons">
+            <BackupOptions />
         </div>
     </section>
     <section>

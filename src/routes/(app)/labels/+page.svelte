@@ -11,10 +11,12 @@
 
     export let data: PageData;
 
+    let { labels } = data;
+
     async function newLabel() {
         let name = 'New Label';
         let i = 0;
-        while (data.labels.some(l => l.name === name)) {
+        while (labels.some(l => l.name === name)) {
             name = `New Label ${++i}`;
         }
 
@@ -25,26 +27,20 @@
 
         const { id } = notify.onErr(await api.post('/labels', newLabel));
 
-        data = {
-            ...data,
-            labels: [
-                ...data.labels,
-                {
-                    ...newLabel,
-                    id,
-                    created: nowUtc(),
-                    entryCount: 0,
-                    eventCount: 0
-                }
-            ]
-        };
+        labels = [
+            ...labels,
+            {
+                ...newLabel,
+                id,
+                created: nowUtc(),
+                entryCount: 0,
+                eventCount: 0
+            }
+        ];
     }
 
     listen.label.onDelete(id => {
-        data = {
-            ...data,
-            labels: data.labels.filter(l => l.id !== id)
-        };
+        labels = labels.filter(l => l.id !== id);
     });
 </script>
 
@@ -53,17 +49,9 @@
 </svelte:head>
 
 <main>
-    <h1>
-        <LabelOutline size="40" />
-        <span>Labels</span>
-        {#if data.labels.length > 0}
-            <Dot />
-            {data.labels.length}
-        {/if}
-    </h1>
     <div class="labels">
         <div class="label-list">
-            {#each data.labels as label}
+            {#each labels as label}
                 <LabelOptions {...label} />
             {/each}
 
@@ -78,23 +66,6 @@
 </main>
 
 <style lang="scss">
-    @import '$lib/styles/layout';
-
-    h1 {
-        @extend .flex-center;
-        margin: 0 0 1rem 0;
-        font-size: 40px;
-
-        i {
-            font-size: 0.5em;
-            margin-left: 0.5em;
-        }
-
-        span {
-            margin-left: 0.2em;
-        }
-    }
-
     .labels {
         display: grid;
         place-content: center;

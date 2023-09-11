@@ -32,14 +32,8 @@
             </div>
         </section>
     {:else}
-        <div class="title-line">
+        <div class="flex justify-between p-2">
             <div />
-            <div>
-                <h1>
-                    <Counter size="40" />
-                    <span> Insights </span>
-                </h1>
-            </div>
             <div class="search-for-word">
                 <SearchForWord />
             </div>
@@ -78,12 +72,12 @@
             </div>
         </section>
 
-        <div class="container" style="padding: 1rem;">
+        <div class="container m-4" style="padding: 1rem;">
             <EntryHeatMap {by} {entries} />
         </div>
         {#if entryCount > 4}
             <div
-                class="container"
+                class="container m-4"
                 style="padding: 1rem;"
                 in:fade={{
                     // stop weird animation when changing buckets
@@ -95,7 +89,7 @@
             </div>
         {/if}
 
-        <section class="container" style="padding: 1rem 1rem 3rem 1rem;">
+        <section class="container m-4" style="padding: 1rem 1rem 3rem 1rem;">
             <h3 style="padding: 0 0 2rem 0"> Common Words </h3>
             <CommonWordsList {entryCount} words={commonWords} />
         </section>
@@ -105,26 +99,12 @@
 <style lang="scss">
     @import '$lib/styles/layout';
 
-    .title-line {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
-        align-items: center;
-
-        .search-for-word {
-            text-align: right;
-
-            @media #{$mobile} {
-                text-align: center;
-                margin: 2rem 0 0 0;
-            }
-        }
+    .search-for-word {
+        text-align: right;
 
         @media #{$mobile} {
-            display: block;
-
-            & > * {
-                margin: 0.5rem 0;
-            }
+            text-align: center;
+            margin: 2rem 0 0 0;
         }
     }
 

@@ -26,7 +26,7 @@
         <div>
             <a class="with-icon" href="/stats">
                 <ArrowLeft size="40" />
-                Analytics
+                Insights
             </a>
         </div>
         <div>

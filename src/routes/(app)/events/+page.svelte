@@ -81,24 +81,13 @@
 </svelte:head>
 
 <main>
-    <div class="menu">
+    <div class="flex justify-between p-2">
         <div>
             <button class="primary with-icon" on:click={newEvent}>
                 <Plus size="30" />
                 New Event
             </button>
         </div>
-
-        <h1>
-            <Calendar size="40" />
-            <span>
-                Events
-                {#if eventCount > 0}
-                    <Dot />
-                    {eventCount}
-                {/if}
-            </span>
-        </h1>
 
         <div class="sort-by">
             <span class="text-light">Sort by</span>
@@ -151,23 +140,6 @@
 
         @media #{$large} {
             grid-template-columns: 1fr 1fr 1fr;
-        }
-    }
-
-    .menu {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
-        margin-bottom: 1em;
-
-        @media #{$mobile} {
-            display: block;
-        }
-
-        button {
-            margin: 0 1rem 0 0;
-            @media #{$mobile} {
-                margin-bottom: 1em;
-            }
         }
     }
 

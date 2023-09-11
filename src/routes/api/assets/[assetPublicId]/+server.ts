@@ -33,7 +33,7 @@ export const DELETE = (async ({ params, cookies }) => {
     const auth = Auth.getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
-    (await Asset.purgeWithPublicId(auth, params['asset'] || '')).unwrap(e => error(404, e));
+    (await Asset.purgeWithPublicId(auth, params['assetPublicId'] || '')).unwrap(e => error(404, e));
 
     return apiResponse(auth, {});
 }) satisfies RequestHandler;

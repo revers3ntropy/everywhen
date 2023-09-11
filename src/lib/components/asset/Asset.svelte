@@ -47,63 +47,65 @@
     }
 </script>
 
-<div class="flex-center m-1 relative overflow-hidden wrapper" class:invisible={deleted}>
-    <img
-        alt={fileName}
-        class={obfuscated ? 'obfuscated' : ''}
-        loading="lazy"
-        src="/api/assets/{publicId}"
-    />
-    <div class="menu">
-        <div>
-            <button
-                aria-label={obfuscated ? 'Show asset' : 'Hide asset'}
-                on:click={() => (obfuscated = !obfuscated)}
-                style="margin: 0 0.5rem 0 0.2rem;"
-            >
-                {#if obfuscated}
-                    <Eye size="25" />
-                {:else}
-                    <EyeOff size="25" />
-                {/if}
-            </button>
-
-            {#if recentlyCopied}
-                <Check size="30" />
-            {:else}
+{#if !deleted}
+    <div class="flex-center m-1 relative overflow-hidden wrapper">
+        <img
+            alt={fileName}
+            class={obfuscated ? 'obfuscated' : ''}
+            loading="lazy"
+            src="/api/assets/{publicId}"
+        />
+        <div class="menu">
+            <div>
                 <button
-                    on:click={copyToClipBoard}
-                    class="icon-button"
-                    style="padding: 0.2rem"
-                    use:tooltip={{
-                        content: 'Copy link',
-                        // `overflow: hidden` so needs to show below
-                        position: 'bottom'
-                    }}
+                    aria-label={obfuscated ? 'Show asset' : 'Hide asset'}
+                    on:click={() => (obfuscated = !obfuscated)}
+                    style="margin: 0 0.5rem 0 0.2rem;"
                 >
-                    <ContentCopy size="30" />
+                    {#if obfuscated}
+                        <Eye size="25" />
+                    {:else}
+                        <EyeOff size="25" />
+                    {/if}
                 </button>
-            {/if}
-        </div>
-        <div>
-            {#if !obfuscated}
-                <UtcTime
-                    relative
-                    timestamp={created}
-                    fmt="MMMM Do YYYY, h:mma"
-                    tooltipPosition="bottom"
-                />
-            {/if}
-        </div>
-        <div>
-            {#if !obfuscated}
-                <button class="icon-button danger" on:click={deleteImg}>
-                    <Delete size="30" />
-                </button>
-            {/if}
+
+                {#if recentlyCopied}
+                    <Check size="30" />
+                {:else}
+                    <button
+                        on:click={copyToClipBoard}
+                        class="icon-button"
+                        style="padding: 0.2rem"
+                        use:tooltip={{
+                            content: 'Copy link',
+                            // `overflow: hidden` so needs to show below
+                            position: 'bottom'
+                        }}
+                    >
+                        <ContentCopy size="30" />
+                    </button>
+                {/if}
+            </div>
+            <div>
+                {#if !obfuscated}
+                    <UtcTime
+                        relative
+                        timestamp={created}
+                        fmt="MMMM Do YYYY, h:mma"
+                        tooltipPosition="bottom"
+                    />
+                {/if}
+            </div>
+            <div>
+                {#if !obfuscated}
+                    <button class="icon-button danger" on:click={deleteImg}>
+                        <Delete size="30" />
+                    </button>
+                {/if}
+            </div>
         </div>
     </div>
-</div>
+{/if}
 
 <style lang="scss">
     @import '$lib/styles/layout';
