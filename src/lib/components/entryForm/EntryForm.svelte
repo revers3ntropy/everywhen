@@ -356,7 +356,7 @@
                 </button>
 
                 <div class="flex-center h-full">
-                    <LocationToggle size="23" />
+                    <LocationToggle size={23} />
                 </div>
                 <div class="flex-center h-full">
                     <FormatOptions {makeWrapper} />
