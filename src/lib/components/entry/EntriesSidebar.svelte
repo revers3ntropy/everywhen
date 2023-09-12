@@ -64,7 +64,7 @@
         <Menu size="40" />
     </button>
 </div>
-<div class="sidebar {showing ? 'showing' : ''}">
+<div class="sidebar" class:showing>
     <div class="header">
         <button
             aria-label={obfuscated ? 'Show entries' : 'Hide entries'}
@@ -87,7 +87,7 @@
     <div>
         {#key [pinnedEntriesSummaries, showingAllPinned]}
             {#if Object.keys(pinnedEntries).length}
-                <section class="container" style="padding: 1rem">
+                <div class="border-r bg-vLightAccent p-4 my-2">
                     <h3
                         class="gradient-icon flex-center"
                         style="justify-content: flex-start; gap: 8px;"
@@ -116,11 +116,11 @@
                             </button>
                         {/if}
                     </div>
-                </section>
+                </div>
             {/if}
         {/key}
         {#if Object.entries(nYearsAgo).length}
-            <section class="container" style="padding: 1rem">
+            <div class="border-r bg-vLightAccent p-4 my-4">
                 {#each Object.entries(nYearsAgo) as [date, entries] (date)}
                     <h3>
                         {fmtUtcRelative(new Date(date), 'en-full')} since...
@@ -135,7 +135,7 @@
                         hideBlurToggle
                     />
                 {/each}
-            </section>
+            </div>
         {/if}
         <InfiniteScroller
             bind:items={titleIds}
@@ -153,7 +153,6 @@
     .sidebar {
         width: 100%;
         overflow-y: auto;
-        padding: 0 0 0 0.5rem;
 
         @media #{$not-mobile} {
             position: sticky;
