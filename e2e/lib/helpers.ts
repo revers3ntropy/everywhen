@@ -109,3 +109,7 @@ export async function expectDeleteUser(
     });
     expect(res.ok).toBe(true);
 }
+
+export function expectTrue(val: boolean): asserts val {
+    expect(val).toBe(true);
+}

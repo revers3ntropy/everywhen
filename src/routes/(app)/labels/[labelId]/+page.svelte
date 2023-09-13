@@ -12,7 +12,7 @@
     import type { PageData } from './$types';
 
     export let data: PageData;
-    const { label, locations, entryCount, events } = data;
+    const { label, locations, entryCount, events, labels } = data;
 
     async function updateName() {
         notify.onErr(

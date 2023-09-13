@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { UUID_LEN } from '../src/lib/constants';
-import { expectDeleteUser, generateUserAndSignIn } from './lib/helpers';
+import { expectDeleteUser, expectTrue, generateUserAndSignIn } from './lib/helpers';
 
 const LONG_TEXT =
     'The very long body of the entry which is too long' +
@@ -60,7 +60,7 @@ test.describe('/journal', () => {
 
         const entryBody = LONG_TEXT;
         const makeEntryRes = await api.post('/entries', { body: entryBody });
-        expect(makeEntryRes.ok).toBe(true);
+        expectTrue(makeEntryRes.ok);
         const { id } = makeEntryRes.val;
         expect(typeof id === 'string').toBe(true);
         if (typeof id !== 'string') throw id;
@@ -73,11 +73,11 @@ test.describe('/journal', () => {
 
         // can pin entry
         await page.locator(`[id="${id}"]`).getByRole('button', { name: 'Open popup' }).click();
-        await page.getByRole('button', { name: 'Pin Entry' }).click();
+        await page.getByRole('button', { name: 'Add to Favourites' }).click();
 
         // can then unpin without reloading page
         await page.locator(`[id="${id}"]`).getByRole('button', { name: 'Open popup' }).click();
-        await page.getByRole('button', { name: 'Unpin Entry' }).click();
+        await page.getByRole('button', { name: 'Remove from Favourites' }).click();
 
         await page.reload();
         // force entries to load
@@ -85,13 +85,13 @@ test.describe('/journal', () => {
 
         // can pin entry
         await page.locator(`[id="${id}"]`).getByRole('button', { name: 'Open popup' }).click();
-        await page.getByRole('button', { name: 'Pin Entry' }).click();
+        await page.getByRole('button', { name: 'Add to Favourites' }).click();
 
         await page.reload();
         await page.mouse.wheel(0, 10000);
 
         // can then unpin after reloading page
         await page.locator(`[id="${id}"]`).getByRole('button', { name: 'Open popup' }).click();
-        await page.getByRole('button', { name: 'Unpin Entry' }).click();
+        await page.getByRole('button', { name: 'Remove from Favourites' }).click();
     });
 });

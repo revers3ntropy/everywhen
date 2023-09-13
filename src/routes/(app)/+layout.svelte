@@ -11,7 +11,6 @@
     import {
         allowedCookies,
         encryptionKey,
-        navExpanded,
         obfuscated,
         passcodeLastEntered,
         settingsStore,

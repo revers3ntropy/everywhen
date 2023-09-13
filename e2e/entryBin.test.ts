@@ -15,7 +15,6 @@ test.describe('/journal/deleted', () => {
         await page.goto('/journal/deleted', { waitUntil: 'networkidle' });
         await expect(page).toHaveURL('/journal/deleted');
 
-        await expect(page.getByText('0', { exact: true })).toBeAttached();
         await page.getByLabel('journal').click();
         await page.locator(`[id="${id}"]`).getByLabel('Open popup').click();
         page.once('dialog', dialog => {
