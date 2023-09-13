@@ -13,26 +13,13 @@
 </script>
 
 <div
-    class="flex fixed top-0 right-2 left-0 z-10 bg-navBg border-0 border-b border-solid border-borderLight justify-between"
+    class="flex fixed top-0 right-2 left-0 z-10 bg-navBg justify-between items-center"
+    style="height: 50px"
 >
+    <div class="w-fit h-fit">
+        <CreateNewButton />
+    </div>
     <div class="flex items-center gap-2 md:gap-4">
-        <div class="bg-vLightAccent">
-            <AccountDropdown>
-                <p> {$username || '...'} </p>
-            </AccountDropdown>
-        </div>
-
-        <button
-            aria-label={$obfuscated ? 'Show all' : 'Hide all'}
-            on:click={() => obfuscated.set(!$obfuscated)}
-        >
-            {#if $obfuscated}
-                <Eye size="25" />
-            {:else}
-                <EyeOff size="25" />
-            {/if}
-        </button>
-
         {#if $settingsStore.passcode.value}
             <button
                 on:click={lock}
@@ -46,9 +33,21 @@
                 <Lock size="25" />
             </button>
         {/if}
-    </div>
+        <button
+            aria-label={$obfuscated ? 'Show all' : 'Hide all'}
+            on:click={() => obfuscated.set(!$obfuscated)}
+        >
+            {#if $obfuscated}
+                <Eye size="25" />
+            {:else}
+                <EyeOff size="25" />
+            {/if}
+        </button>
 
-    <div class="w-fit h-fit p-1">
-        <CreateNewButton />
+        <div class="pr-1">
+            <AccountDropdown>
+                <p> {$username || '...'} </p>
+            </AccountDropdown>
+        </div>
     </div>
 </div>

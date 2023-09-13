@@ -320,7 +320,7 @@
 
 <div
     class="map"
-    class:border-r={roundedCorners}
+    class:rounded-lg={roundedCorners}
     class:hovering={hoveringSomething}
     style="--width: {width}; --height: {height}; --mobile-width: {mobileWidth}; --mobile-height: {mobileHeight};"
     id="ol-map-{mapId}"

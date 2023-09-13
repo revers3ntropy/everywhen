@@ -422,8 +422,8 @@
                     : 'Start writing here...'}
                 class="text-lg"
                 class:obfuscated
-                class:border-r={useBulletEntryForm}
-                class:border-r-b={!useBulletEntryForm}
+                class:rounded-lg={useBulletEntryForm}
+                class:rounded-b-lg={!useBulletEntryForm}
                 class:py-2={useBulletEntryForm}
                 class:px-4={useBulletEntryForm}
                 class:p-4={!useBulletEntryForm}

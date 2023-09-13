@@ -142,12 +142,6 @@
                 {/each}
             </div>
         {/each}
-
-        {#if Object.keys(titles || {}).length === 0}
-            <div class="day">
-                <i class="text-light"> No entries yet </i>
-            </div>
-        {/if}
     {/if}
 </div>
 

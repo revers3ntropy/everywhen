@@ -5,7 +5,9 @@
     type Item = NonNullable<unknown>;
 
     export let showSpinner = true;
-    export let margin = '300px';
+    export let initialMargin = 0;
+    export let maxMargin = 300;
+    export let minItemsHeight: number;
     export let items = [] as Item[];
     export let batchSize = 10;
     export let numItems: number;
@@ -16,6 +18,8 @@
     let currentOffset = items.length;
     let loadingAt = currentOffset as number | null;
     let loadedAny = false;
+
+    let margin = initialMargin;
 
     async function load() {
         pageEndInView = true;
@@ -44,14 +48,18 @@
             void load();
         }
     }
+
+    $: if (!pageEndInView && margin < maxMargin) {
+        margin += minItemsHeight;
+    }
 </script>
 
 <slot {items} />
 
 {#if numItems !== 0}
     <div
-        style="height: 1px"
-        use:inview={{ rootMargin: margin }}
+        style="height: 1px; position: relative; top: -{margin}px"
+        use:inview={{}}
         on:inview_enter={load}
         on:inview_leave={() => (pageEndInView = false)}
     />

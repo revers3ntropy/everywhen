@@ -64,33 +64,3 @@
 .glow {
     box-shadow: 0 0 8px 2px rgba(121, 235, 226, 0.5);
 }
-
-.border-r {
-    border-radius: $border-radius;
-}
-
-.border-r-tl {
-    border-top-left-radius: $border-radius;
-}
-
-.border-r-tr {
-    border-top-right-radius: $border-radius;
-}
-
-.border-r-bl {
-    border-bottom-left-radius: $border-radius;
-}
-
-.border-r-br {
-    border-bottom-right-radius: $border-radius;
-}
-
-.border-r-t {
-    border-top-left-radius: $border-radius;
-    border-top-right-radius: $border-radius;
-}
-
-.border-r-b {
-    border-bottom-left-radius: $border-radius;
-    border-bottom-right-radius: $border-radius;
-}

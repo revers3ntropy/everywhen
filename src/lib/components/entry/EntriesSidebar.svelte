@@ -87,7 +87,7 @@
     <div>
         {#key [pinnedEntriesSummaries, showingAllPinned]}
             {#if Object.keys(pinnedEntries).length}
-                <div class="border-r bg-vLightAccent p-4 my-2">
+                <div class="rounded-lg bg-vLightAccent p-4 my-2">
                     <h3
                         class="gradient-icon flex-center"
                         style="justify-content: flex-start; gap: 8px;"
@@ -120,7 +120,7 @@
             {/if}
         {/key}
         {#if Object.entries(nYearsAgo).length}
-            <div class="border-r bg-vLightAccent p-4 my-4">
+            <div class="rounded-lg bg-vLightAccent p-4 my-4">
                 {#each Object.entries(nYearsAgo) as [date, entries] (date)}
                     <h3>
                         {fmtUtcRelative(new Date(date), 'en-full')} since...
@@ -142,9 +142,14 @@
             batchSize={100}
             numItems={numTitles}
             loadItems={loadMoreTitles}
-            margin="500px"
+            initialMargin={50}
+            maxMargin={500}
+            minItemsHeight={10}
         >
             <EntrySummaries {obfuscated} titles={summaries} hideBlurToggle />
+            <div slot="empty">
+                <i class="text-light"> No entries yet </i>
+            </div>
         </InfiniteScroller>
     </div>
 </div>

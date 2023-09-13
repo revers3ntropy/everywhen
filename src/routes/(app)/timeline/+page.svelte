@@ -1,4 +1,5 @@
 <script lang="ts">
+    import FpsCounter from '$lib/components/canvas/FpsCounter.svelte';
     import { listen } from '$lib/dataChangeEvents';
     import { onMount } from 'svelte';
     import Background from '$lib/components/canvas/Background.svelte';
@@ -130,6 +131,8 @@
 
         <CenterLine />
         <TimeCursor {labels} />
+
+        <FpsCounter />
     </Canvas>
 
     <Filters labels={data.labels} bind:selectedLabels />

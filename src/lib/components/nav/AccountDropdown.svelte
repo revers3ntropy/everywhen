@@ -15,11 +15,14 @@
     }
 </script>
 
-<Dropdown width="200px">
-    <div class="account-button" slot="button">
+<Dropdown fromRight width="200px">
+    <div
+        class="flex justify-end items-center gap-1 bg-vLightAccent rounded-lg py-1 px-2"
+        slot="button"
+    >
+        <ChevronDown />
         <slot />
         <Streaks condensed />
-        <ChevronDown />
     </div>
 
     <div class="account-dropdown-options">
@@ -62,6 +65,7 @@
         justify-content: flex-start;
         padding: 0.75rem;
         text-align: left;
+        background: var(--light-accent);
 
         @media #{$mobile} {
             padding: 0.5rem;

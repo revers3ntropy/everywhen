@@ -71,25 +71,23 @@
         {/if}
     </div>
 
-    {#if assetCount === 0}
-        <div class="flex-center">
+    <InfiniteScroller
+        bind:items={assets}
+        batchSize={5}
+        numItems={assetCount}
+        loadItems={loadMoreAssets}
+        maxMargin={1000}
+        minItemsHeight={10}
+    >
+        <div class="assets">
+            {#each assets as asset}
+                <Asset {...asset} on:delete={() => assetCount--} obfuscated={$obfuscated} />
+            {/each}
+        </div>
+        <div class="flex-center" slot="empty">
             <i>No images yet</i>
         </div>
-    {:else}
-        <InfiniteScroller
-            bind:items={assets}
-            batchSize={4}
-            numItems={assetCount}
-            loadItems={loadMoreAssets}
-            margin="1000px"
-        >
-            <div class="assets">
-                {#each assets as asset}
-                    <Asset {...asset} on:delete={() => assetCount--} obfuscated={$obfuscated} />
-                {/each}
-            </div>
-        </InfiniteScroller>
-    {/if}
+    </InfiniteScroller>
 </main>
 
 <style lang="scss">

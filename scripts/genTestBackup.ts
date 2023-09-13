@@ -1,6 +1,6 @@
 import fs from 'fs';
 import type { Backup } from '../src/lib/controllers/backup/backup';
-import type { Entry } from '../src/lib/controllers/entry/entry';
+import type { ArrayElement } from '../src/types';
 
 const outputFile = 'testBackup.json';
 
@@ -10,6 +10,7 @@ const presets = {
     MAX: {
         entries: {
             incrementing: 10_000,
+            deletedIncrementing: 10_000,
             long: {
                 count: 0,
                 chars: 100_000
@@ -24,6 +25,7 @@ const presets = {
     SIMPLE: {
         entries: {
             incrementing: 5,
+            deletedIncrementing: 5,
             long: {
                 count: 5,
                 chars: 10
@@ -47,12 +49,26 @@ const yesterday = today - 24 * 60 * 60;
 
 function genEntries() {
     console.log('Generating entries...');
-    const entries = [];
+    const entries: ArrayElement<Backup['entries']>[] = [];
 
     for (let i = 0; i < num.entries.incrementing; i++) {
         entries.push({
             body: `entry ${i}`,
-            created: today - i * 60 * 60 * 6
+            created: today - i * 60 * 60 * 6,
+            title: '',
+            agentData: '',
+            createdTzOffset: 0
+        });
+    }
+
+    for (let i = 0; i < num.entries.deletedIncrementing; i++) {
+        entries.push({
+            body: `deleted entry ${i}`,
+            created: today - i * 60 * 60 * 6,
+            deleted: now(),
+            title: '',
+            agentData: '',
+            createdTzOffset: 0
         });
     }
 
@@ -60,7 +76,10 @@ function genEntries() {
     for (let i = 0; i < num.entries.long.count; i++) {
         entries.push({
             body: longText,
-            created: yesterday - i * 60
+            created: yesterday - i * 60,
+            title: '',
+            agentData: '',
+            createdTzOffset: 0
         });
     }
 
@@ -101,7 +120,7 @@ function genAssets() {
 function gen(): Backup {
     console.log('Starting...');
     return {
-        entries: genEntries() as Entry[],
+        entries: genEntries(),
         labels: genLabels(),
         assets: genAssets(),
         events: [],

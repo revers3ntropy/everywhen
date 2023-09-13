@@ -49,9 +49,13 @@
 
 <style lang="scss">
     .spinner-container {
-        box-sizing: border-box;
-        -webkit-font-smoothing: antialiased;
-        display: block !important;
+        // use inline style to hide until this style sheet is loaded
+        display: flex !important;
+
+        min-height: 150px;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
     }
 
     .book {

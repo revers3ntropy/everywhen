@@ -89,7 +89,8 @@
                         batchSize={4}
                         numItems={assetCount}
                         loadItems={loadMoreAssets}
-                        margin="100px"
+                        maxMargin={50}
+                        minItemsHeight={10}
                     >
                         {#each assets as asset}
                             <button

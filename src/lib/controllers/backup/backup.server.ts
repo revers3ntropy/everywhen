@@ -19,10 +19,10 @@ const logger = new FileLogger('Backup');
 export const backupSchema = z.object({
     entries: z.array(
         z.object({
-            title: z.string().optional().default(''),
             body: z.string(),
-            labelName: z.string().nullable().optional(),
             created: z.number(),
+            title: z.string().optional().default(''),
+            labelName: z.string().nullable().optional(),
             createdTzOffset: z.number().optional().default(0),
             latitude: z.number().nullable().optional(),
             longitude: z.number().nullable().optional(),
@@ -33,10 +33,10 @@ export const backupSchema = z.object({
             edits: z
                 .array(
                     z.object({
-                        oldTitle: z.string().default(''),
                         oldBody: z.string(),
-                        oldLabelName: z.string().nullable().optional(),
                         created: z.number(),
+                        oldTitle: z.string().default(''),
+                        oldLabelName: z.string().nullable().optional(),
                         createdTzOffset: z.number().default(0),
                         latitude: z.number().nullable().optional(),
                         longitude: z.number().nullable().optional(),
