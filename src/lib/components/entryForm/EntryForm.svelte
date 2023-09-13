@@ -186,6 +186,11 @@
     }
 
     async function submit() {
+        if (useBulletEntryForm && !newEntryBody) {
+            notify.error(`Bullets cannot be empty`);
+            return;
+        }
+
         currentlyUploadingEntries.update(v => v + 1);
 
         submitted = true;

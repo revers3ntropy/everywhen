@@ -1,11 +1,10 @@
 <script lang="ts">
     import type { PageData } from './$types';
     import Close from 'svelte-material-icons/Close.svelte';
-    import { obfuscated } from '$lib/stores';
+    import { navExpanded, obfuscated } from '$lib/stores';
     import EntryForm from '$lib/components/entryForm/EntryForm.svelte';
 
     export let data: PageData;
-
     let { entry } = data;
 </script>
 
@@ -13,7 +12,7 @@
     <title>Edit Entry</title>
 </svelte:head>
 
-<main>
+<main class="pt-4 md:p-4 {$navExpanded ? 'md:ml-48' : 'md:ml-16'}">
     <div class="header">
         <div>
             <a href="/journal/{entry.id}">

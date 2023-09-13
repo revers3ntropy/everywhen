@@ -6,6 +6,7 @@ export default {
             transparent: 'transparent',
             current: 'currentColor',
             primary: 'var(--primary)',
+            primaryLight: 'var(--primary-light)',
             secondary: 'var(--secondary)',
             secondaryLight: 'var(--secondary-light)',
             backgroundColor: 'var(--background-color)',

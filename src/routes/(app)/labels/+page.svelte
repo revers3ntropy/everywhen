@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { navExpanded } from '$lib/stores';
     import type { PageData } from './$types';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import { api } from '$lib/utils/apiRequest';
@@ -46,7 +47,7 @@
     <title>Labels</title>
 </svelte:head>
 
-<main>
+<main class={$navExpanded ? 'md:ml-48' : 'md:ml-16'}>
     <div class="labels">
         <div class="label-list">
             {#each labels as label}

@@ -67,7 +67,7 @@
         <slot name="button" />
     </button>
     <span class="popup">
-        <span class="content container shadowed" style="--width: {width}">
+        <span class="content container" style="--width: {width}">
             <slot />
         </span>
     </span>

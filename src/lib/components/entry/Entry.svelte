@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { browser } from '$app/environment';
     import Lazy from '$lib/components/Lazy.svelte';
     import type { EntryEdit } from '$lib/controllers/entry/entry';
     import { fmtUtcRelative, nowUtc } from '$lib/utils/time';
+    import { onMount } from 'svelte';
     import ContentCopy from 'svelte-material-icons/ContentCopy.svelte';
     import { slide } from 'svelte/transition';
     import { tooltip } from '@svelte-plugins/tooltips';
@@ -69,6 +69,7 @@
 
         notify.success(`Entry ${thisIsDeleted ? 'restored' : 'deleted'}`);
         await dispatch.delete('entry', id);
+        deleted = thisIsDeleted ? null : nowUtc();
     }
 
     async function togglePinned() {
@@ -112,10 +113,11 @@
 
     let showingMap = false;
 
-    $: entryHtml = browser ? rawMdToHtml(body) : '';
-    // doesn't set reactively on tooltip content if in props???
-    $: restoreDeleteTooltip = Entry.isDeleted({ deleted }) ? 'Restore Entry' : 'Move Entry to Bin';
-    $: pinTooltip = Entry.isPinned({ pinned }) ? 'Unpin Entry' : 'Pin Entry';
+    // cannot generate HTML server-side
+    let entryHtml = '...';
+    onMount(() => {
+        entryHtml = rawMdToHtml(body);
+    });
 </script>
 
 <div class="entry" class:in-dialog={isInDialog} {id}>
@@ -149,7 +151,7 @@
                 <span
                     class="gradient-icon"
                     use:tooltip={{
-                        content: `<span class="oneline">Favourited ${fmtUtcRelative(pinned)}</span>`
+                        content: `Added to favourites ${fmtUtcRelative(pinned)}`
                     }}
                 >
                     <Heart size="20" />
@@ -206,19 +208,23 @@
                             </button>
 
                             {#if !Entry.isDeleted({ deleted })}
-                                <button
-                                    on:click={togglePinned}
-                                    class="with-icon icon-gradient-on-hover"
-                                    aria-label={pinTooltip}
-                                >
-                                    {#if Entry.isPinned({ pinned })}
-                                        <HeartOffOutline size="25" />
-                                        Remove from Favourites
-                                    {:else}
-                                        <Heart size="25" />
-                                        Add to Favourites
-                                    {/if}
-                                </button>
+                                {#key pinned}
+                                    <button
+                                        on:click={togglePinned}
+                                        class="with-icon icon-gradient-on-hover"
+                                        aria-label={Entry.isPinned({ pinned })
+                                            ? 'Remove from Favourites'
+                                            : 'Add to Favourites'}
+                                    >
+                                        {#if Entry.isPinned({ pinned })}
+                                            <HeartOffOutline size="25" />
+                                            Remove from Favourites
+                                        {:else}
+                                            <Heart size="25" />
+                                            Add to Favourites
+                                        {/if}
+                                    </button>
+                                {/key}
                                 <a
                                     href="/journal/{id}/edit"
                                     class="with-icon"
@@ -228,19 +234,23 @@
                                     Edit
                                 </a>
                             {/if}
-                            <button
-                                on:click={deleteSelf}
-                                class="with-icon danger"
-                                aria-label={restoreDeleteTooltip}
-                            >
-                                {#if Entry.isDeleted({ deleted })}
-                                    <Restore size="25" />
-                                    Remove from Bin
-                                {:else}
-                                    <Bin size="25" />
-                                    Move to Bin
-                                {/if}
-                            </button>
+                            {#key deleted}
+                                <button
+                                    on:click={deleteSelf}
+                                    class="with-icon danger"
+                                    aria-label={Entry.isDeleted({ deleted })
+                                        ? 'Restore Entry'
+                                        : 'Move Entry to Bin'}
+                                >
+                                    {#if Entry.isDeleted({ deleted })}
+                                        <Restore size="25" />
+                                        Remove from Bin
+                                    {:else}
+                                        <Bin size="25" />
+                                        Move to Bin
+                                    {/if}
+                                </button>
+                            {/key}
                         </div>
                     </div>
                 </Dropdown>

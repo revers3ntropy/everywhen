@@ -1,6 +1,7 @@
 <script lang="ts">
     import { afterNavigate, beforeNavigate } from '$app/navigation';
     import AllowCookies from '$lib/components/AllowCookies.svelte';
+    import TopNavbar from '$lib/components/nav/TopNavbar.svelte';
     import { Auth } from '$lib/controllers/auth/auth';
     import { Backup } from '$lib/controllers/backup/backup';
     import type { LayoutData } from './$types';
@@ -10,6 +11,7 @@
     import {
         allowedCookies,
         encryptionKey,
+        navExpanded,
         obfuscated,
         passcodeLastEntered,
         settingsStore,
@@ -163,17 +165,19 @@
 
 <Nav />
 
+<TopNavbar />
+
 <div class="page-content">
     <slot />
 </div>
 
 <style lang="scss">
     .page-content {
-        min-height: calc(100vh - var(--nav-height));
-        padding: 0 0 12rem 12rem;
+        min-height: 100vh;
+        padding: 50px 0 12rem 0;
 
         @media #{$mobile} {
-            padding: 0 0 200px 5px;
+            padding: 50px 0 200px 0;
         }
     }
 

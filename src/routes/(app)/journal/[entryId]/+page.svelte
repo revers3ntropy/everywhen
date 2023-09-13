@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { ANIMATION_DURATION } from '$lib/constants';
     import { fmtUtcRelative } from '$lib/utils/time';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
@@ -8,8 +9,9 @@
     import { onMount } from 'svelte';
     import { Entry as EntryController } from '$lib/controllers/entry/entry';
     import Entry from '$lib/components/entry/Entry.svelte';
-    import { obfuscated } from '$lib/stores';
+    import { navExpanded, obfuscated } from '$lib/stores';
     import type { PageData } from './$types';
+    import { slide } from 'svelte/transition';
 
     export let data: PageData;
     let { entry, showHistory } = data;
@@ -29,16 +31,18 @@
     <title>View Entry</title>
 </svelte:head>
 
-<main>
-    <div style="font-style: italic; padding: 1rem 0;" class="text-light">
+<main class="md:p-4 {$navExpanded ? 'md:ml-48' : 'md:ml-16'}">
+    <div class="text-light p-2 italic">
         {#if EntryController.isDeleted(entry)}
-            This entry was deleted {fmtUtcRelative(entry.deleted ?? 0)}
+            <p class="text-warning">
+                This entry was deleted {fmtUtcRelative(entry.deleted ?? 0)}
+            </p>
         {:else if showHistory}
-            Current Version
+            <div transition:slide={{ duration: ANIMATION_DURATION }}> Current Version </div>
         {/if}
     </div>
 
-    <div style="padding: 0 0 1rem 0">
+    <div class="p-2 md:pt-4 bg-vLightAccent md:rounded-lg md:p-4">
         <Entry
             {...entry}
             obfuscated={$obfuscated}
@@ -47,46 +51,49 @@
             {locations}
         />
     </div>
-
-    {#if !showHistory}
-        {#if entry.edits?.length}
-            <div class="flex-center">
-                <button on:click={() => (showHistory = true)}>
+    {#if entry.edits?.length}
+        <div class="flex-center p-4">
+            {#if showHistory}
+                <button on:click={() => (showHistory = false)} class="flex-center gap-2">
+                    <ChevronUp /> Hide History ({entry.edits?.length} edits)
+                </button>
+            {:else}
+                <button on:click={() => (showHistory = true)} class="flex-center gap-2">
                     <ChevronDown /> Show History ({entry.edits?.length} edits)
                 </button>
-            </div>
-        {/if}
-    {:else}
-        <div class="flex-center">
-            <button on:click={() => (showHistory = false)}>
-                <ChevronUp /> Hide History ({entry.edits?.length} edits)
-            </button>
+            {/if}
         </div>
-        {#if !entry.edits?.length}
-            <div class="flex-center"> No edits have been made to this entry </div>
-        {:else}
-            <i>Older Versions</i>
-            {#each (entry.edits || []).sort((a, b) => b.created - a.created) as edit}
-                <Entry
-                    id={edit.id}
-                    title={edit.oldTitle}
-                    body={edit.oldBody}
-                    created={edit.created}
-                    createdTzOffset={edit.createdTzOffset}
-                    label={edit.oldLabel}
-                    latitude={edit.latitude}
-                    longitude={edit.longitude}
-                    deleted={null}
-                    pinned={null}
-                    wordCount={-1}
-                    agentData={edit.agentData}
-                    edits={[]}
-                    isEdit
-                    showFullDate
-                    obfuscated={$obfuscated}
-                    {locations}
-                />
-            {/each}
+        {#if showHistory}
+            <div transition:slide={{ duration: ANIMATION_DURATION }}>
+                {#if !entry.edits?.length}
+                    <div class="flex-center"> No edits have been made to this entry </div>
+                {:else}
+                    <div class="p-2 text-light italic">Older Versions</div>
+                    <div class="p-2 md:pt-4 bg-vLightAccent md:rounded-lg md:p-4">
+                        {#each (entry.edits || []).sort((a, b) => b.created - a.created) as edit}
+                            <Entry
+                                id={edit.id}
+                                title={edit.oldTitle}
+                                body={edit.oldBody}
+                                created={edit.created}
+                                createdTzOffset={edit.createdTzOffset}
+                                label={edit.oldLabel}
+                                latitude={edit.latitude}
+                                longitude={edit.longitude}
+                                deleted={null}
+                                pinned={null}
+                                wordCount={-1}
+                                agentData={edit.agentData}
+                                edits={[]}
+                                isEdit
+                                showFullDate
+                                obfuscated={$obfuscated}
+                                {locations}
+                            />
+                        {/each}
+                    </div>
+                {/if}
+            </div>
         {/if}
     {/if}
 </main>

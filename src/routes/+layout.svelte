@@ -87,9 +87,9 @@
     <Modal classContent="popup-background" classWindow="popup-background" show={$popup} />
 
     <slot />
-</div>
 
-<Footer />
+    <Footer />
+</div>
 
 <style lang="scss">
     .root {

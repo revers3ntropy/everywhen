@@ -124,7 +124,7 @@
     </linearGradient>
 </svg>
 
-<Dropdown>
+<Dropdown fromRight>
     <div class="flex-center gap-2 w-full border-r bordered p-2 hover:bg-lightAccent" slot="button">
         <Plus size="25" />
         <span class="hide-mobile">New</span>

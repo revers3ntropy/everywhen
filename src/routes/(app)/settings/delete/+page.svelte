@@ -5,7 +5,7 @@
     import { api } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
     import type { PageData } from './$types';
-    import { encryptionKey, username } from '$lib/stores';
+    import { encryptionKey, navExpanded, username } from '$lib/stores';
     import { Auth } from '$lib/controllers/auth/auth';
 
     export let data: PageData;
@@ -37,7 +37,7 @@
     <meta content="Delete Everywhen account" name="description" />
 </svelte:head>
 
-<main>
+<main class="md:p-4 {$navExpanded ? 'md:ml-48' : 'md:ml-16'}">
     <section>
         <h1>
             <span class="hide-mobile">

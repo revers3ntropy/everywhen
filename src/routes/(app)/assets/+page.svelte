@@ -6,7 +6,7 @@
     import { Result } from '$lib/utils/result';
     import { nowUtc } from '$lib/utils/time';
     import Upload from 'svelte-material-icons/Upload.svelte';
-    import { currentlyUploadingAssets, obfuscated } from '$lib/stores';
+    import { currentlyUploadingAssets, navExpanded, obfuscated } from '$lib/stores';
     import type { ChangeEventHandler } from 'svelte/elements';
     import Asset from '$lib/components/asset/Asset.svelte';
     import type { PageData } from './$types';
@@ -52,7 +52,7 @@
     <title>Assets</title>
 </svelte:head>
 
-<main>
+<main class="md:mr-2 {$navExpanded ? 'md:ml-48' : 'md:ml-16'}">
     <div class="p-2">
         <button on:click={() => fileDropInput.click()} class="primary with-icon">
             <Upload size="30" />

@@ -9,7 +9,7 @@
     import EntryHeatMap from '../EntryHeatMap.svelte';
     import type { PageData } from './$types';
     import { encrypt } from '$lib/utils/encryption';
-    import { encryptionKey } from '$lib/stores';
+    import { encryptionKey, navExpanded } from '$lib/stores';
 
     let by: By = By.Words;
 
@@ -21,7 +21,7 @@
     <title>Insights</title>
 </svelte:head>
 
-<main>
+<main class="md:p-4 {$navExpanded ? 'md:ml-48' : 'md:ml-16'}">
     <div class="title-line">
         <div>
             <a class="with-icon" href="/stats">
@@ -35,7 +35,7 @@
                     <Counter size="40" />
                 </span>
                 <span class="the-word-with-quotes">
-                    '<span class="the-word">{theWord}</span>'
+                    '{theWord}'
                 </span>
             </h1>
         </div>
@@ -43,7 +43,7 @@
             <SearchForWord value={theWord} />
         </div>
     </div>
-    {#if data.wordInstances === 0}
+    {#if wordInstances === 0}
         <section>
             <div class="flex-center">
                 <p>

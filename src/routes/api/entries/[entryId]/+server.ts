@@ -37,7 +37,7 @@ export const PUT = (async ({ request, params, cookies }) => {
     const body = await getUnwrappedReqBody(auth, request, {
         title: z.string().default(''),
         body: z.string(),
-        label: z.string().nullable(),
+        labelId: z.string().nullable(),
         latitude: z.number().nullable().default(null),
         longitude: z.number().nullable().default(null),
         timezoneUtcOffset: z.number().default(0),
@@ -53,7 +53,7 @@ export const PUT = (async ({ request, params, cookies }) => {
         body.body,
         body.latitude,
         body.longitude,
-        body.label,
+        body.labelId,
         body.timezoneUtcOffset,
         body.agentData
     );

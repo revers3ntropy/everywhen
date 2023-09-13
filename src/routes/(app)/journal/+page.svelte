@@ -2,7 +2,7 @@
     import DatasetShortcutWidgets from '$lib/components/dataset/DatasetShortcutWidgets.svelte';
     import Entries from '$lib/components/entry/Entries.svelte';
     import EntriesSidebar from '$lib/components/entry/EntriesSidebar.svelte';
-    import { encryptionKey, obfuscated } from '$lib/stores';
+    import { encryptionKey, navExpanded, obfuscated } from '$lib/stores';
     import { encrypt } from '$lib/utils/encryption';
     import Search from 'svelte-material-icons/Magnify.svelte';
     import type { PageData } from './$types';
@@ -17,7 +17,7 @@
     <title>Journal</title>
 </svelte:head>
 
-<main class="md:px-4">
+<main class={$navExpanded ? 'md:ml-52' : 'md:ml-20'}>
     <section class="sidebar">
         <EntriesSidebar
             obfuscated={$obfuscated}

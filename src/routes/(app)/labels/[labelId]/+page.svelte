@@ -3,7 +3,7 @@
     import { listen } from '$lib/dataChangeEvents';
     import Delete from 'svelte-material-icons/Delete.svelte';
     import Entries from '$lib/components/entry/Entries.svelte';
-    import { obfuscated } from '$lib/stores';
+    import { navExpanded, obfuscated } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
     import { showPopup } from '$lib/utils/popups';
@@ -78,16 +78,16 @@
 </script>
 
 <svelte:head>
-    <title>{data.label.name} | Label</title>
+    <title>{label.name} | Label</title>
 </svelte:head>
 
-<main>
-    <div class="color-select" style="border-color: {data.label.color}">
-        {data.label.color}
-        <input type="color" bind:value={data.label.color} on:change={updateColor} />
+<main class="md:p-4 {$navExpanded ? 'md:ml-48' : 'md:ml-16'}">
+    <div class="color-select" style="border-color: {label.color}">
+        {label.color}
+        <input type="color" bind:value={label.color} on:change={updateColor} />
     </div>
     <div class="title-line">
-        <input class="name editable-text" bind:value={data.label.name} on:change={updateName} />
+        <input class="name editable-text" bind:value={label.name} on:change={updateName} />
         <button class="with-circled-icon danger" on:click={deleteLabel}>
             <Delete size="30" />
             Delete this Label
@@ -100,15 +100,15 @@
             Event{eventCount !== 1 ? 's' : ''}
         </h1>
         <div class="events">
-            {#each data.events as event}
-                <Event {event} labels={data.labels} obfuscated={$obfuscated} />
+            {#each events as event}
+                <Event {event} {labels} obfuscated={$obfuscated} />
             {/each}
         </div>
     </section>
 
     <section>
-        <h1>{data.entryCount} Entr{data.entryCount === 1 ? 'y' : 'ies'}</h1>
-        <Entries options={{ labelId: data.label.id }} showLabels={false} {locations} />
+        <h1>{entryCount} Entr{entryCount === 1 ? 'y' : 'ies'}</h1>
+        <Entries options={{ labelId: label.id }} showLabels={false} {locations} />
     </section>
 </main>
 

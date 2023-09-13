@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { notify } from '$lib/components/notifications/notifications.js';
+    import { notify } from '$lib/components/notifications/notifications';
     import { onMount } from 'svelte';
     import Dot from '$lib/components/Dot.svelte';
     import type { Entry } from '$lib/controllers/entry/entry';

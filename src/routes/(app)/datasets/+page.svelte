@@ -1,6 +1,7 @@
 <script lang="ts">
     import { datasetPresets } from '$lib/controllers/dataset/presets';
     import type { PresetId } from '$lib/controllers/dataset/presets';
+    import { navExpanded } from '$lib/stores';
     import type { PageData } from './$types';
     import { notify } from '$lib/components/notifications/notifications';
     import { api } from '$lib/utils/apiRequest';
@@ -27,9 +28,7 @@
     <title>Datasets</title>
 </svelte:head>
 
-<main>
-    <h1>Datasets</h1>
-
+<main class="mt-4 {$navExpanded ? 'md:ml-52' : 'md:ml-20'}">
     {#each unusedPresetIds as presetId}
         <div>
             <button on:click={() => makeFromPreset(presetId)}>
