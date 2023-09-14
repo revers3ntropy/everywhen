@@ -125,10 +125,12 @@
 </svg>
 
 <Dropdown>
-    <div class="flex-center gap-2 w-full p-2 hover:bg-lightAccent" slot="button">
-        <Plus size="25" />
-        <span class="hide-mobile">New</span>
+    <div
+        class="flex-center w-full p-2 hover:bg-lightAccent bg-vLightAccent rounded-full"
+        slot="button"
+    >
         <ChevronDown />
+        <Plus size="25" />
     </div>
 
     <div class="record-something-buttons">

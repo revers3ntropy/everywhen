@@ -174,11 +174,11 @@
 
         .entry {
             display: grid;
-            grid-template-columns: 50px 10px 1fr;
-            gap: 5px;
+            grid-template-columns: 45px 10px 1fr;
+            gap: 4px;
             align-items: center;
             color: var(--text-color);
-            padding: 2px 2px;
+            padding: 2px;
             border-radius: 4px;
             width: 100%;
             text-align: left;
@@ -196,7 +196,7 @@
                 font-size: 0.7rem;
                 color: var(--text-color-light);
                 width: 100%;
-                text-align: center;
+                text-align: right;
             }
         }
     }

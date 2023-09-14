@@ -8,11 +8,10 @@
 </script>
 
 <script lang="ts">
-    import type { Control } from 'ol/control';
-    import type { FeatureLike } from 'ol/Feature';
-    import { writable } from 'svelte/store';
-    import type { EntryAsLocation } from '$lib/controllers/entry/entry';
     import type { CallbackObject } from 'ol-contextmenu/dist/types';
+    import ContextMenu from 'ol-contextmenu';
+    import 'ol-contextmenu/ol-contextmenu.css';
+
     import type { MapBrowserEvent } from 'ol';
     import Map from 'ol/Map';
     import TileLayer from 'ol/layer/Tile';
@@ -20,8 +19,14 @@
     import OSM from 'ol/source/OSM';
     import Overlay from 'ol/Overlay';
     import { fromLonLat, toLonLat } from 'ol/proj';
-    import ContextMenu from 'ol-contextmenu';
+    import type { Control } from 'ol/control';
+    import type { FeatureLike } from 'ol/Feature';
+
+    import { writable } from 'svelte/store';
+
+    import type { EntryAsLocation } from '$lib/controllers/entry/entry';
     import { Location } from '$lib/controllers/location/location';
+    import { notify } from '$lib/components/notifications/notifications';
     import { popup, settingsStore } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { showPopup } from '$lib/utils/popups';
@@ -29,7 +34,6 @@
     import EditLocation from '../location/EditLocation.svelte';
     import EntryDialog from '$lib/components/dialogs/EntryDialog.svelte';
     import EntryTooltipOnMap from './EntryTooltipOnMap.svelte';
-    import { notify } from '$lib/components/notifications/notifications';
     import {
         type EntryFeature,
         lastEntry,
@@ -47,7 +51,7 @@
     export let width = '100%';
     export let height = '100vh';
     export let mobileWidth = '100%';
-    export let mobileHeight = 'calc(100vh - 5rem)';
+    export let mobileHeight = '100vh';
     export let roundedCorners = false;
 
     async function reloadLocations() {
@@ -334,7 +338,6 @@
 </div>
 
 <style lang="scss">
-    @import 'ol-contextmenu/ol-contextmenu.css';
     @import '$lib/styles/layout';
 
     .map {

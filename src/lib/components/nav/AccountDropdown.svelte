@@ -17,7 +17,7 @@
 
 <Dropdown fromRight width="200px">
     <div
-        class="flex justify-end items-center gap-1 bg-vLightAccent rounded-lg py-1 px-2"
+        class="flex justify-end items-center gap-1 bg-vLightAccent w-full p-2 hover:bg-lightAccent rounded-full"
         slot="button"
     >
         <ChevronDown />

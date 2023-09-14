@@ -5,6 +5,7 @@
     import LocationDisabledBanner from './LocationDisabledBanner.svelte';
 
     export let data: PageData;
+    let { entries, locations } = data;
 </script>
 
 <svelte:head>
@@ -16,6 +17,8 @@
         {#if !$settingsStore.preferLocationOn.value || !$enabledLocation}
             <LocationDisabledBanner />
         {/if}
-        <Map entries={data.entries} locations={data.locations} />
+        <div class="fixed top-0 left-0 h-screen w-full">
+            <Map {entries} {locations} />
+        </div>
     </section>
 </main>

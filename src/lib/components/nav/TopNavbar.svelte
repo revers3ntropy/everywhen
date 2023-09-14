@@ -13,41 +13,38 @@
 </script>
 
 <div
-    class="flex fixed top-0 right-2 left-0 z-10 bg-navBg justify-between items-center"
+    class="flex fixed top-0 right-2 z-10 bg-navBg justify-between items-center gap-2 md:gap-4 rounded-b-lg pl-1"
     style="height: 50px"
 >
-    <div class="w-fit h-fit">
-        <CreateNewButton />
-    </div>
-    <div class="flex items-center gap-2 md:gap-4">
-        {#if $settingsStore.passcode.value}
-            <button
-                on:click={lock}
-                class="danger"
-                use:tooltip={{
-                    content: '<span class="oneline">Lock (require passcode)</span>',
-                    position: 'bottom'
-                }}
-                aria-label="Lock"
-            >
-                <Lock size="25" />
-            </button>
-        {/if}
-        <button
-            aria-label={$obfuscated ? 'Show all' : 'Hide all'}
-            on:click={() => obfuscated.set(!$obfuscated)}
-        >
-            {#if $obfuscated}
-                <Eye size="25" />
-            {:else}
-                <EyeOff size="25" />
-            {/if}
-        </button>
+    <CreateNewButton />
 
-        <div class="pr-1">
-            <AccountDropdown>
-                <p> {$username || '...'} </p>
-            </AccountDropdown>
-        </div>
+    {#if $settingsStore.passcode.value}
+        <button
+            on:click={lock}
+            class="danger"
+            use:tooltip={{
+                content: '<span class="oneline">Lock (require passcode)</span>',
+                position: 'bottom'
+            }}
+            aria-label="Lock"
+        >
+            <Lock size="25" />
+        </button>
+    {/if}
+    <button
+        aria-label={$obfuscated ? 'Show all' : 'Hide all'}
+        on:click={() => obfuscated.set(!$obfuscated)}
+    >
+        {#if $obfuscated}
+            <Eye size="25" />
+        {:else}
+            <EyeOff size="25" />
+        {/if}
+    </button>
+
+    <div class="pr-1">
+        <AccountDropdown>
+            <p> {$username || '...'} </p>
+        </AccountDropdown>
     </div>
 </div>
