@@ -26,7 +26,7 @@
     </div>
 
     <div class="account-dropdown-options">
-        <Streaks />
+        <Streaks tooltipPosition="left" />
 
         <hr />
 
