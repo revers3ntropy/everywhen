@@ -1,7 +1,7 @@
 <script lang="ts">
     import { renderable } from '$lib/components/canvas/renderable';
 
-    export let frameTimeThreshold = 25;
+    export let frameTimeThreshold = 40;
     export let rollingAvCount = 15;
 
     let lastTime = performance.now();

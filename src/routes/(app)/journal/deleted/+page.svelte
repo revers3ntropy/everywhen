@@ -12,12 +12,16 @@
 </svelte:head>
 
 <main class="md:p-4 {$navExpanded ? 'md:ml-48' : 'md:ml-16'}">
-    <Entries
-        options={{
-            deleted: true
-        }}
-        {locations}
-    />
+    <div class="flex-center">
+        <div style="width: min(100%, 732px)">
+            <Entries
+                options={{
+                    deleted: true
+                }}
+                {locations}
+            />
+        </div>
+    </div>
 </main>
 
 <style lang="scss">

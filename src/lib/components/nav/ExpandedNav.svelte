@@ -17,9 +17,8 @@
 </script>
 
 <div class="wrapper" transition:slide={{ duration: ANIMATION_DURATION, axis: 'x' }}>
-    <div></div>
-
     <div>
+        <div class="serif text-lg flex-center" style="height: 50px"> Everywhen </div>
         <div class="nav-buttons">
             <a
                 href="/journal"
@@ -120,6 +119,8 @@
             </a>
         </div>
     </div>
+
+    <div></div>
 
     <div class="flex items-end p-4 justify-center">
         <button on:click={() => ($navExpanded = false)}>
