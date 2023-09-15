@@ -98,13 +98,13 @@ function datasetFactoryForStandardBuckets(
         const buckets: Record<string, number> = {};
 
         if (selectedBucket === Bucket.Month) {
+            // months do not have constant size
             const end = moment
                 .utc(nowUtc() * 1000)
                 .add(1, 'month')
                 .unix();
 
             let bucket = bucketiseTime(start, Bucket.Month);
-            // months do not have constant size
             while (bucket < end) {
                 buckets[bucketiseTime(bucket, Bucket.Month).toString()] = 0;
                 bucket = moment

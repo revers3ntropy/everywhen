@@ -6,8 +6,8 @@
     <title>{$page.status} | Everywhen</title>
 </svelte:head>
 
-<main>
-    <div class="container">
+<main class="flex-center h-screen">
+    <div>
         <div style="font-size: 1rem; margin: 0 0 1rem 0">
             <a href="/">Home</a>
         </div>
@@ -20,16 +20,3 @@
         </div>
     </div>
 </main>
-
-<style lang="scss">
-    @import '$lib/styles/layout';
-
-    main {
-        @extend .flex-center;
-        height: 100vh;
-
-        .container {
-            padding: 2rem;
-        }
-    }
-</style>
