@@ -68,7 +68,7 @@ function datasetFactoryForStandardBuckets(
             case Bucket.Year:
                 return 60 * 60 * 24 * 365;
             case Bucket.Month:
-                return 60 * 60 * 24 * 30;
+                throw new Error('Should not use this function for months');
             case Bucket.Week:
                 return 60 * 60 * 24 * 7;
             case Bucket.Day:
@@ -96,12 +96,29 @@ function datasetFactoryForStandardBuckets(
         const start = Entry.localTime(sortedEntries[0]);
 
         const buckets: Record<string, number> = {};
-        const end = nowUtc() + bucketSize(selectedBucket);
 
-        let bucket = bucketiseTime(start, selectedBucket);
-        while (bucket < end) {
-            buckets[bucketiseTime(bucket, selectedBucket).toString()] = 0;
-            bucket += bucketSize(selectedBucket);
+        if (selectedBucket === Bucket.Month) {
+            const end = moment
+                .utc(nowUtc() * 1000)
+                .add(1, 'month')
+                .unix();
+
+            let bucket = bucketiseTime(start, Bucket.Month);
+            // months do not have constant size
+            while (bucket < end) {
+                buckets[bucketiseTime(bucket, Bucket.Month).toString()] = 0;
+                bucket = moment
+                    .utc(bucket * 1000)
+                    .add(1, 'month')
+                    .unix();
+            }
+        } else {
+            const end = nowUtc() + bucketSize(selectedBucket);
+            let bucket = bucketiseTime(start, selectedBucket);
+            while (bucket < end) {
+                buckets[bucketiseTime(bucket, selectedBucket).toString()] = 0;
+                bucket += bucketSize(selectedBucket);
+            }
         }
 
         for (const entry of sortedEntries) {
@@ -109,8 +126,9 @@ function datasetFactoryForStandardBuckets(
             buckets[bucket] += by === By.Entries ? 1 : entry.wordCount;
         }
 
-        if (isNaN(Object.values(buckets).reduce((a, b) => a + b, 0)))
-            clientLogger.error('NaN in buckets', { buckets, start, end, selectedBucket });
+        if (isNaN(Object.values(buckets).reduce((a, b) => a + b, 0))) {
+            clientLogger.error('NaN in buckets', { buckets, start, selectedBucket });
+        }
 
         const lastBucket = Object.keys(buckets)
             .map(a => parseInt(a))
