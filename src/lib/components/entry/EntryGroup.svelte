@@ -116,41 +116,42 @@
         </div>
     </div>
     {#if !$collapsed[day]}
-        {#if showEntryForm && isToday}
-            <EntryForm {obfuscated} />
-        {/if}
         <div
-            class="contents"
             transition:slide|local={{
                 axis: 'y',
                 duration: ANIMATION_DURATION
             }}
         >
-            {#if isToday && $currentlyUploadingEntries}
-                {#each { length: $currentlyUploadingEntries } as i (i)}
-                    <Entry
-                        id="temp-{i}"
-                        title=""
-                        body="..."
-                        created={nowUtc()}
-                        createdTzOffset={currentTzOffset()}
-                        label={null}
-                        latitude={null}
-                        longitude={null}
-                        deleted={null}
-                        pinned={null}
-                        wordCount={-1}
-                        agentData=""
-                        edits={[]}
-                        {obfuscated}
-                        {showLabels}
-                        {locations}
-                    />
-                {/each}
+            {#if showEntryForm && isToday}
+                <EntryForm {obfuscated} />
             {/if}
-            {#each entries as entry (entry.id)}
-                <Entry {...entry} {obfuscated} {showLabels} {locations} />
-            {/each}
+            <div class="contents">
+                {#if isToday && $currentlyUploadingEntries}
+                    {#each { length: $currentlyUploadingEntries } as i (i)}
+                        <Entry
+                            id="temp-{i}"
+                            title=""
+                            body="..."
+                            created={nowUtc()}
+                            createdTzOffset={currentTzOffset()}
+                            label={null}
+                            latitude={null}
+                            longitude={null}
+                            deleted={null}
+                            pinned={null}
+                            wordCount={-1}
+                            agentData=""
+                            edits={[]}
+                            {obfuscated}
+                            {showLabels}
+                            {locations}
+                        />
+                    {/each}
+                {/if}
+                {#each entries as entry (entry.id)}
+                    <Entry {...entry} {obfuscated} {showLabels} {locations} />
+                {/each}
+            </div>
         </div>
     {/if}
 </div>
@@ -192,7 +193,7 @@
                 margin: 0.5rem 0;
                 padding: 0.4rem 0.8rem 0.4rem 0;
                 position: sticky;
-                top: 0.3em;
+                top: 55px;
                 z-index: 4;
             }
 

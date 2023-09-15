@@ -20,9 +20,9 @@
         top: 0;
         left: 0;
         bottom: 0;
-        // increased to 5 so that on mobile the nav buttons are not cut off
-        // by entry group titles
-        z-index: 5;
+        // increased to 6 so that on mobile the nav buttons are not cut off
+        // by entry group titles, and is above top navbar
+        z-index: 6;
         height: 100%;
     }
 </style>

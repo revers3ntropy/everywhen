@@ -13,7 +13,7 @@
 </script>
 
 <div
-    class="flex fixed top-0 right-2 z-10 bg-navBg justify-between items-center gap-2 md:gap-4 rounded-b-lg pl-1"
+    class="flex fixed top-0 right-2 bg-navBg justify-between items-center gap-2 md:gap-4 rounded-b-lg pl-1 z-[5]"
     style="height: 50px"
 >
     <CreateNewButton />

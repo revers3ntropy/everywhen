@@ -56,13 +56,15 @@
 
 <slot {items} />
 
-{#if numItems !== 0}
-    <div
-        style="height: 1px; position: relative; top: -{margin}px"
-        use:inview={{}}
-        on:inview_enter={load}
-        on:inview_leave={() => (pageEndInView = false)}
-    />
+{#if numItems > 0}
+    {#key margin}
+        <div
+            style="height: 1px; position: relative; top: -{margin}px"
+            use:inview={{}}
+            on:inview_enter={load}
+            on:inview_leave={() => (pageEndInView = false)}
+        />
+    {/key}
     {#if showSpinner && items.length < numItems}
         <Spinner />
     {/if}

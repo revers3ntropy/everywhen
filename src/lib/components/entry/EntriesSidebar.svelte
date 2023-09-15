@@ -45,17 +45,23 @@
         if (Entry.isPinned(entry) && !pinnedEntriesSummaries.length) {
             pinnedEntriesSummaries = [Entry.summaryFromEntry(entry)];
         }
+        numTitles++;
+        titleIds.push(entry.id);
     });
     listen.entry.onUpdate(entry => {
         if (Entry.isPinned(entry) && !pinnedEntriesSummaries.length) {
             pinnedEntriesSummaries = [Entry.summaryFromEntry(entry)];
         }
     });
+    listen.entry.onDelete(entryId => {
+        numTitles--;
+        titleIds = titleIds.filter(id => id !== entryId);
+    });
 
     let showingAllPinned = false;
     let showing = false;
-    let summaries = {} as Record<string, EntrySummary[]>;
-    let numTitles = -1;
+    let summaries: Record<string, EntrySummary[]> = {};
+    let numTitles = 1;
     let titleIds: string[] = [];
 </script>
 
@@ -66,16 +72,18 @@
 </div>
 <div class="sidebar" class:showing>
     <div class="header">
-        <button
-            aria-label={obfuscated ? 'Show entries' : 'Hide entries'}
-            on:click={() => (obfuscated = !obfuscated)}
-        >
-            {#if obfuscated}
-                <Eye size="25" />
-            {:else}
-                <EyeOff size="25" />
-            {/if}
-        </button>
+        {#if numTitles > 0}
+            <button
+                aria-label={obfuscated ? 'Show entries' : 'Hide entries'}
+                on:click={() => (obfuscated = !obfuscated)}
+            >
+                {#if obfuscated}
+                    <Eye size="25" />
+                {:else}
+                    <EyeOff size="25" />
+                {/if}
+            </button>
+        {/if}
         <button
             class="only-mobile"
             aria-label="Close sidebar menu"
@@ -142,14 +150,11 @@
             batchSize={100}
             numItems={numTitles}
             loadItems={loadMoreTitles}
-            initialMargin={50}
-            maxMargin={500}
+            initialMargin={0}
+            maxMargin={200}
             minItemsHeight={10}
         >
             <EntrySummaries {obfuscated} titles={summaries} hideBlurToggle />
-            <div slot="empty">
-                <i class="text-light"> No entries yet </i>
-            </div>
         </InfiniteScroller>
     </div>
 </div>

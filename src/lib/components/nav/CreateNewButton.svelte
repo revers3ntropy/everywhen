@@ -17,6 +17,8 @@
     import { nowUtc } from '$lib/utils/time';
     import { Event as EventController } from '$lib/controllers/event/event';
 
+    const iconSize = 25;
+
     async function makeLabelFromNameIfDoesntExist(
         name: string,
         defaultColor: string
@@ -135,31 +137,31 @@
 
     <div class="record-something-buttons">
         <button class="with-icon oneline record-entry" on:click={makeEntry}>
-            <Pencil size="30" />
+            <Pencil size={iconSize} />
             Record Entry
         </button>
         <button class="with-icon oneline record-bullet" on:click={makeBullet}>
-            <BulletPoints size="30" />
+            <BulletPoints size={iconSize} />
             Record Bullet
         </button>
 
         <button class="with-icon oneline record-dream" on:click={makeDream}>
-            <Moon size="30" />
+            <Moon size={iconSize} />
             Record Dream
         </button>
 
         <button class="with-icon oneline record-idea" on:click={makeIdea}>
-            <Lightbulb size="30" />
+            <Lightbulb size={iconSize} />
             Record Idea
         </button>
 
         <button class="with-icon oneline record-thought" on:click={makeThought}>
-            <Brain size="30" />
+            <Brain size={iconSize} />
             Record Thought
         </button>
 
         <button class="with-icon oneline new-event" on:click={makeEvent}>
-            <Calendar size="30" />
+            <Calendar size={iconSize} />
             New Event
         </button>
     </div>

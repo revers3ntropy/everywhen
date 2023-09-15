@@ -47,19 +47,16 @@
     <title>Labels</title>
 </svelte:head>
 
-<main class={$navExpanded ? 'md:ml-48' : 'md:ml-16'}>
+<main class="md:p-4 {$navExpanded ? 'md:ml-48' : 'md:ml-16'}">
+    <button class="primary with-icon" on:click={newLabel}>
+        <Plus size="30" />
+        New Label
+    </button>
     <div class="labels">
         <div class="label-list">
             {#each labels as label}
                 <LabelOptions {...label} />
             {/each}
-
-            <div class="flex-center">
-                <button class="primary with-icon" on:click={newLabel}>
-                    <Plus size="30" />
-                    New Label
-                </button>
-            </div>
         </div>
     </div>
 </main>

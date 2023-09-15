@@ -63,13 +63,13 @@
 
 <style lang="scss">
     button.outer {
-        width: calc(100% - 2rem);
+        width: 100vw;
         padding: 0.5rem 0;
         margin: 0;
         position: fixed;
+        bottom: 0;
         z-index: 1;
-        background: var(--translucent-bg);
-        border-radius: $border-radius $border-radius 0 0;
+        background: var(--transluscent-bg);
         display: flex;
         justify-content: center;
         align-items: center;
