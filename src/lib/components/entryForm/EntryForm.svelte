@@ -339,7 +339,7 @@
     }
 </script>
 
-<div class="mt-4 md:mx-4">
+<div class="mt-4 mx-1 md:mx-4">
     {#key useBulletEntryForm}
         <div class="head">
             <div class="left-options">
@@ -379,21 +379,8 @@
                     </div>
                 {/if}
             </div>
-            <div class="right-options {obfuscated ? 'blur' : ''}">
-                <div class="label-select-container">
-                    <LabelSelect bind:value={newEntryLabel} {labels} fromRight />
-                </div>
-
-                <button
-                    aria-label="Submit Entry"
-                    class="primary with-icon hide-mobile"
-                    disabled={submitted}
-                    on:click={submit}
-                    style="padding: 2px 5px; margin: 0 0 3px 0;"
-                >
-                    Submit
-                    <Tick size="26" />
-                </button>
+            <div class="flex justify-end items-center {obfuscated ? 'blur' : ''}">
+                <LabelSelect bind:value={newEntryLabel} {labels} fromRight />
             </div>
         </div>
         {#if !useBulletEntryForm}
@@ -431,15 +418,16 @@
             />
         </div>
 
-        <div class="send-mobile flex-center">
+        <div class="flex py-1 justify-end">
             <button
                 aria-label="Submit Entry"
                 class="primary with-icon"
                 disabled={submitted}
                 on:click={submit}
+                style="padding: 2px 5px; margin: 0 0 3px 0;"
             >
-                <Send size="30" />
-                Submit Entry
+                Submit
+                <Tick size="26" />
             </button>
         </div>
     {/key}
@@ -520,7 +508,6 @@
 
     .entry-container {
         @extend .flex-center;
-        padding: 0 0 1rem 0;
         width: 100%;
 
         @media #{$mobile} {

@@ -1,5 +1,6 @@
 <script lang="ts">
     import Spinner from '$lib/components/BookSpinner.svelte';
+    import { pageInView } from '$lib/stores';
     import { inview } from 'svelte-inview';
 
     type Item = NonNullable<unknown>;
@@ -49,7 +50,7 @@
         }
     }
 
-    $: if (!pageEndInView && margin < maxMargin) {
+    $: if ($pageInView && pageEndInView && margin < maxMargin) {
         margin += minItemsHeight;
     }
 </script>

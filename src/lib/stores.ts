@@ -12,6 +12,7 @@ export const popup = writable<typeof SvelteComponent | null | undefined>(null);
 export const settingsStore = writable<SettingsConfig>(Settings.fillWithDefaults({}));
 export const currentlyUploadingAssets = writable<number>(0);
 export const currentlyUploadingEntries = writable<number>(0);
+export const pageInView = writable<boolean>(true);
 
 // local storage
 export const doesNotWantToEnableLocation = persisted<boolean>(

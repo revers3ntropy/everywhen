@@ -19,7 +19,7 @@ export async function getSummariesNYearsAgo(
         ORDER BY created
         LIMIT 1
     `;
-    if (earliestEntry.length === 0) return Result.ok({});
+    if (earliestEntry.length !== 1) return Result.ok({});
     const earliestEntryYear = parseInt(
         fmtUtc(earliestEntry[0].created, earliestEntry[0].createdTzOffset, 'YYYY')
     );
@@ -87,9 +87,11 @@ export async function getSummariesNYearsAgo(
     return Result.ok(
         dates.reduce(
             (prev, date) => {
-                prev[date] = summariesRes.val.filter(
+                const atDate = summariesRes.val.filter(
                     s => fmtUtc(s.created, s.createdTzOffset, 'YYYY-MM-DD') === date
                 );
+                if (atDate.length === 0) return prev;
+                prev[date] = atDate;
                 return prev;
             },
             {} as Record<string, EntrySummary[]>

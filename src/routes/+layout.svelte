@@ -7,7 +7,7 @@
     import '../app.scss';
     import Notifications from '$lib/components/notifications/Notifications.svelte';
     import { POLL_FOR_UPDATE_INTERVAL } from '$lib/constants';
-    import { populateCookieWritablesWithCookies, popup, theme } from '$lib/stores';
+    import { pageInView, populateCookieWritablesWithCookies, popup, theme } from '$lib/stores';
     import { notify } from '$lib/components/notifications/notifications';
     import { api } from '$lib/utils/apiRequest';
     import Footer from '$lib/components/Footer.svelte';
@@ -36,11 +36,16 @@
     }
 
     onMount(() => {
+        pageInView.set(document.visibilityState === 'visible');
+
         setInterval(() => {
             void checkForUpdate();
         }, POLL_FOR_UPDATE_INTERVAL);
 
-        document.onvisibilitychange = () => void checkForUpdate();
+        document.addEventListener('visibilitychange', () => {
+            pageInView.set(document.visibilityState === 'visible');
+            void checkForUpdate();
+        });
     });
 
     let isNewVersionAvailable = false;
