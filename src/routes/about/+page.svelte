@@ -57,8 +57,8 @@
     </p>
     <p>
         Please disclose any security vulnerabilities to me at
-        <a href="mailto:joseph@halcyon.land"> joseph@halcyon.land </a>
-        , rather than publicly on the GitHub issues.
+        <a href="mailto:josephcoppin@gmail.com"> josephcoppin@gmail.com</a>, rather than publicly on
+        the GitHub issues.
     </p>
 
     <h2> Entries </h2>

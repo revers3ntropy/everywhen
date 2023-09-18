@@ -39,7 +39,12 @@ namespace EntryServer {
                 labelId = ${null},
                 pinned = ${null}
             WHERE entries.id = ${id}
-              AND userId = ${auth.id}
+              AND userId = ${auth.id};
+
+            UPDATE wordsInEntries
+            SET entryIsDeleted = ${restore ? 0 : 1}
+            WHERE entryId = ${id}
+                AND userId = ${auth.id}
         `;
 
         return Result.ok(null);
@@ -47,9 +52,70 @@ namespace EntryServer {
 
     export async function purgeAll(auth: Auth): Promise<void> {
         await query`
-            DELETE FROM entryEdits WHERE userId = ${auth.id};
-            DELETE FROM entries WHERE userId = ${auth.id};
+            DELETE FROM entryEdits     WHERE userId = ${auth.id};
+            DELETE FROM entries        WHERE userId = ${auth.id};
+            DELETE FROM wordsInEntries WHERE userId = ${auth.id};
         `;
+    }
+
+    function splitEntryIntoWordsForIndexing(text: string): string[] {
+        return text
+            .split(/\s+/)
+            .filter(Boolean)
+            .map(word => word.replace(/[^a-zA-Z0-9#@]/g, ''))
+            .map(word => word.toLowerCase());
+    }
+
+    export async function updateWordIndex(
+        auth: Auth,
+        body: string,
+        title: string,
+        entryId: string,
+        entryIsDeleted: boolean,
+        shouldClear: boolean
+    ): Promise<Result<null>> {
+        if (shouldClear) {
+            await query`
+                DELETE FROM wordsInEntries
+                WHERE entryId = ${entryId}
+                AND userId = ${auth.id}
+            `;
+        }
+
+        const titleWords = splitEntryIntoWordsForIndexing(title);
+        const bodyWords = splitEntryIntoWordsForIndexing(body);
+
+        const countMap: Record<string, number> = {};
+
+        for (const word of titleWords) {
+            // searchable, but does not count towards word count
+            countMap[word] = 0;
+        }
+
+        for (const word of bodyWords) {
+            countMap[word] ??= 0;
+            countMap[word] += 1;
+        }
+
+        return (
+            await Result.collectAsync(
+                Object.entries(countMap).map(async ([word, count]) =>
+                    Result.ok(
+                        await query`
+                            INSERT INTO wordsInEntries
+                                (userId, entryId, word, count, entryIsDeleted)
+                            VALUES (
+                                ${auth.id},
+                                ${entryId},
+                                ${word},
+                                ${count},
+                                ${entryIsDeleted}
+                            )
+                        `
+                    )
+                )
+            )
+        ).map(() => null);
     }
 
     export async function create(
@@ -105,6 +171,8 @@ namespace EntryServer {
             )
         `;
 
+        await updateWordIndex(auth, body, title, id, !!deleted, false);
+
         const editsWithIds: (RawEntryEdit & { id: string })[] = [];
 
         for (const edit of edits) {
@@ -146,7 +214,7 @@ namespace EntryServer {
             pinned,
             latitude,
             longitude,
-            label: labelId ? labels.find(l => l.id === labelId) || null : null,
+            label: labels.find(l => l.id === labelId) ?? null,
             agentData,
             wordCount,
             edits: editsWithIds.map(edit => ({
@@ -159,7 +227,7 @@ namespace EntryServer {
                 agentData: edit.agentData,
                 oldTitle: edit.oldTitle,
                 oldBody: edit.oldBody,
-                oldLabel: labelId ? labels.find(l => l.id === labelId) || null : null
+                oldLabel: labels.find(l => l.id === labelId) ?? null
             }))
         });
     }
@@ -227,6 +295,9 @@ namespace EntryServer {
             WHERE id = ${entry.id}
               AND userId = ${auth.id}
         `;
+
+        // assumes you cannot edit a deleted entry
+        await updateWordIndex(auth, editBody, editTitle, entry.id, false, true);
     }
 
     export async function reassignAllLabels(

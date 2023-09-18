@@ -1,3 +1,4 @@
+import { Entry } from '$lib/controllers/entry/entry.server';
 import type { User } from '$lib/controllers/user/user.server';
 import { query } from '$lib/db/mysql.server';
 import { decrypt } from '$lib/utils/encryption';
@@ -50,5 +51,33 @@ const migrators: Record<string, (user: User) => Promise<Result<User>>> = {
         }
 
         return Result.ok({ ...user, versionLastLoggedIn: SemVer.fromString('0.5.88').unwrap() });
+    },
+
+    async '0.6.5'(user: User): Promise<Result<User>> {
+        const entries = await query<
+            { id: string; entry: string; title: string; deleted: number | null }[]
+        >`
+            SELECT id, body, title, deleted
+            FROM entries
+            WHERE userId = ${user.id}
+        `;
+
+        for (const { id, entry, deleted, title } of entries) {
+            const decryptedEntry = decrypt(entry, user.key);
+            if (!decryptedEntry.ok) return decryptedEntry.cast();
+            const decryptedTitle = decrypt(title, user.key);
+            if (!decryptedTitle.ok) return decryptedTitle.cast();
+
+            await Entry.updateWordIndex(
+                user,
+                decryptedEntry.val,
+                decryptedTitle.val,
+                id,
+                Entry.isDeleted({ deleted }),
+                true
+            );
+        }
+
+        return Result.ok({ ...user, versionLastLoggedIn: SemVer.fromString('0.6.5').unwrap() });
     }
 };

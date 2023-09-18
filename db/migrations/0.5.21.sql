@@ -1,3 +1,0 @@
-ALTER TABLE users
-    ADD ghAccessToken VARCHAR(255)
-    DEFAULT NULL;
