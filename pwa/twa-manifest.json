@@ -1,5 +1,5 @@
 {
-  "packageId": "everywhen.twa",
+  "packageId": "me.everywhen.twa",
   "host": "everywhen.me",
   "name": "Everywhen",
   "launcherName": "Everywhen",
@@ -20,8 +20,8 @@
     "path": "/home/joseph/dev/everywhen/twa/android.keystore",
     "alias": "android"
   },
-  "appVersionName": "7",
-  "appVersionCode": 7,
+  "appVersionName": "8",
+  "appVersionCode": 8,
   "shortcuts": [],
   "generatorApp": "bubblewrap-cli",
   "webManifestUrl": "https://everywhen.me/manifest.json",
@@ -47,5 +47,5 @@
   ],
   "additionalTrustedOrigins": [],
   "retainedBundles": [],
-  "appVersion": "7"
+  "appVersion": "8"
 }
