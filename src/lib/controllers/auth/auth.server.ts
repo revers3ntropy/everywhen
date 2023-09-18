@@ -141,7 +141,8 @@ namespace AuthServer {
         // normally very quick, but might be very slow if they haven't logged in for ages...
         // should really do all the time, but as all sessions must be regenerated after
         // a version bump, they must re-login anyway
-        await migrateUser(user);
+        const res = await migrateUser(user);
+        if (!res.ok) return res.cast();
 
         sessions.set(sessionId, session);
 

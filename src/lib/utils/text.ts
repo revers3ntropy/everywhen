@@ -147,3 +147,11 @@ export function recursivelyTrimAndStringify<T>(obj: T, maxStrLen = 10, maxKeys =
     }
     return obj + '';
 }
+
+export function splitEntryIntoWordsForIndexing(text: string): string[] {
+    return text
+        .split(/\s+/)
+        .map(word => word.replace(/[^a-zA-Z0-9#@]/g, ''))
+        .filter(Boolean)
+        .map(word => word.toLowerCase());
+}

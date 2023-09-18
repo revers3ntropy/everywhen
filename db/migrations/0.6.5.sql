@@ -1,9 +1,10 @@
 CREATE TABLE wordsInEntries
 (
-    userId  char(32)     NOT NULL,
-    entryId char(32)     NOT NULL,
-    word    varchar(256) NOT NULL,
-    count   int          NOT NULL,
+    userId         char(32)     NOT NULL,
+    entryId        char(32)     NOT NULL,
+    entryIsDeleted tinyint      NOT NULL,
+    word           varchar(256) NOT NULL,
+    count          int          NOT NULL,
     INDEX `idx_wordsInEntries_userId`  (`userId`),
     INDEX `idx_wordsInEntries_word`    (`userId`, `word`),
     INDEX `idx_wordsInEntries_entryId` (`userId`, `entryId`),

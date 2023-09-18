@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { recursivelyTrimAndStringify, roundToDecimalPlaces, wordCount } from './text';
+import {
+    recursivelyTrimAndStringify,
+    roundToDecimalPlaces,
+    splitEntryIntoWordsForIndexing,
+    wordCount
+} from './text';
 
 describe('wordCount', () => {
     it('Splits words correctly', () => {
@@ -37,5 +42,16 @@ describe('roundToDecimalPlaces', () => {
     it('works', () => {
         expect(roundToDecimalPlaces(1.2345)).toBe(1.2);
         expect(roundToDecimalPlaces(1)).toBe(1.0);
+    });
+});
+
+describe('splitEntryIntoWordsForIndexing', () => {
+    const s = splitEntryIntoWordsForIndexing;
+    it('works', () => {
+        expect(s('hi')).toEqual(['hi']);
+        expect(s('hi there')).toEqual(['hi', 'there']);
+        expect(s("there's this thing")).toEqual(['theres', 'this', 'thing']);
+        expect(s('hi there, how are you?')).toEqual(['hi', 'there', 'how', 'are', 'you']);
+        expect(s('abcd1234       a/c')).toEqual(['abcd1234', 'ac']);
     });
 });

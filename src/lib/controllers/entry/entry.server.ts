@@ -6,7 +6,7 @@ import { query } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import { FileLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
-import { wordCount } from '$lib/utils/text';
+import { splitEntryIntoWordsForIndexing, wordCount } from '$lib/utils/text';
 import { fmtUtc, nowUtc } from '$lib/utils/time';
 import type { Hours, TimestampSecs } from '../../../types';
 import type { Auth } from '../auth/auth.server';
@@ -58,14 +58,6 @@ namespace EntryServer {
         `;
     }
 
-    function splitEntryIntoWordsForIndexing(text: string): string[] {
-        return text
-            .split(/\s+/)
-            .filter(Boolean)
-            .map(word => word.replace(/[^a-zA-Z0-9#@]/g, ''))
-            .map(word => word.toLowerCase());
-    }
-
     export async function updateWordIndex(
         auth: Auth,
         body: string,
@@ -73,7 +65,7 @@ namespace EntryServer {
         entryId: string,
         entryIsDeleted: boolean,
         shouldClear: boolean
-    ): Promise<Result<null>> {
+    ): Promise<void> {
         if (shouldClear) {
             await query`
                 DELETE FROM wordsInEntries
@@ -97,25 +89,23 @@ namespace EntryServer {
             countMap[word] += 1;
         }
 
-        return (
-            await Result.collectAsync(
-                Object.entries(countMap).map(async ([word, count]) =>
-                    Result.ok(
-                        await query`
-                            INSERT INTO wordsInEntries
-                                (userId, entryId, word, count, entryIsDeleted)
-                            VALUES (
-                                ${auth.id},
-                                ${entryId},
-                                ${word},
-                                ${count},
-                                ${entryIsDeleted}
-                            )
-                        `
-                    )
+        await Result.collectAsync(
+            Object.entries(countMap).map(async ([word, count]) =>
+                Result.ok(
+                    await query`
+                        INSERT INTO wordsInEntries
+                            (userId, entryId, word, count, entryIsDeleted)
+                        VALUES (
+                            ${auth.id},
+                            ${entryId},
+                            ${encrypt(word, auth.key)},
+                            ${count},
+                            ${entryIsDeleted}
+                        )
+                    `
                 )
             )
-        ).map(() => null);
+        );
     }
 
     export async function create(
@@ -150,6 +140,8 @@ namespace EntryServer {
 
         const id = await UId.generate();
 
+        await updateWordIndex(auth, body, title, id, !!deleted, false);
+
         await query`
             INSERT INTO entries
                 (id, userId, title, body, created, createdTzOffset, deleted, pinned,
@@ -170,8 +162,6 @@ namespace EntryServer {
                 ${wordCount}
             )
         `;
-
-        await updateWordIndex(auth, body, title, id, !!deleted, false);
 
         const editsWithIds: (RawEntryEdit & { id: string })[] = [];
 

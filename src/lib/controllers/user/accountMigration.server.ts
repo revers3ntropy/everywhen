@@ -21,7 +21,10 @@ export async function migrateUser(user: User): Promise<Result<User>> {
         if (!user.versionLastLoggedIn.isLessThan(version)) continue;
         const migrateRes = await migrators[version.str()](user);
         if (!migrateRes.ok) return migrateRes.cast();
-        user = migrateRes.val;
+        user = {
+            ...migrateRes.val,
+            versionLastLoggedIn: version
+        };
     }
 
     await query`
@@ -35,12 +38,12 @@ export async function migrateUser(user: User): Promise<Result<User>> {
 
 const migrators: Record<string, (user: User) => Promise<Result<User>>> = {
     async '0.5.88'(user: User): Promise<Result<User>> {
-        const entries = await query<{ id: string; entry: string }[]>`
+        const entries = await query<{ id: string; body: string }[]>`
             SELECT id, body FROM entries WHERE userId = ${user.id}
         `;
 
-        for (const { id, entry } of entries) {
-            const decryptedEntry = decrypt(entry, user.key);
+        for (const { id, body } of entries) {
+            const decryptedEntry = decrypt(body, user.key);
             if (!decryptedEntry.ok) return decryptedEntry.cast();
             const entryWordCount = wordCount(decryptedEntry.val);
             await query`
@@ -50,20 +53,20 @@ const migrators: Record<string, (user: User) => Promise<Result<User>>> = {
             `;
         }
 
-        return Result.ok({ ...user, versionLastLoggedIn: SemVer.fromString('0.5.88').unwrap() });
+        return Result.ok(user);
     },
 
-    async '0.6.5'(user: User): Promise<Result<User>> {
+    async '0.6.7'(user: User): Promise<Result<User>> {
         const entries = await query<
-            { id: string; entry: string; title: string; deleted: number | null }[]
+            { id: string; body: string; title: string; deleted: number | null }[]
         >`
             SELECT id, body, title, deleted
             FROM entries
             WHERE userId = ${user.id}
         `;
 
-        for (const { id, entry, deleted, title } of entries) {
-            const decryptedEntry = decrypt(entry, user.key);
+        for (const { id, body, deleted, title } of entries) {
+            const decryptedEntry = decrypt(body, user.key);
             if (!decryptedEntry.ok) return decryptedEntry.cast();
             const decryptedTitle = decrypt(title, user.key);
             if (!decryptedTitle.ok) return decryptedTitle.cast();
@@ -78,6 +81,6 @@ const migrators: Record<string, (user: User) => Promise<Result<User>>> = {
             );
         }
 
-        return Result.ok({ ...user, versionLastLoggedIn: SemVer.fromString('0.6.5').unwrap() });
+        return Result.ok(user);
     }
 };
