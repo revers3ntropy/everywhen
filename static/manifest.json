@@ -1,7 +1,7 @@
 {
-    "short_name": "Halcyon.Land",
-    "name": "Halcyon.Land",
-    "start_url": "/home",
+    "short_name": "Everywhen",
+    "name": "Everywhen",
+    "start_url": "/journal",
     "scope": "/",
     "theme_color": "#E6E6E6",
     "background_color": "#E6E6E6",
