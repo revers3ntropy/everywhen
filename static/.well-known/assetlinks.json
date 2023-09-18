@@ -2,7 +2,7 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
         "namespace": "android_app",
-        "package_name": "land.halcyon.twa",
+        "package_name": "everywhen.twa",
         "sha256_cert_fingerprints": ["24:52:DC:B7:3D:6F:7F:32:71:C7:74:6B:63:F1:87:6B:11:AB:94:AC:32:86:6D:09:F0:C0:91:DE:A0:1F:F8:81"]
     }
 }]

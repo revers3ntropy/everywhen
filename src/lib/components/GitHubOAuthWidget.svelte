@@ -17,7 +17,7 @@
             'https://github.com/login/oauth/authorize' +
             serializeGETArgs({
                 client_id: PUBLIC_GITHUB_AUTH_CLIENT_ID,
-                redirect_uri: 'https://halcyon.land/api/oauth/gh',
+                redirect_uri: 'https://everywhen.me/api/oauth/gh',
                 state,
                 scope: 'read:user repo'
             })

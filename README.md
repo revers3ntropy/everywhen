@@ -1,8 +1,8 @@
-# Halcyon.Land
+# Everywhen
 Journaling and life-logging web app.
 
 ## Website
-https://halcyon.land
+https://everywhen.me
 
 ## Installation
 

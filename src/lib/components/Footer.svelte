@@ -44,7 +44,7 @@
             <div>
                 <a
                     aria-label="Report Bugs and Request Features"
-                    href="https://github.com/revers3ntropy/halcyon.land/issues"
+                    href="https://github.com/revers3ntropy/everywhen/issues"
                     rel="noreferrer"
                     target="_blank"
                     class="with-icon icon-gradient-on-hover"
@@ -59,7 +59,7 @@
                 <a
                     aria-label="Github"
                     class="with-icon"
-                    href="https://github.com/revers3ntropy/halcyon.land"
+                    href="https://github.com/revers3ntropy/everywhen"
                     rel="noreferrer"
                     target="_blank"
                 >

@@ -1,8 +1,8 @@
 {
-  "packageId": "land.halcyon.twa",
-  "host": "halcyon.land",
-  "name": "Halcyon.Land",
-  "launcherName": "Halcyon.Land",
+  "packageId": "everywhen.twa",
+  "host": "everywhen.me",
+  "name": "Everywhen",
+  "launcherName": "Everywhen",
   "display": "standalone",
   "themeColor": "#E6E6E6",
   "navigationColor": "#E6E6E6",
@@ -12,19 +12,19 @@
   "backgroundColor": "#E6E6E6",
   "enableNotifications": true,
   "startUrl": "/home",
-  "iconUrl": "https://halcyon.land/logosquare_small.png",
-  "maskableIconUrl": "https://halcyon.land/logosquare_small.png",
-  "monochromeIconUrl": "https://halcyon.land/logosquare_small.png",
+  "iconUrl": "https://everywhen.me/logosquare_small.png",
+  "maskableIconUrl": "https://everywhen.me/logosquare_small.png",
+  "monochromeIconUrl": "https://everywhen.me/logosquare_small.png",
   "splashScreenFadeOutDuration": 250,
   "signingKey": {
-    "path": "/home/joseph/dev/misc_3/twa/android.keystore",
+    "path": "/home/joseph/dev/everywhen/twa/android.keystore",
     "alias": "android"
   },
   "appVersionName": "7",
   "appVersionCode": 7,
   "shortcuts": [],
   "generatorApp": "bubblewrap-cli",
-  "webManifestUrl": "https://halcyon.land/manifest.json",
+  "webManifestUrl": "https://everywhen.me/manifest.json",
   "fallbackType": "customtabs",
   "features": {
     "locationDelegation": {
@@ -37,7 +37,7 @@
   "enableSiteSettingsShortcut": true,
   "isChromeOSOnly": false,
   "isMetaQuest": false,
-  "fullScopeUrl": "https://halcyon.land/",
+  "fullScopeUrl": "https://everywhen.me/",
   "minSdkVersion": 19,
   "orientation": "portrait",
   "fingerprints": [

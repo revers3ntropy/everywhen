@@ -56,7 +56,7 @@
         </p>
         <h3> Website </h3>
         <p>
-            the website that you are currently using, https://halcyon.land , and any sub-domains of
+            the website that you are currently using, https://everywhen.me, and any sub-domains of
             this site unless expressly excluded by their own terms and conditions.
         </p>
         <p> In this privacy policy, unless the context requires a different interpretation: </p>
@@ -276,7 +276,7 @@
         </p>
         <p>
             We give you control over which Cookies we use. You can adjust your cookies preferences
-            at any time at: https://halcyon.land/settings.
+            at any time at: https://everywhen.me/settings.
         </p>
         <p>
             You can also choose to enable or disable Cookies in your internet browser. By default,

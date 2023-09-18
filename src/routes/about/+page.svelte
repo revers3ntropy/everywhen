@@ -16,7 +16,7 @@
         Everywhen is an
         <a
             aria-label="Source code"
-            href="http://github.com/revers3ntropy/halcyon.land"
+            href="http://github.com/revers3ntropy/everywhen"
             rel="noreferrer"
             target="_blank"
         >
@@ -31,7 +31,7 @@
         welcome on the
         <a
             aria-label="Report issues and feature requests"
-            href="http://github.com/revers3ntropy/halcyon.land/issues"
+            href="http://github.com/revers3ntropy/everywhen/issues"
             rel="noreferrer"
             target="_blank"
         >
