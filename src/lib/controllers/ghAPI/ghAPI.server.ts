@@ -98,7 +98,7 @@ export namespace ghAPI {
         const accessToken = await getGitHubOAuthAccessToken(code, state);
         if (!accessToken.ok) return accessToken.cast();
 
-        const saveRes = await Settings.update(auth, 'gitHubAccessToken', accessToken);
+        const saveRes = await Settings.update(auth, 'gitHubAccessToken', accessToken.val);
         if (!saveRes.ok) return saveRes.cast();
 
         return Result.ok(accessToken.val);
