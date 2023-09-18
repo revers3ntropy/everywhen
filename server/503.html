@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Halcyon.Land</title>
+    <title>Everywhen</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <style>
         * {
             font-family: Roboto, Oxygen, Ubuntu, 'Segoe UI', Arial, -apple-system,
-            BlinkMacSystemFont, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+                BlinkMacSystemFont, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             margin: 0;
             padding: 0;
         }
@@ -57,22 +57,21 @@
         async function seeIfOnline() {
             const res = await fetch('/api/version');
             if (res.ok) {
-                console.log('Server is back online');
-                window.location.reload();
+                location.reload();
             }
 
-            setTimeout(seeIfOnline, 500);
+            setTimeout(seeIfOnline, 1000);
         }
         void seeIfOnline();
     </script>
 </head>
 <body>
     <main>
-        <h1> Halcyon.Land </h1>
+        <h1> Everywhen </h1>
         <p>
             Looks like the server is down for maintenance...
         </p>
-        <button onclick="window.location.reload()">
+        <button onclick="location.reload()">
             Try Again
         </button>
     </main>

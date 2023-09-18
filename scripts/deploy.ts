@@ -445,9 +445,9 @@ async function build() {
 async function backupDatabase(localVersion: Version): Promise<void> {
     console.log(c.yellow(`Backing up database...`));
     // not under remoteDir because it gets deleted on every deploy
-    const backupFile = `~/hl-${env}-${localVersion.str()}-${utcSeconds()}.sql`;
+    const backupFile = `~/ew-${env}-${localVersion.str()}-${utcSeconds()}.sql`;
     await runRemoteCommand(
-        `mysqldump -u ${remoteEnv.DB_USER} -p"${remoteEnv.DB_PASS}" ${remoteEnv.DB} > ${backupFile}`,
+        `mysqldump --no-tablespaces -u ${remoteEnv.DB_USER} -p"${remoteEnv.DB_PASS}" ${remoteEnv.DB} > ${backupFile}`,
         { hideLogs: true }
     );
     console.log(c.green(`Database backed up to '${backupFile}'`));
