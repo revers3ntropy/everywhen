@@ -3,7 +3,6 @@
     import FormatListBulleted from 'svelte-material-icons/FormatListBulleted.svelte';
     import TextBoxEditOutline from 'svelte-material-icons/TextBoxEditOutline.svelte';
     import Tick from 'svelte-material-icons/Check.svelte';
-    import Send from 'svelte-material-icons/Send.svelte';
     import { browser } from '$app/environment';
     import { onMount } from 'svelte';
     import { beforeNavigate, goto } from '$app/navigation';

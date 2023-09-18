@@ -216,7 +216,7 @@
     }
 
     .list-container {
-        max-height: 80vh;
+        max-height: 30vh;
         overflow-y: auto;
         width: 200px;
         padding: 0.5em 0;

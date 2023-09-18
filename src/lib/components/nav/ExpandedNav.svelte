@@ -10,7 +10,6 @@
     import LabelMultipleOutline from 'svelte-material-icons/LabelMultipleOutline.svelte';
     import ImageMultipleOutline from 'svelte-material-icons/ImageMultipleOutline.svelte';
     import CalendarMultiple from 'svelte-material-icons/CalendarMultiple.svelte';
-    import ChartMultiple from 'svelte-material-icons/ChartMultiple.svelte';
     import { ANIMATION_DURATION } from '$lib/constants';
     import { navExpanded } from '$lib/stores';
     import { slide } from 'svelte/transition';
@@ -90,6 +89,7 @@
                 <Counter size="30" />
                 <span> Insights </span>
             </a>
+            <!--
             <a
                 href="/datasets"
                 class="nav-link"
@@ -99,6 +99,7 @@
                 <ChartMultiple size="30" />
                 <span> Datasets </span>
             </a>
+            -->
             <a
                 href="/labels"
                 class="nav-link"

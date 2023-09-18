@@ -124,5 +124,6 @@
         padding: 0;
         background: var(--light-accent);
         width: var(--width);
+        box-shadow: $shadow;
     }
 </style>
