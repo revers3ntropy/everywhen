@@ -11,7 +11,7 @@
   "navigationDividerColorDark": "#E6E6E6",
   "backgroundColor": "#E6E6E6",
   "enableNotifications": true,
-  "startUrl": "/home",
+  "startUrl": "/journal",
   "iconUrl": "https://everywhen.me/logosquare_small.png",
   "maskableIconUrl": "https://everywhen.me/logosquare_small.png",
   "monochromeIconUrl": "https://everywhen.me/logosquare_small.png",
