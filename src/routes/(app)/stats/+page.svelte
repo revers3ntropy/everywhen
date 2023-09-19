@@ -1,9 +1,11 @@
 <script lang="ts">
     import { navExpanded } from '$lib/stores';
+    import ToggleSwitch from 'svelte-material-icons/ToggleSwitch.svelte';
+    import ToggleSwitchOff from 'svelte-material-icons/ToggleSwitchOff.svelte';
     import type { PageData } from './$types';
     import { fade } from 'svelte/transition';
     import { ANIMATION_DURATION } from '$lib/constants';
-    import { By } from './helpers';
+    import { By, heatMapDataFromEntries } from './helpers';
     import CommonWordsList from './CommonWordsList.svelte';
     import EntryBarChart from './EntryChart.svelte';
     import EntryHeatMap from './EntryHeatMap.svelte';
@@ -11,9 +13,12 @@
     import StatPill from './StatPill.svelte';
 
     export let data: PageData;
-    let { entries, entryCount, days, charCount, wordCount, commonWords } = data;
 
     let by: By = By.Entries;
+
+    function toggleBy() {
+        by = by === By.Entries ? By.Words : By.Entries;
+    }
 </script>
 
 <svelte:head>
@@ -21,7 +26,7 @@
 </svelte:head>
 
 <main class="md:p-4 {$navExpanded ? 'md:ml-48' : 'md:ml-16'}">
-    {#if entries.length === 0}
+    {#if data.entryCount < 1}
         <section>
             <h1> No Entries </h1>
             <div class="flex-center" style="padding-top: 1rem">
@@ -33,7 +38,20 @@
         </section>
     {:else}
         <div class="flex justify-between p-2">
-            <div />
+            <div>
+                <button
+                    class="flex-center gap-1 bg-vLightAccent rounded-full px-2"
+                    on:click={toggleBy}
+                >
+                    <span class:text-light={by !== By.Words}> By Words </span>
+                    {#if by === By.Entries}
+                        <ToggleSwitch size="30" />
+                    {:else}
+                        <ToggleSwitchOff size="30" />
+                    {/if}
+                    <span class:text-light={by !== By.Entries}> By Entries </span>
+                </button>
+            </div>
             <div class="search-for-word">
                 <SearchForWord />
             </div>
@@ -41,41 +59,34 @@
 
         <section>
             <div class="stats">
-                <StatPill primary value={entryCount} label="entries" />
-                <StatPill primary value={days} label="days" />
+                <StatPill primary value={data.entryCount} label="entries" />
+                <StatPill primary value={data.days} label="days" />
                 <StatPill
                     primary
-                    value={wordCount}
+                    value={data.wordCount}
                     label="words"
                     tooltip="A typical novel is 100,000 words"
                 />
                 <StatPill
-                    value={(wordCount / days).toFixed(1)}
+                    value={(data.wordCount / data.days).toFixed(1)}
                     label="words / day"
                     tooltip="People typically speak about {(7000).toLocaleString()} words per day"
                 />
-                <StatPill value={charCount} label="characters" />
                 <StatPill
-                    value={(wordCount / (entryCount || 1)).toFixed(1)}
+                    value={(data.wordCount / (data.entryCount || 1)).toFixed(1)}
                     label="words / entry"
                 />
                 <StatPill
-                    value={(charCount / (wordCount || 1)).toFixed(1)}
-                    label="letters / word"
-                    tooltip="The average English word is 4.7 letters long"
-                />
-                <StatPill
-                    value={(entryCount / Math.max(days / 7, 1)).toFixed(1)}
+                    value={(data.entryCount / Math.max(data.days / 7, 1)).toFixed(1)}
                     label="entries / week"
                     tooltip="7 would be one per day"
                 />
             </div>
         </section>
-
         <div class="container my-4" style="padding: 1rem;">
-            <EntryHeatMap {by} {entries} />
+            <EntryHeatMap {by} data={heatMapDataFromEntries(data.summaries)} />
         </div>
-        {#if entryCount > 4}
+        {#if data.entryCount > 4}
             <div
                 class="container my-4"
                 style="padding: 1rem;"
@@ -85,13 +96,13 @@
                     delay: ANIMATION_DURATION
                 }}
             >
-                <EntryBarChart {by} {entries} {days} />
+                <EntryBarChart {by} entries={data.summaries} days={data.days} />
             </div>
         {/if}
 
-        <section class="container my-4" style="padding: 1rem 1rem 3rem 1rem;">
-            <h3 style="padding: 0 0 2rem 0"> Common Words </h3>
-            <CommonWordsList {entryCount} words={commonWords} />
+        <section class="bg-vLightAccent rounded-lg my-4 p-4 pb-12">
+            <h3 class="pb-8"> Common Words </h3>
+            <CommonWordsList entryCount={data.entryCount} words={data.commonWords} />
         </section>
     {/if}
 </main>

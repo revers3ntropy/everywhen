@@ -5,7 +5,6 @@ import { fmtTimePrecise } from '$lib/utils/text';
 import { nowUtc } from '$lib/utils/time';
 import type { Cookies, Handle, RequestEvent } from '@sveltejs/kit';
 import chalk from 'chalk';
-import { connect, dbConnection, logger } from '$lib/db/mysql.server';
 import { cleanupCache } from '$lib/utils/cache.server';
 import { FileLogger } from '$lib/utils/log.server';
 import { Auth } from '$lib/controllers/auth/auth.server';
@@ -13,20 +12,6 @@ import type { Milliseconds, Mutable, TimestampSecs } from './types';
 
 const reqLogger = new FileLogger('REQ', chalk.bgWhite.black);
 const processLogger = new FileLogger('PROC', chalk.black.bgRedBright);
-
-// keep connection to database alive
-// so it's not re-connected on API request
-setInterval(() => {
-    try {
-        if (!dbConnection) {
-            void connect();
-            return;
-        }
-        void dbConnection?.ping();
-    } catch (error) {
-        void logger.error('Failed to ping db', { error, dbConnection });
-    }
-}, 1000 * 60);
 
 setInterval(() => {
     try {

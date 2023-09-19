@@ -1,6 +1,10 @@
 import DomPurify from 'dompurify';
 import { marked } from 'marked';
 
+export function normaliseWordForIndex(word: string): string {
+    return word.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+}
+
 function intlSegmenterSupported() {
     return typeof Intl !== 'undefined' && typeof Intl.Segmenter !== 'undefined';
 }
@@ -17,14 +21,18 @@ function wordsFromTextWithIntl(text: string): string[] {
             return null;
         }
         return segment.segment;
-    }).filter(Boolean);
+    })
+        .filter(Boolean)
+        .map(word => word.toLowerCase().replace(/[^a-z0-9 ]/g, ''));
 }
 
-/**
- * @src https://stackoverflow.com/questions/18473326/javascript-break-sentence-by-words
- */
 function wordsFromTextWithoutIntl(text: string): string[] {
-    return (text.match(/\b(\w+)'?(\w+)?\b/g) || []).filter(Boolean);
+    return text
+        .replace(/\s+/g, ' ')
+        .replace(/[^a-zA-Z0-9 ]/g, '')
+        .split(' ')
+        .filter(Boolean)
+        .map(word => word.toLowerCase());
 }
 
 export const wordsFromText = intlSegmenterSupported()
@@ -105,7 +113,15 @@ export function collapseWhitespace(str: string): string {
     return str.replace(/\n/g, ' ').replace(/\s+/g, ' ').replace(`'`, `\\'`).trim();
 }
 
-export function recursivelyTrimAndStringify<T>(obj: T, maxStrLen = 10, maxKeys = 3): string {
+export function recursivelyTrimAndStringify<T>(
+    obj: T,
+    maxStrLen = 10,
+    maxKeys = 3,
+    depth = 0
+): string {
+    if (depth > 10) {
+        return '...';
+    }
     if (typeof obj === 'string') {
         if (obj.length > maxStrLen) {
             return `'${collapseWhitespace(obj.slice(0, maxStrLen))}'..${obj.length - maxStrLen}`;
@@ -118,20 +134,22 @@ export function recursivelyTrimAndStringify<T>(obj: T, maxStrLen = 10, maxKeys =
                     '[' +
                     obj
                         .slice(0, maxKeys)
-                        .map(o => recursivelyTrimAndStringify(o, maxStrLen, maxKeys))
+                        .map(o => recursivelyTrimAndStringify(o, maxStrLen, maxKeys, depth + 1))
                         .join(', ') +
                     `, ..${obj.length - maxKeys}]`
                 );
             }
             return (
                 '[' +
-                obj.map(o => recursivelyTrimAndStringify(o, maxStrLen, maxKeys)).join(', ') +
+                obj
+                    .map(o => recursivelyTrimAndStringify(o, maxStrLen, maxKeys, depth + 1))
+                    .join(', ') +
                 ']'
             );
         }
         const objectEntries = Object.entries(obj).map(([k, v]) => [
             k,
-            recursivelyTrimAndStringify(v, maxStrLen, maxKeys)
+            recursivelyTrimAndStringify(v, maxStrLen, maxKeys, depth + 1)
         ]);
         if (objectEntries.length > maxKeys) {
             return (
@@ -146,12 +164,4 @@ export function recursivelyTrimAndStringify<T>(obj: T, maxStrLen = 10, maxKeys =
         return '{' + objectEntries.map(([k, v]) => ` ${k}: ${v}`).join(', ') + ' }';
     }
     return obj + '';
-}
-
-export function splitEntryIntoWordsForIndexing(text: string): string[] {
-    return text
-        .split(/\s+/)
-        .map(word => word.replace(/[^a-zA-Z0-9#@]/g, ''))
-        .filter(Boolean)
-        .map(word => word.toLowerCase());
 }

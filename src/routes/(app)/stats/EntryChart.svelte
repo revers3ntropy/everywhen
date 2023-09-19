@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { browser } from '$app/environment';
     import {
         Chart,
         Title,
@@ -11,13 +12,11 @@
         LineElement
     } from 'chart.js';
     import { Line, Bar } from 'svelte-chartjs';
-    import ToggleSwitch from 'svelte-material-icons/ToggleSwitch.svelte';
-    import ToggleSwitchOff from 'svelte-material-icons/ToggleSwitchOff.svelte';
     import Select from '$lib/components/Select.svelte';
     import { getGraphData, type ChartData } from './bucketiseEntriesForBarChart';
-    import { Bucket, bucketNames, By, initialBucket, initialBucketName } from './helpers';
+    import type { EntryStats, By } from './helpers';
+    import { Bucket, bucketNames, initialBucket, initialBucketName } from './helpers';
     import { cssVarValue } from '$lib/utils/getCssVar';
-    import type { EntrySummary } from '$lib/controllers/entry/entry';
     import { Entry } from '$lib/controllers/entry/entry';
 
     Chart.register(
@@ -31,7 +30,7 @@
         LineElement
     );
 
-    export let entries: EntrySummary[];
+    export let entries: EntryStats[];
     export let by: By;
     export let days = 0;
 
@@ -41,15 +40,11 @@
     let smallGraph1Data: ChartData;
     let smallGraph2Data: ChartData;
 
-    function toggleBy() {
-        by = by === By.Entries ? By.Words : By.Entries;
-    }
-
     // no data fetching so top level
-    $: if (entries || by || selectedBucket) {
+    $: if (browser && (entries || by || selectedBucket)) {
         mainGraphData = getGraphData(entries, selectedBucket, by);
     }
-    $: if (entries || by) {
+    $: if (browser && (entries || by)) {
         smallGraph1Data = getGraphData(entries, Bucket.Hour, by);
         smallGraph2Data = getGraphData(entries, Bucket.OperatingSystem, by, {
             borderColor: 'transparent',
@@ -82,17 +77,6 @@
     delete optionsForMainChart['Hour'];
 </script>
 
-<div>
-    <button class="toggle-by-button" on:click={toggleBy}>
-        By Words
-        {#if by === By.Entries}
-            <ToggleSwitch size="30" />
-        {:else}
-            <ToggleSwitchOff size="30" />
-        {/if}
-        By Entries
-    </button>
-</div>
 {#if shouldShowMainGraph}
     <div style="height: 350px">
         <Line data={mainGraphData} options={options()} />
@@ -123,16 +107,6 @@
 </div>
 
 <style lang="scss">
-    .toggle-by-button {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-
-        :global(svg) {
-            margin: 0 0.2rem;
-        }
-    }
-
     .smaller-charts {
         display: grid;
         grid-template-columns: 1fr 1fr;

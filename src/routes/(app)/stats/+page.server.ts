@@ -1,45 +1,100 @@
-import type { EntrySummary } from '$lib/controllers/entry/entry';
-import { error } from '@sveltejs/kit';
-import { Entry } from '$lib/controllers/entry/entry.server';
+import { query } from '$lib/db/mysql.server';
 import { cachedPageRoute } from '$lib/utils/cache.server';
-import { daysSince, nowUtc } from '$lib/utils/time';
+import { decrypt } from '$lib/utils/encryption';
+import { daysSince } from '$lib/utils/time';
+import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
-import { commonWordsFromText } from './helpers';
 
 export const load = cachedPageRoute(async auth => {
-    const entries = (await Entry.all(auth, { deleted: false })).unwrap(e => error(400, e));
+    const earliestCreatedQuery = await query<{ created: number }[]>`
+        SELECT created
+        FROM entries
+        WHERE userId = ${auth.id}
+        AND deleted IS NULL
+        ORDER BY created ASC
+        LIMIT 1
+    `;
 
-    let earliestEntryTimeStamp = nowUtc();
-
-    const entriesWithWordCount: EntrySummary[] = [];
-    let wordCount = 0;
-    let charCount = 0;
-    let commonWords: Record<string, number> = {};
-    for (const entry of entries) {
-        if (entry.created < earliestEntryTimeStamp) {
-            earliestEntryTimeStamp = entry.created;
-        }
-
-        wordCount += entry.wordCount;
-        charCount += entry.body.length + entry.title.length;
-
-        commonWords = commonWordsFromText(entry.body, commonWords);
-
-        commonWords = commonWordsFromText(entry.title, commonWords);
-
-        entriesWithWordCount.push(Entry.summaryFromEntry(entry));
+    if (!earliestCreatedQuery.length) {
+        return {
+            summaries: [],
+            entryCount: 0,
+            commonWords: [],
+            days: 0,
+            wordCount: 0
+        };
     }
 
-    const commonWordsArray = Object.entries(commonWords)
-        .sort(([, a], [, b]) => b - a)
-        .slice(0, 100);
+    const earliestEntryTimeStamp = earliestCreatedQuery[0].created;
+
+    const wordCountQuery = query<{ wordCount: number; entryCount: number }[]>`
+        SELECT SUM(wordCount) as wordCount, COUNT(*) as entryCount
+        FROM entries
+        WHERE userId = ${auth.id}
+        AND deleted IS NULL
+    `.then(([res]) => res);
+
+    const wordFrequenciesQuery = query<{ word: string; count: number }[]>`
+        SELECT word, count
+        FROM wordsInEntries
+        WHERE userId = ${auth.id}
+        AND count > 0
+        AND entryIsDeleted = 0
+    `
+        .then(words =>
+            words.reduce(
+                (map, { word, count }) => {
+                    map[word] ??= 0;
+                    map[word] += count;
+                    return map;
+                },
+                {} as Record<string, number>
+            )
+        )
+        .then(wordsMap =>
+            Object.entries(wordsMap)
+                .sort(([, a], [, b]) => b - a)
+                .slice(0, 100)
+        );
+
+    const summariesQuery = query<
+        {
+            created: number;
+            createdTzOffset: number;
+            wordCount: number;
+            agentData: string;
+        }[]
+    >`
+        SELECT
+            created,
+            createdTzOffset,
+            wordCount,
+            agentData
+        FROM entries
+        WHERE userId = ${auth.id}
+          AND deleted IS NULL
+        ORDER BY created DESC, id
+    `.then(summaries => {
+        return summaries.map(e => ({
+            ...e,
+            agentData: decrypt(e.agentData, auth.key).unwrap(e => error(400, e))
+        }));
+    });
+
+    const [{ wordCount, entryCount }, commonWordsArray, summaries] = await Promise.all([
+        wordCountQuery,
+        wordFrequenciesQuery,
+        summariesQuery
+    ]);
+
+    // should be time zone agnostic?
+    const days = daysSince(earliestEntryTimeStamp, 0);
 
     return {
-        entries: entriesWithWordCount,
-        entryCount: entries.length,
+        summaries,
+        entryCount,
         commonWords: commonWordsArray,
-        days: daysSince(earliestEntryTimeStamp, 0),
-        wordCount,
-        charCount
+        days,
+        wordCount
     };
 }) satisfies PageServerLoad;

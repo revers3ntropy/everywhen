@@ -1,20 +1,29 @@
 <script lang="ts">
+    import { browser } from '$app/environment';
+    import { Auth } from '$lib/controllers/auth/auth';
     import ArrowLeft from 'svelte-material-icons/ArrowLeft.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
     import Entries from '$lib/components/entry/Entries.svelte';
+    import ToggleSwitch from 'svelte-material-icons/ToggleSwitch.svelte';
+    import ToggleSwitchOff from 'svelte-material-icons/ToggleSwitchOff.svelte';
     import { By } from '../helpers';
     import SearchForWord from '../SearchForWord.svelte';
     import StatPill from '../StatPill.svelte';
     import EntryBarChart from '../EntryChart.svelte';
     import EntryHeatMap from '../EntryHeatMap.svelte';
     import type { PageData } from './$types';
-    import { encrypt } from '$lib/utils/encryption';
     import { encryptionKey, navExpanded } from '$lib/stores';
 
-    let by: By = By.Words;
-
     export let data: PageData;
-    const { locations, theWord, wordInstances, totalEntries, entries } = data;
+
+    function toggleBy() {
+        by = by === By.Entries ? By.Words : By.Entries;
+    }
+
+    let by: By = By.Entries;
+
+    let theWordDecrypted = '...';
+    $: theWordDecrypted = browser ? Auth.decryptOrLogOut(data.theWord, $encryptionKey) : '...';
 </script>
 
 <svelte:head>
@@ -23,27 +32,35 @@
 
 <main class="md:p-4 {$navExpanded ? 'md:ml-48' : 'md:ml-16'}">
     <div class="title-line">
-        <div>
-            <a class="with-icon" href="/stats">
-                <ArrowLeft size="40" />
-                Insights
+        <div class="flex align-center gap-2">
+            <a href="/stats">
+                <ArrowLeft size="25" />
             </a>
+            <button class="flex-center gap-1 bg-vLightAccent rounded-full px-2" on:click={toggleBy}>
+                <span class:text-light={by !== By.Words}> By Words </span>
+                {#if by === By.Entries}
+                    <ToggleSwitch size="30" />
+                {:else}
+                    <ToggleSwitchOff size="30" />
+                {/if}
+                <span class:text-light={by !== By.Entries}> By Entries </span>
+            </button>
         </div>
-        <div>
+        <div class="pb-4">
             <h1>
                 <span class="stats-icon">
                     <Counter size="40" />
                 </span>
                 <span class="the-word-with-quotes">
-                    '{theWord}'
+                    '{theWordDecrypted}'
                 </span>
             </h1>
         </div>
         <div class="search-for-word">
-            <SearchForWord value={theWord} />
+            <SearchForWord value={theWordDecrypted} />
         </div>
     </div>
-    {#if wordInstances === 0}
+    {#if data.wordInstances === 0}
         <section>
             <div class="flex-center">
                 <p>
@@ -55,31 +72,36 @@
     {:else}
         <section>
             <div class="stats">
-                <StatPill primary beforeLabel="appears" value={wordInstances} label="times" />
+                <StatPill primary beforeLabel="appears" value={data.wordInstances} label="times" />
                 <StatPill
                     beforeLabel="in"
-                    value={entries.length}
-                    label="({((entries.length / totalEntries) * 100).toFixed(1)}%) entries"
+                    value={data.entries.length}
+                    label="({((data.entries.length / data.totalEntries) * 100).toFixed(
+                        1
+                    )}%) entries"
                 />
-                <StatPill value={(wordInstances / totalEntries).toFixed(1)} label="times / entry" />
+                <StatPill
+                    value={(data.wordInstances / data.totalEntries).toFixed(1)}
+                    label="times / entry"
+                />
             </div>
         </section>
 
         <section class="charts">
             <div class="container" style="margin: 0; padding: 1rem;">
-                <EntryHeatMap {by} {entries} />
+                <EntryHeatMap {by} data={data.heatMapData} />
             </div>
             <div class="container" style="margin: 1rem 0; padding: 1rem;">
-                <EntryBarChart {by} {entries} />
+                <EntryBarChart {by} entries={data.entries} />
             </div>
         </section>
 
         <section class="entries">
             <Entries
                 options={{
-                    search: encrypt(theWord, $encryptionKey, true)
+                    search: data.theWord
                 }}
-                {locations}
+                locations={data.locations}
             />
         </section>
     {/if}

@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
     recursivelyTrimAndStringify,
     roundToDecimalPlaces,
-    splitEntryIntoWordsForIndexing,
+    wordsFromText,
     wordCount
 } from './text';
 
@@ -46,12 +46,25 @@ describe('roundToDecimalPlaces', () => {
 });
 
 describe('splitEntryIntoWordsForIndexing', () => {
-    const s = splitEntryIntoWordsForIndexing;
+    const s = wordsFromText;
     it('works', () => {
         expect(s('hi')).toEqual(['hi']);
+        expect(s('#hi')).toEqual(['hi']);
         expect(s('hi there')).toEqual(['hi', 'there']);
         expect(s("there's this thing")).toEqual(['theres', 'this', 'thing']);
         expect(s('hi there, how are you?')).toEqual(['hi', 'there', 'how', 'are', 'you']);
-        expect(s('abcd1234       a/c')).toEqual(['abcd1234', 'ac']);
+        expect(s('abcd1234       a/c')).toEqual(['abcd1234', 'a', 'c']);
+        expect(s('thisisalloneword? but-what.about!this$set#of~very>nice,words\neh')).toEqual([
+            'thisisalloneword',
+            'but',
+            'whatabout',
+            'this',
+            'set',
+            'of',
+            'very',
+            'nice',
+            'words',
+            'eh'
+        ]);
     });
 });

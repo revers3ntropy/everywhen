@@ -56,7 +56,7 @@ const migrators: Record<string, (user: User) => Promise<Result<User>>> = {
         return Result.ok(user);
     },
 
-    async '0.6.7'(user: User): Promise<Result<User>> {
+    async '0.6.8'(user: User): Promise<Result<User>> {
         const entries = await query<
             { id: string; body: string; title: string; deleted: number | null }[]
         >`

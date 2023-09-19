@@ -96,7 +96,6 @@ export interface EntrySummary {
     agentData: string;
     wordCount: number;
     label: Label | null;
-    editCount: number;
 }
 
 // assumed not deleted
@@ -112,7 +111,6 @@ export interface RawEntrySummary {
     agentData: string;
     wordCount: number;
     labelId: string | null;
-    editCount: number;
 }
 
 export namespace Entry {
@@ -164,8 +162,7 @@ export namespace Entry {
             longitude: entry.longitude,
             agentData: entry.agentData,
             wordCount: entry.wordCount,
-            label: entry.label,
-            editCount: entry.edits.length
+            label: entry.label
         };
     }
 

@@ -6,7 +6,7 @@ import { query } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import { FileLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
-import { splitEntryIntoWordsForIndexing, wordCount } from '$lib/utils/text';
+import { wordCount, wordsFromText } from '$lib/utils/text';
 import { fmtUtc, nowUtc } from '$lib/utils/time';
 import type { Hours, TimestampSecs } from '../../../types';
 import type { Auth } from '../auth/auth.server';
@@ -74,8 +74,8 @@ namespace EntryServer {
             `;
         }
 
-        const titleWords = splitEntryIntoWordsForIndexing(title);
-        const bodyWords = splitEntryIntoWordsForIndexing(body);
+        const titleWords = wordsFromText(title);
+        const bodyWords = wordsFromText(body);
 
         const countMap: Record<string, number> = {};
 

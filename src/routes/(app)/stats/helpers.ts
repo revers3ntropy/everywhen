@@ -1,4 +1,11 @@
-import { wordsFromText } from '$lib/utils/text';
+export type HeatMapData = { date: Date; value: number }[];
+
+export interface EntryStats {
+    created: number;
+    createdTzOffset: number;
+    wordCount: number;
+    agentData: string;
+}
 
 export enum By {
     Words,
@@ -35,14 +42,15 @@ export function initialBucketName(days: number): string {
     return initialBucket(days);
 }
 
-export function commonWordsFromText(
-    txt: string,
-    words: Record<string, number> = {}
-): Record<string, number> {
-    for (const word of wordsFromText(txt)) {
-        const lowercase = word.toLowerCase();
-        words[lowercase] ??= 0;
-        words[lowercase]++;
-    }
-    return words;
+export function heatMapDataFromEntries(entries: EntryStats[]): Record<By, HeatMapData> {
+    return {
+        [By.Words]: entries.map(entry => ({
+            date: new Date(entry.created * 1000),
+            value: entry.wordCount
+        })),
+        [By.Entries]: entries.map(entry => ({
+            date: new Date(entry.created * 1000),
+            value: By.Entries
+        }))
+    };
 }

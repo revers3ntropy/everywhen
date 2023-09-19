@@ -1,6 +1,7 @@
 <script lang="ts">
-    import { encrypt } from '$lib/utils/encryption';
+    import { browser } from '$app/environment';
     import { encryptionKey } from '$lib/stores';
+    import { decrypt } from '$lib/utils/encryption';
 
     export let words: [string, number][];
     export let entryCount: number;
@@ -9,12 +10,8 @@
 <div class="common-words">
     {#each words as [word, count], i}
         <div>#{i + 1}</div>
-        <a
-            href="/stats/{encrypt(word, $encryptionKey, true)}"
-            class="word"
-            data-sveltekit-preload-data="tap"
-        >
-            {word}
+        <a href="/stats/{word}" class="word" data-sveltekit-preload-data="tap">
+            {browser ? decrypt(word, $encryptionKey).unwrap() : ''}
         </a>
 
         <b class="count">{count}</b>

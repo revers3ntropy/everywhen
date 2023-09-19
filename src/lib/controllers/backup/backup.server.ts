@@ -307,8 +307,8 @@ export namespace BackupServer {
         if (versionRes.val.isGreaterThan(currentVersion))
             return Result.err(`Cannot time travel - backup is from the future`);
 
-        if (versionRes.val.isLessThan(SemVer.fromString('0.5.97').unwrap()))
-            return Result.err(`Cannot use backups created before v0.5.97, sorry :/`);
+        if (versionRes.val.isLessThan(SemVer.fromString('0.6.0').unwrap()))
+            return Result.err(`Cannot use backups created before v0.6, sorry :/`);
 
         return Result.ok(json);
     }

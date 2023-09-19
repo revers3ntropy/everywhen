@@ -44,41 +44,26 @@ export async function getSummariesNYearsAgo(
             longitude: number | null;
             agentData: string;
             wordCount: number;
-            editCount: number;
         }[]
     >`
         SELECT
-            entries.id,
-            entries.title,
-            entries.body,
-            entries.created,
-            entries.createdTzOffset,
-            entries.labelId,
-            entries.pinned,
-            entries.latitude,
-            entries.longitude,
-            entries.agentData,
-            entries.wordCount,
-            COUNT(entryEdits.id) as editCount
+            id,
+            title,
+            body,
+            created,
+            createdTzOffset,
+            labelId,
+            pinned,
+            latitude,
+            longitude,
+            agentData,
+            wordCount
         FROM entries
-        LEFT JOIN entryEdits ON entries.id = entryEdits.entryId
         WHERE deleted IS NULL
-            AND entries.userId = ${auth.id}
-            AND DATE_FORMAT(FROM_UNIXTIME(entries.created + entries.createdTzOffset * 60 * 60), '%Y-%m-%d')
+            AND userId = ${auth.id}
+            AND DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%Y-%m-%d')
                 in (${dates})
-        GROUP BY
-            entries.id,
-            entries.title,
-            entries.body,
-            entries.created,
-            entries.createdTzOffset,
-            entries.labelId,
-            entries.pinned,
-            entries.latitude,
-            entries.longitude,
-            entries.agentData,
-            entries.wordCount
-        ORDER BY entries.created DESC, id
+        ORDER BY created DESC, id
     `;
 
     const summariesRes = await summariesFromRaw(auth, rawEntries);
@@ -105,8 +90,9 @@ export async function getPageOfSummaries(
     offset: number
 ): Promise<Result<{ summaries: EntrySummary[]; totalCount: number }>> {
     if (count < 1 || offset < 0 || isNaN(count) || isNaN(offset)) {
-        return Result.err('Invalid entry title count/offset');
+        return Result.err('Invalid entry summary count/offset');
     }
+
     const rawEntries = await query<
         {
             id: string;
@@ -120,39 +106,24 @@ export async function getPageOfSummaries(
             longitude: number | null;
             agentData: string;
             wordCount: number;
-            editCount: number;
         }[]
     >`
         SELECT
-            entries.id,
-            entries.title,
-            entries.body,
-            entries.created,
-            entries.createdTzOffset,
-            entries.labelId,
-            entries.pinned,
-            entries.latitude,
-            entries.longitude,
-            entries.agentData,
-            entries.wordCount,
-            COUNT(entryEdits.id) as editCount
+            id,
+            title,
+            body,
+            created,
+            createdTzOffset,
+            labelId,
+            pinned,
+            latitude,
+            longitude,
+            agentData,
+            wordCount
         FROM entries
-        LEFT JOIN entryEdits ON entries.id = entryEdits.entryId
         WHERE deleted IS NULL
-            AND entries.userId = ${auth.id}
-        GROUP BY
-            entries.id,
-            entries.title,
-            entries.body,
-            entries.created,
-            entries.createdTzOffset,
-            entries.labelId,
-            entries.pinned,
-            entries.latitude,
-            entries.longitude,
-            entries.agentData,
-            entries.wordCount
-        ORDER BY entries.created DESC, id
+            AND userId = ${auth.id}
+        ORDER BY created DESC, id
         LIMIT ${count}
         OFFSET ${offset}
     `;
@@ -186,41 +157,26 @@ export async function getPinnedSummaries(auth: Auth): Promise<Result<EntrySummar
                 longitude: number | null;
                 agentData: string;
                 wordCount: number;
-                editCount: number;
             }[]
         >`
-        SELECT
-            entries.id,
-            entries.title,
-            entries.body,
-            entries.created,
-            entries.createdTzOffset,
-            entries.labelId,
-            entries.pinned,
-            entries.latitude,
-            entries.longitude,
-            entries.agentData,
-            entries.wordCount,
-            COUNT(entryEdits.id) as editCount
-        FROM entries
-        LEFT JOIN entryEdits ON entries.id = entryEdits.entryId
-        WHERE deleted IS NULL
-            AND entries.userId = ${auth.id}
-            AND pinned IS NOT NULL
-        GROUP BY
-            entries.id,
-            entries.title,
-            entries.body,
-            entries.created,
-            entries.createdTzOffset,
-            entries.labelId,
-            entries.pinned,
-            entries.latitude,
-            entries.longitude,
-            entries.agentData,
-            entries.wordCount
-        ORDER BY entries.created DESC, id
-    `
+            SELECT
+                id,
+                title,
+                body,
+                created,
+                createdTzOffset,
+                labelId,
+                pinned,
+                latitude,
+                longitude,
+                agentData,
+                wordCount
+            FROM entries
+            WHERE deleted IS NULL
+                AND userId = ${auth.id}
+                AND pinned IS NOT NULL
+            ORDER BY created DESC, id
+        `
     );
 }
 
@@ -255,8 +211,7 @@ async function summariesFromRaw(
                 longitude: rawEntry.longitude,
                 agentData: agentDataRes.val,
                 wordCount: rawEntry.wordCount,
-                label: rawEntry.labelId ? labelsRes.val[rawEntry.labelId] : null,
-                editCount: rawEntry.editCount
+                label: rawEntry.labelId ? labelsRes.val[rawEntry.labelId] : null
             });
         })
     );

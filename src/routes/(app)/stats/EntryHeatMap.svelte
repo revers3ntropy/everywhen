@@ -1,23 +1,12 @@
 <script lang="ts">
-    import type { EntrySummary } from '$lib/controllers/entry/entry';
     import moment from 'moment';
     import SvelteHeatmap from 'svelte-heatmap';
-    import { By } from './helpers';
+    import type { By, HeatMapData } from './helpers';
 
-    export let entries: EntrySummary[];
     export let by: By;
-    let data: { date: Date; value: number }[] = [];
+    export let data: Record<By, HeatMapData>;
 
-    function reloadChart() {
-        data = entries.map(entry => {
-            return {
-                date: new Date(entry.created * 1000),
-                value: by === By.Entries ? 1 : entry.wordCount
-            };
-        });
-    }
-
-    $: if (entries && typeof by === 'number') reloadChart();
+    $: currentData = data[by];
 
     const showMonths = 6;
     const currentMonth = new Date().getMonth();
@@ -34,7 +23,7 @@
             cellGap={2}
             cellRadius="50%"
             colors={['#95eab0', '#52d8bd', '#3397bd', '#0051cf']}
-            {data}
+            data={currentData}
             dayLabelWidth={20}
             emptyColor={'var(--light-accent)'}
             endDate={moment().toDate()}

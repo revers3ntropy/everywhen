@@ -17,16 +17,8 @@ export const logger = new FileLogger('MySQL', chalk.yellow);
 
 export let dbConnection: mysql.Connection | null = null;
 
-export async function connect() {
-    const config = getConfig();
-    dbConnection = await mysql.createConnection(config).catch((error: unknown) => {
-        dbConnection = null;
-        void logger.error(`Error connecting to mysql db '${config.database || '?'}'`, {
-            error,
-            config
-        });
-        throw error;
-    });
+export function connect() {
+    dbConnection = mysql.createPool(getConfig());
     void logger.log(`Connected`);
 }
 
@@ -124,7 +116,7 @@ export const query = (async <Res extends QueryResult = never>(
 ): Promise<Res> => {
     const start = performance.now();
 
-    if (!dbConnection) await connect();
+    if (!dbConnection) connect();
 
     const [query, queryParams] = buildQuery(queryParts, params);
 
@@ -148,7 +140,7 @@ query.unlogged = (async <Res extends QueryResult = never>(
     queryParts: TemplateStringsArray,
     ...params: QueryParam[]
 ): Promise<Res> => {
-    if (!dbConnection) await connect();
+    if (!dbConnection) connect();
 
     const [query, queryParams] = buildQuery(queryParts, params);
 
