@@ -51,7 +51,7 @@
     export let showLabels = true;
     export let isInDialog = false;
 
-    export let locations: Location[] | null;
+    export let locations: Location[];
 
     async function deleteSelf() {
         const thisIsDeleted = Entry.isDeleted({ deleted });

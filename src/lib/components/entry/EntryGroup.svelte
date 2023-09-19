@@ -22,7 +22,7 @@
     import Dot from '../Dot.svelte';
     import UtcTime from '../UtcTime.svelte';
 
-    export let locations: Location[] | null;
+    export let locations: Location[];
     export let obfuscated = true;
     export let entries: EntryController[];
     export let showLabels = true;

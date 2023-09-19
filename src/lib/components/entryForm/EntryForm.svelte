@@ -36,9 +36,8 @@
     export let action: 'create' | 'edit' = 'create';
 
     export let entry = null as Entry | null;
-    if (entry && action !== 'edit') {
-        throw new Error('eventID can only be set when action is edit');
-    }
+    if (entry && action !== 'edit') throw new Error('entry can only be set when action is edit');
+    if (!entry && action === 'edit') throw new Error('entry must be set when action is edit');
 
     export let loadFromLS = true;
 

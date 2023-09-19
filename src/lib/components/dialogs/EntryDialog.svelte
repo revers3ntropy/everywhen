@@ -12,7 +12,7 @@
     export let obfuscated = false;
 
     let entry = null as EntryController | null;
-    let locations = null as Location[] | null;
+    let locations: Location[];
 
     async function loadEntry() {
         entry = notify.onErr(await api.get(apiPath('/entries/?', id)), () => popup.set(null));

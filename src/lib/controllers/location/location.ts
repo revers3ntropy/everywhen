@@ -107,8 +107,10 @@ export namespace Location {
             }
         }
 
+        touching.sort((a, b) => a.radius - b.radius);
+
         return {
-            touching: touching.toSorted((a, b) => a.radius - b.radius),
+            touching,
             near
         };
     }
