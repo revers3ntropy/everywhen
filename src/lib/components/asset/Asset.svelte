@@ -49,12 +49,7 @@
 
 {#if !deleted}
     <div class="flex-center m-1 relative overflow-hidden wrapper">
-        <img
-            alt={fileName}
-            class={obfuscated ? 'obfuscated' : ''}
-            loading="lazy"
-            src="/api/assets/{publicId}"
-        />
+        <img alt={fileName} class:obfuscated loading="lazy" src="/api/assets/{publicId}" />
         <div class="menu">
             <div>
                 <button

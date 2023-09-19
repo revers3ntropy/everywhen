@@ -131,9 +131,9 @@
             />
         </div>
     {/if}
-    <p class="mobile-title" class:obfuscated>
+    <div class="mobile-title" class:obfuscated>
         {title}
-    </p>
+    </div>
     <div class="header">
         <div style="display: flex; align-items: center; max-width: calc(100% - 60px); gap: 0.5rem;">
             {#if !showFullDate}
@@ -184,18 +184,18 @@
             </div>
         </div>
 
-        <div class="flex-center">
+        <div class="flex-center pr-2">
             {#if !isEdit}
-                <Dropdown fromRight>
-                    <span slot="button" class="options-dropdown-button">
+                <Dropdown fromRight buttonClass="flex-center">
+                    <span slot="button" class="flex-center">
                         <DotsVertical size="22" />
                     </span>
                     <div>
-                        <div class="text-light flex-center" style="padding: 6px">
+                        <div class="text-light flex-center pt-3 pb-2">
                             {wordCount} words
                         </div>
 
-                        <hr />
+                        <hr class="-my-4" />
 
                         <div class="options-dropdown">
                             <button
@@ -259,7 +259,6 @@
             <button
                 aria-label={obfuscated ? 'Show entry' : 'Hide entry'}
                 on:click={toggleObfuscation}
-                style="margin: 0 0.3rem 0 0"
             >
                 {#if obfuscated}
                     <Eye size="20" />
@@ -298,20 +297,13 @@
         </div>
     {/if}
 
-    <hr />
-
-    <p class="body" class:obfuscated>
+    <div class="body" class:obfuscated>
         {@html entryHtml}
-    </p>
+    </div>
 </div>
 
 <style lang="scss">
     @import '$lib/styles/text';
-
-    hr {
-        margin: -16px 0 -10px 0;
-        border-top-color: var(--border-light);
-    }
 
     .entry {
         padding: 0;
@@ -319,17 +311,11 @@
         width: 100%;
         height: fit-content;
         white-space: pre-wrap;
-        border: 1px solid transparent;
         outline: none;
 
         &,
         * {
             font-size: 1.05rem;
-        }
-
-        &:focus {
-            border: 1px solid var(--primary);
-            border-radius: $border-radius;
         }
 
         @media #{$mobile} {
@@ -340,6 +326,10 @@
         :global(img) {
             max-width: 100%;
             max-height: 50vh;
+        }
+
+        .obfuscated :global(img) {
+            filter: blur(30px);
         }
 
         .header {
@@ -378,13 +368,11 @@
         }
 
         .body {
-            margin: 0 2rem;
+            border-top: 2px solid var(--background-color);
+            padding: 1rem;
+            // why????
+            margin: -1rem 0 0 0;
             word-break: break-word;
-            max-width: 700px;
-
-            @media #{$mobile} {
-                margin: 0 0.5rem;
-            }
 
             // inner <p> element is created when using @html
             :global(p) {
@@ -398,8 +386,8 @@
             :global(ul),
             :global(ol) {
                 // ugh
-                margin: -2.5rem 0 -2.5rem 0.8rem;
-                padding: 0;
+                margin: -1rem 0;
+                padding: 0 0 0 1.5em;
                 border: none;
 
                 :global(li) {
@@ -407,6 +395,12 @@
                     padding: 0;
                     border: none;
                 }
+            }
+            :global(ul) {
+                list-style-type: disc;
+            }
+            :global(ol) {
+                list-style-type: decimal;
             }
 
             :global(table) {
@@ -450,11 +444,6 @@
     .edits-link {
         font-size: 0.95rem;
         white-space: nowrap;
-    }
-
-    .options-dropdown-button {
-        margin: 0;
-        padding: 0;
     }
 
     .options-dropdown {

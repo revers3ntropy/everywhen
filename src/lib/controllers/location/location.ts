@@ -82,6 +82,9 @@ export namespace Location {
         );
     }
 
+    /**
+     * 'touching' is returned sorted by radius ascending
+     */
     export function filterLocationsByPoint<T extends { latitude: Degrees; longitude: Degrees }>(
         locations: Location[],
         point: T
@@ -104,6 +107,9 @@ export namespace Location {
             }
         }
 
-        return { touching, near };
+        return {
+            touching: touching.toSorted((a, b) => a.radius - b.radius),
+            near
+        };
     }
 }

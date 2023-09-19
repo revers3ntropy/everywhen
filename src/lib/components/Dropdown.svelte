@@ -19,6 +19,7 @@
     export let openOnHover = false;
     export let stayOpenWhenClicked = false;
     export let fillWidthMobile: boolean | 'mobile' = false;
+    export let buttonClass = '';
 
     export let close = () => {
         open = false;
@@ -55,7 +56,7 @@
 <svelte:window on:mouseup={globalMouseUp} />
 
 <span
-    class="dropdown"
+    class="dropdown {buttonClass}"
     class:open
     class:from-right={fromRight}
     class:from-top={fromTop}
