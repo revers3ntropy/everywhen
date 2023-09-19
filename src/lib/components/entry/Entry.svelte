@@ -326,10 +326,11 @@
         :global(img) {
             max-width: 100%;
             max-height: 50vh;
+            transition: opacity $transition;
         }
 
         .obfuscated :global(img) {
-            filter: blur(30px);
+            opacity: 0.01;
         }
 
         .header {
