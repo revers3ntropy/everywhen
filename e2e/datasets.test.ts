@@ -15,6 +15,9 @@ test.describe('Datasets', () => {
         await page.getByRole('button', { name: "Start Recording 'Weight'" }).click();
         await page.goto('/journal', { waitUntil: 'networkidle' });
 
+        // as dataset changes are not propagated client-side yet
+        await page.reload();
+
         await page.getByLabel('enter your weight').fill('10');
         await page.getByLabel('Submit Weight').click();
         await expect(page.getByText('Weight entered')).toBeAttached();
