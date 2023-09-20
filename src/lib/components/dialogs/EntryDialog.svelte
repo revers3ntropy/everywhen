@@ -12,7 +12,9 @@
     export let obfuscated = false;
 
     let entry = null as EntryController | null;
-    let locations: Location[];
+
+    // TODO receive this as a prop
+    let locations: Location[] = [];
 
     async function loadEntry() {
         entry = notify.onErr(await api.get(apiPath('/entries/?', id)), () => popup.set(null));
@@ -30,7 +32,9 @@
 
 <div>
     {#if entry}
-        <Entry {...entry} isInDialog={true} {obfuscated} showFullDate={true} {locations} />
+        {#key locations}
+            <Entry {...entry} isInDialog={true} {obfuscated} showFullDate={true} {locations} />
+        {/key}
     {:else}
         <BookSpinner />
     {/if}
