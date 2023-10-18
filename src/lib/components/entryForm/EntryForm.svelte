@@ -36,8 +36,12 @@
     export let action: 'create' | 'edit' = 'create';
 
     export let entry = null as Entry | null;
-    if (entry && action !== 'edit') throw new Error('entry can only be set when action is edit');
-    if (!entry && action === 'edit') throw new Error('entry must be set when action is edit');
+    if (entry && action !== 'edit') {
+        throw new Error('entry can only be set when action is edit');
+    }
+    if (!entry && action === 'edit') {
+        throw new Error('entry must be set when action is edit');
+    }
 
     export let loadFromLS = true;
 
@@ -230,11 +234,14 @@
         labels = notify.onErr(await api.get('/labels')).labels;
     }
 
-    function resizeTextAreaToFitContent(self: HTMLTextAreaElement | null = newEntryInputElement) {
-        if (!self) return;
+    function resizeTextAreaToFitContent() {
         const minBodyTextareaHeight = useBulletEntryForm ? 0 : 100;
-        self.style.height = '0px';
-        self.style.height = `${Math.max(self.scrollHeight, minBodyTextareaHeight)}px`;
+        textAreaSizeTester.value = newEntryBody;
+        textAreaSizeTester.style.height = '0px';
+        newEntryInputElement.style.height = `${Math.max(
+            textAreaSizeTester.scrollHeight,
+            minBodyTextareaHeight
+        )}px`;
     }
 
     function handleEntryInputKeydown(event: KeyboardEvent) {
@@ -313,6 +320,7 @@
     let useBulletEntryForm = $settingsStore.useBulletEntryForm.value;
     let mounted = false;
 
+    let textAreaSizeTester: HTMLTextAreaElement;
     let newEntryInputElement: HTMLTextAreaElement;
     let labels: Label[];
 
@@ -406,13 +414,29 @@
                     : useBulletEntryForm
                     ? 'Write a bullet...'
                     : 'Start writing here...'}
-                class="text-lg"
+                class="text-lg resize-none w-full px-3 md:p-4 bg-transparent md:bg-lightAccent"
                 class:obfuscated
                 class:rounded-lg={useBulletEntryForm}
                 class:rounded-b-lg={!useBulletEntryForm}
                 class:py-2={useBulletEntryForm}
                 class:px-4={useBulletEntryForm}
                 class:p-4={!useBulletEntryForm}
+            />
+
+            <!--
+                same styling as actual input textarea, just hidden so that we
+                can measure the height of the text without resizing the actual
+                input textarea (and cause weird scrolling)
+            -->
+            <textarea
+                bind:this={textAreaSizeTester}
+                class="text-lg resize-none w-full px-3 md:p-4 bg-transparent md:bg-lightAccent"
+                class:rounded-lg={useBulletEntryForm}
+                class:rounded-b-lg={!useBulletEntryForm}
+                class:py-2={useBulletEntryForm}
+                class:px-4={useBulletEntryForm}
+                class:p-4={!useBulletEntryForm}
+                style="position: absolute; top: 0; left: -9999px;"
             />
         </div>
 
@@ -510,17 +534,6 @@
 
         @media #{$mobile} {
             padding: 0;
-        }
-
-        textarea {
-            resize: none;
-            width: 100%;
-            background: var(--light-accent);
-
-            @media #{$mobile} {
-                width: calc(100% - 0.8em);
-                background: none;
-            }
         }
     }
 </style>
