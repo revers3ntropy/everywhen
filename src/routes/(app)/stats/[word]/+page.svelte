@@ -123,7 +123,7 @@
 
         @media #{$mobile} {
             margin: 1rem;
-            grid-template-columns: 10px 1fr;
+            grid-template-columns: auto 1fr;
 
             .search-for-word {
                 font-size: 1.5rem;

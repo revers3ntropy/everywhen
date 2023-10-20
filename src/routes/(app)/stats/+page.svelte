@@ -37,7 +37,7 @@
             </div>
         </section>
     {:else}
-        <div class="flex justify-between p-2">
+        <div class="md:flex justify-between p-2">
             <div>
                 <button
                     class="flex-center gap-1 bg-vLightAccent rounded-full px-2"
