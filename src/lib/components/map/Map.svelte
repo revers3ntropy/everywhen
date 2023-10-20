@@ -264,10 +264,12 @@
                 return;
             }
 
-            const mapWidth = map.getSize()?.[0] || window.innerWidth;
+            // Don't show popup, needs improvement
+
+            //const mapWidth = map.getSize()?.[0] || window.innerWidth;
             // never hides the hovered entry
-            popupOnRight = event.pixel[0] < mapWidth / 2;
-            hoveringEntryId = hovering.entry.id;
+            //popupOnRight = event.pixel[0] < mapWidth / 2;
+            //hoveringEntryId = hovering.entry.id;
         });
 
         // save the map view
@@ -331,7 +333,7 @@
     use:map={{ locations, entries }}
 >
     {#if hoveringEntryId !== null}
-        <div bind:this={tooltip} class="ol-popup {popupOnRight ? 'right' : ''}">
+        <div bind:this={tooltip} class="ol-popup" class:right={popupOnRight}>
             <EntryTooltipOnMap id={hoveringEntryId} />
         </div>
     {/if}
@@ -401,6 +403,7 @@
         &.right {
             left: auto;
             right: 0.5rem;
+            top: 4rem;
         }
     }
 </style>

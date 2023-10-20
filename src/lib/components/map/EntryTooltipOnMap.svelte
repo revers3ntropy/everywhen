@@ -37,9 +37,9 @@
             />
         </div>
         {#if entry.title}
-            <h3 class="ellipsis" class:obfuscated>{entry.title}</h3>
+            <h3 class="ellipsis" class:obfuscated={$obfuscated}>{entry.title}</h3>
         {/if}
-        <p class:obfuscated>{entry.body}</p>
+        <p class:obfuscated={$obfuscated}>{entry.body}</p>
     {:else}
         <p>Loading...</p>
     {/if}
