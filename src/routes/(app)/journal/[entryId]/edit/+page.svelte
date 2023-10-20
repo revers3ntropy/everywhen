@@ -12,25 +12,27 @@
     <title>Edit Entry</title>
 </svelte:head>
 
-<main class="pt-4 md:p-4 {$navExpanded ? 'md:ml-48' : 'md:ml-16'}">
-    <div class="header">
-        <div>
-            <a href="/journal/{entry.id}">
-                <Close size="30" />
-            </a>
+<main class="pt-4 md:p-4 {$navExpanded ? 'md:ml-48' : 'md:ml-16'} flex-center">
+    <div class="w-full max-w-3xl">
+        <div class="header">
+            <div>
+                <a href="/journal/{entry.id}">
+                    <Close size="30" />
+                </a>
+            </div>
+            <h1> Edit Entry </h1>
+            <div />
         </div>
-        <h1> Edit Entry </h1>
-        <div />
+        <EntryForm
+            action="edit"
+            {entry}
+            loadFromLS={false}
+            newEntryBody={entry.body}
+            newEntryLabel={entry?.label?.id || ''}
+            newEntryTitle={entry.title}
+            obfuscated={$obfuscated}
+        />
     </div>
-    <EntryForm
-        action="edit"
-        {entry}
-        loadFromLS={false}
-        newEntryBody={entry.body}
-        newEntryLabel={entry?.label?.id || ''}
-        newEntryTitle={entry.title}
-        obfuscated={$obfuscated}
-    />
 </main>
 
 <style lang="scss">
