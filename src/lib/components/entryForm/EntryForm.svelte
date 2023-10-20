@@ -223,6 +223,10 @@
                 throw new Error(`Unknown action: ${action as string}`);
         }
 
+        if (useBulletEntryForm) {
+            newEntryInputElement.focus();
+        }
+
         currentlyUploadingEntries.update(v => v - 1);
     }
 
@@ -235,13 +239,12 @@
     }
 
     function resizeTextAreaToFitContent() {
-        const minBodyTextareaHeight = useBulletEntryForm ? 0 : 100;
         textAreaSizeTester.value = newEntryBody;
         textAreaSizeTester.style.height = '0px';
-        newEntryInputElement.style.height = `${Math.max(
-            textAreaSizeTester.scrollHeight,
-            minBodyTextareaHeight
-        )}px`;
+        textAreaSizeTester.style.width = `${newEntryInputElement.clientWidth}px`;
+        const minBodyTextareaHeight = useBulletEntryForm ? 0 : 100;
+        const heightPx = Math.max(textAreaSizeTester.scrollHeight, minBodyTextareaHeight);
+        newEntryInputElement.style.height = `${heightPx}px`;
     }
 
     function handleEntryInputKeydown(event: KeyboardEvent) {
@@ -414,13 +417,14 @@
                     : useBulletEntryForm
                     ? 'Write a bullet...'
                     : 'Start writing here...'}
-                class="text-lg resize-none w-full px-3 md:p-4 bg-transparent md:bg-lightAccent"
+                class="text-lg resize-none w-full bg-transparent md:bg-lightAccent"
                 class:obfuscated
                 class:rounded-lg={useBulletEntryForm}
                 class:rounded-b-lg={!useBulletEntryForm}
                 class:py-2={useBulletEntryForm}
                 class:px-4={useBulletEntryForm}
-                class:p-4={!useBulletEntryForm}
+                class:px-3={!useBulletEntryForm}
+                class:md:p-4={!useBulletEntryForm}
             />
 
             <!--
@@ -430,12 +434,14 @@
             -->
             <textarea
                 bind:this={textAreaSizeTester}
-                class="text-lg resize-none w-full px-3 md:p-4 bg-transparent md:bg-lightAccent"
+                class="text-lg resize-none w-full bg-transparent md:bg-lightAccent"
+                class:obfuscated
                 class:rounded-lg={useBulletEntryForm}
                 class:rounded-b-lg={!useBulletEntryForm}
                 class:py-2={useBulletEntryForm}
                 class:px-4={useBulletEntryForm}
-                class:p-4={!useBulletEntryForm}
+                class:px-3={!useBulletEntryForm}
+                class:md:p-4={!useBulletEntryForm}
                 style="position: absolute; top: 0; left: -9999px;"
             />
         </div>
