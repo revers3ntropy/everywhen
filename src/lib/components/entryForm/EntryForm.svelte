@@ -57,11 +57,20 @@
         newEntryLabel = '';
     }
 
+    // TODO: encrypt entry data in LS and namespace key to user,
+    //       and then don't clear on logout
     function saveToLS() {
         if (!loadFromLS) return;
         localStorage.setItem(LS_KEYS.newEntryTitle, newEntryTitle);
         localStorage.setItem(LS_KEYS.newEntryBody, newEntryBody);
         localStorage.setItem(LS_KEYS.newEntryLabel, newEntryLabel);
+    }
+
+    function restoreFromLS() {
+        if (!loadFromLS) return;
+        newEntryTitle = localStorage.getItem(LS_KEYS.newEntryTitle) || '';
+        newEntryBody = localStorage.getItem(LS_KEYS.newEntryBody) || '';
+        newEntryLabel = localStorage.getItem(LS_KEYS.newEntryLabel) || '';
     }
 
     function areUnsavedChanges() {
@@ -135,6 +144,7 @@
         if (id) {
             // make really sure it's saved before resetting
             resetEntryForm();
+            saveToLS();
         } else {
             clientLogger.error('failed to make entry', { id, body });
             notify.error(`Failed to create entry`);
@@ -306,10 +316,7 @@
         void loadLabels();
 
         if (loadFromLS) {
-            newEntryTitle = localStorage.getItem(LS_KEYS.newEntryTitle) || '';
-            newEntryBody = localStorage.getItem(LS_KEYS.newEntryBody) || '';
-            newEntryLabel = localStorage.getItem(LS_KEYS.newEntryLabel) || '';
-
+            restoreFromLS();
             if (!newEntryBody && !newEntryTitle) {
                 obfuscated = false;
             }
