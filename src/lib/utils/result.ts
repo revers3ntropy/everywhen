@@ -7,6 +7,8 @@ interface ResultOption<T, E = string> {
 
     mapErr<R>(fn: (err: E) => R): Result<T, R>;
 
+    match<U, V>(mapVal: (val: T) => U, mapErr: (err: E) => V): U | V;
+
     pipe<R>(fn: (val: T) => Result<R, E>): Result<R, E>;
     pipeAsync<R>(fn: (val: T) => Promise<Result<R, E>>): Promise<Result<R, E>>;
 
@@ -88,7 +90,7 @@ class Ok<T, E> implements ResultOption<T, E> {
         return Result.ok(fn(this.val));
     }
 
-    public mapErr<R = E>(_fn: (_err: E) => R): Result<T, R> {
+    public mapErr<R>(_fn: (_err: E) => R): Result<T, R> {
         return this as unknown as Result<T, R>;
     }
 
@@ -100,7 +102,7 @@ class Ok<T, E> implements ResultOption<T, E> {
         return fn(this.val);
     }
 
-    public match<U = T, V = E>(mapVal: (_val: T) => U, _: (_err: E) => V): U {
+    public match<U, V>(mapVal: (_val: T) => U, _: (_err: E) => V): U {
         return mapVal(this.val);
     }
 

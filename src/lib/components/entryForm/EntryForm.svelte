@@ -19,8 +19,10 @@
     import {
         currentlyUploadingAssets,
         currentlyUploadingEntries,
-        enabledLocation, encryptionKey,
-        settingsStore, username
+        enabledLocation,
+        encryptionKey,
+        settingsStore,
+        username
     } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { getLocation } from '$lib/utils/geolocation';
@@ -31,7 +33,7 @@
     import FormatOptions from './FormatOptions.svelte';
     import LocationToggle from '../location/LocationToggle.svelte';
     import { paste } from './paste';
-    import {decrypt, encrypt} from "$lib/utils/encryption";
+    import { decrypt, encrypt } from '$lib/utils/encryption';
 
     // as this form is used in entry editing and creating
     export let action: 'create' | 'edit' = 'create';
@@ -75,18 +77,15 @@
     }
 
     function restoreFromLS() {
-        if (!browser) return;
         // if nothing is saved, don't restore.
         // particularly important for editing entries
         if (localStorage.getItem(bodyLsKey()) === null) return;
-        newEntryTitle = decrypt(localStorage.getItem(titleLsKey()) || '', $encryptionKey).mapErr(() => {
-            notify.error('Failed to decrypt saved entry title');
-            return '';
-        }).merge();
-        newEntryBody =decrypt( localStorage.getItem(bodyLsKey()) || '', $encryptionKey).mapErr(() => {
-            notify.error('Failed to decrypt saved entry');
-            return '';
-        }).merge();
+        newEntryTitle = decrypt(localStorage.getItem(titleLsKey()) || '', $encryptionKey)
+            .mapErr(() => notify.error('Failed to decrypt saved entry title'))
+            .or('');
+        newEntryBody = decrypt(localStorage.getItem(bodyLsKey()) || '', $encryptionKey)
+            .mapErr(() => notify.error('Failed to decrypt saved entry title'))
+            .or('');
         newEntryLabel = localStorage.getItem(labelLsKey()) || '';
     }
 
@@ -322,7 +321,6 @@
     onMount(() => {
         void loadLabels();
 
-        // TODO: entry edit without saved should default to entry
         restoreFromLS();
 
         if (!newEntryBody && !newEntryTitle) {

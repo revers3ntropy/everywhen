@@ -13,4 +13,4 @@ end=$(date +%s)
 
 runtime=$( echo "$end - $start" | bc -l )
 
-echo "Migrated DB '$1' destructively in: $runtime s"
+echo "Migrated Dev DB destructively in $runtime s"
