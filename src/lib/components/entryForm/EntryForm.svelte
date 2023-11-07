@@ -5,7 +5,7 @@
     import Tick from 'svelte-material-icons/Check.svelte';
     import { browser } from '$app/environment';
     import { onMount } from 'svelte';
-    import { beforeNavigate, goto } from '$app/navigation';
+    import { goto } from '$app/navigation';
     import InsertImage from '$lib/components/asset/InsertImage.svelte';
     import { Asset } from '$lib/controllers/asset/asset';
     import type { SettingsKey } from '$lib/controllers/settings/settings';
@@ -19,8 +19,8 @@
     import {
         currentlyUploadingAssets,
         currentlyUploadingEntries,
-        enabledLocation,
-        settingsStore
+        enabledLocation, encryptionKey,
+        settingsStore, username
     } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { getLocation } from '$lib/utils/geolocation';
@@ -31,6 +31,7 @@
     import FormatOptions from './FormatOptions.svelte';
     import LocationToggle from '../location/LocationToggle.svelte';
     import { paste } from './paste';
+    import {decrypt, encrypt} from "$lib/utils/encryption";
 
     // as this form is used in entry editing and creating
     export let action: 'create' | 'edit' = 'create';
@@ -42,8 +43,6 @@
     if (!entry && action === 'edit') {
         throw new Error('entry must be set when action is edit');
     }
-
-    export let loadFromLS = true;
 
     export let newEntryTitle = '';
     export let newEntryBody = '';
@@ -57,24 +56,42 @@
         newEntryLabel = '';
     }
 
+    function titleLsKey() {
+        return `${LS_KEYS.newEntryTitle}-${$username}-${entry?.id ?? ''}`;
+    }
+    function bodyLsKey() {
+        return `${LS_KEYS.newEntryBody}-${$username}-${entry?.id ?? ''}`;
+    }
+    function labelLsKey() {
+        return `${LS_KEYS.newEntryLabel}-${$username}-${entry?.id ?? ''}`;
+    }
+
     // TODO: encrypt entry data in LS and namespace key to user,
     //       and then don't clear on logout
     function saveToLS() {
-        if (!loadFromLS) return;
-        localStorage.setItem(LS_KEYS.newEntryTitle, newEntryTitle);
-        localStorage.setItem(LS_KEYS.newEntryBody, newEntryBody);
-        localStorage.setItem(LS_KEYS.newEntryLabel, newEntryLabel);
+        localStorage.setItem(titleLsKey(), encrypt(newEntryTitle, $encryptionKey));
+        localStorage.setItem(bodyLsKey(), encrypt(newEntryBody, $encryptionKey));
+        localStorage.setItem(labelLsKey(), newEntryLabel);
     }
 
     function restoreFromLS() {
-        if (!loadFromLS) return;
-        newEntryTitle = localStorage.getItem(LS_KEYS.newEntryTitle) || '';
-        newEntryBody = localStorage.getItem(LS_KEYS.newEntryBody) || '';
-        newEntryLabel = localStorage.getItem(LS_KEYS.newEntryLabel) || '';
+        if (!browser) return;
+        // if nothing is saved, don't restore.
+        // particularly important for editing entries
+        if (localStorage.getItem(bodyLsKey()) === null) return;
+        newEntryTitle = decrypt(localStorage.getItem(titleLsKey()) || '', $encryptionKey).mapErr(() => {
+            notify.error('Failed to decrypt saved entry title');
+            return '';
+        }).merge();
+        newEntryBody =decrypt( localStorage.getItem(bodyLsKey()) || '', $encryptionKey).mapErr(() => {
+            notify.error('Failed to decrypt saved entry');
+            return '';
+        }).merge();
+        newEntryLabel = localStorage.getItem(labelLsKey()) || '';
     }
 
     function areUnsavedChanges() {
-        if (!entry || loadFromLS) return false;
+        if (!entry) return false;
 
         // check for unsaved changes
         return (
@@ -291,16 +308,6 @@
         }
     }
 
-    beforeNavigate(({ cancel }) => {
-        // would save to LS here, except sometimes we want to navigate away
-        // after editing something in LS, for example making 'Dream' entry from navbar
-        // in which case saving would override anything we set there.
-
-        if (submitted || !areUnsavedChanges()) return;
-        const shouldProceed = confirm('You have unsaved changes, are you sure you want to leave?');
-        if (!shouldProceed) cancel();
-    });
-
     async function switchEntryFormMode() {
         const mode = !useBulletEntryForm;
         $settingsStore.useBulletEntryForm.value = mode;
@@ -315,11 +322,11 @@
     onMount(() => {
         void loadLabels();
 
-        if (loadFromLS) {
-            restoreFromLS();
-            if (!newEntryBody && !newEntryTitle) {
-                obfuscated = false;
-            }
+        // TODO: entry edit without saved should default to entry
+        restoreFromLS();
+
+        if (!newEntryBody && !newEntryTitle) {
+            obfuscated = false;
         }
 
         resizeTextAreaToFitContent();
@@ -346,7 +353,7 @@
 
     let submitted = false;
 
-    $: if (mounted && browser && loadFromLS && [newEntryTitle, newEntryBody, newEntryLabel]) {
+    $: if (mounted && browser && [newEntryTitle, newEntryBody, newEntryLabel]) {
         saveToLS();
     }
     $: if (browser && newEntryInputElement) {

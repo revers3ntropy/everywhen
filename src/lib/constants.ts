@@ -38,9 +38,6 @@ export const COOKIE_KEYS = {
 } as const;
 
 export const LS_TO_CLEAR_ON_LOGOUT = Object.freeze([
-    LS_KEYS.newEntryBody,
-    LS_KEYS.newEntryTitle,
-    LS_KEYS.newEntryLabel,
     LS_KEYS.passcodeLastEntered,
     LS_KEYS.enabledLocation,
     LS_KEYS.sortEventsKey,
