@@ -26,7 +26,6 @@
         <EntryForm
             action="edit"
             {entry}
-            loadFromLS={false}
             newEntryBody={entry.body}
             newEntryLabel={entry?.label?.id || ''}
             newEntryTitle={entry.title}
