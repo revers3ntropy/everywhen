@@ -10,8 +10,12 @@ export async function getLocation(): Promise<OptionalCoords> {
             },
             err => {
                 notify.error(`Cannot get location: ${err.message}`);
-                resolve([null, null]);
+                resolve(nullLocation());
             }
         );
     });
+}
+
+export function nullLocation(): OptionalCoords {
+    return [null, null];
 }

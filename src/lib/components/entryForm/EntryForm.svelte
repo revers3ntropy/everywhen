@@ -25,7 +25,7 @@
         username
     } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
-    import { getLocation } from '$lib/utils/geolocation';
+    import { getLocation, nullLocation } from '$lib/utils/geolocation';
     import { clientLogger } from '$lib/utils/log';
     import { notify } from '$lib/components/notifications/notifications';
     import { wordCount } from '$lib/utils/text';
@@ -68,8 +68,6 @@
         return `${LS_KEYS.newEntryLabel}-${$username}-${entry?.id ?? ''}`;
     }
 
-    // TODO: encrypt entry data in LS and namespace key to user,
-    //       and then don't clear on logout
     function saveToLS() {
         localStorage.setItem(titleLsKey(), encrypt(newEntryTitle, $encryptionKey));
         localStorage.setItem(bodyLsKey(), encrypt(newEntryBody, $encryptionKey));
@@ -224,7 +222,7 @@
 
         submitted = true;
 
-        const currentLocation = $enabledLocation ? await getLocation() : [null, null];
+        const currentLocation = $enabledLocation ? await getLocation() : nullLocation();
 
         const body = {
             title: newEntryTitle,
@@ -354,9 +352,11 @@
     $: if (mounted && browser && [newEntryTitle, newEntryBody, newEntryLabel]) {
         saveToLS();
     }
-    $: if (browser && newEntryInputElement) {
+
+    $: if (browser) {
         newEntryBody;
         setTimeout(resizeTextAreaToFitContent, 0);
+        console.log('hi');
     }
 </script>
 
@@ -429,14 +429,12 @@
                     : useBulletEntryForm
                     ? 'Write a bullet...'
                     : 'Start writing here...'}
-                class="text-lg resize-none w-full bg-transparent md:bg-lightAccent"
+                class="text-lg py-2 resize-none w-full bg-transparent md:bg-lightAccent"
                 class:obfuscated
                 class:rounded-lg={useBulletEntryForm}
                 class:rounded-b-lg={!useBulletEntryForm}
-                class:py-2={useBulletEntryForm}
                 class:px-4={useBulletEntryForm}
-                class:px-3={!useBulletEntryForm}
-                class:md:p-4={!useBulletEntryForm}
+                class:p-4={!useBulletEntryForm}
             />
 
             <!--
@@ -446,14 +444,12 @@
             -->
             <textarea
                 bind:this={textAreaSizeTester}
-                class="text-lg resize-none w-full bg-transparent md:bg-lightAccent"
+                class="text-lg py-2 resize-none w-full bg-transparent md:bg-lightAccent"
                 class:obfuscated
                 class:rounded-lg={useBulletEntryForm}
                 class:rounded-b-lg={!useBulletEntryForm}
-                class:py-2={useBulletEntryForm}
                 class:px-4={useBulletEntryForm}
-                class:px-3={!useBulletEntryForm}
-                class:md:p-4={!useBulletEntryForm}
+                class:p-4={!useBulletEntryForm}
                 style="position: absolute; top: 0; left: -9999px;"
             />
         </div>
