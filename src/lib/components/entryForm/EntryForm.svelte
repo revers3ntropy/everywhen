@@ -356,7 +356,6 @@
     $: if (browser) {
         newEntryBody;
         setTimeout(resizeTextAreaToFitContent, 0);
-        console.log('hi');
     }
 </script>
 
