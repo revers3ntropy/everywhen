@@ -1,8 +1,6 @@
 import { query } from '$lib/db/mysql.server';
 import { cachedPageRoute } from '$lib/utils/cache.server';
-import { decrypt } from '$lib/utils/encryption';
 import { daysSince } from '$lib/utils/time';
-import { error } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
 export const load = cachedPageRoute(async auth => {
@@ -74,12 +72,7 @@ export const load = cachedPageRoute(async auth => {
         WHERE userId = ${auth.id}
           AND deleted IS NULL
         ORDER BY created DESC, id
-    `.then(summaries => {
-        return summaries.map(e => ({
-            ...e,
-            agentData: decrypt(e.agentData, auth.key).unwrap(e => error(400, e))
-        }));
-    });
+    `;
 
     const [{ wordCount, entryCount }, commonWordsArray, summaries] = await Promise.all([
         wordCountQuery,

@@ -1,5 +1,7 @@
 <script lang="ts">
     import { browser } from '$app/environment';
+    import { notify } from '$lib/components/notifications/notifications.js';
+    import { encryptionKey } from '$lib/stores';
     import {
         Chart,
         Title,
@@ -15,7 +17,13 @@
     import Select from '$lib/components/Select.svelte';
     import { getGraphData, type ChartData } from './bucketiseEntriesForBarChart';
     import type { EntryStats, By } from './helpers';
-    import { Bucket, bucketNames, initialBucket, initialBucketName } from './helpers';
+    import {
+        Bucket,
+        bucketNames,
+        decryptUserAgentsBackground,
+        initialBucket,
+        initialBucketName
+    } from './helpers';
     import { cssVarValue } from '$lib/utils/getCssVar';
     import { Entry } from '$lib/controllers/entry/entry';
 
@@ -41,14 +49,19 @@
     let smallGraph2Data: ChartData;
 
     // no data fetching so top level
-    $: if (browser && (entries || by || selectedBucket)) {
+    $: if (browser) {
         mainGraphData = getGraphData(entries, selectedBucket, by);
-    }
-    $: if (browser && (entries || by)) {
         smallGraph1Data = getGraphData(entries, Bucket.Hour, by);
-        smallGraph2Data = getGraphData(entries, Bucket.OperatingSystem, by, {
-            borderColor: 'transparent',
-            borderRadius: 4
+    }
+    $: if (browser && $encryptionKey) {
+        const start = performance.now();
+        void decryptUserAgentsBackground(entries, $encryptionKey).then(entries => {
+            const end = performance.now();
+            console.log(`decrypting user agents took ${end - start}ms`);
+            smallGraph2Data = getGraphData(notify.onErr(entries), Bucket.OperatingSystem, by, {
+                borderColor: 'transparent',
+                borderRadius: 4
+            });
         });
     }
     $: shouldShowMainGraph = Object.keys(Entry.groupEntriesByDay(entries)).length > 1;

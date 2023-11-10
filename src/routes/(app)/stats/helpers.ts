@@ -1,3 +1,6 @@
+import { decrypt } from '$lib/utils/encryption';
+import { Result } from '$lib/utils/result';
+
 export type HeatMapData = { date: Date; value: number }[];
 
 export interface EntryStats {
@@ -53,4 +56,19 @@ export function heatMapDataFromEntries(entries: EntryStats[]): Record<By, HeatMa
             value: By.Entries
         }))
     };
+}
+
+export function decryptUserAgentsBackground(
+    entries: EntryStats[],
+    key: string
+): Promise<Result<EntryStats[]>> {
+    // TODO: does this actually run the background..?
+    return Result.collectAsync(
+        entries.map(async entry => {
+            await new Promise(resolve => setTimeout(resolve, 0));
+            const decrypted = decrypt(entry.agentData, key);
+            if (!decrypted.ok) return decrypted.cast<EntryStats>();
+            return Result.ok({ ...entry, agentData: decrypted.val });
+        })
+    );
 }
