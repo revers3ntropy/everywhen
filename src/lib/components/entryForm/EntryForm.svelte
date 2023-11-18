@@ -13,8 +13,7 @@
     import { Result } from '$lib/utils/result';
     import { serializedAgentData } from '$lib/utils/userAgent';
     import LabelSelect from '$lib/components/label/LabelSelect.svelte';
-    import { LS_KEYS } from '$lib/constants';
-    import type { Entry } from '$lib/controllers/entry/entry';
+    import { Entry } from '$lib/controllers/entry/entry';
     import type { Label } from '$lib/controllers/label/label';
     import {
         currentlyUploadingAssets,
@@ -58,33 +57,35 @@
         newEntryLabel = '';
     }
 
-    function titleLsKey() {
-        return `${LS_KEYS.newEntryTitle}-${$username}-${entry?.id ?? ''}`;
-    }
-    function bodyLsKey() {
-        return `${LS_KEYS.newEntryBody}-${$username}-${entry?.id ?? ''}`;
-    }
-    function labelLsKey() {
-        return `${LS_KEYS.newEntryLabel}-${$username}-${entry?.id ?? ''}`;
-    }
-
     function saveToLS() {
-        localStorage.setItem(titleLsKey(), encrypt(newEntryTitle, $encryptionKey));
-        localStorage.setItem(bodyLsKey(), encrypt(newEntryBody, $encryptionKey));
-        localStorage.setItem(labelLsKey(), newEntryLabel);
+        localStorage.setItem(
+            Entry.titleLsKey($username, entry),
+            encrypt(newEntryTitle, $encryptionKey)
+        );
+        localStorage.setItem(
+            Entry.bodyLsKey($username, entry),
+            encrypt(newEntryBody, $encryptionKey)
+        );
+        localStorage.setItem(Entry.labelLsKey($username, entry), newEntryLabel);
     }
 
     function restoreFromLS() {
         // if nothing is saved, don't restore.
         // particularly important for editing entries
-        if (localStorage.getItem(bodyLsKey()) === null) return;
-        newEntryTitle = decrypt(localStorage.getItem(titleLsKey()) || '', $encryptionKey)
+        if (localStorage.getItem(Entry.bodyLsKey($username, entry)) === null) return;
+        newEntryTitle = decrypt(
+            localStorage.getItem(Entry.titleLsKey($username, entry)) || '',
+            $encryptionKey
+        )
             .mapErr(() => notify.error('Failed to decrypt saved entry title'))
             .or('');
-        newEntryBody = decrypt(localStorage.getItem(bodyLsKey()) || '', $encryptionKey)
+        newEntryBody = decrypt(
+            localStorage.getItem(Entry.bodyLsKey($username, entry)) || '',
+            $encryptionKey
+        )
             .mapErr(() => notify.error('Failed to decrypt saved entry title'))
             .or('');
-        newEntryLabel = localStorage.getItem(labelLsKey()) || '';
+        newEntryLabel = localStorage.getItem(Entry.labelLsKey($username, entry)) || '';
     }
 
     function areUnsavedChanges() {

@@ -1,3 +1,4 @@
+import { LS_KEYS } from '$lib/constants';
 import { fmtUtc } from '$lib/utils/time';
 import type { Hours, TimestampSecs } from '../../../types';
 import type { Label } from '../label/label';
@@ -171,5 +172,15 @@ export namespace Entry {
         createdTzOffset: Hours;
     }): TimestampSecs {
         return entry.created + entry.createdTzOffset * 60 * 60;
+    }
+
+    export function titleLsKey(username: string | null, editing: Entry | null): string {
+        return `${LS_KEYS.newEntryTitle}-${username ?? ''}-${editing?.id ?? ''}`;
+    }
+    export function bodyLsKey(username: string | null, editing: Entry | null): string {
+        return `${LS_KEYS.newEntryBody}-${username ?? ''}-${editing?.id ?? ''}`;
+    }
+    export function labelLsKey(username: string | null, editing: Entry | null): string {
+        return `${LS_KEYS.newEntryLabel}-${username ?? ''}-${editing?.id ?? ''}`;
     }
 }

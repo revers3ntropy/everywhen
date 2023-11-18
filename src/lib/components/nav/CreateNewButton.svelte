@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { Entry } from '$lib/controllers/entry/entry';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import BulletPoints from 'svelte-material-icons/FormatListBulleted.svelte';
@@ -12,8 +13,7 @@
     import { api } from '$lib/utils/apiRequest';
     import { page } from '$app/stores';
     import { goto } from '$app/navigation';
-    import { LS_KEYS } from '$lib/constants';
-    import { eventsSortKey, settingsStore } from '$lib/stores';
+    import { eventsSortKey, settingsStore, username } from '$lib/stores';
     import { nowUtc } from '$lib/utils/time';
     import { Event as EventController } from '$lib/controllers/event/event';
 
@@ -51,7 +51,7 @@
             value: false
         });
         const labelId = await makeLabelFromNameIfDoesntExist(name, defaultColor);
-        localStorage.setItem(LS_KEYS.newEntryLabel, labelId);
+        localStorage.setItem(Entry.labelLsKey($username, null), labelId);
         await gotoIfNotAt('/journal');
     }
 
@@ -73,7 +73,7 @@
             value: false
         });
         $settingsStore.useBulletEntryForm.value = false;
-        localStorage.removeItem(LS_KEYS.newEntryLabel);
+        localStorage.removeItem(Entry.labelLsKey($username, null));
         await gotoIfNotAt('/journal');
     }
 
