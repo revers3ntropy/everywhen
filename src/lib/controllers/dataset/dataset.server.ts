@@ -317,7 +317,10 @@ namespace DatasetServer {
 
         let columns: DatasetColumn<unknown>[];
         if (presetId) {
-            columns = datasetPresets[presetId as PresetId].columns;
+            const preset = datasetPresets[presetId as PresetId];
+            // TODO: check if is external or not
+            //       if external, cannot add columns
+            columns = preset.columns;
         } else {
             columns = allColumnsRes.val.filter(c => c.datasetId === datasetId);
         }

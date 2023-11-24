@@ -1,10 +1,5 @@
 import adapter from '@sveltejs/adapter-node';
 import { vitePreprocess } from '@sveltejs/kit/vite';
-import fs from 'fs';
-
-/** @type {{ version: string }} */
-const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8'));
-const version = packageJson.version;
 
 const ignoreWarningCodes = ['css-unused-selector', 'unused-export-let'];
 

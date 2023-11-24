@@ -21,6 +21,19 @@ export const datasetPresets = {
             }
         ]
     },
+    happiness: {
+        id: 'happiness',
+        defaultName: 'Happiness',
+        columns: [
+            {
+                id: 0,
+                name: 'Happiness',
+                created: null,
+                type: builtInTypes.number,
+                datasetId: ''
+            }
+        ]
+    },
     gitHubCommits: {
         id: 'gitHubCommits',
         defaultName: 'GitHub Commits',

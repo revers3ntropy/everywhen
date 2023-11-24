@@ -3,6 +3,7 @@ import { PUBLIC_ENV } from '$env/static/public';
 import { DEV_USE_TZ_OFFSET_0 } from '$lib/constants';
 import { browser } from '$app/environment';
 import type { Hours, Seconds, TimestampSecs } from '../../types';
+import { Result } from '$lib/utils/result';
 
 moment.updateLocale('en', {
     relativeTime: {
@@ -119,4 +120,48 @@ export function daysSince(timestamp: TimestampSecs, tzOffset: Hours): number {
         return 1;
     }
     return Math.floor((today - then) / (60 * 60 * 24)) + 1;
+}
+
+export class Day {
+    constructor(
+        public readonly year: number,
+        public readonly month: number,
+        public readonly date: number
+    ) {}
+
+    static fromTimestamp(timestamp: TimestampSecs, tzOffset: Hours): Day {
+        const date = new Date((timestamp + tzOffset * 60 * 60) * 1000);
+        return new Day(date.getFullYear(), date.getMonth() + 1, date.getDate());
+    }
+
+    static today(tzOffset: Hours): Day {
+        return Day.fromTimestamp(nowUtc(), tzOffset);
+    }
+
+    static fromString(str: string): Result<Day> {
+        const parts = str.split('-');
+        if (parts.length !== 3) {
+            return Result.err('Invalid day format');
+        }
+        const [year, month, date] = parts.map(Number);
+        if (isNaN(year) || isNaN(month) || isNaN(date)) {
+            return Result.err('Invalid day format');
+        }
+        if (year < 1000 || year > 9999) {
+            return Result.err('Invalid year');
+        }
+        if (month < 1 || month > 12) {
+            return Result.err('Invalid month');
+        }
+        if (date < 1 || date > 31) {
+            return Result.err('Invalid date');
+        }
+        return Result.ok(new Day(year, month, date));
+    }
+
+    fmtIso(): string {
+        return `${this.year}-${this.month.toString().padStart(2, '0')}-${this.date
+            .toString()
+            .padStart(2, '0')}`;
+    }
 }

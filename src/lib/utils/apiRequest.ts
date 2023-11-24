@@ -58,6 +58,7 @@ export interface ApiRoutes {
     '/oauth/gh': typeof import('../../routes/api/oauth/gh/+server');
     '/events/?': typeof import('../../routes/api/events/[eventId]/+server');
     '/locations/?': typeof import('../../routes/api/locations/[locationId]/+server');
+    '/feed/?': typeof import('../../routes/api/feed/[day]/+server');
 }
 
 export async function makeApiReq<

@@ -174,6 +174,19 @@ export namespace Entry {
         return entry.created + entry.createdTzOffset * 60 * 60;
     }
 
+    export function compareLocalTimes(
+        a: {
+            created: TimestampSecs;
+            createdTzOffset: Hours;
+        },
+        b: {
+            created: TimestampSecs;
+            createdTzOffset: Hours;
+        }
+    ): number {
+        return localTime(a) - localTime(b);
+    }
+
     export function titleLsKey(username: string | null, editing: Entry | null): string {
         return `${LS_KEYS.newEntryTitle}-${username ?? ''}-${editing?.id ?? ''}`;
     }

@@ -6,6 +6,7 @@ import { Location } from '$lib/controllers/location/location.server';
 import { query } from '$lib/db/mysql.server';
 import { decrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
+import type { Day } from '$lib/utils/time';
 
 export async function all(auth: Auth, filter: EntryFilter = {}): Promise<Result<Entry[]>> {
     let location: Location | null = null;
@@ -160,23 +161,19 @@ export async function getPage(
     });
 }
 
-export async function near(
-    auth: Auth,
-    location: Location,
-    deleted: boolean | 'both' = false
-): Promise<Result<Entry[]>> {
-    const raw = await query<
+export async function onDay(auth: Auth, day: Day): Promise<Result<Entry[]>> {
+    const rawEntries = await query<
         {
             id: string;
             created: number;
             createdTzOffset: number;
-            deleted: number | null;
+            title: string;
             pinned: number | null;
+            deleted: number | null;
+            labelId: string | null;
+            body: string;
             latitude: number | null;
             longitude: number | null;
-            title: string;
-            body: string;
-            labelId: string | null;
             agentData: string;
             wordCount: number;
         }[]
@@ -184,29 +181,24 @@ export async function near(
         SELECT id,
                created,
                createdTzOffset,
-               deleted,
+               title,
                pinned,
+               deleted,
+               labelId,
+               body,
                latitude,
                longitude,
-               title,
-               body,
-               labelId,
                agentData,
                wordCount
         FROM entries
-        WHERE (
-            (deleted IS NULL = ${!deleted})
-            OR ${deleted === 'both'}
-        )
-        AND userId = ${auth.id}
-        AND latitude IS NOT NULL
-        AND longitude IS NOT NULL
-        AND SQRT(
-            POW(latitude - ${location.latitude}, 2)
-            + POW(longitude - ${location.longitude}, 2)
-        ) <= ${location.radius}
+        WHERE deleted IS NULL
+          AND userId = ${auth.id}
+          AND DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%Y-%m-%d') = ${day.fmtIso()}
+        ORDER BY created DESC, id
     `;
-    return await entriesFromRaw(auth, raw);
+    // TODO: use index on 'created' with large buffer around day's timestamp to reduce DB reads
+
+    return await entriesFromRaw(auth, rawEntries);
 }
 
 function filterEntriesBySearchTerm(entries: Entry[], searchTerm: string): Entry[] {

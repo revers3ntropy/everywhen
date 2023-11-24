@@ -1,16 +1,13 @@
 <script lang="ts">
     import DatasetShortcutWidgets from '$lib/components/dataset/DatasetShortcutWidgets.svelte';
-    import Entries from '$lib/components/entry/Entries.svelte';
     import EntriesSidebar from '$lib/components/entry/EntriesSidebar.svelte';
-    import { encryptionKey, navExpanded, obfuscated } from '$lib/stores';
-    import { encrypt } from '$lib/utils/encryption';
+    import { navExpanded, obfuscated } from '$lib/stores';
     import Search from 'svelte-material-icons/Magnify.svelte';
     import type { PageData } from './$types';
+    import Feed from '$lib/components/Feed.svelte';
 
     export let data: PageData;
     let { pinnedEntriesList, datasets, nYearsAgo, locations } = data;
-
-    let search: string;
 </script>
 
 <svelte:head>
@@ -27,25 +24,11 @@
     </section>
 
     <section class="feed">
-        <div>
+        <div class="pb-4">
             <DatasetShortcutWidgets {datasets} />
         </div>
 
-        <div style="padding: 1rem 0 0 0.5rem;">
-            <input bind:value={search} placeholder="Search in entries..." type="text" />
-            <button aria-label="search">
-                <Search />
-            </button>
-        </div>
-
-        {#key search}
-            <Entries
-                showLabels
-                showEntryForm
-                {locations}
-                options={{ search: encrypt(search, $encryptionKey, true) }}
-            />
-        {/key}
+        <Feed {locations} />
     </section>
 </main>
 
