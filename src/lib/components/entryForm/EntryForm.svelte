@@ -427,8 +427,8 @@
                 placeholder={obfuscated
                     ? ''
                     : useBulletEntryForm
-                    ? 'Write a bullet...'
-                    : 'Start writing here...'}
+                      ? 'Write a bullet...'
+                      : 'Start writing here...'}
                 class="text-lg py-2 resize-none w-full bg-transparent md:bg-lightAccent"
                 class:obfuscated
                 class:rounded-lg={useBulletEntryForm}

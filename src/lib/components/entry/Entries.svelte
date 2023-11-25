@@ -9,7 +9,7 @@
     import type { Location } from '$lib/controllers/location/location';
     import type { Mutable } from '../../../types';
     import Spinner from '../BookSpinner.svelte';
-    import EntryGroup from '$lib/components/entry/EntryGroup.svelte';
+    import DayInFeed from '$lib/components/feed/DayInFeed.svelte';
 
     interface IOptions extends EntryFilter {
         readonly count?: number;
@@ -112,11 +112,10 @@
 </script>
 
 {#each sortedEntryKeys as day (day)}
-    <EntryGroup
-        entries={entries[day]}
+    <DayInFeed
+        day={{ entries: entries[day], day, happiness: null, nextDayInPast: null }}
         obfuscated={$obfuscated}
         {showLabels}
-        day={new Date(day).getTime() / 1000}
         {locations}
         {showEntryForm}
     />

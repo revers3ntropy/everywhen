@@ -20,5 +20,6 @@ export const githubCommitsProvider = {
 
 export const thirdPartyDatasetProviders: Record<PresetId, ThirdPartyDatasetProvider | null> = {
     weight: null,
-    gitHubCommits: githubCommitsProvider
+    gitHubCommits: githubCommitsProvider,
+    happiness: null
 };

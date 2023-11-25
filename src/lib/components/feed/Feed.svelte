@@ -1,7 +1,7 @@
 <script lang="ts">
     import { obfuscated } from '$lib/stores';
     import InfiniteScroller from '$lib/components/InfiniteScroller.svelte';
-    import EntryGroup from '$lib/components/entry/EntryGroup.svelte';
+    import DayInFeed from '$lib/components/feed/DayInFeed.svelte';
     import type { Location } from '$lib/controllers/location/location';
     import type { FeedDay } from '$lib/controllers/feed/feed';
     import { currentTzOffset, Day } from '$lib/utils/time';
@@ -18,12 +18,13 @@
         if (nextDay === null) {
             feedDaysCount = days.length + 1;
         }
+        console.log(day);
         return [day];
     }
 
     let feedDaysCount = Infinity;
     let days: FeedDay[] = [];
-    let nextDay: Day | null = null;
+    let nextDay: string | null = null;
 </script>
 
 <InfiniteScroller
@@ -36,14 +37,7 @@
 >
     <div class="assets">
         {#each days as day}
-            <EntryGroup
-                entries={day.entries}
-                obfuscated={$obfuscated}
-                showLabels
-                day={new Date(day.day).getTime() / 1000}
-                {locations}
-                showEntryForm
-            />
+            <DayInFeed {day} obfuscated={$obfuscated} showLabels {locations} showEntryForm />
         {/each}
     </div>
     <div class="flex-center" slot="empty">

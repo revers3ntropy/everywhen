@@ -1,10 +1,10 @@
 export type Expand<T> = T extends (infer E)[]
     ? E[]
     : T extends object
-    ? T extends infer O
-        ? { [K in keyof O]: Expand<O[K]> }
-        : never
-    : T;
+      ? T extends infer O
+          ? { [K in keyof O]: Expand<O[K]> }
+          : never
+      : T;
 
 export type ArrayElement<ArrayType extends readonly unknown[]> =
     ArrayType extends readonly (infer ElementType)[] ? ElementType : never;

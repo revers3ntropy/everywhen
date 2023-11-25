@@ -2,7 +2,7 @@
     import { writable } from 'svelte/store';
     import type { Writable } from 'svelte/store';
 
-    let collapsed: Writable<Record<number, boolean>> = writable({});
+    let collapsed: Writable<Record<string, boolean>> = writable({});
 </script>
 
 <script lang="ts">
@@ -16,21 +16,20 @@
     import { ANIMATION_DURATION } from '$lib/constants';
     import { listen } from '$lib/dataChangeEvents';
     import Entry from '$lib/components/entry/Entry.svelte';
-    import type { Entry as EntryController } from '$lib/controllers/entry/entry';
     import type { Location } from '$lib/controllers/location/location';
-    import { currentTzOffset, nowUtc, utcEq } from '$lib/utils/time';
+    import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
     import Dot from '../Dot.svelte';
     import UtcTime from '../UtcTime.svelte';
+    import type { FeedDay } from '$lib/controllers/feed/feed';
 
     export let locations: Location[];
     export let obfuscated = true;
-    export let entries: EntryController[];
+    export let day: FeedDay;
     export let showLabels = true;
     export let showEntryForm = false;
-    export let day: number;
 
     function toggleCollapse() {
-        $collapsed[day] = !$collapsed[day];
+        $collapsed[day.day] = !$collapsed[day.day];
     }
 
     function scrollToEntryIfExists(id: string) {
@@ -45,8 +44,10 @@
         }, 10);
     }
 
-    $: isToday = utcEq(nowUtc(), day, currentTzOffset(), 0, 'YYYY-MM-DD');
-    $: $collapsed[day] = entries.length < 1 && (!isToday || !showEntryForm);
+    $: entries = day.entries;
+    $: isToday = fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD') === day.day;
+    $: dayTimestamp = new Date(day.day).getTime() / 1000;
+    $: $collapsed[day.day] = entries.length < 1 && (!isToday || !showEntryForm);
 
     listen.entry.onCreate(({ entry, isBullet }) => {
         if (!isToday) return;
@@ -72,30 +73,35 @@
 
 <div class="entry-group">
     <div class="title">
-        <div>
-            <h3>
+        <div class="flex justify-between">
+            <div>
                 <button class="flex-center" on:click={toggleCollapse}>
-                    {#if $collapsed[day]}
+                    {#if $collapsed[day.day]}
                         <ChevronDown size="25" />
                     {:else}
                         <ChevronUp size="25" />
                     {/if}
 
-                    <UtcTime fmt="ddd, Do MMMM YYYY" noTooltip timestamp={day} tzOffset={0} />
+                    <UtcTime
+                        fmt="ddd, Do MMMM YYYY"
+                        noTooltip
+                        timestamp={dayTimestamp}
+                        tzOffset={0}
+                    />
 
                     <Dot light marginX={10} />
 
                     <span class="text-light">
                         {#if isToday}
                             <span>Today</span>
-                        {:else if utcEq(nowUtc() - 60 * 60 * 24, day, currentTzOffset(), 0, 'YYYY-MM-DD')}
+                        {:else if fmtUtc(nowUtc() - 60 * 60 * 24, currentTzOffset(), 'YYYY-MM-DD') === day.day}
                             <span>Yesterday</span>
                         {:else}
-                            <UtcTime relative timestamp={day} tzOffset={0} />
+                            <UtcTime relative timestamp={dayTimestamp} tzOffset={0} />
                         {/if}
                     </span>
 
-                    {#if $collapsed[day]}
+                    {#if $collapsed[day.day]}
                         <div
                             transition:fly|local={{
                                 // local transition to avoid affecting other groups
@@ -106,16 +112,21 @@
                         >
                             <Dot light marginX={10} />
                             <p class="entry-count">
-                                {entries.length}
-                                {entries.length === 1 ? 'entry' : 'entries'}
+                                {day.entries.length}
+                                {day.entries.length === 1 ? 'entry' : 'entries'}
                             </p>
                         </div>
                     {/if}
                 </button>
-            </h3>
+            </div>
+            <div>
+                {#if day.happiness !== null}
+                    {day.happiness}
+                {/if}
+            </div>
         </div>
     </div>
-    {#if !$collapsed[day]}
+    {#if !$collapsed[day.day]}
         <div
             transition:slide|local={{
                 axis: 'y',
@@ -148,7 +159,7 @@
                         />
                     {/each}
                 {/if}
-                {#each entries as entry (entry.id)}
+                {#each day.entries as entry (entry.id)}
                     <Entry {...entry} {obfuscated} {showLabels} {locations} />
                 {/each}
             </div>
@@ -181,9 +192,6 @@
         }
 
         .title {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             padding: 0.4rem 0.8rem;
 
             @media #{$mobile} {
@@ -200,10 +208,6 @@
             .entry-count {
                 font-size: 1rem;
                 color: var(--text-color-light);
-            }
-
-            h3 {
-                font-weight: normal;
             }
         }
 

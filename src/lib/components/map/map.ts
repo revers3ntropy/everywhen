@@ -45,7 +45,7 @@ export function olLayerFromLocations(
         radius: Meters
     ) => void
 ): {
-    layer: VectorLayer<VectorSource<Geometry>>;
+    layer: VectorLayer<VectorSource<Feature<Geometry>>>;
     interactions: Modify[];
 } {
     const locationFeatures = locations.map(l => {
@@ -199,7 +199,7 @@ export function olFeatureFromLocation(location: Location, view: View): LocationF
 
 export function olLayerFromEntries(
     entries: EntryAsLocation[]
-): VectorLayer<VectorSource<Geometry>> {
+): VectorLayer<VectorSource<Feature<Geometry>>> {
     return new LayerVector({
         source: new SourceVector({
             features: entries.map(olFeatureFromEntry).filter(Boolean)
@@ -224,7 +224,7 @@ export function olFeatureFromEntry(entry: EntryAsLocation): EntryFeature | null 
 export function olEntryBezierArrows(
     entries: EntryAsLocation[],
     view: View
-): VectorLayer<VectorSource<Geometry>> {
+): VectorLayer<VectorSource<Feature<Geometry>>> {
     const mPerUnit = view.getProjection().getMetersPerUnit();
     if (!mPerUnit) {
         throw new Error('mPerUnit is null');

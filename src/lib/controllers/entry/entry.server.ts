@@ -430,13 +430,17 @@ namespace EntryServer {
         });
     }
 
-    export async function dayOfEntryBeforeThisOne(auth: Auth, entry: Entry): Promise<Day | null> {
+    export async function dayOfEntryBeforeThisOne(
+        auth: Auth,
+        entry: Entry | null
+    ): Promise<Day | null> {
+        const lastTime = entry ? Entry.localTime(entry) : nowUtc();
         const entries = await query<{ created: number; createdTzOffset: number }[]>`
             SELECT created, createdTzOffset
             FROM entries
             WHERE deleted IS NULL
               AND userId = ${auth.id}
-              AND (created + createdTzOffset * 60 * 60) < ${Entry.localTime(entry)}
+              AND (created + createdTzOffset * 60 * 60) < ${lastTime}
             ORDER BY created DESC, id
             LIMIT 1
         `;

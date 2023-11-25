@@ -28,10 +28,10 @@ export interface Options {
 export type ResType<T> = T extends typeof apiRes404
     ? 'this path gives a 404'
     : T extends (props: infer _) => Promise<GenericResponse<infer R>>
-    ? R
-    : T extends (props: infer _) => GenericResponse<infer R>
-    ? R
-    : 'not an API route';
+      ? R
+      : T extends (props: infer _) => GenericResponse<infer R>
+        ? R
+        : 'not an API route';
 
 type Method = 'GET' | 'POST' | 'PUT' | 'DELETE';
 

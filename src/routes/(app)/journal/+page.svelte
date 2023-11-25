@@ -2,9 +2,8 @@
     import DatasetShortcutWidgets from '$lib/components/dataset/DatasetShortcutWidgets.svelte';
     import EntriesSidebar from '$lib/components/entry/EntriesSidebar.svelte';
     import { navExpanded, obfuscated } from '$lib/stores';
-    import Search from 'svelte-material-icons/Magnify.svelte';
     import type { PageData } from './$types';
-    import Feed from '$lib/components/Feed.svelte';
+    import Feed from '$lib/components/feed/Feed.svelte';
 
     export let data: PageData;
     let { pinnedEntriesList, datasets, nYearsAgo, locations } = data;
