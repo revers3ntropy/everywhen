@@ -91,15 +91,11 @@ export namespace Asset {
                             fileName: file.name,
                             content: contentAsWebP.val
                         })
-                    ).match(
-                        val =>
-                            Result.ok<UploadImageResult>({
-                                publicId: val.publicId,
-                                fileName: file.name,
-                                id: val.id
-                            }),
-                        err => Result.err<UploadImageResult>(err)
-                    )
+                    ).map(val => ({
+                        publicId: val.publicId,
+                        fileName: file.name,
+                        id: val.id
+                    }))
                 );
             })
         );
