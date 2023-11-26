@@ -18,7 +18,6 @@
         if (nextDay === null) {
             feedDaysCount = days.length + 1;
         }
-        console.log(day);
         return [day];
     }
 

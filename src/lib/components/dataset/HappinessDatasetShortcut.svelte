@@ -1,54 +1,87 @@
 <script lang="ts">
+    import EmoticonOutline from 'svelte-material-icons/EmoticonOutline.svelte';
+    import Plus from 'svelte-material-icons/Plus.svelte';
     import type { Dataset } from '$lib/controllers/dataset/dataset';
     import { notify } from '$lib/components/notifications/notifications';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { currentTzOffset, nowUtc } from '$lib/utils/time';
+    import HappinessValueIcon from '$lib/components/dataset/HappinessValueIcon.svelte';
+    import Dropdown from '$lib/components/Dropdown.svelte';
+    import { datasetPresets } from '$lib/controllers/dataset/presets';
+    import Check from 'svelte-material-icons/Check.svelte';
 
     export let dataset: Dataset | null;
+
     async function submit(value: number) {
-        if (!dataset) return;
-        if (submitting) return;
+        if (submitted) return;
+        submitted = true;
 
-        submitting = true;
+        if (!dataset) await makeFromPreset();
 
+        const newRow = {
+            elements: [value],
+            created: nowUtc(),
+            timestamp: nowUtc(),
+            timestampTzOffset: currentTzOffset()
+        };
         notify.onErr(
             await api.post(apiPath('/datasets/?', dataset.id), {
-                rows: [
-                    {
-                        elements: [value],
-                        created: nowUtc(),
-                        timestamp: nowUtc(),
-                        timestampTzOffset: currentTzOffset()
-                    }
-                ]
+                rows: [newRow]
             })
         );
 
-        submitting = false;
-        value = '' as unknown as number;
         notify.success('Happiness entered');
     }
 
-    let submitting = false;
+    async function makeFromPreset() {
+        const { id } = notify.onErr(
+            await api.post('/datasets', {
+                name: datasetPresets.happiness.defaultName,
+                presetId: 'happiness'
+            })
+        );
+        dataset = {
+            id,
+            name: datasetPresets.happiness.defaultName,
+            created: nowUtc(),
+            preset: datasetPresets.happiness
+        };
+    }
+
+    let submitted = false;
 </script>
 
-{#if dataset}
-    <div class="container">
-        <div class="flex-center gap-2">
-            <button on:click={() => submit(0)}>Sad</button>
-            <button on:click={() => submit(0.5)}>Meh</button>
-            <button on:click={() => submit(1)}>Happy</button>
+{#if submitted}
+    <div class="bg-vLightAccent rounded-full w-fit p-1 relative">
+        <EmoticonOutline size={32} />
+        <div class="absolute" style="bottom: -1px; left: 26px">
+            <Check size={20} />
         </div>
     </div>
+{:else}
+    <Dropdown>
+        <div slot="button" class="bg-vLightAccent rounded-full w-fit p-1 hover:bg-lightAccent">
+            <EmoticonOutline size={32} />
+            <div class="absolute" style="bottom: -1px; left: 26px">
+                <Plus size={20} />
+            </div>
+        </div>
+        <div class="flex-center gap-2 p-4">
+            <button on:click={() => submit(0)}>
+                <HappinessValueIcon value={0} size={32} />
+            </button>
+            <button on:click={() => submit(0.25)}>
+                <HappinessValueIcon value={0.25} size={32} />
+            </button>
+            <button on:click={() => submit(0.5)}>
+                <HappinessValueIcon value={0.5} size={32} />
+            </button>
+            <button on:click={() => submit(0.75)}>
+                <HappinessValueIcon value={0.75} size={32} />
+            </button>
+            <button on:click={() => submit(1)}>
+                <HappinessValueIcon value={1} size={32} />
+            </button>
+        </div>
+    </Dropdown>
 {/if}
-
-<style lang="scss">
-    .container {
-        width: fit-content;
-        padding: 1rem;
-    }
-
-    input {
-        width: 4rem;
-    }
-</style>

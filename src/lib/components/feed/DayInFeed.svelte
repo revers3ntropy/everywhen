@@ -9,7 +9,6 @@
     import { page } from '$app/stores';
     import EntryForm from '$lib/components/entryForm/EntryForm.svelte';
     import { currentlyUploadingEntries } from '$lib/stores';
-    import { clientLogger } from '$lib/utils/log';
     import { fly, slide } from 'svelte/transition';
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
@@ -21,6 +20,7 @@
     import Dot from '../Dot.svelte';
     import UtcTime from '../UtcTime.svelte';
     import type { FeedDay } from '$lib/controllers/feed/feed';
+    import HappinessValueIcon from '$lib/components/dataset/HappinessValueIcon.svelte';
 
     export let locations: Location[];
     export let obfuscated = true;
@@ -32,34 +32,20 @@
         $collapsed[day.day] = !$collapsed[day.day];
     }
 
-    function scrollToEntryIfExists(id: string) {
-        setTimeout(() => {
-            const el = document.getElementById(id);
-            if (!el) {
-                clientLogger.error('Could not find new entry element');
-                return;
-            }
-            el.tabIndex = -1;
-            el.focus({ preventScroll: false });
-        }, 10);
-    }
-
     $: entries = day.entries;
     $: isToday = fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD') === day.day;
     $: dayTimestamp = new Date(day.day).getTime() / 1000;
     $: $collapsed[day.day] = entries.length < 1 && (!isToday || !showEntryForm);
 
-    listen.entry.onCreate(({ entry, isBullet }) => {
+    listen.entry.onCreate(({ entry }) => {
         if (!isToday) return;
         entries = [...entries, entry].sort((a, b) => b.created - a.created);
-        if (!isBullet) {
-            scrollToEntryIfExists(entry.id);
-        }
     });
     listen.entry.onDelete(id => {
         entries = entries.filter(entry => entry.id !== id);
     });
     listen.entry.onUpdate(entry => {
+        // only update if the entry is in this group
         const i = entries.findIndex(e => e.id === entry.id);
         if (i !== -1) {
             entries[i] = entry;
@@ -112,8 +98,8 @@
                         >
                             <Dot light marginX={10} />
                             <p class="entry-count">
-                                {day.entries.length}
-                                {day.entries.length === 1 ? 'entry' : 'entries'}
+                                {entries.length}
+                                {entries.length === 1 ? 'entry' : 'entries'}
                             </p>
                         </div>
                     {/if}
@@ -121,7 +107,7 @@
             </div>
             <div>
                 {#if day.happiness !== null}
-                    {day.happiness}
+                    <HappinessValueIcon value={day.happiness} />
                 {/if}
             </div>
         </div>
@@ -159,7 +145,7 @@
                         />
                     {/each}
                 {/if}
-                {#each day.entries as entry (entry.id)}
+                {#each entries as entry (entry.id)}
                     <Entry {...entry} {obfuscated} {showLabels} {locations} />
                 {/each}
             </div>
