@@ -5,10 +5,15 @@
     import { doesNotWantToEnableLocation, enabledLocation, settingsStore } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { nowUtc } from '$lib/utils/time';
+    import { notify } from '$lib/components/notifications/notifications';
 
     async function enable() {
         const wasEnabled = $enabledLocation;
         $enabledLocation = true;
+
+        if (!wasEnabled) {
+            notify.success('Location enabled');
+        }
 
         if ($settingsStore.preferLocationOn.value) return;
         // only ask this if showing the 'location not enabled' option
@@ -28,6 +33,7 @@
         });
         $settingsStore.preferLocationOn.value = true;
         $settingsStore.preferLocationOn.created = nowUtc();
+        notify.success('Location enabled by default');
     }
 
     function close() {
@@ -36,8 +42,10 @@
 </script>
 
 {#if (!$enabledLocation || !$settingsStore.preferLocationOn.value) && !$doesNotWantToEnableLocation}
-    <button on:click={enable} class="outer">
-        <Info />
+    <button on:click={enable} class="outer bottom-14 md:bottom-0">
+        <span class="hide-mobile">
+            <Info />
+        </span>
         <span>
             {#if !$enabledLocation}
                 Location is not enabled - click to enable location, so that future entries show up
@@ -67,7 +75,6 @@
         padding: 0.5rem 0;
         margin: 0;
         position: fixed;
-        bottom: 0;
         z-index: 1;
         background: var(--transluscent-bg);
         display: flex;
