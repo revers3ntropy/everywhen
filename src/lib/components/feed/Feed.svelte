@@ -7,8 +7,10 @@
     import { currentTzOffset, Day } from '$lib/utils/time';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
+    import type { Dataset } from '$lib/controllers/dataset/dataset';
 
     export let locations: Location[];
+    export let happinessDataset: Dataset | null;
 
     async function loadMoreDays(): Promise<FeedDay[]> {
         const day = notify.onErr(
@@ -36,7 +38,14 @@
 >
     <div class="assets">
         {#each days as day}
-            <DayInFeed {day} obfuscated={$obfuscated} showLabels {locations} showEntryForm />
+            <DayInFeed
+                {day}
+                obfuscated={$obfuscated}
+                showLabels
+                {locations}
+                showEntryForm
+                {happinessDataset}
+            />
         {/each}
     </div>
     <div class="flex-center" slot="empty">

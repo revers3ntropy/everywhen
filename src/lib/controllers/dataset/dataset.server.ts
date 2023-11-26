@@ -77,6 +77,29 @@ namespace DatasetServer {
         );
     }
 
+    export async function getDatasetFromPresetId(
+        auth: Auth,
+        presetId: PresetId
+    ): Promise<Dataset | null> {
+        return await query<
+            { id: string; name: string; created: TimestampSecs; presetId: PresetId | null }[]
+        >`
+            SELECT id, name, created, presetId
+            FROM datasets
+            WHERE userId = ${auth.id}
+                AND presetId = ${presetId}
+        `.then(rows => {
+            if (rows.length === 0) return null;
+            const [{ id, name, created, presetId }] = rows;
+            return {
+                id,
+                name,
+                created,
+                preset: presetId ? datasetPresets[presetId] : null
+            };
+        });
+    }
+
     export async function allMetaData(auth: Auth): Promise<Result<DatasetMetadata[]>> {
         const metadatas = [] as DatasetMetadata[];
 

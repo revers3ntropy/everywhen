@@ -20,14 +20,17 @@
     import Dot from '../Dot.svelte';
     import UtcTime from '../UtcTime.svelte';
     import type { FeedDay } from '$lib/controllers/feed/feed';
-    import HappinessValueIcon from '$lib/components/dataset/HappinessValueIcon.svelte';
     import { onMount } from 'svelte';
+    import HappinessDatasetShortcut from '$lib/components/dataset/HappinessDatasetShortcut.svelte';
+    import type { Dataset } from '$lib/controllers/dataset/dataset';
+    import HappinessValueIcon from '$lib/components/dataset/HappinessValueIcon.svelte';
 
     export let locations: Location[];
     export let obfuscated = true;
     export let day: FeedDay;
     export let showLabels = true;
     export let showEntryForm = false;
+    export let happinessDataset: Dataset | null = null;
 
     function toggleCollapse() {
         $collapsed[day.day] = !$collapsed[day.day];
@@ -112,7 +115,12 @@
                 </button>
             </div>
             <div>
-                {#if day.happiness !== null}
+                {#if isToday}
+                    <HappinessDatasetShortcut
+                        dataset={happinessDataset}
+                        buttonValue={day.happiness}
+                    />
+                {:else if day.happiness !== null}
                     <HappinessValueIcon value={day.happiness} />
                 {/if}
             </div>

@@ -6,7 +6,7 @@
     import Feed from '$lib/components/feed/Feed.svelte';
 
     export let data: PageData;
-    let { pinnedEntriesList, datasets, nYearsAgo, locations } = data;
+    let { pinnedEntriesList, datasets, nYearsAgo, locations, happinessDataset } = data;
 </script>
 
 <svelte:head>
@@ -27,7 +27,7 @@
             <DatasetShortcutWidgets {datasets} />
         </div>
 
-        <Feed {locations} />
+        <Feed {locations} {happinessDataset} />
     </section>
 </main>
 

@@ -2,7 +2,6 @@
     import type { Dataset, DatasetMetadata } from '$lib/controllers/dataset/dataset';
     import type { PresetId } from '$lib/controllers/dataset/presets';
     import WeightDatasetShortcut from './WeightDatasetShortcut.svelte';
-    import HappinessDatasetShortcut from '$lib/components/dataset/HappinessDatasetShortcut.svelte';
 
     export let datasets: DatasetMetadata[];
 
@@ -19,7 +18,6 @@
 
 <div class="wrapper">
     <WeightDatasetShortcut dataset={datasetsByPresetId['weight'] || null} />
-    <HappinessDatasetShortcut dataset={datasetsByPresetId['happiness'] || null} />
 </div>
 
 <style lang="scss">

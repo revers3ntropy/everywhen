@@ -18,6 +18,7 @@ export const load = cachedPageRoute(async (auth, { parent, locals }) => {
             : ({} as Record<string, EntrySummary[]>),
         pinnedEntriesList: (await Entry.getPinnedSummaries(auth)).unwrap(e => error(400, e)),
         datasets: (await Dataset.allMetaData(auth)).unwrap(e => error(400, e)),
-        locations: (await Location.all(auth)).unwrap(e => error(400, e))
+        locations: (await Location.all(auth)).unwrap(e => error(400, e)),
+        happinessDataset: await Dataset.getDatasetFromPresetId(auth, 'happiness')
     };
 }) satisfies PageServerLoad;

@@ -8,13 +8,13 @@
     import HappinessValueIcon from '$lib/components/dataset/HappinessValueIcon.svelte';
     import Dropdown from '$lib/components/Dropdown.svelte';
     import { datasetPresets } from '$lib/controllers/dataset/presets';
-    import Check from 'svelte-material-icons/Check.svelte';
 
     export let dataset: Dataset | null;
+    export let buttonValue: number | null = null;
 
     async function submit(value: number) {
-        if (submitted) return;
-        submitted = true;
+        if (submitted !== null) return;
+        submitted = value;
 
         if (!dataset) {
             const id = await makeFromPreset();
@@ -50,22 +50,22 @@
         ).id;
     }
 
-    let submitted = false;
+    let submitted: number | null = null;
 </script>
 
 {#if submitted}
-    <div class="bg-vLightAccent rounded-full w-fit p-1 relative">
-        <EmoticonOutline size={32} />
-        <div class="absolute" style="bottom: -1px; left: 26px">
-            <Check size={20} />
-        </div>
-    </div>
+    <HappinessValueIcon value={submitted} size={24} />
 {:else}
     <Dropdown>
-        <div slot="button" class="bg-vLightAccent rounded-full w-fit p-1 hover:bg-lightAccent">
-            <EmoticonOutline size={32} />
-            <div class="absolute" style="bottom: -1px; left: 26px">
-                <Plus size={20} />
+        <div slot="button" class="bg-lightAccent rounded-full w-fit hover:bg-transparent">
+            {#if buttonValue !== null}
+                <HappinessValueIcon value={buttonValue} size={24} />
+            {:else}
+                <EmoticonOutline size={24} />
+            {/if}
+
+            <div class="absolute text-light top-0 left-0" style="transform: translate(15px, -17px)">
+                <Plus size={16} />
             </div>
         </div>
         <div class="flex-center gap-2 p-4">
