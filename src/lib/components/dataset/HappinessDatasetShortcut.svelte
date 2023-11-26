@@ -16,7 +16,15 @@
         if (submitted) return;
         submitted = true;
 
-        if (!dataset) await makeFromPreset();
+        if (!dataset) {
+            const id = await makeFromPreset();
+            dataset = {
+                id,
+                name: datasetPresets.happiness.defaultName,
+                created: nowUtc(),
+                preset: datasetPresets.happiness
+            };
+        }
 
         const newRow = {
             elements: [value],
@@ -33,19 +41,13 @@
         notify.success('Happiness entered');
     }
 
-    async function makeFromPreset() {
-        const { id } = notify.onErr(
+    async function makeFromPreset(): Promise<string> {
+        return notify.onErr(
             await api.post('/datasets', {
                 name: datasetPresets.happiness.defaultName,
                 presetId: 'happiness'
             })
-        );
-        dataset = {
-            id,
-            name: datasetPresets.happiness.defaultName,
-            created: nowUtc(),
-            preset: datasetPresets.happiness
-        };
+        ).id;
     }
 
     let submitted = false;

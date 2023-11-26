@@ -55,7 +55,7 @@ test.describe('/journal', () => {
         await expectDeleteUser(api, auth);
     });
 
-    test('Can mark entry as favourite and unfavourite', async ({ page }) => {
+    test('Can add to and remove from favourites', async ({ page }) => {
         const { api } = await generateUserAndSignIn(page);
 
         const entryBody = LONG_TEXT;
@@ -67,8 +67,6 @@ test.describe('/journal', () => {
         expect(id).toHaveLength(UUID_LEN);
 
         await page.goto('/journal');
-        // must scroll entries into view to load them
-        await page.mouse.wheel(0, 1000);
         await expect(page.getByText(entryBody)).toBeAttached();
 
         // can pin entry
@@ -80,15 +78,12 @@ test.describe('/journal', () => {
         await page.getByRole('button', { name: 'Remove from Favourites' }).click();
 
         await page.reload();
-        // force entries to load
-        await page.mouse.wheel(0, 1000);
 
         // can pin entry
         await page.locator(`[id="${id}"]`).getByRole('button', { name: 'Open popup' }).click();
         await page.getByRole('button', { name: 'Add to Favourites' }).click();
 
         await page.reload();
-        await page.mouse.wheel(0, 10000);
 
         // can then unpin after reloading page
         await page.locator(`[id="${id}"]`).getByRole('button', { name: 'Open popup' }).click();
