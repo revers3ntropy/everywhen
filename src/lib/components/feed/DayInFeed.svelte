@@ -2,7 +2,8 @@
     import { writable } from 'svelte/store';
     import type { Writable } from 'svelte/store';
 
-    let collapsed: Writable<Record<string, boolean>> = writable({});
+    // 'empty' if collapsed by default as there are no entries for this day
+    let collapsed: Writable<Record<string, boolean | 'empty' | undefined>> = writable({});
 </script>
 
 <script lang="ts">
@@ -36,8 +37,14 @@
     $: isToday = fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD') === day.day;
     $: dayTimestamp = new Date(day.day).getTime() / 1000;
 
+    $: if (entries.length > 0 && $collapsed[day.day] == 'empty') {
+        $collapsed[day.day] = false;
+    }
+
     onMount(() => {
-        $collapsed[day.day] = entries.length < 1 && (!isToday || !showEntryForm);
+        if (entries.length < 1 && (!isToday || !showEntryForm)) {
+            $collapsed[day.day] = 'empty';
+        }
     });
 
     listen.entry.onCreate(({ entry }) => {
