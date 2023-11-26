@@ -10,22 +10,14 @@ export const load = cachedPageRoute(async (auth, { parent, locals }) => {
     await parent();
 
     const { settings } = locals;
-    if (!settings) throw error(500, 'Settings not found');
-
-    let nYearsAgo = {} as Record<string, EntrySummary[]>;
-    if (settings.showNYearsAgoEntryTitles.value) {
-        nYearsAgo = (await Entry.getSummariesNYearsAgo(auth)).unwrap(err => error(400, err));
-    }
-
-    const pinnedEntriesList = (await Entry.getPinnedSummaries(auth)).unwrap(err => error(400, err));
-
-    const datasets = (await Dataset.allMetaData(auth)).unwrap(err => error(400, err));
-    const locations = (await Location.all(auth)).unwrap(err => error(400, err));
+    if (!settings) throw error(500, 'User settings not found');
 
     return {
-        nYearsAgo,
-        pinnedEntriesList,
-        datasets,
-        locations
+        nYearsAgo: settings.showNYearsAgoEntryTitles.value
+            ? (await Entry.getSummariesNYearsAgo(auth)).unwrap(e => error(400, e))
+            : ({} as Record<string, EntrySummary[]>),
+        pinnedEntriesList: (await Entry.getPinnedSummaries(auth)).unwrap(e => error(400, e)),
+        datasets: (await Dataset.allMetaData(auth)).unwrap(e => error(400, e)),
+        locations: (await Location.all(auth)).unwrap(e => error(400, e))
     };
 }) satisfies PageServerLoad;

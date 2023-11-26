@@ -6,7 +6,6 @@
 </script>
 
 <script lang="ts">
-    import { page } from '$app/stores';
     import EntryForm from '$lib/components/entryForm/EntryForm.svelte';
     import { currentlyUploadingEntries } from '$lib/stores';
     import { fly, slide } from 'svelte/transition';
@@ -21,6 +20,7 @@
     import UtcTime from '../UtcTime.svelte';
     import type { FeedDay } from '$lib/controllers/feed/feed';
     import HappinessValueIcon from '$lib/components/dataset/HappinessValueIcon.svelte';
+    import { onMount } from 'svelte';
 
     export let locations: Location[];
     export let obfuscated = true;
@@ -35,7 +35,10 @@
     $: entries = day.entries;
     $: isToday = fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD') === day.day;
     $: dayTimestamp = new Date(day.day).getTime() / 1000;
-    $: $collapsed[day.day] = entries.length < 1 && (!isToday || !showEntryForm);
+
+    onMount(() => {
+        $collapsed[day.day] = entries.length < 1 && (!isToday || !showEntryForm);
+    });
 
     listen.entry.onCreate(({ entry }) => {
         if (!isToday) return;
@@ -50,10 +53,6 @@
         if (i !== -1) {
             entries[i] = entry;
         }
-    });
-
-    page.subscribe(() => {
-        collapsed.set({});
     });
 </script>
 
