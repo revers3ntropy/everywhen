@@ -56,7 +56,7 @@
 {#if submitted}
     <HappinessValueIcon value={submitted} size={24} />
 {:else}
-    <Dropdown>
+    <Dropdown fromRight>
         <div slot="button" class="bg-lightAccent rounded-full w-fit hover:bg-transparent">
             {#if buttonValue !== null}
                 <HappinessValueIcon value={buttonValue} size={24} />
@@ -64,7 +64,7 @@
                 <EmoticonOutline size={24} />
             {/if}
 
-            <div class="absolute text-light top-0 left-0" style="transform: translate(15px, -17px)">
+            <div class="absolute text-light top-0 left-0" style="transform: translate(15px, 7px)">
                 <Plus size={16} />
             </div>
         </div>
