@@ -450,6 +450,123 @@ namespace EntryServer {
         return Day.fromTimestamp(created, createdTzOffset);
     }
 
+    export async function allBasicSummaries(auth: Auth): Promise<
+        {
+            created: number;
+            createdTzOffset: number;
+            wordCount: number;
+            agentData: string;
+        }[]
+    > {
+        return await query<
+            {
+                created: number;
+                createdTzOffset: number;
+                wordCount: number;
+                agentData: string;
+            }[]
+        >`
+            SELECT
+                created,
+                createdTzOffset,
+                wordCount,
+                agentData
+            FROM entries
+            WHERE userId = ${auth.id}
+              AND deleted IS NULL
+            ORDER BY created DESC, id
+        `;
+    }
+
+    export async function basicSummariesForEntriesWithWord(
+        auth: Auth,
+        encryptedWord: string
+    ): Promise<
+        {
+            created: number;
+            createdTzOffset: number;
+            wordCount: number;
+            agentData: string;
+        }[]
+    > {
+        return await query<
+            {
+                created: number;
+                createdTzOffset: number;
+                wordCount: number;
+                agentData: string;
+            }[]
+        >`
+            SELECT
+                entries.created,
+                entries.createdTzOffset,
+                entries.agentData,
+                wordsInEntries.count as wordCount
+            FROM entries, wordsInEntries
+            WHERE entries.deleted IS NULL
+                AND entries.userId = ${auth.id}
+                AND wordsInEntries.word = ${encryptedWord}
+                AND wordsInEntries.entryId = entries.id
+            ORDER BY entries.created DESC, entries.id
+        `;
+    }
+
+    export async function wordFrequencies(auth: Auth): Promise<[string, number][]> {
+        return await query<{ word: string; count: number }[]>`
+            SELECT word, count
+            FROM wordsInEntries
+            WHERE userId = ${auth.id}
+            AND count > 0
+            AND entryIsDeleted = 0
+        `
+            .then(words =>
+                words.reduce(
+                    (map, { word, count }) => {
+                        map[word] ??= 0;
+                        map[word] += count;
+                        return map;
+                    },
+                    {} as Record<string, number>
+                )
+            )
+            .then(wordsMap =>
+                Object.entries(wordsMap)
+                    .sort(([, a], [, b]) => b - a)
+                    .slice(0, 100)
+            );
+    }
+
+    export async function counts(auth: Auth): Promise<{ wordCount: number; entryCount: number }> {
+        return await query<{ wordCount: number; entryCount: number }[]>`
+            SELECT SUM(wordCount) as wordCount, COUNT(*) as entryCount
+            FROM entries
+            WHERE userId = ${auth.id}
+            AND deleted IS NULL
+        `.then(([res]) => res);
+    }
+
+    export async function earliestEntryCreation(auth: Auth): Promise<number | null> {
+        return await query<{ created: number }[]>`
+            SELECT created
+            FROM entries
+            WHERE userId = ${auth.id}
+            AND deleted IS NULL
+            ORDER BY created ASC
+            LIMIT 1
+        `.then(res => res[0]?.created ?? null);
+    }
+
+    export async function wordCountForEncryptedWord(auth: Auth, word: string): Promise<number> {
+        return await query<{ wordInstances: number }[]>`
+            SELECT SUM(count) as wordInstances
+            FROM wordsInEntries
+            WHERE userId = ${auth.id}
+            AND word = ${word}
+            AND count > 0
+            AND entryIsDeleted = 0
+        `.then(([res]) => res.wordInstances ?? 0);
+    }
+
     export const getFromId = entryFromId;
     export const all = getMulti.all;
     export const getPage = getMulti.getPage;

@@ -18,7 +18,7 @@
 
     export let locations: Location[];
     export let showLabels = true;
-    export let showEntryForm = false;
+    export let showForms = false;
     export let numberOfEntries = Infinity;
     export let options: IOptions = {};
 
@@ -117,7 +117,7 @@
         obfuscated={$obfuscated}
         {showLabels}
         {locations}
-        {showEntryForm}
+        {showForms}
     />
 {/each}
 <div

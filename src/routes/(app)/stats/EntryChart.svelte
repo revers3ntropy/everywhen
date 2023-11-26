@@ -25,7 +25,7 @@
         initialBucketName
     } from './helpers';
     import { cssVarValue } from '$lib/utils/getCssVar';
-    import { Entry } from '$lib/controllers/entry/entry';
+    import { Day } from '$lib/utils/time';
 
     Chart.register(
         Title,
@@ -42,6 +42,16 @@
     export let by: By;
     export let days = 0;
 
+    function entriesExistOnMultipleDays(entries: EntryStats[]) {
+        if (entries.length === 0) return false;
+        let day = Day.fromTimestamp(entries[0].created, entries[0].createdTzOffset);
+        for (let i = 1; i < entries.length; i++) {
+            if (!day.eq(Day.fromTimestamp(entries[i].created, entries[i].createdTzOffset)))
+                return true;
+        }
+        return false;
+    }
+
     let selectedBucket = initialBucket(days);
 
     let mainGraphData: ChartData;
@@ -54,17 +64,14 @@
         smallGraph1Data = getGraphData(entries, Bucket.Hour, by);
     }
     $: if (browser && $encryptionKey) {
-        const start = performance.now();
         void decryptUserAgentsBackground(entries, $encryptionKey).then(entries => {
-            const end = performance.now();
-            console.log(`decrypting user agents took ${end - start}ms`);
             smallGraph2Data = getGraphData(notify.onErr(entries), Bucket.OperatingSystem, by, {
                 borderColor: 'transparent',
                 borderRadius: 4
             });
         });
     }
-    $: shouldShowMainGraph = Object.keys(Entry.groupEntriesByDay(entries)).length > 1;
+    $: shouldShowMainGraph = entriesExistOnMultipleDays(entries);
 
     const options = () => ({
         responsive: true,

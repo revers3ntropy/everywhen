@@ -29,7 +29,7 @@
     export let obfuscated = true;
     export let day: FeedDay;
     export let showLabels = true;
-    export let showEntryForm = false;
+    export let showForms = false;
     export let happinessDataset: Dataset | null = null;
 
     function toggleCollapse() {
@@ -45,7 +45,7 @@
     }
 
     onMount(() => {
-        if (entries.length < 1 && (!isToday || !showEntryForm)) {
+        if (entries.length < 1 && (!isToday || !showForms)) {
             $collapsed[day.day] = 'empty';
         }
     });
@@ -115,12 +115,14 @@
                 </button>
             </div>
             <div>
-                {#if isToday}
+                {#if isToday && showForms}
                     <HappinessDatasetShortcut
                         dataset={happinessDataset}
                         buttonValue={day.happiness}
                     />
                 {:else if day.happiness !== null}
+                    <!-- show on 'today' when forms are hidden,
+                         and every other day which has a score -->
                     <HappinessValueIcon value={day.happiness} />
                 {/if}
             </div>
@@ -133,7 +135,7 @@
                 duration: ANIMATION_DURATION
             }}
         >
-            {#if showEntryForm && isToday}
+            {#if showForms && isToday}
                 <EntryForm {obfuscated} />
             {/if}
             <div class="contents">

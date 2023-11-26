@@ -164,4 +164,8 @@ export class Day {
             .toString()
             .padStart(2, '0')}`;
     }
+
+    eq(other: Day): boolean {
+        return this.year === other.year && this.month === other.month && this.date === other.date;
+    }
 }

@@ -43,7 +43,7 @@
                 obfuscated={$obfuscated}
                 showLabels
                 {locations}
-                showEntryForm
+                showForms
                 {happinessDataset}
             />
         {/each}
