@@ -81,12 +81,17 @@
         if (!usedPresetIds.includes('sleepCycle')) {
             sleepCycleDatasetId = await makeFromPreset('sleepCycle');
         } else {
-            sleepCycleDatasetId = datasets.find(({ preset }) => preset?.id === 'sleepCycle')?.id;
+            sleepCycleDatasetId =
+                datasets.find(({ preset }) => preset?.id === 'sleepCycle')?.id || '';
+            if (!sleepCycleDatasetId) {
+                notify.error('Could not find Sleep Cycle dataset, try refreshing the page');
+                return;
+            }
         }
         sleepCycleUploadInput?.click();
     }
 
-    let sleepCycleDatasetId: string | undefined;
+    let sleepCycleDatasetId: string;
     let sleepCycleUploadInput: HTMLInputElement;
 </script>
 
