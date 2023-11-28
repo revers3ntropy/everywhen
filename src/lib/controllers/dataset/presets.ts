@@ -34,6 +34,33 @@ export const datasetPresets = {
             }
         ]
     },
+    sleepCycle: {
+        id: 'sleepCycle',
+        defaultName: 'Sleep Cycle',
+        columns: [
+            {
+                id: 0,
+                name: 'Duration',
+                created: null,
+                type: builtInTypes.number,
+                datasetId: ''
+            },
+            {
+                id: 1,
+                name: 'Sleep Quality',
+                created: null,
+                type: builtInTypes.nullableNumber,
+                datasetId: ''
+            },
+            {
+                id: 2,
+                name: 'Regularity',
+                created: null,
+                type: builtInTypes.nullableNumber,
+                datasetId: ''
+            }
+        ]
+    },
     gitHubCommits: {
         id: 'gitHubCommits',
         defaultName: 'GitHub Commits',
