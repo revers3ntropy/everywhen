@@ -1,18 +1,16 @@
+import { Label } from '$lib/controllers/label/label.server';
+import { Result } from '$lib/utils/result';
 import { Feed as _Feed } from './feed';
 import type { FeedDay, FeedItem } from './feed';
 import type { Day } from '$lib/utils/time';
 import { Entry } from '$lib/controllers/entry/entry.server';
+import { Event } from '$lib/controllers/event/event.server';
 import { error } from '@sveltejs/kit';
 import type { Auth } from '$lib/controllers/auth/auth';
 import { query } from '$lib/db/mysql.server';
 
 namespace FeedServer {
-    export async function getDay(auth: Auth, day: Day): Promise<FeedDay> {
-        const entries = (await Entry.onDay(auth, day)).unwrap(e => error(500, e));
-        const lastEntry = [...entries].sort(Entry.compareLocalTimes)[0];
-        const nextDayInPast =
-            (await Entry.dayOfEntryBeforeThisOne(auth, lastEntry))?.fmtIso() ?? null;
-
+    async function happinessForDay(auth: Auth, day: Day): Promise<number | null> {
         const happinesses = await query<{ rowJson: string }[]>`
             SELECT rowJson
             FROM datasetRows, datasets
@@ -23,11 +21,15 @@ namespace FeedServer {
                 AND DATE_FORMAT(FROM_UNIXTIME(datasetRows.timestamp + datasetRows.timestampTzOffset * 60 * 60), '%Y-%m-%d') 
                     = ${day.fmtIso()}
         `;
-        const happiness =
+        if (happinesses.length === 0) return null;
+        return (
             happinesses
                 .map(({ rowJson }) => (JSON.parse(rowJson) as [number])[0])
-                .reduce((sum, value) => sum + value, 0) / happinesses.length;
+                .reduce((sum, value) => sum + value, 0) / happinesses.length
+        );
+    }
 
+    async function sleepsOnDay(auth: Auth, day: Day): Promise<FeedItem[]> {
         const sleeps = await query<
             { rowJson: string; timestamp: number; timestampTzOffset: number; id: string }[]
         >`
@@ -40,7 +42,7 @@ namespace FeedServer {
                 AND DATE_FORMAT(FROM_UNIXTIME(datasetRows.timestamp + datasetRows.timestampTzOffset * 60 * 60), '%Y-%m-%d') 
                     = ${day.fmtIso()}
         `;
-        const sleepItems = sleeps.map(item => {
+        return sleeps.map(item => {
             const [duration, quality, regularity] = JSON.parse(item.rowJson) as [
                 number,
                 number | null,
@@ -56,15 +58,79 @@ namespace FeedServer {
                 regularity
             };
         }) satisfies FeedItem[];
+    }
 
-        const entryItems = entries.map(e => ({ ...e, type: 'entry' as const }));
+    async function eventsOnDay(
+        auth: Auth,
+        day: Day,
+        labels: Record<string, Label>
+    ): Promise<Result<FeedItem[]>> {
+        const rawEventsStartingOnDay = await query<
+            {
+                id: string;
+                name: string;
+                start: number;
+                end: number;
+                labelId: string;
+                created: number;
+            }[]
+        >`
+            SELECT id, name, start, end, labelId, created
+            FROM events
+            WHERE userId = ${auth.id}
+                AND DATE_FORMAT(FROM_UNIXTIME(start), '%Y-%m-%d') = ${day.fmtIso()}
+        `;
+        const rawEventsEndingOnDay = await query<
+            {
+                id: string;
+                name: string;
+                start: number;
+                end: number;
+                labelId: string;
+                created: number;
+            }[]
+        >`
+            SELECT id, name, start, end, labelId, created
+            FROM events
+            WHERE userId = ${auth.id}
+                AND DATE_FORMAT(FROM_UNIXTIME(end), '%Y-%m-%d') = ${day.fmtIso()}
+        `;
 
-        return {
-            items: Feed.orderedFeedItems([...sleepItems, ...entryItems]),
-            happiness,
-            nextDayInPast,
+        const eventsStartingOnDay = Result.collect(
+            rawEventsStartingOnDay.map(e => Event.fromRaw(auth, e, labels))
+        ).map(events => events.map(e => ({ ...e, type: 'event-start' as const })));
+        if (!eventsStartingOnDay.ok) return eventsStartingOnDay.cast();
+        const eventsEndingOnDay = Result.collect(
+            rawEventsEndingOnDay.map(e => Event.fromRaw(auth, e, labels))
+        ).map(events => events.map(e => ({ ...e, id: `${e.id}-end`, type: 'event-end' as const })));
+        if (!eventsEndingOnDay.ok) return eventsEndingOnDay.cast();
+        return Result.ok([
+            ...eventsStartingOnDay.val,
+            ...eventsEndingOnDay.val
+        ] satisfies FeedItem[]);
+    }
+
+    export async function getDay(auth: Auth, day: Day): Promise<Result<FeedDay>> {
+        const entries = await Entry.onDay(auth, day);
+        if (!entries.ok) return entries.cast();
+        const labels = await Label.allIndexedById(auth);
+        if (!labels.ok) return labels.cast();
+        return Result.ok({
+            items: Feed.orderedFeedItems([
+                ...(await sleepsOnDay(auth, day)),
+                ...entries.val.map(e => ({ ...e, type: 'entry' as const })),
+                ...(await eventsOnDay(auth, day, labels.val)).unwrap(e => error(500, e))
+            ]),
+            happiness: await happinessForDay(auth, day),
+            nextDayInPast:
+                (
+                    await Entry.dayOfEntryBeforeThisOne(
+                        auth,
+                        [...entries.val].sort(Entry.compareLocalTimes)[0]
+                    )
+                )?.fmtIso() ?? null,
             day: day.fmtIso()
-        } satisfies FeedDay;
+        } satisfies FeedDay);
     }
 }
 

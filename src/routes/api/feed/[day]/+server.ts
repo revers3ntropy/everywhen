@@ -6,10 +6,12 @@ import { Day } from '$lib/utils/time';
 import { Feed } from '$lib/controllers/feed/feed.server';
 
 export const GET = cachedApiRoute(async (auth, { params }) => {
-    return await Feed.getDay(
-        auth,
-        Day.fromString(params.day).unwrap(e => error(400, e))
-    );
+    return (
+        await Feed.getDay(
+            auth,
+            Day.fromString(params.day).unwrap(e => error(400, e))
+        )
+    ).unwrap(e => error(500, e));
 }) satisfies RequestHandler;
 
 export const POST = apiRes404;

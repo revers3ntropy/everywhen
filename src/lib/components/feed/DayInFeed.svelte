@@ -8,13 +8,14 @@
 
 <script lang="ts">
     import EntryForm from '$lib/components/entryForm/EntryForm.svelte';
+    import EventEndFeedItem from '$lib/components/feed/EventEndFeedItem.svelte';
+    import EventStartFeedItem from '$lib/components/feed/EventStartFeedItem.svelte';
+    import SleepInfo from '$lib/components/feed/SleepCycleFeedItem.svelte';
     import { Feed } from '$lib/controllers/feed/feed';
     import { currentlyUploadingEntries } from '$lib/stores';
-    import { fmtDurationHourMin } from '$lib/utils/time.js';
     import { fly, slide } from 'svelte/transition';
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
-    import Sleep from 'svelte-material-icons/Sleep.svelte';
     import { ANIMATION_DURATION } from '$lib/constants';
     import { listen } from '$lib/dataChangeEvents';
     import Entry from '$lib/components/entry/Entry.svelte';
@@ -39,16 +40,16 @@
         $collapsed[day.day] = !$collapsed[day.day];
     }
 
-    $: items = day.items;
+    $: items = day?.items;
     $: isToday = fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD') === day.day;
     $: dayTimestamp = new Date(day.day).getTime() / 1000;
 
-    $: if (items.length > 0 && $collapsed[day.day] == 'empty') {
+    $: if (items?.length > 0 && $collapsed[day.day] == 'empty') {
         $collapsed[day.day] = false;
     }
 
     onMount(() => {
-        if (items.length < 1 && (!isToday || !showForms)) {
+        if (items?.length < 1 && (!isToday || !showForms)) {
             $collapsed[day.day] = 'empty';
         }
     });
@@ -58,11 +59,11 @@
         items = Feed.orderedFeedItems([...items, { ...entry, type: 'entry' }]);
     });
     listen.entry.onDelete(id => {
-        items = items.filter(entry => entry.id !== id);
+        items = items?.filter(entry => entry.id !== id);
     });
     listen.entry.onUpdate(entry => {
         // only update if the entry is in this group
-        const i = items.findIndex(e => e.id === entry.id);
+        const i = items?.findIndex(e => e.id === entry.id);
         if (i !== -1) {
             items[i] = { ...entry, type: 'entry' };
         }
@@ -110,8 +111,8 @@
                         >
                             <Dot light marginX={10} />
                             <p class="entry-count">
-                                {items.length}
-                                {items.length === 1 ? 'entry' : 'entries'}
+                                {items?.length}
+                                {items?.length === 1 ? 'entry' : 'entries'}
                             </p>
                         </div>
                     {/if}
@@ -164,7 +165,7 @@
                         />
                     {/each}
                 {/if}
-                {#each items as item (item.id)}
+                {#each items || [] as item, i (item.id)}
                     {#if item.type === 'entry'}
                         <!-- hack to remove 'type' attribute from entry -->
                         <Entry
@@ -174,35 +175,17 @@
                             {locations}
                         />
                     {:else if item.type === 'sleep'}
-                        <div class="py-1">
-                            <div class="text-sm pl-1 md:flex md:gap-4">
-                                <div class="flex gap-3 text-textColorLight pb-2">
-                                    <UtcTime
-                                        timestamp={item.start}
-                                        tzOffset={item.startTzOffset}
-                                        fmt="h:mma"
-                                    />
-                                    <Sleep size="22" />
-                                </div>
-
-                                <div class="flex gap-4">
-                                    <span>
-                                        Slept for
-                                        <b>{fmtDurationHourMin(item.duration)}</b>
-                                    </span>
-                                    {#if item.quality !== null}
-                                        <span>
-                                            <b>{(item.quality * 100).toFixed(0)}</b>% quality
-                                        </span>
-                                    {/if}
-                                    {#if item.regularity !== null}
-                                        <span>
-                                            <b>{(item.regularity * 100).toFixed(0)}</b>% regularity
-                                        </span>
-                                    {/if}
-                                </div>
-                            </div>
-                        </div>
+                        <SleepInfo
+                            tzOffset={item.startTzOffset}
+                            start={item.start}
+                            duration={item.duration}
+                            quality={item.quality}
+                            regularity={item.regularity}
+                        />
+                    {:else if item.type === 'event-start'}
+                        <EventStartFeedItem {item} nextItem={items[i + 1] ?? null} />
+                    {:else if item.type === 'event-end'}
+                        <EventEndFeedItem {item} previousItem={items[i - 1] ?? null} />
                     {/if}
                 {/each}
             </div>

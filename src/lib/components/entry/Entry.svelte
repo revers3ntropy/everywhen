@@ -137,7 +137,7 @@
     <div class="header">
         <div class="flex items-center gap-2" style="max-width: calc(100% - 60px)">
             {#if !showFullDate}
-                <span class="text-textColorLight text-sm pl-1">
+                <span class="text-textColorLight text-sm pl-2">
                     <UtcTime
                         fmt={'h:mma'}
                         timestamp={created}
@@ -306,8 +306,6 @@
     @import '$lib/styles/text';
 
     .entry {
-        padding: 0;
-        margin: 0;
         width: 100%;
         height: fit-content;
         white-space: pre-wrap;
@@ -358,7 +356,7 @@
         }
 
         .body {
-            border-top: 2px solid var(--background-color);
+            //border-top: 2px solid var(--background-color);
             padding: 1rem;
             // why????
             margin: -1rem 0 0 0;

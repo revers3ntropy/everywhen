@@ -1,4 +1,5 @@
 import { Entry } from '$lib/controllers/entry/entry';
+import type { Event } from '$lib/controllers/event/event';
 
 export type FeedItem =
     | (Entry & { type: 'entry' })
@@ -10,7 +11,9 @@ export type FeedItem =
           duration: number;
           quality: number | null;
           regularity: number | null;
-      };
+      }
+    | (Event & { type: 'event-start' })
+    | (Event & { type: 'event-end' });
 
 export interface FeedDay {
     day: string;
@@ -30,6 +33,10 @@ export namespace Feed {
                 return Entry.localTime(item);
             case 'sleep':
                 return item.start + item.startTzOffset * 60 * 60;
+            case 'event-start':
+                return item.start;
+            case 'event-end':
+                return item.end;
         }
     }
 
