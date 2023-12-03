@@ -11,7 +11,7 @@ const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8')) as Pac
 const __VERSION__ = JSON.stringify(packageJson.version);
 
 export default defineConfig({
-    plugins: [sveltekit()],
+    plugins: [sveltekit() as unknown as null],
     define: {
         __VERSION__
     },
