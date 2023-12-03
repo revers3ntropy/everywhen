@@ -28,7 +28,7 @@ namespace FeedServer {
                 .reduce((sum, value) => sum + value, 0) / happinesses.length;
 
         return {
-            entries,
+            items: entries.map(e => ({ ...e, type: 'entry' })),
             happiness,
             nextDayInPast,
             day: day.fmtIso()

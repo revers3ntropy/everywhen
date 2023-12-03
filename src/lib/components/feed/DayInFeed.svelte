@@ -8,6 +8,7 @@
 
 <script lang="ts">
     import EntryForm from '$lib/components/entryForm/EntryForm.svelte';
+    import { Feed } from '$lib/controllers/feed/feed';
     import { currentlyUploadingEntries } from '$lib/stores';
     import { fly, slide } from 'svelte/transition';
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
@@ -36,32 +37,32 @@
         $collapsed[day.day] = !$collapsed[day.day];
     }
 
-    $: entries = day.entries;
+    $: items = day.items;
     $: isToday = fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD') === day.day;
     $: dayTimestamp = new Date(day.day).getTime() / 1000;
 
-    $: if (entries.length > 0 && $collapsed[day.day] == 'empty') {
+    $: if (items.length > 0 && $collapsed[day.day] == 'empty') {
         $collapsed[day.day] = false;
     }
 
     onMount(() => {
-        if (entries.length < 1 && (!isToday || !showForms)) {
+        if (items.length < 1 && (!isToday || !showForms)) {
             $collapsed[day.day] = 'empty';
         }
     });
 
     listen.entry.onCreate(({ entry }) => {
         if (!isToday) return;
-        entries = [...entries, entry].sort((a, b) => b.created - a.created);
+        items = Feed.orderedFeedItems([...items, { ...entry, type: 'entry' }]);
     });
     listen.entry.onDelete(id => {
-        entries = entries.filter(entry => entry.id !== id);
+        items = items.filter(entry => entry.id !== id);
     });
     listen.entry.onUpdate(entry => {
         // only update if the entry is in this group
-        const i = entries.findIndex(e => e.id === entry.id);
+        const i = items.findIndex(e => e.id === entry.id);
         if (i !== -1) {
-            entries[i] = entry;
+            items[i] = { ...entry, type: 'entry' };
         }
     });
 </script>
@@ -107,8 +108,8 @@
                         >
                             <Dot light marginX={10} />
                             <p class="entry-count">
-                                {entries.length}
-                                {entries.length === 1 ? 'entry' : 'entries'}
+                                {items.length}
+                                {items.length === 1 ? 'entry' : 'entries'}
                             </p>
                         </div>
                     {/if}
@@ -161,7 +162,7 @@
                         />
                     {/each}
                 {/if}
-                {#each entries as entry (entry.id)}
+                {#each items as entry (entry.id)}
                     <Entry {...entry} {obfuscated} {showLabels} {locations} />
                 {/each}
             </div>

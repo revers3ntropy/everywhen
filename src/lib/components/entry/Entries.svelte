@@ -113,7 +113,12 @@
 
 {#each sortedEntryKeys as day (day)}
     <DayInFeed
-        day={{ entries: entries[day], day, happiness: null, nextDayInPast: null }}
+        day={{
+            items: entries[day].map(e => ({ ...e, type: 'entry' })),
+            day,
+            happiness: null,
+            nextDayInPast: null
+        }}
         obfuscated={$obfuscated}
         {showLabels}
         {locations}
