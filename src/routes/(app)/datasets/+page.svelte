@@ -47,6 +47,8 @@
         const sleepQualityIdx = columns.indexOf('Sleep Quality');
         const regularityIdx = columns.indexOf('Regularity');
 
+        const rows = [];
+
         for (const lines of dataLines) {
             const linesParts = lines.split(',');
             const startTs = linesParts[startTsIdx];
@@ -61,20 +63,19 @@
             const end = new Date(endTs);
             const duration = (end.getTime() - start.getTime()) / 1000;
 
-            console.log([duration, sleepQuality, regularity]);
-            notify.onErr(
-                await api.post(apiPath('/datasets/?', sleepCycleDatasetId), {
-                    rows: [
-                        {
-                            elements: [duration, sleepQuality, regularity],
-                            created: nowUtc(),
-                            timestamp: start.getTime() / 1000,
-                            timestampTzOffset: currentTzOffset()
-                        }
-                    ]
-                })
-            );
+            rows.push({
+                elements: [duration, sleepQuality, regularity],
+                created: nowUtc(),
+                timestamp: start.getTime() / 1000,
+                timestampTzOffset: currentTzOffset()
+            });
         }
+
+        notify.onErr(
+            await api.post(apiPath('/datasets/?', sleepCycleDatasetId), {
+                rows
+            })
+        );
     }) as ChangeEventHandler<HTMLInputElement>;
 
     async function uploadFromSleepCycle() {
