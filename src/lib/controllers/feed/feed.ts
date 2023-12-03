@@ -9,6 +9,7 @@ export type FeedItem =
           startTzOffset: number;
           duration: number;
           quality: number | null;
+          regularity: number | null;
       };
 
 export interface FeedDay {

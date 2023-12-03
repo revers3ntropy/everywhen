@@ -10,7 +10,7 @@
     import EntryForm from '$lib/components/entryForm/EntryForm.svelte';
     import { Feed } from '$lib/controllers/feed/feed';
     import { currentlyUploadingEntries } from '$lib/stores';
-    import { fmtDuration, fmtDurationHourMin } from '$lib/utils/time.js';
+    import { fmtDurationHourMin } from '$lib/utils/time.js';
     import { fly, slide } from 'svelte/transition';
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
@@ -174,15 +174,33 @@
                             {locations}
                         />
                     {:else if item.type === 'sleep'}
-                        <div class=" p-1">
-                            <div class="text-textColorLight text-sm pl-1 flex gap-2">
-                                {fmtUtc(item.start, item.startTzOffset, 'h:mma')}
-                                <Sleep size="20" />
-                                <span>slept for <b>{fmtDurationHourMin(item.duration)}</b></span>
-                                <span>
-                                    (<b>{(item.quality * 100).toFixed(0)}</b>% quality,
-                                    <b>{(item.regularity * 100).toFixed(0)}</b>% regularity)
-                                </span>
+                        <div class="py-1">
+                            <div class="text-sm pl-1 md:flex md:gap-4">
+                                <div class="flex gap-3 text-textColorLight pb-2">
+                                    <UtcTime
+                                        timestamp={item.start}
+                                        tzOffset={item.startTzOffset}
+                                        fmt="h:mma"
+                                    />
+                                    <Sleep size="22" />
+                                </div>
+
+                                <div class="flex gap-4">
+                                    <span>
+                                        Slept for
+                                        <b>{fmtDurationHourMin(item.duration)}</b>
+                                    </span>
+                                    {#if item.quality !== null}
+                                        <span>
+                                            <b>{(item.quality * 100).toFixed(0)}</b>% quality
+                                        </span>
+                                    {/if}
+                                    {#if item.regularity !== null}
+                                        <span>
+                                            <b>{(item.regularity * 100).toFixed(0)}</b>% regularity
+                                        </span>
+                                    {/if}
+                                </div>
                             </div>
                         </div>
                     {/if}

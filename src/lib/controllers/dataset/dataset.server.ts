@@ -311,8 +311,14 @@ namespace DatasetServer {
             timestamp?: TimestampSecs;
             timestampTzOffset?: Hours;
             created?: TimestampSecs;
-        }[]
+        }[],
+        onSameTimestamp: 'override' | 'append' | 'skip' | 'error'
     ): Promise<Result<null>> {
+        if (!['override', 'append', 'skip', 'error'].includes(onSameTimestamp)) {
+            return Result.err('Invalid onSameTimestamp value');
+        }
+        if (rows.length < 1) return Result.ok(null);
+
         const allColumnsRes = await allUserDefinedColumns(auth);
         if (!allColumnsRes.ok) return allColumnsRes.cast();
 
@@ -372,6 +378,30 @@ namespace DatasetServer {
             const rowCreated = row.created ?? nowUtc();
             const rowTimestampTzOffset = row.timestampTzOffset ?? 0;
             const rowJson = JSON.stringify(row.elements);
+
+            if (onSameTimestamp !== 'append') {
+                const [{ count }] = await query<{ count: number }[]>`
+                    SELECT COUNT(*) AS count
+                    FROM datasetRows
+                    WHERE datasetId = ${datasetId}
+                        AND timestamp = ${rowTimestamp}
+                `;
+                if (count > 0) {
+                    if (onSameTimestamp === 'error') {
+                        return Result.err(
+                            `Row with timestamp ${rowTimestamp} already exists in dataset`
+                        );
+                    } else if (onSameTimestamp === 'skip') {
+                        continue;
+                    } else if (onSameTimestamp === 'override') {
+                        await query`
+                            DELETE FROM datasetRows
+                            WHERE datasetId = ${datasetId}
+                                AND timestamp = ${rowTimestamp}
+                        `;
+                    }
+                }
+            }
 
             await query`
                 INSERT INTO datasetRows (id, userId, datasetId, created, timestamp, timestampTzOffset, rowJson)

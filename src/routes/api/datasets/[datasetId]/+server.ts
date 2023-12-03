@@ -19,7 +19,7 @@ export const POST = (async ({ cookies, request, params }) => {
     const auth = Auth.getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
-    const { rows } = await getUnwrappedReqBody(auth, request, {
+    const { rows, onSameTimestamp } = await getUnwrappedReqBody(auth, request, {
         rows: z.array(
             z.object({
                 created: z.number().default(nowUtc()),
@@ -27,10 +27,20 @@ export const POST = (async ({ cookies, request, params }) => {
                 timestampTzOffset: z.number().optional(),
                 elements: z.array(z.unknown())
             })
-        )
+        ),
+        onSameTimestamp: z
+            .union([
+                z.literal('override'),
+                z.literal('append'),
+                z.literal('skip'),
+                z.literal('error')
+            ])
+            .optional()
     });
 
-    (await Dataset.appendRows(auth, params.datasetId, rows)).unwrap(e => error(400, e));
+    (await Dataset.appendRows(auth, params.datasetId, rows, onSameTimestamp ?? 'append')).unwrap(
+        e => error(400, e)
+    );
 
     return apiResponse(auth, {});
 }) satisfies RequestHandler;
