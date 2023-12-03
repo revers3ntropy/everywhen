@@ -68,6 +68,11 @@ export function fmtDuration(time: Seconds): string {
     return moment.duration(time, 's').humanize();
 }
 
+export function fmtDurationHourMin(time: Seconds): string {
+    const m = moment.duration(time, 's');
+    return `${m.hours()}h ${m.minutes()}m`;
+}
+
 export function fmtUtcRelative(timestamp: TimestampSecs | Date, locale = 'en'): string {
     if (timestamp instanceof Date) {
         timestamp = Math.floor(timestamp.getTime() / 1000);

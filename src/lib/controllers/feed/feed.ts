@@ -1,6 +1,15 @@
-import type { Entry } from '$lib/controllers/entry/entry.server';
+import { Entry } from '$lib/controllers/entry/entry';
 
-export type FeedItem = Entry & { type: 'entry' };
+export type FeedItem =
+    | (Entry & { type: 'entry' })
+    | {
+          id: string;
+          type: 'sleep';
+          start: number;
+          startTzOffset: number;
+          duration: number;
+          quality: number | null;
+      };
 
 export interface FeedDay {
     day: string;
@@ -14,7 +23,18 @@ export interface Feed {
 }
 
 export namespace Feed {
+    export function feedItemTime(item: FeedItem): number {
+        switch (item.type) {
+            case 'entry':
+                return Entry.localTime(item);
+            case 'sleep':
+                return item.start + item.startTzOffset * 60 * 60;
+        }
+    }
+
     export function orderedFeedItems(items: FeedItem[]): FeedItem[] {
-        return [...items].sort((a, b) => b.created - a.created);
+        return [...items].sort((a, b) => {
+            return feedItemTime(b) - feedItemTime(a);
+        });
     }
 }

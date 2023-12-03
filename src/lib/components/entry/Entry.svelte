@@ -135,9 +135,9 @@
         {title}
     </div>
     <div class="header">
-        <div style="display: flex; align-items: center; max-width: calc(100% - 60px); gap: 0.5rem;">
+        <div class="flex items-center gap-2" style="max-width: calc(100% - 60px)">
             {#if !showFullDate}
-                <span class="time">
+                <span class="text-textColorLight text-sm pl-1">
                     <UtcTime
                         fmt={'h:mma'}
                         timestamp={created}
@@ -313,11 +313,6 @@
         white-space: pre-wrap;
         outline: none;
 
-        &,
-        * {
-            font-size: 1.05rem;
-        }
-
         @media #{$mobile} {
             padding: 0;
         }
@@ -360,12 +355,6 @@
             @media #{$mobile} {
                 display: none;
             }
-        }
-
-        .time {
-            margin: 0 2px 0 0.5rem;
-            font-size: 0.8em;
-            color: var(--text-color-light);
         }
 
         .body {
