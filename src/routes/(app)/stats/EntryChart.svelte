@@ -40,7 +40,7 @@
 
     export let entries: EntryStats[];
     export let by: By;
-    export let days = 0;
+    export let days: number;
 
     function entriesExistOnMultipleDays(entries: EntryStats[]) {
         if (entries.length === 0) return false;

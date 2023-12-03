@@ -1,5 +1,6 @@
 import { Location } from '$lib/controllers/location/location.server';
 import { decrypt, encrypt } from '$lib/utils/encryption';
+import { daysSince } from '$lib/utils/time';
 import { error } from '@sveltejs/kit';
 import { cachedPageRoute } from '$lib/utils/cache.server';
 import { normaliseWordForIndex } from '$lib/utils/text';
@@ -14,12 +15,15 @@ export const load = cachedPageRoute(async (auth, { params }) => {
     );
 
     const summaries = await Entry.basicSummariesForEntriesWithWord(auth, normalisedEncryptedWord);
+    const days = summaries.length > 0 ? daysSince(summaries[summaries.length - 1].created, 0) : 0;
+
     return {
         entries: summaries,
         wordInstances: await Entry.wordCountForEncryptedWord(auth, normalisedEncryptedWord),
         theWord: normalisedEncryptedWord,
         totalEntries: (await Entry.counts(auth)).entryCount,
         locations: (await Location.all(auth)).unwrap(e => error(400, e)),
-        heatMapData: heatMapDataFromEntries(summaries)
+        heatMapData: heatMapDataFromEntries(summaries),
+        days
     };
 }) satisfies PageServerLoad;

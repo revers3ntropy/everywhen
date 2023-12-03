@@ -9,7 +9,7 @@
     import { By } from '../helpers';
     import SearchForWord from '../SearchForWord.svelte';
     import StatPill from '../StatPill.svelte';
-    import EntryBarChart from '../EntryChart.svelte';
+    import EntryChart from '../EntryChart.svelte';
     import EntryHeatMap from '../EntryHeatMap.svelte';
     import type { PageData } from './$types';
     import { encryptionKey, navExpanded } from '$lib/stores';
@@ -92,7 +92,7 @@
                 <EntryHeatMap {by} data={data.heatMapData} />
             </div>
             <div class="container" style="margin: 1rem 0; padding: 1rem;">
-                <EntryBarChart {by} entries={data.entries} />
+                <EntryChart {by} entries={data.entries} days={data.days} />
             </div>
         </section>
 
