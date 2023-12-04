@@ -30,7 +30,7 @@
     import HappinessValueIcon from '$lib/components/dataset/HappinessValueIcon.svelte';
 
     export let locations: Location[];
-    export let obfuscated = true;
+    export let obfuscated: boolean;
     export let day: FeedDay;
     export let showLabels = true;
     export let showForms = false;
@@ -181,11 +181,12 @@
                             duration={item.duration}
                             quality={item.quality}
                             regularity={item.regularity}
+                            {obfuscated}
                         />
                     {:else if item.type === 'event-start'}
-                        <EventStartFeedItem {item} nextItem={items[i + 1] ?? null} />
+                        <EventStartFeedItem {item} nextItem={items[i + 1] ?? null} {obfuscated} />
                     {:else if item.type === 'event-end'}
-                        <EventEndFeedItem {item} previousItem={items[i - 1] ?? null} />
+                        <EventEndFeedItem {item} previousItem={items[i - 1] ?? null} {obfuscated} />
                     {/if}
                 {/each}
             </div>

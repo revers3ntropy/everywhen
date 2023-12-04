@@ -8,6 +8,7 @@
 
     export let item: Event;
     export let nextItem: FeedItem | null;
+    export let obfuscated: boolean;
 </script>
 
 <!-- if the event starts and then immediately ends, collapse into one item -->
@@ -17,7 +18,7 @@
             <UtcTime timestamp={item.start} fmt="h:mma" />
             <Calendar size="22" />
         </div>
-        <div>
+        <div class:obfuscated>
             {#if item.label}
                 <LabelDot color={item.label.color} name={item.label.name} />
             {/if}
@@ -37,7 +38,9 @@
                     <LabelDot color={item.label.color} name={item.label.name} />
                 </span>
             {/if}
-            {item.name}
+            <span class:obfuscated>
+                {item.name}
+            </span>
         </div>
     </div>
 {/if}

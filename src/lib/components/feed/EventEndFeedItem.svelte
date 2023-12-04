@@ -7,6 +7,7 @@
 
     export let item: Event;
     export let previousItem: FeedItem | null;
+    export let obfuscated: boolean;
 </script>
 
 {#if previousItem && previousItem?.type === 'event-start' && item.id.includes(previousItem?.id)}
@@ -24,7 +25,9 @@
                     <LabelDot color={item.label.color} name={item.label.name} />
                 </span>
             {/if}
-            {item.name}
+            <span class:obfuscated>
+                {item.name}
+            </span>
         </div>
     </div>
 {/if}

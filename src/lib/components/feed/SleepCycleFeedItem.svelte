@@ -8,15 +8,20 @@
     export let duration: number;
     export let quality: number | null;
     export let regularity: number | null;
+    export let obfuscated: boolean;
 </script>
 
 <div class="text-sm p-2 md:flex md:gap-4">
-    <div class="flex gap-3 text-textColorLight pb-2">
-        <UtcTime timestamp={start} {tzOffset} fmt="h:mma" />
-        <Sleep size="22" />
+    <div class="flex gap-3 pb-2">
+        <span class=" text-textColorLight">
+            <UtcTime timestamp={start} {tzOffset} fmt="h:mma" />
+            -
+            <UtcTime timestamp={start + duration} {tzOffset} fmt="h:mma" />
+        </span>
+        <Sleep size="27" class="pl-2" />
     </div>
 
-    <div class="flex gap-4">
+    <div class="flex gap-4" class:obfuscated>
         <span>
             Slept for
             <b>{fmtDurationHourMin(duration)}</b>
