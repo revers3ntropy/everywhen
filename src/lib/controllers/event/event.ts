@@ -1,4 +1,4 @@
-import type { Seconds, TimestampSecs } from '../../../types';
+import type { Hours, Seconds, TimestampSecs } from '../../../types';
 import type { Label } from '../label/label';
 
 export interface Event {
@@ -6,6 +6,7 @@ export interface Event {
     name: string;
     start: TimestampSecs;
     end: TimestampSecs;
+    tzOffset: Hours;
     created: TimestampSecs;
     label: Label | null;
 }
@@ -16,6 +17,14 @@ export namespace Event {
 
     export function duration(evt: { start: TimestampSecs; end: TimestampSecs }): Seconds {
         return evt.end - evt.start;
+    }
+
+    export function localStart(evt: { start: number; tzOffset: number }): TimestampSecs {
+        return evt.start + evt.tzOffset * 60 * 60;
+    }
+
+    export function localEnd(evt: { end: number; tzOffset: number }): TimestampSecs {
+        return evt.end + evt.tzOffset * 60 * 60;
     }
 
     /**
@@ -30,12 +39,12 @@ export namespace Event {
             return evt1Duration > evt2Duration;
         }
 
-        if (evt1.start !== evt2.start) {
-            return evt1.start > evt2.start;
+        if (localStart(evt1) !== localStart(evt2)) {
+            return localStart(evt1) > localStart(evt2);
         }
 
-        if (evt1.end !== evt2.end) {
-            return evt1.end > evt2.end;
+        if (localEnd(evt1) !== localEnd(evt2)) {
+            return localEnd(evt1) > localEnd(evt2);
         }
 
         if (evt1.created !== evt2.created) {
@@ -50,12 +59,12 @@ export namespace Event {
     }
 
     export function intersects(
-        evt1: { start: TimestampSecs; end: TimestampSecs },
-        evt2: { start: TimestampSecs; end: TimestampSecs }
+        evt1: { start: TimestampSecs; end: TimestampSecs; tzOffset: number },
+        evt2: { start: TimestampSecs; end: TimestampSecs; tzOffset: number }
     ): boolean {
         return (
-            (evt1.start <= evt2.start && evt1.end >= evt2.start) ||
-            (evt2.start <= evt1.start && evt2.end >= evt1.start)
+            (localStart(evt1) <= localStart(evt2) && localEnd(evt1) >= localStart(evt2)) ||
+            (localStart(evt2) <= localStart(evt1) && localEnd(evt2) >= localStart(evt1))
         );
     }
 }

@@ -20,6 +20,7 @@
     export let created: number;
     export let start: number;
     export let end: number;
+    export let tzOffset: number;
     export let name: string;
     export let label: Label | null;
     export let yLevel = 0;
@@ -40,6 +41,7 @@
             name,
             start: changes.start || start,
             end: changes.end || end,
+            tzOffset,
             created,
             label: label || null
         };
@@ -104,6 +106,7 @@
                         id,
                         start,
                         end,
+                        tzOffset,
                         name,
                         label,
                         created

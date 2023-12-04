@@ -80,13 +80,14 @@ CREATE TABLE entryEdits
 
 CREATE TABLE events
 (
-    id      char(32)     NOT NULL,
-    userId  char(32)     NOT NULL,
-    name    varchar(256) NOT NULL,
-    start   int          NOT NULL,
-    end     int          NOT NULL,
-    labelId char(32)     DEFAULT NULL,
-    created int          NOT NULL,
+    id       char(32)     NOT NULL,
+    userId   char(32)     NOT NULL,
+    name     varchar(256) NOT NULL,
+    start    int          NOT NULL,
+    end      int          NOT NULL,
+    tzOffset double       NOT NULL,
+    labelId  char(32)     DEFAULT NULL,
+    created  int          NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `idx_events_userId`  (`userId`),
     INDEX `idx_events_labelId` (`userId`, `labelId`)

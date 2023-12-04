@@ -1,6 +1,7 @@
 <script lang="ts">
     import { ANIMATION_DURATION } from '$lib/constants';
     import { dispatch, listen } from '$lib/dataChangeEvents';
+    import { numberAsSignedStr } from '$lib/utils/text';
     import { tooltip } from '@svelte-plugins/tooltips';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
@@ -52,6 +53,7 @@
             name: changes.name || event.name,
             start: changes.start || event.start,
             end: changes.end || event.end,
+            tzOffset: event.tzOffset,
             label
         };
         await dispatch.update('event', event);
@@ -106,6 +108,7 @@
                 name: event.name,
                 start: event.start,
                 end: event.end,
+                tzOffset: currentTzOffset(),
                 created: event.created,
                 labels: event.label?.id
             })
@@ -324,8 +327,10 @@
                         Delete
                     </button>
                 </div>
-                <div class="created-datetime">
-                    <i> Created <UtcTime timestamp={event.created} relative /> </i>
+                <div class="p-4 pb-0 italic">
+                    Created <UtcTime timestamp={event.created} relative />, GMT{numberAsSignedStr(
+                        event.tzOffset
+                    )}
                 </div>
             </div>
         {/if}
@@ -349,10 +354,6 @@
     .event {
         @extend .container;
         margin: 8px;
-
-        .created-datetime {
-            padding: 0 1rem 1rem 1rem;
-        }
 
         .header {
             display: grid;

@@ -24,6 +24,7 @@ export const POST = (async ({ request, cookies }) => {
         name: z.string(),
         start: z.number(),
         end: z.number(),
+        tzOffset: z.number(),
         label: z.string().nullable().default(null)
     });
 
@@ -40,6 +41,7 @@ export const POST = (async ({ request, cookies }) => {
             body.name,
             body.start,
             body.end,
+            body.tzOffset,
             body.label,
             body.created ?? nowUtc()
         )

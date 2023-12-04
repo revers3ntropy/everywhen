@@ -6,7 +6,7 @@ import type { Label } from '$lib/controllers/label/label';
 import { dispatch } from '$lib/dataChangeEvents';
 import { api } from '$lib/utils/apiRequest';
 import { showPopup } from '$lib/utils/popups';
-import { nowUtc } from '$lib/utils/time';
+import { currentTzOffset, nowUtc } from '$lib/utils/time';
 import type { Writable } from 'svelte/store';
 import type { TimestampSecs } from '../../../types';
 
@@ -22,7 +22,8 @@ export function makeStandardContextMenu(
             await api.post('/events', {
                 name: Event.NEW_EVENT_NAME,
                 start,
-                end
+                end,
+                tzOffset: currentTzOffset()
             })
         );
         const event: Event = {
@@ -30,6 +31,7 @@ export function makeStandardContextMenu(
             name: Event.NEW_EVENT_NAME,
             start,
             end,
+            tzOffset: currentTzOffset(),
             created: nowUtc(), // not precise but fine,
             label: null
         };

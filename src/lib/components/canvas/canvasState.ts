@@ -2,7 +2,7 @@ import { browser } from '$app/environment';
 import { theme } from '$lib/stores';
 import { writable } from 'svelte/store';
 import { clientLogger } from '$lib/utils/log';
-import { currentTzOffset, nowUtc } from '$lib/utils/time';
+import { nowUtc } from '$lib/utils/time';
 import type { Interactable } from './interactable';
 import { cssVarValue } from '$lib/utils/getCssVar';
 import type { CursorStyle, Pixels, TimestampSecs } from '../../../types';
@@ -338,7 +338,6 @@ export class CanvasState implements CanvasListeners {
     }
 
     public timeToX(t: TimestampSecs): Pixels {
-        t -= currentTzOffset();
         t = nowUtc(false) - t + this.cameraOffset;
         t = this.zoomScaledPosition(t, this.zoom, this.cameraOffset);
         return this.width - t;
@@ -359,7 +358,7 @@ export class CanvasState implements CanvasListeners {
     public xToTime(pos: Pixels): TimestampSecs {
         pos = this.width - pos;
         pos = this.zoomScaledPosition(pos, 1 / this.zoom, this.cameraOffset);
-        return nowUtc(false) - pos + this.cameraOffset + currentTzOffset();
+        return nowUtc(false) - pos + this.cameraOffset;
     }
 
     public zoomOnCenter(deltaZoom: number) {

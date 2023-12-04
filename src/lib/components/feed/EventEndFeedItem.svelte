@@ -15,7 +15,7 @@
 {:else}
     <div class="text-sm p-2 flex gap-4">
         <div class="flex gap-3 text-textColorLight pb-2">
-            <UtcTime timestamp={item.end} fmt="h:mma" />
+            <UtcTime timestamp={item.end} tzOffset={item.tzOffset} fmt="h:mma" />
             <CalendarEnd size="22" />
         </div>
         <div>

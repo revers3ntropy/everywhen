@@ -67,6 +67,7 @@ export const backupSchema = z.object({
             labelName: z.string().nullable().optional(),
             start: z.number(),
             end: z.number(),
+            tzOffset: z.number(),
             created: z.number()
         })
     ),
@@ -160,6 +161,7 @@ export namespace BackupServer {
                     labelName: event.label?.name,
                     start: event.start,
                     end: event.end,
+                    tzOffset: event.tzOffset,
                     created: event.created
                 })
             ),
@@ -258,6 +260,7 @@ export namespace BackupServer {
                     event.name,
                     event.start,
                     event.end,
+                    event.tzOffset,
                     labelsIndexedByName[event.labelName || '']?.id ?? null,
                     event.created
                 );

@@ -71,11 +71,12 @@ namespace FeedServer {
                 name: string;
                 start: number;
                 end: number;
+                tzOffset: number;
                 labelId: string;
                 created: number;
             }[]
         >`
-            SELECT id, name, start, end, labelId, created
+            SELECT id, name, start, end, tzOffset, labelId, created
             FROM events
             WHERE userId = ${auth.id}
                 AND DATE_FORMAT(FROM_UNIXTIME(start), '%Y-%m-%d') = ${day.fmtIso()}
@@ -86,11 +87,12 @@ namespace FeedServer {
                 name: string;
                 start: number;
                 end: number;
+                tzOffset: number;
                 labelId: string;
                 created: number;
             }[]
         >`
-            SELECT id, name, start, end, labelId, created
+            SELECT id, name, start, end, tzOffset, labelId, created
             FROM events
             WHERE userId = ${auth.id}
                 AND DATE_FORMAT(FROM_UNIXTIME(end), '%Y-%m-%d') = ${day.fmtIso()}

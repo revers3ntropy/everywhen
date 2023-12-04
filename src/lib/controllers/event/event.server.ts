@@ -18,6 +18,7 @@ namespace EventServer {
         name: string;
         start: number;
         end: number;
+        tzOffset: number;
         created: number;
         labelId: string | null;
     }
@@ -32,6 +33,7 @@ namespace EventServer {
                 name: string;
                 start: number;
                 end: number;
+                tzOffset: number;
                 labelId: string;
                 created: number;
             }[]
@@ -40,6 +42,7 @@ namespace EventServer {
                    name,
                    start,
                    end,
+                   tzOffset,
                    labelId,
                    created
             FROM events
@@ -98,6 +101,7 @@ namespace EventServer {
             name: nameDecrypted.val,
             start: rawEvent.start,
             end: rawEvent.end,
+            tzOffset: rawEvent.tzOffset,
             created: rawEvent.created,
             label
         });
@@ -125,6 +129,7 @@ namespace EventServer {
         name: string,
         start: TimestampSecs,
         end: TimestampSecs,
+        tzOffset: number,
         labelId: string | null,
         created: TimestampSecs | null
     ): Promise<Result<RawEvent>> {
@@ -136,12 +141,13 @@ namespace EventServer {
 
         await query`
             INSERT INTO events
-                (id, userId, name, start, end, created, labelId)
+                (id, userId, name, start, end, tzOffset, created, labelId)
             VALUES (${id},
                     ${auth.id},
                     ${encrypt(name, auth.key)},
                     ${start},
                     ${end},
+                    ${tzOffset},
                     ${created},
                     ${labelId || null})
         `;
@@ -152,6 +158,7 @@ namespace EventServer {
             name,
             start,
             end,
+            tzOffset,
             labelId
         });
     }

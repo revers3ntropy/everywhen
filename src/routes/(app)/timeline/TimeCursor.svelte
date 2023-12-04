@@ -20,7 +20,8 @@
             await api.post('/events', {
                 name: EventController.NEW_EVENT_NAME,
                 start,
-                end
+                end,
+                tzOffset: currentTzOffset()
             })
         );
         const event: EventController = {
@@ -28,6 +29,7 @@
             name: EventController.NEW_EVENT_NAME,
             start,
             end,
+            tzOffset: currentTzOffset(),
             created: nowUtc(), // not precise but fine
             label: null
         };

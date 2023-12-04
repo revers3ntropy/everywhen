@@ -6,7 +6,7 @@
     import { eventsSortKey, navExpanded, obfuscated } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
-    import { nowUtc } from '$lib/utils/time';
+    import { currentTzOffset, nowUtc } from '$lib/utils/time';
     import EventComponent from '$lib/components/event/Event.svelte';
     import type { EventsSortKey } from '../../../types';
     import type { PageData } from './$types';
@@ -37,7 +37,8 @@
             await api.post('/events', {
                 name: Event.NEW_EVENT_NAME,
                 start: now,
-                end: now
+                end: now,
+                tzOffset: currentTzOffset()
             })
         );
 
@@ -46,6 +47,7 @@
             name: Event.NEW_EVENT_NAME,
             start: now,
             end: now,
+            tzOffset: currentTzOffset(),
             created: now,
             label: null
         };
@@ -56,7 +58,7 @@
 
     type EventData = Event & { deleted?: true };
 
-    let { events, labels } = data;
+    let { events } = data;
     $: if ($eventsSortKey) events = sortEvents(events, $eventsSortKey);
 
     let selectNameId: string;
@@ -98,7 +100,12 @@
     <ul>
         {#each events as event}
             <li>
-                <EventComponent {event} {selectNameId} {labels} obfuscated={$obfuscated} />
+                <EventComponent
+                    {event}
+                    {selectNameId}
+                    labels={data.labels}
+                    obfuscated={$obfuscated}
+                />
             </li>
         {/each}
     </ul>

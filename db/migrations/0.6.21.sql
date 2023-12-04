@@ -1,0 +1,1 @@
+ALTER TABLE events ADD COLUMN tzOffset double NOT NULL AFTER end;

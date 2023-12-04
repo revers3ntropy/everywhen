@@ -1,5 +1,5 @@
-import { Entry } from '$lib/controllers/entry/entry';
-import type { Event } from '$lib/controllers/event/event';
+import type { Entry } from '$lib/controllers/entry/entry';
+import { Event } from '$lib/controllers/event/event';
 
 export type FeedItem =
     | (Entry & { type: 'entry' })
@@ -30,13 +30,17 @@ export namespace Feed {
     export function feedItemTime(item: FeedItem): number {
         switch (item.type) {
             case 'entry':
-                return Entry.localTime(item);
+                return item.created;
             case 'sleep':
-                return item.start + item.startTzOffset * 60 * 60;
+                return item.start;
             case 'event-start':
                 return item.start;
             case 'event-end':
-                return item.end;
+                // put the end of instant events after the start
+                // as events are instant if they are less than 60
+                // seconds long, shouldn't make a difference...
+                // TODO order properly
+                return item.end + (Event.isInstantEvent(item) ? 1 : 0);
         }
     }
 

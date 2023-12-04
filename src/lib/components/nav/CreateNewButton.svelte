@@ -14,7 +14,7 @@
     import { page } from '$app/stores';
     import { goto } from '$app/navigation';
     import { eventsSortKey, settingsStore, username } from '$lib/stores';
-    import { nowUtc } from '$lib/utils/time';
+    import { currentTzOffset, nowUtc } from '$lib/utils/time';
     import { Event as EventController } from '$lib/controllers/event/event';
 
     const iconSize = 25;
@@ -99,7 +99,8 @@
             await api.post('/events', {
                 name: EventController.NEW_EVENT_NAME,
                 start: now,
-                end: now
+                end: now,
+                tzOffset: currentTzOffset()
             })
         );
 

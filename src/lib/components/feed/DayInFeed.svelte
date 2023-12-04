@@ -184,9 +184,9 @@
                             {obfuscated}
                         />
                     {:else if item.type === 'event-start'}
-                        <EventStartFeedItem {item} nextItem={items[i + 1] ?? null} {obfuscated} />
+                        <EventStartFeedItem {item} nextItem={items[i - 1] ?? null} {obfuscated} />
                     {:else if item.type === 'event-end'}
-                        <EventEndFeedItem {item} previousItem={items[i - 1] ?? null} {obfuscated} />
+                        <EventEndFeedItem {item} previousItem={items[i + 1] ?? null} {obfuscated} />
                     {/if}
                 {/each}
             </div>
