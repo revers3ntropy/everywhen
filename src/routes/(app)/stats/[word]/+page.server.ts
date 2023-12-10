@@ -1,3 +1,4 @@
+import { Label } from '$lib/controllers/label/label.server';
 import { Location } from '$lib/controllers/location/location.server';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import { daysSince } from '$lib/utils/time';
@@ -24,6 +25,7 @@ export const load = cachedPageRoute(async (auth, { params }) => {
         totalEntries: (await Entry.counts(auth)).entryCount,
         locations: (await Location.all(auth)).unwrap(e => error(400, e)),
         heatMapData: heatMapDataFromEntries(summaries),
+        labels: (await Label.allIndexedById(auth)).unwrap(e => error(400, e)),
         days
     };
 }) satisfies PageServerLoad;

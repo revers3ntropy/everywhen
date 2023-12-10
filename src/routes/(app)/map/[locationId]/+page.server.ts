@@ -1,3 +1,4 @@
+import { Label } from '$lib/controllers/label/label.server';
 import { error } from '@sveltejs/kit';
 import { Location } from '$lib/controllers/location/location.server';
 import { cachedPageRoute } from '$lib/utils/cache.server';
@@ -11,5 +12,9 @@ export const load = cachedPageRoute(async (auth, { params }) => {
     const location = locations.find(l => l.id === labelId);
     if (!location) throw error(404, 'Location not found');
 
-    return { location, locations };
+    return {
+        location,
+        locations,
+        labels: (await Label.allIndexedById(auth)).unwrap(e => error(500, e))
+    };
 }) satisfies PageServerLoad;

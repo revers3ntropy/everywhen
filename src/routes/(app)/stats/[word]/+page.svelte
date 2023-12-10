@@ -22,7 +22,6 @@
 
     let by: By = By.Entries;
 
-    let theWordDecrypted = '...';
     $: theWordDecrypted = browser ? Auth.decryptOrLogOut(data.theWord, $encryptionKey) : '...';
 </script>
 
@@ -102,6 +101,7 @@
                     search: data.theWord
                 }}
                 locations={data.locations}
+                labels={data.labels}
             />
         </section>
     {/if}

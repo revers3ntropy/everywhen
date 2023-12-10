@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type { Label } from '$lib/controllers/label/label';
     import { obfuscated } from '$lib/stores';
     import InfiniteScroller from '$lib/components/InfiniteScroller.svelte';
     import DayInFeed from '$lib/components/feed/DayInFeed.svelte';
@@ -10,6 +11,7 @@
     import type { Dataset } from '$lib/controllers/dataset/dataset';
 
     export let locations: Location[];
+    export let labels: Record<string, Label>;
     export let happinessDataset: Dataset | null;
 
     async function loadMoreDays(): Promise<FeedDay[]> {
@@ -43,6 +45,7 @@
                 obfuscated={$obfuscated}
                 showLabels
                 {locations}
+                {labels}
                 showForms
                 {happinessDataset}
             />

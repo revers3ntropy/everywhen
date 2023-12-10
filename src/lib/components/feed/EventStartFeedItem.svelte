@@ -1,14 +1,21 @@
 <script lang="ts">
     import LabelDot from '$lib/components/label/LabelDot.svelte';
     import UtcTime from '$lib/components/UtcTime.svelte';
-    import type { FeedItem } from '$lib/controllers/feed/feed';
+    import { Auth } from '$lib/controllers/auth/auth';
+    import type { FeedItem, FeedItemTypes } from '$lib/controllers/feed/feed';
+    import type { Label } from '$lib/controllers/label/label';
+    import { encryptionKey } from '$lib/stores';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
     import CalendarStart from 'svelte-material-icons/CalendarStart.svelte';
     import { Event } from '$lib/controllers/event/event';
 
-    export let item: Event;
+    export let item: FeedItemTypes['eventStart'];
+    export let labels: Record<string, Label>;
     export let nextItem: FeedItem | null;
     export let obfuscated: boolean;
+
+    $: label = item.labelId ? labels[item.labelId] : null;
+    $: name = Auth.decryptOrLogOut(item.nameEncrypted, $encryptionKey);
 </script>
 
 <!-- if the event starts and then immediately ends, collapse into one item -->
@@ -25,10 +32,10 @@
             <Calendar size="22" />
         </div>
         <div class:obfuscated>
-            {#if item.label}
-                <LabelDot color={item.label.color} name={item.label.name} />
+            {#if label}
+                <LabelDot color={label.color} name={label.name} />
             {/if}
-            {item.name}
+            {name}
         </div>
     </div>
 {:else}
@@ -39,13 +46,13 @@
         </div>
         <div>
             <span class="text-textColorLight">start of</span>
-            {#if item.label}
+            {#if label}
                 <span class="pl-1">
-                    <LabelDot color={item.label.color} name={item.label.name} />
+                    <LabelDot color={label.color} name={label.name} />
                 </span>
             {/if}
             <span class:obfuscated>
-                {item.name}
+                {name}
             </span>
         </div>
     </div>

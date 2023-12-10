@@ -1,5 +1,6 @@
 <script lang="ts">
     import { browser } from '$app/environment';
+    import type { Label } from '$lib/controllers/label/label';
     import { inview } from 'svelte-inview';
     import { obfuscated } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
@@ -17,6 +18,7 @@
     }
 
     export let locations: Location[];
+    export let labels: Record<string, Label>;
     export let showLabels = true;
     export let showForms = false;
     export let numberOfEntries = Infinity;
@@ -123,6 +125,7 @@
         {showLabels}
         {locations}
         {showForms}
+        {labels}
     />
 {/each}
 <div

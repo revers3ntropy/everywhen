@@ -97,7 +97,7 @@
     <section>
         <h1>
             {eventCount}
-            Event{eventCount !== 1 ? 's' : ''}
+            Events
         </h1>
         <div class="events">
             {#each events as event}
@@ -107,8 +107,13 @@
     </section>
 
     <section>
-        <h1>{entryCount} Entr{entryCount === 1 ? 'y' : 'ies'}</h1>
-        <Entries options={{ labelId: label.id }} showLabels={false} {locations} />
+        <h1>{entryCount} Entries</h1>
+        <Entries
+            options={{ labelId: label.id }}
+            showLabels={false}
+            {locations}
+            labels={data.labels}
+        />
     </section>
 </main>
 

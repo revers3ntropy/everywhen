@@ -1,19 +1,38 @@
 import type { Entry } from '$lib/controllers/entry/entry';
 import { Event } from '$lib/controllers/event/event';
 
-export type FeedItem =
-    | (Entry & { type: 'entry' })
-    | {
-          id: string;
-          type: 'sleep';
-          start: number;
-          startTzOffset: number;
-          duration: number;
-          quality: number | null;
-          regularity: number | null;
-      }
-    | (Event & { type: 'event-start' })
-    | (Event & { type: 'event-end' });
+export type FeedItemTypes = {
+    eventEnd: {
+        type: 'event-end';
+        id: string;
+        start: number;
+        end: number;
+        tzOffset: number;
+        labelId: string;
+        nameEncrypted: string;
+    };
+    eventStart: {
+        type: 'event-start';
+        id: string;
+        start: number;
+        end: number;
+        tzOffset: number;
+        labelId: string;
+        nameEncrypted: string;
+    };
+    sleep: {
+        id: string;
+        type: 'sleep';
+        start: number;
+        startTzOffset: number;
+        duration: number;
+        quality: number | null;
+        regularity: number | null;
+    };
+    entry: Entry & { type: 'entry' };
+};
+
+export type FeedItem = FeedItemTypes[keyof FeedItemTypes];
 
 export interface FeedDay {
     day: string;

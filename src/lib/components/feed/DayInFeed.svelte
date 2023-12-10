@@ -12,6 +12,7 @@
     import EventStartFeedItem from '$lib/components/feed/EventStartFeedItem.svelte';
     import SleepInfo from '$lib/components/feed/SleepCycleFeedItem.svelte';
     import { Feed } from '$lib/controllers/feed/feed';
+    import type { Label } from '$lib/controllers/label/label';
     import { currentlyUploadingEntries } from '$lib/stores';
     import { fly, slide } from 'svelte/transition';
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
@@ -30,6 +31,7 @@
     import HappinessValueIcon from '$lib/components/dataset/HappinessValueIcon.svelte';
 
     export let locations: Location[];
+    export let labels: Record<string, Label>;
     export let obfuscated: boolean;
     export let day: FeedDay;
     export let showLabels = true;
@@ -184,9 +186,19 @@
                             {obfuscated}
                         />
                     {:else if item.type === 'event-start'}
-                        <EventStartFeedItem {item} nextItem={items[i - 1] ?? null} {obfuscated} />
+                        <EventStartFeedItem
+                            {labels}
+                            {item}
+                            nextItem={items[i - 1] ?? null}
+                            {obfuscated}
+                        />
                     {:else if item.type === 'event-end'}
-                        <EventEndFeedItem {item} previousItem={items[i + 1] ?? null} {obfuscated} />
+                        <EventEndFeedItem
+                            {labels}
+                            {item}
+                            previousItem={items[i + 1] ?? null}
+                            {obfuscated}
+                        />
                     {/if}
                 {/each}
             </div>

@@ -7,7 +7,6 @@
     import type { PageData } from './$types';
 
     export let data: PageData;
-    const { location, locations } = data;
 
     async function onChange(newLocation: Location | null): Promise<void> {
         if (newLocation === null) {
@@ -17,20 +16,21 @@
 </script>
 
 <svelte:head>
-    <title>{location.name} | Location</title>
+    <title>{data.location.name} | Location</title>
 </svelte:head>
 <main class="p-4 {$navExpanded ? 'md:ml-48' : 'md:ml-16'}">
     <section class="p-2 md:rounded-lg md:bg-vLightAccent md:p-4">
-        <EditLocation {...location} {onChange} />
+        <EditLocation {...data.location} {onChange} />
     </section>
 
     <section class="pt-4">
         <Entries
             options={{
-                locationId: location.id
+                locationId: data.location.id
             }}
             showLabels
-            {locations}
+            locations={data.locations}
+            labels={data.labels}
         />
     </section>
 </main>

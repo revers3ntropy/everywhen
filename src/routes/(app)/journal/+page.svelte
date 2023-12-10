@@ -6,7 +6,6 @@
     import Feed from '$lib/components/feed/Feed.svelte';
 
     export let data: PageData;
-    let { pinnedEntriesList, datasets, nYearsAgo, locations, happinessDataset } = data;
 </script>
 
 <svelte:head>
@@ -17,17 +16,21 @@
     <section class="sidebar">
         <EntriesSidebar
             obfuscated={$obfuscated}
-            {nYearsAgo}
-            pinnedEntriesSummaries={pinnedEntriesList}
+            nYearsAgo={data.nYearsAgo}
+            pinnedEntriesSummaries={data.pinnedEntriesList}
         />
     </section>
 
     <section class="feed">
         <div class="pb-4">
-            <DatasetShortcutWidgets {datasets} />
+            <DatasetShortcutWidgets datasets={data.datasets} />
         </div>
 
-        <Feed {locations} {happinessDataset} />
+        <Feed
+            locations={data.locations}
+            happinessDataset={data.happinessDataset}
+            labels={data.labels}
+        />
     </section>
 </main>
 

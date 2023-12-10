@@ -25,7 +25,7 @@
     } from '$lib/utils/time';
     import { slide, fly } from 'svelte/transition';
 
-    export let labels: Label[];
+    export let labels: Record<string, Label>;
     export let obfuscated = true;
 
     export let bordered = true;
@@ -44,9 +44,7 @@
     }) {
         notify.onErr(await api.put(apiPath('/events/?', event.id), changes));
 
-        const label = changes.label
-            ? labels?.find(l => l.id === changes.label) || null
-            : event.label;
+        const label = changes.label ? labels[changes.label] || null : event.label;
 
         event = {
             ...event,
@@ -140,7 +138,7 @@
         if (id === (event.label?.id || '')) return;
         if (!labels) return;
 
-        event.label = labels.find(l => l.id === id) || null;
+        event.label = labels[id] || null;
         await updateEvent({
             label: id
         });
@@ -159,13 +157,20 @@
     }
 
     listen.label.onCreate(label => {
-        labels = [...labels, label];
+        labels = {
+            ...labels,
+            [label.id]: label
+        };
     });
     listen.label.onUpdate(label => {
-        labels = labels.map(l => (l.id === label.id ? label : l));
+        labels = {
+            ...labels,
+            [label.id]: label
+        };
     });
     listen.label.onDelete(id => {
-        labels = labels.filter(l => l.id !== id);
+        // TODO check this syntax will actually update Svelte thing
+        delete labels[id];
     });
 
     listen.event.onUpdate(e => {
@@ -205,7 +210,7 @@
                         <LabelSelect
                             on:change={updateLabel}
                             value={event.label?.id || ''}
-                            {labels}
+                            labels={Object.values(labels)}
                             condensed
                         />
                     </div>
@@ -270,7 +275,7 @@
                         <LabelSelect
                             on:change={updateLabel}
                             value={event.label?.id || ''}
-                            {labels}
+                            labels={Object.values(labels)}
                         />
                     </div>
                 </div>

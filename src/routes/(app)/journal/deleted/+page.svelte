@@ -4,7 +4,6 @@
     import type { PageData } from './$types';
 
     export let data: PageData;
-    const { locations } = data;
 </script>
 
 <svelte:head>
@@ -18,7 +17,8 @@
                 options={{
                     deleted: true
                 }}
-                {locations}
+                locations={data.locations}
+                labels={data.labels}
             />
         </div>
     </div>
