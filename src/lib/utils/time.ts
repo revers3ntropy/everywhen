@@ -128,22 +128,22 @@ export function daysSince(timestamp: TimestampSecs, tzOffset: Hours): number {
 }
 
 export class Day {
-    constructor(
+    public constructor(
         public readonly year: number,
         public readonly month: number,
         public readonly date: number
     ) {}
 
-    static fromTimestamp(timestamp: TimestampSecs, tzOffset: Hours): Day {
+    public static fromTimestamp(timestamp: TimestampSecs, tzOffset: Hours): Day {
         const date = new Date((timestamp + tzOffset * 60 * 60) * 1000);
         return new Day(date.getFullYear(), date.getMonth() + 1, date.getDate());
     }
 
-    static today(tzOffset: Hours): Day {
+    public static today(tzOffset: Hours): Day {
         return Day.fromTimestamp(nowUtc(), tzOffset);
     }
 
-    static fromString(str: string): Result<Day> {
+    public static fromString(str: string): Result<Day> {
         const parts = str.split('-');
         if (parts.length !== 3) {
             return Result.err('Invalid day format');
@@ -164,13 +164,31 @@ export class Day {
         return Result.ok(new Day(year, month, date));
     }
 
-    fmtIso(): string {
+    public fmtIso(): string {
         return `${this.year}-${this.month.toString().padStart(2, '0')}-${this.date
             .toString()
             .padStart(2, '0')}`;
     }
 
-    eq(other: Day): boolean {
+    public utcTimestamp(tzOffset: Hours): TimestampSecs {
+        return new Date(`${this.fmtIso()}T12:00:00Z`).getTime() / 1000 - tzOffset * 60 * 60;
+    }
+
+    public eq(other: Day): boolean {
         return this.year === other.year && this.month === other.month && this.date === other.date;
+    }
+
+    public lt(other: Day): boolean {
+        if (this.year < other.year) return true;
+        if (this.year > other.year) return false;
+        if (this.month < other.month) return true;
+        if (this.month > other.month) return false;
+        return this.date < other.date;
+    }
+
+    public plusDays(days: number): Day {
+        const date = new Date(`${this.fmtIso()}T12:00:00Z`);
+        date.setDate(date.getDate() + days);
+        return Day.fromTimestamp(date.getTime() / 1000, currentTzOffset());
     }
 }

@@ -7,7 +7,7 @@ import { decrypt, encrypt } from '$lib/utils/encryption';
 import { FileLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 import { wordCount, wordsFromText } from '$lib/utils/text';
-import { Day, fmtUtc, nowUtc } from '$lib/utils/time';
+import { fmtUtc, nowUtc } from '$lib/utils/time';
 import type { Hours, TimestampSecs } from '../../../types';
 import type { Auth } from '../auth/auth.server';
 import type { Label } from '../label/label';
@@ -429,27 +429,6 @@ namespace EntryServer {
             agentData: agentDataRes.val
         });
     }
-
-    export async function dayOfEntryBeforeThisOne(
-        auth: Auth,
-        entry: Entry | null
-    ): Promise<Day | null> {
-        const lastTime = entry ? Entry.localTime(entry) : nowUtc();
-        const entries = await query<{ created: number; createdTzOffset: number }[]>`
-            SELECT created, createdTzOffset
-            FROM entries
-            WHERE deleted IS NULL
-              AND userId = ${auth.id}
-              AND (created + createdTzOffset * 60 * 60) < ${lastTime}
-            ORDER BY created DESC, id
-            LIMIT 1
-        `;
-        if (!entries.length) return null;
-
-        const { created, createdTzOffset } = entries[0];
-        return Day.fromTimestamp(created, createdTzOffset);
-    }
-
     export async function allBasicSummaries(auth: Auth): Promise<
         {
             created: number;
