@@ -12,6 +12,11 @@ describe('Day.addDays', () => {
         expect(new Day(2022, 12, 31).plusDays(366)?.fmtIso()).toBe('2024-01-01');
         expect(new Day(2023, 11, 30).plusDays(1)?.fmtIso()).toBe('2023-12-01');
         expect(new Day(2023, 11, 30).plusDays(3)?.fmtIso()).toBe('2023-12-03');
+        expect(new Day(2022, 1, 1).plusDays(-1)?.fmtIso()).toBe('2021-12-31');
+        expect(new Day(2022, 1, 1).plusDays(-10)?.fmtIso()).toBe('2021-12-22');
+        expect(new Day(2022, 1, 1).plusDays(-365)?.fmtIso()).toBe('2021-01-01');
+        expect(new Day(2022, 1, 1).plusDays(-366)?.fmtIso()).toBe('2020-12-31');
+        expect(new Day(2022, 1, 4).plusDays(-2)?.fmtIso()).toBe('2022-01-02');
     });
 
     it('Compares with lt correctly', () => {

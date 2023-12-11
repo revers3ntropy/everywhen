@@ -37,7 +37,7 @@ namespace FeedServer {
     }
 
     async function getNextDayInPast(auth: Auth, day: Day): Promise<Day | null> {
-        const tomorrow = day.plusDays(1);
+        const tomorrow = day.plusDays(-1);
         return await PROVIDERS.map(p => p.nextDayWithFeedItems(auth, day)).reduce(
             async (acc, nextRes) => {
                 const accDay = await acc;
@@ -51,9 +51,9 @@ namespace FeedServer {
                 if (accDay === null) return next;
 
                 // if the next day is closer to today than the current closest day,
-                // return the next day
-                if (next.lt(accDay)) return next;
-                return acc;
+                // return the next day (less than as all dates are assumed in past)
+                if (next.lt(accDay)) return accDay;
+                return next;
             },
             Promise.resolve<null | Day>(null)
         );
