@@ -17,7 +17,6 @@
     import type { Label } from '$lib/controllers/label/label';
     import {
         currentlyUploadingAssets,
-        currentlyUploadingEntries,
         enabledLocation,
         encryptionKey,
         settingsStore,
@@ -219,8 +218,6 @@
             return;
         }
 
-        currentlyUploadingEntries.update(v => v + 1);
-
         submitted = true;
 
         const currentLocation = $enabledLocation ? await getLocation() : nullLocation();
@@ -251,8 +248,6 @@
         if (useBulletEntryForm) {
             newEntryInputElement.focus();
         }
-
-        currentlyUploadingEntries.update(v => v - 1);
     }
 
     function onNewImage(md: string) {
@@ -360,10 +355,10 @@
     }
 </script>
 
-<div class="mt-4 mx-1 md:mx-4">
+<div class="md:bg-vLightAccent rounded-2xl">
     {#key useBulletEntryForm}
-        <div class="head">
-            <div class="left-options">
+        <div class="flex justify-between gap-4 p-1">
+            <div class="flex gap-1">
                 <button
                     aria-label="Switch to bullet journaling"
                     class="with-circled-icon"
@@ -400,16 +395,17 @@
                     </div>
                 {/if}
             </div>
-            <div class="flex justify-end items-center {obfuscated ? 'blur' : ''}">
+            <div class="flex justify-end items-center" class:blur={obfuscated}>
                 <LabelSelect bind:value={newEntryLabel} {labels} fromRight />
             </div>
         </div>
         {#if !useBulletEntryForm}
-            <div class="entry-title-container">
+            <div class="py-1 px-2">
                 <input
                     aria-label="Entry Title"
                     bind:value={newEntryTitle}
-                    class="title text-lg"
+                    class="w-full text-lg"
+                    style="background: none; border-bottom: 2px solid var(--background-color); padding-inline: 0.5rem; border-radius: 0"
                     class:obfuscated
                     placeholder={obfuscated ? '' : 'Title (optional)'}
                     disabled={obfuscated || submitted}
@@ -429,7 +425,7 @@
                     : useBulletEntryForm
                       ? 'Write a bullet...'
                       : 'Start writing here...'}
-                class="text-lg py-2 resize-none w-full bg-transparent md:bg-lightAccent"
+                class="text-lg py-2 resize-none w-full bg-transparent"
                 class:obfuscated
                 class:rounded-lg={useBulletEntryForm}
                 class:rounded-b-lg={!useBulletEntryForm}
@@ -444,7 +440,7 @@
             -->
             <textarea
                 bind:this={textAreaSizeTester}
-                class="text-lg py-2 resize-none w-full bg-transparent md:bg-lightAccent"
+                class="text-lg py-2 resize-none w-full bg-transparent"
                 class:obfuscated
                 class:rounded-lg={useBulletEntryForm}
                 class:rounded-b-lg={!useBulletEntryForm}
@@ -457,12 +453,13 @@
         <div class="flex py-1 justify-end">
             <button
                 aria-label="Submit Entry"
-                class="primary with-icon"
+                class="flex-center p-1 primary"
                 disabled={submitted}
                 on:click={submit}
-                style="padding: 2px 5px; margin: 0 0 3px 0;"
             >
-                Submit
+                {#if !useBulletEntryForm}
+                    Submit
+                {/if}
                 <Tick size="26" />
             </button>
         </div>
@@ -473,81 +470,7 @@
     @import '$lib/styles/layout';
     @import '$lib/styles/input';
 
-    .head {
-        margin: 0 0 4px 0;
-        padding: 0;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-
-        @media #{$mobile} {
-            border: none;
-        }
-
-        .left-options {
-            @extend .flex-center;
-            height: 100%;
-            justify-content: flex-start;
-            gap: 3px;
-        }
-
-        .right-options {
-            height: 100%;
-            display: grid;
-            grid-template-columns: 1fr auto;
-            justify-content: flex-end;
-            align-items: center;
-
-            &.blur {
-                filter: blur(4px);
-            }
-
-            .label-select-container {
-                display: grid;
-                justify-content: flex-end;
-                align-items: center;
-            }
-        }
-    }
-
-    .send-mobile {
-        display: none;
-
-        @media #{$mobile} {
-            display: flex;
-        }
-    }
-
-    .entry-title-container {
-        @extend .flex-center;
-        padding: 0;
-
-        @media #{$mobile} {
-            padding: 0;
-        }
-
-        input {
-            padding: 0.5rem 1rem;
-            margin: 0;
-            outline: none;
-            border: none;
-            background: var(--light-accent);
-            border-radius: $border-radius $border-radius 0 0;
-            border-bottom: 2px solid var(--background-color);
-            width: 100%;
-
-            @media #{$mobile} {
-                background: transparent;
-                border-bottom: 1px solid var(--border-color);
-            }
-        }
-    }
-
-    .entry-container {
-        @extend .flex-center;
-        width: 100%;
-
-        @media #{$mobile} {
-            padding: 0;
-        }
+    .blur {
+        filter: blur(4px);
     }
 </style>

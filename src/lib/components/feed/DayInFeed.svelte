@@ -11,9 +11,8 @@
     import EventEndFeedItem from '$lib/components/feed/EventEndFeedItem.svelte';
     import EventStartFeedItem from '$lib/components/feed/EventStartFeedItem.svelte';
     import SleepInfo from '$lib/components/feed/SleepCycleFeedItem.svelte';
-    import { Feed } from '$lib/controllers/feed/feed';
+    import { Feed, type FeedItem } from '$lib/controllers/feed/feed';
     import type { Label } from '$lib/controllers/label/label';
-    import { currentlyUploadingEntries } from '$lib/stores';
     import { fly, slide } from 'svelte/transition';
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
@@ -42,7 +41,9 @@
         $collapsed[day.day] = !$collapsed[day.day];
     }
 
-    $: items = day?.items;
+    let items: FeedItem[];
+    $: items = Feed.orderedFeedItems(day.items).reverse();
+    $: entryCount = items?.filter(item => item.type === 'entry').length ?? 0;
     $: isToday = fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD') === day.day;
     $: dayTimestamp = new Date(day.day).getTime() / 1000;
 
@@ -58,22 +59,23 @@
 
     listen.entry.onCreate(({ entry }) => {
         if (!isToday) return;
-        items = Feed.orderedFeedItems([...items, { ...entry, type: 'entry' }]);
+        items = Feed.orderedFeedItems([...(items ?? []), { ...entry, type: 'entry' }]).reverse();
     });
     listen.entry.onDelete(id => {
-        items = items?.filter(entry => entry.id !== id);
+        items = items.filter(entry => entry.id !== id);
     });
     listen.entry.onUpdate(entry => {
+        items ??= [];
         // only update if the entry is in this group
-        const i = items?.findIndex(e => e.id === entry.id);
+        const i = items.findIndex(e => e.id === entry.id);
         if (i !== -1) {
             items[i] = { ...entry, type: 'entry' };
         }
     });
 </script>
 
-<div class="entry-group">
-    <div class="title">
+<div class="pt-4">
+    <div class="bg-vLightAccent rounded-lg p-2">
         <div class="flex justify-between">
             <div>
                 <button class="flex-center" on:click={toggleCollapse}>
@@ -112,9 +114,9 @@
                             class="flex-center hide-mobile"
                         >
                             <Dot light marginX={10} />
-                            <p class="entry-count">
-                                {items?.length}
-                                {items?.length === 1 ? 'entry' : 'entries'}
+                            <p class="text-textColorLight">
+                                {entryCount}
+                                {entryCount === 1 ? 'entry' : 'entries'}
                             </p>
                         </div>
                     {/if}
@@ -141,32 +143,7 @@
                 duration: ANIMATION_DURATION
             }}
         >
-            {#if showForms && isToday}
-                <EntryForm {obfuscated} />
-            {/if}
-            <div class="contents">
-                {#if isToday && $currentlyUploadingEntries}
-                    {#each { length: $currentlyUploadingEntries } as i (i)}
-                        <Entry
-                            id="temp-{i}"
-                            title=""
-                            body="..."
-                            created={nowUtc()}
-                            createdTzOffset={currentTzOffset()}
-                            label={null}
-                            latitude={null}
-                            longitude={null}
-                            deleted={null}
-                            pinned={null}
-                            wordCount={-1}
-                            agentData=""
-                            edits={[]}
-                            {obfuscated}
-                            {showLabels}
-                            {locations}
-                        />
-                    {/each}
-                {/if}
+            <div class="pb-4">
                 {#each items || [] as item, i (item.id)}
                     {#if item.type === 'entry'}
                         <!-- hack to remove 'type' attribute from entry -->
@@ -202,6 +179,9 @@
                     {/if}
                 {/each}
             </div>
+            {#if showForms && isToday}
+                <EntryForm {obfuscated} />
+            {/if}
         </div>
     {/if}
 </div>
@@ -210,54 +190,6 @@
     @import '$lib/styles/layout';
 
     .entry-group {
-        width: 100%;
-        margin: 0;
-        padding: 0;
-
         transition: height #{$transition};
-
-        @media #{$not-mobile} {
-            border-radius: $border-radius;
-            background: var(--v-light-accent);
-            margin: 1rem 0;
-            padding: 7px 0;
-
-            &:first-child {
-                margin-top: 0;
-            }
-            &:last-child {
-                margin-bottom: 0;
-            }
-        }
-
-        .title {
-            padding: 0.4rem 0.8rem;
-
-            @media #{$mobile} {
-                border-radius: $border-radius;
-                background: var(--v-light-accent);
-                border: 1px solid var(--border-color);
-                margin: 0.5rem 0;
-                padding: 0.4rem 0.8rem 0.4rem 0;
-                position: sticky;
-                top: 55px;
-                z-index: 4;
-            }
-
-            .entry-count {
-                font-size: 1rem;
-                color: var(--text-color-light);
-            }
-        }
-
-        @media #{$mobile} {
-            margin: 0;
-            border: none;
-            border-radius: 0;
-        }
-
-        .contents {
-            padding: 0 0 1em 0;
-        }
     }
 </style>

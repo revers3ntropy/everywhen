@@ -1,6 +1,5 @@
 <script lang="ts">
     import type { Label } from '$lib/controllers/label/label';
-    import { obfuscated } from '$lib/stores';
     import InfiniteScroller from '$lib/components/InfiniteScroller.svelte';
     import DayInFeed from '$lib/components/feed/DayInFeed.svelte';
     import type { Location } from '$lib/controllers/location/location';
@@ -13,45 +12,29 @@
     export let locations: Location[];
     export let labels: Record<string, Label>;
     export let happinessDataset: Dataset | null;
+    export let obfuscated: boolean;
 
-    async function loadMoreDays(): Promise<FeedDay[]> {
-        const day = notify.onErr(
-            await api.get(apiPath('/feed/?', nextDay ?? Day.today(currentTzOffset()).fmtIso()))
-        );
+    async function loadMoreDays(): Promise<void> {
+        if (!nextDay) throw new Error('nextDay is null');
+        const day = notify.onErr(await api.get(apiPath('/feed/?', nextDay)));
         nextDay = day.nextDayInPast;
-        if (nextDay === null) {
-            feedDaysCount = days.length + 1;
-        }
-        return [day];
+        days = [...days, day];
     }
 
-    let feedDaysCount = Infinity;
-    let days: FeedDay[] = [];
-    let nextDay: string | null = null;
+    let days = [] as FeedDay[];
+    let nextDay: string | null = Day.today(currentTzOffset()).fmtIso();
 </script>
 
-<InfiniteScroller
-    bind:items={days}
-    batchSize={5}
-    numItems={feedDaysCount}
-    loadItems={loadMoreDays}
-    maxMargin={200}
-    minItemsHeight={50}
->
-    <div class="assets">
-        {#each days as day}
-            <DayInFeed
-                {day}
-                obfuscated={$obfuscated}
-                showLabels
-                {locations}
-                {labels}
-                showForms
-                {happinessDataset}
-            />
-        {/each}
-    </div>
-    <div class="flex-center" slot="empty">
-        <i>No images yet</i>
-    </div>
+<InfiniteScroller loadItems={loadMoreDays} hasMore={() => nextDay !== null} invertDirection>
+    {#each days as day (day.day)}
+        <DayInFeed
+            {day}
+            {obfuscated}
+            showLabels
+            {locations}
+            {labels}
+            showForms
+            {happinessDataset}
+        />
+    {/each}
 </InfiniteScroller>

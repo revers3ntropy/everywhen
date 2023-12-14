@@ -16,12 +16,9 @@
 
     let { assets, assetCount } = data;
 
-    async function loadMoreAssets(
-        offset: number,
-        count: number
-    ): Promise<Omit<IAsset, 'content'>[]> {
-        const res = notify.onErr(await api.get(`/assets`, { offset, count }));
-        return res.assets;
+    async function loadMoreAssets(): Promise<void> {
+        const res = notify.onErr(await api.get(`/assets`, { offset: assets.length, count: 8 }));
+        assets = [...assets, ...res.assets];
     }
 
     const upload = (async e => {
@@ -71,22 +68,10 @@
         {/if}
     </div>
 
-    <InfiniteScroller
-        bind:items={assets}
-        batchSize={5}
-        numItems={assetCount}
-        loadItems={loadMoreAssets}
-        maxMargin={1000}
-        minItemsHeight={10}
-    >
-        <div class="assets">
-            {#each assets as asset}
-                <Asset {...asset} on:delete={() => assetCount--} obfuscated={$obfuscated} />
-            {/each}
-        </div>
-        <div class="flex-center" slot="empty">
-            <i>No images yet</i>
-        </div>
+    <InfiniteScroller loadItems={loadMoreAssets} hasMore={() => assets.length < assetCount}>
+        {#each assets as asset}
+            <Asset {...asset} on:delete={() => assetCount--} obfuscated={$obfuscated} />
+        {/each}
     </InfiniteScroller>
 </main>
 
@@ -106,11 +91,5 @@
         span {
             margin-left: 0.2em;
         }
-    }
-
-    .assets {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
     }
 </style>

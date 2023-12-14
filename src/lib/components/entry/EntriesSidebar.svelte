@@ -19,15 +19,15 @@
 
     const showLimitPinnedEntries = 10;
 
-    async function loadMoreTitles(offset: number, count: number): Promise<string[]> {
+    async function loadMoreTitles(): Promise<void> {
         const { summaries: newEntrySummaries, totalCount } = notify.onErr(
-            await api.get('/entries/titles', { offset, count })
+            await api.get('/entries/titles', { offset: titleIds.length, count: 10 })
         );
         numTitles = totalCount;
 
         summaries = Entry.groupEntriesByDay(newEntrySummaries, summaries);
 
-        return newEntrySummaries.map(t => t.id);
+        titleIds = [...titleIds, ...newEntrySummaries.map(t => t.id)];
     }
 
     $: pinnedEntries = Entry.groupEntriesByDay(
@@ -145,15 +145,7 @@
                 {/each}
             </div>
         {/if}
-        <InfiniteScroller
-            bind:items={titleIds}
-            batchSize={100}
-            numItems={numTitles}
-            loadItems={loadMoreTitles}
-            initialMargin={0}
-            maxMargin={200}
-            minItemsHeight={10}
-        >
+        <InfiniteScroller loadItems={loadMoreTitles} hasMore={() => titleIds.length < numTitles}>
             <EntrySummaries {obfuscated} titles={summaries} hideBlurToggle />
         </InfiniteScroller>
     </div>

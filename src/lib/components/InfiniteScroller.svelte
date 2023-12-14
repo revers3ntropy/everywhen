@@ -1,74 +1,60 @@
 <script lang="ts">
-    import Spinner from '$lib/components/BookSpinner.svelte';
-    import { pageInView } from '$lib/stores';
+    import { onMount } from 'svelte';
     import { inview } from 'svelte-inview';
 
-    type Item = NonNullable<unknown>;
-
-    export let showSpinner = true;
-    export let initialMargin = 0;
-    export let maxMargin = 300;
-    export let minItemsHeight: number;
-    export let items = [] as Item[];
-    export let batchSize = 10;
-    export let numItems: number;
-
-    export let loadItems: (offset: number, count: number) => Promise<Item[]>;
+    export let hasMore: () => boolean;
+    export let loadItems: () => Promise<void>;
+    export let invertDirection = false;
 
     let pageEndInView = false;
-    let currentOffset = items.length;
-    let loadingAt = currentOffset as number | null;
-    let loadedAny = false;
-
-    let margin = initialMargin;
+    let currentlyLoading = false;
 
     async function load() {
         pageEndInView = true;
-        let offset = currentOffset;
-        if (loadingAt === offset && loadedAny) {
-            return;
-        }
-        loadingAt = offset;
+        if (currentlyLoading || !hasMore()) return;
+        currentlyLoading = true;
 
-        if (loadingAt >= numItems && loadedAny) {
-            return;
-        }
+        await loadItems();
 
-        loadedAny = true;
-
-        const newItems = await loadItems(offset, batchSize);
-
-        currentOffset += newItems.length;
-        items = [...items, ...newItems];
-
-        if (loadingAt === offset) {
-            loadingAt = null;
-        }
-
-        if (pageEndInView) {
-            void load();
-        }
+        setTimeout(() => {
+            currentlyLoading = false;
+            if (pageEndInView) {
+                void load();
+            }
+        }, 10);
     }
 
-    $: if ($pageInView && pageEndInView && margin < maxMargin) {
-        margin += minItemsHeight;
-    }
+    onMount(() => {
+        if (invertDirection) {
+            let scrollContainer = document.getElementsByClassName('root')[0]! as HTMLDivElement;
+            let scrollFromBottom = scrollContainer.scrollHeight - scrollContainer.scrollTop;
+            const observer = new MutationObserver(mutationsList => {
+                for (let mutation of mutationsList) {
+                    if (mutation.type === 'childList') {
+                        scrollContainer.scrollTo(
+                            0,
+                            scrollContainer.scrollHeight - scrollFromBottom
+                        );
+                    }
+                }
+            });
+            observer.observe(containerEl, { childList: true });
+            scrollContainer.onscroll = () => {
+                scrollFromBottom = scrollContainer.scrollHeight - scrollContainer.scrollTop;
+            };
+        }
+    });
+
+    let containerEl: HTMLDivElement;
 </script>
 
-<slot {items} />
+<div bind:this={containerEl} class="flex" class:flex-col-reverse={invertDirection}>
+    <slot />
 
-{#if numItems > 0}
-    {#key margin}
-        <div
-            style="height: 1px; position: relative; top: -{margin}px"
-            use:inview={{}}
-            on:inview_enter={load}
-            on:inview_leave={() => (pageEndInView = false)}
-        />
-    {/key}
-    {#if showSpinner && items.length < numItems}
-        <Spinner />
-    {/if}
-{:else}
-    <slot name="empty" />
-{/if}
+    <div
+        style="height: 1px; position: relative; top: -1px"
+        use:inview={{}}
+        on:inview_enter={load}
+        on:inview_leave={() => (pageEndInView = false)}
+    />
+</div>

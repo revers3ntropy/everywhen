@@ -15,13 +15,10 @@
     export let size = '30';
     export let onInput: (markdown: string) => void;
 
-    async function loadMoreAssets(
-        offset: number,
-        count: number
-    ): Promise<Omit<Asset, 'content'>[]> {
-        const res = notify.onErr(await api.get(`/assets`, { offset, count }));
+    async function loadMoreAssets(): Promise<void> {
+        const res = notify.onErr(await api.get(`/assets`, { offset: assets.length, count: 4 }));
         assetCount = res.assetCount;
-        return res.assets;
+        assets = [...assets, ...res.assets];
     }
 
     const upload = (async e => {
@@ -49,13 +46,13 @@
     }) as ChangeEventHandler<HTMLInputElement>;
 
     onMount(async () => {
-        assets = await loadMoreAssets(0, 10);
+        await loadMoreAssets();
     });
 
     let closePopup: () => void;
     let fileDropInput: HTMLInputElement;
     let assets = [] as Omit<Asset, 'content'>[];
-    let assetCount = -1;
+    let assetCount = Infinity;
 </script>
 
 <div>
@@ -85,12 +82,8 @@
             <div style="width: 300px; max-height: 500px; overflow-y: scroll">
                 {#if assetCount > -1 && assets.length}
                     <InfiniteScroller
-                        bind:items={assets}
-                        batchSize={4}
-                        numItems={assetCount}
                         loadItems={loadMoreAssets}
-                        maxMargin={50}
-                        minItemsHeight={10}
+                        hasMore={() => assets.length < assetCount}
                     >
                         {#each assets as asset}
                             <button

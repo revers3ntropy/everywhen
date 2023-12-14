@@ -6,11 +6,7 @@ import {
     SESSION_KEYS,
     SESSION_TO_CLEAR_ON_LOGOUT
 } from '$lib/constants';
-import {
-    currentlyUploadingAssets,
-    currentlyUploadingEntries,
-    populateCookieWritablesWithCookies
-} from '$lib/stores';
+import { currentlyUploadingAssets, populateCookieWritablesWithCookies } from '$lib/stores';
 import { decrypt } from '$lib/utils/encryption';
 import { Logger } from '$lib/utils/log';
 import Cookie from 'js-cookie';
@@ -67,7 +63,6 @@ export namespace Auth {
         );
 
         currentlyUploadingAssets.set(0);
-        currentlyUploadingEntries.set(0);
 
         // do not trigger storage event for these
         localStorage.removeItem(SESSION_KEYS.username);
