@@ -291,7 +291,7 @@
         insertAtCursor(newEntryInputElement, text);
     }
 
-    async function pasteFiles(files: File[] | FileList) {
+    async function uploadAndPasteFiles(files: File[] | FileList) {
         const [uploadedImages, errors] = Result.filter(await Asset.uploadImages(files));
 
         notify.error(errors);
@@ -305,7 +305,7 @@
         const mode = !useBulletEntryForm;
         $settingsStore.useBulletEntryForm.value = mode;
         useBulletEntryForm = mode;
-        resizeTextAreaToFitContent();
+        setTimeout(resizeTextAreaToFitContent, 0);
         await api.put('/settings', {
             key: 'useBulletEntryForm' as SettingsKey,
             value: mode
@@ -412,56 +412,59 @@
                 />
             </div>
         {/if}
-        <div class="entry-container">
-            <textarea
-                bind:this={newEntryInputElement}
-                bind:value={newEntryBody}
-                on:keydown={handleEntryInputKeydown}
-                use:paste={{ handleText: pasteText, handleFiles: pasteFiles }}
-                disabled={obfuscated || submitted}
-                aria-label="Entry Body"
-                placeholder={obfuscated
-                    ? ''
-                    : useBulletEntryForm
-                      ? 'Write a bullet...'
-                      : 'Start writing here...'}
-                class="text-lg py-2 resize-none w-full bg-transparent"
-                class:obfuscated
-                class:rounded-lg={useBulletEntryForm}
-                class:rounded-b-lg={!useBulletEntryForm}
-                class:px-4={useBulletEntryForm}
-                class:p-4={!useBulletEntryForm}
-            />
+        <div style={useBulletEntryForm ? 'display: grid; grid-template-columns: 1fr auto' : ''}>
+            <div>
+                <textarea
+                    bind:this={newEntryInputElement}
+                    bind:value={newEntryBody}
+                    on:keydown={handleEntryInputKeydown}
+                    use:paste={{ handleText: pasteText, handleFiles: uploadAndPasteFiles }}
+                    disabled={obfuscated || submitted}
+                    aria-label="Entry Body"
+                    placeholder={obfuscated
+                        ? ''
+                        : useBulletEntryForm
+                          ? 'Write a bullet...'
+                          : 'Start writing here...'}
+                    class="text-lg py-2 resize-none w-full bg-transparent"
+                    class:obfuscated
+                    class:rounded-lg={useBulletEntryForm}
+                    class:rounded-b-lg={!useBulletEntryForm}
+                    class:px-4={useBulletEntryForm}
+                    class:p-4={!useBulletEntryForm}
+                />
 
-            <!--
-                same styling as actual input textarea, just hidden so that we
-                can measure the height of the text without resizing the actual
-                input textarea (and cause weird scrolling)
-            -->
-            <textarea
-                bind:this={textAreaSizeTester}
-                class="text-lg py-2 resize-none w-full bg-transparent"
-                class:obfuscated
-                class:rounded-lg={useBulletEntryForm}
-                class:rounded-b-lg={!useBulletEntryForm}
-                class:px-4={useBulletEntryForm}
-                class:p-4={!useBulletEntryForm}
-                style="position: absolute; top: 0; left: -9999px;"
-            />
-        </div>
+                <!--
+                    same styling as actual input textarea, just hidden so that we
+                    can measure the height of the text without resizing the actual
+                    input textarea (and cause weird scrolling)
+                -->
+                <textarea
+                    bind:this={textAreaSizeTester}
+                    class="text-lg py-2 resize-none w-full bg-transparent"
+                    class:obfuscated
+                    class:rounded-lg={useBulletEntryForm}
+                    class:rounded-b-lg={!useBulletEntryForm}
+                    class:px-4={useBulletEntryForm}
+                    class:p-4={!useBulletEntryForm}
+                    style="position: absolute; top: 0; left: -9999px;"
+                />
+            </div>
 
-        <div class="flex py-1 justify-end">
-            <button
-                aria-label="Submit Entry"
-                class="flex-center p-1 primary"
-                disabled={submitted}
-                on:click={submit}
-            >
-                {#if !useBulletEntryForm}
-                    Submit
-                {/if}
-                <Tick size="26" />
-            </button>
+            <div class="flex p-2 justify-end">
+                <button
+                    aria-label="Submit Entry"
+                    class="flex-center primary"
+                    style="padding: 0.25rem; margin: 0"
+                    disabled={submitted}
+                    on:click={submit}
+                >
+                    {#if !useBulletEntryForm}
+                        Submit
+                    {/if}
+                    <Tick size="26" />
+                </button>
+            </div>
         </div>
     {/key}
 </div>
