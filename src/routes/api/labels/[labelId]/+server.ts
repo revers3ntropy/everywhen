@@ -40,7 +40,7 @@ export const DELETE = (async ({ cookies, params, request }) => {
     invalidateCache(auth.id);
 
     if (!(await Label.userHasLabelWithId(auth, params.labelId))) {
-        throw error(404, 'Label with that id not found');
+        error(404, 'Label with that id not found');
     }
 
     const [, entriesWithLabel] = (
@@ -65,9 +65,9 @@ export const DELETE = (async ({ cookies, params, request }) => {
     });
 
     if (strategy === 'reassign') {
-        if (!newLabelId) throw error(400, 'New label id must be provided');
+        if (!newLabelId) error(400, 'New label id must be provided');
         if (!(await Label.userHasLabelWithId(auth, newLabelId)))
-            throw error(400, 'New label not found');
+            error(400, 'New label not found');
 
         await Entry.reassignAllLabels(auth, params.labelId, newLabelId);
         await Event.reassignAllLabels(auth, params.labelId, newLabelId);
@@ -82,7 +82,7 @@ export const DELETE = (async ({ cookies, params, request }) => {
         return apiResponse(auth, {});
     }
 
-    throw error(400, 'Invalid deletion strategy');
+    error(400, 'Invalid deletion strategy');
 }) satisfies RequestHandler;
 
 export const POST = apiRes404;

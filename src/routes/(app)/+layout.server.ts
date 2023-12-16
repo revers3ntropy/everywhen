@@ -7,7 +7,7 @@ export const load = (async ({ url, locals, parent }) => {
     const { auth, settings } = locals;
 
     if (!auth || !settings) {
-        throw redirect(307, Auth.wantsToStayLoggedInAuthUrl(url.href));
+        redirect(307, Auth.wantsToStayLoggedInAuthUrl(url.href));
     }
 
     return {

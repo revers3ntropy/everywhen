@@ -9,7 +9,7 @@ import { Auth } from '$lib/controllers/auth/auth.server';
 
 export const PUT = (async ({ request, params, cookies }) => {
     const auth = Auth.getAuthFromCookies(cookies);
-    if (!params.eventId) throw error(400, 'invalid event id');
+    if (!params.eventId) error(400, 'invalid event id');
     invalidateCache(auth.id);
 
     const body = await getUnwrappedReqBody(auth, request, {
@@ -51,7 +51,7 @@ export const PUT = (async ({ request, params, cookies }) => {
 
 export const DELETE = (async ({ params, cookies }) => {
     const auth = Auth.getAuthFromCookies(cookies);
-    if (!params.eventId) throw error(400, 'invalid event id');
+    if (!params.eventId) error(400, 'invalid event id');
     invalidateCache(auth.id);
 
     const event = (await Event.fromId(auth, params.eventId)).unwrap(e => error(404, e));

@@ -8,7 +8,7 @@ import type { RequestHandler } from './$types';
 import { Auth } from '$lib/controllers/auth/auth.server';
 
 export const GET = cachedApiRoute(async (auth, { params }) => {
-    if (!params.entryId) throw error(400, 'invalid id');
+    if (!params.entryId) error(400, 'invalid id');
 
     const entry = (await Entry.getFromId(auth, params.entryId, true)).unwrap(e => error(400, e));
 
@@ -17,7 +17,7 @@ export const GET = cachedApiRoute(async (auth, { params }) => {
 
 export const DELETE = (async ({ request, params, cookies }) => {
     const auth = Auth.getAuthFromCookies(cookies);
-    if (!params.entryId) throw error(400, 'invalid id');
+    if (!params.entryId) error(400, 'invalid id');
     invalidateCache(auth.id);
 
     const body = await getUnwrappedReqBody(auth, request, {
@@ -31,7 +31,7 @@ export const DELETE = (async ({ request, params, cookies }) => {
 
 export const PUT = (async ({ request, params, cookies }) => {
     const auth = Auth.getAuthFromCookies(cookies);
-    if (!params.entryId) throw error(400, 'invalid id');
+    if (!params.entryId) error(400, 'invalid id');
     invalidateCache(auth.id);
 
     const body = await getUnwrappedReqBody(auth, request, {

@@ -9,7 +9,7 @@ import type { RequestHandler } from './$types';
 // as it could change externally
 export const GET = cachedApiRoute(async auth => {
     const settings = (await Settings.allAsMapWithDefaults(auth)).unwrap(e => error(500, e));
-    if (!settings.gitHubAccessToken.value) throw error(404, 'No GitHub account is linked');
+    if (!settings.gitHubAccessToken.value) error(404, 'No GitHub account is linked');
     return (await ghAPI.getGhUserInfo(settings.gitHubAccessToken.value)).unwrap(e => error(500, e));
 }) satisfies RequestHandler;
 

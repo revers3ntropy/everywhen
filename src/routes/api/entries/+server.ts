@@ -19,8 +19,8 @@ export const GET = cachedApiRoute(async (auth, { url }) => {
     const search = url.searchParams.get('search') || '';
     const labelId = url.searchParams.get('labelId') || undefined;
     const locationId = url.searchParams.get('locationId') || undefined;
-    if (offset < 0) throw error(400, 'Invalid page number');
-    if (!count || count < 0) throw error(400, 'Invalid page size');
+    if (offset < 0) error(400, 'Invalid page number');
+    if (!count || count < 0) error(400, 'Invalid page size');
 
     const searchDecrypted = decrypt(search, auth.key).unwrap(() =>
         error(400, 'Invalid search query')

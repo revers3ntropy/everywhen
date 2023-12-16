@@ -68,7 +68,7 @@ namespace AuthServer {
 
     export function getAuthFromCookies(cookie: Cookies): Auth {
         const user = tryGetAuthFromCookies(cookie);
-        if (!user) throw error(401, 'Invalid authentication');
+        if (!user) error(401, 'Invalid authentication');
         return user;
     }
 

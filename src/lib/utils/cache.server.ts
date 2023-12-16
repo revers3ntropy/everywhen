@@ -126,7 +126,7 @@ export function cachedApiRoute<
         const url = event.url.href;
         const auth = event.locals.auth;
 
-        if (!auth) throw error(401, 'Unauthorized');
+        if (!auth) error(401, 'Unauthorized');
 
         const cached = getCachedResponse<Response>(url, auth.id)?.clone();
         if (cached) {
@@ -174,7 +174,7 @@ export function cachedPageRoute<
         const url = props.url.href;
         let auth = props.locals.auth as Auth | (MustHaveAuth extends true ? Auth : null);
         if (requireAuth) {
-            if (!auth) throw redirect(301, Auth.wantsToStayLoggedInAuthUrl(url));
+            if (!auth) redirect(301, Auth.wantsToStayLoggedInAuthUrl(url));
         } else {
             auth = null as unknown as Auth;
         }

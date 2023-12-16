@@ -11,7 +11,7 @@ import { Auth } from '$lib/controllers/auth/auth.server';
 import { z } from 'zod';
 
 export const POST = (async ({ request, cookies, locals: { auth } }) => {
-    if (auth?.key) throw error(401, 'Invalid authentication');
+    if (auth?.key) error(401, 'Invalid authentication');
 
     const body = await getUnwrappedReqBody(null, request, {
         username: z.string(),
@@ -34,7 +34,7 @@ export const POST = (async ({ request, cookies, locals: { auth } }) => {
 }) satisfies RequestHandler;
 
 export const DELETE = (async ({ cookies, request, locals: { auth } }) => {
-    if (!auth) throw error(401, 'Invalid authentication');
+    if (!auth) error(401, 'Invalid authentication');
     invalidateCache(auth.id);
 
     const body = await getUnwrappedReqBody(auth.key, request, {
@@ -45,7 +45,7 @@ export const DELETE = (async ({ cookies, request, locals: { auth } }) => {
     const userIdFromLogIn = (await Auth.userIdFromLogIn(body.username, body.encryptionKey)).unwrap(
         e => error(401, e)
     );
-    if (userIdFromLogIn !== auth.id) throw error(401, 'Invalid authentication');
+    if (userIdFromLogIn !== auth.id) error(401, 'Invalid authentication');
 
     const backup = (await Backup.generate(auth)).unwrap(e => error(400, e));
 

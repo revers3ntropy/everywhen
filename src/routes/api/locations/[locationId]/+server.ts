@@ -46,7 +46,7 @@ export const PUT = (async ({ cookies, request, params }) => {
 
 export const DELETE = (async ({ params, cookies }) => {
     const auth = Auth.getAuthFromCookies(cookies);
-    if (!params.locationId) throw error(400, 'invalid location id');
+    if (!params.locationId) error(400, 'invalid location id');
     invalidateCache(auth.id);
 
     (await Location.purge(auth, params.locationId)).unwrap(e => error(400, e));

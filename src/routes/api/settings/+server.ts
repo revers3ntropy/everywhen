@@ -24,7 +24,7 @@ export const PUT = (async ({ request, cookies }) => {
     });
 
     if (!(key in Settings.config)) {
-        throw error(400, 'Invalid key');
+        error(400, 'Invalid key');
     }
 
     const setting = (await Settings.update(auth, key as SettingsKey, value)).unwrap(e =>

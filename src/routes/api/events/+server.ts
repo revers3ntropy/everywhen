@@ -31,7 +31,7 @@ export const POST = (async ({ request, cookies }) => {
     // check label exists
     if (body.label) {
         if (!(await Label.userHasLabelWithId(auth, body.label))) {
-            throw error(400, `Label doesn't exist`);
+            error(400, `Label doesn't exist`);
         }
     }
 

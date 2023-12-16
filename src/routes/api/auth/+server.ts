@@ -15,7 +15,7 @@ export const GET = (async ({ url, cookies }) => {
     const username: string | null = url.searchParams.get('username');
     const rememberMe = GETParamIsTruthy(url.searchParams.get('rememberMe'));
 
-    if (!key || !username) throw error(401, 'Invalid login');
+    if (!key || !username) error(401, 'Invalid login');
 
     const sessionId = (
         await Auth.authenticateUserFromLogIn(username, key, maxAgeFromShouldRememberMe(rememberMe))

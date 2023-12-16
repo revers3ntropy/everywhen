@@ -9,7 +9,7 @@ import { Auth } from '$lib/controllers/auth/auth.server';
 
 export const PUT = (async ({ request, params, cookies }) => {
     const auth = Auth.getAuthFromCookies(cookies);
-    if (!params.entryId) throw error(400, 'invalid id');
+    if (!params.entryId) error(400, 'invalid id');
     invalidateCache(auth.id);
 
     const body = await getUnwrappedReqBody(auth, request, { pinned: z.boolean().default(false) });

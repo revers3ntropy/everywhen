@@ -11,7 +11,7 @@ export const load = cachedPageRoute(async (auth, { parent, locals }) => {
     await parent();
 
     const { settings } = locals;
-    if (!settings) throw error(500, 'User settings not found');
+    if (!settings) error(500, 'User settings not found');
 
     return {
         nYearsAgo: settings.showNYearsAgoEntryTitles.value

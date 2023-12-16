@@ -8,7 +8,7 @@ import type { PageServerLoad } from './$types';
 
 export const load = cachedPageRoute(async (auth, { params }) => {
     const labelId = params.labelId;
-    if (!labelId) throw error(404, 'Not found');
+    if (!labelId) error(404, 'Not found');
 
     return {
         label: (await Label.fromId(auth, labelId)).unwrap(e => error(404, e)),

@@ -22,7 +22,7 @@ export const POST = (async ({ request, cookies }) => {
     const accessTokenRes = await ghAPI.linkToGitHubOAuth(auth, body.code, body.state);
     if (!accessTokenRes.ok) {
         await logger.error('Failed on ghAPI.linkToGitHubOAuth', { accessToken: accessTokenRes });
-        throw error(500, 'Internal server error');
+        error(500, 'Internal server error');
     }
 
     return apiResponse(auth, { accessToken: accessTokenRes.val });

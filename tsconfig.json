@@ -17,7 +17,6 @@
         "noUnusedLocals": true,
         "noUncheckedIndexedAccess": false,
         "allowUnreachableCode": false,
-        "importsNotUsedAsValues": "error",
         "noPropertyAccessFromIndexSignature": true,
         "noUnusedParameters": true,
         "noImplicitReturns": true,
