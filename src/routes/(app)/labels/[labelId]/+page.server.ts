@@ -7,7 +7,7 @@ import { cachedPageRoute } from '$lib/utils/cache.server';
 import type { PageServerLoad } from './$types';
 
 export const load = cachedPageRoute(async (auth, { params }) => {
-    const labelId = params.labelId;
+    const { labelId } = params;
     if (!labelId) error(404, 'Not found');
 
     return {

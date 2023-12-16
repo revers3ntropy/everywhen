@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { browser } from '$app/environment';
     import DatasetShortcutWidgets from '$lib/components/dataset/DatasetShortcutWidgets.svelte';
     import { navExpanded, obfuscated } from '$lib/stores';
     import type { PageData } from './$types';
@@ -22,6 +23,7 @@
             happinessDataset={data.happinessDataset}
             labels={data.labels}
             obfuscated={$obfuscated}
+            scrollContainer={browser ? document.getElementsByClassName('root')[0] : null}
         />
     </div>
 </main>

@@ -13,7 +13,6 @@
     import { Asset as IAsset } from '$lib/controllers/asset/asset';
 
     export let data: PageData;
-
     let { assets, assetCount } = data;
 
     async function loadMoreAssets(): Promise<void> {

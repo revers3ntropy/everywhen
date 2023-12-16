@@ -8,11 +8,13 @@
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
     import type { Dataset } from '$lib/controllers/dataset/dataset';
+    import { onMount, onDestroy } from 'svelte';
 
     export let locations: Location[];
     export let labels: Record<string, Label>;
     export let happinessDataset: Dataset | null;
     export let obfuscated: boolean;
+    export let scrollContainer: HTMLElement;
 
     async function loadMoreDays(): Promise<void> {
         if (!nextDay) throw new Error('nextDay is null');
@@ -21,20 +23,42 @@
         days = [...days, day];
     }
 
+    onMount(() => {
+        let scrollFromBottom = scrollContainer.scrollHeight - scrollContainer.scrollTop;
+        scrollContainerObserver = new MutationObserver(mutationsList => {
+            for (let mutation of mutationsList) {
+                if (mutation.type === 'childList') {
+                    scrollContainer.scrollTo(0, scrollContainer.scrollHeight - scrollFromBottom);
+                }
+            }
+        });
+        scrollContainerObserver.observe(containerEl, { childList: true });
+
+        scrollContainer.onscroll = () => {
+            scrollFromBottom = scrollContainer.scrollHeight - scrollContainer.scrollTop;
+        };
+    });
+
+    onDestroy(() => scrollContainerObserver?.disconnect());
+
+    let scrollContainerObserver: MutationObserver;
     let days = [] as FeedDay[];
     let nextDay: string | null = Day.today(currentTzOffset()).fmtIso();
+    let containerEl: HTMLDivElement;
 </script>
 
-<InfiniteScroller loadItems={loadMoreDays} hasMore={() => nextDay !== null} invertDirection>
-    {#each days as day (day.day)}
-        <DayInFeed
-            {day}
-            {obfuscated}
-            showLabels
-            {locations}
-            {labels}
-            showForms
-            {happinessDataset}
-        />
-    {/each}
-</InfiniteScroller>
+<div bind:this={containerEl} class="flex flex-col-reverse">
+    <InfiniteScroller loadItems={loadMoreDays} hasMore={() => nextDay !== null}>
+        {#each days as day (day.day)}
+            <DayInFeed
+                {day}
+                {obfuscated}
+                showLabels
+                {locations}
+                {labels}
+                showForms
+                {happinessDataset}
+            />
+        {/each}
+    </InfiniteScroller>
+</div>

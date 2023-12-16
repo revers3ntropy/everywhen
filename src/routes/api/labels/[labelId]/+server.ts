@@ -66,8 +66,7 @@ export const DELETE = (async ({ cookies, params, request }) => {
 
     if (strategy === 'reassign') {
         if (!newLabelId) error(400, 'New label id must be provided');
-        if (!(await Label.userHasLabelWithId(auth, newLabelId)))
-            error(400, 'New label not found');
+        if (!(await Label.userHasLabelWithId(auth, newLabelId))) error(400, 'New label not found');
 
         await Entry.reassignAllLabels(auth, params.labelId, newLabelId);
         await Event.reassignAllLabels(auth, params.labelId, newLabelId);

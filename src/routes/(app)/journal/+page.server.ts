@@ -10,11 +10,9 @@ import { Location } from '$lib/controllers/location/location.server';
 export const load = cachedPageRoute(async (auth, { parent, locals }) => {
     await parent();
 
-    const { settings } = locals;
-    if (!settings) error(500, 'User settings not found');
-
     return {
-        nYearsAgo: settings.showNYearsAgoEntryTitles.value
+        nYearsAgo: (locals.settings ?? error(500, 'User settings not found'))
+            .showNYearsAgoEntryTitles.value
             ? (await Entry.getSummariesNYearsAgo(auth)).unwrap(e => error(400, e))
             : ({} as Record<string, EntrySummary[]>),
         pinnedEntriesList: (await Entry.getPinnedSummaries(auth)).unwrap(e => error(400, e)),
