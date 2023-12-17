@@ -4,7 +4,7 @@ import { type Writable, writable } from 'svelte/store';
 import Cookie from 'js-cookie';
 
 export interface CookieWritableOptions {
-    cookieOptions?: Cookie.CookieAttributes;
+    cookieOptions?: Cookies.CookieAttributes;
 }
 
 /**

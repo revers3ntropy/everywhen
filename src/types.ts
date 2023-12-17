@@ -1,3 +1,10 @@
+import type { Coordinate } from 'ol/coordinate';
+
+export type OlCallbackObject = {
+    coordinate: Coordinate;
+    data: unknown;
+};
+
 export type Expand<T> = T extends (infer E)[]
     ? E[]
     : T extends object

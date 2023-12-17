@@ -8,7 +8,6 @@
 </script>
 
 <script lang="ts">
-    import type { CallbackObject } from 'ol-contextmenu/dist/types';
     import ContextMenu from 'ol-contextmenu';
     import 'ol-contextmenu/ol-contextmenu.css';
 
@@ -30,7 +29,7 @@
     import { popup, settingsStore } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { showPopup } from '$lib/utils/popups';
-    import type { Degrees, Meters } from '../../../types';
+    import type { Degrees, Meters, OlCallbackObject } from '../../../types';
     import EditLocation from '../location/EditLocation.svelte';
     import EntryDialog from '$lib/components/dialogs/EntryDialog.svelte';
     import EntryTooltipOnMap from './EntryTooltipOnMap.svelte';
@@ -221,7 +220,7 @@
                     {
                         text: 'Add Named Location',
                         classname: 'context-menu-option',
-                        callback: (o: CallbackObject) => {
+                        callback: (o: OlCallbackObject) => {
                             const coordinate = o.coordinate;
                             const [lng, lat] = toLonLat(coordinate);
                             void addNamedLocation(lat, lng);

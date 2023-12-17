@@ -15,7 +15,7 @@ export function maxAgeFromShouldRememberMe(rememberMe: boolean): Seconds {
 export function cookieOptions({
     rememberMe,
     httpOnly
-}: ICookieOptions): Readonly<CookieSerializeOptions> {
+}: ICookieOptions): Readonly<CookieSerializeOptions & { path: string }> {
     const maxAge = maxAgeFromShouldRememberMe(rememberMe);
     const expires = new Date(Math.floor(Date.now() / 1000) * 1000 + maxAge * 1000);
     return Object.freeze({
@@ -32,6 +32,8 @@ export function cookieOptions({
     });
 }
 
-export function sessionCookieOptions(rememberMe: boolean): Readonly<CookieSerializeOptions> {
+export function sessionCookieOptions(
+    rememberMe: boolean
+): Readonly<CookieSerializeOptions & { path: string }> {
     return cookieOptions({ httpOnly: true, rememberMe });
 }

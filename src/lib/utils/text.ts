@@ -52,7 +52,9 @@ export function roundToDecimalPlaces(num: number, n: number = 1): number {
 }
 
 export function rawMdToHtml(md: string): string {
-    return DomPurify.sanitize(marked.parse(md));
+    // cast to string as odd type error where marked.parse returns string | Promise<string>,
+    // but will only return a promise is { async: true } is passed to marked.parse
+    return DomPurify.sanitize(marked.parse(md) as string);
 }
 
 export function limitStrLen(str: string, len: number, append = '..'): string {

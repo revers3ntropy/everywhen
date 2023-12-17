@@ -14,7 +14,7 @@
     export let labels: Record<string, Label>;
     export let happinessDataset: Dataset | null;
     export let obfuscated: boolean;
-    export let scrollContainer: HTMLElement;
+    export let container: () => HTMLElement;
 
     async function loadMoreDays(): Promise<void> {
         if (!nextDay) throw new Error('nextDay is null');
@@ -24,8 +24,10 @@
     }
 
     onMount(() => {
+        const scrollContainer = container();
         let scrollFromBottom = scrollContainer.scrollHeight - scrollContainer.scrollTop;
         scrollContainerObserver = new MutationObserver(mutationsList => {
+            if (!scrollContainer) throw new Error('scrollContainer is null on mutation');
             for (let mutation of mutationsList) {
                 if (mutation.type === 'childList') {
                     scrollContainer.scrollTo(0, scrollContainer.scrollHeight - scrollFromBottom);
@@ -35,6 +37,7 @@
         scrollContainerObserver.observe(containerEl, { childList: true });
 
         scrollContainer.onscroll = () => {
+            if (!scrollContainer) throw new Error('scrollContainer is null on scroll');
             scrollFromBottom = scrollContainer.scrollHeight - scrollContainer.scrollTop;
         };
     });

@@ -1,11 +1,12 @@
 <script lang="ts">
-    import { browser } from '$app/environment';
     import DatasetShortcutWidgets from '$lib/components/dataset/DatasetShortcutWidgets.svelte';
     import { navExpanded, obfuscated } from '$lib/stores';
     import type { PageData } from './$types';
     import Feed from '$lib/components/feed/Feed.svelte';
 
     export let data: PageData;
+
+    const feedContainer = () => document.getElementsByClassName('root')[0] as HTMLDivElement;
 </script>
 
 <svelte:head>
@@ -23,7 +24,7 @@
             happinessDataset={data.happinessDataset}
             labels={data.labels}
             obfuscated={$obfuscated}
-            scrollContainer={browser ? document.getElementsByClassName('root')[0] : null}
+            container={feedContainer}
         />
     </div>
 </main>
