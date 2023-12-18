@@ -324,6 +324,38 @@ namespace EventServer {
               AND userId = ${auth.id}
         `;
     }
+
+    export async function updateEncryptedFields(
+        userId: string,
+        oldDecrypt: (a: string) => Result<string>,
+        newEncrypt: (a: string) => string
+    ): Promise<Result<null[], string>> {
+        const events = await query<
+            {
+                id: string;
+                name: string;
+            }[]
+        >`
+            SELECT id, name
+            FROM events
+            WHERE userId = ${userId}
+        `;
+
+        return await Result.collectAsync(
+            events.map(async (event): Promise<Result<null>> => {
+                const nameRes = oldDecrypt(event.name);
+                if (!nameRes.ok) return nameRes.cast();
+
+                await query`
+                    UPDATE events
+                    SET name = ${newEncrypt(nameRes.val)}
+                    WHERE id = ${event.id}
+                      AND userId = ${userId}
+                `;
+                return Result.ok(null);
+            })
+        );
+    }
 }
 
 export const Event = {

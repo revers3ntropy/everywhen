@@ -165,22 +165,41 @@ namespace SettingsServer {
         return Result.ok(null);
     }
 
-    export async function changeEncryptionKeyInDB(
-        auth: Auth,
-        newKey: string
-    ): Promise<Result<null>> {
-        const unencryptedSettings = await all(auth);
-        if (!unencryptedSettings.ok) return unencryptedSettings.cast();
-        for (const setting of unencryptedSettings.val) {
-            const newValue = encrypt(JSON.stringify(setting.value), newKey);
+    /**
+     * @param {string} userId - The ID of the user
+     * @param {(a: string) => Result<string>} oldDecrypt - The decryption function for the old encryption
+     * @param {(a: string) => string} newEncrypt - The encryption function for the new encryption
+     * @returns {Promise<string[]>} - A promise that resolves with an array of errors
+     */
+    export async function updateEncryptedFields(
+        userId: string,
+        oldDecrypt: (a: string) => Result<string>,
+        newEncrypt: (a: string) => string
+    ): Promise<Result<null[], string>> {
+        const settings = await query<
+            {
+                id: string;
+                value: string;
+            }[]
+        >`
+            SELECT id, value
+            FROM settings
+            WHERE userId = ${userId}
+        `;
 
-            await query`
-                UPDATE settings
-                SET value = ${newValue}
-                WHERE id = ${setting.id}
-            `;
-        }
-        return Result.ok(null);
+        return await Result.collectAsync(
+            settings.map(async (setting): Promise<Result<null>> => {
+                const decryptRes = oldDecrypt(setting.value);
+                if (!decryptRes.ok) return decryptRes.cast();
+                await query`
+                        UPDATE settings
+                        SET value = ${newEncrypt(decryptRes.val)}
+                        WHERE id = ${setting.id}
+                          AND userId = ${userId}
+                    `;
+                return Result.ok(null);
+            })
+        );
     }
 }
 

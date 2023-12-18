@@ -44,7 +44,6 @@ export interface ApiRoutes {
     '/entries/streaks': typeof import('../../routes/api/entries/streaks/+server');
     '/entries/?': typeof import('../../routes/api/entries/[entryId]/+server');
     '/entries/?/pinned': typeof import('../../routes/api/entries/[entryId]/pinned/+server');
-    '/backups': typeof import('../../routes/api/backups/+server');
     '/auth': typeof import('../../routes/api/auth/+server');
     '/assets/?': typeof import('../../routes/api/assets/[assetPublicId]/+server');
     '/settings': typeof import('../../routes/api/settings/+server');

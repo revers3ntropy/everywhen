@@ -419,6 +419,70 @@ namespace DatasetServer {
 
         return Result.ok(null);
     }
+
+    export async function updateDatasetColumnsEncryptedFields(
+        userId: string,
+        oldDecrypt: (a: string) => Result<string>,
+        newEncrypt: (a: string) => string
+    ): Promise<Result<null[], string>> {
+        const datasetColumns = await query<
+            {
+                id: string;
+                name: string;
+            }[]
+        >`
+            SELECT id, name
+            FROM datasetColumns
+            WHERE userId = ${userId}
+        `;
+
+        return await Result.collectAsync(
+            datasetColumns.map(async (col): Promise<Result<null>> => {
+                const nameRes = oldDecrypt(col.name);
+                if (!nameRes.ok) return nameRes.cast();
+
+                await query`
+                    UPDATE datasetColumns
+                    SET name = ${newEncrypt(nameRes.val)}
+                    WHERE id = ${col.id}
+                      AND userId = ${userId}
+                `;
+                return Result.ok(null);
+            })
+        );
+    }
+
+    export async function updateDatasetEncryptedFields(
+        userId: string,
+        oldDecrypt: (a: string) => Result<string>,
+        newEncrypt: (a: string) => string
+    ): Promise<Result<null[], string>> {
+        const datasetColumns = await query<
+            {
+                id: string;
+                name: string;
+            }[]
+        >`
+            SELECT id, name
+            FROM datasets
+            WHERE userId = ${userId}
+        `;
+
+        return await Result.collectAsync(
+            datasetColumns.map(async (col): Promise<Result<null>> => {
+                const nameRes = oldDecrypt(col.name);
+                if (!nameRes.ok) return nameRes.cast();
+
+                await query`
+                    UPDATE datasets
+                    SET name = ${newEncrypt(nameRes.val)}
+                    WHERE id = ${col.id}
+                      AND userId = ${userId}
+                `;
+                return Result.ok(null);
+            })
+        );
+    }
 }
 
 export const Dataset = {

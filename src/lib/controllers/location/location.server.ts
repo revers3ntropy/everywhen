@@ -283,6 +283,38 @@ namespace LocationServer {
         `;
         return Result.ok(null);
     }
+
+    export async function updateEncryptedFields(
+        userId: string,
+        oldDecrypt: (a: string) => Result<string>,
+        newEncrypt: (a: string) => string
+    ): Promise<Result<null[], string>> {
+        const locations = await query<
+            {
+                id: string;
+                name: string;
+            }[]
+        >`
+            SELECT id, name
+            FROM locations
+            WHERE userId = ${userId}
+        `;
+
+        return await Result.collectAsync(
+            locations.map(async (location): Promise<Result<null>> => {
+                const nameRes = oldDecrypt(location.name);
+                if (!nameRes.ok) return nameRes.cast();
+
+                await query`
+                    UPDATE locations
+                    SET name = ${newEncrypt(nameRes.val)}
+                    WHERE id = ${location.id}
+                      AND userId = ${userId}
+                `;
+                return Result.ok(null);
+            })
+        );
+    }
 }
 
 export const Location = {

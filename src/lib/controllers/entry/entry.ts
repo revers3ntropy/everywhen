@@ -196,4 +196,17 @@ export namespace Entry {
     export function labelLsKey(username: string | null, editing: Entry | null): string {
         return `${LS_KEYS.newEntryLabel}-${username ?? ''}-${editing?.id ?? ''}`;
     }
+
+    export function clearEntryFormKeys(username: string | null, storage: Storage): void {
+        for (const keyStart of [
+            titleLsKey(username, null),
+            bodyLsKey(username, null),
+            labelLsKey(username, null)
+        ]) {
+            for (let i = 0; i < storage.length; i++) {
+                const key = storage.key(i);
+                if (key?.startsWith(keyStart)) storage.removeItem(key);
+            }
+        }
+    }
 }

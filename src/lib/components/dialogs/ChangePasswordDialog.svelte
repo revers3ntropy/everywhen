@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { popup } from '$lib/stores';
+    import { Entry } from '$lib/controllers/entry/entry';
+    import { popup, username } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
     import { Auth } from '$lib/controllers/auth/auth';
@@ -19,6 +20,12 @@
         }
         passwordsDoNotMatch = false;
 
+        let finished = false;
+        setTimeout(() => {
+            if (finished) return;
+            notify.info('Re-encrypting data, may take a while...');
+        }, 1000);
+
         submitted = true;
         notify.onErr(
             await api.put('/auth', {
@@ -27,6 +34,10 @@
             }),
             () => (submitted = false)
         );
+
+        finished = true;
+
+        Entry.clearEntryFormKeys($username, localStorage);
 
         await Auth.logOut();
     }

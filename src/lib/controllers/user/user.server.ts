@@ -1,6 +1,6 @@
 import { LIMITS } from '$lib/constants';
-import { Backup } from '$lib/controllers/backup/backup.server';
 import { query } from '$lib/db/mysql.server';
+import { decrypt, encrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
 import { currentVersion } from '$lib/utils/semVer';
 import { nowUtc } from '$lib/utils/time';
@@ -13,6 +13,8 @@ import type { User as _User } from './user';
 import { UId } from '$lib/controllers/uuid/uuid.server';
 import { Auth } from '$lib/controllers/auth/auth.server';
 import { Asset } from '$lib/controllers/asset/asset.server';
+import { Dataset } from '../dataset/dataset.server';
+import { Location } from '../location/location.server';
 
 export namespace UserServer {
     type User = _User;
@@ -116,21 +118,28 @@ export namespace UserServer {
         if (oldKey !== auth.key) {
             return Result.err('Current password is invalid');
         }
-
         if (oldPassword === newPassword) {
             return Result.err('New password is same as current password');
         }
 
         const newKey = Auth.encryptionKeyFromPassword(newPassword);
 
-        const newAuth = {
-            ...auth,
-            key: newKey
-        };
+        // TODO update everything with new encryption
 
-        const backupRes = await Backup.generate(auth);
-        if (!backupRes.ok) return backupRes.cast();
-        const encryptedBackup = Backup.asEncryptedString(backupRes.val, auth.key);
+        const oldDecrypt = (a: string) => decrypt(a, oldKey);
+        const newEncrypt = (a: string) => encrypt(a, newKey);
+
+        const result = await Result.collectAsync([
+            Settings.updateEncryptedFields(auth.id, oldDecrypt, newEncrypt),
+            Asset.updateEncryptedFields(auth.id, oldDecrypt, newEncrypt),
+            Dataset.updateDatasetEncryptedFields(auth.id, oldDecrypt, newEncrypt),
+            Dataset.updateDatasetColumnsEncryptedFields(auth.id, oldDecrypt, newEncrypt),
+            Entry.updateEncryptedFields(auth.id, oldDecrypt, newEncrypt),
+            Event.updateEncryptedFields(auth.id, oldDecrypt, newEncrypt),
+            Label.updateEncryptedFields(auth.id, oldDecrypt, newEncrypt),
+            Location.updateEncryptedFields(auth.id, oldDecrypt, newEncrypt)
+        ]);
+        if (!result.ok) return result.cast();
 
         Auth.invalidateAllSessionsForUser(auth.id);
 
@@ -140,10 +149,7 @@ export namespace UserServer {
             WHERE id = ${auth.id}
         `;
 
-        const restoreRes = await Backup.restore(newAuth, encryptedBackup, auth.key);
-        if (!restoreRes.ok) return restoreRes.cast();
-
-        return await Settings.changeEncryptionKeyInDB(auth, newKey);
+        return Result.ok(null);
     }
 }
 

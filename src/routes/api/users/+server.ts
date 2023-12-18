@@ -1,4 +1,3 @@
-import { Backup } from '$lib/controllers/backup/backup.server';
 import { maxAgeFromShouldRememberMe, sessionCookieOptions } from '$lib/utils/cookies';
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
@@ -47,15 +46,11 @@ export const DELETE = (async ({ cookies, request, locals: { auth } }) => {
     );
     if (userIdFromLogIn !== auth.id) error(401, 'Invalid authentication');
 
-    const backup = (await Backup.generate(auth)).unwrap(e => error(400, e));
-
     await User.purge(auth);
 
     cookies.delete(COOKIE_KEYS.sessionId, sessionCookieOptions(false));
 
-    return apiResponse(null, {
-        backup: JSON.stringify(backup)
-    });
+    return apiResponse(null, {});
 }) satisfies RequestHandler;
 
 export const GET = apiRes404;

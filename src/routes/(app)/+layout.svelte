@@ -3,7 +3,6 @@
     import AllowCookies from '$lib/components/AllowCookies.svelte';
     import TopNavbar from '$lib/components/nav/TopNavbar.svelte';
     import { Auth } from '$lib/controllers/auth/auth';
-    import { Backup } from '$lib/controllers/backup/backup';
     import type { LayoutData } from './$types';
     import { onDestroy, onMount } from 'svelte';
     import { browser } from '$app/environment';
@@ -16,7 +15,6 @@
         settingsStore,
         username
     } from '$lib/stores';
-    import { api } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
     import Nav from '$lib/components/nav/Nav.svelte';
@@ -25,7 +23,7 @@
     export let data: LayoutData;
 
     function checkObfuscatedTimeout() {
-        // === true to get around a weird TS + Svelte bug
+        // === true to get around a weird TS + Svelte thing
         if ($obfuscated === true) return;
 
         const hideAfter = $settingsStore.autoHideEntriesDelay.value;
@@ -47,14 +45,6 @@
         lastActivity = nowUtc();
     }
 
-    async function downloadBackup() {
-        if (downloadingBackup) return;
-        downloadingBackup = true;
-        const { data: backupData } = notify.onErr(await api.get('/backups', { encrypted: 1 }));
-        Backup.download(backupData, $username, true);
-        downloadingBackup = false;
-    }
-
     function keydown(e: KeyboardEvent) {
         lastActivity = nowUtc();
 
@@ -67,12 +57,6 @@
         if (e.ctrlKey || e.metaKey) {
             if (e.key === 'Escape') {
                 obfuscated.set(!$obfuscated);
-                e.preventDefault();
-                return;
-            }
-
-            if (e.key === 's') {
-                void downloadBackup();
                 e.preventDefault();
                 return;
             }
@@ -90,8 +74,6 @@
     let lastActivity = nowUtc();
 
     let showPasscodeModal = true;
-
-    let downloadingBackup = false;
 
     let mounted = false;
     let intervalId: number | null = null;

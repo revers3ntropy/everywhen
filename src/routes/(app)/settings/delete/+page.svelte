@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { Backup } from '$lib/controllers/backup/backup';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import Skull from 'svelte-material-icons/Skull.svelte';
     import { api } from '$lib/utils/apiRequest';
@@ -15,14 +14,13 @@
         badPassword = Auth.encryptionKeyFromPassword(passwordInput.value) !== $encryptionKey;
         if (badUsername || badPassword) return;
 
-        const { backup: backupData } = notify.onErr(
+        notify.onErr(
             await api.delete(
                 '/users',
                 { username: $username, encryptionKey: $encryptionKey },
                 { doNotTryToDecryptResponse: true }
             )
         );
-        Backup.download(backupData, $username, true);
         await Auth.logOut();
     }
 
@@ -46,8 +44,7 @@
             <span> Delete My Account </span>
         </h1>
         <p>
-            All your data will be <b>deleted</b> and you will be <b>logged out</b>. <br />
-            A <b>backup</b> of your data will be <b>downloaded</b>.
+            All your data will be <b>deleted</b> and you will be <b>logged out</b>.
         </p>
 
         <form>
@@ -72,7 +69,7 @@
 
         <button aria-label="Delete Account" class="with-icon primary" on:click={deleteAccount}>
             <Skull size="30" />
-            Delete Account, Erase & Download Data
+            Delete Account and Erase Data
         </button>
     </section>
 </main>

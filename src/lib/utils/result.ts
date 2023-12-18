@@ -80,6 +80,20 @@ export namespace Result {
         }
         return [results, errors];
     }
+
+    export async function filterAsync<T, E = string>(
+        iter: Iterable<Promise<Result<T, E>>> | Promise<Result<T, E>>[]
+    ): Promise<[T[], E[]]> {
+        return Result.filter(
+            (await Promise.allSettled(iter)).map(result => {
+                if (result.status === 'fulfilled') {
+                    return result.value;
+                } else {
+                    return Result.err(result.reason);
+                }
+            })
+        );
+    }
 }
 
 class Ok<T, E> implements ResultOption<T, E> {

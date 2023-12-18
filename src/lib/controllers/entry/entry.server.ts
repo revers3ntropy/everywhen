@@ -546,6 +546,108 @@ namespace EntryServer {
         `.then(([res]) => res.wordInstances ?? 0);
     }
 
+    export async function updateEncryptedFields(
+        userId: string,
+        oldDecrypt: (a: string) => Result<string>,
+        newEncrypt: (a: string) => string
+    ): Promise<Result<null[], string>> {
+        const entries = await query<
+            {
+                id: string;
+                title: string;
+                body: string;
+                agentData: string;
+            }[]
+        >`
+            SELECT id, title, body, agentData
+            FROM entries
+            WHERE userId = ${userId}
+        `;
+
+        const entryRes = await Result.collectAsync(
+            entries.map(async (event): Promise<Result<null>> => {
+                const titleRes = oldDecrypt(event.title);
+                if (!titleRes.ok) return titleRes.cast();
+                const bodyRes = oldDecrypt(event.body);
+                if (!bodyRes.ok) return bodyRes.cast();
+                const agentDataRes = oldDecrypt(event.agentData);
+                if (!agentDataRes.ok) return agentDataRes.cast();
+
+                await query`
+                    UPDATE entries
+                    SET title = ${newEncrypt(titleRes.val)},
+                        body  = ${newEncrypt(bodyRes.val)},
+                        agentData = ${newEncrypt(agentDataRes.val)}
+                    WHERE id = ${event.id}
+                      AND userId = ${userId}
+                `;
+                return Result.ok(null);
+            })
+        );
+        if (!entryRes.ok) return entryRes.cast();
+
+        const edits = await query<
+            {
+                id: string;
+                oldTitle: string;
+                oldBody: string;
+                agentData: string;
+            }[]
+        >`
+            SELECT id, oldTitle, oldBody, agentData
+            FROM entryEdits
+            WHERE userId = ${userId}
+        `;
+
+        const editRes = await Result.collectAsync(
+            edits.map(async (edit): Promise<Result<null>> => {
+                const titleRes = oldDecrypt(edit.oldTitle);
+                if (!titleRes.ok) return titleRes.cast();
+                const bodyRes = oldDecrypt(edit.oldBody);
+                if (!bodyRes.ok) return bodyRes.cast();
+                const agentDataRes = oldDecrypt(edit.agentData);
+                if (!agentDataRes.ok) return agentDataRes.cast();
+
+                await query`
+                    UPDATE entryEdits
+                    SET oldTitle = ${newEncrypt(titleRes.val)},
+                        oldBody  = ${newEncrypt(bodyRes.val)},
+                        agentData = ${newEncrypt(agentDataRes.val)}
+                    WHERE id = ${edit.id}
+                      AND userId = ${userId}
+                `;
+                return Result.ok(null);
+            })
+        );
+        if (!editRes.ok) return editRes.cast();
+
+        const words = await query<
+            {
+                entryId: string;
+                word: string;
+            }[]
+        >`
+            SELECT entryId, word
+            FROM wordsInEntries
+            WHERE userId = ${userId}
+        `;
+        return await Result.collectAsync(
+            words.map(async (wordData): Promise<Result<null>> => {
+                const wordRes = oldDecrypt(wordData.word);
+                if (!wordRes.ok) return wordRes.cast();
+
+                await query`
+                    UPDATE wordsInEntries
+                    SET word = ${newEncrypt(wordRes.val)}
+                    WHERE entryId = ${wordData.entryId}
+                        AND word = ${wordData.word}
+                        AND userId = ${userId}
+                `;
+                return Result.ok(null);
+            })
+        );
+    }
+
     export const getFromId = entryFromId;
     export const all = getMulti.all;
     export const getPage = getMulti.getPage;

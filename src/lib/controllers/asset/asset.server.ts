@@ -214,6 +214,42 @@ namespace AssetServer {
         }
         return Result.ok(null);
     }
+
+    export async function updateEncryptedFields(
+        userId: string,
+        oldDecrypt: (a: string) => Result<string>,
+        newEncrypt: (a: string) => string
+    ): Promise<Result<null[], string>> {
+        const assets = await query<
+            {
+                id: string;
+                fileName: string;
+                content: string;
+            }[]
+        >`
+            SELECT id, fileName, content
+            FROM assets
+            WHERE userId = ${userId}
+        `;
+
+        return await Result.collectAsync(
+            assets.map(async (asset): Promise<Result<null>> => {
+                const fileNameRes = oldDecrypt(asset.fileName);
+                if (!fileNameRes.ok) return fileNameRes.cast();
+                const contentRes = oldDecrypt(asset.content);
+                if (!contentRes.ok) return contentRes.cast();
+
+                await query`
+                    UPDATE assets
+                    SET fileName = ${newEncrypt(fileNameRes.val)},
+                        content  = ${newEncrypt(contentRes.val)}
+                    WHERE id = ${asset.id}
+                        AND userId = ${userId}
+                `;
+                return Result.ok(null);
+            })
+        );
+    }
 }
 
 export const Asset = {
