@@ -47,7 +47,7 @@
     $: isToday = fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD') === day.day;
     $: dayTimestamp = new Date(day.day).getTime() / 1000;
 
-    $: if (items?.length > 0 && $collapsed[day.day] == 'empty') {
+    $: if ((items?.length > 0 && $collapsed[day.day] == 'empty') || (isToday && showForms)) {
         $collapsed[day.day] = false;
     }
 
