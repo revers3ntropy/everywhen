@@ -1,6 +1,7 @@
 import { Settings } from '$lib/controllers/settings/settings';
 import type { SettingsConfig } from '$lib/controllers/settings/settings';
 import { cookieWritable } from '$lib/cookieWritable';
+import { Result } from '$lib/utils/result';
 import type { SvelteComponent } from 'svelte';
 import { writable } from 'svelte/store';
 import type { EventsSortKey } from '../types';
@@ -41,23 +42,12 @@ export function populateCookieWritablesWithCookies(
     cookies: RawCookies,
     settings: SettingsConfig | null
 ) {
-    function tryParse<T>(value: string | undefined, defaultValue: T): T {
-        if (value) {
-            try {
-                return JSON.parse(value) as T;
-            } catch (e) {
-                return defaultValue;
-            }
-        }
-        return defaultValue;
-    }
-
     if (cookies.theme) {
-        theme.set(tryParse<Theme>(cookies.theme, Theme.light));
+        theme.set(Result.tryJsonParse<Theme>(cookies.theme).or(Theme.light));
     }
 
     if (cookies.allowedCookies) {
-        allowedCookies.set(tryParse<boolean>(cookies.allowedCookies, false));
+        allowedCookies.set(Result.tryJsonParse<boolean>(cookies.allowedCookies).or(false));
     }
 
     if (settings) {
