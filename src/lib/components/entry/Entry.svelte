@@ -292,7 +292,7 @@
         {title}
     </div>
 
-    <div class="body md:p-4 p-2" class:obfuscated>
+    <div class="body md:p-4 p-2 whitespace-pre-wrap" class:obfuscated>
         {@html entryHtml}
     </div>
 </div>
@@ -303,12 +303,7 @@
     .entry {
         width: 100%;
         height: fit-content;
-        white-space: pre-wrap;
         outline: none;
-
-        @media #{$mobile} {
-            padding: 0;
-        }
 
         // so images don't appear too large
         :global(img) {
