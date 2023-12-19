@@ -5,32 +5,11 @@ import { Label } from '$lib/controllers/label/label.server';
 import { query } from '$lib/db/mysql.server';
 import { decrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
-import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
-import type { Hours, TimestampSecs } from '../../../types';
+import { fmtUtc } from '$lib/utils/time';
 
 export async function getSummariesNYearsAgo(
     auth: Auth
 ): Promise<Result<Record<string, EntrySummary[]>>> {
-    const earliestEntry = await query<{ created: TimestampSecs; createdTzOffset: Hours }[]>`
-        SELECT created, createdTzOffset
-        FROM entries
-        WHERE userId = ${auth.id} 
-          AND deleted IS NULL
-        ORDER BY created
-        LIMIT 1
-    `;
-    if (earliestEntry.length !== 1) return Result.ok({});
-    const earliestEntryYear = parseInt(
-        fmtUtc(earliestEntry[0].created, earliestEntry[0].createdTzOffset, 'YYYY')
-    );
-    const numYearsBack = parseInt(fmtUtc(nowUtc(), currentTzOffset(), 'YYYY')) - earliestEntryYear;
-
-    const dates = Array.from({ length: numYearsBack }, (_, i) => i + earliestEntryYear).map(
-        y => `${y}-${fmtUtc(nowUtc(), 0, 'MM-DD')}`
-    );
-
-    if (dates.length === 0) return Result.ok({});
-
     const rawEntries = await query<
         {
             id: string;
@@ -61,27 +40,19 @@ export async function getSummariesNYearsAgo(
         FROM entries
         WHERE deleted IS NULL
             AND userId = ${auth.id}
-            AND DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%Y-%m-%d')
-                in (${dates})
+            AND DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%m-%d') = DATE_FORMAT(NOW(), '%m-%d')
         ORDER BY created DESC, id
     `;
 
-    const summariesRes = await summariesFromRaw(auth, rawEntries);
-    if (!summariesRes.ok) return summariesRes.cast();
-
-    return Result.ok(
-        dates.reduce(
-            (prev, date) => {
-                const atDate = summariesRes.val.filter(
-                    s => fmtUtc(s.created, s.createdTzOffset, 'YYYY-MM-DD') === date
-                );
-                if (atDate.length === 0) return prev;
-                prev[date] = atDate;
-                return prev;
-            },
-            {} as Record<string, EntrySummary[]>
-        )
-    );
+    return (await summariesFromRaw(auth, rawEntries)).map(summaries => {
+        const byDay: Record<string, EntrySummary[]> = {};
+        for (const entry of summaries) {
+            const date = fmtUtc(entry.created, entry.createdTzOffset, 'YYYY-MM-DD');
+            byDay[date] ??= [];
+            byDay[date].push(entry);
+        }
+        return byDay;
+    });
 }
 
 export async function getPageOfSummaries(
