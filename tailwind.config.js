@@ -26,7 +26,12 @@ export default {
             textColorOnGradient: 'var(--text-color-on-gradient)',
             textColorInverted: 'var(--text-color-inverted)',
             textColorDanger: 'var(--text-color-danger)',
-            timelineAccent: 'var(--timeline-accent)'
+            timelineAccent: 'var(--timeline-accent)',
+            likertRed: 'var(--likert-red)',
+            likertOrange: 'var(--likert-orange)',
+            likertYellow: 'var(--likert-yellow)',
+            likertLightGreen: 'var(--likert-light-green)',
+            likertGreen: 'var(--likert-green)'
         }
     },
     plugins: []

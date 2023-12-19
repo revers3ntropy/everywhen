@@ -10,13 +10,13 @@
 </script>
 
 {#if value < 0.125}
-    <EmoticonSadOutline {size} />
+    <EmoticonSadOutline {size} color="var(--likert-red)" />
 {:else if value < 0.375}
-    <EmoticonConfusedOutline {size} />
+    <EmoticonConfusedOutline {size} color="var(--likert-orange)" />
 {:else if value < 0.625}
-    <EmoticonNeutralOutline {size} />
+    <EmoticonNeutralOutline {size} color="var(--likert-yellow)" />
 {:else if value < 0.875}
-    <EmoticonHappyOutline {size} />
+    <EmoticonHappyOutline {size} color="var(--likert-light-green)" />
 {:else}
-    <EmoticonExcitedOutline {size} />
+    <EmoticonExcitedOutline {size} color="var(--likert-green)" />
 {/if}
