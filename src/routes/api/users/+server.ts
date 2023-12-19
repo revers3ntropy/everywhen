@@ -27,9 +27,19 @@ export const POST = (async ({ request, cookies, locals: { auth } }) => {
         )
     ).unwrap(e => error(401, e));
 
-    cookies.set(COOKIE_KEYS.sessionId, sessionId, sessionCookieOptions(false));
-
-    return apiResponse(body.encryptionKey, { sessionId });
+    return apiResponse(
+        body.encryptionKey,
+        { sessionId },
+        {
+            headers: {
+                'Set-Cookie': cookies.serialize(
+                    COOKIE_KEYS.sessionId,
+                    sessionId,
+                    sessionCookieOptions(false)
+                )
+            }
+        }
+    );
 }) satisfies RequestHandler;
 
 export const DELETE = (async ({ cookies, request, locals: { auth } }) => {

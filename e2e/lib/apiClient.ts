@@ -1,9 +1,8 @@
 import { request } from '@playwright/test';
 import type { APIRequestContext, APIResponse } from '@playwright/test';
-import { serialize } from 'cookie';
+import { type CookieSerializeOptions, serialize } from 'cookie';
 import { COOKIE_KEYS } from '../../src/lib/constants';
 import type { ApiRoutes, ReqBody, ResType } from '../../src/lib/utils/apiRequest';
-import { sessionCookieOptions } from '../../src/lib/utils/cookies';
 import type { Hours, TimestampSecs } from '../../src/types';
 import { decrypt, encrypt } from './encryption';
 import { serializeGETArgs } from '../../src/lib/utils/GETArgs';
@@ -31,6 +30,19 @@ interface ErrResponse {
     status: number;
 }
 
+export function sessionCookieOptions(): Readonly<CookieSerializeOptions & { path: string }> {
+    const maxAge = 60 * 60;
+    const expires = new Date(Math.floor(Date.now() / 1000) * 1000 + maxAge * 1000);
+    return Object.freeze({
+        secure: false,
+        path: '/',
+        sameSite: 'lax',
+        httpOnly: true,
+        expires,
+        maxAge
+    });
+}
+
 export class ApiClient {
     public static async fromSessionId(sessionId: string, encryptionKey: string) {
         const client = await request.newContext({
@@ -39,7 +51,7 @@ export class ApiClient {
                 'Content-Type': 'application/json',
                 Accept: 'application/json',
                 Cookie: sessionId
-                    ? serialize(COOKIE_KEYS.sessionId, sessionId, sessionCookieOptions(false))
+                    ? serialize(COOKIE_KEYS.sessionId, sessionId, sessionCookieOptions())
                     : ''
             }
         });
