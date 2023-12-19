@@ -1,13 +1,14 @@
 <script lang="ts">
+    import TimeInFeed from '$lib/components/feed/TimeInFeed.svelte';
     import LabelDot from '$lib/components/label/LabelDot.svelte';
     import UtcTime from '$lib/components/UtcTime.svelte';
     import { Auth } from '$lib/controllers/auth/auth';
     import type { FeedItem, FeedItemTypes } from '$lib/controllers/feed/feed';
     import type { Label } from '$lib/controllers/label/label';
     import { encryptionKey } from '$lib/stores';
+    import { Day } from '$lib/utils/time';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
     import CalendarStart from 'svelte-material-icons/CalendarStart.svelte';
-    import { Event } from '$lib/controllers/event/event';
 
     export let item: FeedItemTypes['eventStart'];
     export let labels: Record<string, Label>;
@@ -19,18 +20,10 @@
 </script>
 
 <!-- if the event starts and then immediately ends, collapse into one item -->
-{#if nextItem?.type === 'event-end' && nextItem?.id === `${item.id}-end`}
-    <div class="text-sm p-2 flex gap-4">
-        <div class="flex gap-3 pb-2">
-            <span class="text-textColorLight">
-                <UtcTime timestamp={item.start} tzOffset={item.tzOffset} fmt="h:mma" />
-                {#if !Event.isInstantEvent(item)}
-                    -
-                    <UtcTime timestamp={item.end} tzOffset={item.tzOffset} fmt="h:mma" />
-                {/if}
-            </span>
-            <Calendar size="22" />
-        </div>
+{#if nextItem?.type === 'event-end' && nextItem?.id === `${item.id}-end` && Day.timestampsAreSameDay(item.start, item.end, item.tzOffset)}
+    <div class="text-sm py-2 flex gap-4">
+        <TimeInFeed timestamp={item.start} to={item.end} tzOffset={item.tzOffset} />
+        <Calendar size="22" />
         <div class:obfuscated>
             {#if label}
                 <LabelDot color={label.color} name={label.name} />
@@ -39,11 +32,9 @@
         </div>
     </div>
 {:else}
-    <div class="text-sm p-2 flex gap-4">
-        <div class="flex gap-3 text-textColorLight pb-2">
-            <UtcTime timestamp={item.start} tzOffset={item.tzOffset} fmt="h:mma" />
-            <CalendarStart size="22" />
-        </div>
+    <div class="text-sm py-2 flex gap-4">
+        <TimeInFeed timestamp={item.start} tzOffset={item.tzOffset} />
+        <CalendarStart size="22" />
         <div>
             <span class="text-textColorLight">start of</span>
             {#if label}

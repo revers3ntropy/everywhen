@@ -1,10 +1,11 @@
 <script lang="ts">
+    import TimeInFeed from '$lib/components/feed/TimeInFeed.svelte';
     import LabelDot from '$lib/components/label/LabelDot.svelte';
-    import UtcTime from '$lib/components/UtcTime.svelte';
     import { Auth } from '$lib/controllers/auth/auth';
     import type { FeedItem, FeedItemTypes } from '$lib/controllers/feed/feed';
     import type { Label } from '$lib/controllers/label/label';
     import { encryptionKey } from '$lib/stores';
+    import { Day } from '$lib/utils/time';
     import CalendarEnd from 'svelte-material-icons/CalendarEnd.svelte';
 
     export let item: FeedItemTypes['eventEnd'];
@@ -15,15 +16,13 @@
     $: label = item.labelId ? labels[item.labelId] : null;
 </script>
 
-{#if previousItem && previousItem?.type === 'event-start' && item.id.includes(previousItem?.id)}
+{#if previousItem && previousItem?.type === 'event-start' && item.id.includes(previousItem?.id) && Day.timestampsAreSameDay(item.start, item.end, item.tzOffset)}
     <!-- don't show end of event if start of event is shown immediately before -->
 {:else}
-    <div class="text-sm p-2 flex gap-4">
-        <div class="flex gap-3 text-textColorLight pb-2">
-            <UtcTime timestamp={item.end} tzOffset={item.tzOffset} fmt="h:mma" />
-            <CalendarEnd size="22" />
-        </div>
-        <div>
+    <div class="text-sm py-2 flex gap-4">
+        <TimeInFeed timestamp={item.end} tzOffset={item.tzOffset} />
+        <CalendarEnd size="22" />
+        <div class="pb-2">
             <span class="text-textColorLight">end of</span>
             {#if label}
                 <span class="pl-1">

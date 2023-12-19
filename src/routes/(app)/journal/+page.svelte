@@ -1,20 +1,27 @@
 <script lang="ts">
     import DatasetShortcutWidgets from '$lib/components/dataset/DatasetShortcutWidgets.svelte';
+    import EntriesSidebar from '$lib/components/entry/EntriesSidebar.svelte';
     import { navExpanded, obfuscated } from '$lib/stores';
     import type { PageData } from './$types';
     import Feed from '$lib/components/feed/Feed.svelte';
 
     export let data: PageData;
-
-    const feedContainer = () => document.getElementsByClassName('root')[0] as HTMLDivElement;
 </script>
 
 <svelte:head>
     <title>Journal</title>
 </svelte:head>
 
-<main class={$navExpanded ? 'md:ml-52' : 'md:ml-20'}>
-    <div style="width: min(100%, 732px)">
+<main class="md:flex md:justify-center gap-4 {$navExpanded ? 'md:ml-52' : 'md:ml-20'}">
+    <section class="sidebar">
+        <EntriesSidebar
+            obfuscated={$obfuscated}
+            nYearsAgo={data.nYearsAgo}
+            pinnedEntriesSummaries={data.pinnedEntriesList}
+        />
+    </section>
+
+    <section class="w-full max-w-3xl -order-1">
         <div class="pb-4">
             <DatasetShortcutWidgets datasets={data.datasets} />
         </div>
@@ -24,21 +31,6 @@
             happinessDataset={data.happinessDataset}
             labels={data.labels}
             obfuscated={$obfuscated}
-            container={feedContainer}
         />
-    </div>
+    </section>
 </main>
-
-<style lang="scss">
-    @import '$lib/styles/layout';
-
-    main {
-        display: flex;
-        justify-content: center;
-        gap: 1rem;
-
-        @media #{$mobile} {
-            display: block;
-        }
-    }
-</style>

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import TimeInFeed from '$lib/components/feed/TimeInFeed.svelte';
     import Lazy from '$lib/components/Lazy.svelte';
     import type { EntryEdit } from '$lib/controllers/entry/entry';
     import { fmtUtcRelative, nowUtc } from '$lib/utils/time';
@@ -134,19 +135,13 @@
     <div class="mobile-title" class:obfuscated>
         {title}
     </div>
-    <div class="header">
+    <div class="flex justify-between">
         <div class="flex items-center gap-2" style="max-width: calc(100% - 60px)">
             {#if !showFullDate}
-                <span class="text-textColorLight text-sm pl-2">
-                    <UtcTime
-                        fmt={'h:mma'}
-                        timestamp={created}
-                        tooltipPosition="right"
-                        tzOffset={createdTzOffset}
-                    />
-                </span>
+                <div class="h-full">
+                    <TimeInFeed timestamp={created} tzOffset={createdTzOffset} />
+                </div>
             {/if}
-
             {#if pinned !== null}
                 <span
                     class="gradient-icon"
@@ -326,25 +321,6 @@
             opacity: 0.01;
         }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            max-width: 100%;
-
-            @media #{$mobile} {
-                margin: 0;
-                padding: 0;
-            }
-
-            :global(svg) {
-                color: var(--text-color-light);
-            }
-        }
-
         .title {
             @extend .ellipsis;
             font-size: 1.1em;
@@ -356,7 +332,6 @@
         }
 
         .body {
-            //border-top: 2px solid var(--background-color);
             padding: 1rem;
             // why????
             margin: -1rem 0 0 0;

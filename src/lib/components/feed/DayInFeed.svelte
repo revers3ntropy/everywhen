@@ -42,12 +42,12 @@
     }
 
     let items: FeedItem[];
-    $: items = Feed.orderedFeedItems(day.items).reverse();
+    $: items = Feed.orderedFeedItems(day.items);
     $: entryCount = items?.filter(item => item.type === 'entry').length ?? 0;
     $: isToday = fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD') === day.day;
     $: dayTimestamp = new Date(day.day).getTime() / 1000;
 
-    $: if ((items?.length > 0 && $collapsed[day.day] == 'empty') || (isToday && showForms)) {
+    $: if ((items?.length > 0 || (isToday && showForms)) && $collapsed[day.day] == 'empty') {
         $collapsed[day.day] = false;
     }
 
@@ -59,7 +59,7 @@
 
     listen.entry.onCreate(({ entry }) => {
         if (!isToday) return;
-        items = Feed.orderedFeedItems([...(items ?? []), { ...entry, type: 'entry' }]).reverse();
+        items = Feed.orderedFeedItems([...(items ?? []), { ...entry, type: 'entry' }]);
     });
     listen.entry.onDelete(id => {
         items = items.filter(entry => entry.id !== id);
@@ -74,8 +74,8 @@
     });
 </script>
 
-<div class="pt-4">
-    <div class="bg-vLightAccent rounded-lg p-2">
+<div class="pb-4 border-x border-solid border-borderLight w-full">
+    <div class="bg-vLightAccent p-2">
         <div class="flex justify-between">
             <div>
                 <button class="flex-center" on:click={toggleCollapse}>
@@ -143,7 +143,12 @@
                 duration: ANIMATION_DURATION
             }}
         >
-            <div class="pb-4">
+            {#if showForms && isToday}
+                <div class="bg-vLightAccent">
+                    <EntryForm {obfuscated} />
+                </div>
+            {/if}
+            <div class="pb-4 w-full">
                 {#each items || [] as item, i (item.id)}
                     {#if item.type === 'entry'}
                         <!-- hack to remove 'type' attribute from entry -->
@@ -179,9 +184,6 @@
                     {/if}
                 {/each}
             </div>
-            {#if showForms && isToday}
-                <EntryForm {obfuscated} />
-            {/if}
         </div>
     {/if}
 </div>

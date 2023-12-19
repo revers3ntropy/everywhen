@@ -164,6 +164,14 @@ export class Day {
         return Result.ok(new Day(year, month, date));
     }
 
+    public static timestampsAreSameDay(
+        a: TimestampSecs,
+        b: TimestampSecs,
+        tzOffset: Hours
+    ): boolean {
+        return Day.fromTimestamp(a, tzOffset).eq(Day.fromTimestamp(b, tzOffset));
+    }
+
     public fmtIso(): string {
         return `${this.year}-${this.month.toString().padStart(2, '0')}-${this.date
             .toString()
