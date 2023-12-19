@@ -13,7 +13,7 @@
     export let key: string;
     export let defaultValue: string | number | boolean;
     export let name: string;
-    export let type: string;
+    export let type: string | string[];
     export let description: string;
     export let unit = '';
     export let value: string | number | boolean;
@@ -22,7 +22,7 @@
 
     let saving = false;
 
-    let inputType: 'text' | 'number' | 'checkbox';
+    let inputType: 'text' | 'number' | 'checkbox' | 'select';
 
     if (!type || !key) throw new Error('Missing type or key');
 
@@ -37,6 +37,11 @@
             inputType = 'checkbox';
             break;
         default:
+            if (Array.isArray(type)) {
+                inputType = 'select';
+                break;
+            }
+
             throw new Error(`Unknown input type: ${key}`);
     }
 
@@ -120,15 +125,25 @@
     </div>
     <div class="right">
         <label class="label-for-{inputType}">
-            <input
-                checked={inputType === 'checkbox' && !!value}
-                class="text-box"
-                on:change={onInput}
-                type={inputType}
-                {value}
-            />
-            <span class="checkmark" />
-            {unit}
+            {#if inputType === 'select'}
+                <select class="text-box" on:change={onInput}>
+                    {#each type as option}
+                        <option value={option} selected={option === value}>
+                            {option}
+                        </option>
+                    {/each}
+                </select>
+            {:else}
+                <input
+                    checked={inputType === 'checkbox' && !!value}
+                    class="text-box"
+                    on:change={onInput}
+                    type={inputType}
+                    {value}
+                />
+                <span class="checkmark" />
+                {unit}
+            {/if}
         </label>
     </div>
 </div>

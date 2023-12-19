@@ -25,10 +25,19 @@ namespace SettingsServer {
         const now = nowUtc();
 
         const expectedType = Settings.config[key].type;
-        if (typeof value !== expectedType) {
-            return Result.err(
-                `Invalid setting value, expected ${expectedType} but got ${typeof value}`
-            );
+        if (typeof expectedType === 'string') {
+            if (typeof value !== expectedType) {
+                return Result.err(
+                    `Invalid setting value, expected ${expectedType} but got ${typeof value}`
+                );
+            }
+        } else {
+            // enum type
+            if (typeof value !== 'string' || !expectedType.includes(value)) {
+                return Result.err(
+                    `Invalid setting value, expected one of [${expectedType.join(', ')}]`
+                );
+            }
         }
 
         const valEncrypted = encrypt(JSON.stringify(value), auth.key);

@@ -95,7 +95,8 @@ export namespace Result {
         );
     }
 
-    export function tryJsonParse<T>(json: string): Result<T> {
+    export function tryJsonParse<T>(json: string | null | undefined): Result<T> {
+        if (typeof json !== 'string') return Result.err('JSON is not a string');
         try {
             return Result.ok(JSON.parse(json) as T);
         } catch (e: unknown) {

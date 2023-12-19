@@ -82,5 +82,12 @@ export const settingsConfig = {
         name: 'GitHub Access Token',
         description: `Access token for GitHub API. Used to fetch your GitHub activity.`,
         showInSettings: false
+    } as SettingConfig<string>,
+    happinessInputStyle: {
+        type: ['likert', 'scale'],
+        defaultValue: 'likert',
+        name: 'Happiness Input Style',
+        description: `How you want to enter a value for Happiness.`,
+        showInSettings: true
     } as SettingConfig<string>
 } satisfies Record<string, SettingConfig<SettingValue>>;

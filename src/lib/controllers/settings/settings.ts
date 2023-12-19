@@ -3,7 +3,7 @@ import { settingsConfig } from './settingsConfig';
 export type SettingValue = string | boolean | number;
 
 export interface SettingConfig<T extends SettingValue> {
-    type: 'string' | 'boolean' | 'number';
+    type: 'string' | 'boolean' | 'number' | string[];
     name: string;
     description: string;
     defaultValue: T;
