@@ -94,6 +94,14 @@ export namespace Result {
             })
         );
     }
+
+    export function tryJsonParse<T>(json: string): Result<T> {
+        try {
+            return Result.ok(JSON.parse(json) as T);
+        } catch (e: unknown) {
+            return Result.err('failed to parse JSON');
+        }
+    }
 }
 
 class Ok<T, E> implements ResultOption<T, E> {
