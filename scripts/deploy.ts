@@ -7,16 +7,12 @@ import prompts from 'prompts';
 import fs from 'fs';
 import fetch from 'node-fetch';
 
-const cliArgs = commandLineArgs;
-
-export const { verbose, env } = cliArgs([
+export const { verbose, env } = commandLineArgs([
     { name: 'verbose', type: Boolean, alias: 'v', defaultValue: false },
     { name: 'env', type: String, alias: 'e', defaultValue: 'prod' }
 ]) as { verbose: boolean; env: string };
 
 const remoteEnvFile = fs.readFileSync(`./secrets/${env}/remote.env`, 'utf8');
-const deploymentEnvFile = fs.readFileSync(`./secrets/${env}/.env`, 'utf8');
-
 const remoteEnv = dotenv.parse<{
     PUBLIC_INIT_VECTOR: string;
     PUBLIC_SVELTEKIT_PORT: string;
@@ -29,17 +25,22 @@ const remoteEnv = dotenv.parse<{
     HTTPS_PORT: string;
     BODY_SIZE_LIMIT: string;
 }>(remoteEnvFile);
+
+const deploymentEnvFile = fs.readFileSync(`./secrets/${env}/.env`, 'utf8');
 const deploymentEnv = dotenv.parse<{
     REMOTE_ADDRESS: string;
     REMOTE_USER: string;
     DIR: string;
 }>(deploymentEnvFile);
 
+// values to replace in files,
+// eg. replaces all occurrences of '%ENV%' with 'prod'
 const replacerValues = {
     '%ENV%': env
 };
 
-const pathsToUseReplacer = [`./server/remote.package.json`];
+// files to search for and replace values in
+const pathsToUseReplacer = [`./server/remote.package.json`, `./server/makeBackup.js`];
 
 const uploadPaths = {
     [`./secrets/${env}/cert.pem`]: '/cert.pem',
@@ -47,7 +48,8 @@ const uploadPaths = {
     [`./secrets/${env}/ca.pem`]: '/ca.pem',
     [`./secrets/${env}/remote.env`]: '/.env',
     ['./server/server.js']: '/server.js',
-    [`./server/remote.package.json`]: '/package.json'
+    [`./server/remote.package.json`]: '/package.json',
+    [`./server/makeBackup.js`]: '/makeBackup.js'
 };
 
 const LOG_PREFIX = c.blueBright('[deploy.js]');
