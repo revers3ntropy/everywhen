@@ -21,11 +21,21 @@ export const GET = (async ({ url, cookies }) => {
         await Auth.authenticateUserFromLogIn(username, key, maxAgeFromShouldRememberMe(rememberMe))
     ).unwrap(e => error(401, e));
 
-    cookies.set(COOKIE_KEYS.sessionId, sessionId, sessionCookieOptions(rememberMe));
-
-    return apiResponse(key, {
-        username
-    });
+    return apiResponse(
+        key,
+        {
+            username
+        },
+        {
+            headers: {
+                'Set-Cookie': cookies.serialize(
+                    COOKIE_KEYS.sessionId,
+                    sessionId,
+                    sessionCookieOptions(rememberMe)
+                )
+            }
+        }
+    );
 }) satisfies RequestHandler;
 
 export const PUT = (async ({ request, cookies }) => {
