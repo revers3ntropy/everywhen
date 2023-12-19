@@ -28,8 +28,8 @@ test.describe('/journal', () => {
         await page.getByRole('button', { name: 'Submit Entry' }).click();
 
         await expect(page.getByText(entryBody)).toBeAttached();
-        // mobile title and entry title
-        expect(await page.getByText(entryTitle).all()).toHaveLength(2);
+        // sidebar, mobile title and entry title
+        expect(await page.getByText(entryTitle).all()).toHaveLength(3);
 
         await expectDeleteUser(api, auth);
     });
