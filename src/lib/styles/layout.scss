@@ -25,27 +25,17 @@
 }
 
 .container-shadow {
-    // this is what Google uses ¯\_(ツ)_/¯
     box-shadow: $shadow;
 }
 
 .container {
-    padding: 0.3em 0;
+    padding: 0.5em;
     border-radius: $border-radius;
-    background: var(--v-light-accent);
+    border: 1px solid var(--border-color);
+    //background: var(--v-light-accent);
 
     @media #{$mobile} {
-        padding: 0.2rem;
-    }
-
-    &.flat {
-        box-shadow: none;
-        background: none;
-        border: 1px solid var(--border-color);
-    }
-
-    &.shadowed {
-        @extend .container-shadow;
+        padding: 0.25rem;
     }
 }
 

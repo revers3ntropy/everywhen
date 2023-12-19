@@ -113,26 +113,30 @@
     $: entries[fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD')] ??= [];
 </script>
 
-{#each sortedEntryKeys as day (day)}
-    <DayInFeed
-        day={{
-            items: entries[day].map(e => ({ ...e, type: 'entry' })),
-            day,
-            happiness: null,
-            nextDayInPast: null
-        }}
-        obfuscated={$obfuscated}
-        {showLabels}
-        {locations}
-        {showForms}
-        {labels}
-    />
-{/each}
-<div
-    use:inview={{ rootMargin: '200px' }}
-    on:inview_enter={() => loadMoreEntries()}
-    on:inview_leave={() => (pageEndInView = false)}
-/>
-{#if loadingAt !== null && loadingAt < numberOfEntries}
-    <Spinner />
-{/if}
+<div class="md:pl-4 w-full max-w-3xl">
+    <div class="border border-borderColor">
+        {#each sortedEntryKeys as day (day)}
+            <DayInFeed
+                day={{
+                    items: entries[day].map(e => ({ ...e, type: 'entry' })),
+                    day,
+                    happiness: null,
+                    nextDayInPast: null
+                }}
+                obfuscated={$obfuscated}
+                {showLabels}
+                {locations}
+                {showForms}
+                {labels}
+            />
+        {/each}
+        <div
+            use:inview={{ rootMargin: '200px' }}
+            on:inview_enter={() => loadMoreEntries()}
+            on:inview_leave={() => (pageEndInView = false)}
+        />
+        {#if loadingAt !== null && loadingAt < numberOfEntries}
+            <Spinner />
+        {/if}
+    </div>
+</div>

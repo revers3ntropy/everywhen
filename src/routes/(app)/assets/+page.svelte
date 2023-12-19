@@ -66,12 +66,13 @@
             Uploading {$currentlyUploadingAssets} images...
         {/if}
     </div>
-
-    <InfiniteScroller loadItems={loadMoreAssets} hasMore={() => assets.length < assetCount}>
-        {#each assets as asset}
-            <Asset {...asset} on:delete={() => assetCount--} obfuscated={$obfuscated} />
-        {/each}
-    </InfiniteScroller>
+    <div class="flex flex-wrap">
+        <InfiniteScroller loadItems={loadMoreAssets} hasMore={() => assets.length < assetCount}>
+            {#each assets as asset}
+                <Asset {...asset} on:delete={() => assetCount--} obfuscated={$obfuscated} />
+            {/each}
+        </InfiniteScroller>
+    </div>
 </main>
 
 <style lang="scss">

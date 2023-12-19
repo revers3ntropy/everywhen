@@ -6,11 +6,12 @@
     import Modal from 'svelte-simple-modal';
     import '../app.scss';
     import Notifications from '$lib/components/notifications/Notifications.svelte';
-    import { POLL_FOR_UPDATE_INTERVAL } from '$lib/constants';
+    import { POLL_FOR_UPDATE_INTERVAL, Theme } from '$lib/constants';
     import { pageInView, populateCookieWritablesWithCookies, popup, theme } from '$lib/stores';
     import { notify } from '$lib/components/notifications/notifications';
     import { api } from '$lib/utils/apiRequest';
     import Footer from '$lib/components/Footer.svelte';
+    import { Result } from '$lib/utils/result';
 
     export let data: PageData;
 
@@ -79,7 +80,14 @@
     </div>
 </noscript>
 
-<div data-sveltekit-preload-data="hover" data-theme={$theme} class="root" bind:this={root}>
+<div
+    data-sveltekit-preload-data="hover"
+    data-theme={browser
+        ? $theme
+        : Result.tryJsonParse(data.__cookieWritables?.theme).or(Theme.light)}
+    class="root"
+    bind:this={root}
+>
     <svg class="accent-gradient-svg" height={0} width={0}>
         <linearGradient id="accent-gradient" x1={1} x2={1} y1={0} y2={1}>
             <stop offset={0} stop-color="var(--secondary)" />

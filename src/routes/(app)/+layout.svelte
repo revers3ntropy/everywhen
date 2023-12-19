@@ -3,6 +3,7 @@
     import AllowCookies from '$lib/components/AllowCookies.svelte';
     import TopNavbar from '$lib/components/nav/TopNavbar.svelte';
     import { Auth } from '$lib/controllers/auth/auth';
+    import { Result } from '$lib/utils/result';
     import type { LayoutData } from './$types';
     import { onDestroy, onMount } from 'svelte';
     import { browser } from '$app/environment';
@@ -136,7 +137,7 @@
     <PasscodeModal bind:show={showPasscodeModal} passcode={$settingsStore.passcode.value} />
 {/if}
 
-{#if !$allowedCookies}
+{#if !(browser ? $allowedCookies : Result.tryJsonParse(data.__cookieWritables.allowedCookies).or(false))}
     <AllowCookies />
 {/if}
 

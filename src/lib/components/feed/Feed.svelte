@@ -25,7 +25,7 @@
     let nextDay: string | null = Day.today(currentTzOffset()).fmtIso();
 </script>
 
-<div>
+<div class="border border-borderColor">
     <InfiniteScroller loadItems={loadMoreDays} hasMore={() => nextDay !== null}>
         {#each days as day (day.day)}
             <DayInFeed

@@ -128,7 +128,7 @@
         height: 50px;
         border-radius: 0 0 $border-radius $border-radius;
         padding: 5px;
-        background: var(--translucent-bg);
+        background: var(--transluscent-bg);
         justify-content: center;
         align-items: center;
         transition: opacity #{$transition};

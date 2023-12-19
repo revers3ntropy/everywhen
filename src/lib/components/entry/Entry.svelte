@@ -121,7 +121,7 @@
     });
 </script>
 
-<div class="entry" class:in-dialog={isInDialog} {id}>
+<div class="entry pt-2" class:in-dialog={isInDialog} {id}>
     {#if showFullDate}
         <div class="text-light">
             <UtcTime
@@ -183,11 +183,11 @@
                         <DotsVertical size="22" />
                     </span>
                     <div>
-                        <div class="text-light flex-center pt-3 pb-2">
+                        <div class="text-light flex-center py-3">
                             {wordCount} words
                         </div>
 
-                        <hr class="-my-4" />
+                        <div class="border-t border-backgroundColor"></div>
 
                         <div class="options-dropdown">
                             <button
@@ -310,6 +310,7 @@
             max-width: 100%;
             max-height: 50vh;
             transition: opacity $transition;
+            border-radius: 0.5rem;
         }
 
         .obfuscated :global(img) {
