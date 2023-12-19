@@ -5,7 +5,7 @@ import { Label } from '$lib/controllers/label/label.server';
 import { query } from '$lib/db/mysql.server';
 import { decrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
-import { fmtUtc } from '$lib/utils/time';
+import { currentTzOffset, Day, fmtUtc } from '$lib/utils/time';
 
 export async function getSummariesNYearsAgo(
     auth: Auth
@@ -45,9 +45,11 @@ export async function getSummariesNYearsAgo(
     `;
 
     return (await summariesFromRaw(auth, rawEntries)).map(summaries => {
+        const today = Day.today(currentTzOffset()).fmtIso();
         const byDay: Record<string, EntrySummary[]> = {};
         for (const entry of summaries) {
             const date = fmtUtc(entry.created, entry.createdTzOffset, 'YYYY-MM-DD');
+            if (date === today) continue;
             byDay[date] ??= [];
             byDay[date].push(entry);
         }
