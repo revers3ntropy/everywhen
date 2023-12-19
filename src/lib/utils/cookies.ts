@@ -1,6 +1,9 @@
+import { PUBLIC_ENV } from '$env/static/public';
 import type { Seconds } from '../../types';
 import { NORMAL_COOKIE_TIMEOUT_DAYS, REMEMBER_ME_COOKIE_TIMEOUT_DAYS } from '../constants';
 import type { CookieSerializeOptions } from 'cookie';
+
+const insecureCookieEnvironments = ['dev', 'test'];
 
 interface ICookieOptions {
     rememberMe: boolean;
@@ -19,7 +22,8 @@ export function cookieOptions({
     const maxAge = maxAgeFromShouldRememberMe(rememberMe);
     const expires = new Date(Math.floor(Date.now() / 1000) * 1000 + maxAge * 1000);
     return Object.freeze({
-        secure: true,
+        // always try to set a secure cookie in prod
+        secure: !insecureCookieEnvironments.includes(PUBLIC_ENV),
         path: '/',
         // Needed for GitHub OAuth callback to work smoothly,
         // if set to 'strict' then no cookies are sent to the callback page
