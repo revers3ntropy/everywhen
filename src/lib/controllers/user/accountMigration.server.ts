@@ -84,18 +84,20 @@ const migrators: Record<string, (user: User) => Promise<Result<User>>> = {
         return Result.ok(user);
     },
 
-    async '0.6.27'(user: User): Promise<Result<User>> {
-        const datasetRows = await query<{ id: string; rowJson: string }[]>`
-            SELECT id, rowJson
+    async '0.6.28'(user: User): Promise<Result<User>> {
+        const datasetRows = await query<{ id: number; datasetId: string; rowJson: string }[]>`
+            SELECT id, datasetId, rowJson
             FROM datasetRows
             WHERE userId = ${user.id}
         `;
 
-        for (const { id, rowJson } of datasetRows) {
+        for (const { id, rowJson, datasetId } of datasetRows) {
             await query`
                 UPDATE datasetRows
                 SET rowJson = ${encrypt(rowJson, user.key)}
                 WHERE id = ${id}
+                  AND userId = ${user.id}
+                  AND datasetId = ${datasetId}
             `;
         }
 

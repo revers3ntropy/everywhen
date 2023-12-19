@@ -33,7 +33,7 @@ namespace FeedServer {
         return (
             happinesses
                 .map(({ rowJson }) => decrypt(rowJson, auth.key).or(null))
-                .filter(Boolean)
+                .filter((v): v is string => v !== null)
                 .map(rowJson => (JSON.parse(rowJson) as [number])[0])
                 .reduce((sum, value) => sum + value, 0) / happinesses.length
         );
