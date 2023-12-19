@@ -2,6 +2,7 @@ import type { Auth } from '$lib/controllers/auth/auth';
 import type { FeedItem } from '$lib/controllers/feed/feed';
 import type { FeedProvider } from '$lib/controllers/feed/feed.server';
 import { query } from '$lib/db/mysql.server';
+import { decrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
 import { Day } from '$lib/utils/time';
 
@@ -19,23 +20,25 @@ export const sleepCycleProvider = {
                 AND DATE_FORMAT(FROM_UNIXTIME(datasetRows.timestamp + datasetRows.timestampTzOffset * 60 * 60), '%Y-%m-%d') 
                     = ${day.fmtIso()}
         `;
-        return Result.ok(
+        return Result.collect(
             sleeps.map(item => {
-                const [duration, quality, regularity] = JSON.parse(item.rowJson) as [
-                    number,
-                    number | null,
-                    number | null
-                ];
-                return {
-                    id: item.id,
-                    type: 'sleep' as const,
-                    start: item.timestamp,
-                    startTzOffset: item.timestampTzOffset,
-                    duration,
-                    quality,
-                    regularity
-                };
-            }) satisfies FeedItem[]
+                return decrypt(item.rowJson, auth.key).map(rowJson => {
+                    const [duration, quality, regularity] = JSON.parse(rowJson) as [
+                        number,
+                        number | null,
+                        number | null
+                    ];
+                    return {
+                        id: item.id,
+                        type: 'sleep' as const,
+                        start: item.timestamp,
+                        startTzOffset: item.timestampTzOffset,
+                        duration,
+                        quality,
+                        regularity
+                    } satisfies FeedItem;
+                });
+            })
         );
     },
     async nextDayWithFeedItems(auth: Auth, day: Day): Promise<Result<Day | null>> {

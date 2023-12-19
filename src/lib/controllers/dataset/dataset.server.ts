@@ -205,6 +205,10 @@ namespace DatasetServer {
         return Result.collect(
             rows.map(row => {
                 let elements: unknown[];
+                const decryptedJson = decrypt(row.rowJson, auth.key);
+                if (!decryptedJson.ok) {
+                    return Result.err('Invalid data point');
+                }
                 try {
                     const parsedRowData = JSON.parse(row.rowJson);
                     if (!Array.isArray(parsedRowData)) {
@@ -412,7 +416,7 @@ namespace DatasetServer {
                     ${rowCreated},
                     ${rowTimestamp},
                     ${rowTimestampTzOffset},
-                    ${rowJson}
+                    ${encrypt(rowJson, auth.key)}
                 )
             `;
         }

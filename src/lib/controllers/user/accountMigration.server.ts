@@ -1,7 +1,7 @@
 import { Entry } from '$lib/controllers/entry/entry.server';
 import type { User } from '$lib/controllers/user/user.server';
 import { query } from '$lib/db/mysql.server';
-import { decrypt } from '$lib/utils/encryption';
+import { decrypt, encrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
 import { currentVersion, SemVer } from '$lib/utils/semVer';
 import { wordCount } from '$lib/utils/text';
@@ -79,6 +79,24 @@ const migrators: Record<string, (user: User) => Promise<Result<User>>> = {
                 Entry.isDeleted({ deleted }),
                 true
             );
+        }
+
+        return Result.ok(user);
+    },
+
+    async '0.6.27'(user: User): Promise<Result<User>> {
+        const datasetRows = await query<{ id: string; rowJson: string }[]>`
+            SELECT id, rowJson
+            FROM datasetRows
+            WHERE userId = ${user.id}
+        `;
+
+        for (const { id, rowJson } of datasetRows) {
+            await query`
+                UPDATE datasetRows
+                SET rowJson = ${encrypt(rowJson, user.key)}
+                WHERE id = ${id}
+            `;
         }
 
         return Result.ok(user);

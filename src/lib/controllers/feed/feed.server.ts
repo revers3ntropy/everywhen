@@ -2,6 +2,7 @@ import { entriesProvider } from '$lib/controllers/feed/entriesProvider';
 import { eventEndsProvider, eventStartsProvider } from '$lib/controllers/feed/eventsProvider';
 import { sleepCycleProvider } from '$lib/controllers/feed/sleepCycleProvider';
 import { Label } from '$lib/controllers/label/label.server';
+import { decrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
 import { Feed as _Feed, type FeedItem, type FeedDay } from './feed';
 import type { Day } from '$lib/utils/time';
@@ -31,7 +32,9 @@ namespace FeedServer {
         if (happinesses.length === 0) return null;
         return (
             happinesses
-                .map(({ rowJson }) => (JSON.parse(rowJson) as [number])[0])
+                .map(({ rowJson }) => decrypt(rowJson, auth.key).or(null))
+                .filter(Boolean)
+                .map(rowJson => (JSON.parse(rowJson) as [number])[0])
                 .reduce((sum, value) => sum + value, 0) / happinesses.length
         );
     }
@@ -39,15 +42,15 @@ namespace FeedServer {
     async function getNextDayInPast(auth: Auth, day: Day): Promise<Day | null> {
         const tomorrow = day.plusDays(-1);
         return await PROVIDERS.map(p => p.nextDayWithFeedItems(auth, day)).reduce(
-            async (acc, nextRes) => {
+            async (acc, nextRes): Promise<Day | null> => {
                 const accDay = await acc;
                 // short circuit if the next day is tomorrow,
                 // there won't be a day closer to today that isn't today
-                if (accDay !== null && accDay.eq(tomorrow)) return acc;
+                if (accDay !== null && accDay.eq(tomorrow)) return accDay;
                 const next = (await nextRes).unwrap(e => error(400, e));
 
                 // treat null as Infinity
-                if (next === null) return acc;
+                if (next === null) return accDay;
                 if (accDay === null) return next;
 
                 // if the next day is closer to today than the current closest day,

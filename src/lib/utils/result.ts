@@ -14,7 +14,7 @@ interface ResultOption<T, E = string> {
 
     unwrap(mapErr?: (err: E) => unknown): T;
 
-    or(fallback: T): T;
+    or<O>(fallback: O): T | O;
 
     merge(): T | E;
 }
@@ -124,7 +124,7 @@ class Ok<T, E> implements ResultOption<T, E> {
         return this.val;
     }
 
-    public or(_: T): T {
+    public or<O>(_: O): T | O {
         return this.val;
     }
 
@@ -165,7 +165,7 @@ class Err<T, E> implements ResultOption<unknown, E> {
         throw map ? map(this.err) : this.err;
     }
 
-    public or(fallback: T): T {
+    public or<O>(fallback: O): T | O {
         return fallback;
     }
 
