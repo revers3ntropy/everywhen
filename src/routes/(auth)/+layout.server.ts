@@ -5,6 +5,6 @@ export const load = (async ({ locals, parent }) => {
     await parent();
 
     if (locals.auth) {
-        redirect(307, '/journal?x=1');
+        redirect(307, '/journal');
     }
 }) satisfies LayoutServerLoad;
