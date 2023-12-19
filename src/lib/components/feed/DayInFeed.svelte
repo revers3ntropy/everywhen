@@ -74,7 +74,7 @@
     });
 </script>
 
-<div class="pb-4 border-x border-solid border-borderLight w-full">
+<div class="pb-4 w-full">
     <div class="bg-vLightAccent p-2">
         <div class="flex justify-between">
             <div>

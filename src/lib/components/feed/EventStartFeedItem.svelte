@@ -1,7 +1,6 @@
 <script lang="ts">
     import TimeInFeed from '$lib/components/feed/TimeInFeed.svelte';
     import LabelDot from '$lib/components/label/LabelDot.svelte';
-    import UtcTime from '$lib/components/UtcTime.svelte';
     import { Auth } from '$lib/controllers/auth/auth';
     import type { FeedItem, FeedItemTypes } from '$lib/controllers/feed/feed';
     import type { Label } from '$lib/controllers/label/label';

@@ -132,9 +132,6 @@
             />
         </div>
     {/if}
-    <div class="mobile-title" class:obfuscated>
-        {title}
-    </div>
     <div class="flex justify-between">
         <div class="flex items-center gap-2" style="max-width: calc(100% - 60px)">
             {#if !showFullDate}
@@ -291,8 +288,11 @@
             />
         </div>
     {/if}
+    <div class="text-lg only-mobile" class:obfuscated>
+        {title}
+    </div>
 
-    <div class="body" class:obfuscated>
+    <div class="body md:p-4 p-2" class:obfuscated>
         {@html entryHtml}
     </div>
 </div>
@@ -332,11 +332,6 @@
         }
 
         .body {
-            padding: 1rem;
-            // why????
-            margin: -1rem 0 0 0;
-            word-break: break-word;
-
             // inner <p> element is created when using @html
             :global(p) {
                 margin: 0;
@@ -389,17 +384,6 @@
                 border-left: 3px solid var(--primary);
                 margin: 0 0 0 0.5em;
                 padding: 0 0 0 1em;
-            }
-        }
-
-        .mobile-title {
-            display: none;
-            margin: 2rem 0 -1.2rem 0.5rem;
-            font-size: 1.1em;
-            text-align: center;
-
-            @media #{$mobile} {
-                display: block;
             }
         }
     }

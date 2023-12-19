@@ -13,7 +13,7 @@
 
 <div class="text-sm py-2 md:flex md:gap-4">
     <TimeInFeed timestamp={start} to={start + duration} {tzOffset} />
-    <Sleep size="27" />
+    <Sleep size="24" />
     <div class="flex gap-4" class:obfuscated>
         <span>
             Slept for
