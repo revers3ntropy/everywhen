@@ -15,11 +15,6 @@ export async function all(auth: Auth, filter: EntryFilter = {}): Promise<Result<
         if (!locationResult.ok) return locationResult.cast();
         location = locationResult.val;
     }
-    if (filter.onlyWithLocation && location) {
-        return Result.err(
-            'Cannot both filter out all entries with a location and filter by location'
-        );
-    }
 
     const rawEntries = await query<
         {

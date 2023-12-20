@@ -125,23 +125,25 @@ export namespace Entry {
         return typeof self.pinned === 'number';
     }
 
+    /**
+     * Mutates the 'grouped' parameter and arrays it contains
+     */
     export function groupEntriesByDay<
         T extends {
             created: TimestampSecs;
             createdTzOffset: Hours;
         }
-    >(entries: T[], grouped: Record<string, T[]> = {}): Record<string, T[]> {
-        entries.forEach(entry => {
+    >(entries: T[], grouped: Record<string, T[]> = {}, sortEachDay = true): Record<string, T[]> {
+        for (const entry of entries) {
             const localDate = fmtUtc(entry.created, entry.createdTzOffset, 'YYYY-MM-DD');
             grouped[localDate] ??= [];
             grouped[localDate].push(entry);
-        });
+        }
 
-        // sort each day
-        for (const day of Object.keys(grouped)) {
-            grouped[day].sort((a, b) => {
-                return b.created - a.created;
-            });
+        if (sortEachDay) {
+            for (const day of Object.keys(grouped)) {
+                grouped[day].sort((a, b) => b.created - a.created);
+            }
         }
 
         return grouped;

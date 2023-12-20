@@ -22,6 +22,7 @@
     "@types/html-minifier": "4.0.5",
     "@types/js-cookie": "3.0.6",
     "@types/marked": "5.0.2",
+    "@types/pdfkit": "^0.13.3",
     "@types/prompt-sync": "^4.2.3",
     "@types/prompts": "^2.4.9",
     "@types/sha256": "0.2.2",
@@ -79,5 +80,8 @@
     "webp-converter": "2.3.3",
     "zod": "^3.22.4",
     "zx": "^7.2.3"
+  },
+  "dependencies": {
+    "pdfkit": "^0.14.0"
   }
 }
