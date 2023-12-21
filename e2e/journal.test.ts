@@ -20,15 +20,18 @@ test.describe('/journal', () => {
         const entryBody = 'This is a test entry body!';
         const entryTitle = 'This is a test entry title!';
 
-        await page.waitForTimeout(1000);
-
         await page.getByLabel('Entry Title').click();
         await page.getByLabel('Entry Title').fill(entryTitle);
         await page.getByLabel('Entry Body').fill(entryBody);
         await page.getByRole('button', { name: 'Submit Entry' }).click();
 
         await expect(page.getByText(entryBody)).toBeAttached();
-        // sidebar, mobile title and entry title
+        // mobile title and entry title
+        expect(await page.getByText(entryTitle).all()).toHaveLength(2);
+
+        await page.reload({ waitUntil: 'networkidle' });
+
+        // sidebar should have appeared now so +1 occurrences
         expect(await page.getByText(entryTitle).all()).toHaveLength(3);
 
         await expectDeleteUser(api, auth);

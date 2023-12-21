@@ -135,7 +135,7 @@
     <div class="flex justify-between">
         <div class="flex items-center gap-2" style="max-width: calc(100% - 60px)">
             {#if !showFullDate}
-                <div class="h-full">
+                <div class="h-full pr-2">
                     <TimeInFeed timestamp={created} tzOffset={createdTzOffset} />
                 </div>
             {/if}
@@ -344,10 +344,22 @@
                 padding: 0 0 0 1.5em;
                 border: none;
 
+                :global(li:has(input[type='checkbox'])) {
+                    list-style-type: none;
+                }
+
                 :global(li) {
                     margin: 0;
                     padding: 0;
                     border: none;
+                    position: relative;
+
+                    :global(input[type='checkbox']) {
+                        position: absolute;
+                        left: -22px;
+                        top: 2px;
+                        opacity: 1;
+                    }
                 }
             }
             :global(ul) {
