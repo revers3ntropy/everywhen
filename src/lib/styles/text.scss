@@ -7,7 +7,7 @@
 }
 
 .redacted {
-    font-family: 'Redacted Script', 'Redacted', cursive !important;
+    font-family: 'Redacted Script', 'Redacted' !important;
 }
 
 .mono {
@@ -88,6 +88,15 @@ pre {
         text-shadow: 0 0 1px var(--text-color-light) !important;
         @extend .redacted;
     }
+    opacity: 0;
+    border: 3px solid red;
+}
+.redacted-font-loaded {
+    .obfuscated {
+        opacity: 100% !important;
+        border: 3px solid yellow;
+    }
+    border: 3px solid green;
 }
 
 .text-light {

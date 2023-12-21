@@ -36,6 +36,29 @@
         }
     }
 
+    function checkRedactedFontIsLoaded() {
+        if (document && document.fonts) {
+            if (document.fonts.check('16px "Redacted Script"')) {
+                console.log('already loaded');
+                // Make font using elements visible
+                root.classList.add('redacted-font-loaded');
+                return;
+            }
+            // Do not block page loading
+            setTimeout(() => {
+                void document.fonts.load('16px "Redacted Script"').then(() => {
+                    console.log('now loaded');
+                    // Make font using elements visible
+                    root.classList.add('redacted-font-loaded');
+                });
+            }, 0);
+            return;
+        }
+        console.log('font api not supported');
+        // Fallback if API does not exist
+        root.classList.add('redacted-font-loaded');
+    }
+
     onMount(() => {
         pageInView.set(document.visibilityState === 'visible');
 
@@ -47,6 +70,7 @@
             pageInView.set(document.visibilityState === 'visible');
             void checkForUpdate();
         });
+        checkRedactedFontIsLoaded();
     });
 
     let isNewVersionAvailable = false;

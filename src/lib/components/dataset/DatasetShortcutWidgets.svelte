@@ -16,15 +16,6 @@
     );
 </script>
 
-<div class="wrapper">
+<div class="w-full flex items-center justify-start">
     <WeightDatasetShortcut dataset={datasetsByPresetId['weight'] || null} />
 </div>
-
-<style lang="scss">
-    .wrapper {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-    }
-</style>
