@@ -89,14 +89,11 @@ pre {
         @extend .redacted;
     }
     opacity: 0;
-    border: 3px solid red;
 }
 .redacted-font-loaded {
     .obfuscated {
         opacity: 100% !important;
-        border: 3px solid yellow;
     }
-    border: 3px solid green;
 }
 
 .text-light {
