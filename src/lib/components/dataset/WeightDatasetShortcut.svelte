@@ -50,41 +50,43 @@
 </script>
 
 {#if dataset}
-    <div class="container">
-        <div>
-            <a href="/datasets/{dataset.id}">Weight</a>
-        </div>
-        <div class="flex-center" style="margin: 0.5rem 0; gap: 4px">
-            <input
-                type="number"
-                class="num-no-arrows"
-                on:keyup={onKeyUp}
-                bind:value
-                min="0"
-                disabled={submitting}
-                aria-label="enter your weight"
-            />
-            kg
-            <button
-                on:click={submit}
-                class="with-circled-icon no-text"
-                disabled={submitting}
-                aria-label="Submit Weight"
-            >
-                <Plus size="25" />
-            </button>
-        </div>
-        {#if showInvalidMsg}
-            <div
-                class="text-warning"
-                transition:slide={{
-                    duration: ANIMATION_DURATION,
-                    axis: 'y'
-                }}
-            >
-                Invalid weight
+    <div class="pb-4">
+        <div class="container">
+            <div>
+                <a href="/datasets/{dataset.id}">Weight</a>
             </div>
-        {/if}
+            <div class="flex-center" style="margin: 0.5rem 0; gap: 4px">
+                <input
+                    type="number"
+                    class="num-no-arrows"
+                    on:keyup={onKeyUp}
+                    bind:value
+                    min="0"
+                    disabled={submitting}
+                    aria-label="enter your weight"
+                />
+                kg
+                <button
+                    on:click={submit}
+                    class="with-circled-icon no-text"
+                    disabled={submitting}
+                    aria-label="Submit Weight"
+                >
+                    <Plus size="25" />
+                </button>
+            </div>
+            {#if showInvalidMsg}
+                <div
+                    class="text-warning"
+                    transition:slide={{
+                        duration: ANIMATION_DURATION,
+                        axis: 'y'
+                    }}
+                >
+                    Invalid weight
+                </div>
+            {/if}
+        </div>
     </div>
 {/if}
 

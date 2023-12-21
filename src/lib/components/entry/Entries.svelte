@@ -113,8 +113,8 @@
     $: entries[fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD')] ??= [];
 </script>
 
-<div class="md:pl-4 w-full max-w-3xl">
-    <div class="border border-borderColor">
+<div class="md:pl-4 w-full md:max-w-3xl">
+    <div class="md:border md:border-borderColor">
         {#each sortedEntryKeys as day (day)}
             <DayInFeed
                 day={{

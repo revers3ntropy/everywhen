@@ -1,5 +1,7 @@
 <script lang="ts">
+    import { slide } from 'svelte/transition';
     import LabelDot from '$lib/components/label/LabelDot.svelte';
+    import { ANIMATION_DURATION } from '$lib/constants';
     import { listen } from '$lib/dataChangeEvents';
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
@@ -93,8 +95,8 @@
     {/if}
 
     {#if sortedTitles}
-        {#each sortedTitles as [day, date]}
-            <div class="day">
+        {#each sortedTitles as [day, date] (date)}
+            <div class="day" transition:slide={{ duration: ANIMATION_DURATION, axis: 'x' }}>
                 <h2>
                     <UtcTime timestamp={day} fmt="dddd DD/MM/YYYY" noTooltip={true} tzOffset={0} />
                     {#if showTimeAgo}
@@ -115,7 +117,7 @@
                     <i class="text-light flex-center"> No entries on this day </i>
                 {/if}
 
-                {#each (titles || {})[date] as entry}
+                {#each (titles || {})[date] as entry (entry.id)}
                     <button class="entry" on:click={() => showEntryPopup(entry.id)}>
                         <span class="entry-time">
                             <UtcTime

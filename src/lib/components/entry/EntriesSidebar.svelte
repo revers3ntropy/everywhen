@@ -1,9 +1,11 @@
 <script lang="ts">
     import InfiniteScroller from '$lib/components/InfiniteScroller.svelte';
     import { notify } from '$lib/components/notifications/notifications';
+    import { ANIMATION_DURATION } from '$lib/constants';
     import { listen } from '$lib/dataChangeEvents';
     import { api } from '$lib/utils/apiRequest';
     import { fmtUtcRelative } from '$lib/utils/time';
+    import { onMount } from 'svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import Close from 'svelte-material-icons/Close.svelte';
     import Eye from 'svelte-material-icons/Eye.svelte';
@@ -12,6 +14,7 @@
     import Menu from 'svelte-material-icons/Menu.svelte';
     import { Entry, type EntrySummary } from '$lib/controllers/entry/entry';
     import EntrySummaries from './EntrySummaries.svelte';
+    import { slide } from 'svelte/transition';
 
     export let obfuscated = false;
     export let nYearsAgo: Record<string, EntrySummary[]>;
@@ -24,7 +27,11 @@
             await api.get('/entries/titles', { offset: titleIds.length, count: 10 })
         );
         numTitles = totalCount;
+        if (!loadedAny) {
+            noEntries = numTitles < 1;
+        }
 
+        loadedAny = true;
         summaries = Entry.groupEntriesByDay(newEntrySummaries, summaries);
 
         titleIds = [...titleIds, ...newEntrySummaries.map(t => t.id)];
@@ -58,6 +65,12 @@
         titleIds = titleIds.filter(id => id !== entryId);
     });
 
+    onMount(() => {
+        void loadMoreTitles();
+    });
+
+    let loadedAny = false;
+    let noEntries = true;
     let showingAllPinned = false;
     let showing = false;
     let summaries: Record<string, EntrySummary[]> = {};
@@ -70,9 +83,9 @@
         <Menu size="40" />
     </button>
 </div>
-<div class="sidebar" class:showing>
+<div class="sidebar border-borderColor" class:md:border={!noEntries} class:showing>
     <div class="header">
-        {#if numTitles > 0}
+        {#if !noEntries}
             <button
                 aria-label={obfuscated ? 'Show entries' : 'Hide entries'}
                 on:click={() => (obfuscated = !obfuscated)}
@@ -95,7 +108,10 @@
     <div>
         {#key [pinnedEntriesSummaries, showingAllPinned]}
             {#if Object.keys(pinnedEntries).length}
-                <div class="rounded-lg bg-vLightAccent p-4 my-2">
+                <div
+                    class="bg-lightAccent p-2 my-2"
+                    transition:slide={{ duration: ANIMATION_DURATION, axis: 'x' }}
+                >
                     <h3
                         class="gradient-icon flex-center"
                         style="justify-content: flex-start; gap: 8px;"
@@ -128,7 +144,7 @@
             {/if}
         {/key}
         {#if Object.entries(nYearsAgo).length}
-            <div class="rounded-lg bg-vLightAccent p-4 my-4">
+            <div class="container my-4">
                 {#each Object.entries(nYearsAgo) as [date, entries] (date)}
                     <h3>
                         {fmtUtcRelative(new Date(date), 'en-full')} since...
@@ -145,9 +161,16 @@
                 {/each}
             </div>
         {/if}
-        <InfiniteScroller loadItems={loadMoreTitles} hasMore={() => titleIds.length < numTitles}>
-            <EntrySummaries {obfuscated} titles={summaries} hideBlurToggle />
-        </InfiniteScroller>
+        {#if !noEntries}
+            <div class="p-2">
+                <InfiniteScroller
+                    loadItems={loadMoreTitles}
+                    hasMore={() => titleIds.length < numTitles}
+                >
+                    <EntrySummaries {obfuscated} titles={summaries} hideBlurToggle />
+                </InfiniteScroller>
+            </div>
+        {/if}
     </div>
 </div>
 

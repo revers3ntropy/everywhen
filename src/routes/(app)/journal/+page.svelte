@@ -22,7 +22,7 @@
     </section>
 
     <section class="w-full max-w-3xl -order-1">
-        <div class="pb-4">
+        <div>
             <DatasetShortcutWidgets datasets={data.datasets} />
         </div>
 

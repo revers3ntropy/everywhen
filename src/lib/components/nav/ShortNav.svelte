@@ -25,6 +25,8 @@
     </div>
 
     <div class="flex items-end p-4 justify-center hide-mobile">
-        <button on:click={() => ($navExpanded = true)}> <ChevronRight size="30" /> </button>
+        <button on:click={() => ($navExpanded = true)} aria-label="expand navigation bar">
+            <ChevronRight size="30" />
+        </button>
     </div>
 </div>
