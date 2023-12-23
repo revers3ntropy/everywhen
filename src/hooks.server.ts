@@ -116,8 +116,10 @@ export const handle = (async ({ event, resolve }) => {
     } else {
         event.locals.auth = null;
 
-        // unset session cookie if invalid session
-        event.cookies.delete(COOKIE_KEYS.sessionId, sessionCookieOptions(false));
+        if (event.cookies.get(COOKIE_KEYS.sessionId)) {
+            // unset session cookie if invalid session
+            event.cookies.delete(COOKIE_KEYS.sessionId, sessionCookieOptions(false));
+        }
     }
 
     event.locals.__cookieWritables = getCookieWritableCookies(event.cookies);
