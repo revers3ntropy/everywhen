@@ -26,7 +26,9 @@ process.on('SIGINT', exitHandler);
 process.on('SIGTERM', exitHandler);
 process.on('SIGUSR1', exitHandler);
 process.on('SIGUSR2', exitHandler);
-process.on('uncaughtException', exitHandler);
+process.on('uncaughtException', (...args) => {
+    void processLogger.log(`Uncaught Exception`, { args });
+});
 
 function exitHandler(...args: unknown[]) {
     void processLogger.log(`Exited!`, { args }).then(() => {
