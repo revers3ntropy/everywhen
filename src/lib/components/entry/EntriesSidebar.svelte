@@ -109,7 +109,7 @@
         {#key [pinnedEntriesSummaries, showingAllPinned]}
             {#if Object.keys(pinnedEntries).length}
                 <div
-                    class="bg-lightAccent p-2 my-2"
+                    class="bg-vLightAccent p-2 my-2"
                     transition:slide={{ duration: ANIMATION_DURATION, axis: 'x' }}
                 >
                     <h3
@@ -144,7 +144,7 @@
             {/if}
         {/key}
         {#if Object.entries(nYearsAgo).length}
-            <div class="container my-4">
+            <div class="bg-vLightAccent p-2 my-4">
                 {#each Object.entries(nYearsAgo) as [date, entries] (date)}
                     <h3>
                         {fmtUtcRelative(new Date(date), 'en-full')} since...
