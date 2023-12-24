@@ -49,7 +49,7 @@ export const eventStartsProvider = {
                 WHERE userId = ${auth.id}
                   AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(start + tzOffset * 60 * 60), '%Y-%m-%d'), DATE)
                         > CONVERT(${day.fmtIso()}, DATE)
-                ORDER BY created ASC, id
+                ORDER BY start + tzOffset * 60 * 60 ASC, id
                 LIMIT 1
             `
             : await query<{ start: number; tzOffset: number }[]>`
@@ -58,7 +58,7 @@ export const eventStartsProvider = {
                 WHERE userId = ${auth.id}
                   AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(start + tzOffset * 60 * 60), '%Y-%m-%d'), DATE)
                         < CONVERT(${day.fmtIso()}, DATE)
-                ORDER BY created DESC, id
+                ORDER BY start + tzOffset * 60 * 60 DESC, id
                 LIMIT 1
             `;
         if (!events.length) return Result.ok(null);
@@ -112,7 +112,7 @@ export const eventEndsProvider = {
                 WHERE userId = ${auth.id}
                   AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(end + tzOffset * 60 * 60), '%Y-%m-%d'), DATE)
                         > CONVERT(${day.fmtIso()}, DATE)
-                ORDER BY created ASC, id
+                ORDER BY end + tzOffset * 60 * 60 ASC, id
                 LIMIT 1
             `
             : await query<{ end: number; tzOffset: number }[]>`
@@ -121,7 +121,7 @@ export const eventEndsProvider = {
                 WHERE userId = ${auth.id}
                   AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(end + tzOffset * 60 * 60), '%Y-%m-%d'), DATE)
                         < CONVERT(${day.fmtIso()}, DATE)
-                ORDER BY created DESC, id
+                ORDER BY end + tzOffset * 60 * 60 DESC, id
                 LIMIT 1
             `;
         if (!events.length) return Result.ok(null);
