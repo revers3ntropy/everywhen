@@ -25,7 +25,7 @@ export const entriesProvider = {
                   AND userId = ${auth.id}
                   AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%Y-%m-%d'), DATE)
                    > CONVERT(${day.fmtIso()}, DATE)
-                ORDER BY created ASC, id
+                ORDER BY created + createdTzOffset * 60 * 60 ASC, id
                 LIMIT 1
             `
             : await query<{ created: number; createdTzOffset: number }[]>`
@@ -35,7 +35,7 @@ export const entriesProvider = {
                   AND userId = ${auth.id}
                   AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%Y-%m-%d'), DATE)
                    < CONVERT(${day.fmtIso()}, DATE)
-                ORDER BY created DESC, id
+                ORDER BY created + createdTzOffset * 60 * 60 DESC, id
                 LIMIT 1
             `;
         if (!entries.length) return Result.ok(null);

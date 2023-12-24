@@ -45,8 +45,7 @@ namespace FeedServer {
         return await PROVIDERS.map(p => p.nextDayWithFeedItems(auth, day, false)).reduce(
             async (acc, nextRes): Promise<Day | null> => {
                 const accDay = await acc;
-                // short circuit if the next day is tomorrow,
-                // there won't be a day closer to today that isn't today
+                // short circuit if the next day is yesterday
                 if (accDay !== null && accDay.eq(yesterday)) return accDay;
                 const next = (await nextRes).unwrap(e => error(400, e));
 
@@ -68,8 +67,7 @@ namespace FeedServer {
         return await PROVIDERS.map(p => p.nextDayWithFeedItems(auth, day, true)).reduce(
             async (acc, nextRes): Promise<Day | null> => {
                 const accDay = await acc;
-                // short circuit if the next day is tomorrow,
-                // there won't be a day closer to today that isn't today
+                // short circuit if the next day is tomorrow
                 if (accDay !== null && accDay.eq(tomorrow)) return accDay;
                 const next = (await nextRes).unwrap(e => error(400, e));
 
@@ -77,10 +75,9 @@ namespace FeedServer {
                 if (next === null) return accDay;
                 if (accDay === null) return next;
 
-                // if the next day is closer to today than the current closest day,
-                // return the next day (less than as all dates are assumed in past)
+                // if the next day is closer to today than the current closest day
                 if (next.lt(accDay)) return next;
-                return next;
+                return accDay;
             },
             Promise.resolve<null | Day>(null)
         );
