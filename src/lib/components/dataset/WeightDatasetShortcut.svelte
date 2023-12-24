@@ -50,7 +50,7 @@
 </script>
 
 {#if dataset}
-    <div class="pb-4">
+    <div class="p-2 md:p-0 md:pb-4">
         <div class="container">
             <div>
                 <a href="/datasets/{dataset.id}">Weight</a>

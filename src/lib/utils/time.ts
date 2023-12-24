@@ -194,6 +194,14 @@ export class Day {
         return this.date < other.date;
     }
 
+    public gt(other: Day): boolean {
+        if (this.year > other.year) return true;
+        if (this.year < other.year) return false;
+        if (this.month > other.month) return true;
+        if (this.month < other.month) return false;
+        return this.date > other.date;
+    }
+
     public plusDays(days: number): Day {
         const date = new Date(`${this.fmtIso()}T12:00:00Z`);
         date.setDate(date.getDate() + days);

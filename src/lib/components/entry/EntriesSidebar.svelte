@@ -19,6 +19,7 @@
     export let obfuscated = false;
     export let nYearsAgo: Record<string, EntrySummary[]>;
     export let pinnedEntriesSummaries: EntrySummary[];
+    export let openOnMobile = false;
 
     const showLimitPinnedEntries = 10;
 
@@ -72,18 +73,21 @@
     let loadedAny = false;
     let noEntries = true;
     let showingAllPinned = false;
-    let showing = false;
     let summaries: Record<string, EntrySummary[]> = {};
     let numTitles = 1;
     let titleIds: string[] = [];
 </script>
 
-<div class="floating-button only-mobile">
-    <button aria-label="Show sidebar menu" on:click={() => (showing = !showing)}>
+<div class="fixed only-mobile z-10 p-1 top-0">
+    <button
+        aria-label="Show sidebar menu"
+        class="bg-vLightAccent rounded-xl"
+        on:click={() => (openOnMobile = !openOnMobile)}
+    >
         <Menu size="40" />
     </button>
 </div>
-<div class="sidebar border-borderColor" class:md:border={!noEntries} class:showing>
+<div class="sidebar border-borderColor" class:md:border={!noEntries} class:showing={openOnMobile}>
     <div class="header">
         {#if !noEntries}
             <button
@@ -100,7 +104,7 @@
         <button
             class="only-mobile"
             aria-label="Close sidebar menu"
-            on:click={() => (showing = !showing)}
+            on:click={() => (openOnMobile = !openOnMobile)}
         >
             <Close size="30" />
         </button>

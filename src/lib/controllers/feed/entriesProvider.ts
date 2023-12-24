@@ -12,19 +12,33 @@ export const entriesProvider = {
             entries.map(e => ({ ...e, type: 'entry' as const }))
         );
     },
-    async nextDayWithFeedItems(auth: Auth, day: Day): Promise<Result<Day | null>> {
-        const entries = await query<{ created: number; createdTzOffset: number }[]>`
-            SELECT created, createdTzOffset
-            FROM entries
-            WHERE deleted IS NULL
-              AND userId = ${auth.id}
-              AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%Y-%m-%d'), DATE)
-               < CONVERT(${day.fmtIso()}, DATE)
-            ORDER BY created DESC, id
-            LIMIT 1
-        `;
+    async nextDayWithFeedItems(
+        auth: Auth,
+        day: Day,
+        inFuture: boolean
+    ): Promise<Result<Day | null>> {
+        const entries = inFuture
+            ? await query<{ created: number; createdTzOffset: number }[]>`
+                SELECT created, createdTzOffset
+                FROM entries
+                WHERE deleted IS NULL
+                  AND userId = ${auth.id}
+                  AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%Y-%m-%d'), DATE)
+                   > CONVERT(${day.fmtIso()}, DATE)
+                ORDER BY created ASC, id
+                LIMIT 1
+            `
+            : await query<{ created: number; createdTzOffset: number }[]>`
+                SELECT created, createdTzOffset
+                FROM entries
+                WHERE deleted IS NULL
+                  AND userId = ${auth.id}
+                  AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%Y-%m-%d'), DATE)
+                   < CONVERT(${day.fmtIso()}, DATE)
+                ORDER BY created DESC, id
+                LIMIT 1
+            `;
         if (!entries.length) return Result.ok(null);
-
         const { created, createdTzOffset } = entries[0];
         return Result.ok(Day.fromTimestamp(created, createdTzOffset));
     }

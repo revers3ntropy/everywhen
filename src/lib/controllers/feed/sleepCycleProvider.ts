@@ -41,19 +41,37 @@ export const sleepCycleProvider = {
             })
         );
     },
-    async nextDayWithFeedItems(auth: Auth, day: Day): Promise<Result<Day | null>> {
-        const records = await query<{ day: string }[]>`
-            SELECT DATE_FORMAT(FROM_UNIXTIME(datasetRows.timestamp + datasetRows.timestampTzOffset * 60 * 60), '%Y-%m-%d') as day
-            FROM datasetRows, datasets
-            WHERE datasets.id = datasetRows.datasetId
-              AND datasets.userId = ${auth.id}
-              AND datasetRows.userId = ${auth.id}
-              AND datasets.presetId = 'sleepCycle'
-              AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(datasetRows.timestamp + datasetRows.timestampTzOffset * 60 * 60), '%Y-%m-%d'), DATE)
-                < CONVERT(${day.fmtIso()}, DATE)
-            ORDER BY timestamp DESC, datasetRows.id
-            LIMIT 1
-        `;
+
+    async nextDayWithFeedItems(
+        auth: Auth,
+        day: Day,
+        inFuture: boolean
+    ): Promise<Result<Day | null>> {
+        const records = inFuture
+            ? await query<{ day: string }[]>`
+                SELECT DATE_FORMAT(FROM_UNIXTIME(datasetRows.timestamp + datasetRows.timestampTzOffset * 60 * 60), '%Y-%m-%d') as day
+                FROM datasetRows, datasets
+                WHERE datasets.id = datasetRows.datasetId
+                  AND datasets.userId = ${auth.id}
+                  AND datasetRows.userId = ${auth.id}
+                  AND datasets.presetId = 'sleepCycle'
+                  AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(datasetRows.timestamp + datasetRows.timestampTzOffset * 60 * 60), '%Y-%m-%d'), DATE)
+                    > CONVERT(${day.fmtIso()}, DATE)
+                ORDER BY timestamp ASC, datasetRows.id
+                LIMIT 1
+            `
+            : await query<{ day: string }[]>`
+                SELECT DATE_FORMAT(FROM_UNIXTIME(datasetRows.timestamp + datasetRows.timestampTzOffset * 60 * 60), '%Y-%m-%d') as day
+                FROM datasetRows, datasets
+                WHERE datasets.id = datasetRows.datasetId
+                  AND datasets.userId = ${auth.id}
+                  AND datasetRows.userId = ${auth.id}
+                  AND datasets.presetId = 'sleepCycle'
+                  AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(datasetRows.timestamp + datasetRows.timestampTzOffset * 60 * 60), '%Y-%m-%d'), DATE)
+                    < CONVERT(${day.fmtIso()}, DATE)
+                ORDER BY timestamp DESC, datasetRows.id
+                LIMIT 1
+            `;
         if (!records.length) return Result.ok(null);
         return Result.ok(Day.fromString(records[0].day).unwrap());
     }

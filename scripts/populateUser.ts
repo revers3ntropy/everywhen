@@ -65,6 +65,32 @@ function encryptionKeyFromPassword(pass: string): string {
     return sha256(pass).substring(0, 32);
 }
 
+async function entry(
+    id: string,
+    userId: string,
+    created: number,
+    body: string,
+    title = '',
+    deleted = false
+) {
+    await query(
+        'INSERT INTO entries (id, userId, created, createdTzOffset, latitude, longitude, title, body, labelId, deleted, pinned, agentData, wordCount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        id,
+        userId,
+        created,
+        0,
+        null,
+        null,
+        encrypt(title),
+        encrypt(body),
+        null,
+        deleted ? nowUtc() : null,
+        null,
+        encrypt(''),
+        2
+    );
+}
+
 async function main() {
     const [{ id: userId }] = await query<{ id: string }[]>(
         'SELECT id FROM users WHERE username = ?',
@@ -78,25 +104,11 @@ async function main() {
     }
 
     let i = 0;
-    for (let created = nowUtc(); created > nowUtc() - 3600 * 24 * 365; created -= 3600 * 24) {
-        await query(
-            'INSERT INTO entries (id, userId, created, createdTzOffset, latitude, longitude, title, body, labelId, deleted, pinned, agentData, wordCount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            `my-entry-${created}`,
-            userId,
-            created,
-            0,
-            null,
-            null,
-            encrypt(''),
-            encrypt(`Entry ${i}`),
-            null,
-            null,
-            null,
-            encrypt(''),
-            2
-        );
+    for (let created = nowUtc(); created > nowUtc() - 3600 * 24 * 365 * 10; created -= 3600 * 12) {
+        await entry(`my-entry-${i}`, userId, created, `Entry ${i}`);
         i++;
     }
+    log(`created ${i} entries`);
 
     log('done');
 }

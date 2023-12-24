@@ -24,7 +24,7 @@ export interface Notify {
     info(text: string | string[], timeout?: Milliseconds): void;
     success(text: string | string[], timeout?: Milliseconds): void;
     error(text: string | string[], timeout?: Milliseconds): void;
-    onErr<T>(result: Result<T>, onErr?: (err: string | null) => unknown): T;
+    onErr: <T>(result: Result<T>, onErr?: (err: string | null) => unknown) => T;
 }
 
 export function removeNotification(notification: Notification) {

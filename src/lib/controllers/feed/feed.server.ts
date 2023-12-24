@@ -12,7 +12,7 @@ import { query } from '$lib/db/mysql.server';
 
 export interface FeedProvider {
     feedItemsOnDay(auth: Auth, day: Day): Promise<Result<FeedItem[]>>;
-    nextDayWithFeedItems(auth: Auth, day: Day): Promise<Result<Day | null>>;
+    nextDayWithFeedItems(auth: Auth, day: Day, inFuture: boolean): Promise<Result<Day | null>>;
 }
 
 namespace FeedServer {
@@ -41,8 +41,31 @@ namespace FeedServer {
     }
 
     async function getNextDayInPast(auth: Auth, day: Day): Promise<Day | null> {
-        const tomorrow = day.plusDays(-1);
-        return await PROVIDERS.map(p => p.nextDayWithFeedItems(auth, day)).reduce(
+        const yesterday = day.plusDays(-1);
+        return await PROVIDERS.map(p => p.nextDayWithFeedItems(auth, day, false)).reduce(
+            async (acc, nextRes): Promise<Day | null> => {
+                const accDay = await acc;
+                // short circuit if the next day is tomorrow,
+                // there won't be a day closer to today that isn't today
+                if (accDay !== null && accDay.eq(yesterday)) return accDay;
+                const next = (await nextRes).unwrap(e => error(400, e));
+
+                // treat null as Infinity
+                if (next === null) return accDay;
+                if (accDay === null) return next;
+
+                // if the next day is closer to today than the current closest day,
+                // return the next day (less than as all dates are assumed in past)
+                if (next.lt(accDay)) return accDay;
+                return next;
+            },
+            Promise.resolve<null | Day>(null)
+        );
+    }
+
+    async function getNextDayInFuture(auth: Auth, day: Day): Promise<Day | null> {
+        const tomorrow = day.plusDays(1);
+        return await PROVIDERS.map(p => p.nextDayWithFeedItems(auth, day, true)).reduce(
             async (acc, nextRes): Promise<Day | null> => {
                 const accDay = await acc;
                 // short circuit if the next day is tomorrow,
@@ -56,7 +79,7 @@ namespace FeedServer {
 
                 // if the next day is closer to today than the current closest day,
                 // return the next day (less than as all dates are assumed in past)
-                if (next.lt(accDay)) return accDay;
+                if (next.lt(accDay)) return next;
                 return next;
             },
             Promise.resolve<null | Day>(null)
@@ -73,6 +96,7 @@ namespace FeedServer {
                 .unwrap(e => error(400, e)),
             happiness: await happinessForDay(auth, day),
             nextDayInPast: (await getNextDayInPast(auth, day))?.fmtIso() ?? null,
+            nextDayInFuture: (await getNextDayInFuture(auth, day))?.fmtIso() ?? null,
             day: day.fmtIso()
         } satisfies FeedDay);
     }

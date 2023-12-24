@@ -39,6 +39,7 @@ export interface FeedDay {
     items: FeedItem[];
     happiness: number | null;
     nextDayInPast: string | null;
+    nextDayInFuture: string | null;
 }
 
 export interface Feed {

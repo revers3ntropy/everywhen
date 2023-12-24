@@ -6,9 +6,7 @@
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import { Entry, type EntrySummary } from '$lib/controllers/entry/entry';
-    import { showPopup } from '$lib/utils/popups';
     import { currentTzOffset, fmtUtc, nowUtc, utcEq } from '$lib/utils/time';
-    import EntryDialog from '$lib/components/dialogs/EntryDialog.svelte';
     import Dot from '../Dot.svelte';
     import UtcTime from '../UtcTime.svelte';
 
@@ -19,13 +17,6 @@
     export let hideBlurToggle = false;
     export let onCreateFilter: (entry: Entry) => boolean = () => true;
     export let showOnUpdateAndNotAlreadyShownFilter: (entry: Entry) => boolean = () => false;
-
-    function showEntryPopup(entryId: string) {
-        showPopup(EntryDialog, {
-            id: entryId,
-            obfuscated
-        });
-    }
 
     listen.entry.onCreate(({ entry }) => {
         if (!onCreateFilter(entry)) return;
@@ -118,7 +109,7 @@
                 {/if}
 
                 {#each (titles || {})[date] as entry (entry.id)}
-                    <button class="entry" on:click={() => showEntryPopup(entry.id)}>
+                    <a class="entry" href="/journal#{entry.id}">
                         <span class="entry-time">
                             <UtcTime
                                 timestamp={entry.created}
@@ -140,7 +131,7 @@
                                 </i>
                             {/if}
                         </span>
-                    </button>
+                    </a>
                 {/each}
             </div>
         {/each}

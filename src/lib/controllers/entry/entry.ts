@@ -1,5 +1,5 @@
 import { LS_KEYS } from '$lib/constants';
-import { fmtUtc } from '$lib/utils/time';
+import { Day, fmtUtc } from '$lib/utils/time';
 import type { Hours, TimestampSecs } from '../../../types';
 import type { Label } from '../label/label';
 
@@ -210,5 +210,9 @@ export namespace Entry {
                 if (key?.startsWith(keyStart)) storage.removeItem(key);
             }
         }
+    }
+
+    export function dayOf(entry: { created: number; createdTzOffset: number }): Day {
+        return Day.fromTimestamp(entry.created, entry.createdTzOffset);
     }
 }

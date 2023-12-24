@@ -288,7 +288,7 @@
             />
         </div>
     {/if}
-    <div class="text-lg only-mobile" class:obfuscated>
+    <div class="text-lg only-mobile p-2" class:obfuscated>
         {title}
     </div>
 

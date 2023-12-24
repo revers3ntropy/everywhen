@@ -37,16 +37,30 @@ export const eventStartsProvider = {
             })) satisfies FeedItem[]
         );
     },
-    async nextDayWithFeedItems(auth: Auth, day: Day): Promise<Result<Day | null>> {
-        const events = await query<{ start: number; tzOffset: number }[]>`
-            SELECT start, tzOffset
-            FROM events
-            WHERE userId = ${auth.id}
-              AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(start + tzOffset * 60 * 60), '%Y-%m-%d'), DATE)
-                    < CONVERT(${day.fmtIso()}, DATE)
-            ORDER BY created DESC, id
-            LIMIT 1
-        `;
+    async nextDayWithFeedItems(
+        auth: Auth,
+        day: Day,
+        inFuture: boolean
+    ): Promise<Result<Day | null>> {
+        const events = inFuture
+            ? await query<{ start: number; tzOffset: number }[]>`
+                SELECT start, tzOffset
+                FROM events
+                WHERE userId = ${auth.id}
+                  AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(start + tzOffset * 60 * 60), '%Y-%m-%d'), DATE)
+                        > CONVERT(${day.fmtIso()}, DATE)
+                ORDER BY created ASC, id
+                LIMIT 1
+            `
+            : await query<{ start: number; tzOffset: number }[]>`
+                SELECT start, tzOffset
+                FROM events
+                WHERE userId = ${auth.id}
+                  AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(start + tzOffset * 60 * 60), '%Y-%m-%d'), DATE)
+                        < CONVERT(${day.fmtIso()}, DATE)
+                ORDER BY created DESC, id
+                LIMIT 1
+            `;
         if (!events.length) return Result.ok(null);
 
         const { start, tzOffset } = events[0];
@@ -86,16 +100,30 @@ export const eventEndsProvider = {
             })) satisfies FeedItem[]
         );
     },
-    async nextDayWithFeedItems(auth: Auth, day: Day): Promise<Result<Day | null>> {
-        const events = await query<{ end: number; tzOffset: number }[]>`
-            SELECT end, tzOffset
-            FROM events
-            WHERE userId = ${auth.id}
-              AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(end + tzOffset * 60 * 60), '%Y-%m-%d'), DATE)
-                    < CONVERT(${day.fmtIso()}, DATE)
-            ORDER BY created DESC, id
-            LIMIT 1
-        `;
+    async nextDayWithFeedItems(
+        auth: Auth,
+        day: Day,
+        inFuture: boolean
+    ): Promise<Result<Day | null>> {
+        const events = inFuture
+            ? await query<{ end: number; tzOffset: number }[]>`
+                SELECT end, tzOffset
+                FROM events
+                WHERE userId = ${auth.id}
+                  AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(end + tzOffset * 60 * 60), '%Y-%m-%d'), DATE)
+                        > CONVERT(${day.fmtIso()}, DATE)
+                ORDER BY created ASC, id
+                LIMIT 1
+            `
+            : await query<{ end: number; tzOffset: number }[]>`
+                SELECT end, tzOffset
+                FROM events
+                WHERE userId = ${auth.id}
+                  AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(end + tzOffset * 60 * 60), '%Y-%m-%d'), DATE)
+                        < CONVERT(${day.fmtIso()}, DATE)
+                ORDER BY created DESC, id
+                LIMIT 1
+            `;
         if (!events.length) return Result.ok(null);
 
         const { end, tzOffset } = events[0];

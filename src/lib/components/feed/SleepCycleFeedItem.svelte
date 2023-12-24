@@ -11,10 +11,11 @@
     export let obfuscated: boolean;
 </script>
 
-<div class="text-sm py-2 md:flex md:gap-4">
+<div class="text-sm py-2 flex gap-y-1 gap-4 flex-wrap">
     <TimeInFeed timestamp={start} to={start + duration} {tzOffset} />
     <Sleep size="24" />
-    <div class="flex gap-4" class:obfuscated>
+    <div class="basis-full h-0 md:hidden"></div>
+    <div class="flex gap-4 px-2 md:p-0" class:obfuscated>
         <span>
             Slept for
             <b>{fmtDurationHourMin(duration)}</b>
