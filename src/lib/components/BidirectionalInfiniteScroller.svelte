@@ -9,7 +9,7 @@
 
     let pageEndInViewTop = false;
     let pageEndInViewBottom = false;
-    let currentlyLoading = false;
+    let currentlyLoading: false | 'top' | 'bottom' = false;
     let destroyed = false;
     let tryLoadOtherDirectionIfFinished = false;
 
@@ -20,11 +20,13 @@
             pageEndInViewBottom = true;
         }
         if (currentlyLoading) {
-            tryLoadOtherDirectionIfFinished = true;
+            if (currentlyLoading !== (isFromTop ? 'top' : 'bottom')) {
+                tryLoadOtherDirectionIfFinished = true;
+            }
             return;
         }
         if (destroyed || !hasMore(isFromTop)) return;
-        currentlyLoading = true;
+        currentlyLoading = isFromTop ? 'top' : 'bottom';
 
         await loadItems(isFromTop);
 

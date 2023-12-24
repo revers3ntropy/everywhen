@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { page } from '$app/stores';
     import TimeInFeed from '$lib/components/feed/TimeInFeed.svelte';
     import Lazy from '$lib/components/Lazy.svelte';
     import type { EntryEdit } from '$lib/controllers/entry/entry';
@@ -121,7 +122,12 @@
     });
 </script>
 
-<div class="entry pt-2" class:in-dialog={isInDialog} {id}>
+<div
+    class="entry w-full h-fit pt-2 outline-none border border-transparent rounded-md"
+    class:in-dialog={isInDialog}
+    {id}
+    style={$page.url.hash.endsWith(id) ? 'border-color: var(--secondary)' : ''}
+>
     {#if showFullDate}
         <div class="text-light">
             <UtcTime
@@ -299,12 +305,9 @@
 
 <style lang="scss">
     @import '$lib/styles/text';
+    @import '$lib/styles/variables';
 
     .entry {
-        width: 100%;
-        height: fit-content;
-        outline: none;
-
         // so images don't appear too large
         :global(img) {
             max-width: 100%;
