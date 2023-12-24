@@ -6,12 +6,11 @@ import { sha256 } from 'js-sha256';
 import mysql from 'mysql2/promise';
 import type { TimestampSecs } from '../src/types';
 
-export const { verbose, username, clear, password } = commandLineArgs([
+export const { verbose, username, password } = commandLineArgs([
     { name: 'verbose', type: Boolean, alias: 'v', defaultValue: true },
-    { name: 'clear', type: Boolean, alias: 'c', defaultValue: true },
     { name: 'username', type: String, alias: 'u', defaultValue: 'test' },
     { name: 'password', type: String, alias: 'p', defaultValue: 'password' }
-]) as { verbose: boolean; username: string; password: string; clear: boolean };
+]) as { verbose: boolean; username: string; password: string };
 
 const envFile = fs.readFileSync(`./.env`, 'utf8');
 const env = dotenv.parse<{
@@ -99,12 +98,14 @@ async function main() {
 
     log('got user ID', { userId });
 
-    if (clear) {
-        await query('DELETE FROM entries WHERE userId = ?', userId);
-    }
+    await query('DELETE FROM entries WHERE userId = ?', userId);
 
     let i = 0;
-    for (let created = nowUtc(); created > nowUtc() - 3600 * 24 * 365 * 10; created -= 3600 * 12) {
+    for (
+        let created = nowUtc();
+        created > nowUtc() - 60 * 60 * 24 * 365 * 20;
+        created -= 60 * 60 * 1
+    ) {
         await entry(`my-entry-${i}`, userId, created, `Entry ${i}`);
         i++;
     }
