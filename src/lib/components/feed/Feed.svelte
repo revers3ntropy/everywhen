@@ -24,10 +24,25 @@
         if (!loadingDay) throw new Error('day is null');
         const day = notify.onErr(await api.get(apiPath('/feed/?', loadingDay)));
         if (atTop) {
-            nextDay = day.nextDayInFuture;
-            if (nextDay && Day.fromString(nextDay).unwrap().gt(Day.today(currentTzOffset()))) {
-                nextDay = null;
+            console.log(
+                !day.nextDayInFuture &&
+                    nextDay &&
+                    Day.fromString(nextDay).unwrap().lt(Day.today(currentTzOffset()))
+            );
+            if (
+                !day.nextDayInFuture &&
+                nextDay &&
+                Day.fromString(nextDay).unwrap().lt(Day.today(currentTzOffset()))
+            ) {
+                // edge case: if we're loading from the top, always load today
+                nextDay = Day.today(currentTzOffset()).fmtIso();
+            } else {
+                nextDay = day.nextDayInFuture;
+                if (nextDay && Day.fromString(nextDay).unwrap().gt(Day.today(currentTzOffset()))) {
+                    nextDay = null;
+                }
             }
+
             if (loadingDay !== fromDay.fmtIso()) {
                 // edge case: don't load today twice, from both directions
                 // not great, but idk how else to start loading from the middle
@@ -44,7 +59,7 @@
         return atTop ? nextDay !== null : prevDay !== null;
     }
 
-    onMount(() => {
+    function setUpScrollListeners() {
         const scrollContainer = getScrollContainer();
         let scrollFromBottom = 0;
         let scrollFromTop = 0;
@@ -66,8 +81,14 @@
         });
         scrollContainerObserver.observe(containerEl, { childList: true });
         scrollContainer.onscroll = updateScroll;
+    }
+
+    onMount(() => {
+        setUpScrollListeners();
     });
-    onDestroy(() => scrollContainerObserver?.disconnect());
+    onDestroy(() => {
+        scrollContainerObserver?.disconnect();
+    });
 
     let isLoadingAtTop = false;
     let scrollContainerObserver: MutationObserver;

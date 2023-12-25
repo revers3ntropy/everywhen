@@ -31,6 +31,7 @@ CREATE TABLE entries
     wordCount       int      NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `idx_entries_userId`  (`userId`),
+    INDEX `idx_created` (`created`),
     INDEX `idx_entries_labelId` (`userId`, `labelId`)
 )
     ENGINE = InnoDB

@@ -17,14 +17,18 @@ export const entriesProvider = {
         day: Day,
         inFuture: boolean
     ): Promise<Result<Day | null>> {
+        const minTimestamp = day.utcTimestamp(24);
+        const maxTimestamp = day.utcTimestamp(-24);
         const entries = inFuture
             ? await query<{ created: number; createdTzOffset: number }[]>`
                 SELECT created, createdTzOffset
                 FROM entries
                 WHERE deleted IS NULL
-                  AND userId = ${auth.id}
-                  AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%Y-%m-%d'), DATE)
-                   > CONVERT(${day.fmtIso()}, DATE)
+                    AND userId = ${auth.id}
+                    AND created > ${minTimestamp}
+                    AND created < ${maxTimestamp}
+                    AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%Y-%m-%d'), DATE)
+                        > CONVERT(${day.fmtIso()}, DATE)
                 ORDER BY created + createdTzOffset * 60 * 60 ASC, id
                 LIMIT 1
             `
@@ -32,9 +36,11 @@ export const entriesProvider = {
                 SELECT created, createdTzOffset
                 FROM entries
                 WHERE deleted IS NULL
-                  AND userId = ${auth.id}
-                  AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%Y-%m-%d'), DATE)
-                   < CONVERT(${day.fmtIso()}, DATE)
+                    AND userId = ${auth.id}
+                    AND created > ${minTimestamp}
+                    AND created < ${maxTimestamp}
+                    AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%Y-%m-%d'), DATE)
+                        < CONVERT(${day.fmtIso()}, DATE)
                 ORDER BY created + createdTzOffset * 60 * 60 DESC, id
                 LIMIT 1
             `;

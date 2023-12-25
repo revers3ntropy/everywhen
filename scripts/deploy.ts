@@ -487,29 +487,13 @@ async function standardDeploy() {
     console.log(`Estimated downtime: ${c.red(downtime.toPrecision(3))}s`);
 }
 
-async function awsDeploy() {
-    await $`bin/build`;
-    console.error('AWS deployment not implemented');
-}
-
 async function main() {
     const start = now();
 
-    switch (env) {
-        case 'aws':
-            await awsDeploy();
-            break;
-        case 'staging':
-        case 'prod':
-            await standardDeploy();
-            break;
-        default:
-            console.error('Invalid env: ' + env);
-            break;
-    }
+    await standardDeploy();
 
     const totalTime = (now() - start) / 1000;
-    console.log(`Total time: ${c.cyan(totalTime.toPrecision(3))}s`);
+    console.log(`Deployment finished in ${c.cyan(totalTime.toPrecision(3))}s`);
 }
 
 void main();

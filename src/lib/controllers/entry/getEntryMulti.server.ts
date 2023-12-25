@@ -157,6 +157,8 @@ export async function getPage(
 }
 
 export async function onDay(auth: Auth, day: Day): Promise<Result<Entry[]>> {
+    const minTimestamp = day.utcTimestamp(24);
+    const maxTimestamp = day.utcTimestamp(-24);
     const rawEntries = await query<
         {
             id: string;
@@ -187,8 +189,10 @@ export async function onDay(auth: Auth, day: Day): Promise<Result<Entry[]>> {
                wordCount
         FROM entries
         WHERE deleted IS NULL
-          AND userId = ${auth.id}
-          AND DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%Y-%m-%d') = ${day.fmtIso()}
+            AND userId = ${auth.id}
+            AND created > ${minTimestamp}
+            AND created < ${maxTimestamp}
+            AND DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%Y-%m-%d') = ${day.fmtIso()}
         ORDER BY created DESC, id
     `;
     // TODO: use index on 'created' with large buffer around day's timestamp to reduce DB reads
