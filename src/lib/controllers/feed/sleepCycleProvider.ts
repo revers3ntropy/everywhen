@@ -8,6 +8,8 @@ import { Day } from '$lib/utils/time';
 
 export const sleepCycleProvider = {
     async feedItemsOnDay(auth: Auth, day: Day): Promise<Result<FeedItem[]>> {
+        const minTimestamp = day.utcTimestamp(24);
+        const maxTimestamp = day.utcTimestamp(-24);
         const sleeps = await query<
             { rowJson: string; timestamp: number; timestampTzOffset: number; id: string }[]
         >`
@@ -17,6 +19,8 @@ export const sleepCycleProvider = {
                 AND datasets.userId = ${auth.id}
                 AND datasetRows.userId = ${auth.id}
                 AND datasets.presetId = 'sleepCycle'
+                AND datasetRows.timestamp > ${minTimestamp}
+                AND datasetRows.timestamp < ${maxTimestamp}
                 AND DATE_FORMAT(FROM_UNIXTIME(datasetRows.timestamp + datasetRows.timestampTzOffset * 60 * 60), '%Y-%m-%d') 
                     = ${day.fmtIso()}
         `;
@@ -47,6 +51,8 @@ export const sleepCycleProvider = {
         day: Day,
         inFuture: boolean
     ): Promise<Result<Day | null>> {
+        const minTimestamp = day.utcTimestamp(24);
+        const maxTimestamp = day.utcTimestamp(-24);
         const records = inFuture
             ? await query<{ day: string }[]>`
                 SELECT DATE_FORMAT(FROM_UNIXTIME(datasetRows.timestamp + datasetRows.timestampTzOffset * 60 * 60), '%Y-%m-%d') as day
@@ -55,9 +61,11 @@ export const sleepCycleProvider = {
                   AND datasets.userId = ${auth.id}
                   AND datasetRows.userId = ${auth.id}
                   AND datasets.presetId = 'sleepCycle'
+                  AND datasetRows.timestamp > ${minTimestamp}
+                  AND datasetRows.timestamp < ${maxTimestamp}
                   AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(datasetRows.timestamp + datasetRows.timestampTzOffset * 60 * 60), '%Y-%m-%d'), DATE)
                     > CONVERT(${day.fmtIso()}, DATE)
-                ORDER BY timestamp ASC, datasetRows.id
+                ORDER BY datasetRows.timestamp + datasetRows.timestampTzOffset * 60 * 60 ASC, datasetRows.id
                 LIMIT 1
             `
             : await query<{ day: string }[]>`
@@ -67,9 +75,11 @@ export const sleepCycleProvider = {
                   AND datasets.userId = ${auth.id}
                   AND datasetRows.userId = ${auth.id}
                   AND datasets.presetId = 'sleepCycle'
+                  AND datasetRows.timestamp > ${minTimestamp}
+                  AND datasetRows.timestamp < ${maxTimestamp}
                   AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(datasetRows.timestamp + datasetRows.timestampTzOffset * 60 * 60), '%Y-%m-%d'), DATE)
                     < CONVERT(${day.fmtIso()}, DATE)
-                ORDER BY timestamp DESC, datasetRows.id
+                ORDER BY datasetRows.timestamp + datasetRows.timestampTzOffset * 60 * 60 DESC, datasetRows.id
                 LIMIT 1
             `;
         if (!records.length) return Result.ok(null);

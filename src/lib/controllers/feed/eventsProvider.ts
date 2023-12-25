@@ -7,6 +7,8 @@ import { Day } from '$lib/utils/time';
 
 export const eventStartsProvider = {
     async feedItemsOnDay(auth: Auth, day: Day): Promise<Result<FeedItem[]>> {
+        const minTimestamp = day.utcTimestamp(24);
+        const maxTimestamp = day.utcTimestamp(-24);
         const rawEvents = await query<
             {
                 id: string;
@@ -21,6 +23,8 @@ export const eventStartsProvider = {
             SELECT id, name, start, end, tzOffset, labelId, created
             FROM events
             WHERE userId = ${auth.id}
+                AND start > ${minTimestamp}
+                AND start < ${maxTimestamp}
                 AND DATE_FORMAT(FROM_UNIXTIME(start), '%Y-%m-%d') = ${day.fmtIso()}
         `;
 
@@ -42,12 +46,16 @@ export const eventStartsProvider = {
         day: Day,
         inFuture: boolean
     ): Promise<Result<Day | null>> {
+        const minTimestamp = day.utcTimestamp(24);
+        const maxTimestamp = day.utcTimestamp(-24);
         const events = inFuture
             ? await query<{ start: number; tzOffset: number }[]>`
                 SELECT start, tzOffset
                 FROM events
                 WHERE userId = ${auth.id}
-                  AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(start + tzOffset * 60 * 60), '%Y-%m-%d'), DATE)
+                    AND start > ${minTimestamp}
+                    AND start < ${maxTimestamp}
+                    AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(start + tzOffset * 60 * 60), '%Y-%m-%d'), DATE)
                         > CONVERT(${day.fmtIso()}, DATE)
                 ORDER BY start + tzOffset * 60 * 60 ASC, id
                 LIMIT 1
@@ -70,6 +78,8 @@ export const eventStartsProvider = {
 
 export const eventEndsProvider = {
     async feedItemsOnDay(auth: Auth, day: Day): Promise<Result<FeedItem[]>> {
+        const minTimestamp = day.utcTimestamp(24);
+        const maxTimestamp = day.utcTimestamp(-24);
         const rawEvents = await query<
             {
                 id: string;
@@ -84,6 +94,8 @@ export const eventEndsProvider = {
             SELECT id, name, start, end, tzOffset, labelId, created
             FROM events
             WHERE userId = ${auth.id}
+                AND end > ${minTimestamp}
+                AND end < ${maxTimestamp}
                 AND DATE_FORMAT(FROM_UNIXTIME(end), '%Y-%m-%d') = ${day.fmtIso()}
         `;
 
@@ -105,12 +117,16 @@ export const eventEndsProvider = {
         day: Day,
         inFuture: boolean
     ): Promise<Result<Day | null>> {
+        const minTimestamp = day.utcTimestamp(24);
+        const maxTimestamp = day.utcTimestamp(-24);
         const events = inFuture
             ? await query<{ end: number; tzOffset: number }[]>`
                 SELECT end, tzOffset
                 FROM events
                 WHERE userId = ${auth.id}
-                  AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(end + tzOffset * 60 * 60), '%Y-%m-%d'), DATE)
+                    AND end > ${minTimestamp}
+                    AND end < ${maxTimestamp}
+                    AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(end + tzOffset * 60 * 60), '%Y-%m-%d'), DATE)
                         > CONVERT(${day.fmtIso()}, DATE)
                 ORDER BY end + tzOffset * 60 * 60 ASC, id
                 LIMIT 1
@@ -119,7 +135,9 @@ export const eventEndsProvider = {
                 SELECT end, tzOffset
                 FROM events
                 WHERE userId = ${auth.id}
-                  AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(end + tzOffset * 60 * 60), '%Y-%m-%d'), DATE)
+                    AND end < ${maxTimestamp}
+                    AND end > ${minTimestamp}
+                    AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(end + tzOffset * 60 * 60), '%Y-%m-%d'), DATE)
                         < CONVERT(${day.fmtIso()}, DATE)
                 ORDER BY end + tzOffset * 60 * 60 DESC, id
                 LIMIT 1

@@ -24,11 +24,6 @@
         if (!loadingDay) throw new Error('day is null');
         const day = notify.onErr(await api.get(apiPath('/feed/?', loadingDay)));
         if (atTop) {
-            console.log(
-                !day.nextDayInFuture &&
-                    nextDay &&
-                    Day.fromString(nextDay).unwrap().lt(Day.today(currentTzOffset()))
-            );
             if (
                 !day.nextDayInFuture &&
                 nextDay &&

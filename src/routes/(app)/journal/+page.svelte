@@ -29,14 +29,12 @@
 
 <main class="md:flex md:justify-center gap-4 {$navExpanded ? 'md:ml-52' : 'md:ml-20'}">
     <section>
-        {#key $page}
-            <EntriesSidebar
-                obfuscated={$obfuscated}
-                nYearsAgo={data.nYearsAgo}
-                pinnedEntriesSummaries={data.pinnedEntriesList}
-                openOnMobile={false}
-            />
-        {/key}
+        <EntriesSidebar
+            obfuscated={$obfuscated}
+            nYearsAgo={data.nYearsAgo}
+            pinnedEntriesSummaries={data.pinnedEntriesList}
+            openOnMobile={false}
+        />
     </section>
 
     <section class="w-full max-w-3xl -order-1">

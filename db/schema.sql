@@ -31,7 +31,7 @@ CREATE TABLE entries
     wordCount       int      NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `idx_entries_userId`  (`userId`),
-    INDEX `idx_created` (`created`),
+    INDEX `idx_entries_created` (`created`),
     INDEX `idx_entries_labelId` (`userId`, `labelId`)
 )
     ENGINE = InnoDB
@@ -72,6 +72,7 @@ CREATE TABLE entryEdits
     oldLabelId      char(32) DEFAULT NULL,
     PRIMARY KEY (`id`),
     INDEX `idx_entryEdits_userId` (`userId`),
+    INDEX `idx_entryEdits_created` (`created`),
     INDEX `idx_entryEdits_entryId` (`userId`, `entryId`)
 )
     ENGINE = InnoDB
@@ -91,6 +92,7 @@ CREATE TABLE events
     created  int          NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `idx_events_userId`  (`userId`),
+    INDEX `idx_events_created`  (`created`),
     INDEX `idx_events_labelId` (`userId`, `labelId`)
 )
     ENGINE = InnoDB
@@ -235,6 +237,8 @@ CREATE TABLE datasetRows
     rowJson           longtext NOT NULL,
     INDEX `idx_datasetRows_userId`               (`userId`),
     INDEX `idx_datasetRows_datasetId`            (`userId`, `datasetId`),
+    INDEX `idx_datasetRows_created`              (`created`),
+    INDEX `idx_datasetRows_timestamp`            (`timestamp`),
     UNIQUE INDEX `uidx_datasetRows_id_datasetId` (`id`, `userId`, `datasetId`)
 )
     ENGINE = InnoDB

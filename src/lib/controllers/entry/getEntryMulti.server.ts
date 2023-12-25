@@ -195,7 +195,6 @@ export async function onDay(auth: Auth, day: Day): Promise<Result<Entry[]>> {
             AND DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%Y-%m-%d') = ${day.fmtIso()}
         ORDER BY created DESC, id
     `;
-    // TODO: use index on 'created' with large buffer around day's timestamp to reduce DB reads
 
     return await entriesFromRaw(auth, rawEntries);
 }

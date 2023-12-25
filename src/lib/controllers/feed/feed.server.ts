@@ -86,14 +86,24 @@ namespace FeedServer {
     export async function getDay(auth: Auth, day: Day): Promise<Result<FeedDay>> {
         const labels = await Label.allIndexedById(auth);
         if (!labels.ok) return labels.cast();
+
+        const [items, happiness, nextDayInPast, nextDayInFuture] = await Promise.all([
+            Result.collectAsync(PROVIDERS.map(p => p.feedItemsOnDay(auth, day))).then(r =>
+                r
+                    .map(items => items.flat())
+                    .map(Feed.orderedFeedItems)
+                    .unwrap(e => error(400, e))
+            ),
+            happinessForDay(auth, day),
+            getNextDayInPast(auth, day).then(d => d?.fmtIso() ?? null),
+            getNextDayInFuture(auth, day).then(d => d?.fmtIso() ?? null)
+        ]);
+
         return Result.ok({
-            items: (await Result.collectAsync(PROVIDERS.map(p => p.feedItemsOnDay(auth, day))))
-                .map(items => items.flat())
-                .map(Feed.orderedFeedItems)
-                .unwrap(e => error(400, e)),
-            happiness: await happinessForDay(auth, day),
-            nextDayInPast: (await getNextDayInPast(auth, day))?.fmtIso() ?? null,
-            nextDayInFuture: (await getNextDayInFuture(auth, day))?.fmtIso() ?? null,
+            items,
+            happiness,
+            nextDayInPast,
+            nextDayInFuture,
             day: day.fmtIso()
         } satisfies FeedDay);
     }
