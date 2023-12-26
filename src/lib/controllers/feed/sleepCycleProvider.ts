@@ -62,7 +62,6 @@ export const sleepCycleProvider = {
                   AND datasetRows.userId = ${auth.id}
                   AND datasets.presetId = 'sleepCycle'
                   AND datasetRows.timestamp > ${minTimestamp}
-                  AND datasetRows.timestamp < ${maxTimestamp}
                   AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(datasetRows.timestamp + datasetRows.timestampTzOffset * 60 * 60), '%Y-%m-%d'), DATE)
                     > CONVERT(${day.fmtIso()}, DATE)
                 ORDER BY datasetRows.timestamp + datasetRows.timestampTzOffset * 60 * 60 ASC, datasetRows.id
@@ -75,7 +74,6 @@ export const sleepCycleProvider = {
                   AND datasets.userId = ${auth.id}
                   AND datasetRows.userId = ${auth.id}
                   AND datasets.presetId = 'sleepCycle'
-                  AND datasetRows.timestamp > ${minTimestamp}
                   AND datasetRows.timestamp < ${maxTimestamp}
                   AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(datasetRows.timestamp + datasetRows.timestampTzOffset * 60 * 60), '%Y-%m-%d'), DATE)
                     < CONVERT(${day.fmtIso()}, DATE)

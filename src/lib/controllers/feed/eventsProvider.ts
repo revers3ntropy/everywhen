@@ -54,7 +54,6 @@ export const eventStartsProvider = {
                 FROM events
                 WHERE userId = ${auth.id}
                     AND start > ${minTimestamp}
-                    AND start < ${maxTimestamp}
                     AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(start + tzOffset * 60 * 60), '%Y-%m-%d'), DATE)
                         > CONVERT(${day.fmtIso()}, DATE)
                 ORDER BY start + tzOffset * 60 * 60 ASC, id
@@ -64,6 +63,7 @@ export const eventStartsProvider = {
                 SELECT start, tzOffset
                 FROM events
                 WHERE userId = ${auth.id}
+                  AND start < ${maxTimestamp}
                   AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(start + tzOffset * 60 * 60), '%Y-%m-%d'), DATE)
                         < CONVERT(${day.fmtIso()}, DATE)
                 ORDER BY start + tzOffset * 60 * 60 DESC, id
@@ -125,7 +125,6 @@ export const eventEndsProvider = {
                 FROM events
                 WHERE userId = ${auth.id}
                     AND end > ${minTimestamp}
-                    AND end < ${maxTimestamp}
                     AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(end + tzOffset * 60 * 60), '%Y-%m-%d'), DATE)
                         > CONVERT(${day.fmtIso()}, DATE)
                 ORDER BY end + tzOffset * 60 * 60 ASC, id
@@ -136,7 +135,6 @@ export const eventEndsProvider = {
                 FROM events
                 WHERE userId = ${auth.id}
                     AND end < ${maxTimestamp}
-                    AND end > ${minTimestamp}
                     AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(end + tzOffset * 60 * 60), '%Y-%m-%d'), DATE)
                         < CONVERT(${day.fmtIso()}, DATE)
                 ORDER BY end + tzOffset * 60 * 60 DESC, id

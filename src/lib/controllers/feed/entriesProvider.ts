@@ -20,32 +20,29 @@ export const entriesProvider = {
         const minTimestamp = day.utcTimestamp(24);
         const maxTimestamp = day.utcTimestamp(-24);
         const entries = inFuture
-            ? await query<{ created: number; createdTzOffset: number }[]>`
-                SELECT created, createdTzOffset
+            ? await query<{ day: string }[]>`
+                SELECT DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%Y-%m-%d') as day
                 FROM entries
                 WHERE deleted IS NULL
                     AND userId = ${auth.id}
                     AND created > ${minTimestamp}
-                    AND created < ${maxTimestamp}
                     AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%Y-%m-%d'), DATE)
                         > CONVERT(${day.fmtIso()}, DATE)
-                ORDER BY created + createdTzOffset * 60 * 60 ASC, id
+                ORDER BY created + createdTzOffset * 60 * 60 ASC
                 LIMIT 1
             `
-            : await query<{ created: number; createdTzOffset: number }[]>`
-                SELECT created, createdTzOffset
+            : await query<{ day: string }[]>`
+                SELECT DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%Y-%m-%d') as day
                 FROM entries
                 WHERE deleted IS NULL
                     AND userId = ${auth.id}
-                    AND created > ${minTimestamp}
                     AND created < ${maxTimestamp}
                     AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%Y-%m-%d'), DATE)
                         < CONVERT(${day.fmtIso()}, DATE)
-                ORDER BY created + createdTzOffset * 60 * 60 DESC, id
+                ORDER BY created + createdTzOffset * 60 * 60 DESC
                 LIMIT 1
             `;
-        if (!entries.length) return Result.ok(null);
-        const { created, createdTzOffset } = entries[0];
-        return Result.ok(Day.fromTimestamp(created, createdTzOffset));
+        if (entries.length !== 1) return Result.ok(null);
+        return Result.ok(Day.fromString(entries[0].day).unwrap());
     }
 } satisfies FeedProvider;
