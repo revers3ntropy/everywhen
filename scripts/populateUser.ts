@@ -6,11 +6,12 @@ import { sha256 } from 'js-sha256';
 import mysql from 'mysql2/promise';
 import type { TimestampSecs } from '../src/types';
 
-export const { verbose, username, password } = commandLineArgs([
-    { name: 'verbose', type: Boolean, alias: 'v', defaultValue: true },
+export const { quiet, username, password } = commandLineArgs([
+    { name: 'quiet', type: Boolean, alias: 'q', defaultValue: false },
     { name: 'username', type: String, alias: 'u', defaultValue: 'test' },
     { name: 'password', type: String, alias: 'p', defaultValue: 'password' }
-]) as { verbose: boolean; username: string; password: string };
+]) as { quiet: boolean; username: string; password: string };
+const verbose = !quiet;
 
 const envFile = fs.readFileSync(`./.env`, 'utf8');
 const env = dotenv.parse<{
@@ -68,6 +69,7 @@ async function entry(
     id: string,
     userId: string,
     created: number,
+    wordCount: number,
     body: string,
     title = '',
     deleted = false
@@ -86,7 +88,7 @@ async function entry(
         deleted ? nowUtc() : null,
         null,
         encrypt(''),
-        2
+        wordCount
     );
 }
 
@@ -100,18 +102,29 @@ async function main() {
 
     await query('DELETE FROM entries WHERE userId = ?', userId);
 
+    const years = 40;
+    const entriesPerDay = 24;
+
     let i = 0;
     for (
         let created = nowUtc();
-        created > nowUtc() - 60 * 60 * 24 * 365 * 20;
-        created -= 60 * 60 * 1
+        created > nowUtc() - 60 * 60 * 24 * 365 * years;
+        created -= 60 * 60 * (24 / entriesPerDay)
     ) {
-        await entry(`my-entry-${i}`, userId, created, `Entry ${i}`);
+        await entry(`my-entry-${i}`, userId, created, 2, `Entry ${i}`);
+        i++;
+    }
+    for (
+        let created = nowUtc() - 60 * 60 * 24 * 365 * years;
+        created > nowUtc() - 60 * 60 * 24 * 365 * years * 2;
+        created -= 60 * 60 * 24
+    ) {
+        await entry(`my-entry-${i}`, userId, created, 3, `Sparse Entry ${i}`);
         i++;
     }
     log(`created ${i} entries`);
 
-    log('done');
+    console.log('done');
 }
 
 void main();

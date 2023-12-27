@@ -32,7 +32,6 @@
     import type { Degrees, Meters, OlCallbackObject } from '../../../types';
     import EditLocation from '../location/EditLocation.svelte';
     import EntryDialog from '$lib/components/dialogs/EntryDialog.svelte';
-    import EntryTooltipOnMap from './EntryTooltipOnMap.svelte';
     import {
         type EntryFeature,
         lastEntry,
@@ -243,7 +242,6 @@
             const features = sortFeatures(map.getFeaturesAtPixel(event.pixel));
 
             if (!features.length) {
-                hoveringEntryId = null;
                 hoveringSomething = false;
                 return;
             }
@@ -251,7 +249,6 @@
             const hovering = features[0];
 
             if (!entriesInteractable && 'entry' in hovering) {
-                hoveringEntryId = null;
                 hoveringSomething = false;
                 return;
             }
@@ -259,16 +256,10 @@
             hoveringSomething = true;
 
             if (!('entry' in hovering)) {
-                hoveringEntryId = null;
                 return;
             }
 
-            // Don't show popup, needs improvement
-
-            //const mapWidth = map.getSize()?.[0] || window.innerWidth;
-            // never hides the hovered entry
-            //popupOnRight = event.pixel[0] < mapWidth / 2;
-            //hoveringEntryId = hovering.entry.id;
+            // could show entry popup here...
         });
 
         // save the map view
@@ -299,8 +290,6 @@
 
     let mapId = getId();
     let tooltip: HTMLElement;
-    let hoveringEntryId: string | null = null;
-    let popupOnRight = false;
     let hoveringSomething = false;
     let mapZoom = writable<number | undefined>(undefined);
     let mapCenter = writable<number[] | undefined>(undefined);
@@ -330,13 +319,7 @@
     style="--width: {width}; --height: {height}; --mobile-width: {mobileWidth}; --mobile-height: {mobileHeight};"
     id="ol-map-{mapId}"
     use:map={{ locations, entries }}
->
-    {#if hoveringEntryId !== null}
-        <div bind:this={tooltip} class="ol-popup" class:right={popupOnRight}>
-            <EntryTooltipOnMap id={hoveringEntryId} />
-        </div>
-    {/if}
-</div>
+/>
 
 <style lang="scss">
     @import '$lib/styles/layout';

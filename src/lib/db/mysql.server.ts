@@ -1,4 +1,4 @@
-import mysql from 'mysql2/promise';
+import mysql, { type FieldPacket } from 'mysql2/promise';
 import chalk from 'chalk';
 import '../require';
 import { DB, DB_HOST, DB_PASS, DB_PORT, DB_USER } from '$env/static/private';
@@ -120,14 +120,14 @@ export const query = (async <Res extends QueryResult = never>(
 
     const [query, queryParams] = buildQuery(queryParts, params);
 
-    const result = ((await dbConnection?.query(query, queryParams).catch((error: unknown) => {
+    const [result, _] = ((await dbConnection?.query(query, queryParams).catch((error: unknown) => {
         const end = performance.now();
         void (async () => {
             await logQuery(query, queryParams, null, end - start);
             await logger.error(`Error querying mysql db '${DB}'`, { error });
         })();
         throw error;
-    })) || [])[0] as Res;
+    })) || [[], []]) as [Res, FieldPacket[]];
 
     const end = performance.now();
 
