@@ -32,7 +32,8 @@ CREATE TABLE entries
     PRIMARY KEY (`id`),
     INDEX `idx_entries_userId`  (`userId`),
     INDEX `idx_entries_created` (`created`),
-    INDEX `idx_entries_labelId` (`userId`, `labelId`)
+    INDEX `idx_entries_labelId` (`userId`, `labelId`),
+    INDEX `idx_entries_userId_created_deleted` (`userId`, `created`, `deleted`)
 )
     ENGINE = InnoDB
     DEFAULT CHARSET = utf8mb4

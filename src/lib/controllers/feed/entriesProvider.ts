@@ -23,6 +23,7 @@ export const entriesProvider = {
             ? await query<{ estimateTimestamp: number }[]>`
                 SELECT MIN(created) as estimateTimestamp
                 FROM entries
+                USE INDEX (idx_entries_userId_created_deleted)
                 WHERE deleted IS NULL
                     AND userId = ${auth.id}
                     AND created > ${estimateMinTimestamp}
@@ -30,6 +31,7 @@ export const entriesProvider = {
             : await query<{ estimateTimestamp: number }[]>`
                 SELECT MAX(created) as estimateTimestamp
                 FROM entries
+                USE INDEX (idx_entries_userId_created_deleted)
                 WHERE deleted IS NULL
                     AND userId = ${auth.id}
                     AND created < ${estimateMaxTimestamp}

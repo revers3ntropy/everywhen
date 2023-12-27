@@ -64,3 +64,8 @@ export function decrypt(ciphertext: string, key: string | null): Result<string> 
         return Result.err('Failed to decrypt data');
     }
 }
+
+if (typeof window === 'object') {
+    (window as unknown as Record<string, unknown>)['__encrypt'] = encrypt;
+    (window as unknown as Record<string, unknown>)['__decrypt'] = decrypt;
+}

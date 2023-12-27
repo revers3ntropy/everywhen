@@ -4,6 +4,7 @@ import * as dotenv from 'dotenv';
 import fs from 'fs';
 import { sha256 } from 'js-sha256';
 import mysql from 'mysql2/promise';
+import { LIMITS } from '../src/lib/constants';
 import type { TimestampSecs } from '../src/types';
 
 export const { quiet, username, password } = commandLineArgs([
@@ -108,7 +109,7 @@ async function main() {
     let i = 0;
     for (
         let created = nowUtc();
-        created > nowUtc() - 60 * 60 * 24 * 365 * years;
+        created > nowUtc() - 60 * 60 * 24 * 365 * years && i < LIMITS.entry.maxCount;
         created -= 60 * 60 * (24 / entriesPerDay)
     ) {
         await entry(`my-entry-${i}`, userId, created, 2, `Entry ${i}`);
@@ -116,7 +117,7 @@ async function main() {
     }
     for (
         let created = nowUtc() - 60 * 60 * 24 * 365 * years;
-        created > nowUtc() - 60 * 60 * 24 * 365 * years * 2;
+        created > nowUtc() - 60 * 60 * 24 * 365 * years * 2 && i < LIMITS.entry.maxCount;
         created -= 60 * 60 * 24
     ) {
         await entry(`my-entry-${i}`, userId, created, 3, `Sparse Entry ${i}`);

@@ -16,8 +16,9 @@
         const averageFrameTime =
             frameDurations.reduce((a: number, b: number) => a + b, 0) / rollingAvCount;
 
-        if (averageFrameTime < frameTimeThreshold) {
-            const fpsFmt = `${(1000 / averageFrameTime).toFixed(1)}fps`;
+        const fps = 1000 / averageFrameTime;
+        if (fps < frameTimeThreshold) {
+            const fpsFmt = `${fps.toFixed(1)}fps`;
             state.text(fpsFmt, 10, 70, {
                 color: state.colors.lightAccent
             });

@@ -1,6 +1,5 @@
 // src: https://awik.io/determine-color-bright-dark-using-javascript/
 import type { CanvasState } from '$lib/components/canvas/canvasState';
-import type { EntrySummary } from '$lib/controllers/entry/entry';
 import { Event } from '$lib/controllers/event/event';
 import { nowUtc } from '$lib/utils/time';
 
@@ -55,10 +54,16 @@ export function addYToEvents(rawEvents: Event[]): [EventWithYLevel[], EventWithY
 
 export function getInitialZoomAndPos(
     state: CanvasState,
-    entries: EntrySummary[],
+    entries: { created: number }[],
     events: Event[]
 ): [number, number] {
-    const earliestTimestamp = Math.min(...entries.map(e => e.created), ...events.map(e => e.start));
+    let earliestTimestamp = Infinity;
+    for (const entry of entries) {
+        earliestTimestamp = Math.min(earliestTimestamp, entry.created);
+    }
+    for (const event of events) {
+        earliestTimestamp = Math.min(earliestTimestamp, event.start);
+    }
     const earliestTimestampTimeAgo = nowUtc(false) - earliestTimestamp;
     const daysAgo = Math.round(
         Math.min(52, Math.max(earliestTimestampTimeAgo / (60 * 60 * 24), 0))

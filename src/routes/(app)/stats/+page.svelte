@@ -100,7 +100,7 @@
             </div>
         {/if}
 
-        <section class="bg-vLightAccent rounded-lg my-4 p-4 pb-12">
+        <section class="container my-4 p-4 pb-12">
             <h3 class="pb-8"> Common Words </h3>
             <CommonWordsList entryCount={data.entryCount} words={data.commonWords} />
         </section>

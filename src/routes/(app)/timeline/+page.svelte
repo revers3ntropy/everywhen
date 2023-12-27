@@ -7,7 +7,7 @@
     import { canvasState } from '$lib/components/canvas/canvasState';
     import CenterLine from './CenterLine.svelte';
     import Controls from './Controls.svelte';
-    import EntryInTimeline from './EntryInTimeline.svelte';
+    import EntriesInTimeline from './EntriesInTimeline.svelte';
     import EventInTimeline from './EventInTimeline.svelte';
     import Filters from './Filters.svelte';
     import MobileZoom from './MobileZoom.svelte';
@@ -107,11 +107,7 @@
 
         <NowLine />
 
-        {#each entries as entry, i}
-            {#if selectedLabels.includes(entry.label?.id || '')}
-                <EntryInTimeline {entry} entryTextParityHeight={i % 2 === 0} />
-            {/if}
-        {/each}
+        <EntriesInTimeline {entries} selectedLabelIds={selectedLabels} {labels} />
 
         {#key instantEvents}
             {#key durationEvents}

@@ -1,15 +1,25 @@
-import { LIMITS } from '$lib/constants';
+import { query } from '$lib/db/mysql.server';
 import { error } from '@sveltejs/kit';
-import { Entry } from '$lib/controllers/entry/entry.server';
 import { Event } from '$lib/controllers/event/event.server';
 import { Label } from '$lib/controllers/label/label.server';
 import { cachedPageRoute } from '$lib/utils/cache.server';
 
 export const load = cachedPageRoute(async auth => {
     return {
-        entries: (await Entry.getPageOfSummaries(auth, LIMITS.entry.maxCount + 1, 0)).unwrap(e =>
-            error(400, e)
-        ).summaries,
+        entries: await query<
+            {
+                id: string;
+                created: number;
+                createdTzOffset: number;
+                title: string;
+                labelId: string;
+                wordCount: number;
+            }[]
+        >`
+            SELECT id, created, createdTzOffset, title, labelId, wordCount
+            FROM entries
+            WHERE userId = ${auth.id}
+        `,
         events: (await Event.all(auth)).unwrap(e => error(400, e)),
         labels: (await Label.all(auth)).unwrap(e => error(400, e))
     };
