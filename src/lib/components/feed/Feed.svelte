@@ -25,17 +25,21 @@
         const day = notify.onErr(await api.get(apiPath('/feed/?', loadingDay)));
         if (atTop) {
             if (
-                !day.nextDayInFuture &&
+                (!day.nextDayInFuture ||
+                    Day.fromString(day.nextDayInFuture).unwrap().isInFuture()) &&
                 nextDay &&
-                Day.fromString(nextDay).unwrap().lt(Day.today(currentTzOffset()))
+                Day.fromString(nextDay).unwrap().isInPast()
             ) {
                 // edge case: if we're loading from the top, always load today
                 nextDay = Day.today(currentTzOffset()).fmtIso();
+            } else if (
+                day.nextDayInFuture &&
+                Day.fromString(day.nextDayInFuture).unwrap().isInFuture()
+            ) {
+                // don't load days in the future from today
+                nextDay = null;
             } else {
                 nextDay = day.nextDayInFuture;
-                if (nextDay && Day.fromString(nextDay).unwrap().gt(Day.today(currentTzOffset()))) {
-                    nextDay = null;
-                }
             }
 
             if (loadingDay !== fromDay.fmtIso()) {

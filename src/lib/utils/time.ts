@@ -207,4 +207,16 @@ export class Day {
         date.setDate(date.getDate() + days);
         return Day.fromTimestamp(date.getTime() / 1000, currentTzOffset());
     }
+
+    public isInFuture(tzOffset: Hours = currentTzOffset()): boolean {
+        return this.gt(Day.today(tzOffset));
+    }
+
+    public isInPast(tzOffset: Hours = currentTzOffset()): boolean {
+        return this.lt(Day.today(tzOffset));
+    }
+
+    public isToday(tzOffset: Hours = currentTzOffset()): boolean {
+        return this.eq(Day.today(tzOffset));
+    }
 }
