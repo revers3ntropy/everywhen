@@ -54,9 +54,9 @@
 
     let selectedBucket = initialBucket(days);
 
-    let mainGraphData: ChartData;
-    let smallGraph1Data: ChartData;
-    let smallGraph2Data: ChartData;
+    let mainGraphData: ChartData | null;
+    let smallGraph1Data: ChartData | null;
+    let smallGraph2Data: ChartData | null;
 
     // no data fetching so top level
     $: if (browser) {
@@ -98,9 +98,11 @@
 </script>
 
 {#if shouldShowMainGraph}
-    <div style="height: 350px">
-        <Line data={mainGraphData} options={options()} />
-    </div>
+    {#if mainGraphData !== null}
+        <div style="height: 350px">
+            <Line data={mainGraphData} options={options()} />
+        </div>
+    {/if}
     <div>
         <span class="text-light" style="margin: 0.3rem"> Group by </span>
         <Select
@@ -115,13 +117,21 @@
     <div>
         <h3> Time of Day </h3>
         <div style="height: 250px; width: calc(100% - 1rem)">
-            <Line data={smallGraph1Data} options={options()} />
+            {#if smallGraph1Data !== null}
+                <Line data={smallGraph1Data} options={options()} />
+            {:else}
+                <p class="italic text-textColorLight"> No data </p>
+            {/if}
         </div>
     </div>
     <div>
         <h3> Device </h3>
         <div style="height: 250px; width: calc(100% - 1rem)">
-            <Bar data={smallGraph2Data} options={options()} />
+            {#if smallGraph2Data !== null}
+                <Bar data={smallGraph2Data} options={options()} />
+            {:else}
+                <p class="italic text-textColorLight"> No data </p>
+            {/if}
         </div>
     </div>
 </div>

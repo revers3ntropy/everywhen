@@ -195,8 +195,12 @@ export function getGraphData(
         borderWidth?: number;
         borderRadius?: number;
     } = {}
-): ChartData {
+): ChartData | null {
+    const titleLabel = by === By.Entries ? 'Entries' : 'Words';
     const sortedEntries = [...entries].sort((a, b) => a.created - b.created);
+    if (sortedEntries.length < 1) {
+        return null;
+    }
     const start = sortedEntries[0].created;
 
     const bucketsMap = generateDataset[selectedBucket](sortedEntries, by);
@@ -210,7 +214,7 @@ export function getGraphData(
                 borderWidth: 1,
                 borderRadius: 0,
                 data: Object.values(bucketsMap),
-                label: by === By.Entries ? 'Entries' : 'Words',
+                label: titleLabel,
                 cubicInterpolationMode: 'monotone',
                 tension: 0.4,
                 pointRadius: 1,
