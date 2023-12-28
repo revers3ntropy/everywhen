@@ -55,6 +55,14 @@ async function logQuery(query: string, params: unknown[], result: unknown, time:
             `\n     ${paramsFmt}` +
             `\n     (${fmtTimePrecise(time)}) => ${resultStr}`
     );
+
+    if (time > 50) {
+        await logger.warn(`Slow query: ${time}ms`, {
+            query: collapseWhitespace(query),
+            params: paramsFmt,
+            result: resultStr
+        });
+    }
 }
 
 function buildQuery(queryParts: TemplateStringsArray, params: QueryParam[]): [string, unknown[]] {

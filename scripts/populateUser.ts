@@ -104,23 +104,23 @@ async function main() {
     await query('DELETE FROM entries WHERE userId = ?', userId);
 
     const years = 40;
-    const entriesPerDay = 24;
+    const entriesPerDay = 12;
 
     let i = 0;
     for (
         let created = nowUtc();
         created > nowUtc() - 60 * 60 * 24 * 365 * years && i < LIMITS.entry.maxCount;
-        created -= 60 * 60 * (24 / entriesPerDay)
+        created -= 60 * 60 * 24 * 3
     ) {
-        await entry(`my-entry-${i}`, userId, created, 2, `Entry ${i}`);
+        await entry(`my-entry-${i}`, userId, created, 3, `Sparse Entry ${i}`);
         i++;
     }
     for (
         let created = nowUtc() - 60 * 60 * 24 * 365 * years;
         created > nowUtc() - 60 * 60 * 24 * 365 * years * 2 && i < LIMITS.entry.maxCount;
-        created -= 60 * 60 * 24
+        created -= 60 * 60 * (24 / entriesPerDay)
     ) {
-        await entry(`my-entry-${i}`, userId, created, 3, `Sparse Entry ${i}`);
+        await entry(`my-entry-${i}`, userId, created, 2, `Entry ${i}`);
         i++;
     }
     log(`created ${i} entries`);

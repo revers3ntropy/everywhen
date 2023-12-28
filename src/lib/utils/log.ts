@@ -17,7 +17,7 @@ export class Logger {
         this.nameLength = groupName.length;
     }
 
-    protected fmt(useUTC: boolean, logLvl: LogLevel, ...args: unknown[]): string {
+    protected fmt(useUTC: boolean, logLvl: LogLevel | string, ...args: unknown[]): string {
         const time = chalk.dim(new Date()[useUTC ? 'toUTCString' : 'toLocaleTimeString']());
         return (
             `${time} [${this.coloredName}:${logLvl}] ` +
@@ -43,11 +43,11 @@ export class Logger {
     }
 
     public warn(msg: string, context?: Record<string, unknown>): void {
-        this.logger.warn(this.fmt(false, LogLevel.WARN, msg), context || '');
+        this.logger.warn(this.fmt(false, chalk.yellow(LogLevel.WARN), msg), context || '');
     }
 
     public error(msg: string, context?: Record<string, unknown>): void {
-        this.logger.error(this.fmt(false, LogLevel.ERROR, msg), context || '');
+        this.logger.error(this.fmt(false, chalk.red(LogLevel.ERROR), msg), context || '');
     }
 }
 

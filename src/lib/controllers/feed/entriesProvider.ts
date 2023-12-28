@@ -17,29 +17,8 @@ export const entriesProvider = {
         day: Day,
         inFuture: boolean
     ): Promise<Result<Day | null>> {
-        const estimateMinTimestamp = day.utcTimestamp(24);
-        const estimateMaxTimestamp = day.utcTimestamp(-24);
-        const estimate = inFuture
-            ? await query<{ estimateTimestamp: number }[]>`
-                SELECT MIN(created) as estimateTimestamp
-                FROM entries
-                USE INDEX (idx_entries_userId_created_deleted)
-                WHERE deleted IS NULL
-                    AND userId = ${auth.id}
-                    AND created > ${estimateMinTimestamp}
-            `
-            : await query<{ estimateTimestamp: number }[]>`
-                SELECT MAX(created) as estimateTimestamp
-                FROM entries
-                USE INDEX (idx_entries_userId_created_deleted)
-                WHERE deleted IS NULL
-                    AND userId = ${auth.id}
-                    AND created < ${estimateMaxTimestamp}
-            `;
-        if (estimate.length !== 1) return Result.ok(null);
-
-        const minTimestamp = estimate[0].estimateTimestamp - 60 * 60 * 24 * 2;
-        const maxTimestamp = estimate[0].estimateTimestamp + 60 * 60 * 24 * 2;
+        const minTimestamp = day.utcTimestamp(24);
+        const maxTimestamp = day.utcTimestamp(-24);
         const entries = inFuture
             ? await query<{ day: string }[]>`
                 SELECT DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%Y-%m-%d') as day
@@ -47,7 +26,6 @@ export const entriesProvider = {
                 WHERE deleted IS NULL
                     AND userId = ${auth.id}
                     AND created > ${minTimestamp}
-                    AND created < ${maxTimestamp}
                     AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%Y-%m-%d'), DATE)
                         > CONVERT(${day.fmtIso()}, DATE)
                 ORDER BY created + createdTzOffset * 60 * 60 ASC
@@ -58,7 +36,6 @@ export const entriesProvider = {
                 FROM entries
                 WHERE deleted IS NULL
                     AND userId = ${auth.id}
-                    AND created > ${minTimestamp}
                     AND created < ${maxTimestamp}
                     AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%Y-%m-%d'), DATE)
                         < CONVERT(${day.fmtIso()}, DATE)

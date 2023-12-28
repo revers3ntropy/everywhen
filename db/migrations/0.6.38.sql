@@ -1,1 +1,0 @@
-ALTER TABLE entries ADD INDEX `idx_entries_userId_created_deleted` (`userId`, `created`, `deleted`);

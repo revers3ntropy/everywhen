@@ -1,5 +1,6 @@
 <script lang="ts">
     import FpsCounter from '$lib/components/canvas/FpsCounter.svelte';
+    import type { Label } from '$lib/controllers/label/label';
     import { listen } from '$lib/dataChangeEvents';
     import { onMount } from 'svelte';
     import Background from '$lib/components/canvas/Background.svelte';
@@ -22,6 +23,7 @@
     export let data: PageData;
 
     let { labels, events, entries } = data;
+    const labelsById = Object.fromEntries(labels.map<[string, Label]>(l => [l.id, l]));
 
     let selectedLabels = [...(labels.map(l => l.id) || []), ''];
 
@@ -51,12 +53,15 @@
     });
     listen.label.onCreate(label => {
         labels = [...(labels || []), label];
+        labelsById[label.id] = label;
     });
     listen.label.onUpdate(label => {
         labels = labels.map(l => (l.id === label.id ? label : l));
+        labelsById[label.id] = label;
     });
     listen.label.onDelete(id => {
         labels = labels.filter(l => l.id !== id);
+        delete labelsById[id];
     });
 </script>
 
@@ -107,7 +112,7 @@
 
         <NowLine />
 
-        <EntriesInTimeline {entries} selectedLabelIds={selectedLabels} {labels} />
+        <EntriesInTimeline {entries} selectedLabelIds={selectedLabels} labels={labelsById} />
 
         {#key instantEvents}
             {#key durationEvents}
