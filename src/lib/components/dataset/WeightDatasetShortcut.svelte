@@ -51,7 +51,7 @@
 
 {#if dataset}
     <div class="p-2 md:p-0 md:pb-4">
-        <div class="container">
+        <div class="container w-fit p-4">
             <div>
                 <a href="/datasets/{dataset.id}">Weight</a>
             </div>
@@ -91,11 +91,6 @@
 {/if}
 
 <style lang="scss">
-    .container {
-        width: fit-content;
-        padding: 1rem;
-    }
-
     input {
         width: 4rem;
     }
