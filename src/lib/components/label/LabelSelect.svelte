@@ -1,5 +1,6 @@
 <script lang="ts">
     import LabelDot from '$lib/components/label/LabelDot.svelte';
+    import { notify } from '$lib/components/notifications/notifications';
     import { listen } from '$lib/dataChangeEvents';
     import { createEventDispatcher } from 'svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
@@ -7,13 +8,12 @@
     import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
     import Dropdown from '$lib/components/Dropdown.svelte';
     import type { Label } from '$lib/controllers/label/label';
-    import { clientLogger } from '$lib/utils/log';
     import { showPopup } from '$lib/utils/popups';
     import NewLabelDialog from '$lib/components/dialogs/NewLabelDialog.svelte';
     import MenuDown from 'svelte-material-icons/MenuDown.svelte';
 
     export let fromRight = false;
-    export let labels = null as Label[] | null;
+    export let labels: Record<string, Label>;
     export let value = '';
     export let showAddButton = true;
     export let filter: (l: Label, i: number, arr: Label[]) => boolean = () => true;
@@ -27,49 +27,34 @@
 
     let closeDropDown: () => void;
 
-    $: if (labels && value && !labels.find(l => l.id === value)) {
-        clientLogger.error(`Label ${value} not found`);
+    $: dispatchEvent('change', { id: value });
+    $: if (labels && value && !labels[value]) {
+        notify.error(`Label not found`);
         value = '';
     }
-
-    $: dispatchEvent('change', { id: value });
-    $: selectedLabel = (labels ?? []).find(l => l.id === value);
-    $: labels = labels?.sort((a, b) => a.name.localeCompare(b.name)) || null;
-
     listen.label.onCreate(label => {
-        labels = [...(labels || []), label];
+        labels[label.id] = label;
         value = label.id;
     });
     listen.label.onUpdate(label => {
-        if (!labels) {
-            clientLogger.error('Labels not loaded but being updated');
-            return;
-        }
-
-        labels = labels.map(l => (l.id === label.id ? label : l));
+        labels[label.id] = label;
     });
     listen.label.onDelete(id => {
-        if (!labels) {
-            clientLogger.error('Labels not loaded but being deleted');
-            return;
-        }
-
         if (value === id) value = '';
-
-        labels = labels.filter(l => l.id !== id);
+        delete labels[id];
     });
 </script>
 
 <span class="select-label" class:condensed>
     <Dropdown bind:close={closeDropDown} ariaLabel={() => 'Set label'} {fromRight}>
         <span slot="button" class="select-button">
-            {#if labels}
-                {#if selectedLabel}
-                    <LabelDot big color={(labels ?? []).find(l => l.id === value)?.color || null} />
+            {#key value}
+                {#if value && labels[value]}
+                    <LabelDot big color={labels[value]?.color || null} />
 
                     {#if !condensed}
                         <span class="label-name">
-                            {selectedLabel.name}
+                            {labels[value].name}
                         </span>
                     {/if}
                 {:else}
@@ -81,12 +66,7 @@
                 {#if !condensed}
                     <MenuDown size="20" />
                 {/if}
-            {:else}
-                <span />
-                <i class="text-light">
-                    {#if !condensed}Loading{/if}...
-                </i>
-            {/if}
+            {/key}
         </span>
         <div class="list-container">
             <button
@@ -101,7 +81,9 @@
                 </span>
                 <span class="label-name"> No Label </span>
             </button>
-            {#each (labels ?? []).filter(filter) as label (label.id)}
+            {#each Object.values(labels)
+                .filter(filter)
+                .sort((a, b) => a.name.localeCompare(b.name)) as label (label.id)}
                 <button
                     on:click={() => {
                         value = label.id;

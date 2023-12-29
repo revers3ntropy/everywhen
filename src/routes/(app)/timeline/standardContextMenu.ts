@@ -11,7 +11,7 @@ import type { Writable } from 'svelte/store';
 import type { TimestampSecs } from '../../../types';
 
 export function makeStandardContextMenu(
-    labels: Label[],
+    labels: Record<string, Label>,
     canvasState: Writable<CanvasState>
 ): ContextMenuOptions {
     let state: CanvasState;

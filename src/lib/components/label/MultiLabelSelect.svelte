@@ -1,6 +1,5 @@
 <script lang="ts">
     import { listen } from '$lib/dataChangeEvents';
-    import { clientLogger } from '$lib/utils/log';
     import { createEventDispatcher } from 'svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import LabelOffOutline from 'svelte-material-icons/LabelOffOutline.svelte';
@@ -8,7 +7,7 @@
     import { showPopup } from '$lib/utils/popups';
     import NewLabelDialog from '$lib/components/dialogs/NewLabelDialog.svelte';
 
-    export let labels = null as Label[] | null;
+    export let labels: Record<string, Label>;
     export let value = [] as string[];
     export let showAddButton = true;
 
@@ -27,28 +26,17 @@
     const dispatchEvent = createEventDispatcher();
 
     $: dispatchEvent('change', { ids: value });
-    $: labels = labels?.sort((a, b) => a.name.localeCompare(b.name)) || null;
 
     listen.label.onCreate(label => {
-        labels = [...(labels || []), label];
+        labels[label.id] = label;
         value = [...value, label.id];
     });
     listen.label.onUpdate(label => {
-        if (!labels) {
-            clientLogger.error('Labels not loaded but being updated');
-            return;
-        }
-
-        labels = labels.map(l => (l.id === label.id ? label : l));
+        labels[label.id] = label;
     });
     listen.label.onDelete(id => {
-        if (!labels) {
-            clientLogger.error('Labels not loaded but being deleted');
-            return;
-        }
-
         value = value.filter(v => v !== id);
-        labels = labels.filter(l => l.id !== id);
+        delete labels[id];
     });
 </script>
 
@@ -71,21 +59,21 @@
             <span class="label-name"> No Label </span>
         </span>
     </button>
-    {#each labels || [] as label (label.id)}
+    {#each Object.keys(labels).sort((a, b) => a.localeCompare(b)) as label (label)}
         <button
-            on:click={() => toggleLabel(label.id)}
+            on:click={() => toggleLabel(label)}
             class="label-button"
-            aria-label="Select label {label.name}"
+            aria-label="Select label {labels[label].name}"
         >
             <span class="flex-center">
                 <span
                     class="entry-color"
-                    class:selected={value.includes(label.id)}
-                    style="--label-color: {label.color}"
+                    class:selected={value.includes(label)}
+                    style="--label-color: {labels[label].color}"
                 />
             </span>
-            <span class="label-name">
-                {label.name}
+            <span class="ellipsis w-full text-left px-2 label-name">
+                {labels[label].name}
             </span>
         </button>
     {/each}
@@ -118,13 +106,6 @@
 
             &:hover {
                 background: var(--v-light-accent);
-            }
-
-            .label-name {
-                @extend .ellipsis;
-                width: 100%;
-                text-align: left;
-                padding: 0 0.5rem;
             }
 
             .entry-color {

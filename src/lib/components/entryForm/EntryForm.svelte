@@ -47,7 +47,7 @@
     export let newEntryTitle = '';
     export let newEntryBody = '';
     export let newEntryLabel = '';
-
+    export let labels: Record<string, Label>;
     export let obfuscated = true;
 
     function resetEntryForm() {
@@ -167,10 +167,8 @@
 
         let label: null | Label = null;
         if (body.labelId) {
-            label = labels?.find(l => l.id === body.labelId) ?? null;
-            if (!label) {
-                clientLogger.error('label not found');
-            }
+            label = labels[body.labelId] ?? null;
+            if (!label) notify.error('label not found');
         }
 
         await dispatch.create('entry', {
@@ -254,10 +252,6 @@
         insertAtCursor(newEntryInputElement, `\n${md}\n`);
     }
 
-    async function loadLabels() {
-        labels = notify.onErr(await api.get('/labels')).labels;
-    }
-
     function resizeTextAreaToFitContent() {
         textAreaSizeTester.value = newEntryBody;
         textAreaSizeTester.style.height = '0px';
@@ -307,14 +301,12 @@
         useBulletEntryForm = mode;
         setTimeout(resizeTextAreaToFitContent, 0);
         await api.put('/settings', {
-            key: 'useBulletEntryForm' as SettingsKey,
+            key: 'useBulletEntryForm' satisfies SettingsKey,
             value: mode
         });
     }
 
     onMount(() => {
-        void loadLabels();
-
         restoreFromLS();
 
         if (!newEntryBody && !newEntryTitle) {
@@ -331,16 +323,15 @@
 
     let textAreaSizeTester: HTMLTextAreaElement;
     let newEntryInputElement: HTMLTextAreaElement;
-    let labels: Label[];
 
     listen.label.onCreate(label => {
-        labels = [...labels, label];
+        labels[label.id] = label;
     });
     listen.label.onUpdate(label => {
-        labels = labels.map(l => (l.id === label.id ? label : l));
+        labels[label.id] = label;
     });
     listen.label.onDelete(id => {
-        labels = labels.filter(l => l.id !== id);
+        delete labels[id];
     });
 
     let submitted = false;

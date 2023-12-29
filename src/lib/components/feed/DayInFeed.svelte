@@ -145,7 +145,7 @@
         >
             {#if showForms && isToday}
                 <div class="bg-vLightAccent">
-                    <EntryForm {obfuscated} />
+                    <EntryForm {obfuscated} {labels} />
                 </div>
             {/if}
             <div class="pb-4 w-full">

@@ -28,7 +28,6 @@
     export let labels: Record<string, Label>;
     export let obfuscated = true;
 
-    export let bordered = true;
     export let event: Event & { deleted?: boolean };
     export let selectNameId = '';
     export let expanded = false;
@@ -210,7 +209,7 @@
                         <LabelSelect
                             on:change={updateLabel}
                             value={event.label?.id || ''}
-                            labels={Object.values(labels)}
+                            {labels}
                             condensed
                         />
                     </div>
@@ -275,7 +274,7 @@
                         <LabelSelect
                             on:change={updateLabel}
                             value={event.label?.id || ''}
-                            labels={Object.values(labels)}
+                            {labels}
                         />
                     </div>
                 </div>
@@ -357,9 +356,6 @@
     }
 
     .event {
-        @extend .container;
-        margin: 8px;
-
         .header {
             display: grid;
             grid-template-columns: auto 1fr auto;

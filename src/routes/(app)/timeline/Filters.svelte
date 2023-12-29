@@ -4,7 +4,7 @@
     import Dropdown from '$lib/components/Dropdown.svelte';
     import MultiLabelSelect from '$lib/components/label/MultiLabelSelect.svelte';
 
-    export let labels = null as null | Label[];
+    export let labels: Record<string, Label>;
     export let selectedLabels = [] as string[];
 </script>
 

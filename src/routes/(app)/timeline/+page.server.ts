@@ -21,6 +21,6 @@ export const load = cachedPageRoute(async auth => {
             WHERE userId = ${auth.id}
         `,
         events: (await Event.all(auth)).unwrap(e => error(400, e)),
-        labels: (await Label.all(auth)).unwrap(e => error(400, e))
+        labels: (await Label.allIndexedById(auth)).unwrap(e => error(400, e))
     };
 });

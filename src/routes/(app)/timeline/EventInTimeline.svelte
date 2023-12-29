@@ -14,7 +14,7 @@
     import type { Pixels, TimestampSecs } from '../../../types';
     import EventDragHandle from './EventDragHandle.svelte';
 
-    export let labels: Label[];
+    export let labels: Record<string, Label>;
 
     export let id: string;
     export let created: number;
@@ -255,16 +255,6 @@
         ]
     });
 
-    listen.label.onCreate(label => {
-        labels = [...labels, label];
-    });
-    listen.label.onUpdate(label => {
-        labels = labels.map(l => (l.id === label.id ? label : l));
-    });
-    listen.label.onDelete(id => {
-        labels = labels.filter(l => l.id !== id);
-    });
-
     listen.event.onUpdate(e => {
         if (e.id !== id) return;
         start = e.start;
@@ -280,15 +270,7 @@
 </script>
 
 {#if !isInstantEvent && !thisIsDeleted}
-    <EventDragHandle
-        {labels}
-        {id}
-        {start}
-        {end}
-        height={HEIGHT}
-        getY={getYForDragHandle}
-        {updateEvent}
-    />
+    <EventDragHandle {id} {start} {end} height={HEIGHT} getY={getYForDragHandle} {updateEvent} />
 {/if}
 
 <slot />

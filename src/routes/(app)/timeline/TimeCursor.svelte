@@ -13,7 +13,7 @@
     import type { Pixels, TimestampSecs } from '../../../types';
     import { makeStandardContextMenu } from './standardContextMenu';
 
-    export let labels: Label[];
+    export let labels: Record<string, Label>;
 
     async function newEvent(start: TimestampSecs, end: TimestampSecs) {
         const { id } = notify.onErr(

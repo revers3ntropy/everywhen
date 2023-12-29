@@ -15,7 +15,7 @@
 
     let entryCount = 0;
     let eventCount = 0;
-    let labels = null as Label[] | null;
+    let labels: Record<string, Label>;
 
     let loaded = false;
     let changeLabelId: string;
@@ -28,9 +28,6 @@
 
         const eventsRes = notify.onErr(await api.get(`/events`, { labelId: id }));
         eventCount = eventsRes.events.filter(e => e.label?.id === id).length;
-
-        const labelsRes = notify.onErr(await api.get('/labels'));
-        labels = labelsRes.labels;
 
         loaded = true;
     }
@@ -76,7 +73,7 @@
 </script>
 
 <div>
-    <h1>Delete Label '{name}'</h1>
+    <h1 class="mb-4">Delete Label '{name}'</h1>
     <p>
         There are {entryCount} entries and {eventCount} events with this label.
     </p>
@@ -86,11 +83,7 @@
     {:else}
         <div class="options">
             <div>
-                {#if labels}
-                    <LabelSelect bind:value={changeLabelId} {filter} {labels} />
-                {:else}
-                    Loading...
-                {/if}
+                <LabelSelect bind:value={changeLabelId} {filter} {labels} />
                 <button on:click={reassign}>
                     Give Different Label to Entries/Events with this Label
                 </button>
@@ -110,10 +103,6 @@
 </div>
 
 <style lang="scss">
-    h1 {
-        margin: 0 0 1rem 0;
-    }
-
     .options {
         display: flex;
         flex-direction: column;

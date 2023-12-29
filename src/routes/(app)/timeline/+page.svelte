@@ -1,6 +1,5 @@
 <script lang="ts">
     import FpsCounter from '$lib/components/canvas/FpsCounter.svelte';
-    import type { Label } from '$lib/controllers/label/label';
     import { listen } from '$lib/dataChangeEvents';
     import { onMount } from 'svelte';
     import Background from '$lib/components/canvas/Background.svelte';
@@ -23,9 +22,8 @@
     export let data: PageData;
 
     let { labels, events, entries } = data;
-    const labelsById = Object.fromEntries(labels.map<[string, Label]>(l => [l.id, l]));
 
-    let selectedLabels = [...(labels.map(l => l.id) || []), ''];
+    let selectedLabels = [...Object.keys(labels), ''];
 
     let instantEvents: EventWithYLevel[];
     let durationEvents: EventWithYLevel[];
@@ -52,16 +50,13 @@
         entries = [...entries.filter(e => e.id !== id)];
     });
     listen.label.onCreate(label => {
-        labels = [...(labels || []), label];
-        labelsById[label.id] = label;
+        labels[label.id] = label;
     });
     listen.label.onUpdate(label => {
-        labels = labels.map(l => (l.id === label.id ? label : l));
-        labelsById[label.id] = label;
+        labels[label.id] = label;
     });
     listen.label.onDelete(id => {
-        labels = labels.filter(l => l.id !== id);
-        delete labelsById[id];
+        delete labels[id];
     });
 </script>
 
@@ -112,7 +107,7 @@
 
         <NowLine />
 
-        <EntriesInTimeline {entries} selectedLabelIds={selectedLabels} labels={labelsById} />
+        <EntriesInTimeline {entries} selectedLabelIds={selectedLabels} {labels} />
 
         {#key instantEvents}
             {#key durationEvents}

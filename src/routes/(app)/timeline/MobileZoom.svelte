@@ -5,7 +5,7 @@
     import type { Label } from '$lib/controllers/label/label';
     import { makeStandardContextMenu } from './standardContextMenu';
 
-    export let labels: Label[];
+    export let labels: Record<string, Label>;
 
     const WIDTH = 50;
     const BAR_WIDTH = 100;

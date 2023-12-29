@@ -10,7 +10,7 @@
     import { currentTzOffset, nowUtc } from '$lib/utils/time';
     import Plus from 'svelte-material-icons/Plus.svelte';
 
-    export let labels: Label[];
+    export let labels: Record<string, Label>;
 
     async function newEvent() {
         const start = nowUtc(true);

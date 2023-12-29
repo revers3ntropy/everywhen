@@ -5,7 +5,6 @@
     import EntryForm from '$lib/components/entryForm/EntryForm.svelte';
 
     export let data: PageData;
-    let { entry } = data;
 </script>
 
 <svelte:head>
@@ -14,9 +13,9 @@
 
 <main class="pt-4 md:p-4 {$navExpanded ? 'md:ml-48' : 'md:ml-16'} flex-center">
     <div class="w-full max-w-3xl">
-        <div class="header">
+        <div class="flex-center justify-between">
             <div>
-                <a href="/journal/{entry.id}">
+                <a href="/journal/{data.entry.id}">
                     <Close size="30" />
                 </a>
             </div>
@@ -25,20 +24,12 @@
         </div>
         <EntryForm
             action="edit"
-            {entry}
-            newEntryBody={entry.body}
-            newEntryLabel={entry?.label?.id || ''}
-            newEntryTitle={entry.title}
+            entry={data.entry}
+            newEntryBody={data.entry.body}
+            newEntryLabel={data.entry?.label?.id || ''}
+            newEntryTitle={data.entry.title}
             obfuscated={$obfuscated}
+            labels={data.labels}
         />
     </div>
 </main>
-
-<style lang="scss">
-    @import '$lib/styles/layout';
-
-    .header {
-        @extend .flex-center;
-        justify-content: space-between;
-    }
-</style>

@@ -43,8 +43,7 @@ export const LS_TO_CLEAR_ON_LOGOUT = Object.freeze([
     LS_KEYS.sortEventsKey,
     LS_KEYS.obfuscated,
     LS_KEYS.lastTipNumber,
-    LS_KEYS.doesNotWantToEnableLocation,
-    LS_KEYS.navbarOpen
+    LS_KEYS.doesNotWantToEnableLocation
 ] as const);
 export const SESSION_TO_CLEAR_ON_LOGOUT = Object.freeze([SESSION_KEYS.GH_CB]);
 export const COOKIES_TO_CLEAR_ON_LOGOUT = Object.freeze([]);
