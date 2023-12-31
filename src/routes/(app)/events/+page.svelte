@@ -78,7 +78,7 @@
 </svelte:head>
 
 <main class={$navExpanded ? 'md:ml-48' : 'md:ml-16'}>
-    <div class="flex justify-between p-2 md:pt-4">
+    <div class="flex justify-between p-2 md:p-4">
         <div>
             <button class="primary with-icon" on:click={newEvent}>
                 <Plus size="30" />
@@ -97,18 +97,23 @@
             {/if}
         </div>
     </div>
-    <ul>
-        {#each events as event}
-            <li>
-                <EventComponent
-                    {event}
-                    {selectNameId}
-                    labels={data.labels}
-                    obfuscated={$obfuscated}
-                />
-            </li>
-        {/each}
-    </ul>
+    <div class="md:p-2">
+        <ul>
+            {#each events as event}
+                <div class="border-t border-borderColor only-mobile"></div>
+                <li class="p-2">
+                    <div class="container">
+                        <EventComponent
+                            {event}
+                            {selectNameId}
+                            labels={data.labels}
+                            obfuscated={$obfuscated}
+                        />
+                    </div>
+                </li>
+            {/each}
+        </ul>
+    </div>
 </main>
 
 <style lang="scss">

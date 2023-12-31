@@ -368,13 +368,6 @@
             }
         }
 
-        @media #{$mobile} {
-            margin: 1rem 0;
-            border-radius: 0;
-            background: none;
-            border-bottom: 1px solid var(--border-color);
-        }
-
         .expanded-content {
             .top-row {
                 display: flex;
