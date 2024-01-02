@@ -2,6 +2,7 @@
     import TimeInFeed from '$lib/components/feed/TimeInFeed.svelte';
     import LabelDot from '$lib/components/label/LabelDot.svelte';
     import { Auth } from '$lib/controllers/auth/auth';
+    import { Event } from '$lib/controllers/event/event';
     import type { FeedItem, FeedItemTypes } from '$lib/controllers/feed/feed';
     import type { Label } from '$lib/controllers/label/label';
     import { encryptionKey } from '$lib/stores';
@@ -19,7 +20,7 @@
 </script>
 
 <!-- if the event starts and then immediately ends, collapse into one item -->
-{#if nextItem?.type === 'event-end' && nextItem?.id === `${item.id}-end` && Day.timestampsAreSameDay(item.start, item.end, item.tzOffset)}
+{#if nextItem?.type === 'event-end' && nextItem?.id === `${item.id}-end` && Day.timestampsAreSameDay(item.start, item.end, item.tzOffset) && !Event.isInstantEvent(item)}
     <div class="text-sm py-2 flex gap-4">
         <TimeInFeed timestamp={item.start} to={item.end} tzOffset={item.tzOffset} />
         <Calendar size="22" />
@@ -35,7 +36,9 @@
         <TimeInFeed timestamp={item.start} tzOffset={item.tzOffset} />
         <CalendarStart size="22" />
         <div>
-            <span class="text-textColorLight">start of</span>
+            {#if !Event.isInstantEvent(item)}
+                <span class="text-textColorLight"> start of </span>
+            {/if}
             {#if label}
                 <span class="pl-1">
                     <LabelDot color={label.color} name={label.name} />
