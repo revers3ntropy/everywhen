@@ -1,10 +1,12 @@
 <script lang="ts">
+    import type { Day } from '$lib/utils/time';
     import moment from 'moment';
     import SvelteHeatmap from 'svelte-heatmap';
     import type { By, HeatMapData } from './helpers';
 
     export let by: By;
     export let data: Record<By, HeatMapData>;
+    export let earliestEntryDay: Day;
 
     $: currentData = data[by];
 
@@ -17,20 +19,18 @@
 </script>
 
 <div class="outer">
-    <div class="inner">
+    <div class="w-[1200px] md:w-full">
         <SvelteHeatmap
             allowOverflow={true}
-            cellGap={2}
-            cellRadius="50%"
+            cellGap={1}
+            cellRadius={2}
             colors={['#95eab0', '#52d8bd', '#3397bd', '#0051cf']}
             data={currentData}
-            dayLabelWidth={20}
-            emptyColor={'var(--light-accent)'}
-            endDate={moment().toDate()}
+            emptyColor={'var(--v-light-accent)'}
             fontColor={'var(--text-color-light)'}
-            fontSize="12"
-            monthGap={20}
-            monthLabelHeight={20}
+            fontSize="9"
+            monthGap={4}
+            monthLabelHeight={10}
             monthLabels={[
                 `Jan ${lastJanYear}`,
                 'Feb',
@@ -46,6 +46,7 @@
                 'Dec'
             ]}
             startDate={moment().subtract(showMonths, 'months').toDate()}
+            endDate={moment().toDate()}
             view={'monthly'}
         />
     </div>
@@ -56,10 +57,6 @@
         .outer {
             overflow-x: auto;
             direction: rtl;
-
-            .inner {
-                width: 1200px;
-            }
         }
     }
 </style>

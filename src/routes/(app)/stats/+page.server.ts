@@ -1,5 +1,5 @@
 import { cachedPageRoute } from '$lib/utils/cache.server';
-import { daysSince } from '$lib/utils/time';
+import { Day } from '$lib/utils/time';
 import type { PageServerLoad } from './$types';
 import { Entry } from '$lib/controllers/entry/entry.server';
 
@@ -10,12 +10,10 @@ export const load = cachedPageRoute(async auth => {
             summaries: [],
             entryCount: 0,
             commonWords: [],
-            days: 0,
-            wordCount: 0
+            wordCount: 0,
+            dayOfFirstEntry: null
         };
     }
-    // should be time zone agnostic?
-    const days = daysSince(earliestCreated, 0);
 
     const [{ wordCount, entryCount }, commonWordsArray, summaries] = await Promise.all([
         Entry.counts(auth),
@@ -27,7 +25,10 @@ export const load = cachedPageRoute(async auth => {
         summaries,
         entryCount,
         commonWords: commonWordsArray,
-        days,
-        wordCount
+        wordCount,
+        dayOfFirstEntry: Day.fromTimestamp(
+            earliestCreated.created,
+            earliestCreated.createdTzOffset
+        ).fmtIso()
     };
 }) satisfies PageServerLoad;

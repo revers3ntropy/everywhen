@@ -219,4 +219,12 @@ export class Day {
     public isToday(tzOffset: Hours = currentTzOffset()): boolean {
         return this.eq(Day.today(tzOffset));
     }
+
+    public daysUntil(day: Day, tzOffset: number): number {
+        return Math.floor((day.utcTimestamp(tzOffset) - this.utcTimestamp(tzOffset)) / 86400);
+    }
+
+    public daysSince(day: Day, tzOffset: number): number {
+        return Math.floor((this.utcTimestamp(tzOffset) - day.utcTimestamp(tzOffset)) / 86400);
+    }
 }

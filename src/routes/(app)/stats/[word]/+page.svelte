@@ -70,7 +70,7 @@
         </section>
     {:else}
         <section class="flex flex-wrap gap-8 container md:p-4">
-            <StatPill primary beforeLabel="appears" value={data.wordInstances} label="times" />
+            <StatPill beforeLabel="appears" value={data.wordInstances} label="times" />
             <StatPill
                 beforeLabel="in"
                 value={data.entries.length}

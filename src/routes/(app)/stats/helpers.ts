@@ -53,7 +53,7 @@ export function heatMapDataFromEntries(entries: EntryStats[]): Record<By, HeatMa
         })),
         [By.Entries]: entries.map(entry => ({
             date: new Date(entry.created * 1000),
-            value: By.Entries
+            value: 1
         }))
     };
 }

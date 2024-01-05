@@ -1,5 +1,6 @@
 declare module '@svelte-plugins/tooltips' {
     import type { ActionReturn } from 'svelte/action';
+    import type { TooltipPosition } from './types';
 
     export function tooltip(
         el: HTMLElement,
@@ -11,8 +12,6 @@ declare module '@svelte-plugins/tooltips' {
         }
     ): ActionReturn;
 }
-
-declare module 'svelte-heatmap';
 
 declare module 'crypto-browserify';
 

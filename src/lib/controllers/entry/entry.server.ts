@@ -524,15 +524,17 @@ namespace EntryServer {
         `.then(([res]) => res);
     }
 
-    export async function earliestEntryCreation(auth: Auth): Promise<number | null> {
-        return await query<{ created: number }[]>`
-            SELECT created
+    export async function earliestEntryCreation(
+        auth: Auth
+    ): Promise<{ created: number; createdTzOffset: number } | null> {
+        return await query<{ created: number; createdTzOffset: number }[]>`
+            SELECT created, createdTzOffset
             FROM entries
             WHERE userId = ${auth.id}
             AND deleted IS NULL
             ORDER BY created ASC
             LIMIT 1
-        `.then(res => res[0]?.created ?? null);
+        `.then(res => res[0] ?? null);
     }
 
     export async function wordCountForEncryptedWord(auth: Auth, word: string): Promise<number> {

@@ -1,5 +1,6 @@
 <script lang="ts">
     import { navExpanded } from '$lib/stores';
+    import { currentTzOffset, Day } from '$lib/utils/time';
     import ToggleSwitch from 'svelte-material-icons/ToggleSwitch.svelte';
     import ToggleSwitchOff from 'svelte-material-icons/ToggleSwitchOff.svelte';
     import type { PageData } from './$types';
@@ -19,6 +20,12 @@
     function toggleBy() {
         by = by === By.Entries ? By.Words : By.Entries;
     }
+
+    $: daysSinceFirstEntry = data.dayOfFirstEntry
+        ? Day.fromString(data.dayOfFirstEntry)
+              .unwrap()
+              .daysUntil(Day.today(currentTzOffset()), currentTzOffset())
+        : null;
 </script>
 
 <svelte:head>
@@ -36,6 +43,8 @@
                 </p>
             </div>
         </section>
+    {:else if daysSinceFirstEntry === null || data.dayOfFirstEntry === null}
+        ???
     {:else}
         <div class="md:flex justify-between p-2">
             <div>
@@ -59,14 +68,14 @@
 
         <section class="flex flex-wrap gap-8 container md:p-4">
             <StatPill value={data.entryCount} label="entries" />
-            <StatPill value={data.days} label="days" />
+            <StatPill value={daysSinceFirstEntry} label="days" />
             <StatPill
                 value={data.wordCount}
                 label="words"
                 tooltip="A typical novel is 100,000 words"
             />
             <StatPill
-                value={(data.wordCount / data.days).toFixed(1)}
+                value={(data.wordCount / daysSinceFirstEntry).toFixed(1)}
                 label="words / day"
                 tooltip="People typically speak about {(7000).toLocaleString()} words per day"
             />
@@ -75,25 +84,28 @@
                 label="words / entry"
             />
             <StatPill
-                value={(data.entryCount / Math.max(data.days / 7, 1)).toFixed(1)}
+                value={(data.entryCount / Math.max(daysSinceFirstEntry / 7, 1)).toFixed(1)}
                 label="entries / week"
                 tooltip="7 would be one per day"
             />
         </section>
         <div class="container my-4 p-4">
-            <EntryHeatMap {by} data={heatMapDataFromEntries(data.summaries)} />
+            <EntryHeatMap
+                {by}
+                data={heatMapDataFromEntries(data.summaries)}
+                earliestEntryDay={Day.fromString(data.dayOfFirstEntry).unwrap()}
+            />
         </div>
         {#if data.entryCount > 4}
             <div
-                class="container my-4"
-                style="padding: 1rem;"
+                class="container my-4 p-4"
                 in:fade={{
                     // stop weird animation when changing buckets
                     duration: ANIMATION_DURATION,
                     delay: ANIMATION_DURATION
                 }}
             >
-                <EntryBarChart {by} entries={data.summaries} days={data.days} />
+                <EntryBarChart {by} entries={data.summaries} days={daysSinceFirstEntry} />
             </div>
         {/if}
 
