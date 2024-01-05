@@ -69,21 +69,17 @@
             </div>
         </section>
     {:else}
-        <section>
-            <div class="stats">
-                <StatPill primary beforeLabel="appears" value={data.wordInstances} label="times" />
-                <StatPill
-                    beforeLabel="in"
-                    value={data.entries.length}
-                    label="({((data.entries.length / data.totalEntries) * 100).toFixed(
-                        1
-                    )}%) entries"
-                />
-                <StatPill
-                    value={(data.wordInstances / data.totalEntries).toFixed(1)}
-                    label="times / entry"
-                />
-            </div>
+        <section class="flex flex-wrap gap-8 container md:p-4">
+            <StatPill primary beforeLabel="appears" value={data.wordInstances} label="times" />
+            <StatPill
+                beforeLabel="in"
+                value={data.entries.length}
+                label="({((data.entries.length / data.totalEntries) * 100).toFixed(1)}%) entries"
+            />
+            <StatPill
+                value={(data.wordInstances / data.totalEntries).toFixed(1)}
+                label="times / entry"
+            />
         </section>
 
         <section class="charts">
@@ -109,7 +105,6 @@
 
 <style lang="scss">
     @import '$lib/styles/layout';
-
     @import '$lib/styles/text';
 
     .title-line {

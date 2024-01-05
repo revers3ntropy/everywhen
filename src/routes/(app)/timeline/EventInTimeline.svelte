@@ -113,8 +113,7 @@
                     },
                     labels,
                     expanded: true,
-                    allowCollapseChange: false,
-                    bordered: false
+                    allowCollapseChange: false
                 });
                 return;
             }

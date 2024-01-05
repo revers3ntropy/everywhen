@@ -33,7 +33,10 @@ CREATE TABLE entries
     INDEX `idx_entries_userId`  (`userId`),
     INDEX `idx_entries_created` (`created`),
     INDEX `idx_entries_labelId` (`userId`, `labelId`),
-    INDEX `idx_entries_userId_created_deleted` (`userId`, `created`, `deleted`)
+    INDEX `idx_entries_userId_created_deleted` (`userId`, `created`, `deleted`),
+    INDEX `idx_entries_lat` (`userId`, `latitude`),
+    INDEX `idx_entries_lon` (`userId`, `longitude`),
+    INDEX `idx_entries_lat_lon` (`userId`, `latitude`, `longitude`)
 )
     ENGINE = InnoDB
     DEFAULT CHARSET = utf8mb4
