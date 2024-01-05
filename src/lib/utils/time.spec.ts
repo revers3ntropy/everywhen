@@ -30,4 +30,31 @@ describe('Day.addDays', () => {
         expect(new Day(2023, 1, 1).lt(new Day(2022, 1, 1))).toBe(false);
         expect(new Day(2022, 2, 1).lt(new Day(2022, 1, 1))).toBe(false);
     });
+
+    it('adds months correctly', () => {
+        expect(new Day(2022, 1, 1).plusMonths(0)?.fmtIso()).toBe('2022-01-01');
+        expect(new Day(2022, 1, 1).plusMonths(1)?.fmtIso()).toBe('2022-02-01');
+        expect(new Day(2022, 1, 1).plusMonths(2)?.fmtIso()).toBe('2022-03-01');
+        expect(new Day(2022, 1, 1).plusMonths(12)?.fmtIso()).toBe('2023-01-01');
+        expect(new Day(2022, 1, 1).plusMonths(13)?.fmtIso()).toBe('2023-02-01');
+        expect(new Day(2022, 1, 1).plusMonths(24)?.fmtIso()).toBe('2024-01-01');
+        expect(new Day(2022, 1, 1).plusMonths(-1)?.fmtIso()).toBe('2021-12-01');
+        expect(new Day(2022, 1, 1).plusMonths(-2)?.fmtIso()).toBe('2021-11-01');
+        expect(new Day(2022, 1, 1).plusMonths(-12)?.fmtIso()).toBe('2021-01-01');
+    });
+
+    it('calculates months ago correctly', () => {
+        expect(Day.today().monthsAgo()).toBe(0);
+        expect(Day.today().plusMonths(-1).monthsAgo()).toBe(1);
+        expect(Day.today().plusMonths(-2).monthsAgo()).toBe(2);
+        expect(Day.today().plusMonths(-12).monthsAgo()).toBe(12);
+        expect(Day.today().plusMonths(-13).monthsAgo()).toBe(13);
+        expect(Day.today().plusMonths(-24).monthsAgo()).toBe(24);
+        expect(new Day(2023, 1, 1).monthsAgo(new Day(2023, 1, 1))).toBe(0);
+        expect(new Day(2023, 1, 2).monthsAgo(new Day(2023, 1, 1))).toBe(0);
+        expect(new Day(2023, 1, 1).monthsAgo(new Day(2023, 1, 2))).toBe(0);
+        expect(new Day(2023, 1, 1).monthsAgo(new Day(2023, 2, 1))).toBe(1);
+        expect(new Day(2023, 1, 1).monthsAgo(new Day(2023, 2, 2))).toBe(1);
+        expect(new Day(2023, 1, 2).monthsAgo(new Day(2023, 2, 1))).toBe(1);
+    });
 });

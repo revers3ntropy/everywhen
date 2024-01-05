@@ -1,7 +1,7 @@
 import { Label } from '$lib/controllers/label/label.server';
 import { Location } from '$lib/controllers/location/location.server';
 import { decrypt, encrypt } from '$lib/utils/encryption';
-import { daysSince } from '$lib/utils/time';
+import { Day, daysSince } from '$lib/utils/time';
 import { error } from '@sveltejs/kit';
 import { cachedPageRoute } from '$lib/utils/cache.server';
 import { normaliseWordForIndex } from '$lib/utils/text';
@@ -26,6 +26,10 @@ export const load = cachedPageRoute(async (auth, { params }) => {
         locations: (await Location.all(auth)).unwrap(e => error(400, e)),
         heatMapData: heatMapDataFromEntries(summaries),
         labels: (await Label.allIndexedById(auth)).unwrap(e => error(400, e)),
-        days
+        days,
+        dayOfFirstEntryWithWord: Day.fromTimestamp(
+            summaries[summaries.length - 1].created,
+            summaries[summaries.length - 1].createdTzOffset
+        ).fmtIso()
     };
 }) satisfies PageServerLoad;

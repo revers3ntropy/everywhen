@@ -1,6 +1,5 @@
 <script lang="ts">
-    import type { Day } from '$lib/utils/time';
-    import moment from 'moment';
+    import { Day } from '$lib/utils/time';
     import SvelteHeatmap from 'svelte-heatmap';
     import type { By, HeatMapData } from './helpers';
 
@@ -9,30 +8,26 @@
     export let earliestEntryDay: Day;
 
     $: currentData = data[by];
-
-    const showMonths = 6;
-    const currentMonth = new Date().getMonth();
-    const lastJanInCurrentYear = currentMonth <= showMonths;
-    const lastJanYear = lastJanInCurrentYear
-        ? new Date().getFullYear()
-        : new Date().getFullYear() - 1;
+    $: goFrom = earliestEntryDay.monthsAgo() < 6 ? Day.today().plusMonths(-6) : earliestEntryDay;
 </script>
 
-<div class="outer">
-    <div class="w-[1200px] md:w-full">
+<div class="overflow-x-auto py-2" style="direction: rtl">
+    <div style="width: {(goFrom.monthsAgo() + 1) * 100 + 20}px; direction: ltr">
         <SvelteHeatmap
+            data={currentData}
+            view={'weekly'}
             allowOverflow={true}
-            cellGap={1}
+            cellGap={2}
             cellRadius={2}
             colors={['#95eab0', '#52d8bd', '#3397bd', '#0051cf']}
-            data={currentData}
-            emptyColor={'var(--v-light-accent)'}
+            emptyColor={'var(--light-accent)'}
             fontColor={'var(--text-color-light)'}
-            fontSize="9"
-            monthGap={4}
-            monthLabelHeight={10}
+            fontSize={9}
+            monthGap={20}
+            monthLabelHeight={12}
+            dayLabelWidth={20}
             monthLabels={[
-                `Jan ${lastJanYear}`,
+                `Jan`,
                 'Feb',
                 'Mar',
                 'Apr',
@@ -45,18 +40,8 @@
                 'Nov',
                 'Dec'
             ]}
-            startDate={moment().subtract(showMonths, 'months').toDate()}
-            endDate={moment().toDate()}
-            view={'monthly'}
+            startDate={goFrom.dateObj()}
+            endDate={Day.today().dateObj()}
         />
     </div>
 </div>
-
-<style lang="scss">
-    @media #{$mobile} {
-        .outer {
-            overflow-x: auto;
-            direction: rtl;
-        }
-    }
-</style>

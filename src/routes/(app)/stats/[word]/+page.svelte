@@ -1,6 +1,7 @@
 <script lang="ts">
     import { browser } from '$app/environment';
     import { Auth } from '$lib/controllers/auth/auth';
+    import { Day } from '$lib/utils/time';
     import ArrowLeft from 'svelte-material-icons/ArrowLeft.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
     import Entries from '$lib/components/entry/Entries.svelte';
@@ -50,14 +51,10 @@
                 <span class="stats-icon">
                     <Counter size="40" />
                 </span>
-                <span class="the-word-with-quotes">
-                    '{theWordDecrypted}'
-                </span>
+                <SearchForWord value={theWordDecrypted} />
             </h1>
         </div>
-        <div class="search-for-word">
-            <SearchForWord value={theWordDecrypted} />
-        </div>
+        <div class=""> </div>
     </div>
     {#if data.wordInstances === 0}
         <section>
@@ -84,7 +81,11 @@
 
         <section class="charts">
             <div class="container" style="margin: 0; padding: 1rem;">
-                <EntryHeatMap {by} data={data.heatMapData} />
+                <EntryHeatMap
+                    {by}
+                    data={data.heatMapData}
+                    earliestEntryDay={Day.fromString(data.dayOfFirstEntryWithWord).unwrap()}
+                />
             </div>
             <div class="container" style="margin: 1rem 0; padding: 1rem;">
                 <EntryChart {by} entries={data.entries} days={data.days} />
@@ -118,7 +119,7 @@
 
         @media #{$mobile} {
             margin: 1rem;
-            grid-template-columns: auto 1fr;
+            grid-template-columns: 1fr;
 
             .search-for-word {
                 font-size: 1.5rem;
@@ -134,13 +135,6 @@
 
     h1 {
         @extend .flex-center;
-        font-size: 40px;
-        margin: 0;
-        padding: 0;
-
-        span {
-            margin-left: 0.5rem;
-        }
     }
 
     .stats {

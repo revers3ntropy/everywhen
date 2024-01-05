@@ -13,6 +13,8 @@ declare module '@svelte-plugins/tooltips' {
     ): ActionReturn;
 }
 
+declare module 'svelte-heatmap';
+
 declare module 'crypto-browserify';
 
 declare module 'svelte-simple-modal' {

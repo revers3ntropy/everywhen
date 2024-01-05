@@ -139,7 +139,7 @@ export class Day {
         return new Day(date.getFullYear(), date.getMonth() + 1, date.getDate());
     }
 
-    public static today(tzOffset: Hours): Day {
+    public static today(tzOffset: Hours = currentTzOffset()): Day {
         return Day.fromTimestamp(nowUtc(), tzOffset);
     }
 
@@ -182,6 +182,10 @@ export class Day {
         return new Date(`${this.fmtIso()}T12:00:00Z`).getTime() / 1000 - tzOffset * 60 * 60;
     }
 
+    public dateObj(): Date {
+        return new Date(`${this.fmtIso()}T12:00:00Z`);
+    }
+
     public eq(other: Day): boolean {
         return this.year === other.year && this.month === other.month && this.date === other.date;
     }
@@ -208,6 +212,16 @@ export class Day {
         return Day.fromTimestamp(date.getTime() / 1000, currentTzOffset());
     }
 
+    public plusMonths(months: number): Day {
+        const date = new Date(`${this.fmtIso()}T12:00:00Z`);
+        date.setMonth(date.getMonth() + months);
+        return Day.fromTimestamp(date.getTime() / 1000, currentTzOffset());
+    }
+
+    public startOfMonth(): Day {
+        return new Day(this.year, this.month, 1);
+    }
+
     public isInFuture(tzOffset: Hours = currentTzOffset()): boolean {
         return this.gt(Day.today(tzOffset));
     }
@@ -220,11 +234,18 @@ export class Day {
         return this.eq(Day.today(tzOffset));
     }
 
-    public daysUntil(day: Day, tzOffset: number): number {
+    public daysUntil(day: Day, tzOffset: number = currentTzOffset()): number {
         return Math.floor((day.utcTimestamp(tzOffset) - this.utcTimestamp(tzOffset)) / 86400);
     }
 
-    public daysSince(day: Day, tzOffset: number): number {
-        return Math.floor((this.utcTimestamp(tzOffset) - day.utcTimestamp(tzOffset)) / 86400);
+    public monthsAgo(from: Day = Day.today()): number {
+        let months = 0;
+        let day = this.startOfMonth();
+        const startOfMonthFrom = from.startOfMonth();
+        while (day.lt(startOfMonthFrom)) {
+            day = day.plusMonths(1);
+            months++;
+        }
+        return months;
     }
 }
