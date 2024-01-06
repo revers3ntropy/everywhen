@@ -148,11 +148,14 @@ export class Day {
         if (parts.length !== 3) {
             return Result.err('Invalid day format');
         }
+        if (parts[0].length < 4 || parts[1].length !== 2 || parts[2].length !== 2) {
+            return Result.err('Invalid day format');
+        }
         const [year, month, date] = parts.map(Number);
         if (isNaN(year) || isNaN(month) || isNaN(date)) {
             return Result.err('Invalid day format');
         }
-        if (year < 1000 || year > 9999) {
+        if (year < 0 || year > 99999) {
             return Result.err('Invalid year');
         }
         if (month < 1 || month > 12) {
@@ -173,9 +176,10 @@ export class Day {
     }
 
     public fmtIso(): string {
-        return `${this.year}-${this.month.toString().padStart(2, '0')}-${this.date
-            .toString()
-            .padStart(2, '0')}`;
+        const y = this.year.toString().padStart(4, '0');
+        const m = this.month.toString().padStart(2, '0');
+        const d = this.date.toString().padStart(2, '0');
+        return `${y}-${m}-${d}`;
     }
 
     public utcTimestamp(tzOffset: Hours): TimestampSecs {
