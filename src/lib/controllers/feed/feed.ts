@@ -21,15 +21,27 @@ export type FeedItemTypes = {
         nameEncrypted: string;
     };
     sleep: {
-        id: string;
         type: 'sleep';
+        id: string;
         start: number;
         startTzOffset: number;
         duration: number;
         quality: number | null;
         regularity: number | null;
     };
-    entry: Entry & { type: 'entry' };
+    entry: { type: 'entry' } & Entry;
+    entryEdit: {
+        type: 'entry-edit';
+        id: string;
+        entryId: string;
+        created: number;
+        createdTzOffset: number;
+        latitude: number | null;
+        longitude: number | null;
+        agentData: string;
+        titleShortened: string;
+        bodyShortened: string;
+    };
 };
 
 export type FeedItem = FeedItemTypes[keyof FeedItemTypes];
@@ -50,9 +62,9 @@ export namespace Feed {
     export function feedItemTime(item: FeedItem): number {
         switch (item.type) {
             case 'entry':
+            case 'entry-edit':
                 return item.created;
             case 'sleep':
-                return item.start;
             case 'event-start':
                 return item.start;
             case 'event-end':

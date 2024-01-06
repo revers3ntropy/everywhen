@@ -8,6 +8,7 @@
 
 <script lang="ts">
     import EntryForm from '$lib/components/entryForm/EntryForm.svelte';
+    import EntryEditFeedItem from '$lib/components/feed/EntryEditFeedItem.svelte';
     import EventEndFeedItem from '$lib/components/feed/EventEndFeedItem.svelte';
     import EventStartFeedItem from '$lib/components/feed/EventStartFeedItem.svelte';
     import SleepInfo from '$lib/components/feed/SleepCycleFeedItem.svelte';
@@ -157,6 +158,12 @@
                             {obfuscated}
                             {showLabels}
                             {locations}
+                        />
+                    {:else if item.type === 'entry-edit'}
+                        <EntryEditFeedItem
+                            {...(({ type: _, ...rest }) => rest)(item)}
+                            {locations}
+                            {obfuscated}
                         />
                     {:else if item.type === 'sleep'}
                         <SleepInfo

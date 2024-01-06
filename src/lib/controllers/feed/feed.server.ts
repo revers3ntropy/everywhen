@@ -1,4 +1,5 @@
 import { entriesProvider } from '$lib/controllers/feed/entriesProvider';
+import { entryEditsProvider } from '$lib/controllers/feed/entryEditsProvider';
 import { eventEndsProvider, eventStartsProvider } from '$lib/controllers/feed/eventsProvider';
 import { sleepCycleProvider } from '$lib/controllers/feed/sleepCycleProvider';
 import { Label } from '$lib/controllers/label/label.server';
@@ -16,7 +17,13 @@ export interface FeedProvider {
 }
 
 namespace FeedServer {
-    const PROVIDERS = [sleepCycleProvider, entriesProvider, eventEndsProvider, eventStartsProvider];
+    const PROVIDERS = [
+        sleepCycleProvider,
+        entriesProvider,
+        entryEditsProvider,
+        eventEndsProvider,
+        eventStartsProvider
+    ];
 
     async function happinessForDay(auth: Auth, day: Day): Promise<number | null> {
         const happinesses = await query<{ rowJson: string }[]>`
