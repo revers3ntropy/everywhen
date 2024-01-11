@@ -1,13 +1,14 @@
 <script lang="ts">
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
+    import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
     import MapMarker from 'svelte-material-icons/MapMarkerOutline.svelte';
     import { Location } from '$lib/controllers/location/location';
 
     export let obfuscated = false;
     export let locations: Location[];
-    export let entryId: string | null = null;
     export let latitude: number;
     export let longitude: number;
+    export let showingMap: boolean;
 
     const { near, touching } = Location.filterLocationsByPoint(locations, {
         latitude,
@@ -18,7 +19,11 @@
 <span class="flex items-center max-w-full text-sm">
     <span class="flex-center">
         <MapMarker size="20" />
-        <ChevronDown size="15" />
+        {#if showingMap}
+            <ChevronUp size="15" />
+        {:else}
+            <ChevronDown size="15" />
+        {/if}
     </span>
     {#if touching.length}
         <span class="">

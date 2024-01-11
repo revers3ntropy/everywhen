@@ -162,7 +162,7 @@
 
             {#if latitude && longitude}
                 <button on:click={() => (showingMap = !showingMap)} aria-label="Expand map">
-                    <LocationWidget {locations} entryId={id} {latitude} {longitude} {obfuscated} />
+                    <LocationWidget {locations} {showingMap} {latitude} {longitude} {obfuscated} />
                 </button>
             {/if}
 
@@ -268,10 +268,10 @@
     </div>
 
     {#if showingMap}
-        <i class="text-light" style="font-size: 0.9rem">
-            Created at lat {latitude}, lng {longitude}
-        </i>
         <div transition:slide={{ duration: ANIMATION_DURATION, axis: 'y' }} class="map-container">
+            <i class="text-light text-sm pb-1">
+                lat {latitude}, lng {longitude}
+            </i>
             <Lazy
                 shouldLoad={showingMap}
                 key="$lib/components/map/Map.svelte"
