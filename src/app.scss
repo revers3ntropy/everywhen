@@ -21,17 +21,11 @@ body {
 *::after {
     box-sizing: border-box;
     color: var(--text-color);
-    //scroll-behavior: smooth;
     margin: 0;
     padding: 0;
     border-width: 0;
     vertical-align: baseline;
     overflow-wrap: break-word;
-}
-
-img, picture {
-    max-width: 100%;
-    display: block;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -59,33 +53,36 @@ blockquote, q {
 blockquote:before, blockquote:after, q:before, q:after {
     content: none;
 }
+
 table {
     border-collapse: collapse;
     border-spacing: 0;
 }
 
+img, picture {
+    max-width: 100%;
+    display: block;
+}
+
 hr {
     border: none;
     border-top: 1px solid var(--border-color);
-    margin: 10px;
 }
 
 svg {
     color: var(--text-color);
+    // assume small SVGs, for larger this should be overridden
     shape-rendering: geometricPrecision;
 }
 
 // Scrollbar
-
 ::-webkit-scrollbar {
     width: 6px;
     height: 3px;
 }
-
 ::-webkit-scrollbar-track {
     background-color: var(--background-color);
 }
-
 ::-webkit-scrollbar-thumb {
     background-color: var(--text-color-light);
     border-radius: 3px;
