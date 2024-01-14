@@ -1,7 +1,7 @@
 <script lang="ts">
     import FilterVariant from 'svelte-material-icons/FilterVariant.svelte';
     import type { Label } from '$lib/controllers/label/label';
-    import Dropdown from '$lib/components/Dropdown.svelte';
+    import Dropdown from '$lib/components/ui/Dropdown.svelte';
     import MultiLabelSelect from '$lib/components/label/MultiLabelSelect.svelte';
 
     export let labels: Record<string, Label>;

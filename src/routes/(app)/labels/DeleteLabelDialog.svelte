@@ -1,7 +1,7 @@
 <script lang="ts">
     import { dispatch } from '$lib/dataChangeEvents';
     import { onMount } from 'svelte';
-    import BookSpinner from '$lib/components/BookSpinner.svelte';
+    import BookSpinner from '$lib/components/ui/BookSpinner.svelte';
     import LabelSelect from '$lib/components/label/LabelSelect.svelte';
     import type { Label } from '$lib/controllers/label/label';
     import { popup } from '$lib/stores';

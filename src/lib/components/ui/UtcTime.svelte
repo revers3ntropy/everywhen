@@ -1,8 +1,8 @@
 <script lang="ts">
     import { tooltip } from '@svelte-plugins/tooltips';
-    import type { Hours, Seconds, TooltipPosition } from '../../types';
-    import { numberAsSignedStr } from '../utils/text';
-    import { currentTzOffset, fmtUtc, fmtUtcRelative } from '../utils/time';
+    import type { Hours, Seconds, TooltipPosition } from '../../../types';
+    import { numberAsSignedStr } from '$lib/utils/text';
+    import { currentTzOffset, fmtUtc, fmtUtcRelative } from '$lib/utils/time';
 
     export let timestamp: Seconds;
     export let tzOffset: Hours = currentTzOffset();

@@ -4,7 +4,7 @@
     import FormatItalic from 'svelte-material-icons/FormatItalic.svelte';
     import FormatBold from 'svelte-material-icons/FormatBold.svelte';
     import FormatHeader1 from 'svelte-material-icons/FormatHeader1.svelte';
-    import Dropdown from '$lib/components/Dropdown.svelte';
+    import Dropdown from '$lib/components/ui/Dropdown.svelte';
     import Link from 'svelte-material-icons/Link.svelte';
     import CodeTags from 'svelte-material-icons/CodeTags.svelte';
     import ImageArea from 'svelte-material-icons/ImageArea.svelte';

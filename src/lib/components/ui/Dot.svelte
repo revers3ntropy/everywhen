@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { Pixels } from '../../types';
+    import type { Pixels } from '../../../types';
 
     export let light = false;
     export let marginX: Pixels = 6;

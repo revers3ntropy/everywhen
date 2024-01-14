@@ -9,7 +9,7 @@
     import { Entry, type EntryFilter } from '$lib/controllers/entry/entry';
     import type { Location } from '$lib/controllers/location/location';
     import type { Mutable } from '../../../types';
-    import Spinner from '../BookSpinner.svelte';
+    import Spinner from '../ui/BookSpinner.svelte';
     import DayInFeed from '$lib/components/feed/DayInFeed.svelte';
 
     interface IOptions extends EntryFilter {

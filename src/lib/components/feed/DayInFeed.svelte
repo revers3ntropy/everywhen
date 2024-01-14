@@ -22,8 +22,8 @@
     import Entry from '$lib/components/entry/Entry.svelte';
     import type { Location } from '$lib/controllers/location/location';
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
-    import Dot from '../Dot.svelte';
-    import UtcTime from '../UtcTime.svelte';
+    import Dot from '../ui/Dot.svelte';
+    import UtcTime from '../ui/UtcTime.svelte';
     import type { FeedDay } from '$lib/controllers/feed/feed';
     import { onMount } from 'svelte';
     import HappinessDatasetShortcut from '$lib/components/dataset/HappinessDatasetShortcut.svelte';

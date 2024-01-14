@@ -650,6 +650,19 @@ namespace EntryServer {
         );
     }
 
+    export async function getEntryCountPerDay(auth: Auth): Promise<Record<string, number>> {
+        return Object.fromEntries(
+            (
+                await query<{ day: string; count: number }[]>`
+                    SELECT DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%Y-%m-%d') as day, COUNT(*) as count
+                    FROM entries
+                    WHERE userId = ${auth.id}
+                    GROUP BY day
+                `
+            ).map(({ day, count }) => [day, count])
+        );
+    }
+
     export const getFromId = entryFromId;
     export const all = getMulti.all;
     export const getPage = getMulti.getPage;

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Dot from '$lib/components/Dot.svelte';
+    import Dot from '$lib/components/ui/Dot.svelte';
     import { tooltip } from '@svelte-plugins/tooltips';
     import CloudCheckOutline from 'svelte-material-icons/CloudCheckOutline.svelte';
     import Sync from 'svelte-material-icons/Sync.svelte';

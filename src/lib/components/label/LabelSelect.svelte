@@ -6,7 +6,7 @@
     import Plus from 'svelte-material-icons/Plus.svelte';
     import LabelOffOutline from 'svelte-material-icons/LabelOffOutline.svelte';
     import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
-    import Dropdown from '$lib/components/Dropdown.svelte';
+    import Dropdown from '$lib/components/ui/Dropdown.svelte';
     import type { Label } from '$lib/controllers/label/label';
     import { showPopup } from '$lib/utils/popups';
     import NewLabelDialog from '$lib/components/dialogs/NewLabelDialog.svelte';

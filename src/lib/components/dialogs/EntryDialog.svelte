@@ -5,7 +5,7 @@
     import type { Entry as EntryController } from '../../controllers/entry/entry';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
-    import BookSpinner from '../BookSpinner.svelte';
+    import BookSpinner from '../ui/BookSpinner.svelte';
     import Entry from '$lib/components/entry/Entry.svelte';
 
     export let id: string;

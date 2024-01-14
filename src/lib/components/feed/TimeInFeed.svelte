@@ -1,5 +1,5 @@
 <script lang="ts">
-    import UtcTime from '$lib/components/UtcTime.svelte';
+    import UtcTime from '$lib/components/ui/UtcTime.svelte';
 
     export let timestamp: number;
     export let tzOffset: number;

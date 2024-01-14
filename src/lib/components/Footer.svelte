@@ -6,7 +6,7 @@
     import History from 'svelte-material-icons/History.svelte';
     import OpenInNew from 'svelte-material-icons/OpenInNew.svelte';
     import DonateWidget from '$lib/components/DonateWidget.svelte';
-    import Logo from '$lib/components/Logo.svelte';
+    import Logo from '$lib/components/ui/Logo.svelte';
     import { PUBLIC_ENV } from '$env/static/public';
 
     const version = __VERSION__;

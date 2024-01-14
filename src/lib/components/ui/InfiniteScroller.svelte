@@ -4,6 +4,8 @@
 
     export let hasMore: () => boolean;
     export let loadItems: () => Promise<void>;
+    export let margin = 1;
+    export let marginBelow = 1;
 
     let pageEndInView = false;
     let currentlyLoading = false;
@@ -32,7 +34,8 @@
 <slot />
 
 <div
-    style="height: 1px; position: relative; top: -1px"
+    style="height: {margin + marginBelow}px; position: absolute; bottom: -{marginBelow}px"
+    class="absolute left-0 right-0 pointer-events-none"
     use:inview={{}}
     on:inview_enter={load}
     on:inview_leave={() => (pageEndInView = false)}

@@ -7,8 +7,8 @@
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import { Entry, type EntrySummary } from '$lib/controllers/entry/entry';
     import { currentTzOffset, fmtUtc, nowUtc, utcEq } from '$lib/utils/time';
-    import Dot from '../Dot.svelte';
-    import UtcTime from '../UtcTime.svelte';
+    import Dot from '../ui/Dot.svelte';
+    import UtcTime from '../ui/UtcTime.svelte';
 
     export let titles: Record<string, EntrySummary[]>;
     export let obfuscated = true;

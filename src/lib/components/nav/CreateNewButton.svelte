@@ -7,7 +7,7 @@
     import Moon from 'svelte-material-icons/MoonWaningCrescent.svelte';
     import Lightbulb from 'svelte-material-icons/Lightbulb.svelte';
     import Brain from 'svelte-material-icons/Brain.svelte';
-    import Dropdown from '$lib/components/Dropdown.svelte';
+    import Dropdown from '$lib/components/ui/Dropdown.svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import { notify } from '$lib/components/notifications/notifications';
     import { api } from '$lib/utils/apiRequest';

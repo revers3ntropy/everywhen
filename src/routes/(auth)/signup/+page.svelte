@@ -9,7 +9,7 @@
     import type { PageData } from './$types';
     import { api } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
-    import Dot from '$lib/components/Dot.svelte';
+    import Dot from '$lib/components/ui/Dot.svelte';
 
     export let data: PageData;
     const { redirect } = data;

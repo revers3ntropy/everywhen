@@ -1,5 +1,5 @@
 <script lang="ts">
-    import BidirectionalInfiniteScroller from '$lib/components/BidirectionalInfiniteScroller.svelte';
+    import BidirectionalInfiniteScroller from '$lib/components/ui/BidirectionalInfiniteScroller.svelte';
     import type { Label } from '$lib/controllers/label/label';
     import DayInFeed from '$lib/components/feed/DayInFeed.svelte';
     import type { Location } from '$lib/controllers/location/location';

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import InfiniteScroller from '$lib/components/InfiniteScroller.svelte';
+    import InfiniteScroller from '$lib/components/ui/InfiniteScroller.svelte';
     import { notify } from '$lib/components/notifications/notifications';
     import { ANIMATION_DURATION } from '$lib/constants';
     import { listen } from '$lib/dataChangeEvents';
@@ -166,10 +166,11 @@
             </div>
         {/if}
         {#if !noEntries}
-            <div class="p-2">
+            <div class="p-2 relative">
                 <InfiniteScroller
                     loadItems={loadMoreTitles}
                     hasMore={() => titleIds.length < numTitles}
+                    margin={500}
                 >
                     <EntrySummaries {obfuscated} titles={summaries} hideBlurToggle />
                 </InfiniteScroller>

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import InfiniteScroller from '$lib/components/InfiniteScroller.svelte';
+    import InfiniteScroller from '$lib/components/ui/InfiniteScroller.svelte';
     import { FILE_INPUT_ACCEPT_TYPES } from '$lib/constants';
     import { Asset } from '$lib/controllers/asset/asset';
     import { notify } from '$lib/components/notifications/notifications';
@@ -9,7 +9,7 @@
     import { onMount } from 'svelte';
     import ImageArea from 'svelte-material-icons/ImageArea.svelte';
     import Upload from 'svelte-material-icons/Upload.svelte';
-    import Dropdown from '$lib/components/Dropdown.svelte';
+    import Dropdown from '$lib/components/ui/Dropdown.svelte';
     import type { ChangeEventHandler } from 'svelte/elements';
 
     export let size = '30';
@@ -60,7 +60,7 @@
         <span slot="button">
             <ImageArea {size} />
         </span>
-        <div style="padding: 1rem 0">
+        <div class="pt-4">
             <button
                 on:click={() => fileDropInput.click()}
                 class="with-icon upload-button icon-gradient-on-hover"
@@ -79,33 +79,39 @@
 
             <hr />
 
-            <div style="width: 300px; max-height: 500px; overflow-y: scroll">
-                {#if assetCount > -1 && assets.length}
-                    <InfiniteScroller
-                        loadItems={loadMoreAssets}
-                        hasMore={() => assets.length < assetCount}
-                    >
-                        {#each assets as asset}
-                            <button
-                                class="asset"
-                                on:click={() => {
-                                    onInput(
-                                        Asset.generateMarkdownLink(asset.fileName, asset.publicId)
-                                    );
-                                    closePopup();
-                                }}
-                            >
-                                <img
-                                    src="/api/assets/{asset.publicId}"
-                                    alt={asset.fileName}
-                                    loading="lazy"
-                                />
-                            </button>
-                        {/each}
-                    </InfiniteScroller>
-                {:else}
-                    <div class="text-light" style="margin: 1rem"> No images in gallery yet </div>
-                {/if}
+            <div style="width: 300px; max-height: 500px" class="overflow-y-auto">
+                <div class="relative">
+                    {#if assetCount > -1 && assets.length}
+                        <InfiniteScroller
+                            loadItems={loadMoreAssets}
+                            hasMore={() => assets.length < assetCount}
+                            margin={100}
+                        >
+                            {#each assets as asset}
+                                <button
+                                    class="asset"
+                                    on:click={() => {
+                                        onInput(
+                                            Asset.generateMarkdownLink(
+                                                asset.fileName,
+                                                asset.publicId
+                                            )
+                                        );
+                                        closePopup();
+                                    }}
+                                >
+                                    <img
+                                        src="/api/assets/{asset.publicId}"
+                                        alt={asset.fileName}
+                                        loading="lazy"
+                                    />
+                                </button>
+                            {/each}
+                        </InfiniteScroller>
+                    {:else}
+                        <div class="text-light m-4"> No images in gallery yet </div>
+                    {/if}
+                </div>
             </div>
         </div>
     </Dropdown>

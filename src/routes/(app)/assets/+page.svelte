@@ -1,5 +1,5 @@
 <script lang="ts">
-    import InfiniteScroller from '$lib/components/InfiniteScroller.svelte';
+    import InfiniteScroller from '$lib/components/ui/InfiniteScroller.svelte';
     import { FILE_INPUT_ACCEPT_TYPES } from '$lib/constants';
     import { api } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
@@ -66,8 +66,13 @@
             Uploading {$currentlyUploadingAssets} images...
         {/if}
     </div>
-    <div class="flex flex-wrap">
-        <InfiniteScroller loadItems={loadMoreAssets} hasMore={() => assets.length < assetCount}>
+    <div class="flex flex-wrap relative">
+        <InfiniteScroller
+            loadItems={loadMoreAssets}
+            hasMore={() => assets.length < assetCount}
+            margin={500}
+            marginBelow={500}
+        >
             {#each assets as asset}
                 <Asset {...asset} on:delete={() => assetCount--} obfuscated={$obfuscated} />
             {/each}

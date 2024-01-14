@@ -2,7 +2,7 @@
     import { theme } from '$lib/stores';
     import { Theme } from '$lib/constants';
     import { Auth } from '$lib/controllers/auth/auth';
-    import Dropdown from '$lib/components/Dropdown.svelte';
+    import Dropdown from '$lib/components/ui/Dropdown.svelte';
     import LightTheme from 'svelte-material-icons/WhiteBalanceSunny.svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import Logout from 'svelte-material-icons/Logout.svelte';

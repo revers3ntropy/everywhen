@@ -1,5 +1,5 @@
 <script lang="ts">
-    import BookSpinner from '$lib/components/BookSpinner.svelte';
+    import BookSpinner from '$lib/components/ui/BookSpinner.svelte';
     import { notify } from '$lib/components/notifications/notifications';
     import { filedrop, type FileDropOptions, type Files } from 'filedrop-svelte';
     import { popup } from '$lib/stores';

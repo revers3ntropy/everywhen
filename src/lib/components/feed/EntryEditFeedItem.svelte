@@ -2,7 +2,7 @@
     import { slide } from 'svelte/transition';
     import AgentWidget from '$lib/components/entry/AgentWidget.svelte';
     import TimeInFeed from '$lib/components/feed/TimeInFeed.svelte';
-    import Lazy from '$lib/components/Lazy.svelte';
+    import Lazy from '$lib/components/ui/Lazy.svelte';
     import LocationWidget from '$lib/components/location/LocationWidget.svelte';
     import { ANIMATION_DURATION } from '$lib/constants';
     import { Entry } from '$lib/controllers/entry/entry';

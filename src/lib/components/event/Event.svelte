@@ -12,7 +12,7 @@
     import type { ChangeEventHandler } from 'svelte/elements';
     import LabelSelect from '$lib/components/label/LabelSelect.svelte';
     import type { TimestampSecs } from '../../../types';
-    import UtcTime from '../UtcTime.svelte';
+    import UtcTime from '../ui/UtcTime.svelte';
     import { Event } from '$lib/controllers/event/event';
     import type { Label } from '$lib/controllers/label/label';
     import { api, apiPath } from '$lib/utils/apiRequest';

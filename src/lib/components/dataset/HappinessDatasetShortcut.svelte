@@ -7,7 +7,7 @@
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { currentTzOffset, nowUtc } from '$lib/utils/time';
     import HappinessValueIcon from '$lib/components/dataset/HappinessValueIcon.svelte';
-    import Dropdown from '$lib/components/Dropdown.svelte';
+    import Dropdown from '$lib/components/ui/Dropdown.svelte';
     import { datasetPresets } from '$lib/controllers/dataset/presets';
 
     export let dataset: Dataset | null;

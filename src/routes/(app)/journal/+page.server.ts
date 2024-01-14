@@ -20,5 +20,6 @@ export const load = cachedPageRoute(async (auth, { parent, locals }) => {
         locations: (await Location.all(auth)).unwrap(e => error(400, e)),
         happinessDataset: await Dataset.getDatasetFromPresetId(auth, 'happiness'),
         labels: (await Label.allIndexedById(auth)).unwrap(e => error(400, e))
+        //entryCountPerDay: await Entry.getEntryCountPerDay(auth)
     };
 }) satisfies PageServerLoad;

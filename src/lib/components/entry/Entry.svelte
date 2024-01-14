@@ -1,7 +1,7 @@
 <script lang="ts">
     import { page } from '$app/stores';
     import TimeInFeed from '$lib/components/feed/TimeInFeed.svelte';
-    import Lazy from '$lib/components/Lazy.svelte';
+    import Lazy from '$lib/components/ui/Lazy.svelte';
     import type { EntryEdit } from '$lib/controllers/entry/entry';
     import { fmtUtcRelative, nowUtc } from '$lib/utils/time';
     import { onMount } from 'svelte';
@@ -25,8 +25,8 @@
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
     import { rawMdToHtml } from '$lib/utils/text';
-    import UtcTime from '$lib/components/UtcTime.svelte';
-    import Dropdown from '$lib/components/Dropdown.svelte';
+    import UtcTime from '$lib/components/ui/UtcTime.svelte';
+    import Dropdown from '$lib/components/ui/Dropdown.svelte';
     import AgentWidget from './AgentWidget.svelte';
     import Pencil from 'svelte-material-icons/Pencil.svelte';
     import Label from '$lib/components/label/Label.svelte';
