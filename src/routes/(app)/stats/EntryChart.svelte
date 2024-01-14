@@ -2,6 +2,7 @@
     import { browser } from '$app/environment';
     import { notify } from '$lib/components/notifications/notifications.js';
     import { encryptionKey } from '$lib/stores';
+    import { Day } from '$lib/utils/day';
     import {
         Chart,
         Title,
@@ -25,7 +26,6 @@
         initialBucketName
     } from './helpers';
     import { cssVarValue } from '$lib/utils/getCssVar';
-    import { Day } from '$lib/utils/time';
 
     Chart.register(
         Title,

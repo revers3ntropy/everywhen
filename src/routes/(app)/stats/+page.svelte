@@ -1,6 +1,6 @@
 <script lang="ts">
     import { navExpanded } from '$lib/stores';
-    import { Day } from '$lib/utils/time';
+    import { Day } from '$lib/utils/day';
     import { onMount } from 'svelte';
     import ToggleSwitch from 'svelte-material-icons/ToggleSwitch.svelte';
     import ToggleSwitchOff from 'svelte-material-icons/ToggleSwitchOff.svelte';

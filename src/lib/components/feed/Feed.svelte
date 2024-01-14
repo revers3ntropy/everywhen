@@ -4,7 +4,7 @@
     import DayInFeed from '$lib/components/feed/DayInFeed.svelte';
     import type { Location } from '$lib/controllers/location/location';
     import type { FeedDay } from '$lib/controllers/feed/feed';
-    import { Day } from '$lib/utils/time';
+    import { Day } from '$lib/utils/day';
     import { currentTzOffset } from '$lib/utils/time';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';

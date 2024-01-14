@@ -1,7 +1,8 @@
 import { Label } from '$lib/controllers/label/label.server';
 import { Location } from '$lib/controllers/location/location.server';
+import { Day } from '$lib/utils/day';
 import { decrypt, encrypt } from '$lib/utils/encryption';
-import { Day, daysSince } from '$lib/utils/time';
+import { daysSince } from '$lib/utils/time';
 import { error } from '@sveltejs/kit';
 import { cachedPageRoute } from '$lib/utils/cache.server';
 import { normaliseWordForIndex } from '$lib/utils/text';

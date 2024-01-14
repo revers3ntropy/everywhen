@@ -6,7 +6,7 @@
     import type { FeedItem, FeedItemTypes } from '$lib/controllers/feed/feed';
     import type { Label } from '$lib/controllers/label/label';
     import { encryptionKey } from '$lib/stores';
-    import { Day } from '$lib/utils/time';
+    import { Day } from '$lib/utils/day';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
     import CalendarStart from 'svelte-material-icons/CalendarStart.svelte';
 

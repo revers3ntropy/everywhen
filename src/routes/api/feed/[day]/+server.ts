@@ -1,8 +1,8 @@
 import { apiRes404 } from '$lib/utils/apiResponse.server';
 import { cachedApiRoute } from '$lib/utils/cache.server';
+import { Day } from '$lib/utils/day';
 import type { RequestHandler } from './$types';
 import { error } from '@sveltejs/kit';
-import { Day } from '$lib/utils/time';
 import { Feed } from '$lib/controllers/feed/feed.server';
 
 export const GET = cachedApiRoute(async (auth, { params }) => {

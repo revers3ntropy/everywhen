@@ -2,8 +2,8 @@ import type { Auth } from '$lib/controllers/auth/auth';
 import type { FeedItem } from '$lib/controllers/feed/feed';
 import type { FeedProvider } from '$lib/controllers/feed/feed.server';
 import { query } from '$lib/db/mysql.server';
+import { Day } from '$lib/utils/day';
 import { Result } from '$lib/utils/result';
-import { Day } from '$lib/utils/time';
 
 export const eventStartsProvider = {
     async feedItemsOnDay(auth: Auth, day: Day): Promise<Result<FeedItem[]>> {

@@ -4,9 +4,9 @@ import { Entry } from '$lib/controllers/entry/entry.server';
 import { Label } from '$lib/controllers/label/label.server';
 import { Location } from '$lib/controllers/location/location.server';
 import { query } from '$lib/db/mysql.server';
+import type { Day } from '$lib/utils/day';
 import { decrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
-import type { Day } from '$lib/utils/time';
 
 export async function all(auth: Auth, filter: EntryFilter = {}): Promise<Result<Entry[]>> {
     let location: Location | null = null;
@@ -157,8 +157,6 @@ export async function getPage(
 }
 
 export async function onDay(auth: Auth, day: Day): Promise<Result<Entry[]>> {
-    const minTimestamp = day.utcTimestamp(24);
-    const maxTimestamp = day.utcTimestamp(-24);
     const rawEntries = await query<
         {
             id: string;
@@ -190,9 +188,7 @@ export async function onDay(auth: Auth, day: Day): Promise<Result<Entry[]>> {
         FROM entries
         WHERE deleted IS NULL
             AND userId = ${auth.id}
-            AND created > ${minTimestamp}
-            AND created < ${maxTimestamp}
-            AND DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%Y-%m-%d') = ${day.fmtIso()}
+            AND day = ${day.fmtIso()}
         ORDER BY created DESC, id
     `;
 

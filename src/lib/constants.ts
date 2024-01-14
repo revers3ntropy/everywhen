@@ -65,8 +65,6 @@ export const POLL_FOR_UPDATE_INTERVAL: Milliseconds = 1000 * 20;
 
 export const LOG_FILE_NAME = 'general.log';
 
-export const DEV_USE_TZ_OFFSET_0 = false;
-
 export const FILE_INPUT_ACCEPT_TYPES = 'image/png,image/jpeg,image/jpg,image/webp,image/svg+xml';
 
 // all limits are inclusive

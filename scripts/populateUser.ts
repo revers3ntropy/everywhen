@@ -5,6 +5,7 @@ import fs from 'fs';
 import { sha256 } from 'js-sha256';
 import mysql from 'mysql2/promise';
 import { LIMITS } from '../src/lib/constants';
+import { Day } from '../src/lib/utils/day';
 import type { TimestampSecs } from '../src/types';
 
 export const { quiet, username, password } = commandLineArgs([
@@ -76,11 +77,12 @@ async function entry(
     deleted = false
 ) {
     await query(
-        'INSERT INTO entries (id, userId, created, createdTzOffset, latitude, longitude, title, body, labelId, deleted, pinned, agentData, wordCount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        'INSERT INTO entries (id, userId, created, createdTzOffset, day, latitude, longitude, title, body, labelId, deleted, pinned, agentData, wordCount) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
         id,
         userId,
         created,
         0,
+        Day.fromTimestamp(created, 0).fmtIso(),
         null,
         null,
         encrypt(title),
@@ -103,8 +105,8 @@ async function main() {
 
     await query('DELETE FROM entries WHERE userId = ?', userId);
 
-    const years = 40;
-    const entriesPerDay = 12;
+    const years = 32;
+    const entriesPerDay = 32;
 
     let i = 0;
     for (
@@ -128,4 +130,7 @@ async function main() {
     console.log('done');
 }
 
-void main();
+void (async () => {
+    await main();
+    process.exit(0);
+})();

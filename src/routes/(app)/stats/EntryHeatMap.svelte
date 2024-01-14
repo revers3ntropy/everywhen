@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Day } from '$lib/utils/time';
+    import { Day } from '$lib/utils/day';
     import SvelteHeatmap from 'svelte-heatmap';
     import type { By, HeatMapData } from './helpers';
 

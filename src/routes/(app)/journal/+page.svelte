@@ -4,7 +4,8 @@
     import EntriesSidebar from '$lib/components/entry/EntriesSidebar.svelte';
     import { notify } from '$lib/components/notifications/notifications.js';
     import { navExpanded, obfuscated } from '$lib/stores';
-    import { currentTzOffset, Day } from '$lib/utils/time';
+    import { Day } from '$lib/utils/day';
+    import { currentTzOffset } from '$lib/utils/time';
     import type { PageData } from './$types';
     import Feed from '$lib/components/feed/Feed.svelte';
     import { page } from '$app/stores';

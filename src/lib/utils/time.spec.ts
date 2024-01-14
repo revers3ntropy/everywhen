@@ -1,4 +1,4 @@
-import { Day } from '$lib/utils/time';
+import { Day } from '$lib/utils/day';
 import { describe, expect, it } from 'vitest';
 
 describe('Day', () => {

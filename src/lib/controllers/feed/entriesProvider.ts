@@ -3,8 +3,8 @@ import { Entry } from '$lib/controllers/entry/entry.server';
 import type { FeedItem } from '$lib/controllers/feed/feed';
 import type { FeedProvider } from '$lib/controllers/feed/feed.server';
 import { query } from '$lib/db/mysql.server';
+import { Day } from '$lib/utils/day';
 import { Result } from '$lib/utils/result';
-import { Day } from '$lib/utils/time';
 
 export const entriesProvider = {
     async feedItemsOnDay(auth: Auth, day: Day): Promise<Result<FeedItem[]>> {
@@ -21,24 +21,22 @@ export const entriesProvider = {
         const maxTimestamp = day.utcTimestamp(-24);
         const entries = inFuture
             ? await query<{ day: string }[]>`
-                SELECT DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%Y-%m-%d') as day
+                SELECT day
                 FROM entries
                 WHERE deleted IS NULL
                     AND userId = ${auth.id}
                     AND created > ${minTimestamp}
-                    AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%Y-%m-%d'), DATE)
-                        > CONVERT(${day.fmtIso()}, DATE)
+                    AND CONVERT(day, DATE) > CONVERT(${day.fmtIso()}, DATE)
                 ORDER BY created + createdTzOffset * 60 * 60 ASC
                 LIMIT 1
             `
             : await query<{ day: string }[]>`
-                SELECT DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%Y-%m-%d') as day
+                SELECT day
                 FROM entries
                 WHERE deleted IS NULL
                     AND userId = ${auth.id}
                     AND created < ${maxTimestamp}
-                    AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%Y-%m-%d'), DATE)
-                        < CONVERT(${day.fmtIso()}, DATE)
+                    AND CONVERT(day, DATE) < CONVERT(${day.fmtIso()}, DATE)
                 ORDER BY created + createdTzOffset * 60 * 60 DESC
                 LIMIT 1
             `;

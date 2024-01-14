@@ -3,9 +3,10 @@ import type { EntrySummary, RawEntrySummary } from '$lib/controllers/entry/entry
 import { Entry } from '$lib/controllers/entry/entry.server';
 import { Label } from '$lib/controllers/label/label.server';
 import { query } from '$lib/db/mysql.server';
+import { Day } from '$lib/utils/day';
 import { decrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
-import { currentTzOffset, Day, fmtUtc } from '$lib/utils/time';
+import { currentTzOffset, fmtUtc } from '$lib/utils/time';
 
 export async function getSummariesNYearsAgo(
     auth: Auth
@@ -40,7 +41,7 @@ export async function getSummariesNYearsAgo(
         FROM entries
         WHERE deleted IS NULL
             AND userId = ${auth.id}
-            AND DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%m-%d') = DATE_FORMAT(NOW(), '%m-%d')
+            AND day LIKE ${`%${Day.today(currentTzOffset()).fmtIsoNoYear()}`}
         ORDER BY created DESC, id
     `;
 

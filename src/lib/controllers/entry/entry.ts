@@ -1,5 +1,6 @@
 import { LS_KEYS } from '$lib/constants';
-import { Day, fmtUtc } from '$lib/utils/time';
+import { Day } from '$lib/utils/day';
+import { fmtUtc } from '$lib/utils/time';
 import type { Hours, TimestampSecs } from '../../../types';
 import type { Label } from '../label/label';
 

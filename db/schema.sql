@@ -20,6 +20,7 @@ CREATE TABLE entries
     userId          char(32) NOT NULL,
     created         int      NOT NULL,
     createdTzOffset double   NOT NULL,
+    day             CHAR(10) NOT NULL,
     latitude        double   DEFAULT NULL,
     longitude       double   DEFAULT NULL,
     title           text     NOT NULL,
@@ -36,7 +37,8 @@ CREATE TABLE entries
     INDEX `idx_entries_userId_created_deleted` (`userId`, `created`, `deleted`),
     INDEX `idx_entries_lat` (`userId`, `latitude`),
     INDEX `idx_entries_lon` (`userId`, `longitude`),
-    INDEX `idx_entries_lat_lon` (`userId`, `latitude`, `longitude`)
+    INDEX `idx_entries_lat_lon` (`userId`, `latitude`, `longitude`),
+    INDEX `idx_entries_day` (`userId`, `day`)
 )
     ENGINE = InnoDB
     DEFAULT CHARSET = utf8mb4

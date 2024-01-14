@@ -3,6 +3,7 @@ import { entryFromId } from '$lib/controllers/entry/getEntrySingle.server';
 import * as getMulti from '$lib/controllers/entry/getEntryMulti.server';
 import * as getSummary from '$lib/controllers/entry/getEntrySummaries.server';
 import { query } from '$lib/db/mysql.server';
+import { Day } from '$lib/utils/day';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import { FileLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
@@ -144,7 +145,7 @@ namespace EntryServer {
 
         await query`
             INSERT INTO entries
-                (id, userId, title, body, created, createdTzOffset, deleted, pinned,
+                (id, userId, title, body, created, createdTzOffset, day, deleted, pinned,
                  labelId, latitude, longitude, agentData, wordCount)
             VALUES (
                 ${id},
@@ -153,6 +154,7 @@ namespace EntryServer {
                 ${encrypt(body, auth.key)},
                 ${created},
                 ${createdTzOffset},
+                ${Day.fromTimestamp(created, createdTzOffset).fmtIso()},
                 ${deleted},
                 ${pinned},
                 ${labelId},
@@ -654,7 +656,7 @@ namespace EntryServer {
         return Object.fromEntries(
             (
                 await query<{ day: string; count: number }[]>`
-                    SELECT DATE_FORMAT(FROM_UNIXTIME(created + createdTzOffset * 60 * 60), '%Y-%m-%d') as day, COUNT(*) as count
+                    SELECT day, COUNT(*) as count
                     FROM entries
                     WHERE userId = ${auth.id}
                     GROUP BY day

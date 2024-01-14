@@ -3,9 +3,9 @@ import { Entry } from '$lib/controllers/entry/entry.server';
 import type { FeedItem } from '$lib/controllers/feed/feed';
 import type { FeedProvider } from '$lib/controllers/feed/feed.server';
 import { query } from '$lib/db/mysql.server';
+import { Day } from '$lib/utils/day';
 import { decrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
-import { Day } from '$lib/utils/time';
 
 export const entryEditsProvider = {
     async feedItemsOnDay(auth: Auth, day: Day): Promise<Result<FeedItem[]>> {

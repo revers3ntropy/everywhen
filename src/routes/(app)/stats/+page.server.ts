@@ -1,5 +1,5 @@
 import { cachedPageRoute } from '$lib/utils/cache.server';
-import { Day } from '$lib/utils/time';
+import { Day } from '$lib/utils/day';
 import type { PageServerLoad } from './$types';
 import { Entry } from '$lib/controllers/entry/entry.server';
 

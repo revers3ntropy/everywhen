@@ -1,7 +1,7 @@
 <script lang="ts">
     import { browser } from '$app/environment';
     import { Auth } from '$lib/controllers/auth/auth';
-    import { Day } from '$lib/utils/time';
+    import { Day } from '$lib/utils/day';
     import ArrowLeft from 'svelte-material-icons/ArrowLeft.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
     import Entries from '$lib/components/entry/Entries.svelte';

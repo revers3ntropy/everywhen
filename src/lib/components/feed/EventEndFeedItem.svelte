@@ -5,7 +5,7 @@
     import type { FeedItem, FeedItemTypes } from '$lib/controllers/feed/feed';
     import type { Label } from '$lib/controllers/label/label';
     import { encryptionKey } from '$lib/stores';
-    import { Day } from '$lib/utils/time';
+    import { Day } from '$lib/utils/day';
     import CalendarEnd from 'svelte-material-icons/CalendarEnd.svelte';
 
     export let item: FeedItemTypes['eventEnd'];
