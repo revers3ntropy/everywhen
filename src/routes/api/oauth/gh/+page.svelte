@@ -3,11 +3,8 @@
     import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
     import { page } from '$app/stores';
-    import type { PageData } from './$types';
     import { SESSION_KEYS } from '$lib/constants';
     import { api } from '$lib/utils/apiRequest';
-
-    export let data: PageData;
 
     let error = false;
 
@@ -34,7 +31,7 @@
     });
 </script>
 
-<main class="flex-center" style="min-height: 100vh">
+<main class="flex-center min-h-screen">
     {#if error}
         <h1> Something went wrong </h1>
     {:else}
