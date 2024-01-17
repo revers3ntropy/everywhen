@@ -34,7 +34,11 @@
 {:else}
     <div class="text-sm py-2 flex gap-4">
         <TimeInFeed timestamp={item.start} tzOffset={item.tzOffset} />
-        <CalendarStart size="22" />
+        {#if !Event.isInstantEvent(item)}
+            <CalendarStart size="22" />
+        {:else}
+            <Calendar size="22" />
+        {/if}
         <div>
             {#if !Event.isInstantEvent(item)}
                 <span class="text-textColorLight"> start of </span>
