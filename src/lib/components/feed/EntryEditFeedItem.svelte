@@ -28,9 +28,9 @@
     let showingMap = false;
 </script>
 
-<div class="text-sm py-2 flex gap-y-2 gap-x-2 flex-wrap">
+<div class="text-sm py-2 flex gap-2 flex-wrap">
     <TimeInFeed timestamp={created} tzOffset={createdTzOffset} />
-    <NoteEditOutline size="24" />
+    <NoteEditOutline size="24" class="ml-2" />
     {#if $settingsStore.showAgentWidgetOnEntries.value}
         <AgentWidget data={agentData} />
     {/if}

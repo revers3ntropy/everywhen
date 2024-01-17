@@ -1,4 +1,5 @@
 <script lang="ts">
+    import EventsList from '$lib/components/event/EventsList.svelte';
     import { dispatch } from '$lib/dataChangeEvents';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import Select from '$lib/components/Select.svelte';
@@ -7,7 +8,6 @@
     import { api } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
     import { currentTzOffset, nowUtc } from '$lib/utils/time';
-    import EventComponent from '$lib/components/event/Event.svelte';
     import type { EventsSortKey } from '../../../types';
     import type { PageData } from './$types';
 
@@ -61,8 +61,8 @@
     let { events } = data;
     $: if ($eventsSortKey) events = sortEvents(events, $eventsSortKey);
 
-    let selectNameId: string;
-    $: selectNameId =
+    let selectId: string;
+    $: selectId =
         events[events.findIndex(e => e.name === Event.NEW_EVENT_NAME && !e.deleted)]?.id || '';
 
     const sortEventsKeys = {
@@ -97,22 +97,8 @@
             {/if}
         </div>
     </div>
-    <div class="md:p-2">
-        <ul>
-            {#each events as event}
-                <div class="border-t border-borderColor only-mobile"></div>
-                <li class="p-2">
-                    <div class="container">
-                        <EventComponent
-                            {event}
-                            {selectNameId}
-                            labels={data.labels}
-                            obfuscated={$obfuscated}
-                        />
-                    </div>
-                </li>
-            {/each}
-        </ul>
+    <div class="md:p-4">
+        <EventsList labels={data.labels} {events} {selectId} obfuscated={$obfuscated} />
     </div>
 </main>
 
@@ -131,22 +117,6 @@
 
         span {
             margin-left: 0.2em;
-        }
-    }
-
-    ul {
-        list-style: none;
-        padding: 0;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-
-        @media #{$mobile} {
-            grid-template-columns: 1fr;
-            margin: 0;
-        }
-
-        @media #{$large} {
-            grid-template-columns: 1fr 1fr 1fr;
         }
     }
 

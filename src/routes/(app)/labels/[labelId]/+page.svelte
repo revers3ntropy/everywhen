@@ -1,5 +1,6 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
+    import EventsList from '$lib/components/event/EventsList.svelte';
     import { listen } from '$lib/dataChangeEvents';
     import Delete from 'svelte-material-icons/Delete.svelte';
     import Entries from '$lib/components/entry/Entries.svelte';
@@ -81,48 +82,44 @@
     <title>{label.name} | Label</title>
 </svelte:head>
 
-<main class="md:p-4 {$navExpanded ? 'md:ml-48' : 'md:ml-16'}">
-    <div class="color-select" style="border-color: {label.color}">
-        {label.color}
-        <input type="color" bind:value={label.color} on:change={updateColor} />
-    </div>
-    <div class="title-line">
-        <input class="name editable-text" bind:value={label.name} on:change={updateName} />
-        <button class="with-circled-icon danger" on:click={deleteLabel}>
-            <Delete size="30" />
-            Delete this Label
-        </button>
-    </div>
-
-    <section>
-        <h1>
-            {eventCount}
-            Events
-        </h1>
-        <div class="events">
-            {#each events as event}
-                <Event {event} {labels} obfuscated={$obfuscated} />
-            {/each}
+<main class="md:p-4 {$navExpanded ? 'md:ml-48' : 'md:ml-16'} flex-center">
+    <div class="w-full md:max-w-5xl">
+        <div class="w-100 border-b-4 font-bold py-1" style="border-color: {label.color}">
+            {label.color}
+            <input type="color" bind:value={label.color} on:change={updateColor} />
         </div>
-    </section>
+        <div class="title-line">
+            <input
+                class="font-bold text-[2em] editable-text py-1"
+                bind:value={label.name}
+                on:change={updateName}
+            />
+            <button class="with-circled-icon danger" on:click={deleteLabel}>
+                <Delete size="30" />
+                Delete this Label
+            </button>
+        </div>
+        <div class="p-2 md:p-0 md:pb-4 md:pt-1 text-textColorLight italic">
+            {entryCount} entries, {eventCount} events have this label
+        </div>
 
-    <section>
-        <h1>{entryCount} Entries</h1>
-        <Entries
-            options={{ labelId: label.id }}
-            showLabels={false}
-            {locations}
-            labels={data.labels}
-        />
-    </section>
+        <section>
+            <EventsList labels={data.labels} {events} obfuscated={$obfuscated} />
+        </section>
+
+        <section class="pt-4">
+            <Entries
+                options={{ labelId: label.id }}
+                showLabels={false}
+                {locations}
+                labels={data.labels}
+            />
+        </section>
+    </div>
 </main>
 
 <style lang="scss">
     @import '$lib/styles/layout';
-
-    h1 {
-        margin: 2rem 0 1rem 0;
-    }
 
     .title-line {
         display: grid;
@@ -134,32 +131,6 @@
             display: block;
             justify-content: left;
             overflow-x: hidden;
-        }
-    }
-
-    .name {
-        font-size: 2em;
-        font-weight: bold;
-    }
-
-    .color-select {
-        width: calc(100% - 1em);
-        border: none;
-        border-bottom: 3px solid black;
-        font-size: 1em;
-        font-weight: bold;
-        padding: 0.4em;
-        margin: 0.4em 0;
-    }
-
-    .events {
-        padding: 0;
-        display: grid;
-        grid-template-columns: 50% 50%;
-
-        @media #{$mobile} {
-            grid-template-columns: 100%;
-            margin: 0;
         }
     }
 </style>

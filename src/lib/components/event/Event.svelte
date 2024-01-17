@@ -29,7 +29,7 @@
     export let obfuscated = true;
 
     export let event: Event & { deleted?: boolean };
-    export let selectNameId = '';
+    export let selectNameId: string | null = null;
     export let expanded = false;
     export let allowCollapseChange = true;
 
@@ -143,7 +143,7 @@
         });
     }
 
-    function selectIfSelected(selectNameId: string, eventId: string): undefined {
+    function selectIfSelected(selectNameId: string | null, eventId: string): undefined {
         if (selectNameId !== eventId) return;
         obfuscated = false;
         if (nameInput) {

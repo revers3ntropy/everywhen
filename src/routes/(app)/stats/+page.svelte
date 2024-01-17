@@ -29,7 +29,9 @@
     let heatMapData: Record<By, HeatMapData> | null = null;
     onMount(() => {
         // does not scale well, will be slow with lots of entries
+        console.log('before', data.summaries.length);
         heatMapData = heatMapDataFromEntries(data.summaries);
+        console.log('end');
     });
 </script>
 
