@@ -8,25 +8,23 @@
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
     import { showPopup } from '$lib/utils/popups';
-    import Event from '$lib/components/event/Event.svelte';
     import DeleteLabelDialog from '../DeleteLabelDialog.svelte';
     import type { PageData } from './$types';
 
     export let data: PageData;
-    const { label, locations, entryCount, events, labels } = data;
 
     async function updateName() {
         notify.onErr(
-            await api.put(apiPath('/labels/?', label.id), {
-                name: label.name
+            await api.put(apiPath('/labels/?', data.label.id), {
+                name: data.label.name
             })
         );
     }
 
     async function updateColor() {
         notify.onErr(
-            await api.put(apiPath('/labels/?', label.id), {
-                color: label.color
+            await api.put(apiPath('/labels/?', data.label.id), {
+                color: data.label.color
             })
         );
     }
@@ -36,8 +34,8 @@
         // label, deleting it easy, but if there are then
         // a more complex approach is required to clear the
         // label from the entries and events
-        if (entryCount + eventCount < 1) {
-            notify.onErr(await api.delete(apiPath(`/labels/?`, label.id)));
+        if (data.entryCount + eventCount < 1) {
+            notify.onErr(await api.delete(apiPath(`/labels/?`, data.label.id)));
             await goto('../');
             return;
         }
@@ -45,9 +43,9 @@
         showPopup(
             DeleteLabelDialog,
             {
-                id: label.id,
-                color: label.color,
-                name: label.name,
+                id: data.label.id,
+                color: data.label.color,
+                name: data.label.name,
                 reloadOnDelete: false
             },
             () => {
@@ -56,15 +54,15 @@
         );
     }
 
-    let eventCount = events.length;
+    let eventCount = data.events.length;
 
     listen.event.onDelete(id => {
-        if (events.find(e => e.id === id)) {
+        if (data.events.find(e => e.id === id)) {
             eventCount -= 1;
         }
     });
     listen.event.onCreate(({ label: l }) => {
-        if (l?.id === label.id) {
+        if (l?.id === data.label.id) {
             eventCount += 1;
         }
     });
@@ -72,26 +70,26 @@
         // As all events on this page have this label already,
         // they could only be removed from this label, not added
         // TODO: but what about changed twice...
-        if (l?.id !== label.id) {
+        if (l?.id !== data.label.id) {
             eventCount -= 1;
         }
     });
 </script>
 
 <svelte:head>
-    <title>{label.name} | Label</title>
+    <title>{data.label.name} | Label</title>
 </svelte:head>
 
 <main class="md:p-4 {$navExpanded ? 'md:ml-48' : 'md:ml-16'} flex-center">
     <div class="w-full md:max-w-5xl">
-        <div class="w-100 border-b-4 font-bold py-1" style="border-color: {label.color}">
-            {label.color}
-            <input type="color" bind:value={label.color} on:change={updateColor} />
+        <div class="w-100 border-b-4 font-bold py-1" style="border-color: {data.label.color}">
+            {data.label.color}
+            <input type="color" bind:value={data.label.color} on:change={updateColor} />
         </div>
         <div class="title-line">
             <input
                 class="font-bold text-[2em] editable-text py-1"
-                bind:value={label.name}
+                bind:value={data.label.name}
                 on:change={updateName}
             />
             <button class="with-circled-icon danger" on:click={deleteLabel}>
@@ -100,18 +98,18 @@
             </button>
         </div>
         <div class="p-2 md:p-0 md:pb-4 md:pt-1 text-textColorLight italic">
-            {entryCount} entries, {eventCount} events have this label
+            {data.entryCount} entries, {eventCount} events have this label
         </div>
 
         <section>
-            <EventsList labels={data.labels} {events} obfuscated={$obfuscated} />
+            <EventsList labels={data.labels} events={data.events} obfuscated={$obfuscated} />
         </section>
 
         <section class="pt-4">
             <Entries
-                options={{ labelId: label.id }}
+                options={{ labelId: data.label.id }}
                 showLabels={false}
-                {locations}
+                locations={data.locations}
                 labels={data.labels}
             />
         </section>
