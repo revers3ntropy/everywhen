@@ -43,7 +43,7 @@
 
     <a class="flex gap-2 pl-2 md:pr-2 md:p-0" href="/journal#{entryId}" class:obfuscated>
         <ArrowDown size="20" />
-        jump to
+        edited
         <span class="text-light pr-2">
             {#if titleShortened}
                 {titleShortened}
