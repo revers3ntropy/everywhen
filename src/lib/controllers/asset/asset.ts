@@ -69,21 +69,34 @@ export namespace Asset {
         }
 
         await Promise.allSettled(
-            [...files].map(async file => {
+            Array.from(files).map(async file => {
                 const content = await getFileContents(file, 'b64');
 
-                if (!content.ok) return void finishedUpload(content.cast());
+                if (!content.ok) {
+                    finishedUpload(content.cast());
+                    return;
+                }
 
-                if (content.val.length > 1024 * 1024 * 32)
-                    return void finishedUpload(Result.err('Image is too large'));
+                if (content.val.length > 1024 * 1024 * 32) {
+                    finishedUpload(Result.err('Image is too large'));
+                    return;
+                }
 
-                if (!content) return void finishedUpload(Result.err('Failed to read file'));
+                if (!content) {
+                    finishedUpload(Result.err('Failed to read file'));
+                    return;
+                }
 
                 const contentAsWebP = await imageToWebpUsingCanvas(content.val);
-                if (!contentAsWebP.ok) return void finishedUpload(contentAsWebP.cast());
+                if (!contentAsWebP.ok) {
+                    finishedUpload(contentAsWebP.cast());
+                    return;
+                }
 
-                if (contentAsWebP.val.length > MAX_IMAGE_SIZE)
-                    return void finishedUpload(Result.err('Image is too large'));
+                if (contentAsWebP.val.length > MAX_IMAGE_SIZE) {
+                    finishedUpload(Result.err('Image is too large'));
+                    return;
+                }
 
                 finishedUpload(
                     (

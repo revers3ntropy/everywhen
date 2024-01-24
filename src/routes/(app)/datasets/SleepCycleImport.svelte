@@ -20,7 +20,7 @@
             notify.error('Only one file can be uploaded at a time');
             return;
         }
-        const [file] = files;
+        const file = files[0];
         const csv = notify.onErr(await getFileContents(file, 'UTF-8'));
         const lines = csv.split('\n');
         const [header, ...dataLines] = lines;
