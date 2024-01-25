@@ -16,7 +16,7 @@
         <SvelteHeatmap
             data={currentData}
             view={'weekly'}
-            allowOverflow={true}
+            allowOverflow={false}
             cellGap={2}
             cellRadius={2}
             colors={['#95eab0', '#52d8bd', '#3397bd', '#0051cf']}
