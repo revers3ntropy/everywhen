@@ -191,12 +191,11 @@ async function runRemoteCommand(
     if (hideLogs) $.verbose = false;
 
     let result;
-    try {
-        result =
-            await $`sshpass -f './secrets/${env}/sshpass.txt' ssh ${remoteSshAddress()} ${command}`;
-    } catch (err) {
-        if (failOnError) throw err;
-        console.error(err);
+    const p = $`sshpass -f './secrets/${env}/sshpass.txt' ssh ${remoteSshAddress()} ${command}`;
+    if (failOnError) {
+        result = await p;
+    } else {
+        result = await p.nothrow();
     }
 
     $.verbose = wasVerbose;
