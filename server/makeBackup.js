@@ -27,18 +27,22 @@ const envFileContent = fs.readFileSync(path.resolve(__dirname, `.env`), 'utf8');
 const envFile = dotenv.parse(envFileContent);
 
 const backupsPath = `~/ew-backups/${env}`;
+const backupsPathExpanded = path.join(process.env.HOME, backupsPath.slice(1));
 const backupPath = `${backupsPath}/${Date.now()}.sql`;
 const backupsToKeep = 7;
 
 function clearOldBackups() {
-    fs.readdirSync(backupsPath)
+    // expand '~'
+    fs.readdirSync(backupsPathExpanded)
         .map(fileName => ({
             fileName,
             timestamp: parseInt(fileName.split('.')[0])
         }))
+        // sort by timestamp (newest first)
         .sort((a, b) => b.timestamp - a.timestamp)
         .slice(backupsToKeep)
-        .forEach(({ fileName }) => fs.unlinkSync(`${backupsPath}/${fileName}`));
+        // remove old backups
+        .forEach(({ fileName }) => fs.unlinkSync(`${backupsPathExpanded}/${fileName}`));
 }
 
 function createNewBackup() {
