@@ -151,7 +151,7 @@
                 disabled={actionPending}
                 on:click|preventDefault={create}
                 type="button"
-                class="primary with-icon icon-right"
+                class="primary flex-center gap-1"
             >
                 Create Account
                 <ArrowRightThinCircleOutline size="25" />

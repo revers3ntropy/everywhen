@@ -80,7 +80,7 @@
 <main class={$navExpanded ? 'md:ml-48' : 'md:ml-16'}>
     <div class="flex justify-between p-2 md:p-4">
         <div>
-            <button class="primary with-icon" on:click={newEvent}>
+            <button class="primary flex-center gap-1" on:click={newEvent}>
                 <Plus size="30" />
                 New Event
             </button>

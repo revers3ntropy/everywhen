@@ -127,7 +127,7 @@
             </a>
             <button
                 aria-label="Log In"
-                class="primary with-icon"
+                class="primary flex-center gap-1"
                 disabled={actionPending}
                 on:click|preventDefault={login}
                 type="button"

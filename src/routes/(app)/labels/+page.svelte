@@ -48,7 +48,7 @@
 </svelte:head>
 
 <main class="md:p-4 {$navExpanded ? 'md:ml-48' : 'md:ml-16'}">
-    <button class="primary with-icon" on:click={newLabel}>
+    <button class="primary flex-center gap-1" on:click={newLabel}>
         <Plus size="30" />
         New Label
     </button>

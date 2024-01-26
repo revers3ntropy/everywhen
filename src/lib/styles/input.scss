@@ -132,10 +132,9 @@ select {
 a,
 button {
     &.primary {
-        border-radius: $border-radius;
-        padding: 0.4em 0.8em 0.4em 0.4em;
-        margin: 0.5em;
+        border-radius: 9999px;
         background: var(--accent-gradient);
+        padding: 0.25rem 0.5rem;
 
         &, svg, * {
             color: var(--text-colour-on-gradient) !important;
@@ -261,4 +260,12 @@ input[type=number].num-no-arrows {
         -webkit-appearance: none;
     }
     -moz-appearance: textfield;
+}
+
+.grad-bg {
+    background: var(--accent-gradient);
+
+    &, svg, svg * {
+        color: var(--text-colour-on-gradient);
+    }
 }

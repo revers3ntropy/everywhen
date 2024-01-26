@@ -50,7 +50,7 @@
 
 <main class="md:mr-2 {$navExpanded ? 'md:ml-48' : 'md:ml-16'}">
     <div class="p-2">
-        <button on:click={() => fileDropInput.click()} class="primary with-icon">
+        <button on:click={() => fileDropInput.click()} class="primary flex-center gap-1">
             <Upload size="30" />
             Upload
         </button>

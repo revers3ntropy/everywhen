@@ -16,7 +16,7 @@
         <h1> <span class="serif">Everywhen</span> <span class="beta"> beta </span> </h1>
         <p> YOUR JOURNAL AND LIFE LOG </p>
 
-        <a href="./login" class="primary with-icon serif">
+        <a href="./login" class="primary flex-center gap-2 serif">
             Start Writing <ArrowRightThinCircleOutline size="20" />
         </a>
     </div>

@@ -445,8 +445,7 @@
             <div class="flex p-2 justify-end">
                 <button
                     aria-label="Submit Entry"
-                    class="flex-center primary"
-                    style="padding: 0.25rem; margin: 0"
+                    class="flex-center gap-2 primary"
                     disabled={submitted}
                     on:click={submit}
                 >
