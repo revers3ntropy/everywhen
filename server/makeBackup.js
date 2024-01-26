@@ -26,17 +26,39 @@ const envFileContent = fs.readFileSync(path.resolve(__dirname, `.env`), 'utf8');
  */
 const envFile = dotenv.parse(envFileContent);
 
-const backupPath = `~/ew-backups/${env}/${Date.now()}.sql`;
+const backupsPath = `~/ew-backups/${env}`;
+const backupPath = `${backupsPath}/${Date.now()}.sql`;
+const backupsToKeep = 7;
 
-exec(
-    `mysqldump --no-tablespaces -u "${envFile.DB_USER}" -p"${envFile.DB_PASS}" "${envFile.DB}" > ${backupPath}`,
-    (err, stdout, stderr) => {
-        if (err) {
-            console.log(err);
-            return;
-        }
+function clearOldBackups() {
+    fs.readdirSync(backupsPath)
+        .map(fileName => ({
+            fileName,
+            timestamp: parseInt(fileName.split('.')[0])
+        }))
+        .sort((a, b) => b.timestamp - a.timestamp)
+        .slice(backupsToKeep)
+        .forEach(({ fileName }) => fs.unlinkSync(`${backupsPath}/${fileName}`));
+}
 
-        console.log(stdout);
-        console.log(stderr);
-    }
-);
+function createNewBackup() {
+    return new Promise(resolve =>
+        exec(
+            `mysqldump --no-tablespaces -u "${envFile.DB_USER}" -p"${envFile.DB_PASS}" "${envFile.DB}" > ${backupPath}`,
+            (err, stdout, stderr) => {
+                if (err) {
+                    console.log(err);
+                    return;
+                }
+
+                console.log(stdout);
+                console.log(stderr);
+                resolve();
+            }
+        )
+    );
+}
+
+void (async () => {
+    await createNewBackup().then(clearOldBackups);
+})();

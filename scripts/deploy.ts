@@ -487,13 +487,11 @@ async function standardDeploy() {
     console.log(`Estimated downtime: ${c.red(downtime.toPrecision(3))}s`);
 }
 
-async function main() {
+void (async () => {
     const start = now();
 
     await standardDeploy();
 
     const totalTime = (now() - start) / 1000;
     console.log(`Deployment finished in ${c.cyan(totalTime.toPrecision(3))}s`);
-}
-
-void main();
+})();
