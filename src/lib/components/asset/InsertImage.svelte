@@ -60,13 +60,14 @@
         <span slot="button">
             <ImageArea {size} />
         </span>
-        <div class="pt-4">
+        <div>
             <button
                 on:click={() => fileDropInput.click()}
                 class="with-icon upload-button icon-gradient-on-hover"
+                style="padding: 0.75rem;"
             >
                 <Upload size="30" />
-                Upload
+                Upload Image
             </button>
             <input
                 type="file"
