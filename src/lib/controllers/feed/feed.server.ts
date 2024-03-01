@@ -1,15 +1,14 @@
 import { entriesProvider } from '$lib/controllers/feed/entriesProvider';
 import { entryEditsProvider } from '$lib/controllers/feed/entryEditsProvider';
 import { eventEndsProvider, eventStartsProvider } from '$lib/controllers/feed/eventsProvider';
+import { happinessProvider } from '$lib/controllers/feed/happinessProvidor';
 import { sleepCycleProvider } from '$lib/controllers/feed/sleepCycleProvider';
 import { Label } from '$lib/controllers/label/label.server';
 import type { Day } from '$lib/utils/day';
-import { decrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
 import { Feed as _Feed, type FeedItem, type FeedDay } from './feed';
 import { error } from '@sveltejs/kit';
 import type { Auth } from '$lib/controllers/auth/auth';
-import { query } from '$lib/db/mysql.server';
 
 export interface FeedProvider {
     feedItemsOnDay(auth: Auth, day: Day): Promise<Result<FeedItem[]>>;
@@ -22,30 +21,9 @@ namespace FeedServer {
         entriesProvider,
         entryEditsProvider,
         eventEndsProvider,
-        eventStartsProvider
+        eventStartsProvider,
+        happinessProvider
     ];
-
-    async function happinessForDay(auth: Auth, day: Day): Promise<number | null> {
-        const happinesses = await query<{ rowJson: string }[]>`
-            SELECT rowJson
-            FROM datasetRows, datasets
-            WHERE datasets.id = datasetRows.datasetId
-                AND datasets.userId = ${auth.id}
-                AND datasetRows.userId = ${auth.id}
-                AND datasets.presetId = 'happiness'
-                AND DATE_FORMAT(FROM_UNIXTIME(datasetRows.timestamp + datasetRows.timestampTzOffset * 60 * 60), '%Y-%m-%d') 
-                    = ${day.fmtIso()}
-        `;
-        if (happinesses.length === 0) return null;
-        return (
-            happinesses
-                .map(({ rowJson }) => decrypt(rowJson, auth.key).or(null))
-                .filter((v): v is string => v !== null)
-                .map(rowJson => Result.tryJsonParse<[number]>(rowJson).or(null))
-                .filter((v): v is [number] => v !== null)
-                .reduce((sum, value) => sum + value[0], 0) / happinesses.length
-        );
-    }
 
     async function getNextDayInPast(auth: Auth, day: Day): Promise<Day | null> {
         const yesterday = day.plusDays(-1);
@@ -94,21 +72,19 @@ namespace FeedServer {
         const labels = await Label.allIndexedById(auth);
         if (!labels.ok) return labels.cast();
 
-        const [items, happiness, nextDayInPast, nextDayInFuture] = await Promise.all([
+        const [items, nextDayInPast, nextDayInFuture] = await Promise.all([
             Result.collectAsync(PROVIDERS.map(p => p.feedItemsOnDay(auth, day))).then(r =>
                 r
                     .map(items => items.flat())
                     .map(Feed.orderedFeedItems)
                     .unwrap(e => error(400, e))
             ),
-            happinessForDay(auth, day),
             getNextDayInPast(auth, day).then(d => d?.fmtIso() ?? null),
             getNextDayInFuture(auth, day).then(d => d?.fmtIso() ?? null)
         ]);
 
         return Result.ok({
             items,
-            happiness,
             nextDayInPast,
             nextDayInFuture,
             day: day.fmtIso()

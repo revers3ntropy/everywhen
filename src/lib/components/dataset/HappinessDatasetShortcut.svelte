@@ -11,7 +11,6 @@
     import { datasetPresets } from '$lib/controllers/dataset/presets';
 
     export let dataset: Dataset | null;
-    export let buttonValue: number | null = null;
 
     async function submit(value: number) {
         if (submitted !== null) return;
@@ -59,11 +58,7 @@
 {:else}
     <Dropdown fromRight>
         <div slot="button" class="bg-lightAccent rounded-full w-fit hover:bg-transparent">
-            {#if buttonValue !== null}
-                <HappinessValueIcon value={buttonValue} size={24} />
-            {:else}
-                <EmoticonOutline size={24} />
-            {/if}
+            <EmoticonOutline size={24} />
 
             <div class="absolute text-light top-0 left-0" style="transform: translate(15px, 7px)">
                 <Plus size={16} />

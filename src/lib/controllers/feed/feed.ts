@@ -29,6 +29,13 @@ export type FeedItemTypes = {
         quality: number | null;
         regularity: number | null;
     };
+    happiness: {
+        type: 'happiness';
+        id: string;
+        timestamp: number;
+        timestampTzOffset: number;
+        value: number;
+    };
     entry: { type: 'entry' } & Entry;
     entryEdit: {
         type: 'entry-edit';
@@ -49,7 +56,6 @@ export type FeedItem = FeedItemTypes[keyof FeedItemTypes];
 export interface FeedDay {
     day: string;
     items: FeedItem[];
-    happiness: number | null;
     nextDayInPast: string | null;
     nextDayInFuture: string | null;
 }
@@ -64,6 +70,8 @@ export namespace Feed {
             case 'entry':
             case 'entry-edit':
                 return item.created;
+            case 'happiness':
+                return item.timestamp;
             case 'sleep':
             case 'event-start':
                 return item.start;

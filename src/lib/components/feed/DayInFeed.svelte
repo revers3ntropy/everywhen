@@ -11,6 +11,7 @@
     import EntryEditFeedItem from '$lib/components/feed/EntryEditFeedItem.svelte';
     import EventEndFeedItem from '$lib/components/feed/EventEndFeedItem.svelte';
     import EventStartFeedItem from '$lib/components/feed/EventStartFeedItem.svelte';
+    import HappinessFeedItem from '$lib/components/feed/HappinessFeedItem.svelte';
     import SleepInfo from '$lib/components/feed/SleepCycleFeedItem.svelte';
     import { Feed, type FeedItem } from '$lib/controllers/feed/feed';
     import type { Label } from '$lib/controllers/label/label';
@@ -125,14 +126,7 @@
             </div>
             <div>
                 {#if isToday && showForms}
-                    <HappinessDatasetShortcut
-                        dataset={happinessDataset}
-                        buttonValue={day.happiness}
-                    />
-                {:else if day.happiness !== null}
-                    <!-- show on 'today' when forms are hidden,
-                         and every other day which has a score -->
-                    <HappinessValueIcon value={day.happiness} />
+                    <HappinessDatasetShortcut dataset={happinessDataset} />
                 {/if}
             </div>
         </div>
@@ -187,6 +181,13 @@
                             {item}
                             previousItem={items[i + 1] ?? null}
                             {obfuscated}
+                        />
+                    {:else if item.type === 'happiness'}
+                        <HappinessFeedItem
+                            {obfuscated}
+                            timestamp={item.timestamp}
+                            tzOffset={item.timestampTzOffset}
+                            value={item.value}
                         />
                     {/if}
                 {/each}
