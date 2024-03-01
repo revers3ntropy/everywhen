@@ -13,6 +13,6 @@
     <HappinessValueIcon {value} />
     <div class="basis-full h-0 md:hidden"></div>
     <div class="flex-center gap-4 px-2 md:p-0" class:obfuscated>
-        {value * 10}/10
+        <span class="font-bold">{value * 10}</span>/10
     </div>
 </div>
