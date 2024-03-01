@@ -1,6 +1,7 @@
 <script lang="ts">
     import HappinessValueIcon from '$lib/components/dataset/HappinessValueIcon.svelte';
     import TimeInFeed from '$lib/components/feed/TimeInFeed.svelte';
+    import { settingsStore } from '$lib/stores';
 
     export let tzOffset: number;
     export let timestamp: number;
@@ -12,7 +13,9 @@
     <TimeInFeed {timestamp} {tzOffset} />
     <HappinessValueIcon {value} />
     <div class="basis-full h-0 md:hidden"></div>
-    <div class="flex-center gap-4 px-2 md:p-0" class:obfuscated>
-        <span class="font-bold">{value * 10}</span>/10
-    </div>
+    {#if $settingsStore.happinessInputStyle.value === 'scale'}
+        <div class="flex-center gap-4 px-2 md:p-0" class:obfuscated>
+            <span class="font-bold">{value * 10}</span>
+        </div>
+    {/if}
 </div>
