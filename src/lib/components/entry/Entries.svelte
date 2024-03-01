@@ -120,7 +120,6 @@
                 day={{
                     items: entries[day].map(e => ({ ...e, type: 'entry' })),
                     day,
-                    happiness: null,
                     nextDayInPast: null,
                     nextDayInFuture: null
                 }}
