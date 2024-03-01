@@ -29,7 +29,6 @@
     import { onMount } from 'svelte';
     import HappinessDatasetShortcut from '$lib/components/dataset/HappinessDatasetShortcut.svelte';
     import type { Dataset } from '$lib/controllers/dataset/dataset';
-    import HappinessValueIcon from '$lib/components/dataset/HappinessValueIcon.svelte';
 
     export let locations: Location[];
     export let labels: Record<string, Label>;
