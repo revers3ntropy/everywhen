@@ -18,9 +18,16 @@ export const githubCommitsProvider = {
     }
 } satisfies ThirdPartyDatasetProvider;
 
+export const weatherProvider = {
+    fetchDataset(): Promise<Result<DatasetRow[]>> {
+        return Promise.resolve(Result.err('Not implemented'));
+    }
+} satisfies ThirdPartyDatasetProvider;
+
 export const thirdPartyDatasetProviders: Record<PresetId, ThirdPartyDatasetProvider | null> = {
     weight: null,
     gitHubCommits: githubCommitsProvider,
     happiness: null,
-    sleepCycle: null
+    sleepCycle: null,
+    weather: weatherProvider
 };

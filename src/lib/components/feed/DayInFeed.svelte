@@ -53,6 +53,7 @@
     }
 
     onMount(() => {
+        console.log(day.weather);
         if (items?.length < 1 && (!isToday || !showForms)) {
             $collapsed[day.day] = 'empty';
         }

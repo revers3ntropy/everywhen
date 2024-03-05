@@ -65,6 +65,47 @@ export const datasetPresets = {
         id: 'gitHubCommits',
         defaultName: 'GitHub Commits',
         columns: []
+    },
+    weather: {
+        id: 'weather',
+        defaultName: 'Weather',
+        columns: [
+            {
+                id: 0,
+                name: 'Temperature',
+                created: null,
+                type: builtInTypes.number,
+                datasetId: ''
+            },
+            {
+                id: 1,
+                name: 'Humidity',
+                created: null,
+                type: builtInTypes.number,
+                datasetId: ''
+            },
+            {
+                id: 2,
+                name: 'Precipitation',
+                created: null,
+                type: builtInTypes.number,
+                datasetId: ''
+            },
+            {
+                id: 3,
+                name: 'Cloud Cover',
+                created: null,
+                type: builtInTypes.number,
+                datasetId: ''
+            },
+            {
+                id: 4,
+                name: 'Wind Speed (Max)',
+                created: null,
+                type: builtInTypes.number,
+                datasetId: ''
+            }
+        ]
     }
 } satisfies Record<string, DatasetPreset>;
 

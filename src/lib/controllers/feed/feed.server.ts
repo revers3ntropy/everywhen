@@ -4,6 +4,7 @@ import { eventEndsProvider, eventStartsProvider } from '$lib/controllers/feed/ev
 import { happinessProvider } from '$lib/controllers/feed/happinessProvidor';
 import { sleepCycleProvider } from '$lib/controllers/feed/sleepCycleProvider';
 import { Label } from '$lib/controllers/label/label.server';
+import { OpenWeatherMapAPI } from '$lib/controllers/openWeatherMapAPI/openWeatherMapAPI.server';
 import type { Day } from '$lib/utils/day';
 import { Result } from '$lib/utils/result';
 import { Feed as _Feed, type FeedItem, type FeedDay } from './feed';
@@ -68,11 +69,22 @@ namespace FeedServer {
         );
     }
 
+    async function weatherDataForDay(day: Day): Promise<Result<FeedDay['weather']>> {
+        return OpenWeatherMapAPI.getWeatherForDay(day, 0, 0).then(r =>
+            r.map(({ wind, temperature, cloud_cover, precipitation }) => ({
+                temperatureMean: temperature.afternoon,
+                precipitationTotal: precipitation.total,
+                cloudCoverAt12pm: cloud_cover.afternoon,
+                windSpeedMax: wind.max.speed
+            }))
+        );
+    }
+
     export async function getDay(auth: Auth, day: Day): Promise<Result<FeedDay>> {
         const labels = await Label.allIndexedById(auth);
         if (!labels.ok) return labels.cast();
 
-        const [items, nextDayInPast, nextDayInFuture] = await Promise.all([
+        const [items, nextDayInPast, nextDayInFuture, weather] = await Promise.all([
             Result.collectAsync(PROVIDERS.map(p => p.feedItemsOnDay(auth, day))).then(r =>
                 r
                     .map(items => items.flat())
@@ -80,14 +92,16 @@ namespace FeedServer {
                     .unwrap(e => error(400, e))
             ),
             getNextDayInPast(auth, day).then(d => d?.fmtIso() ?? null),
-            getNextDayInFuture(auth, day).then(d => d?.fmtIso() ?? null)
+            getNextDayInFuture(auth, day).then(d => d?.fmtIso() ?? null),
+            weatherDataForDay(day).then(w => w.unwrap(e => error(400, e)))
         ]);
 
         return Result.ok({
             items,
             nextDayInPast,
             nextDayInFuture,
-            day: day.fmtIso()
+            day: day.fmtIso(),
+            weather
         } satisfies FeedDay);
     }
 }

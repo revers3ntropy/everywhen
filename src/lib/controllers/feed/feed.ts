@@ -58,6 +58,12 @@ export interface FeedDay {
     items: FeedItem[];
     nextDayInPast: string | null;
     nextDayInFuture: string | null;
+    weather: {
+        temperatureMean: number;
+        precipitationTotal: number;
+        cloudCoverAt12pm: number;
+        windSpeedMax: number;
+    } | null;
 }
 
 export interface Feed {
