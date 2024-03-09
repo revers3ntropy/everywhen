@@ -69,15 +69,8 @@ namespace FeedServer {
         );
     }
 
-    async function weatherDataForDay(day: Day): Promise<Result<FeedDay['weather']>> {
-        return OpenWeatherMapAPI.getWeatherForDay(day, 0, 0).then(r =>
-            r.map(({ wind, temperature, cloud_cover, precipitation }) => ({
-                temperatureMean: temperature.afternoon,
-                precipitationTotal: precipitation.total,
-                cloudCoverAt12pm: cloud_cover.afternoon,
-                windSpeedMax: wind.max.speed
-            }))
-        );
+    async function weatherDataForDay(day: Day): Promise<Result<OpenWeatherMapAPI.WeatherForDay>> {
+        return OpenWeatherMapAPI.getWeatherForDay(day, 52.3779, -1.5587);
     }
 
     export async function getDay(auth: Auth, day: Day): Promise<Result<FeedDay>> {
@@ -93,7 +86,7 @@ namespace FeedServer {
             ),
             getNextDayInPast(auth, day).then(d => d?.fmtIso() ?? null),
             getNextDayInFuture(auth, day).then(d => d?.fmtIso() ?? null),
-            weatherDataForDay(day).then(w => w.unwrap(e => error(400, e)))
+            weatherDataForDay(day).then(w => w.or(null))
         ]);
 
         return Result.ok({

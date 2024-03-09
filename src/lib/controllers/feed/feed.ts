@@ -1,5 +1,6 @@
 import type { Entry } from '$lib/controllers/entry/entry';
 import { Event } from '$lib/controllers/event/event';
+import type { OpenWeatherMapAPI } from '$lib/controllers/openWeatherMapAPI/openWeatherMapAPI.server';
 
 export type FeedItemTypes = {
     eventEnd: {
@@ -58,12 +59,7 @@ export interface FeedDay {
     items: FeedItem[];
     nextDayInPast: string | null;
     nextDayInFuture: string | null;
-    weather: {
-        temperatureMean: number;
-        precipitationTotal: number;
-        cloudCoverAt12pm: number;
-        windSpeedMax: number;
-    } | null;
+    weather: OpenWeatherMapAPI.WeatherForDay | null;
 }
 
 export interface Feed {

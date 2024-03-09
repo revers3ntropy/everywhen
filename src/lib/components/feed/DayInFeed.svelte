@@ -7,14 +7,18 @@
 </script>
 
 <script lang="ts">
+    import WeatherDialog from '$lib/components/dialogs/WeatherDialog.svelte';
     import EntryForm from '$lib/components/entryForm/EntryForm.svelte';
     import EntryEditFeedItem from '$lib/components/feed/EntryEditFeedItem.svelte';
     import EventEndFeedItem from '$lib/components/feed/EventEndFeedItem.svelte';
     import EventStartFeedItem from '$lib/components/feed/EventStartFeedItem.svelte';
     import HappinessFeedItem from '$lib/components/feed/HappinessFeedItem.svelte';
     import SleepInfo from '$lib/components/feed/SleepCycleFeedItem.svelte';
+    import WeatherWidget from '$lib/components/weather/WeatherWidget.svelte';
     import { Feed, type FeedItem } from '$lib/controllers/feed/feed';
     import type { Label } from '$lib/controllers/label/label';
+    import { Day } from '$lib/utils/day';
+    import { showPopup } from '$lib/utils/popups';
     import { fly, slide } from 'svelte/transition';
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
@@ -124,7 +128,18 @@
                     {/if}
                 </button>
             </div>
-            <div>
+            <div class="flex-center gap-2">
+                {#if day.weather}
+                    <button
+                        on:click={() =>
+                            showPopup(WeatherDialog, {
+                                day: Day.fromString(day.day).unwrap(),
+                                weather: day.weather
+                            })}
+                    >
+                        <WeatherWidget weather={day.weather} />
+                    </button>
+                {/if}
                 {#if isToday && showForms}
                     <HappinessDatasetShortcut dataset={happinessDataset} />
                 {/if}

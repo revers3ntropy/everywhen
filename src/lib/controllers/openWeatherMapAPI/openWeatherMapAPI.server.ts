@@ -43,11 +43,18 @@ const weatherForDayExpectedSchema = z.object({
 export namespace OpenWeatherMapAPI {
     export type WeatherForDay = z.infer<typeof weatherForDayExpectedSchema>;
 
+    const cache = new Map<string, WeatherForDay>();
+
     export async function getWeatherForDay(
         day: Day,
         lat: number,
         long: number
     ): Promise<Result<WeatherForDay>> {
+        const cacheKey = `${day.fmtIso()}-${lat}-${long}`;
+        if (cache.has(cacheKey)) {
+            return Result.ok(cache.get(cacheKey));
+        }
+
         // will work up to 1.5 years into the future,
         // but should really only be for days in the past as days in the future
         // is prediction but would display like it's a fact
@@ -57,18 +64,14 @@ export namespace OpenWeatherMapAPI {
         if (!OPEN_WEATHER_MAP_API_KEY) {
             return Result.err('Cannot fetch weather data at this time');
         }
-        const apiUrl = `https://api.openweathermap.org/data/3.0/onecall/day_summary?lat=${lat}&lon=${long}&date=${day.fmtIso()}&appid=${OPEN_WEATHER_MAP_API_KEY}}`;
+        const apiUrl = `https://api.openweathermap.org/data/3.0/onecall/day_summary?lat=${lat}&lon=${long}&date=${day.fmtIso()}&appid=${OPEN_WEATHER_MAP_API_KEY}`;
         let res;
         try {
-            console.log('WEATHER API REQUEST!!!');
             res = await fetch(apiUrl, {
-                method: 'GET',
-                headers: {
-                    Accept: 'application/json'
-                }
+                method: 'GET'
             });
         } catch (error) {
-            await logger.warn('makeGhApiReq: Error connecting to OpenWeatherMap', {
+            await logger.warn('getWeatherForDay: Error connecting to OpenWeatherMap', {
                 error,
                 day,
                 lat,
@@ -81,9 +84,15 @@ export namespace OpenWeatherMapAPI {
         try {
             data = await res.json();
         } catch (error) {
-            await logger.error('makeGhApiReq: Invalid response from OpenWeatherMap', {
+            let textRes = 'could not parse response';
+            try {
+                textRes = await res.text();
+            } catch (error) {
+                // ignore
+            }
+            await logger.error('getWeatherForDay: Invalid response from OpenWeatherMap', {
                 res,
-                textRes: await res.text(),
+                textRes,
                 error
             });
             return Result.err('Invalid response from OpenWeatherMap');
@@ -95,6 +104,8 @@ export namespace OpenWeatherMapAPI {
             await logger.error(`getWeatherForDay: Invalid response from OpenWeatherMap`, { data });
             return Result.err('Invalid response from OpenWeatherMap');
         }
+
+        cache.set(cacheKey, parseResult.data);
 
         return Result.ok(parseResult.data);
     }

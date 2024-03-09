@@ -114,11 +114,20 @@
     }
 
     let showingMap = false;
+    let containerDiv: HTMLDivElement;
+
+    $: isFocused = $page.url.hash.endsWith(id);
 
     // cannot generate HTML server-side
     let entryHtml = '...';
     onMount(() => {
         entryHtml = rawMdToHtml(body);
+
+        if (isFocused) {
+            setTimeout(() => {
+                containerDiv.scrollIntoView();
+            }, 0);
+        }
     });
 </script>
 
@@ -126,7 +135,8 @@
     class="entry w-full h-fit pt-2 outline-none border border-transparent rounded-md"
     class:in-dialog={isInDialog}
     {id}
-    style={$page.url.hash.endsWith(id) ? 'border-color: var(--secondary)' : ''}
+    style={isFocused ? 'border-color: var(--secondary)' : ''}
+    bind:this={containerDiv}
 >
     {#if showFullDate}
         <div class="text-light">
