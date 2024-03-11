@@ -1,7 +1,14 @@
 import type { SettingConfig, SettingValue } from '$lib/controllers/settings/settings';
-import type { Seconds } from '../../../types';
+import type { OptionalCoords, Seconds } from '../../../types';
 
 export const settingsConfig = {
+    homeLocation: {
+        type: 'location',
+        defaultValue: [null, null],
+        name: 'Home Location',
+        description: 'Your home location. Used by Weather.',
+        showInSettings: true
+    } as SettingConfig<OptionalCoords>,
     hideEntriesByDefault: {
         type: 'boolean',
         defaultValue: false,

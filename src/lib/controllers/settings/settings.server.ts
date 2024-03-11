@@ -3,7 +3,12 @@ import { decrypt, encrypt } from '$lib/utils/encryption';
 import { FileLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 import { nowUtc } from '$lib/utils/time';
-import { Settings as _Settings, type SettingsConfig, type SettingsKey } from './settings';
+import {
+    Settings as _Settings,
+    type SettingConfig,
+    type SettingsConfig,
+    type SettingsKey
+} from './settings';
 import { UId } from '$lib/controllers/uuid/uuid.server';
 import type { Auth } from '$lib/controllers/auth/auth';
 
@@ -12,6 +17,32 @@ const logger = new FileLogger('Stngs');
 namespace SettingsServer {
     const Settings = _Settings;
     type Settings = _Settings;
+
+    export function validateSetting(
+        expectedType: SettingConfig<string>['type'],
+        value: unknown
+    ): null | string {
+        if (expectedType === 'location') {
+            if (!Array.isArray(value) || value.length !== 2) {
+                return 'Invalid setting value, expected [number, number]';
+            }
+
+            if (typeof value[0] !== 'number' || typeof value[1] !== 'number') {
+                if (!(value[1] === null && value[0] === null))
+                    return 'Invalid setting value, expected [number, number]';
+            }
+        } else if (typeof expectedType === 'string' && typeof value !== expectedType) {
+            return `Invalid setting value, expected ${expectedType} but got ${typeof value}`;
+        }
+        // enum type
+        else if (
+            typeof expectedType !== 'string' &&
+            (typeof value !== 'string' || !expectedType.includes(value))
+        ) {
+            return `Invalid setting value, expected one of [${expectedType.join(', ')}]`;
+        }
+        return null;
+    }
 
     export async function update(
         auth: Auth,
@@ -24,20 +55,9 @@ namespace SettingsServer {
 
         const now = nowUtc();
 
-        const expectedType = Settings.config[key].type;
-        if (typeof expectedType === 'string') {
-            if (typeof value !== expectedType) {
-                return Result.err(
-                    `Invalid setting value, expected ${expectedType} but got ${typeof value}`
-                );
-            }
-        } else {
-            // enum type
-            if (typeof value !== 'string' || !expectedType.includes(value)) {
-                return Result.err(
-                    `Invalid setting value, expected one of [${expectedType.join(', ')}]`
-                );
-            }
+        const validationErr = validateSetting(Settings.config[key].type, value);
+        if (validationErr !== null) {
+            return Result.err(validationErr);
         }
 
         const valEncrypted = encrypt(JSON.stringify(value), auth.key);

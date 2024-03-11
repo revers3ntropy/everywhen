@@ -1,4 +1,5 @@
 <script lang="ts">
+    import LocationSelector from '$lib/components/location/LocationSelector.svelte';
     import Dot from '$lib/components/ui/Dot.svelte';
     import { tooltip } from '@svelte-plugins/tooltips';
     import CloudCheckOutline from 'svelte-material-icons/CloudCheckOutline.svelte';
@@ -6,23 +7,24 @@
     import { api } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
     import { currentTzOffset, fmtDuration, fmtUtc, nowUtc } from '$lib/utils/time';
-    import type { SettingsConfig } from '$lib/controllers/settings/settings';
+    import type { SettingsConfig, SettingValue } from '$lib/controllers/settings/settings';
     import { settingsStore } from '$lib/stores';
+    import type { OptionalCoords } from '../../../types';
 
     export let id: string;
     export let key: string;
-    export let defaultValue: string | number | boolean;
+    export let defaultValue: SettingValue;
     export let name: string;
     export let type: string | string[];
     export let description: string;
     export let unit = '';
-    export let value: string | number | boolean;
+    export let value: SettingValue;
     export let created = null as number | null;
     export let showInSettings = true as boolean;
 
     let saving = false;
 
-    let inputType: 'text' | 'number' | 'checkbox' | 'select';
+    let inputType: 'text' | 'number' | 'checkbox' | 'select' | 'location';
 
     if (!type || !key) throw new Error('Missing type or key');
 
@@ -36,16 +38,19 @@
         case 'boolean':
             inputType = 'checkbox';
             break;
+        case 'location':
+            inputType = type;
+            break;
         default:
             if (Array.isArray(type)) {
                 inputType = 'select';
                 break;
             }
 
-            throw new Error(`Unknown input type: ${key}`);
+            throw new Error(`Unknown input type for ${key}`);
     }
 
-    async function updateValue(newValue: string | number | boolean) {
+    async function updateValue(newValue: SettingValue) {
         saving = true;
 
         value = newValue;
@@ -66,6 +71,10 @@
     }
 
     async function onInput(event: Event) {
+        if (type === 'location') {
+            await updateValue((event as CustomEvent<OptionalCoords>).detail);
+            return;
+        }
         let target = event.target as HTMLInputElement;
         let newValue: boolean | string | number = target.value;
         if (type === 'boolean') {
@@ -133,6 +142,8 @@
                         </option>
                     {/each}
                 </select>
+            {:else if inputType === 'location'}
+                <LocationSelector {value} on:change={onInput} height="25vh" />
             {:else}
                 <input
                     checked={inputType === 'checkbox' && !!value}

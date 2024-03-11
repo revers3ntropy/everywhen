@@ -41,6 +41,7 @@ export type TimestampMilliseconds = number;
 export type Milliseconds = number;
 export type Degrees = number;
 export type Meters = number;
+export type OptionalCoords = [Degrees, Degrees] | [null, null];
 
 export type EventsSortKey = 'name' | 'start' | 'end' | 'created';
 

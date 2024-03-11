@@ -5,6 +5,7 @@ import { happinessProvider } from '$lib/controllers/feed/happinessProvidor';
 import { sleepCycleProvider } from '$lib/controllers/feed/sleepCycleProvider';
 import { Label } from '$lib/controllers/label/label.server';
 import { OpenWeatherMapAPI } from '$lib/controllers/openWeatherMapAPI/openWeatherMapAPI.server';
+import { Settings } from '$lib/controllers/settings/settings.server';
 import type { Day } from '$lib/utils/day';
 import { Result } from '$lib/utils/result';
 import { Feed as _Feed, type FeedItem, type FeedDay } from './feed';
@@ -69,8 +70,15 @@ namespace FeedServer {
         );
     }
 
-    async function weatherDataForDay(day: Day): Promise<Result<OpenWeatherMapAPI.WeatherForDay>> {
-        return OpenWeatherMapAPI.getWeatherForDay(day, 52.3779, -1.5587);
+    async function weatherDataForDay(
+        auth: Auth,
+        day: Day
+    ): Promise<Result<OpenWeatherMapAPI.WeatherForDay>> {
+        const setting = await Settings.getValue(auth, 'homeLocation');
+        if (!setting.ok) return setting.cast();
+        const [lon, lat] = setting.val;
+        if (lat === null || lon === null) return Result.err('No home location set');
+        return OpenWeatherMapAPI.getWeatherForDay(day, lat, lon);
     }
 
     export async function getDay(auth: Auth, day: Day): Promise<Result<FeedDay>> {
@@ -86,7 +94,7 @@ namespace FeedServer {
             ),
             getNextDayInPast(auth, day).then(d => d?.fmtIso() ?? null),
             getNextDayInFuture(auth, day).then(d => d?.fmtIso() ?? null),
-            weatherDataForDay(day).then(w => w.or(null))
+            weatherDataForDay(auth, day).then(w => w.or(null))
         ]);
 
         return Result.ok({

@@ -1,9 +1,10 @@
+import type { OptionalCoords } from '../../../types';
 import { settingsConfig } from './settingsConfig';
 
-export type SettingValue = string | boolean | number;
-
+export type SettingValue = string | boolean | number | OptionalCoords;
+export type SettingTypeSpecifier = 'string' | 'boolean' | 'number' | 'location' | string[];
 export interface SettingConfig<T extends SettingValue> {
-    type: 'string' | 'boolean' | 'number' | string[];
+    type: SettingTypeSpecifier;
     name: string;
     description: string;
     defaultValue: T;

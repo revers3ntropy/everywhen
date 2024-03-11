@@ -360,7 +360,7 @@
         }
 
         :global(.ol-attribution) {
-            // sorry but it's really messy :/
+            // sorry OL, but it's really messy :/
             display: none;
         }
     }
