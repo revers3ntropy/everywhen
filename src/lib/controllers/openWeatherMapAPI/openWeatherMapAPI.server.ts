@@ -54,6 +54,11 @@ export namespace OpenWeatherMapAPI {
         if (cache.has(cacheKey)) {
             return Result.ok(cache.get(cacheKey));
         }
+        // rate limit entire application to avoid fees from OpenWeatherMap
+        // (£1.2/1000 requests after 2000 requests per day)
+        if (cache.size > 1900) {
+            return Result.err('Cannot fetch weather data at this time');
+        }
 
         // will work up to 1.5 years into the future,
         // but should really only be for days in the past as days in the future

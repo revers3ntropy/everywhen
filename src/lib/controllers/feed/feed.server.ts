@@ -1,3 +1,4 @@
+import { Dataset } from '$lib/controllers/dataset/dataset.server';
 import { entriesProvider } from '$lib/controllers/feed/entriesProvider';
 import { entryEditsProvider } from '$lib/controllers/feed/entryEditsProvider';
 import { eventEndsProvider, eventStartsProvider } from '$lib/controllers/feed/eventsProvider';
@@ -74,6 +75,8 @@ namespace FeedServer {
         auth: Auth,
         day: Day
     ): Promise<Result<OpenWeatherMapAPI.WeatherForDay>> {
+        if (!(await Dataset.hasDatasetWithPresetId(auth, 'weather')))
+            return Result.err('Invalid day');
         const setting = await Settings.getValue(auth, 'homeLocation');
         if (!setting.ok) return setting.cast();
         const [lon, lat] = setting.val;
@@ -94,6 +97,9 @@ namespace FeedServer {
             ),
             getNextDayInPast(auth, day).then(d => d?.fmtIso() ?? null),
             getNextDayInFuture(auth, day).then(d => d?.fmtIso() ?? null),
+            // .or(null) throws away any errors generated,
+            // the user will see no weather rather than an error if
+            // something goes wrong
             weatherDataForDay(auth, day).then(w => w.or(null))
         ]);
 

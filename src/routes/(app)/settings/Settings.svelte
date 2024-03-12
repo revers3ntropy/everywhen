@@ -143,7 +143,12 @@
                     {/each}
                 </select>
             {:else if inputType === 'location'}
-                <LocationSelector {value} on:change={onInput} height="25vh" />
+                <!-- value is always an array, but need a check to satisfy the type system -->
+                {#if Array.isArray(value)}
+                    <LocationSelector {value} on:change={onInput} height="25vh" />
+                {:else}
+                    Something went wrong!
+                {/if}
             {:else}
                 <input
                     checked={inputType === 'checkbox' && !!value}

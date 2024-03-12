@@ -100,6 +100,15 @@ namespace DatasetServer {
         });
     }
 
+    export async function hasDatasetWithPresetId(auth: Auth, presetId: PresetId): Promise<boolean> {
+        return await query<{ id: string }[]>`
+            SELECT id
+            FROM datasets
+            WHERE userId = ${auth.id}
+                AND presetId = ${presetId}
+        `.then(rows => rows.length > 0);
+    }
+
     export async function allMetaData(auth: Auth): Promise<Result<DatasetMetadata[]>> {
         const metadatas = [] as DatasetMetadata[];
 
