@@ -121,7 +121,8 @@
                     items: entries[day].map(e => ({ ...e, type: 'entry' })),
                     day,
                     nextDayInPast: null,
-                    nextDayInFuture: null
+                    nextDayInFuture: null,
+                    weather: null
                 }}
                 obfuscated={$obfuscated}
                 {showLabels}

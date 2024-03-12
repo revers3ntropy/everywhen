@@ -9,7 +9,6 @@ import type { apiRes404, GenericResponse } from './apiResponse.server';
 import { serializeGETArgs } from './GETArgs';
 import { Result } from './result';
 import { currentTzOffset, nowUtc } from './time';
-import type { Expand } from '../../types';
 
 const logger = new Logger('ApiRq');
 
@@ -69,7 +68,7 @@ export async function makeApiReq<
     path: Path,
     body: Body | null = null,
     options: Partial<Options> = {}
-): Promise<Result<Expand<ResType<ApiRoutes[Path][Verb]>>>> {
+): Promise<Result<ResType<ApiRoutes[Path][Verb]>>> {
     if (!browser) throw new Error(`Cannot make API request on server`);
     const url = `/api${path}`;
 
@@ -109,7 +108,7 @@ export async function makeApiReq<
     const response = await fetch(url, init);
 
     if (response.ok) {
-        return await handleOkResponse<Expand<ResType<ApiRoutes[Path][Verb]>>>(
+        return await handleOkResponse<ResType<ApiRoutes[Path][Verb]>>(
             response,
             method,
             url,

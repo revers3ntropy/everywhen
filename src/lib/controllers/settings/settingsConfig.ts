@@ -4,7 +4,7 @@ import type { OptionalCoords, Seconds } from '../../../types';
 export const settingsConfig = {
     homeLocation: {
         type: 'location',
-        defaultValue: [null, null],
+        defaultValue: [null, null] as OptionalCoords,
         name: 'Home Location',
         description: 'Your home location. Used by Weather.',
         showInSettings: true
