@@ -15,7 +15,7 @@
     } from '$lib/controllers/settings/settings';
     import Settings from './Settings.svelte';
     import type { PageData } from './$types';
-    import { navExpanded, settingsStore } from '$lib/stores';
+    import { settingsStore } from '$lib/stores';
     import { Auth } from '$lib/controllers/auth/auth';
 
     export let data: PageData;
@@ -38,7 +38,7 @@
     <title>Settings</title>
 </svelte:head>
 
-<main class="md:p-4 {$navExpanded ? 'md:ml-48' : 'md:ml-16'}">
+<main class="md:p-4 md:ml-16">
     <section>
         <h1>
             <AccountCircleOutline size="35" />

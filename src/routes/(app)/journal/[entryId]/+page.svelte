@@ -5,7 +5,7 @@
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
     import { Entry as EntryController } from '$lib/controllers/entry/entry';
     import Entry from '$lib/components/entry/Entry.svelte';
-    import { navExpanded, obfuscated } from '$lib/stores';
+    import { obfuscated } from '$lib/stores';
     import type { PageData } from './$types';
     import { slide } from 'svelte/transition';
 
@@ -19,7 +19,7 @@
     <title>View Entry</title>
 </svelte:head>
 
-<main class="md:p-4 {$navExpanded ? 'md:ml-48' : 'md:ml-16'}">
+<main class="md:p-4 md:ml-16">
     <div class="text-light p-2 italic">
         {#if EntryController.isDeleted(data.entry)}
             <p class="text-warning">

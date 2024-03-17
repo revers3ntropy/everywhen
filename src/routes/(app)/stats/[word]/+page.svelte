@@ -13,7 +13,7 @@
     import EntryChart from '../EntryChart.svelte';
     import EntryHeatMap from '../EntryHeatMap.svelte';
     import type { PageData } from './$types';
-    import { encryptionKey, navExpanded } from '$lib/stores';
+    import { encryptionKey } from '$lib/stores';
 
     export let data: PageData;
 
@@ -30,7 +30,7 @@
     <title>Insights</title>
 </svelte:head>
 
-<main class="md:p-4 {$navExpanded ? 'md:ml-48' : 'md:ml-16'}">
+<main class="md:p-4 md:ml-16">
     <div class="title-line">
         <div class="flex align-center gap-2">
             <a href="/stats">

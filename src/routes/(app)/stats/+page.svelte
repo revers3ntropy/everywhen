@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { navExpanded } from '$lib/stores';
     import { Day } from '$lib/utils/day';
     import { onMount } from 'svelte';
     import ToggleSwitch from 'svelte-material-icons/ToggleSwitch.svelte';
@@ -29,9 +28,7 @@
     let heatMapData: Record<By, HeatMapData> | null = null;
     onMount(() => {
         // does not scale well, will be slow with lots of entries
-        console.log('before', data.summaries.length);
         heatMapData = heatMapDataFromEntries(data.summaries);
-        console.log('end');
     });
 </script>
 
@@ -39,7 +36,7 @@
     <title>Insights</title>
 </svelte:head>
 
-<main class="md:p-4 {$navExpanded ? 'md:pl-48' : 'md:pl-16'} flex-center">
+<main class="md:p-4 md:pl-16 flex-center">
     <div class="w-full md:max-w-5xl">
         {#if data.entryCount < 1}
             <section>

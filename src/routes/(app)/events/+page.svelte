@@ -4,7 +4,7 @@
     import Plus from 'svelte-material-icons/Plus.svelte';
     import Select from '$lib/components/Select.svelte';
     import { Event } from '$lib/controllers/event/event';
-    import { eventsSortKey, navExpanded, obfuscated } from '$lib/stores';
+    import { eventsSortKey, obfuscated } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
     import { currentTzOffset, nowUtc } from '$lib/utils/time';
@@ -77,7 +77,7 @@
     <title>Events</title>
 </svelte:head>
 
-<main class={$navExpanded ? 'md:ml-48' : 'md:ml-16'}>
+<main class="md:ml-16">
     <div class="flex justify-between p-2 md:p-4">
         <div>
             <button class="primary flex-center gap-1" on:click={newEvent}>

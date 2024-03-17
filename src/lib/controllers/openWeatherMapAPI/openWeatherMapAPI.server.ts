@@ -1,5 +1,5 @@
 import { OPEN_WEATHER_MAP_API_KEY } from '$env/static/private';
-import type { Day } from '$lib/utils/day';
+import { Day } from '$lib/utils/day';
 import { FileLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 import { z } from 'zod';
@@ -44,6 +44,7 @@ export namespace OpenWeatherMapAPI {
     export type WeatherForDay = z.infer<typeof weatherForDayExpectedSchema>;
 
     const cache = new Map<string, WeatherForDay>();
+    const numRequestsPerDay = new Map<string, number>();
 
     export async function getWeatherForDay(
         day: Day,
@@ -55,9 +56,17 @@ export namespace OpenWeatherMapAPI {
             return Result.ok(cache.get(cacheKey));
         }
         // rate limit entire application to avoid fees from OpenWeatherMap
-        // (£1.2/1000 requests after 2000 requests per day)
-        if (cache.size > 1900) {
+        // (£1.2/1000 requests after 1000 requests per day)
+        const reqsToday = numRequestsPerDay.get(Day.today(0).fmtIso()) || 0;
+        if (reqsToday > 900) {
             return Result.err('Cannot fetch weather data at this time');
+        }
+        if (!reqsToday || reqsToday < 1) {
+            // memory clean up when day changes
+            numRequestsPerDay.clear();
+            numRequestsPerDay.set(Day.today(0).fmtIso(), 1);
+        } else {
+            numRequestsPerDay.set(Day.today(0).fmtIso(), reqsToday + 1);
         }
 
         // will work up to 1.5 years into the future,
@@ -111,7 +120,6 @@ export namespace OpenWeatherMapAPI {
         }
 
         cache.set(cacheKey, parseResult.data);
-
         return Result.ok(parseResult.data);
     }
 }

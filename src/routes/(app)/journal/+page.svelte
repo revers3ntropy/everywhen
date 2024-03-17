@@ -3,7 +3,7 @@
     import DatasetShortcutWidgets from '$lib/components/dataset/DatasetShortcutWidgets.svelte';
     import EntriesSidebar from '$lib/components/entry/EntriesSidebar.svelte';
     import { notify } from '$lib/components/notifications/notifications.js';
-    import { navExpanded, obfuscated } from '$lib/stores';
+    import { obfuscated } from '$lib/stores';
     import { Day } from '$lib/utils/day';
     import { currentTzOffset } from '$lib/utils/time';
     import type { PageData } from './$types';
@@ -28,7 +28,7 @@
     <title>Journal</title>
 </svelte:head>
 
-<main class="md:flex md:justify-center gap-4 {$navExpanded ? 'md:ml-52' : 'md:ml-20'}">
+<main class="md:flex md:justify-center gap-4 md:ml-20">
     <section>
         <EntriesSidebar
             obfuscated={$obfuscated}

@@ -1,7 +1,6 @@
 <script lang="ts">
     import { datasetPresets } from '$lib/controllers/dataset/presets';
     import type { PresetId } from '$lib/controllers/dataset/presets';
-    import { navExpanded } from '$lib/stores';
     import type { PageData } from './$types';
     import { makeFromPreset } from './importHelpers';
     import SleepCycleImport from './SleepCycleImport.svelte';
@@ -19,7 +18,7 @@
     <title>Datasets</title>
 </svelte:head>
 
-<main class="mt-4 {$navExpanded ? 'md:ml-52' : 'md:ml-20'}">
+<main class="mt-4 md:ml-20">
     {#each unusedPresetIds as presetId}
         <div class="py-2">
             <button on:click={() => makeFromPreset(presetId)}>

@@ -1,6 +1,5 @@
 <script lang="ts">
     import Entries from '$lib/components/entry/Entries.svelte';
-    import { navExpanded } from '$lib/stores';
     import type { PageData } from './$types';
 
     export let data: PageData;
@@ -10,7 +9,7 @@
     <title>Deleted Entries</title>
 </svelte:head>
 
-<main class="md:p-4 {$navExpanded ? 'md:ml-48' : 'md:ml-16'}">
+<main class="md:p-4 md:ml-16">
     <div class="flex-center">
         <div style="width: min(100%, 732px)">
             <Entries

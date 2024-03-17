@@ -265,7 +265,7 @@ input[type=number].num-no-arrows {
 .grad-bg {
     background: var(--accent-gradient);
 
-    &, svg, svg * {
-        color: var(--text-colour-on-gradient);
+    &, svg, * {
+        color: var(--text-colour-on-gradient) !important;
     }
 }

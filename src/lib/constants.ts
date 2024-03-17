@@ -15,7 +15,6 @@ export const LS_KEYS = {
     enabledLocation: `${KEY_PREFIX}enabled_location`,
     sortEventsKey: `${KEY_PREFIX}events_sort_key`,
     obfuscated: `${KEY_PREFIX}obfuscated`,
-    lastTipNumber: `${KEY_PREFIX}last_tip_number`,
     doesNotWantToEnableLocation: `${KEY_PREFIX}does_not_want_to_enable_location`,
     navbarOpen: `${KEY_PREFIX}navbar_open`
 } as const;
@@ -42,7 +41,6 @@ export const LS_TO_CLEAR_ON_LOGOUT = Object.freeze([
     LS_KEYS.enabledLocation,
     LS_KEYS.sortEventsKey,
     LS_KEYS.obfuscated,
-    LS_KEYS.lastTipNumber,
     LS_KEYS.doesNotWantToEnableLocation
 ] as const);
 export const SESSION_TO_CLEAR_ON_LOGOUT = Object.freeze([SESSION_KEYS.GH_CB]);

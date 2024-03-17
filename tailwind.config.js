@@ -1,6 +1,11 @@
 /** @type {import('tailwindcss').Config} */
 export default {
     content: ['./src/**/*.{html,js,svelte,ts,scss}'],
+    variants: {
+        extend: {
+            display: ['group-hover']
+        }
+    },
     theme: {
         colors: {
             transparent: 'transparent',

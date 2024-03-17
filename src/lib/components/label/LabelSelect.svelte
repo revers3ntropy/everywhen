@@ -1,4 +1,5 @@
 <script lang="ts">
+    import CogOutline from 'svelte-material-icons/CogOutline.svelte';
     import LabelDot from '$lib/components/label/LabelDot.svelte';
     import { notify } from '$lib/components/notifications/notifications';
     import { listen } from '$lib/dataChangeEvents';
@@ -69,6 +70,12 @@
             {/key}
         </span>
         <div class="list-container">
+            <a href="/labels" class="flex items-center gap-2 px-2 py-1">
+                <CogOutline size="22" /> Manage Labels
+            </a>
+
+            <hr class="border-backgroundColor m-2" />
+
             <button
                 on:click={() => {
                     value = '';

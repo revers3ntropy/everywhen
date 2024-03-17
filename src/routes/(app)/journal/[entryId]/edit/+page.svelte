@@ -1,7 +1,7 @@
 <script lang="ts">
     import type { PageData } from './$types';
     import Close from 'svelte-material-icons/Close.svelte';
-    import { navExpanded, obfuscated } from '$lib/stores';
+    import { obfuscated } from '$lib/stores';
     import EntryForm from '$lib/components/entryForm/EntryForm.svelte';
 
     export let data: PageData;
@@ -11,7 +11,7 @@
     <title>Edit Entry</title>
 </svelte:head>
 
-<main class="pt-4 md:p-4 {$navExpanded ? 'md:ml-48' : 'md:ml-16'} flex-center">
+<main class="pt-4 md:p-4 md:ml-16 flex-center">
     <div class="w-full max-w-3xl">
         <div class="flex-center justify-between">
             <div>

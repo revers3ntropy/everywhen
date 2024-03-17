@@ -4,7 +4,7 @@
     import { listen } from '$lib/dataChangeEvents';
     import Delete from 'svelte-material-icons/Delete.svelte';
     import Entries from '$lib/components/entry/Entries.svelte';
-    import { navExpanded, obfuscated } from '$lib/stores';
+    import { obfuscated } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
     import { showPopup } from '$lib/utils/popups';
@@ -80,7 +80,7 @@
     <title>{data.label.name} | Label</title>
 </svelte:head>
 
-<main class="md:p-4 {$navExpanded ? 'md:ml-48' : 'md:ml-16'} flex-center">
+<main class="md:p-4 md:ml-16 flex-center">
     <div class="w-full md:max-w-5xl">
         <div class="w-100 border-b-4 font-bold py-1" style="border-color: {data.label.color}">
             {data.label.color}

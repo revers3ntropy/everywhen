@@ -3,7 +3,6 @@
     import EditLocation from '$lib/components/location/EditLocation.svelte';
     import Entries from '$lib/components/entry/Entries.svelte';
     import type { Location } from '$lib/controllers/location/location';
-    import { navExpanded } from '$lib/stores';
     import type { PageData } from './$types';
 
     export let data: PageData;
@@ -18,7 +17,7 @@
 <svelte:head>
     <title>{data.location.name} | Location</title>
 </svelte:head>
-<main class="p-4 {$navExpanded ? 'md:ml-48' : 'md:ml-16'}">
+<main class="p-4 md:ml-16">
     <section class="p-2 md:rounded-lg md:bg-vLightAccent md:p-4">
         <EditLocation {...data.location} {onChange} />
     </section>

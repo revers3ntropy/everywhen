@@ -22,9 +22,7 @@ export const doesNotWantToEnableLocation = persisted<boolean>(
 export const enabledLocation = persisted<boolean>(LS_KEYS.enabledLocation, false);
 export const passcodeLastEntered = persisted<number>(LS_KEYS.passcodeLastEntered, 0);
 export const eventsSortKey = persisted<EventsSortKey>(LS_KEYS.sortEventsKey, 'created');
-export const lastTipNumber = persisted<number>(LS_KEYS.lastTipNumber, 0);
 export const obfuscated = persisted<boolean>(LS_KEYS.obfuscated, false);
-export const navExpanded = persisted<boolean>(LS_KEYS.navbarOpen, false);
 
 // session storage
 export const username = persisted<string | null>(SESSION_KEYS.username, null);

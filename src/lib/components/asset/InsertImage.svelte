@@ -61,12 +61,17 @@
             <ImageArea {size} />
         </span>
         <div>
+            <a href="/assets">
+                <button class="flex p-3 items-center gap-2">
+                    <ImageArea size="28" />
+                    Open Gallery
+                </button>
+            </a>
             <button
                 on:click={() => fileDropInput.click()}
-                class="with-icon upload-button icon-gradient-on-hover"
-                style="padding: 0.75rem;"
+                class="flex items-center hover:bg-vLightAccent icon-gradient-on-hover p-3 gap-2 w-full"
             >
-                <Upload size="30" />
+                <Upload size="28" />
                 Upload Image
             </button>
             <input
@@ -122,17 +127,6 @@
     .asset {
         &:hover {
             filter: brightness(0.85);
-        }
-    }
-
-    .upload-button {
-        width: 100%;
-        padding: 4px;
-        margin: 0;
-        text-align: left;
-
-        &:hover {
-            background-color: var(--v-light-accent);
         }
     }
 </style>
