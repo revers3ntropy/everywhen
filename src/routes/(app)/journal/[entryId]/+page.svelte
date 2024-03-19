@@ -19,7 +19,7 @@
     <title>View Entry</title>
 </svelte:head>
 
-<main class="md:p-4 md:ml-16">
+<main class="md:p-4 md:ml-[7.5em]">
     <div class="text-light p-2 italic">
         {#if EntryController.isDeleted(data.entry)}
             <p class="text-warning">

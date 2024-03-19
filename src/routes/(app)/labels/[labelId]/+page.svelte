@@ -80,7 +80,7 @@
     <title>{data.label.name} | Label</title>
 </svelte:head>
 
-<main class="md:p-4 md:ml-16 flex-center">
+<main class="md:p-4 md:ml-[7.5em] flex-center">
     <div class="w-full md:max-w-5xl">
         <div class="w-100 border-b-4 font-bold py-1" style="border-color: {data.label.color}">
             {data.label.color}

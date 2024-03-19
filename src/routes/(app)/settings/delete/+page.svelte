@@ -35,7 +35,7 @@
     <meta content="Delete Everywhen account" name="description" />
 </svelte:head>
 
-<main class="md:p-4 md:ml-16">
+<main class="md:p-4 md:ml-[7.5em]">
     <section>
         <h1>
             <span class="hide-mobile">

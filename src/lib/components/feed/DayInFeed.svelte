@@ -80,7 +80,8 @@
 </script>
 
 <div class="pb-4 w-full">
-    <div class="bg-vLightAccent p-2">
+    <!-- only round top right on 'today' as the entry form always appears directly below -->
+    <div class="bg-vLightAccent p-2 rounded-{isToday && !$collapsed[day.day] ? 'tr' : 'r'}-xl">
         <div class="flex justify-between">
             <div>
                 <button class="flex-center" on:click={toggleCollapse}>
@@ -90,24 +91,25 @@
                         <ChevronUp size="25" />
                     {/if}
 
-                    <UtcTime
-                        fmt="ddd, Do MMMM YYYY"
-                        noTooltip
-                        timestamp={dayTimestamp}
-                        tzOffset={0}
-                    />
+                    {#if isToday}
+                        <span>Today</span>
+                    {:else if fmtUtc(nowUtc() - 60 * 60 * 24, currentTzOffset(), 'YYYY-MM-DD') === day.day}
+                        <span>Yesterday</span>
+                    {:else}
+                        <UtcTime
+                            fmt="ddd, Do MMMM YYYY"
+                            noTooltip
+                            timestamp={dayTimestamp}
+                            tzOffset={0}
+                        />
 
-                    <Dot light marginX={10} />
-
-                    <span class="text-light">
-                        {#if isToday}
-                            <span>Today</span>
-                        {:else if fmtUtc(nowUtc() - 60 * 60 * 24, currentTzOffset(), 'YYYY-MM-DD') === day.day}
-                            <span>Yesterday</span>
-                        {:else}
-                            <UtcTime relative timestamp={dayTimestamp} tzOffset={0} />
+                        {#if Day.fromString(day.day).unwrap().monthsAgo() < 13}
+                            <Dot light marginX={10} />
+                            <span class="text-light">
+                                <UtcTime relative timestamp={dayTimestamp} tzOffset={0} />
+                            </span>
                         {/if}
-                    </span>
+                    {/if}
 
                     {#if $collapsed[day.day]}
                         <div
@@ -153,7 +155,7 @@
             }}
         >
             {#if showForms && isToday}
-                <div class="bg-vLightAccent">
+                <div class="bg-vLightAccent rounded-br-xl">
                     <EntryForm {obfuscated} {labels} />
                 </div>
             {/if}

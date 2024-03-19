@@ -114,7 +114,7 @@
 </script>
 
 <div class="w-full md:max-w-3xl">
-    <div class="md:border md:border-borderColor">
+    <div class="md:border-l-2 md:border-borderColor">
         {#each sortedEntryKeys as day (day)}
             <DayInFeed
                 day={{

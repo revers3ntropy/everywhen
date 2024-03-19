@@ -9,6 +9,11 @@
 
 <script lang="ts">
     import 'ol-contextmenu/ol-contextmenu.css';
+    import { notify } from '$lib/components/notifications/notifications';
+    import MagnifyPlus from 'svelte-material-icons/MagnifyPlusOutline.svelte';
+    import MagnifyMinus from 'svelte-material-icons/MagnifyMinusOutline.svelte';
+    import Undo from 'svelte-material-icons/Undo.svelte';
+    import CrosshairsGps from 'svelte-material-icons/CrosshairsGps.svelte';
     import Map from 'ol/Map';
     import TileLayer from 'ol/layer/Tile';
     import View from 'ol/View';
@@ -43,7 +48,7 @@
             zoom = 15;
         }
 
-        const map = new Map({
+        map = new Map({
             target: node.id,
             layers: [osmLayer],
             view: new View({ center, zoom })
@@ -63,7 +68,7 @@
         return map;
     }
 
-    function map(node: HTMLElement) {
+    function withMap(node: HTMLElement) {
         let map = setupMap(node);
         return {
             destroy() {
@@ -76,23 +81,61 @@
         };
     }
 
+    function zoomToCurrentLocation() {
+        navigator.geolocation.getCurrentPosition(
+            position =>
+                void map
+                    .getView()
+                    .setCenter(fromLonLat([position.coords.longitude, position.coords.latitude])),
+            () => void notify.error('Could not get your current location')
+        );
+    }
+
+    let initialLocation = value;
+    let map: Map;
     let mapId = getId();
     let hoveringSomething = false;
     const eventDispatch = createEventDispatcher();
 </script>
 
 <div
-    class="map"
+    class="map rounded-t-xl"
     class:rounded-lg={roundedCorners}
     class:hovering={hoveringSomething}
     style="--width: {width}; --height: {height}; --mobile-width: {mobileWidth}; --mobile-height: {mobileHeight};"
     id="ol-map-{mapId}"
-    use:map
+    use:withMap
 >
     <div
         class="absolute top-0 left-0 right-0 bottom-0 flex items-center justify-center z-10 pointer-events-none"
     >
         .
+    </div>
+</div>
+<div class="bg-lightAccent p-1 rounded-b-xl flex justify-between">
+    <div>
+        <button class="icon-gradient-on-hover" on:click={() => map.getView().adjustZoom(1.1)}>
+            <MagnifyPlus size={24} />
+        </button>
+        <button class="icon-gradient-on-hover" on:click={() => map.getView().adjustZoom(0.9)}>
+            <MagnifyMinus size={24} />
+        </button>
+    </div>
+    <div>
+        {#if (value[0] !== initialLocation[0] || value[1] !== initialLocation[1]) && initialLocation[0] !== null && initialLocation[1] !== null}
+            <button
+                class="icon-gradient-on-hover"
+                on:click={() =>
+                    // add check for null to avoid type error :/
+                    initialLocation[0] !== null &&
+                    map.getView().setCenter(fromLonLat(initialLocation))}
+            >
+                <Undo size={24} />
+            </button>
+        {/if}
+        <button class="icon-gradient-on-hover" on:click={zoomToCurrentLocation}>
+            <CrosshairsGps size={24} />
+        </button>
     </div>
 </div>
 

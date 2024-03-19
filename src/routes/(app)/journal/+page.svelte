@@ -28,7 +28,7 @@
     <title>Journal</title>
 </svelte:head>
 
-<main class="md:flex md:justify-center gap-4 md:ml-20">
+<main class="md:flex md:justify-center gap-4 md:ml-[7.5em]">
     <section>
         <EntriesSidebar
             obfuscated={$obfuscated}

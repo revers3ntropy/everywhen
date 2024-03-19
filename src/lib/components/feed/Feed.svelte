@@ -97,7 +97,7 @@
     let nextDay: string | null = fromDay.fmtIso();
 </script>
 
-<div bind:this={containerEl} class="md:border border-borderColor relative">
+<div bind:this={containerEl} class="md:border-l-2 border-borderColor relative">
     <BidirectionalInfiniteScroller
         loadItems={loadMoreDays}
         hasMore={moreDaysToLoad}

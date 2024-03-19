@@ -36,7 +36,7 @@
     <title>Insights</title>
 </svelte:head>
 
-<main class="md:p-4 md:pl-16 flex-center">
+<main class="md:p-4 md:pl-[7.5em] flex-center">
     <div class="w-full md:max-w-5xl">
         {#if data.entryCount < 1}
             <section>
