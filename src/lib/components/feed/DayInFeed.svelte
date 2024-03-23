@@ -51,6 +51,7 @@
     $: entryCount = items?.filter(item => item.type === 'entry').length ?? 0;
     $: isToday = fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD') === day.day;
     $: dayTimestamp = new Date(day.day).getTime() / 1000;
+    $: monthsAgo = Day.fromString(day.day).unwrap().monthsAgo();
 
     $: if ((items?.length > 0 || (isToday && showForms)) && $collapsed[day.day] == 'empty') {
         $collapsed[day.day] = false;
@@ -81,7 +82,11 @@
 
 <div class="pb-4 w-full">
     <!-- only round top right on 'today' as the entry form always appears directly below -->
-    <div class="bg-vLightAccent p-2 rounded-{isToday && !$collapsed[day.day] ? 'tr' : 'r'}-xl">
+    <div
+        class="bg-vLightAccent p-2 {isToday && !$collapsed[day.day]
+            ? 'rounded-tr-xl'
+            : 'rounded-r-xl'}"
+    >
         <div class="flex justify-between">
             <div>
                 <button class="flex-center" on:click={toggleCollapse}>
@@ -97,13 +102,13 @@
                         <span>Yesterday</span>
                     {:else}
                         <UtcTime
-                            fmt="ddd, Do MMMM YYYY"
+                            fmt="ddd, Do MMMM{monthsAgo < 8 ? '' : ' YYYY'}"
                             noTooltip
                             timestamp={dayTimestamp}
                             tzOffset={0}
                         />
 
-                        {#if Day.fromString(day.day).unwrap().monthsAgo() < 13}
+                        {#if monthsAgo < 13}
                             <Dot light marginX={10} />
                             <span class="text-light">
                                 <UtcTime relative timestamp={dayTimestamp} tzOffset={0} />

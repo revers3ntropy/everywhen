@@ -30,7 +30,7 @@
     <title>Insights</title>
 </svelte:head>
 
-<main class="md:p-4 md:ml-[7.5em]">
+<main class="md:p-4 md:ml-[8.5em]">
     <div class="title-line">
         <div class="flex align-center gap-2">
             <a href="/stats">

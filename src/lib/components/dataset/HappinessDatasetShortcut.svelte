@@ -60,7 +60,7 @@
         <div slot="button" class="bg-lightAccent rounded-full w-fit hover:bg-transparent">
             <EmoticonOutline size={24} />
 
-            <div class="absolute text-light top-0 left-0" style="transform: translate(15px, 7px)">
+            <div class="absolute text-light top-0 left-0" style="transform: translate(17px, 10px)">
                 <Plus size={16} />
             </div>
         </div>

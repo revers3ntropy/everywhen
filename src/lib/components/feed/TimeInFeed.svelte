@@ -9,7 +9,7 @@
 <div>
     <div class="relative">
         <span
-            class="text-textColorLight text-sm px-2 border-borderColor border-solid border rounded-lg absolute md:-left-4 top-0 bg-backgroundColor flex-center gap-1 shadow"
+            class="text-textColorLight text-sm px-2 border-borderColor border-solid border rounded-lg absolute md:-left-4 top-0 bg-backgroundColor flex-center gap-1 shadow ml-[1px] md:m-0"
         >
             <UtcTime fmt={'h:mma'} {timestamp} tooltipPosition="right" {tzOffset} />
             {#if to}

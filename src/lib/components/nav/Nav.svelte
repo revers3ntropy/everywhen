@@ -2,8 +2,13 @@
     import { page } from '$app/stores';
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
+    import DeleteOutline from 'svelte-material-icons/DeleteOutline.svelte';
     import MapOutline from 'svelte-material-icons/MapOutline.svelte';
     import Notebook from 'svelte-material-icons/NotebookOutline.svelte';
+
+    const buttonCls =
+        'w-full inline-flex px-2 py-3 items-center content-center gap-1 flex-col md:flex-row' +
+        ' hover:bg-lightAccent text-textColorLight hover:text-textColor hover:no-underline icon-gradient-on-hover';
 </script>
 
 <nav>
@@ -14,61 +19,59 @@
             class="fixed bottom-0 left-0 w-full h-fit z-50 flex items-center justify-center md:static md:w-fit md:h-full"
         >
             <div
-                class="flex justify-center w-full bg-vLightAccent md:bordered overflow-hidden items-center md:rounded-r-lg md:flex-col"
+                class="flex-center w-full bg-vLightAccent md:bordered overflow-hidden items-center md:rounded-r-lg md:flex-col border border-solid border-backgroundColor border-l-0"
             >
                 <a
                     href="/journal"
                     aria-label="journal"
-                    class="w-full inline-flex items-center justify-center flex-col p-3 hover:bg-lightAccent"
+                    class={buttonCls}
                     class:bg-primaryLight={$page.url.pathname.startsWith('/journal') &&
                         !$page.url.pathname.startsWith('/journal/deleted')}
                     class:hover:bg-primaryLight={$page.url.pathname.startsWith('/journal') &&
                         !$page.url.pathname.startsWith('/journal/deleted')}
                 >
                     <Notebook size="30" />
-                    Journal
+                    <div class="text-sm md:text-base"> Journal </div>
                 </a>
                 <a
                     href="/timeline"
                     aria-label="timeline"
-                    class="w-full inline-flex items-center justify-center flex-col p-3 hover:bg-lightAccent"
+                    class={buttonCls}
                     class:bg-primaryLight={$page.url.pathname.startsWith('/timeline')}
-                    class:hover:bg-secondaryLight={$page.url.pathname.startsWith('/timeline')}
+                    class:hover:bg-primaryLight={$page.url.pathname.startsWith('/timeline')}
                 >
                     <ChartTimeline size="30" />
-                    Timeline
+                    <div class="text-sm md:text-base"> Timeline </div>
                 </a>
                 <a
                     href="/map"
                     aria-label="map"
-                    class="w-full inline-flex items-center justify-center flex-col p-3 hover:bg-lightAccent"
+                    class={buttonCls}
                     class:bg-primaryLight={$page.url.pathname.startsWith('/map')}
-                    class:hover:bg-secondaryLight={$page.url.pathname.startsWith('/map')}
+                    class:hover:bg-primaryLight={$page.url.pathname.startsWith('/map')}
                 >
                     <MapOutline size="30" />
-                    Map
+                    <div class="text-sm md:text-base"> Map </div>
                 </a>
                 <a
                     href="/stats"
-                    class="w-full inline-flex items-center justify-center flex-col p-3 hover:bg-lightAccent"
+                    class={buttonCls}
                     class:bg-primaryLight={$page.url.pathname.startsWith('/stats')}
-                    class:hover:bg-secondaryLight={$page.url.pathname.startsWith('/stats')}
-                    aria-label="statistics"
+                    class:hover:bg-primaryLight={$page.url.pathname.startsWith('/stats')}
+                    aria-label="insights"
                 >
                     <Counter size="30" />
-                    Insights
+                    <div class="text-sm md:text-base"> Insights </div>
                 </a>
                 <a
                     href="/journal/deleted"
-                    class="w-full inline-flex items-center justify-center flex-col p-3 hover:bg-lightAccent"
+                    class={buttonCls}
                     class:bg-primaryLight={$page.url.pathname.startsWith('/journal/deleted')}
-                    class:hover:bg-secondaryLight={$page.url.pathname.startsWith(
-                        '/journal/deleted'
-                    )}
+                    class:hover:bg-primaryLight={$page.url.pathname.startsWith('/journal/deleted')}
                     aria-label="bin"
                 >
-                    <Counter size="30" />
-                    Bin
+                    <DeleteOutline size="30" />
+                    <div class="text-sm md:text-base"> Bin </div>
                 </a>
             </div>
         </div>

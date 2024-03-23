@@ -12,7 +12,6 @@
 <div class="text-sm py-2 flex gap-y-1 gap-4 flex-wrap">
     <TimeInFeed {timestamp} {tzOffset} />
     <HappinessValueIcon {value} />
-    <div class="basis-full h-0 md:hidden"></div>
     {#if $settingsStore.happinessInputStyle.value === 'scale'}
         <div class="flex-center gap-4 px-2 md:p-0" class:obfuscated>
             <span class="font-bold">{value * 10}</span>

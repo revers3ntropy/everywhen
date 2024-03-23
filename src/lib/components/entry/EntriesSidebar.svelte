@@ -87,8 +87,12 @@
         <Menu size="40" />
     </button>
 </div>
-<div class="sidebar border-borderColor" class:md:border={!noEntries} class:showing={openOnMobile}>
-    <div class="header">
+
+<div
+    class="bg-vLightAccent h-screen z-10 w-full border-borderColor overflow-y-auto fixed top-0 left-0 md:sticky md:top-4 md:border-none rounded-xl md:z-0 -translate-x-full md:translate-x-0 transition-[300ms]"
+    class:translate-x-0={openOnMobile}
+>
+    <div class="p-2 flex justify-end sticky top-0">
         {#if !noEntries}
             <button
                 aria-label={obfuscated ? 'Show entries' : 'Hide entries'}
@@ -112,56 +116,60 @@
     <div>
         {#key [pinnedEntriesSummaries, showingAllPinned]}
             {#if Object.keys(pinnedEntries).length}
-                <div
-                    class="bg-vLightAccent p-2 my-2"
-                    transition:slide={{ duration: ANIMATION_DURATION, axis: 'x' }}
-                >
-                    <h3
-                        class="gradient-icon flex-center"
-                        style="justify-content: flex-start; gap: 8px;"
+                <div class="pb-2">
+                    <div
+                        class="bg-vLightAccent p-2 border-l-2 border-borderColor"
+                        transition:slide={{ duration: ANIMATION_DURATION, axis: 'x' }}
                     >
-                        <Heart size="25" />
-                        Favourites
-                    </h3>
-                    <div>
-                        <EntrySummaries
-                            titles={pinnedEntries}
-                            {obfuscated}
-                            onCreateFilter={Entry.isPinned}
-                            showOnUpdateAndNotAlreadyShownFilter={Entry.isPinned}
-                            hideBlurToggle
-                        />
-                        {#if areHiddenPinnedEntries}
-                            <button
-                                class="text-light"
-                                on:click={() => {
-                                    showingAllPinned = !showingAllPinned;
-                                }}
-                            >
-                                <ChevronDown />
-                                Show all entries in favourites ({pinnedEntriesSummaries.length -
-                                    showLimitPinnedEntries})
-                            </button>
-                        {/if}
+                        <h3
+                            class="gradient-icon flex-center"
+                            style="justify-content: flex-start; gap: 8px;"
+                        >
+                            <Heart size="25" />
+                            Favourites
+                        </h3>
+                        <div>
+                            <EntrySummaries
+                                titles={pinnedEntries}
+                                {obfuscated}
+                                onCreateFilter={Entry.isPinned}
+                                showOnUpdateAndNotAlreadyShownFilter={Entry.isPinned}
+                                hideBlurToggle
+                            />
+                            {#if areHiddenPinnedEntries}
+                                <button
+                                    class="text-light"
+                                    on:click={() => {
+                                        showingAllPinned = !showingAllPinned;
+                                    }}
+                                >
+                                    <ChevronDown />
+                                    Show all entries in favourites ({pinnedEntriesSummaries.length -
+                                        showLimitPinnedEntries})
+                                </button>
+                            {/if}
+                        </div>
                     </div>
                 </div>
             {/if}
         {/key}
         {#if Object.entries(nYearsAgo).length}
-            <div class="bg-vLightAccent p-2 my-4">
+            <div class="bg-vLightAccent flex flex-col gap-2">
                 {#each Object.entries(nYearsAgo) as [date, entries] (date)}
-                    <h3>
-                        {fmtUtcRelative(new Date(date), 'en-full')} since...
-                    </h3>
-                    <EntrySummaries
-                        titles={{
-                            [date]: entries
-                        }}
-                        {obfuscated}
-                        showTimeAgo={false}
-                        onCreateFilter={() => false}
-                        hideBlurToggle
-                    />
+                    <div class="border-l-2 border-borderColor p-2">
+                        <h3>
+                            {fmtUtcRelative(new Date(date), 'en-full')} since...
+                        </h3>
+                        <EntrySummaries
+                            titles={{
+                                [date]: entries
+                            }}
+                            {obfuscated}
+                            showTimeAgo={false}
+                            onCreateFilter={() => false}
+                            hideBlurToggle
+                        />
+                    </div>
                 {/each}
             </div>
         {/if}
@@ -178,45 +186,3 @@
         {/if}
     </div>
 </div>
-
-<style lang="scss">
-    .sidebar {
-        width: 100%;
-        overflow-y: auto;
-
-        @media #{$not-mobile} {
-            position: sticky;
-            top: 1rem;
-            height: calc(100vh - 2rem);
-            // for the scroll bar
-            border-radius: 0;
-            background: none;
-        }
-
-        @media #{$mobile} {
-            background: var(--v-light-accent);
-            height: 100vh;
-            z-index: 10;
-            transition: #{$transition};
-            transform: translateX(-100%);
-            position: fixed;
-            top: 0;
-            left: 0;
-            margin: 0;
-
-            &.showing {
-                transform: translateX(0);
-                border-right: 2px solid var(--border-heavy);
-            }
-        }
-
-        .header {
-            padding: 0.5rem;
-            display: flex;
-            justify-content: right;
-            align-content: center;
-            position: sticky;
-            top: 0;
-        }
-    }
-</style>

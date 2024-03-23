@@ -122,7 +122,11 @@
                     <span class="oneline">
                         <Dot light />
                         <button on:click={() => updateValue(defaultValue)}>
-                            Restore default ({JSON.stringify(defaultValue)})
+                            {#if Array.isArray(defaultValue) && defaultValue[0] === null}
+                                Remove
+                            {:else}
+                                Restore default ({JSON.stringify(defaultValue)})
+                            {/if}
                         </button>
                     </span>
                 </p>
