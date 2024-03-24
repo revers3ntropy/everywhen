@@ -107,7 +107,22 @@ namespace EventServer {
         });
     }
 
-    async function canCreateEventWithName(auth: Auth, name: string): Promise<string | true> {
+    function eventEndTooFarInFuture(end: number): boolean {
+        // max value is the year 3000 - arbitrary, could be increased
+        return end > 32503680000;
+    }
+
+    function eventStartTooFarInPast(start: number): boolean {
+        // before age of universe, a bit before the minimum theoretical value of a 64-bit timestamp
+        return start < -4.32e17;
+    }
+
+    async function canCreateEvent(
+        auth: Auth,
+        name: string,
+        start: number,
+        end: number
+    ): Promise<string | true> {
         const numEvents = await query<{ count: number }[]>`
             SELECT COUNT(*) as count
             FROM events
@@ -121,6 +136,10 @@ namespace EventServer {
 
         if (name.length > LIMITS.event.nameLenMax) return 'Event name too long';
 
+        if (start > end) return 'Start time cannot be after end time';
+        if (eventEndTooFarInFuture(end)) return 'Too far in future';
+        if (eventStartTooFarInPast(start)) return 'Too far in past';
+
         return true;
     }
 
@@ -133,7 +152,7 @@ namespace EventServer {
         labelId: string | null,
         created: TimestampSecs | null
     ): Promise<Result<RawEvent>> {
-        const canCreate = await canCreateEventWithName(auth, name);
+        const canCreate = await canCreateEvent(auth, name, start, end);
         if (canCreate !== true) return Result.err(canCreate);
 
         const id = await UId.generate();
@@ -205,6 +224,9 @@ namespace EventServer {
             // update end to be 1 hour after start
             return updateStartAndEnd(auth, self, start, start + 60 * 60);
         }
+        if (eventStartTooFarInPast(start)) {
+            return Result.err('Start time too far in past');
+        }
         self.start = start;
         await query`
             UPDATE events
@@ -225,6 +247,9 @@ namespace EventServer {
             // update start to be 1 hour before end
             return updateStartAndEnd(auth, self, end - 60 * 60, end);
         }
+        if (eventEndTooFarInFuture(end)) {
+            return Result.err('End time too far in future');
+        }
         self.end = end;
         await query`
             UPDATE events
@@ -242,6 +267,8 @@ namespace EventServer {
         end: TimestampSecs
     ): Promise<Result<Event>> {
         if (start > end) return Result.err('Start time cannot be after end time');
+        if (eventEndTooFarInFuture(end)) return Result.err('Too far in future');
+        if (eventStartTooFarInPast(start)) return Result.err('Too far in past');
 
         self.start = start;
         self.end = end;

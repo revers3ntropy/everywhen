@@ -89,8 +89,9 @@
 </div>
 
 <div
-    class="bg-vLightAccent h-screen z-10 w-full border-borderColor overflow-y-auto fixed top-0 left-0 md:sticky md:top-4 md:border-none rounded-xl md:z-0 -translate-x-full md:translate-x-0 transition-[300ms]"
+    class="h-screen z-10 w-full border-borderColor overflow-y-auto fixed top-0 left-0 md:sticky md:top-4 md:border-none rounded-xl md:z-0 -translate-x-full md:translate-x-0 transition-[300ms]"
     class:translate-x-0={openOnMobile}
+    class:bg-vLightAccent={openOnMobile || !noEntries}
 >
     <div class="p-2 flex justify-end sticky top-0">
         {#if !noEntries}

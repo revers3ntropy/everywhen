@@ -88,14 +88,14 @@ CREATE TABLE entryEdits
 
 CREATE TABLE events
 (
-    id       char(32)     NOT NULL,
-    userId   char(32)     NOT NULL,
-    name     varchar(256) NOT NULL,
-    start    int          NOT NULL,
-    end      int          NOT NULL,
-    tzOffset double       NOT NULL,
-    labelId  char(32)     DEFAULT NULL,
-    created  int          NOT NULL,
+    id       char(32)      NOT NULL,
+    userId   char(32)      NOT NULL,
+    name     varchar(256)  NOT NULL,
+    start    bigint signed NOT NULL,
+    end      bigint signed NOT NULL,
+    tzOffset double        NOT NULL,
+    labelId  char(32)      DEFAULT NULL,
+    created  int           NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `idx_events_userId`  (`userId`),
     INDEX `idx_events_created`  (`created`),
@@ -171,28 +171,6 @@ CREATE TABLE locations
     radius          double       NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `idx_locations_userId` (`userId`)
-)
-    ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4
-    COLLATE utf8mb4_bin;
-
-
-CREATE TABLE pageLoads
-(
-    userId       char(32)     DEFAULT NULL,
-    created      int          NOT NULL,
-    method       varchar(64)  NOT NULL,
-    url          varchar(512) NOT NULL,
-    route        varchar(256) NOT NULL,
-    loadTimeMs   real         NOT NULL,
-    responseCode int          NOT NULL,
-    userAgent    varchar(512) NOT NULL,
-    requestSize  int          NOT NULL,
-    responseSize int          NOT NULL,
-    ipAddress    varchar(64)  DEFAULT NULL,
-    INDEX `idx_pageLoads_userId`  (`userId`),
-    INDEX `idx_pageLoads_created` (`created`),
-    INDEX `idx_pageLoads_route`   (`route`)
 )
     ENGINE = InnoDB
     DEFAULT CHARSET = utf8mb4
