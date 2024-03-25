@@ -81,7 +81,7 @@ export function drawDays(state: RenderProps, startYear: number) {
     let day = Math.floor(leftMost / 86400) * 86400;
     // deal with timezones
     day -= currentTzOffset() * 60 * 60;
-    // put at midday for daylight saving's issues
+    // put at midday for daylight saving issues
     day += 12 * 60 * 60;
 
     const showDayText = state.zoom >= 1.2e-3;
@@ -90,44 +90,40 @@ export function drawDays(state: RenderProps, startYear: number) {
     const showWeeks = state.zoom >= 1.2e-4;
 
     while (true) {
-        const dayDate = new Date(day * 1000);
-        const dayStart =
-            new Date(dayDate.getFullYear(), dayDate.getMonth(), dayDate.getDate()).getTime() / 1000;
+        const dayStart = day + currentTzOffset() * 60 * 60 - 12 * 60 * 60;
         const renderPos = state.timeToX(dayStart);
 
         if (renderPos > state.width) break;
 
-        const isMonday = fmtUtc(dayStart, currentTzOffset(), 'ddd') === 'Mon';
+        const isMonday = fmtUtc(day, 0, 'ddd') === 'Mon';
 
-        const shouldShow = (isMonday && showWeeks) || showDays;
-
-        if (shouldShow) {
+        if ((isMonday && showWeeks) || showDays) {
             state.rect(renderPos, 0, 1, state.height, {
                 color: isMonday ? state.colors.primary : state.colors.lightAccent
             });
-        }
 
-        if (showDayText && shouldShow) {
-            let text = fmtUtc(dayStart, currentTzOffset(), 'ddd Do');
+            if (showDayText) {
+                let text = fmtUtc(day, 0, 'ddd Do');
 
-            if (
-                fmtUtc(dayStart, currentTzOffset(), 'YYY-MM-DD') ===
-                fmtUtc(nowUtc(), currentTzOffset(), 'YYY-MM-DD')
-            ) {
-                text += ' (Today)';
-            } else if (
-                fmtUtc(dayStart, currentTzOffset(), 'YYY-MM-DD') ===
-                fmtUtc(nowUtc() - 86400, currentTzOffset(), 'YYY-MM-DD')
-            ) {
-                text += ' (Yesterday)';
-            } else if (
-                fmtUtc(dayStart, currentTzOffset(), 'YYY-MM-DD') ===
-                fmtUtc(nowUtc() + 86400, currentTzOffset(), 'YYY-MM-DD')
-            ) {
-                text += ' (Tomorrow)';
+                if (
+                    fmtUtc(dayStart, 0, 'YYY-MM-DD') ===
+                    fmtUtc(nowUtc(), currentTzOffset(), 'YYY-MM-DD')
+                ) {
+                    text += ' (Today)';
+                } else if (
+                    fmtUtc(dayStart, 0, 'YYY-MM-DD') ===
+                    fmtUtc(nowUtc() - 86400, currentTzOffset(), 'YYY-MM-DD')
+                ) {
+                    text += ' (Yesterday)';
+                } else if (
+                    fmtUtc(dayStart, 0, 'YYY-MM-DD') ===
+                    fmtUtc(nowUtc() + 86400, currentTzOffset(), 'YYY-MM-DD')
+                ) {
+                    text += ' (Tomorrow)';
+                }
+
+                state.text(text, renderPos + 6, NAVBAR_HEIGHT + 40);
             }
-
-            state.text(text, renderPos + 6, NAVBAR_HEIGHT + 40);
         }
 
         const week = fmtUtc(dayStart, currentTzOffset(), 'YYYY-WW');
