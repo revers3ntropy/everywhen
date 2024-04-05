@@ -7,41 +7,56 @@ import { z } from 'zod';
 const logger = new FileLogger('OpenWeatherMapAPI');
 
 const weatherForDayExpectedSchema = z.object({
-    lat: z.number(),
-    lon: z.number(),
-    tz: z.string(),
-    date: z.string(),
-    units: z.string(),
-    cloud_cover: z.object({
-        afternoon: z.number()
-    }),
-    humidity: z.object({
-        afternoon: z.number()
-    }),
-    precipitation: z.object({
-        total: z.number()
-    }),
-    temperature: z.object({
-        min: z.number(),
-        max: z.number(),
-        afternoon: z.number(),
-        night: z.number(),
-        evening: z.number(),
-        morning: z.number()
-    }),
-    pressure: z.object({
-        afternoon: z.number()
-    }),
-    wind: z.object({
-        max: z.object({
-            speed: z.number(),
-            direction: z.number()
+    list: z.array(
+        z.object({
+            dt: z.number(),
+            main: z.object({
+                temp: z.number(),
+                feels_like: z.number(),
+                temp_min: z.number(),
+                temp_max: z.number(),
+                pressure: z.number(),
+                humidity: z.number()
+            }),
+            wind: z
+                .object({
+                    speed: z.number(),
+                    deg: z.number()
+                })
+                .default({ speed: 0, deg: 0 }),
+            clouds: z
+                .object({
+                    all: z.number()
+                })
+                .default({ all: 0 }),
+            weather: z.array(
+                z.object({
+                    id: z.number(),
+                    main: z.string(),
+                    description: z.string(),
+                    icon: z.string()
+                })
+            ),
+            rain: z
+                .object({
+                    '1h': z.number().optional(),
+                    '3h': z.number().optional()
+                })
+                .default({ '1h': 0 }),
+            snow: z
+                .object({
+                    '1h': z.number().optional(),
+                    '3h': z.number().optional()
+                })
+                .default({ '1h': 0 })
         })
-    })
+    )
 });
 
 export namespace OpenWeatherMapAPI {
-    export type WeatherForDay = z.infer<typeof weatherForDayExpectedSchema>;
+    export type WeatherForDay = {
+        temp: number;
+    };
 
     const cache = new Map<string, WeatherForDay>();
     const numRequestsPerDay = new Map<string, number>();
@@ -78,7 +93,7 @@ export namespace OpenWeatherMapAPI {
         if (!OPEN_WEATHER_MAP_API_KEY) {
             return Result.err('Cannot fetch weather data at this time');
         }
-        const apiUrl = `https://api.openweathermap.org/data/3.0/onecall/day_summary?lat=${lat}&lon=${long}&date=${day.fmtIso()}&appid=${OPEN_WEATHER_MAP_API_KEY}`;
+        const apiUrl = `https://history.openweathermap.org/data/2.5/history/city?lat=${lat}&lon=${long}&date=${day.fmtIso()}&appid=${OPEN_WEATHER_MAP_API_KEY}`;
         let res;
         try {
             res = await fetch(apiUrl, {
@@ -119,7 +134,11 @@ export namespace OpenWeatherMapAPI {
             return Result.err('Invalid response from OpenWeatherMap');
         }
 
-        cache.set(cacheKey, parseResult.data);
-        return Result.ok(parseResult.data);
+        const weather = {
+            temp: parseResult.data.list[0].main.temp
+        } satisfies WeatherForDay;
+
+        cache.set(cacheKey, weather);
+        return Result.ok(weather);
     }
 }
