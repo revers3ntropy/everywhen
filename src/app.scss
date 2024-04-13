@@ -70,6 +70,7 @@ hr {
 }
 
 svg {
+    display: inline-block;
     color: var(--text-color);
     // assume small SVGs, for larger this should be overridden
     shape-rendering: geometricPrecision;

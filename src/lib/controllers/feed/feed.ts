@@ -1,6 +1,6 @@
 import type { Entry } from '$lib/controllers/entry/entry';
 import { Event } from '$lib/controllers/event/event';
-import type { OpenWeatherMapAPI } from '$lib/controllers/openWeatherMapAPI/openWeatherMapAPI.server';
+import type { OpenWeatherMapAPI } from '$lib/controllers/openWeatherMapAPI/openWeatherMapAPI';
 
 export type FeedItemTypes = {
     eventEnd: {

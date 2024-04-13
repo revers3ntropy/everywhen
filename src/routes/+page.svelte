@@ -8,12 +8,12 @@
     <meta content="Journaling and Life Logging App" name="description" />
 </svelte:head>
 
-<main class="flex-center">
+<main class="flex-center w-screen h-screen p-4">
     <div class="flex-center">
-        <Logo />
+        <Logo scale={0.28} />
     </div>
     <div>
-        <h1> <span class="serif">Everywhen</span> <span class="beta"> beta </span> </h1>
+        <h1 class="serif text-left text-5xl"> Everywhen </h1>
         <p> YOUR JOURNAL AND LIFE LOG </p>
 
         <a href="./login" class="primary flex-center gap-2 serif">
@@ -24,10 +24,6 @@
 
 <style lang="scss">
     main {
-        width: 100vw;
-        height: 100vh;
-        padding: 1rem;
-
         @media #{$mobile} {
             display: grid;
             text-align: center;
@@ -35,24 +31,6 @@
             justify-content: center;
             grid-template-columns: 1fr;
             grid-template-rows: auto 1fr;
-        }
-    }
-
-    h1 {
-        font-size: 3rem;
-        padding: 0;
-        margin: 0;
-
-        .beta {
-            font-size: 1.2rem;
-            color: var(--text-color-light);
-            vertical-align: text-top;
-            font-weight: bold;
-            margin-left: -10px;
-
-            @media (max-width: 400px) {
-                font-size: 1rem;
-            }
         }
     }
 

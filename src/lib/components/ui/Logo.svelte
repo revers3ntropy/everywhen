@@ -2,8 +2,8 @@
     import { theme } from '$lib/stores';
 
     // logo dimensions
-    const WIDTH = 459;
-    const HEIGHT = 672;
+    const WIDTH = 512;
+    const HEIGHT = 512;
 
     export let scale = 1 / 4;
 

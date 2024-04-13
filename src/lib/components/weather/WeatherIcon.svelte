@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { OpenWeatherMapAPI } from '$lib/controllers/openWeatherMapAPI/openWeatherMapAPI.server';
+    import type { WeatherForDay } from '$lib/controllers/openWeatherMapAPI/openWeatherMapAPI.server';
     import WeatherSunny from 'svelte-material-icons/WeatherSunny.svelte';
     import WeatherCloudy from 'svelte-material-icons/WeatherCloudy.svelte';
     import WeatherRainy from 'svelte-material-icons/WeatherRainy.svelte';
@@ -8,7 +8,7 @@
     import WeatherFog from 'svelte-material-icons/WeatherFog.svelte';
     import WeatherPartlyCloudy from 'svelte-material-icons/WeatherPartlyCloudy.svelte';
 
-    export let weather: OpenWeatherMapAPI.WeatherForDay;
+    export let weather: WeatherForDay;
     export let size: number = 24;
 </script>
 

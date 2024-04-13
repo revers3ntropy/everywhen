@@ -7,7 +7,7 @@
     export let day: Day;
     export let weather: OpenWeatherMapAPI.WeatherForDay;
 
-    let lat, lon;
+    let lat: number, lon: number;
     $: [lat, lon] = OpenWeatherMapAPI.decreaseResolutionOfCoordsForWeather(
         weather.lat,
         weather.lon

@@ -14,7 +14,7 @@
         {
             "src": "/favicon.png",
             "type": "image/png",
-            "sizes": "459x672"
+            "sizes": "512x512"
         },
         {
             "src": "/favicon.ico",
@@ -31,22 +31,6 @@
             "src": "/favicon-128x128.ico",
             "type": "image/x-icon",
             "sizes": "128x128"
-        },
-        {
-            "src": "/logodark.png",
-            "type": "image/png",
-            "sizes": "459x672"
-        },
-        {
-            "src": "/logolight.png",
-            "type": "image/png",
-            "sizes": "459x672"
-        },
-        {
-            "src": "/logosquare_small.png",
-            "type": "image/png",
-            "sizes": "750x750",
-            "purpose": "any maskable"
         }
     ]
 }

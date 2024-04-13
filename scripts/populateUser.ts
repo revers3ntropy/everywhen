@@ -111,15 +111,15 @@ async function main() {
     let i = 0;
     for (
         let created = nowUtc();
-        created > nowUtc() - 60 * 60 * 24 * 365 * years && i < LIMITS.entry.maxCount;
-        created -= 60 * 60 * 24 * 3
+        created > nowUtc() - 60 * 60 * 24 * 365 * years && i < LIMITS.entry.maxCount - 1000;
+        created -= 60 * 60 * 24
     ) {
         await entry(`my-entry-${i}`, userId, created, 3, `Sparse Entry ${i}`);
         i++;
     }
     for (
         let created = nowUtc() - 60 * 60 * 24 * 365 * years;
-        created > nowUtc() - 60 * 60 * 24 * 365 * years * 2 && i < LIMITS.entry.maxCount;
+        created > nowUtc() - 60 * 60 * 24 * 365 * years * 2 && i < LIMITS.entry.maxCount - 1000;
         created -= 60 * 60 * (24 / entriesPerDay)
     ) {
         await entry(`my-entry-${i}`, userId, created, 2, `Entry ${i}`);

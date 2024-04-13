@@ -5,7 +5,10 @@ import { eventEndsProvider, eventStartsProvider } from '$lib/controllers/feed/ev
 import { happinessProvider } from '$lib/controllers/feed/happinessProvidor';
 import { sleepCycleProvider } from '$lib/controllers/feed/sleepCycleProvider';
 import { Label } from '$lib/controllers/label/label.server';
-import { OpenWeatherMapAPI } from '$lib/controllers/openWeatherMapAPI/openWeatherMapAPI.server';
+import {
+    OpenWeatherMapAPI,
+    type WeatherForDay
+} from '$lib/controllers/openWeatherMapAPI/openWeatherMapAPI.server';
 import { Settings } from '$lib/controllers/settings/settings.server';
 import type { Day } from '$lib/utils/day';
 import { Result } from '$lib/utils/result';
@@ -71,10 +74,7 @@ namespace FeedServer {
         );
     }
 
-    async function weatherDataForDay(
-        auth: Auth,
-        day: Day
-    ): Promise<Result<OpenWeatherMapAPI.WeatherForDay>> {
+    async function weatherDataForDay(auth: Auth, day: Day): Promise<Result<WeatherForDay>> {
         if (!(await Dataset.hasDatasetWithPresetId(auth, 'weather')))
             return Result.err('Invalid day');
         const setting = await Settings.getValue(auth, 'homeLocation');

@@ -8,6 +8,8 @@ import { OpenWeatherMapAPI as _OpenWeatherMapAPI } from '$lib/controllers/openWe
 
 const logger = new FileLogger('OpenWeatherMapAPI');
 
+export type WeatherForDay = _OpenWeatherMapAPI.WeatherForDay;
+
 export namespace OpenWeatherMapAPIServer {
     type WeatherForDay = _OpenWeatherMapAPI.WeatherForDay;
 
@@ -240,5 +242,3 @@ export const OpenWeatherMapAPI = {
     ..._OpenWeatherMapAPI,
     ...OpenWeatherMapAPIServer
 };
-
-export type WeatherForDay = _OpenWeatherMapAPI.WeatherForDay;
