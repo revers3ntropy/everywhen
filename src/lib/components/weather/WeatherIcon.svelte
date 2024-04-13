@@ -3,21 +3,33 @@
     import WeatherSunny from 'svelte-material-icons/WeatherSunny.svelte';
     import WeatherCloudy from 'svelte-material-icons/WeatherCloudy.svelte';
     import WeatherRainy from 'svelte-material-icons/WeatherRainy.svelte';
-    import WeatherWindy from 'svelte-material-icons/WeatherWindy.svelte';
-    import WeatherPouring from 'svelte-material-icons/WeatherPouring.svelte';
+    import WeatherLightningRainy from 'svelte-material-icons/WeatherLightningRainy.svelte';
+    import WeatherSnowy from 'svelte-material-icons/WeatherSnowy.svelte';
+    import WeatherFog from 'svelte-material-icons/WeatherFog.svelte';
+    import WeatherPartlyCloudy from 'svelte-material-icons/WeatherPartlyCloudy.svelte';
 
     export let weather: OpenWeatherMapAPI.WeatherForDay;
     export let size: number = 24;
 </script>
 
-{#if weather.precipitation.total > 10}
-    <WeatherPouring {size} />
-{:else if weather.wind.max.speed > 10}
-    <WeatherWindy {size} />
-{:else if weather.precipitation.total > 3}
-    <WeatherRainy {size} />
-{:else if weather.cloud_cover.afternoon > 50}
-    <WeatherCloudy {size} />
-{:else}
+{#if weather.iconCode === '01'}
     <WeatherSunny {size} />
+{:else if weather.iconCode === '02'}
+    <WeatherPartlyCloudy {size} />
+{:else if weather.iconCode === '03'}
+    <WeatherCloudy {size} />
+{:else if weather.iconCode === '04'}
+    <WeatherCloudy {size} />
+{:else if weather.iconCode === '09'}
+    <WeatherRainy {size} />
+{:else if weather.iconCode === '10'}
+    <WeatherRainy {size} />
+{:else if weather.iconCode === '11'}
+    <WeatherLightningRainy {size} />
+{:else if weather.iconCode === '13'}
+    <WeatherSnowy {size} />
+{:else if weather.iconCode === '50'}
+    <WeatherFog {size} />
+{:else}
+    ?
 {/if}
