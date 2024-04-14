@@ -32,7 +32,7 @@
     <p> <span class="text-textColorLight">Snow:</span> {weather.snowTotal.toFixed(1)}mm </p>
     <p>
         <span class="text-textColorLight">Humidity:</span>
-        {weather.humidityMean.toPrecision(3)}mm
+        {weather.humidityMean.toPrecision(3)}%
     </p>
     <p>
         <span class="text-textColorLight">Cloud cover:</span>
