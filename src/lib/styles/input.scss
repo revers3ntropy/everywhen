@@ -132,16 +132,13 @@ select {
 a,
 button {
     &.primary {
+        // this is what tailwind does ¯\_(ツ)_/¯
         border-radius: 9999px;
         background: var(--accent-gradient);
         padding: 0.25rem 0.5rem;
 
         &, svg, * {
             color: var(--text-colour-on-gradient) !important;
-        }
-
-        &:hover {
-            @extend .glow;
         }
 
         &:after {
@@ -157,13 +154,6 @@ button {
         justify-content: flex-start;
         margin: 0 0.2rem;
         gap: 0.5rem;
-
-        &.icon-right {
-            // text then icon
-            // use weird gap stuff to make the icon right aligned
-            grid-template-columns: 1fr 15px;
-            gap: 10px;
-        }
     }
 
     &.with-circled-icon {

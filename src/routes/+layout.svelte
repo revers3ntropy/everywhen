@@ -106,7 +106,7 @@
     data-theme={browser
         ? $theme
         : Result.tryJsonParse(data.__cookieWritables?.theme).or(Theme.light)}
-    class="root"
+    class="root h-screen bg-backgroundColor p-0 overflow-y-auto overflow-x-hidden"
     bind:this={root}
 >
     <svg class="accent-gradient-svg" height={0} width={0}>
@@ -124,15 +124,3 @@
 
     <Footer />
 </div>
-
-<style lang="scss">
-    .root {
-        // scroll inside root so that the scrollbar is styled
-        // with correct theme
-        height: 100vh;
-        background: var(--background-color);
-        padding: 0;
-        overflow-y: scroll;
-        overflow-x: hidden;
-    }
-</style>

@@ -1,10 +1,10 @@
 @import 'variables';
 
 [data-theme='light'], :root {
-    --primary: rgb(136, 0, 181);
-    --secondary: rgb(0, 182, 255);
-    --primary-light: rgb(223, 182, 255);
-    --secondary-light: rgb(128, 247, 255);
+    --primary: rgb(118, 88, 66);
+    --secondary: rgb(118, 88, 66);
+    --primary-light: rgb(200, 170, 150);
+    --secondary-light: rgba(200, 170, 150);
 
     --background-color: rgb(255, 255, 255);
     --nav-bg: var(--background-color);
@@ -13,21 +13,21 @@
 
     --accent-danger: rgba(255, 41, 41, 0.76);
     --accent-gradient: linear-gradient(140deg, var(--secondary), var(--primary));
-    --light-accent: rgb(230, 230, 230);
-    --v-light-accent: rgb(245, 245, 245);
+    --light-accent: rgb(224, 217, 208);
+    --v-light-accent: rgb(245, 240, 235);
 
     --border-light: rgb(190, 190, 190);
-    --border-color: rgb(160, 160, 160);
+    --border-color: rgb(118, 88, 66);
     --border-heavy: rgb(130, 130, 130);
 
     --text-color: rgba(0, 0, 0);
-    --text-color-accent: rgb(79, 40, 161);
+    --text-color-accent: rgb(118, 88, 66);
     --text-color-light: rgb(60, 60, 60);
     --text-colour-on-gradient: rgb(255, 255, 255);
     --text-color-invert: rgb(255, 255, 255);
     --text-color-danger: rgb(255, 56, 56);
 
-    --timeline-accent: rgb(79, 40, 161);
+    --timeline-accent: rgb(98, 73, 55);
 
     --likert-red: #c32415;
     --likert-orange: rgb(255, 153, 0);
@@ -37,10 +37,10 @@
 }
 
 [data-theme='dark'] {
-    --primary: rgb(192, 122, 254);
-    --secondary: rgb(128, 247, 255);
-    --primary-light: rgb(136, 0, 181);
-    --secondary-light: rgb(0, 182, 255);
+    --primary: rgb(224, 190, 163);
+    --secondary: var(--primary);
+    --primary-light: rgb(118, 88, 66);
+    --secondary-light: rgb(118, 88, 66);
 
     --background-color: rgb(30, 30, 30);
     --nav-bg: var(--background-color);
@@ -49,8 +49,8 @@
 
     --accent-danger: rgb(255, 120, 120);
     --accent-gradient: linear-gradient(140deg, var(--secondary), var(--primary));
-    --light-accent: rgb(76, 76, 76);
-    --v-light-accent: rgb(46, 46, 46);
+    --light-accent: rgb(80, 70, 65);
+    --v-light-accent: rgb(55, 44, 38);
 
     --border-light: rgb(55, 55, 55);
     --border-color: rgb(78, 78, 78);
@@ -63,7 +63,7 @@
     --text-color-invert: black;
     --text-color-danger: rgb(255, 56, 56);
 
-    --timeline-accent: var(--secondary);
+    --timeline-accent: var(--primary);
 
     --likert-red: rgb(255, 100, 100);
     --likert-orange: rgb(255, 130, 35);
