@@ -207,7 +207,7 @@
                 body as unknown as Record<string, unknown>
             )
         );
-        await goto(`/journal/${entry.id}`);
+        await goto(`/journal#${entry.id}`);
     }
 
     async function submit() {
