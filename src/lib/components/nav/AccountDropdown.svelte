@@ -1,12 +1,13 @@
 <script lang="ts">
-    import { theme } from '$lib/stores';
+    import Streaks from '$lib/components/Streaks.svelte';
+    import { theme, username } from '$lib/stores';
     import { Theme } from '$lib/constants';
     import { Auth } from '$lib/controllers/auth/auth';
     import Dropdown from '$lib/components/ui/Dropdown.svelte';
-    import LightTheme from 'svelte-material-icons/WhiteBalanceSunny.svelte';
+    import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
+    import LightTheme from 'svelte-material-icons/WhiteBalanceSunny.svelte';
     import Logout from 'svelte-material-icons/Logout.svelte';
-    import Streaks from '$lib/components/Streaks.svelte';
     import CogOutline from 'svelte-material-icons/CogOutline.svelte';
     import DarkTheme from 'svelte-material-icons/WeatherNight.svelte';
 
@@ -15,18 +16,23 @@
     }
 </script>
 
-<Dropdown fromRight width="200px">
+<Dropdown width="200px">
     <div
-        class="flex justify-end items-center gap-1 bg-vLightAccent w-full p-2 hover:bg-lightAccent rounded-full"
+        class="flex justify-end items-center gap-1 w-full py-1 hover:bg-lightAccent rounded-full border border-borderColor px-2"
         slot="button"
     >
-        <ChevronDown />
-        <slot />
+        <AccountCircleOutline size="32" />
         <Streaks condensed />
+        <ChevronDown />
     </div>
 
     <div class="account-dropdown-options">
-        <Streaks tooltipPosition="left" />
+        <p class="px-2 text-lg">
+            <AccountCircleOutline size="25" />
+            {$username || '...'}
+        </p>
+
+        <Streaks tooltipPosition="bottom" />
 
         <hr />
 

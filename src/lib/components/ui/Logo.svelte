@@ -16,5 +16,4 @@
     alt="Logo"
     height={HEIGHT * scale}
     width={WIDTH * scale}
-    style="margin-right: 1rem"
 />

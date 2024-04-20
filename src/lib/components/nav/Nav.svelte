@@ -1,26 +1,77 @@
 <script lang="ts">
     import { page } from '$app/stores';
+    import AccountDropdown from '$lib/components/nav/AccountDropdown.svelte';
+    import CreateNewButton from '$lib/components/nav/CreateNewButton.svelte';
+    import Streaks from '$lib/components/Streaks.svelte';
+    import Logo from '$lib/components/ui/Logo.svelte';
+    import { obfuscated, passcodeLastEntered, settingsStore, username } from '$lib/stores';
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
     import DeleteOutline from 'svelte-material-icons/DeleteOutline.svelte';
+    import Eye from 'svelte-material-icons/Eye.svelte';
+    import EyeOff from 'svelte-material-icons/EyeOff.svelte';
+    import Lock from 'svelte-material-icons/Lock.svelte';
     import MapOutline from 'svelte-material-icons/MapOutline.svelte';
     import Notebook from 'svelte-material-icons/NotebookOutline.svelte';
+    import { tooltip } from '@svelte-plugins/tooltips';
 
     const buttonCls =
-        'w-full inline-flex px-2 py-3 items-center content-center gap-1 flex-col md:flex-row' +
+        'w-full inline-flex px-2 py-3 items-center content-center gap-2 flex-col md:flex-row' +
         ' hover:bg-lightAccent text-textColorLight hover:text-textColor hover:no-underline icon-gradient-on-hover';
+
+    function lock() {
+        passcodeLastEntered.set(0);
+    }
 </script>
 
-<nav>
-    <div class="grid grid-cols-1 grid-rows-3 h-full w-fit">
-        <div />
+<!-- z is 6 so that on mobile the nav buttons are not cut off
+     by entry group titles, and is above top navbar -->
+<nav class="fixed top-0 left-0 bottom-0 z-[6] h-full w-36 bg-vLightAccent">
+    <div class="grid grid-cols-1 grid-rows-3 h-full w-full">
+        <div class="pt-4">
+            <div class="pb-4 pl-2">
+                <a href="/" class="flex-center gap-1 w-fit text-lg text-textColor serif">
+                    <Logo scale={0.06} /> Everywhen
+                </a>
+            </div>
+            <div class="pb-4 pl-1">
+                <AccountDropdown />
+            </div>
+            <div class="pb-4 pl-2">
+                <CreateNewButton />
+            </div>
+
+            <div class="pl-4">
+                {#if $settingsStore.passcode.value}
+                    <button
+                        on:click={lock}
+                        class="danger"
+                        use:tooltip={{
+                            content: '<span class="oneline">Lock (require passcode)</span>',
+                            position: 'bottom'
+                        }}
+                        aria-label="Lock"
+                    >
+                        <Lock size="25" />
+                    </button>
+                {/if}
+                <button
+                    aria-label={$obfuscated ? 'Show all' : 'Hide all'}
+                    on:click={() => obfuscated.set(!$obfuscated)}
+                >
+                    {#if $obfuscated}
+                        <Eye size="25" />
+                    {:else}
+                        <EyeOff size="25" />
+                    {/if}
+                </button>
+            </div>
+        </div>
 
         <div
-            class="fixed bottom-0 left-0 w-full h-fit z-50 flex items-center justify-center md:static md:w-fit md:h-full"
+            class="fixed bottom-0 left-0 w-full h-fit z-50 flex items-center justify-center md:static md:h-full"
         >
-            <div
-                class="flex-center w-full bg-vLightAccent md:bordered overflow-hidden items-center md:rounded-r-lg md:flex-col border border-solid border-backgroundColor border-l-0"
-            >
+            <div class="flex-center w-full overflow-hidden items-center md:flex-col">
                 <a
                     href="/journal"
                     aria-label="journal"
@@ -79,18 +130,3 @@
         <div />
     </div>
 </nav>
-
-<style lang="scss">
-    $nav-open-width: 12rem;
-
-    nav {
-        position: fixed;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        // increased to 6 so that on mobile the nav buttons are not cut off
-        // by entry group titles, and is above top navbar
-        z-index: 6;
-        height: 100%;
-    }
-</style>

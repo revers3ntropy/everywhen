@@ -17,7 +17,7 @@
 <svelte:head>
     <title>{data.location.name} | Location</title>
 </svelte:head>
-<main class="p-4 md:ml-[8.5em]">
+<main class="p-4 md:ml-40">
     <section class="p-2 md:rounded-lg md:bg-vLightAccent md:p-4">
         <EditLocation {...data.location} {onChange} />
     </section>

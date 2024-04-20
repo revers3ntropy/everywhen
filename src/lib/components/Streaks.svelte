@@ -77,7 +77,7 @@
             Error
         {:else if streaks}
             {#if condensed}
-                <span class="flex-center">
+                <span class="flex-center text-sm">
                     {#if streaks.runningOut}
                         <TimerSand size="25" />
                     {:else if streaks.current > 0}
@@ -91,7 +91,7 @@
                 </span>
             {:else}
                 <div
-                    class="flex-center full"
+                    class="flex-center full text-sm"
                     use:tooltip={{
                         content: tooltipContent,
                         position: tooltipPosition
@@ -105,11 +105,15 @@
                         <Fire size="25" />
                     {/if}
                     <div class="py-1">
-                        <div class="oneline pb-1">
-                            <b>{streaks.current}</b>
-                            day streak
-                        </div>
                         <div class="oneline">
+                            {#if streaks.current < 1}
+                                no streak
+                            {:else}
+                                <b>{streaks.current}</b>
+                                day streak
+                            {/if}
+                        </div>
+                        <div class="oneline text-light">
                             <b>{streaks.longest}</b>
                             longest
                         </div>
@@ -119,7 +123,7 @@
         {/if}
     {:else}
         <span
-            class="flex-center"
+            class="flex-center text-sm"
             use:tooltip={{
                 content: '...',
                 position: tooltipPosition
@@ -135,6 +139,6 @@
     .full {
         display: grid;
         grid-template-columns: 35px 1fr;
-        margin: 0 0.5rem;
+        margin: 0 0.5em;
     }
 </style>

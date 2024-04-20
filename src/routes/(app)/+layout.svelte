@@ -1,7 +1,6 @@
 <script lang="ts">
     import { afterNavigate, beforeNavigate } from '$app/navigation';
     import AllowCookies from '$lib/components/AllowCookies.svelte';
-    import TopNavbar from '$lib/components/nav/TopNavbar.svelte';
     import { Auth } from '$lib/controllers/auth/auth';
     import { Result } from '$lib/utils/result';
     import type { LayoutData } from './$types';
@@ -147,8 +146,6 @@
 
 <Nav />
 
-<TopNavbar />
-
 <div class="page-content">
     <slot />
 </div>
@@ -156,7 +153,7 @@
 <style lang="scss">
     .page-content {
         min-height: 100vh;
-        padding: 50px 0 12rem 0;
+        padding: 0 0 12rem 0;
 
         @media #{$mobile} {
             padding: 50px 0 200px 0;

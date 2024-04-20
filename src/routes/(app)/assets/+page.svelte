@@ -48,7 +48,7 @@
     <title>Assets</title>
 </svelte:head>
 
-<main class="md:mr-2 md:ml-[8.5em]">
+<main class="md:mr-2 md:ml-40">
     <div class="p-2">
         <button on:click={() => fileDropInput.click()} class="primary flex-center gap-1">
             <Upload size="30" />

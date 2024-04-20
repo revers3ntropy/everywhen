@@ -12,11 +12,12 @@
     <div class="flex-center">
         <Logo scale={0.28} />
     </div>
-    <div>
-        <h1 class="serif text-left text-5xl"> Everywhen </h1>
-        <p> YOUR JOURNAL AND LIFE LOG </p>
+    <div class="pl-4">
+        <!-- 50px so that the title is same width as tagline -->
+        <h1 class="title-font text-left text-[55px] pb-1"> Everywhen </h1>
+        <p class="pb-4"> YOUR JOURNAL AND LIFE LOG </p>
 
-        <a href="./login" class="primary flex-center gap-2 serif">
+        <a href="./login" class="primary flex-center gap-2">
             Start Writing <ArrowRightThinCircleOutline size="20" />
         </a>
     </div>
@@ -36,7 +37,6 @@
 
     p {
         letter-spacing: 1px;
-        margin: 1rem 0;
 
         @media (max-width: 350px) {
             font-size: 0.9rem;

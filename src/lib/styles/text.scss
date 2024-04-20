@@ -6,6 +6,12 @@
     -moz-osx-font-smoothing: auto;
 }
 
+.title-font {
+    font-family: serif;
+    -webkit-font-smoothing: subpixel-antialiased;
+    -moz-osx-font-smoothing: auto;
+}
+
 .redacted {
     font-family: 'Redacted Script', 'Redacted' !important;
 }
