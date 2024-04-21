@@ -2,9 +2,8 @@
     import { page } from '$app/stores';
     import AccountDropdown from '$lib/components/nav/AccountDropdown.svelte';
     import CreateNewButton from '$lib/components/nav/CreateNewButton.svelte';
-    import Streaks from '$lib/components/Streaks.svelte';
     import Logo from '$lib/components/ui/Logo.svelte';
-    import { obfuscated, passcodeLastEntered, settingsStore, username } from '$lib/stores';
+    import { obfuscated, passcodeLastEntered, settingsStore } from '$lib/stores';
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
     import DeleteOutline from 'svelte-material-icons/DeleteOutline.svelte';
@@ -26,10 +25,10 @@
 
 <!-- z is 6 so that on mobile the nav buttons are not cut off
      by entry group titles, and is above top navbar -->
-<nav class="fixed top-0 left-0 bottom-0 z-[6] h-full w-36 bg-vLightAccent">
-    <div class="grid grid-cols-1 grid-rows-3 h-full w-full">
+<nav class="md:fixed md:top-0 md:left-0 bottom-0 z-[6] md:h-full w-36 bg-vLightAccent">
+    <div class="grid grid-cols-1 grid-rows-3 h-16 md:h-full w-full">
         <div class="pt-4">
-            <div class="pb-4 pl-2">
+            <div class="pb-4 pl-2 hide-mobile">
                 <a href="/" class="flex-center gap-1 w-fit text-lg text-textColor serif">
                     <Logo scale={0.06} /> Everywhen
                 </a>
@@ -68,8 +67,9 @@
             </div>
         </div>
 
+        <!-- z-[14] as user popup is z-[15] -->
         <div
-            class="fixed bottom-0 left-0 w-full h-fit z-50 flex items-center justify-center md:static md:h-full"
+            class="bg-vLightAccent border-borderColor border-t-2 md:border-none fixed bottom-0 left-0 w-full h-fit z-[14] flex items-center justify-center md:static md:h-full"
         >
             <div class="flex-center w-full overflow-hidden items-center md:flex-col">
                 <a

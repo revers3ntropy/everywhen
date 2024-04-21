@@ -27,10 +27,10 @@
     </div>
 
     <div class="account-dropdown-options">
-        <p class="px-2 text-lg">
-            <AccountCircleOutline size="25" />
-            {$username || '...'}
-        </p>
+        <div class="px-2 text-lg">
+            <p class="text-sm text-light">logged in as</p>
+            <p>{$username || '...'}</p>
+        </div>
 
         <Streaks tooltipPosition="bottom" />
 

@@ -119,7 +119,7 @@
             {#if Object.keys(pinnedEntries).length}
                 <div class="pb-2">
                     <div
-                        class="bg-vLightAccent p-2 border-l-2 border-borderColor"
+                        class="p-2 border-l-2 border-b-2 border-borderColor rounded-bl-lg"
                         transition:slide={{ duration: ANIMATION_DURATION, axis: 'x' }}
                     >
                         <h3
@@ -155,9 +155,9 @@
             {/if}
         {/key}
         {#if Object.entries(nYearsAgo).length}
-            <div class="bg-vLightAccent flex flex-col gap-2">
+            <div class="flex flex-col gap-2">
                 {#each Object.entries(nYearsAgo) as [date, entries] (date)}
-                    <div class="border-l-2 border-borderColor p-2">
+                    <div class="border-l-2 border-b-2 border-borderColor rounded-bl-lg p-2">
                         <h3>
                             {fmtUtcRelative(new Date(date), 'en-full')} since...
                         </h3>
