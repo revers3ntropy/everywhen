@@ -27,7 +27,7 @@
     </div>
 
     <div class="account-dropdown-options">
-        <div class="px-2 text-lg">
+        <div class="px-2 text-lg text-right">
             <p class="text-sm text-light">logged in as</p>
             <p>{$username || '...'}</p>
         </div>

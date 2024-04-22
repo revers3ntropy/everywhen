@@ -25,9 +25,9 @@
 
 <!-- z is 6 so that on mobile the nav buttons are not cut off
      by entry group titles, and is above top navbar -->
-<nav class="md:fixed md:top-0 md:left-0 bottom-0 z-[6] md:h-full w-36 bg-vLightAccent">
-    <div class="grid grid-cols-1 grid-rows-3 h-16 md:h-full w-full">
-        <div class="pt-4">
+<nav class="md:fixed top-0 md:left-0 right-0 md:bottom-0 z-[6] md:h-full w-36 md:bg-vLightAccent">
+    <div class="md:grid grid-cols-1 grid-rows-3 h-16 md:h-full w-full">
+        <div class="pt-4 flex md:block pr-4 pl-[50px] md:pl-0">
             <div class="pb-4 pl-2 hide-mobile">
                 <a href="/" class="flex-center gap-1 w-fit text-lg text-textColor serif">
                     <Logo scale={0.06} /> Everywhen

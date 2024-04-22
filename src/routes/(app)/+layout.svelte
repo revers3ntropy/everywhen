@@ -156,7 +156,7 @@
         padding: 0 0 12rem 0;
 
         @media #{$mobile} {
-            padding: 50px 0 200px 0;
+            padding: 0 0 200px 0;
         }
     }
 

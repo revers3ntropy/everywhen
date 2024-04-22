@@ -133,7 +133,7 @@
         slot="button"
     >
         <Plus size="25" />
-        New
+        <span class="hide-mobile">New</span>
         <ChevronDown />
     </div>
 
