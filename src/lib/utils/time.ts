@@ -49,8 +49,7 @@ export function nowUtc(rounded = true): TimestampSecs {
 }
 
 export function currentTzOffset(): Hours {
-    return 4;
-    //return -(new Date().getTimezoneOffset() / 60);
+    return -(new Date().getTimezoneOffset() / 60);
 }
 
 export function fmtUtc(timestamp: TimestampSecs, tzOffset: Hours, fmt: string): string {
