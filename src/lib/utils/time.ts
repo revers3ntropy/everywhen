@@ -49,11 +49,12 @@ export function nowUtc(rounded = true): TimestampSecs {
 }
 
 export function currentTzOffset(): Hours {
-    return -(new Date().getTimezoneOffset() / 60);
+    return 4;
+    //return -(new Date().getTimezoneOffset() / 60);
 }
 
 export function fmtUtc(timestamp: TimestampSecs, tzOffset: Hours, fmt: string): string {
-    return moment(new Date((timestamp + tzOffset * 60 * 60) * 1000))
+    return moment((timestamp + tzOffset * 60 * 60) * 1000)
         .utc()
         .format(fmt);
 }
@@ -115,8 +116,6 @@ export function utcEq(
 export function daysSince(timestamp: TimestampSecs, tzOffset: Hours): number {
     const today = dayUtcFromTimestamp(nowUtc(), tzOffset);
     const then = dayUtcFromTimestamp(timestamp, tzOffset);
-    if (then > today) {
-        return 1;
-    }
+    if (then > today) return 1;
     return Math.floor((today - then) / (60 * 60 * 24)) + 1;
 }

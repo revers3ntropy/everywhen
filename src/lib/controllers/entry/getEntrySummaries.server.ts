@@ -6,11 +6,13 @@ import { query } from '$lib/db/mysql.server';
 import { Day } from '$lib/utils/day';
 import { decrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
-import { currentTzOffset, fmtUtc } from '$lib/utils/time';
+import { fmtUtc, nowUtc } from '$lib/utils/time';
 
 export async function getSummariesNYearsAgo(
-    auth: Auth
+    auth: Auth,
+    tzOffset: number
 ): Promise<Result<Record<string, EntrySummary[]>>> {
+    console.log('today is ', Day.today(tzOffset).fmtIsoNoYear());
     const rawEntries = await query<
         {
             id: string;
@@ -41,16 +43,15 @@ export async function getSummariesNYearsAgo(
         FROM entries
         WHERE deleted IS NULL
             AND userId = ${auth.id}
-            AND day LIKE ${`%${Day.today(currentTzOffset()).fmtIsoNoYear()}`}
+            AND day LIKE ${`%${Day.today(tzOffset).fmtIsoNoYear()}`}
+            AND created < ${nowUtc() - 48 * 60 * 60}
         ORDER BY created DESC, id
     `;
 
     return (await summariesFromRaw(auth, rawEntries)).map(summaries => {
-        const today = Day.today(currentTzOffset()).fmtIso();
         const byDay: Record<string, EntrySummary[]> = {};
         for (const entry of summaries) {
             const date = fmtUtc(entry.created, entry.createdTzOffset, 'YYYY-MM-DD');
-            if (date === today) continue;
             byDay[date] ??= [];
             byDay[date].push(entry);
         }

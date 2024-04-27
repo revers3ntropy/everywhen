@@ -143,6 +143,8 @@ namespace EntryServer {
 
         await updateWordIndex(auth, body, title, id, !!deleted, false);
 
+        console.log('created entry on', Day.fromTimestamp(created, createdTzOffset));
+
         await query`
             INSERT INTO entries
                 (id, userId, title, body, created, createdTzOffset, day, deleted, pinned,

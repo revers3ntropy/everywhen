@@ -7,6 +7,8 @@ import { FileLogger } from '$lib/utils/log.server';
 import { Auth } from '$lib/controllers/auth/auth.server';
 import type { Mutable } from './types';
 
+process.env.TZ = 'Etc/Greenwich';
+
 const reqLogger = new FileLogger('REQ', chalk.bgWhite.black);
 const processLogger = new FileLogger('PROC', chalk.black.bgRedBright);
 

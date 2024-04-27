@@ -6,11 +6,12 @@
     import { obfuscated } from '$lib/stores';
     import { Day } from '$lib/utils/day';
     import { currentTzOffset } from '$lib/utils/time';
+    import { onMount } from 'svelte';
     import type { PageData } from './$types';
     import Feed from '$lib/components/feed/Feed.svelte';
     import { page } from '$app/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
-    import { Entry } from '$lib/controllers/entry/entry';
+    import { Entry, type EntrySummary } from '$lib/controllers/entry/entry';
 
     export let data: PageData;
 
@@ -22,6 +23,14 @@
     page.subscribe(() => {
         getScrollContainer()?.scrollTo(0, 0);
     });
+
+    // could be fetched by sidebar..?
+    let onThisDayData: Record<string, EntrySummary[]> = {};
+    onMount(async () => {
+        onThisDayData = notify.onErr(
+            await api.get('/entries/onThisDay', { tz: currentTzOffset() })
+        );
+    });
 </script>
 
 <svelte:head>
@@ -32,7 +41,7 @@
     <section>
         <EntriesSidebar
             obfuscated={$obfuscated}
-            nYearsAgo={data.nYearsAgo}
+            nYearsAgo={onThisDayData}
             pinnedEntriesSummaries={data.pinnedEntriesList}
             openOnMobile={false}
         />
