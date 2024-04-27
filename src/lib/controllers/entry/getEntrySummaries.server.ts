@@ -12,7 +12,6 @@ export async function getSummariesNYearsAgo(
     auth: Auth,
     tzOffset: number
 ): Promise<Result<Record<string, EntrySummary[]>>> {
-    console.log('today is ', Day.today(tzOffset).fmtIsoNoYear());
     const rawEntries = await query<
         {
             id: string;
