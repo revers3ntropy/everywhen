@@ -39,7 +39,7 @@ export const entryEditsProvider = {
                 AND entries.deleted IS NULL
                 AND entryEdits.created > ${minTimestamp}
                 AND entryEdits.created < ${maxTimestamp}
-                AND DATE_FORMAT(FROM_UNIXTIME(entryEdits.created + entryEdits.createdTzOffset * 60 * 60), '%Y-%m-%d') = ${day.fmtIso()}
+                AND DATE_FORMAT(FROM_UNIXTIME(entryEdits.created + (entryEdits.createdTzOffset - TIMESTAMPDIFF(HOUR, UTC_TIMESTAMP(), NOW())) * 60 * 60), '%Y-%m-%d') = ${day.fmtIso()}
             ORDER BY entryEdits.created DESC, entries.id
         `;
         return Result.collect(
@@ -75,25 +75,25 @@ export const entryEditsProvider = {
         const maxTimestamp = day.utcTimestamp(-24);
         const entries = inFuture
             ? await query<{ day: string }[]>`
-                SELECT DATE_FORMAT(FROM_UNIXTIME(entryEdits.created + entryEdits.createdTzOffset * 60 * 60), '%Y-%m-%d') as day
+                SELECT DATE_FORMAT(FROM_UNIXTIME(entryEdits.created + (entryEdits.createdTzOffset - TIMESTAMPDIFF(HOUR, UTC_TIMESTAMP(), NOW())) * 60 * 60), '%Y-%m-%d') as day
                 FROM entryEdits, entries
                 WHERE deleted IS NULL
                     AND entryEdits.entryId = entries.id
                     AND entryEdits.userId = ${auth.id}
                     AND entryEdits.created > ${minTimestamp}
-                    AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(entryEdits.created + entryEdits.createdTzOffset * 60 * 60), '%Y-%m-%d'), DATE)
+                    AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(entryEdits.created + (entryEdits.createdTzOffset - TIMESTAMPDIFF(HOUR, UTC_TIMESTAMP(), NOW())) * 60 * 60), '%Y-%m-%d'), DATE)
                         > CONVERT(${day.fmtIso()}, DATE)
                 ORDER BY entryEdits.created + entryEdits.createdTzOffset * 60 * 60 ASC
                 LIMIT 1
             `
             : await query<{ day: string }[]>`
-                SELECT DATE_FORMAT(FROM_UNIXTIME(entryEdits.created + entryEdits.createdTzOffset * 60 * 60), '%Y-%m-%d') as day
+                SELECT DATE_FORMAT(FROM_UNIXTIME(entryEdits.created + (entryEdits.createdTzOffset - TIMESTAMPDIFF(HOUR, UTC_TIMESTAMP(), NOW())) * 60 * 60), '%Y-%m-%d') as day
                 FROM entryEdits, entries
                 WHERE deleted IS NULL
                     AND entryEdits.entryId = entries.id
                     AND entryEdits.userId = ${auth.id}
                     AND entryEdits.created < ${maxTimestamp}
-                    AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(entryEdits.created + entryEdits.createdTzOffset * 60 * 60), '%Y-%m-%d'), DATE)
+                    AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(entryEdits.created + (entryEdits.createdTzOffset - TIMESTAMPDIFF(HOUR, UTC_TIMESTAMP(), NOW())) * 60 * 60), '%Y-%m-%d'), DATE)
                         < CONVERT(${day.fmtIso()}, DATE)
                 ORDER BY entryEdits.created + entryEdits.createdTzOffset * 60 * 60 DESC
                 LIMIT 1

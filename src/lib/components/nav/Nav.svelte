@@ -2,7 +2,6 @@
     import { page } from '$app/stores';
     import AccountDropdown from '$lib/components/nav/AccountDropdown.svelte';
     import CreateNewButton from '$lib/components/nav/CreateNewButton.svelte';
-    import Logo from '$lib/components/ui/Logo.svelte';
     import { obfuscated, passcodeLastEntered, settingsStore } from '$lib/stores';
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
@@ -12,7 +11,6 @@
     import Lock from 'svelte-material-icons/Lock.svelte';
     import MapOutline from 'svelte-material-icons/MapOutline.svelte';
     import Notebook from 'svelte-material-icons/NotebookOutline.svelte';
-    import { tooltip } from '@svelte-plugins/tooltips';
 
     const buttonCls =
         'w-full inline-flex px-2 py-3 items-center content-center gap-2 flex-col md:flex-row' +
@@ -27,41 +25,32 @@
      by entry group titles, and is above top navbar -->
 <nav class="md:fixed top-0 md:left-0 right-0 md:bottom-0 z-[6] md:h-full w-36 md:bg-vLightAccent">
     <div class="md:grid grid-cols-1 grid-rows-3 h-16 md:h-full w-full">
-        <div class="pt-4 flex md:block pr-4 pl-[50px] md:pl-0">
-            <div class="pb-4 pl-2 hide-mobile">
-                <a href="/" class="flex-center gap-1 w-fit text-lg text-textColor serif">
-                    <Logo scale={0.06} /> Everywhen
-                </a>
-            </div>
-            <div class="pb-4 pl-1">
+        <div class="pt-2 flex md:block pr-4 pl-[50px] md:pl-0">
+            <div class="pb-4 pl-1 w-full">
                 <AccountDropdown />
             </div>
             <div class="pb-4 pl-2">
                 <CreateNewButton />
             </div>
 
-            <div class="pl-4">
+            <div class="pl-4 flex flex-col gap-3 items-start">
                 {#if $settingsStore.passcode.value}
-                    <button
-                        on:click={lock}
-                        class="danger"
-                        use:tooltip={{
-                            content: '<span class="oneline">Lock (require passcode)</span>',
-                            position: 'bottom'
-                        }}
-                        aria-label="Lock"
-                    >
+                    <button on:click={lock} class="danger flex-center gap-2" aria-label="Lock">
                         <Lock size="25" />
+                        Lock
                     </button>
                 {/if}
                 <button
                     aria-label={$obfuscated ? 'Show all' : 'Hide all'}
                     on:click={() => obfuscated.set(!$obfuscated)}
+                    class="flex-center gap-2"
                 >
                     {#if $obfuscated}
                         <Eye size="25" />
+                        Show all
                     {:else}
                         <EyeOff size="25" />
+                        Hide all
                     {/if}
                 </button>
             </div>

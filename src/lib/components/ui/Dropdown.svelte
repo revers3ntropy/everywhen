@@ -20,6 +20,7 @@
     export let stayOpenWhenClicked = false;
     export let fillWidthMobile: boolean | 'mobile' = false;
     export let buttonClass = '';
+    export let containerClass = '';
 
     export let close = () => {
         open = false;
@@ -56,7 +57,7 @@
 <svelte:window on:mouseup={globalMouseUp} />
 
 <span
-    class="dropdown {buttonClass}"
+    class="dropdown {containerClass}"
     class:open
     class:from-right={fromRight}
     class:from-top={fromTop}
@@ -64,7 +65,11 @@
     class:fill-width-mobile={fillWidthMobile}
     {id}
 >
-    <button aria-label={label} on:click={() => (open = !open)} class="dropdown-button">
+    <button
+        aria-label={label}
+        on:click={() => (open = !open)}
+        class="dropdown-button {buttonClass}"
+    >
         <slot name="button" />
     </button>
     <span class="popup">

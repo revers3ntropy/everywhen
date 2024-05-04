@@ -54,7 +54,7 @@ export const eventStartsProvider = {
                 FROM events
                 WHERE userId = ${auth.id}
                     AND start > ${minTimestamp}
-                    AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(start + tzOffset * 60 * 60), '%Y-%m-%d'), DATE)
+                    AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(start + (tzOffset - TIMESTAMPDIFF(HOUR, UTC_TIMESTAMP(), NOW())) * 60 * 60), '%Y-%m-%d'), DATE)
                         > CONVERT(${day.fmtIso()}, DATE)
                 ORDER BY start + tzOffset * 60 * 60 ASC, id
                 LIMIT 1
@@ -64,7 +64,7 @@ export const eventStartsProvider = {
                 FROM events
                 WHERE userId = ${auth.id}
                   AND start < ${maxTimestamp}
-                  AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(start + tzOffset * 60 * 60), '%Y-%m-%d'), DATE)
+                  AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(start + (tzOffset - TIMESTAMPDIFF(HOUR, UTC_TIMESTAMP(), NOW())) * 60 * 60), '%Y-%m-%d'), DATE)
                         < CONVERT(${day.fmtIso()}, DATE)
                 ORDER BY start + tzOffset * 60 * 60 DESC, id
                 LIMIT 1
@@ -125,7 +125,7 @@ export const eventEndsProvider = {
                 FROM events
                 WHERE userId = ${auth.id}
                     AND end > ${minTimestamp}
-                    AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(end + tzOffset * 60 * 60), '%Y-%m-%d'), DATE)
+                    AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(end + (tzOffset - TIMESTAMPDIFF(HOUR, UTC_TIMESTAMP(), NOW())) * 60 * 60), '%Y-%m-%d'), DATE)
                         > CONVERT(${day.fmtIso()}, DATE)
                 ORDER BY end + tzOffset * 60 * 60 ASC, id
                 LIMIT 1
@@ -135,13 +135,12 @@ export const eventEndsProvider = {
                 FROM events
                 WHERE userId = ${auth.id}
                     AND end < ${maxTimestamp}
-                    AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(end + tzOffset * 60 * 60), '%Y-%m-%d'), DATE)
+                    AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(end + (tzOffset - TIMESTAMPDIFF(HOUR, UTC_TIMESTAMP(), NOW())) * 60 * 60), '%Y-%m-%d'), DATE)
                         < CONVERT(${day.fmtIso()}, DATE)
                 ORDER BY end + tzOffset * 60 * 60 DESC, id
                 LIMIT 1
             `;
         if (!events.length) return Result.ok(null);
-
         const { end, tzOffset } = events[0];
         return Result.ok(Day.fromTimestamp(end, tzOffset));
     }

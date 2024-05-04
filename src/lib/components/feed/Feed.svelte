@@ -23,19 +23,28 @@
         const loadingDay = atTop ? nextDay : prevDay;
         if (!loadingDay) throw new Error('day is null');
         const day = notify.onErr(await api.get(apiPath('/feed/?', loadingDay)));
+        const dayDay = Day.fromString(day.day).unwrap();
+        const nextDayInFuture = day.nextDayInFuture
+            ? Day.fromString(day.nextDayInFuture).unwrap()
+            : null;
+        if (nextDayInFuture && !nextDayInFuture.gt(dayDay)) {
+            console.error(day);
+            throw new Error('next day is not in future');
+        }
+        const nextDayInPast = day.nextDayInPast ? Day.fromString(day.nextDayInPast).unwrap() : null;
+        if (nextDayInPast && !nextDayInPast.lt(dayDay)) {
+            console.error(day);
+            throw new Error('next day is not in past');
+        }
         if (atTop) {
             if (
-                (!day.nextDayInFuture ||
-                    Day.fromString(day.nextDayInFuture).unwrap().isInFuture()) &&
+                (!nextDayInFuture || nextDayInFuture.isInFuture()) &&
                 nextDay &&
                 Day.fromString(nextDay).unwrap().isInPast()
             ) {
                 // edge case: if we're loading from the top, always load today
                 nextDay = Day.today(currentTzOffset()).fmtIso();
-            } else if (
-                day.nextDayInFuture &&
-                Day.fromString(day.nextDayInFuture).unwrap().isInFuture()
-            ) {
+            } else if (nextDayInFuture && nextDayInFuture.isInFuture()) {
                 // don't load days in the future from today
                 nextDay = null;
             } else {

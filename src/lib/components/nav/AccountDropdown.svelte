@@ -16,9 +16,9 @@
     }
 </script>
 
-<Dropdown width="200px">
+<Dropdown width="200px" containerClass="w-full block" buttonClass="w-full">
     <div
-        class="flex justify-end items-center gap-1 w-full py-1 hover:bg-lightAccent rounded-full border border-borderColor px-2"
+        class="flex justify-between items-center gap-1 w-full py-1 hover:bg-lightAccent rounded-full border border-borderColor px-2"
         slot="button"
     >
         <AccountCircleOutline size="32" />
@@ -27,10 +27,12 @@
     </div>
 
     <div class="account-dropdown-options">
-        <div class="px-2 text-lg text-right">
+        <div class="px-2 text-lg">
             <p class="text-sm text-light">logged in as</p>
             <p>{$username || '...'}</p>
         </div>
+
+        <hr />
 
         <Streaks tooltipPosition="bottom" />
 

@@ -56,11 +56,17 @@ namespace FeedServer {
     async function getNextDayInFuture(auth: Auth, day: Day): Promise<Day | null> {
         const tomorrow = day.plusDays(1);
         return await PROVIDERS.map(p => p.nextDayWithFeedItems(auth, day, true)).reduce(
-            async (acc, nextRes): Promise<Day | null> => {
+            async (acc, nextRes, i): Promise<Day | null> => {
                 const accDay = await acc;
                 // short circuit if the next day is tomorrow
                 if (accDay !== null && accDay.eq(tomorrow)) return accDay;
                 const next = (await nextRes).unwrap(e => error(400, e));
+
+                if (next && !next.gt(day)) {
+                    console.log({ day, next, i, accDay });
+                    throw new Error('Next day is in the past!');
+                }
+                console.log('NEXT$ ', next, 'ACC$ ', accDay);
 
                 // treat null as Infinity
                 if (next === null) return accDay;
