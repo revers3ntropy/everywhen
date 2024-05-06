@@ -23,7 +23,9 @@
     >
         <AccountCircleOutline size="32" />
         <Streaks condensed />
-        <ChevronDown />
+        <span class="hide-mobile">
+            <ChevronDown />
+        </span>
     </div>
 
     <div class="account-dropdown-options">

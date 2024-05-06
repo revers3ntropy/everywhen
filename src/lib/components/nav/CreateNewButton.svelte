@@ -129,12 +129,11 @@
 
 <Dropdown>
     <div
-        class="flex-center w-full pl-2.5 pr-4 py-2 hover:bg-lightAccent bg-lightAccent rounded-lg gap-2"
+        class="flex-center w-full px-2 md:pl-2.5 md:pr-4 py-2 hover:bg-lightAccent bg-lightAccent rounded-lg gap-2"
         slot="button"
     >
         <Plus size="25" />
-        <span class="hide-mobile">New</span>
-        <ChevronDown />
+        <span class="hide-mobile"> New <ChevronDown /> </span>
     </div>
 
     <div class="record-something-buttons">

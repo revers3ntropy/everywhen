@@ -81,7 +81,7 @@
 <div class="fixed only-mobile z-10 p-1 top-0">
     <button
         aria-label="Show sidebar menu"
-        class="bg-vLightAccent rounded-xl"
+        class="bg-lightAccent rounded-lg"
         on:click={() => (openOnMobile = !openOnMobile)}
     >
         <Menu size="40" />

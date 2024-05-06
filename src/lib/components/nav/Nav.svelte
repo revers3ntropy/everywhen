@@ -18,6 +18,7 @@
 
     function lock() {
         passcodeLastEntered.set(0);
+        obfuscated.set(true);
     }
 </script>
 
@@ -25,19 +26,19 @@
      by entry group titles, and is above top navbar -->
 <nav class="md:fixed top-0 md:left-0 right-0 md:bottom-0 z-[6] md:h-full w-36 md:bg-vLightAccent">
     <div class="md:grid grid-cols-1 grid-rows-3 h-16 md:h-full w-full">
-        <div class="pt-2 flex md:block pr-4 pl-[50px] md:pl-0">
-            <div class="pb-4 pl-1 w-full">
+        <div class="pt-1 md:pt-2 flex md:block pr-4 pl-[50px] md:pl-0">
+            <div class="md:pb-4 pl-1 w-full">
                 <AccountDropdown />
             </div>
-            <div class="pb-4 pl-2">
+            <div class="md:pb-4 pl-2">
                 <CreateNewButton />
             </div>
 
-            <div class="pl-4 flex flex-col gap-3 items-start">
+            <div class="pl-4 flex md:flex-col gap-3 items-center md:items-start justify-center">
                 {#if $settingsStore.passcode.value}
                     <button on:click={lock} class="danger flex-center gap-2" aria-label="Lock">
                         <Lock size="25" />
-                        Lock
+                        <span class="hide-mobile"> Lock </span>
                     </button>
                 {/if}
                 <button
@@ -47,10 +48,10 @@
                 >
                     {#if $obfuscated}
                         <Eye size="25" />
-                        Show all
+                        <span class="hide-mobile"> Show all </span>
                     {:else}
                         <EyeOff size="25" />
-                        Hide all
+                        <span class="hide-mobile"> Hide all </span>
                     {/if}
                 </button>
             </div>
