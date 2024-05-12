@@ -1,9 +1,12 @@
 <script lang="ts">
+    import EntryDialog from '$lib/components/dialogs/EntryDialog.svelte';
+    import { showPopup } from '$lib/utils/popups';
     import { slide } from 'svelte/transition';
     import LabelDot from '$lib/components/label/LabelDot.svelte';
     import { ANIMATION_DURATION } from '$lib/constants';
     import { listen } from '$lib/dataChangeEvents';
     import Eye from 'svelte-material-icons/Eye.svelte';
+    import OpenInApp from 'svelte-material-icons/OpenInApp.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import { Entry, type EntrySummary } from '$lib/controllers/entry/entry';
     import { currentTzOffset, fmtUtc, nowUtc, utcEq } from '$lib/utils/time';
@@ -109,29 +112,44 @@
                 {/if}
 
                 {#each (titles || {})[date] as entry (entry.id)}
-                    <a class="entry" href="/journal#{entry.id}">
-                        <span class="entry-time">
-                            <UtcTime
-                                timestamp={entry.created}
-                                fmt="h:mma"
-                                tzOffset={entry.createdTzOffset}
-                                tooltipPosition="right"
-                            />
-                        </span>
+                    <span class="flex entry-container">
+                        <a class="entry" href="/journal#{entry.id}">
+                            <span class="text-sm text-textColorLight w-full text-right">
+                                <UtcTime
+                                    timestamp={entry.created}
+                                    fmt="h:mma"
+                                    tzOffset={entry.createdTzOffset}
+                                    tooltipPosition="right"
+                                />
+                            </span>
 
-                        <LabelDot name={entry.label?.name} color={entry.label?.color || null} />
+                            <LabelDot name={entry.label?.name} color={entry.label?.color || null} />
 
-                        <span class="title" class:obfuscated>
-                            {#if entry.titleShortened}
-                                {entry.titleShortened}
-                            {:else}
-                                <i class="text-light">
-                                    {entry.bodyShortened}{#if entry.bodyShortened.length >= Entry.TITLE_LENGTH_CUTOFF}...
-                                    {/if}
-                                </i>
-                            {/if}
+                            <span class="ellipsis max-w-[20vw]" class:obfuscated>
+                                {#if entry.titleShortened}
+                                    {entry.titleShortened}
+                                {:else}
+                                    <i class="text-light">
+                                        {entry.bodyShortened}{#if entry.bodyShortened.length >= Entry.TITLE_LENGTH_CUTOFF}...
+                                        {/if}
+                                    </i>
+                                {/if}
+                            </span>
+                        </a>
+
+                        <span
+                            class="open-in-dialog-button hover:bg-lightAccent flex-center rounded-md"
+                        >
+                            <button
+                                on:click={() =>
+                                    showPopup(EntryDialog, {
+                                        id: entry.id
+                                    })}
+                            >
+                                <OpenInApp size="20" />
+                            </button>
                         </span>
-                    </a>
+                    </span>
                 {/each}
             </div>
         {/each}
@@ -140,6 +158,13 @@
 
 <style lang="scss">
     @import '$lib/styles/text';
+
+    .open-in-dialog-button {
+        display: none;
+    }
+    .entry-container:hover .open-in-dialog-button {
+        display: block;
+    }
 
     .menu {
         display: flex;
@@ -184,18 +209,6 @@
             &:hover {
                 background-color: var(--light-accent);
             }
-
-            .entry-time {
-                font-size: 0.7rem;
-                color: var(--text-color-light);
-                width: 100%;
-                text-align: right;
-            }
         }
-    }
-
-    .title {
-        @extend .ellipsis;
-        max-width: 350px;
     }
 </style>

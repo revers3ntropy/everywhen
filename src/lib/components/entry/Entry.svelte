@@ -135,7 +135,7 @@
     class="entry w-full h-fit pt-2 outline-none border border-transparent rounded-md"
     class:in-dialog={isInDialog}
     {id}
-    style={isFocused ? 'border-color: var(--secondary)' : ''}
+    style={isFocused && !isInDialog ? 'border-color: var(--secondary)' : ''}
     bind:this={containerDiv}
 >
     {#if showFullDate}
