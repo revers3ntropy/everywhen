@@ -18,7 +18,7 @@
     <title>Datasets</title>
 </svelte:head>
 
-<main class="mt-4 md:ml-40">
+<main class="mt-4 md:ml-[10.5rem]">
     {#each unusedPresetIds as presetId}
         <div class="py-2">
             <button on:click={() => makeFromPreset(presetId)}>

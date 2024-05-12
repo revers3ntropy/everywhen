@@ -1,4 +1,5 @@
 <script lang="ts">
+    import FeedItemIcon from '$lib/components/feed/FeedItemIcon.svelte';
     import TimeInFeed from '$lib/components/feed/TimeInFeed.svelte';
     import LabelDot from '$lib/components/label/LabelDot.svelte';
     import { Auth } from '$lib/controllers/auth/auth';
@@ -7,8 +8,6 @@
     import type { Label } from '$lib/controllers/label/label';
     import { encryptionKey } from '$lib/stores';
     import { Day } from '$lib/utils/day';
-    import Calendar from 'svelte-material-icons/Calendar.svelte';
-    import CalendarStart from 'svelte-material-icons/CalendarStart.svelte';
 
     export let item: FeedItemTypes['eventStart'];
     export let labels: Record<string, Label>;
@@ -21,9 +20,9 @@
 
 <!-- if the event starts and then immediately ends, collapse into one item -->
 {#if nextItem?.type === 'event-end' && nextItem?.id === `${item.id}-end` && Day.timestampsAreSameDay(item.start, item.end, item.tzOffset) && !Event.isInstantEvent(item)}
+    <FeedItemIcon type="event" />
     <div class="text-sm py-2 flex gap-4">
         <TimeInFeed timestamp={item.start} to={item.end} tzOffset={item.tzOffset} />
-        <Calendar size="22" />
         <div class:obfuscated>
             {#if label}
                 <LabelDot color={label.color} name={label.name} />
@@ -32,13 +31,9 @@
         </div>
     </div>
 {:else}
+    <FeedItemIcon type={!Event.isInstantEvent(item) ? 'event-start' : 'event'} />
     <div class="text-sm py-2 flex gap-4">
         <TimeInFeed timestamp={item.start} tzOffset={item.tzOffset} />
-        {#if !Event.isInstantEvent(item)}
-            <CalendarStart size="22" />
-        {:else}
-            <Calendar size="22" />
-        {/if}
         <div>
             {#if !Event.isInstantEvent(item)}
                 <span class="text-textColorLight"> start of </span>

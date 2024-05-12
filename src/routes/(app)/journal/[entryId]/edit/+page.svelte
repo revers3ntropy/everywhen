@@ -11,7 +11,7 @@
     <title>Edit Entry</title>
 </svelte:head>
 
-<main class="pt-4 md:p-4 md:ml-40 flex-center">
+<main class="pt-4 md:p-4 md:ml-[10.5rem] flex-center">
     <div class="w-full max-w-3xl">
         <div class="flex-center justify-between">
             <div>

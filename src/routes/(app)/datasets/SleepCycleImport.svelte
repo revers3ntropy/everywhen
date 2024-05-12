@@ -26,8 +26,8 @@
         const [header, ...dataLines] = lines;
 
         const columns = header.split(',');
-        const startTsIdx = columns.indexOf('Start');
-        const endTsIdx = columns.indexOf('End');
+        const startTsIdx = columns.indexOf('Went to bed');
+        const endTsIdx = columns.indexOf('Woke up');
         const sleepQualityIdx = columns.indexOf('Sleep Quality');
         const regularityIdx = columns.indexOf('Regularity');
 
@@ -46,11 +46,13 @@
             const start = new Date(startTs);
             const end = new Date(endTs);
             const duration = (end.getTime() - start.getTime()) / 1000;
+            const timestamp = start.getTime() / 1000;
+            if (isNaN(duration) || isNaN(timestamp)) continue;
 
             rows.push({
                 elements: [duration, sleepQuality, regularity],
                 created: nowUtc(),
-                timestamp: start.getTime() / 1000,
+                timestamp,
                 timestampTzOffset: currentTzOffset()
             });
         }
@@ -61,6 +63,7 @@
                 onSameTimestamp: 'skip'
             })
         );
+        notify.success('Sleep Cycle data imported successfully');
     }) as ChangeEventHandler<HTMLInputElement>;
 
     async function uploadFromSleepCycle() {

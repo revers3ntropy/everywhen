@@ -10,6 +10,7 @@
     import WeatherDialog from '$lib/components/dialogs/WeatherDialog.svelte';
     import EntryForm from '$lib/components/entryForm/EntryForm.svelte';
     import EntryEditFeedItem from '$lib/components/feed/EntryEditFeedItem.svelte';
+    import EntryFeedItem from '$lib/components/feed/EntryFeedItem.svelte';
     import EventEndFeedItem from '$lib/components/feed/EventEndFeedItem.svelte';
     import EventStartFeedItem from '$lib/components/feed/EventStartFeedItem.svelte';
     import HappinessFeedItem from '$lib/components/feed/HappinessFeedItem.svelte';
@@ -24,7 +25,6 @@
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import { ANIMATION_DURATION } from '$lib/constants';
     import { listen } from '$lib/dataChangeEvents';
-    import Entry from '$lib/components/entry/Entry.svelte';
     import type { Location } from '$lib/controllers/location/location';
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
     import Dot from '../ui/Dot.svelte';
@@ -163,53 +163,49 @@
                     <EntryForm {obfuscated} {labels} />
                 </div>
             {/if}
-            <div class="pb-4 w-full">
+            <div class="w-full">
                 {#each items || [] as item, i (item.id)}
-                    {#if item.type === 'entry'}
-                        <!-- hack to remove 'type' attribute from entry -->
-                        <Entry
-                            {...(({ type: _, ...rest }) => rest)(item)}
-                            {obfuscated}
-                            {showLabels}
-                            {locations}
-                        />
-                    {:else if item.type === 'entry-edit'}
-                        <EntryEditFeedItem
-                            {...(({ type: _, ...rest }) => rest)(item)}
-                            {locations}
-                            {obfuscated}
-                        />
-                    {:else if item.type === 'sleep'}
-                        <SleepInfo
-                            tzOffset={item.startTzOffset}
-                            start={item.start}
-                            duration={item.duration}
-                            quality={item.quality}
-                            regularity={item.regularity}
-                            {obfuscated}
-                        />
-                    {:else if item.type === 'event-start'}
-                        <EventStartFeedItem
-                            {labels}
-                            {item}
-                            nextItem={items[i - 1] ?? null}
-                            {obfuscated}
-                        />
-                    {:else if item.type === 'event-end'}
-                        <EventEndFeedItem
-                            {labels}
-                            {item}
-                            previousItem={items[i + 1] ?? null}
-                            {obfuscated}
-                        />
-                    {:else if item.type === 'happiness'}
-                        <HappinessFeedItem
-                            {obfuscated}
-                            timestamp={item.timestamp}
-                            tzOffset={item.timestampTzOffset}
-                            value={item.value}
-                        />
-                    {/if}
+                    <div class="pb-4">
+                        {#if item.type === 'entry'}
+                            <EntryFeedItem entry={item} {obfuscated} {showLabels} {locations} />
+                        {:else if item.type === 'entry-edit'}
+                            <EntryEditFeedItem
+                                {...(({ type: _, ...rest }) => rest)(item)}
+                                {locations}
+                                {obfuscated}
+                            />
+                        {:else if item.type === 'sleep'}
+                            <SleepInfo
+                                tzOffset={item.startTzOffset}
+                                start={item.start}
+                                duration={item.duration}
+                                quality={item.quality}
+                                regularity={item.regularity}
+                                {obfuscated}
+                            />
+                        {:else if item.type === 'event-start'}
+                            <EventStartFeedItem
+                                {labels}
+                                {item}
+                                nextItem={items[i - 1] ?? null}
+                                {obfuscated}
+                            />
+                        {:else if item.type === 'event-end'}
+                            <EventEndFeedItem
+                                {labels}
+                                {item}
+                                previousItem={items[i + 1] ?? null}
+                                {obfuscated}
+                            />
+                        {:else if item.type === 'happiness'}
+                            <HappinessFeedItem
+                                {obfuscated}
+                                timestamp={item.timestamp}
+                                tzOffset={item.timestampTzOffset}
+                                value={item.value}
+                            />
+                        {/if}
+                    </div>
                 {/each}
             </div>
         </div>

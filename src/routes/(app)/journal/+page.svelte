@@ -24,7 +24,7 @@
         getScrollContainer()?.scrollTo(0, 0);
     });
 
-    // could be fetched by sidebar..?
+    // could be fetched by sidebar...?
     let onThisDayData: Record<string, EntrySummary[]> = {};
     onMount(async () => {
         onThisDayData = notify.onErr(
@@ -37,7 +37,7 @@
     <title>Journal</title>
 </svelte:head>
 
-<main class="md:flex md:justify-center gap-4 md:ml-40 pt-4">
+<main class="md:flex md:justify-center gap-4 md:ml-[10.5rem] pt-4">
     <section>
         <EntriesSidebar
             obfuscated={$obfuscated}

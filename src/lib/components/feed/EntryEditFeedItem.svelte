@@ -1,4 +1,5 @@
 <script lang="ts">
+    import FeedItemIcon from '$lib/components/feed/FeedItemIcon.svelte';
     import { slide } from 'svelte/transition';
     import AgentWidget from '$lib/components/entry/AgentWidget.svelte';
     import TimeInFeed from '$lib/components/feed/TimeInFeed.svelte';
@@ -8,7 +9,6 @@
     import { Entry } from '$lib/controllers/entry/entry';
     import type { Location } from '$lib/controllers/location/location';
     import { settingsStore } from '$lib/stores';
-    import NoteEditOutline from 'svelte-material-icons/NoteEditOutline.svelte';
     import ArrowDown from 'svelte-material-icons/ArrowDown.svelte';
 
     export let id: string;
@@ -28,9 +28,10 @@
     let showingMap = false;
 </script>
 
+<FeedItemIcon type="entry-edit" />
+
 <div class="text-sm py-2 flex gap-2 flex-wrap">
     <TimeInFeed timestamp={created} tzOffset={createdTzOffset} />
-    <NoteEditOutline size="24" class="ml-2" />
     {#if $settingsStore.showAgentWidgetOnEntries.value}
         <AgentWidget data={agentData} />
     {/if}

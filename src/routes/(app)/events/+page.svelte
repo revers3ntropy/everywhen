@@ -77,7 +77,7 @@
     <title>Events</title>
 </svelte:head>
 
-<main class="md:ml-40">
+<main class="md:ml-[10.5rem]">
     <div class="flex justify-between p-2 md:p-4">
         <div>
             <button class="primary flex-center gap-1" on:click={newEvent}>

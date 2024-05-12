@@ -46,7 +46,7 @@
     <title>Labels</title>
 </svelte:head>
 
-<main class="md:p-4 md:ml-40">
+<main class="md:p-4 md:ml-[10.5rem]">
     <button class="primary flex-center gap-1" on:click={newLabel}>
         <Plus size="30" />
         New Label

@@ -6,17 +6,10 @@
     export let to: number | null = null;
 </script>
 
-<div>
-    <div class="relative">
-        <span
-            class="text-textColorLight text-sm px-2 border-borderColor border-solid border rounded-lg absolute md:-left-4 top-0 bg-backgroundColor flex-center gap-1 shadow ml-[1px] md:m-0"
-        >
-            <UtcTime fmt={'h:mma'} {timestamp} tooltipPosition="right" {tzOffset} />
-            {#if to}
-                <span>-</span>
-                <UtcTime fmt={'h:mma'} timestamp={to} tooltipPosition="right" {tzOffset} />
-            {/if}
-        </span>
-    </div>
-    <div class={to === null ? 'w-16 md:w-12' : 'w-[125px]'}></div>
-</div>
+<span class="text-textColorLight text-sm flex-center gap-1 pl-6 md:m-0">
+    <UtcTime fmt={'h:mma'} {timestamp} tooltipPosition="right" {tzOffset} />
+    {#if to}
+        <span>-</span>
+        <UtcTime fmt={'h:mma'} timestamp={to} tooltipPosition="right" {tzOffset} />
+    {/if}
+</span>

@@ -38,7 +38,7 @@
     <title>Settings</title>
 </svelte:head>
 
-<main class="md:p-4 md:ml-40">
+<main class="md:p-4 md:ml-[10.5rem]">
     <section>
         <h1>
             <AccountCircleOutline size="35" />
