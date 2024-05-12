@@ -87,8 +87,19 @@ export namespace Feed {
     }
 
     export function orderedFeedItems(items: FeedItem[]): FeedItem[] {
-        return [...items].sort((a, b) => {
-            return feedItemTime(b) - feedItemTime(a);
-        });
+        // ensure no duplicate ids
+        // TODO why is this necessary? IS it necessary?
+        // getting 'duplicate id' errors in the console
+        // in production, not sure where else it could come from...
+        const ids = new Set<string>();
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            if (ids.has(item.id)) {
+                items = items.slice(0, i).concat(items.slice(i + 1));
+            }
+            ids.add(item.id);
+        }
+
+        return [...items].sort((a, b) => feedItemTime(b) - feedItemTime(a));
     }
 }

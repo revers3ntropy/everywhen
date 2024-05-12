@@ -52,7 +52,6 @@
     $: isToday = fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD') === day.day;
     $: dayTimestamp = new Date(day.day).getTime() / 1000;
     $: monthsAgo = Day.fromString(day.day).unwrap().monthsAgo();
-
     $: if ((items?.length > 0 || (isToday && showForms)) && $collapsed[day.day] == 'empty') {
         $collapsed[day.day] = false;
     }
