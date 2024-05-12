@@ -160,10 +160,10 @@
     @import '$lib/styles/text';
 
     .open-in-dialog-button {
-        display: none;
+        opacity: 0;
     }
     .entry-container:hover .open-in-dialog-button {
-        display: block;
+        opacity: 1;
     }
 
     .menu {
@@ -192,7 +192,7 @@
 
         .entry {
             display: grid;
-            grid-template-columns: 45px 10px 1fr;
+            grid-template-columns: 3.75rem 10px 1fr;
             gap: 4px;
             align-items: center;
             color: var(--text-color);
