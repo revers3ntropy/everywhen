@@ -48,7 +48,7 @@
     $: areHiddenPinnedEntries =
         pinnedEntriesSummaries.length > showLimitPinnedEntries && !showingAllPinned;
 
-    listen.entry.onCreate(({ entry }) => {
+    listen.entry.onCreate(entry => {
         // if no pinned entries already, face to force the pinned entries to be shown
         if (Entry.isPinned(entry) && !pinnedEntriesSummaries.length) {
             pinnedEntriesSummaries = [Entry.summaryFromEntry(entry)];

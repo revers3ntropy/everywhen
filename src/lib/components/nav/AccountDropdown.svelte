@@ -28,10 +28,19 @@
         </span>
     </div>
 
-    <div class="account-dropdown-options">
-        <div class="px-2 text-lg">
-            <p class="text-sm text-light">logged in as</p>
-            <p>{$username || '...'}</p>
+    <div class="p-1">
+        <div class="flex content-between py-2">
+            <button
+                aria-label="log out"
+                class="account-dropdown-button danger"
+                on:click={() => void Auth.logOut()}
+            >
+                <Logout size="30" />
+            </button>
+            <div class="px-2 text-lg">
+                <p class="text-sm text-light">logged in as</p>
+                <p>{$username || '...'}</p>
+            </div>
         </div>
 
         <hr />
@@ -40,7 +49,7 @@
 
         <hr />
 
-        <button class="account-dropdown-button" on:click={switchTheme}>
+        <button on:click={switchTheme} class="flex justify-start items-center p-2 gap-2">
             {#if $theme === Theme.light}
                 <DarkTheme size="30" />
                 Dark Mode
@@ -50,19 +59,10 @@
             {/if}
         </button>
 
-        <a aria-label="settings" class="account-dropdown-button" href="/settings">
+        <a aria-label="settings" href="/settings" class="flex justify-start items-center p-2 gap-2">
             <CogOutline size="30" />
             Settings
         </a>
-
-        <button
-            aria-label="log out"
-            class="account-dropdown-button danger"
-            on:click={() => void Auth.logOut()}
-        >
-            <Logout size="30" />
-            Log Out
-        </button>
     </div>
 </Dropdown>
 
@@ -79,33 +79,6 @@
 
         @media #{$mobile} {
             padding: 0.5rem;
-        }
-    }
-
-    .account-dropdown-options {
-        padding: 0.5rem 0;
-
-        button,
-        a {
-            margin: 0;
-            padding: 0.4em 0.8em 0.4em 0.4em;
-            width: 100%;
-            display: grid;
-            grid-template-columns: auto 1fr;
-            gap: 1rem;
-            align-items: center;
-            justify-content: flex-start;
-            text-align: left;
-
-            &:hover {
-                background-color: var(--v-light-accent);
-            }
-        }
-
-        hr {
-            margin: 10px 0;
-            border: none;
-            border-bottom: 1px solid var(--background-color);
         }
     }
 </style>

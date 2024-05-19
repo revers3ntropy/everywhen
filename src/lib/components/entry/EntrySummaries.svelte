@@ -21,7 +21,7 @@
     export let onCreateFilter: (entry: Entry) => boolean = () => true;
     export let showOnUpdateAndNotAlreadyShownFilter: (entry: Entry) => boolean = () => false;
 
-    listen.entry.onCreate(({ entry }) => {
+    listen.entry.onCreate(entry => {
         if (!onCreateFilter(entry)) return;
         if (!titles) titles = {};
 

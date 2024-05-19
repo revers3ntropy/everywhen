@@ -2,7 +2,6 @@
     import { Entry } from '$lib/controllers/entry/entry';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
-    import BulletPoints from 'svelte-material-icons/FormatListBulleted.svelte';
     import Pencil from 'svelte-material-icons/Pencil.svelte';
     import Moon from 'svelte-material-icons/MoonWaningCrescent.svelte';
     import Lightbulb from 'svelte-material-icons/Lightbulb.svelte';
@@ -13,7 +12,7 @@
     import { api } from '$lib/utils/apiRequest';
     import { page } from '$app/stores';
     import { goto } from '$app/navigation';
-    import { eventsSortKey, settingsStore, username } from '$lib/stores';
+    import { eventsSortKey, username } from '$lib/stores';
     import { currentTzOffset, nowUtc } from '$lib/utils/time';
     import { Event as EventController } from '$lib/controllers/event/event';
 
@@ -72,22 +71,8 @@
             key: 'useBulletEntryForm',
             value: false
         });
-        $settingsStore.useBulletEntryForm.value = false;
         localStorage.removeItem(Entry.labelLsKey($username, null));
         await gotoIfNotAt('/journal');
-    }
-
-    async function makeBullet() {
-        await api.put('/settings', {
-            key: 'useBulletEntryForm',
-            value: true
-        });
-        $settingsStore.useBulletEntryForm.value = true;
-        if ($page.url.pathname !== '/journal') {
-            await goto('/journal');
-        } else {
-            location.reload();
-        }
     }
 
     async function makeEvent() {
@@ -140,10 +125,6 @@
         <button class="with-icon oneline record-entry" on:click={makeEntry}>
             <Pencil size={iconSize} />
             Record Entry
-        </button>
-        <button class="with-icon oneline record-bullet" on:click={makeBullet}>
-            <BulletPoints size={iconSize} />
-            Record Bullet
         </button>
 
         <button class="with-icon oneline record-dream" on:click={makeDream}>

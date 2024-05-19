@@ -7,10 +7,7 @@ import type { MaybePromise } from '../types';
 type Entities = 'entry' | 'label' | 'event';
 
 type Create = {
-    entry: {
-        entry: Entry;
-        isBullet: boolean;
-    };
+    entry: Entry;
     label: Label;
     event: Event;
 };

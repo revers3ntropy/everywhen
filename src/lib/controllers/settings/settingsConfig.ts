@@ -16,13 +16,6 @@ export const settingsConfig = {
         description: 'Blur entries by default, and manually show them.',
         showInSettings: true
     } as SettingConfig<boolean>,
-    useBulletEntryForm: {
-        type: 'boolean',
-        defaultValue: false,
-        name: 'Use Bullet Mode',
-        description: 'Write entries in Bullet Journaling mode.',
-        showInSettings: false
-    } as SettingConfig<boolean>,
     showAgentWidgetOnEntries: {
         type: 'boolean',
         defaultValue: false,

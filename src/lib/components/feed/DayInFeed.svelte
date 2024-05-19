@@ -62,7 +62,7 @@
         }
     });
 
-    listen.entry.onCreate(({ entry }) => {
+    listen.entry.onCreate(entry => {
         if (!isToday) return;
         items = Feed.orderedFeedItems([...(items ?? []), { ...entry, type: 'entry' }]);
     });
