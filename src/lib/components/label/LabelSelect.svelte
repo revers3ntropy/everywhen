@@ -46,9 +46,12 @@
     });
 </script>
 
-<span class="select-label" class:condensed>
+<span
+    class="select-label flex px-1 items-center justify-between rounded-full hover:bg-vLightAccent"
+    class:condensed
+>
     <Dropdown bind:close={closeDropDown} ariaLabel={() => 'Set label'} {fromRight}>
-        <span slot="button" class="select-button">
+        <span slot="button" class="select-button rounded-full">
             {#key value}
                 {#if value && labels[value]}
                     <LabelDot big color={labels[value]?.color || null} />
@@ -148,16 +151,6 @@
     }
 
     .select-label {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        border-radius: $border-radius;
-        border: none;
-
-        &:hover {
-            background: var(--v-light-accent);
-        }
-
         .icon-button {
             background: transparent;
             padding: 0.2em;
