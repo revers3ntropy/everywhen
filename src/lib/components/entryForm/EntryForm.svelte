@@ -1,5 +1,7 @@
 <script lang="ts">
+    import { ANIMATION_DURATION } from '$lib/constants';
     import Tick from 'svelte-material-icons/Check.svelte';
+    import UploadMultiple from 'svelte-material-icons/UploadMultiple.svelte';
     import { browser } from '$app/environment';
     import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
@@ -27,6 +29,7 @@
     import LocationToggle from '../location/LocationToggle.svelte';
     import { paste } from './paste';
     import { decrypt, encrypt } from '$lib/utils/encryption';
+    import { slide } from 'svelte/transition';
 
     // as this form is used in entry editing and creating
     export let action: 'create' | 'edit' = 'create';
@@ -325,28 +328,29 @@
 </script>
 
 <div class="md:bg-vLightAccent rounded-2xl">
-    <div class="flex justify-between gap-4 p-1 border-t-2 border-b border-borderColor">
-        <div class="flex gap-1">
-            <div class="flex-center h-full pl-2">
+    <div class="px-2">
+        <div class="flex items-center bg-lightAccent rounded-full w-fit">
+            <div class="flex items-center gap-2 py-1 px-4 w-fit">
                 <LocationToggle size={23} />
-            </div>
-            <div class="flex-center h-full">
+
                 <FormatOptions {makeWrapper} />
-            </div>
-            <div class="flex-center h-full">
+
                 <InsertImage onInput={onNewImage} />
+
+                <div class="pl-2">
+                    <LabelSelect bind:value={newEntryLabel} {labels} fromRight />
+                </div>
             </div>
 
             {#if $currentlyUploadingAssets > 0}
-                <div style="margin: 0 0 0 4px;">
-                    <i class="text-light">
-                        Uploading {$currentlyUploadingAssets} images...
-                    </i>
+                <div
+                    class="flex-center h-full px-2 py-1 border border-textColor rounded-full"
+                    transition:slide={{ duration: ANIMATION_DURATION, axis: 'x' }}
+                >
+                    <UploadMultiple size="26" />
+                    {$currentlyUploadingAssets}
                 </div>
             {/if}
-        </div>
-        <div class="flex justify-end items-center" class:blur={obfuscated}>
-            <LabelSelect bind:value={newEntryLabel} {labels} fromRight />
         </div>
     </div>
     <div class="grid" style="grid-template-columns: 1fr auto">
@@ -394,9 +398,6 @@
 </div>
 
 <style lang="scss">
-    @import '$lib/styles/layout';
-    @import '$lib/styles/input';
-
     .blur {
         filter: blur(4px);
     }
