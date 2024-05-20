@@ -27,10 +27,10 @@
         </div>
     {/each}
 
-    <div class="py-4">
+    <div class="py-4 flex gap-2">
         {#each datasets as dataset}
             <div class="bg-lightAccent w-fit p-3 rounded-xl">
-                {dataset.name}
+                <a href="datasets/{dataset.id}">{dataset.name}</a>
             </div>
         {/each}
     </div>

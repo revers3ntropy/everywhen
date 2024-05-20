@@ -80,7 +80,7 @@ namespace DatasetServer {
     export async function getDatasetFromPresetId(
         auth: Auth,
         presetId: PresetId
-    ): Promise<Dataset | null> {
+    ): Promise<Result<Dataset | null>> {
         return await query<
             { id: string; name: string; created: TimestampSecs; presetId: PresetId | null }[]
         >`
@@ -89,14 +89,53 @@ namespace DatasetServer {
             WHERE userId = ${auth.id}
                 AND presetId = ${presetId}
         `.then(rows => {
-            if (rows.length === 0) return null;
+            if (rows.length === 0) return Result.ok(null);
             const [{ id, name, created, presetId }] = rows;
-            return {
+            const nameDecrypted = decrypt(name, auth.key);
+            if (!nameDecrypted.ok) return nameDecrypted.cast();
+            return Result.ok({
                 id,
-                name,
+                name: nameDecrypted.val,
                 created,
                 preset: presetId ? datasetPresets[presetId] : null
-            };
+            });
+        });
+    }
+
+    export async function getDatasetMetadata(
+        auth: Auth,
+        datasetId: string
+    ): Promise<Result<DatasetMetadata | null>> {
+        const rows = await query<
+            { id: string; name: string; created: TimestampSecs; presetId: PresetId | null }[]
+        >`
+            SELECT id, name, created, presetId
+            FROM datasets
+            WHERE userId = ${auth.id}
+                AND id = ${datasetId}
+        `;
+        if (rows.length === 0) return Result.ok(null);
+        const [{ id, name, created, presetId }] = rows;
+        const nameDecrypted = decrypt(name, auth.key);
+        if (!nameDecrypted.ok) return nameDecrypted.cast();
+
+        let columns = [];
+
+        if (presetId) {
+            columns = datasetPresets[presetId].columns;
+        } else {
+            const allCols = await allUserDefinedColumns(auth, datasetId);
+            if (!allCols.ok) return allCols.cast();
+
+            columns = allCols.val.filter(c => c.datasetId === datasetId);
+        }
+
+        return Result.ok({
+            id,
+            name: nameDecrypted.val,
+            created,
+            preset: presetId ? datasetPresets[presetId] : null,
+            columns
         });
     }
 
@@ -215,11 +254,10 @@ namespace DatasetServer {
             rows.map(row => {
                 let elements: unknown[];
                 const decryptedJson = decrypt(row.rowJson, auth.key);
-                if (!decryptedJson.ok) {
-                    return Result.err('Invalid data point');
-                }
+                if (!decryptedJson.ok) return Result.err('Invalid data point');
+
                 try {
-                    const parsedRowData = JSON.parse(row.rowJson);
+                    const parsedRowData = JSON.parse(decryptedJson.val);
                     if (!Array.isArray(parsedRowData)) {
                         return Result.err('Invalid row JSON');
                     }
@@ -495,6 +533,24 @@ namespace DatasetServer {
                 return Result.ok(null);
             })
         );
+    }
+
+    export async function updateName(
+        auth: Auth,
+        datasetId: string,
+        name: string
+    ): Promise<Result<null>> {
+        const canCreate = await canCreateWithName(auth, name, null);
+        if (canCreate !== true) return Result.err(canCreate);
+
+        await query`
+            UPDATE datasets
+            SET name = ${encrypt(name, auth.key)}
+            WHERE id = ${datasetId}
+              AND userId = ${auth.id}
+        `;
+
+        return Result.ok(null);
     }
 }
 

@@ -43,6 +43,15 @@ export type Degrees = number;
 export type Meters = number;
 export type OptionalCoords = [Degrees, Degrees] | [null, null];
 
+export interface ChartData {
+    datasets: {
+        data: number[];
+        label: string;
+        [key: string]: unknown;
+    }[];
+    labels: string[];
+}
+
 export type EventsSortKey = 'name' | 'start' | 'end' | 'created';
 
 export type TooltipPosition = 'top' | 'bottom' | 'left' | 'right';

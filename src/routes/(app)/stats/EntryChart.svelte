@@ -16,7 +16,8 @@
     } from 'chart.js';
     import { Line, Bar } from 'svelte-chartjs';
     import Select from '$lib/components/Select.svelte';
-    import { getGraphData, type ChartData } from './bucketiseEntriesForBarChart';
+    import type { ChartData } from '../../../types';
+    import { getGraphData } from './bucketiseEntriesForBarChart';
     import type { EntryStats, By } from './helpers';
     import {
         Bucket,

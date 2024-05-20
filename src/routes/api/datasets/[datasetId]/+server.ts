@@ -12,7 +12,11 @@ import { Auth } from '$lib/controllers/auth/auth.server';
 export const GET = cachedApiRoute(async (auth, { params }) => {
     const { datasetId } = params;
     const settings = (await Settings.allAsMapWithDefaults(auth)).unwrap(e => error(500, e));
-    return (await Dataset.getDatasetRows(auth, settings, datasetId, {})).unwrap(e => error(400, e));
+    return {
+        rows: (await Dataset.getDatasetRows(auth, settings, datasetId, {})).unwrap(e =>
+            error(400, e)
+        )
+    };
 }) satisfies RequestHandler;
 
 export const POST = (async ({ cookies, request, params }) => {
@@ -45,5 +49,21 @@ export const POST = (async ({ cookies, request, params }) => {
     return apiResponse(auth, {});
 }) satisfies RequestHandler;
 
+export const PUT = (async ({ cookies, request, params }) => {
+    const auth = Auth.getAuthFromCookies(cookies);
+    invalidateCache(auth.id);
+
+    const { name } = await getUnwrappedReqBody(auth, request, {
+        name: z.string().optional()
+    });
+
+    if (name) {
+        (await Dataset.updateName(auth, params.datasetId, name)).unwrap(e => error(400, e));
+    }
+
+    // can add more checks/updates for more properties here
+
+    return apiResponse(auth, {});
+}) satisfies RequestHandler;
+
 export const DELETE = apiRes404;
-export const PUT = apiRes404;

@@ -1,13 +1,63 @@
-import { clientLogger } from '$lib/utils/log';
+import type { DatasetRow } from '$lib/controllers/dataset/dataset';
 import moment from 'moment/moment';
-import { capitalise } from '$lib/utils/text';
 import { dayUtcFromTimestamp, fmtUtc, nowUtc } from '$lib/utils/time';
-import { deviceDataFromEntry, type OsGroup, osGroups } from '$lib/utils/userAgent';
-import type { ChartData, Seconds, TimestampSecs } from '../../../types';
-import type { EntryStats } from './helpers';
-import { Bucket, By } from './helpers';
-import { Entry } from '$lib/controllers/entry/entry';
+import type { ChartData, Seconds, TimestampSecs } from '../../../../types';
 import { cssVarValue } from '$lib/utils/getCssVar';
+
+export enum Bucket {
+    // hour is a little different in that it only looks at the hour, ignores day
+    Hour = 'Hour',
+    Day = 'Day',
+    Week = 'Week',
+    Month = 'Month',
+    Year = 'Year'
+}
+
+export const bucketNames: Record<string, Bucket> = {
+    Year: Bucket.Year,
+    Month: Bucket.Month,
+    Week: Bucket.Week,
+    Day: Bucket.Day,
+    Hour: Bucket.Hour
+};
+
+export enum ReductionStrategy {
+    Sum = 'Sum',
+    Mean = 'Mean',
+    Count = 'Count',
+    Max = 'Max',
+    Min = 'Min'
+}
+
+export const reductionStrategyNames: Record<string, ReductionStrategy> = {
+    Sum: ReductionStrategy.Sum,
+    Mean: ReductionStrategy.Mean,
+    Count: ReductionStrategy.Count,
+    Max: ReductionStrategy.Max,
+    Min: ReductionStrategy.Min
+};
+
+const ReductionStrategies: Record<ReductionStrategy, (items: number[]) => number> = {
+    [ReductionStrategy.Sum]: items => items.reduce((a, b) => a + b, 0),
+    [ReductionStrategy.Mean]: items => {
+        if (items.length === 0) return 0;
+        return items.reduce((a, b) => a + b, 0) / items.length;
+    },
+    [ReductionStrategy.Count]: items => items.length,
+    [ReductionStrategy.Max]: items => (items.length ? Math.max(...items) : 0),
+    [ReductionStrategy.Min]: items => (items.length ? Math.min(...items) : 0)
+};
+
+export function initialBucket(days: number): Bucket {
+    if (days < 7 + 3) return Bucket.Day;
+    if (days < 7 * 14) return Bucket.Week;
+    if (days < 365 * 10) return Bucket.Month;
+    return Bucket.Year;
+}
+
+export function initialBucketName(days: number): string {
+    return initialBucket(days);
+}
 
 const generateLabelsDayAndWeek = (start: TimestampSecs, buckets: string[]): string[] => {
     let year = parseInt(fmtUtc(start, 0, 'YYYY'));
@@ -47,13 +97,16 @@ const generateLabels: Record<
     },
     [Bucket.Year]: (_start: TimestampSecs, buckets: string[]): string[] => {
         return buckets.map(k => fmtUtc(parseInt(k), 0, 'YYYY'));
-    },
-    [Bucket.OperatingSystem]: () => osGroups.map(capitalise)
+    }
 };
 
-function datasetFactoryForStandardBuckets(
-    selectedBucket: Bucket
-): (entries: EntryStats[], by: By) => Record<string | number, number> {
+type DatasetGenerationStrategy = (
+    sortedEntries: DatasetRow[],
+    columnIndex: number,
+    reductionStrategy: ReductionStrategy
+) => Record<string | number, number>;
+
+function datasetFactoryForStandardBuckets(selectedBucket: Bucket): DatasetGenerationStrategy {
     function bucketSize(bucket: Bucket): Seconds {
         switch (bucket) {
             case Bucket.Year:
@@ -83,10 +136,14 @@ function datasetFactoryForStandardBuckets(
         throw new Error(`Invalid bucket ${time} ${bucket}`);
     }
 
-    return (sortedEntries: EntryStats[], by: By): Record<string | number, number> => {
-        const start = Entry.localTime(sortedEntries[0]);
+    return (
+        sortedRows: DatasetRow[],
+        columnIndex: number,
+        reductionStrategy: ReductionStrategy
+    ): Record<string | number, number> => {
+        const start = sortedRows[0].timestamp + sortedRows[0].timestampTzOffset * 60 * 60;
 
-        const buckets: Record<string, number> = {};
+        const buckets: Record<string, number[]> = {};
 
         if (selectedBucket === Bucket.Month) {
             // months do not have constant size
@@ -97,7 +154,7 @@ function datasetFactoryForStandardBuckets(
 
             let bucket = bucketiseTime(start, Bucket.Month);
             while (bucket < end) {
-                buckets[bucketiseTime(bucket, Bucket.Month).toString()] = 0;
+                buckets[bucketiseTime(bucket, Bucket.Month).toString()] = [];
                 bucket = moment
                     .utc(bucket * 1000)
                     .add(1, 'month')
@@ -107,79 +164,68 @@ function datasetFactoryForStandardBuckets(
             const end = nowUtc() + bucketSize(selectedBucket);
             let bucket = bucketiseTime(start, selectedBucket);
             while (bucket < end) {
-                buckets[bucketiseTime(bucket, selectedBucket).toString()] = 0;
+                buckets[bucketiseTime(bucket, selectedBucket).toString()] = [];
                 bucket += bucketSize(selectedBucket);
             }
         }
 
-        for (const entry of sortedEntries) {
-            const bucket = bucketiseTime(Entry.localTime(entry), selectedBucket).toString();
-            buckets[bucket] += by === By.Entries ? 1 : entry.wordCount;
-        }
-
-        if (isNaN(Object.values(buckets).reduce((a, b) => a + b, 0))) {
-            clientLogger.error('NaN in buckets', { buckets, start, selectedBucket });
+        for (const row of sortedRows) {
+            const bucket = bucketiseTime(
+                row.timestamp + row.timestampTzOffset * 60 * 60,
+                selectedBucket
+            ).toString();
+            buckets[bucket].push(row.elements[columnIndex] as number);
         }
 
         const lastBucket = Object.keys(buckets)
             .map(a => parseInt(a))
             .sort((a, b) => a - b)
             .pop();
-        if (lastBucket && buckets[lastBucket.toString()] === 0) {
+        if (lastBucket && buckets[lastBucket.toString()].length === 0) {
             delete buckets[lastBucket.toString()];
         }
 
-        return buckets;
+        return Object.fromEntries(
+            Object.entries(buckets).map(([i, items]) => {
+                return [i, ReductionStrategies[reductionStrategy](items)];
+            })
+        );
     };
 }
 
-const generateDataset: Record<
-    Bucket,
-    (entries: EntryStats[], by: By) => Record<string | number, number>
-> = {
-    [Bucket.Hour]: (sortedEntries: EntryStats[], by: By): Record<string | number, number> => {
+const generateDataset: Record<Bucket, DatasetGenerationStrategy> = {
+    [Bucket.Hour]: (
+        sortedEntries: DatasetRow[],
+        columnIndex: number,
+        reductionStrategy: ReductionStrategy
+    ): Record<string | number, number> => {
         // Entries at 3pm on different days go in the same bucket
 
-        const buckets = Array<number>(24).fill(0);
-
-        for (const entry of sortedEntries) {
-            const bucket = parseInt(fmtUtc(entry.created, entry.createdTzOffset, 'H'));
-            buckets[bucket] += by === By.Entries ? 1 : entry.wordCount;
+        const buckets: number[][] = [];
+        for (let i = 0; i < 24; i++) {
+            buckets.push([] as number[]);
         }
 
-        return buckets as Record<number, number>;
+        for (const row of sortedEntries) {
+            const bucket = parseInt(fmtUtc(row.timestamp, row.timestampTzOffset, 'H'));
+            buckets[bucket].push(row.elements[columnIndex] as number);
+        }
+
+        return buckets.map(items => {
+            return ReductionStrategies[reductionStrategy](items);
+        }) as Record<number, number>;
     },
     [Bucket.Day]: datasetFactoryForStandardBuckets(Bucket.Day),
     [Bucket.Week]: datasetFactoryForStandardBuckets(Bucket.Week),
     [Bucket.Month]: datasetFactoryForStandardBuckets(Bucket.Month),
-    [Bucket.Year]: datasetFactoryForStandardBuckets(Bucket.Year),
-    [Bucket.OperatingSystem]: (
-        sortedEntries: EntryStats[],
-        by: By
-    ): Record<string | number, number> => {
-        // Entries at 3pm on different days go in the same bucket
-
-        const buckets = osGroups.reduce(
-            (acc, group) => {
-                acc[group] = 0;
-                return acc;
-            },
-            {} as Record<OsGroup, number>
-        );
-
-        for (const entry of sortedEntries) {
-            const { osGroup } = deviceDataFromEntry(entry);
-            buckets[osGroup] += by === By.Entries ? 1 : entry.wordCount;
-        }
-
-        return buckets;
-    }
+    [Bucket.Year]: datasetFactoryForStandardBuckets(Bucket.Year)
 };
 
-export function getGraphData(
-    entries: EntryStats[],
+export function generateChartData(
+    rows: DatasetRow[],
     selectedBucket: Bucket,
-    by: By,
+    columnIndex: number,
+    reductionStrategy: ReductionStrategy,
     style: {
         backgroundColor?: string;
         borderColor?: string;
@@ -187,13 +233,12 @@ export function getGraphData(
         borderRadius?: number;
     } = {}
 ): ChartData | null {
-    if (entries.length < 1) return null;
-    const titleLabel = by === By.Entries ? 'Entries' : 'Words';
-    const sortedEntries = [...entries].sort((a, b) => a.created - b.created);
+    if (rows.length < 1) return null;
+    const sortedRows = [...rows].sort((a, b) => a.timestamp - b.timestamp);
 
-    const start = sortedEntries[0].created;
+    const start = sortedRows[0].timestamp;
 
-    const bucketsMap = generateDataset[selectedBucket](sortedEntries, by);
+    const bucketsMap = generateDataset[selectedBucket](sortedRows, columnIndex, reductionStrategy);
     const labels = generateLabels[selectedBucket](start, Object.keys(bucketsMap), selectedBucket);
     return {
         labels,
@@ -204,7 +249,7 @@ export function getGraphData(
                 borderWidth: 1,
                 borderRadius: 0,
                 data: Object.values(bucketsMap),
-                label: titleLabel,
+                label: 'my title',
                 cubicInterpolationMode: 'monotone',
                 tension: 0.4,
                 pointRadius: 1,
