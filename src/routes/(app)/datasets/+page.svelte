@@ -1,9 +1,12 @@
 <script lang="ts">
+    import Dot from '$lib/components/ui/Dot.svelte';
     import { datasetPresets } from '$lib/controllers/dataset/presets';
     import type { PresetId } from '$lib/controllers/dataset/presets';
     import type { PageData } from './$types';
     import { makeFromPreset } from './importHelpers';
     import SleepCycleImport from './SleepCycleImport.svelte';
+    import { tooltip } from '@svelte-plugins/tooltips';
+    import TuneVariant from 'svelte-material-icons/TuneVariant.svelte';
 
     export let data: PageData;
     const { datasets } = data;
@@ -29,9 +32,29 @@
 
     <div class="py-4 flex gap-2">
         {#each datasets as dataset}
-            <div class="bg-lightAccent w-fit p-3 rounded-xl">
-                <a href="datasets/{dataset.id}">{dataset.name}</a>
-            </div>
+            <a href="datasets/{dataset.id}" class="bg-lightAccent w-fit p-3 rounded-xl">
+                <span class="flex justify-start items-center gap-2 pb-2">
+                    {#if dataset.preset}
+                        <span
+                            use:tooltip={{ content: `From preset '${dataset.preset.defaultName}'` }}
+                        >
+                            <span
+                                class="border border-borderHeavy rounded-full p-1 inline-flex content-center justify-center"
+                            >
+                                <TuneVariant size="20" />
+                            </span>
+                        </span>
+                    {/if}
+                    {dataset.name}
+                </span>
+                <span>
+                    <span class="text-textColorLight">
+                        {dataset.columns.length} columns
+                        <Dot />
+                        {dataset.rowCount} rows
+                    </span>
+                </span>
+            </a>
         {/each}
     </div>
 

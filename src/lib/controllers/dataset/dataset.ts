@@ -12,6 +12,7 @@ export interface Dataset {
 
 export interface DatasetMetadata extends Dataset {
     columns: DatasetColumn<unknown>[];
+    rowCount: number;
 }
 
 export type DatasetData = DatasetRow[];

@@ -130,12 +130,20 @@ namespace DatasetServer {
             columns = allCols.val.filter(c => c.datasetId === datasetId);
         }
 
+        const [{ rowCount }] = await query<{ rowCount: number }[]>`
+            SELECT COUNT(*) AS rowCount
+            FROM datasetRows
+            WHERE datasetId = ${datasetId}
+            AND userId = ${auth.id}
+        `;
+
         return Result.ok({
             id,
             name: nameDecrypted.val,
             created,
             preset: presetId ? datasetPresets[presetId] : null,
-            columns
+            columns,
+            rowCount
         });
     }
 
@@ -181,12 +189,21 @@ namespace DatasetServer {
                 columns = usersColumnsRes.val.filter(c => c.datasetId === dataset.id);
             }
 
+            // TODO remove and add as cached column on Dataset table
+            const [{ rowCount }] = await query<{ rowCount: number }[]>`
+                SELECT COUNT(*) AS rowCount
+                FROM datasetRows
+                WHERE datasetId = ${dataset.id}
+                AND userId = ${auth.id}
+            `;
+
             metadatas.push({
                 id: dataset.id,
                 name: decryptedName.val,
                 created: dataset.created,
                 columns,
-                preset
+                preset,
+                rowCount
             });
         }
 
