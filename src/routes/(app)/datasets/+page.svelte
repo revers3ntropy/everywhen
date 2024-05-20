@@ -49,9 +49,9 @@
                 </span>
                 <span>
                     <span class="text-textColorLight">
-                        {dataset.columns.length} columns
-                        <Dot />
                         {dataset.rowCount} rows
+                        <Dot />
+                        {dataset.columns.length} columns
                     </span>
                 </span>
             </a>

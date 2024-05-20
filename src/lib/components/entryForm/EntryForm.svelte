@@ -328,9 +328,9 @@
 </script>
 
 <div class="md:bg-vLightAccent rounded-2xl">
-    <div class="px-2">
-        <div class="flex items-center bg-lightAccent rounded-full w-fit">
-            <div class="flex items-center gap-2 py-1 px-4 w-fit">
+    <div class="md:px-2 pb-2 md:pb-4">
+        <div class="flex items-center bg-lightAccent md:rounded-full md:w-fit">
+            <div class="flex items-center gap-2 py-1 px-2 md:px-4 w-fit">
                 <LocationToggle size={23} />
 
                 <FormatOptions {makeWrapper} />
@@ -353,7 +353,7 @@
             {/if}
         </div>
     </div>
-    <div class="grid" style="grid-template-columns: 1fr auto">
+    <div>
         <div>
             <textarea
                 bind:this={newEntryInputElement}
@@ -380,19 +380,15 @@
             />
         </div>
 
-        <div class="flex p-2 flex-col justify-between">
-            <span />
-
-            <span class="h-fit">
-                <button
-                    aria-label="Submit Entry"
-                    class="flex-center aspect-square primary"
-                    disabled={submitted}
-                    on:click={submit}
-                >
-                    <Tick size="26" />
-                </button>
-            </span>
+        <div class="flex p-2 justify-end">
+            <button
+                aria-label="Submit Entry"
+                class="flex-center aspect-square primary"
+                disabled={submitted}
+                on:click={submit}
+            >
+                <Tick size="26" />
+            </button>
         </div>
     </div>
 </div>

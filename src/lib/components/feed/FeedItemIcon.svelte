@@ -12,7 +12,7 @@
 
 <div class="relative">
     <span
-        class="flex-center absolute top-0 -left-5 bg-backgroundColor rounded-full border-2 border-borderColor w-10 h-10"
+        class="flex-center absolute top-0 md:-left-5 bg-backgroundColor rounded-full border-2 border-borderColor w-10 h-10"
     >
         {#if type === 'entry-edit'}
             <NoteEditOutline size={24} />

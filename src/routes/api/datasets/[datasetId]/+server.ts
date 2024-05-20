@@ -1,5 +1,5 @@
 import { Settings } from '$lib/controllers/settings/settings.server';
-import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
+import { apiResponse } from '$lib/utils/apiResponse.server';
 import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
 import { nowUtc } from '$lib/utils/time';
 import type { RequestHandler } from './$types';
@@ -66,4 +66,14 @@ export const PUT = (async ({ cookies, request, params }) => {
     return apiResponse(auth, {});
 }) satisfies RequestHandler;
 
-export const DELETE = apiRes404;
+export const DELETE = (async ({ cookies, params }) => {
+    const auth = Auth.getAuthFromCookies(cookies);
+    invalidateCache(auth.id);
+
+    if (!(await Dataset.existsWithId(auth, params.datasetId))) {
+        return error(400, 'dataset not found with that id');
+    }
+    await Dataset.deleteDataset(auth, params.datasetId);
+
+    return apiResponse(auth, {});
+}) satisfies RequestHandler;

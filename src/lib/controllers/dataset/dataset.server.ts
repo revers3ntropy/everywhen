@@ -569,6 +569,32 @@ namespace DatasetServer {
 
         return Result.ok(null);
     }
+
+    export async function deleteDataset(auth: Auth, datasetId: string): Promise<void> {
+        await query`
+            DELETE FROM datasets
+            WHERE id = ${datasetId}
+              AND userId = ${auth.id};
+
+            DELETE FROM datasetColumns
+            WHERE datasetId = ${datasetId}
+                AND userId = ${auth.id};
+
+            DELETE FROM datasetRows
+            WHERE datasetId = ${datasetId}
+                AND userId = ${auth.id};
+        `;
+    }
+
+    export async function existsWithId(auth: Auth, datasetId: string): Promise<boolean> {
+        const datasets = await query<{ id: string }[]>`
+            SELECT id
+            FROM datasets
+            WHERE id = ${datasetId}
+                AND userId = ${auth.id}
+        `;
+        return datasets.length > 0;
+    }
 }
 
 export const Dataset = {
