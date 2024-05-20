@@ -4,6 +4,8 @@ import { dayUtcFromTimestamp, fmtUtc, nowUtc } from '$lib/utils/time';
 import type { ChartData, Seconds, TimestampSecs } from '../../../../types';
 import { cssVarValue } from '$lib/utils/getCssVar';
 
+type Rows = DatasetRow<(number | null)[]>[];
+
 export enum Bucket {
     // hour is a little different in that it only looks at the hour, ignores day
     Hour = 'Hour',
@@ -37,15 +39,17 @@ export const reductionStrategyNames: Record<string, ReductionStrategy> = {
     Min: ReductionStrategy.Min
 };
 
-const ReductionStrategies: Record<ReductionStrategy, (items: number[]) => number> = {
-    [ReductionStrategy.Sum]: items => items.reduce((a, b) => a + b, 0),
+const ReductionStrategies: Record<ReductionStrategy, (items: (number | null)[]) => number> = {
+    [ReductionStrategy.Sum]: items => items.reduce((a: number, b) => a + (b || 0), 0),
     [ReductionStrategy.Mean]: items => {
         if (items.length === 0) return 0;
-        return items.reduce((a, b) => a + b, 0) / items.length;
+        return items.reduce((a: number, b) => a + (b || 0), 0) / items.length;
     },
     [ReductionStrategy.Count]: items => items.length,
-    [ReductionStrategy.Max]: items => (items.length ? Math.max(...items) : 0),
-    [ReductionStrategy.Min]: items => (items.length ? Math.min(...items) : 0)
+    [ReductionStrategy.Max]: items =>
+        items.length ? Math.max(...items.filter((i): i is number => i !== null)) : 0,
+    [ReductionStrategy.Min]: items =>
+        items.length ? Math.min(...items.filter((i): i is number => i !== null)) : 0
 };
 
 export function initialBucket(days: number): Bucket {
@@ -101,7 +105,7 @@ const generateLabels: Record<
 };
 
 type DatasetGenerationStrategy = (
-    sortedEntries: DatasetRow[],
+    sortedEntries: Rows,
     columnIndex: number,
     reductionStrategy: ReductionStrategy
 ) => Record<string | number, number>;
@@ -137,7 +141,7 @@ function datasetFactoryForStandardBuckets(selectedBucket: Bucket): DatasetGenera
     }
 
     return (
-        sortedRows: DatasetRow[],
+        sortedRows: Rows,
         columnIndex: number,
         reductionStrategy: ReductionStrategy
     ): Record<string | number, number> => {
@@ -222,7 +226,7 @@ const generateDataset: Record<Bucket, DatasetGenerationStrategy> = {
 };
 
 export function generateChartData(
-    rows: DatasetRow[],
+    rows: Rows,
     selectedBucket: Bucket,
     columnIndex: number,
     reductionStrategy: ReductionStrategy,

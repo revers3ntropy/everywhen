@@ -1,6 +1,7 @@
 <script lang="ts">
     import { notify } from '$lib/components/notifications/notifications';
     import Select from '$lib/components/Select.svelte';
+    import { builtInTypes } from '$lib/controllers/dataset/columnTypes';
     import type { DatasetMetadata, DatasetRow } from '$lib/controllers/dataset/dataset';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { cssVarValue } from '$lib/utils/getCssVar';
@@ -59,31 +60,24 @@
     });
 
     async function retrieveData() {
-        // fetch data from the server
         const { rows } = notify.onErr(await api.get(apiPath('/datasets/?', dataset.id)));
         datasetRows = rows;
     }
 
-    function arrayDiff(a: [number, number]): number {
-        return a[1] - a[0];
-    }
-
     function calculateDaysDatasetCovers(rows: DatasetRow[]): number {
         if (!rows.length) return 0;
-        return (
-            arrayDiff(
-                datasetRows.reduce(
-                    (acc, row) => {
-                        const rowTime = row.timestamp + row.timestampTzOffset * 60 * 60;
-                        if (acc[0] > rowTime) acc[0] = rowTime;
-                        if (acc[1] < rowTime) acc[1] = rowTime;
-                        return acc;
-                    },
-                    [Infinity, -Infinity]
-                )
-            ) /
-            (60 * 60 * 24)
+
+        const [min, max] = datasetRows.reduce(
+            (acc, row) => {
+                const rowTime = row.timestamp + row.timestampTzOffset * 60 * 60;
+                if (acc[0] > rowTime) acc[0] = rowTime;
+                if (acc[1] < rowTime) acc[1] = rowTime;
+                return acc;
+            },
+            [Infinity, -Infinity]
         );
+
+        return (max - min) / (60 * 60 * 24);
     }
 
     onMount(async () => {
@@ -95,8 +89,14 @@
     let selectedColumnIdx = 0;
     let selectedReductionStrategy = ReductionStrategy.Mean;
 
+    // only allow numeric columns to be selected
+    // TODO remove this constraint
+    $: numericColumns = dataset.columns.filter(col =>
+        [builtInTypes.number.id, builtInTypes.nullableNumber.id].includes(col.type.id)
+    );
+
     $: graphData = generateChartData(
-        datasetRows,
+        datasetRows as DatasetRow<(number | null)[]>[],
         selectedBucket,
         selectedColumnIdx,
         selectedReductionStrategy
@@ -105,31 +105,37 @@
 
 <div style="height: 70vh" class="">
     <div class="flex gap-4 py-4">
-        <div class="rounded-full bg-vLightAccent py-2 px-4">
-            <span class="text-light pr-2"> Group by </span>
+        <div class="rounded-full bg-vLightAccent py-2 px-4 flex-center gap-2">
+            <span class="text-light"> Group by </span>
             <Select
                 bind:value={selectedBucket}
                 key={initialBucketName(days)}
                 options={bucketNames}
             />
         </div>
-        <div class="rounded-full bg-vLightAccent py-2 px-4">
-            <span class="text-light pr-2"> Reduce by </span>
+        <div class="rounded-full bg-vLightAccent py-2 px-4 flex-center gap-2">
+            <span class="text-light"> Reduce by </span>
             <Select
                 bind:value={selectedReductionStrategy}
                 key={ReductionStrategy.Mean}
                 options={reductionStrategyNames}
             />
         </div>
-        <div class="rounded-full bg-vLightAccent py-2 px-4">
-            <Select
-                bind:value={selectedColumnIdx}
-                key={'0'}
-                options={Object.fromEntries(
-                    dataset.columns.map((column, idx) => [column.name, idx])
-                )}
-            />
-            <span class="text-light px-2"> against </span>
+        <div class="rounded-full bg-vLightAccent py-2 px-4 flex-center gap-2">
+            {#if numericColumns.length === 0}
+                <span class="text-light"> [No columns] </span>
+            {:else if numericColumns.length === 1}
+                <span class=""> {dataset.columns[0].name} </span>
+            {:else}
+                <Select
+                    bind:value={selectedColumnIdx}
+                    key={'0'}
+                    options={Object.fromEntries(
+                        numericColumns.map((column, idx) => [column.name, idx])
+                    )}
+                />
+            {/if}
+            <span class="text-light"> against </span>
             Time
         </div>
     </div>
