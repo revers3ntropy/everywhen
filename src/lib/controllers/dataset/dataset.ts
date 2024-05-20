@@ -32,12 +32,12 @@ export interface DatasetColumn<T> {
     type: DatasetColumnType<T>;
 }
 
-export interface DatasetRow {
+export interface DatasetRow<E extends unknown[] = unknown[]> {
     id: number;
     created: TimestampSecs;
     timestamp: TimestampSecs;
     timestampTzOffset: Hours;
-    elements: unknown[];
+    elements: E;
 }
 
 export interface DatasetDataFilter {}
