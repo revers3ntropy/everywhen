@@ -9,7 +9,7 @@ export const builtInTypes = {
         validate: (value: unknown): value is number => typeof value === 'number'
     },
     nullableNumber: {
-        id: 'number',
+        id: 'nullable number',
         created: null,
         name: 'Number',
         unit: '',
