@@ -16,7 +16,7 @@
     } from 'chart.js';
     import { Line, Bar } from 'svelte-chartjs';
     import Select from '$lib/components/Select.svelte';
-    import type { ChartData } from '../../../types';
+    import type { BarChartData, LineChartData } from '../../../types';
     import { getGraphData } from './bucketiseEntriesForBarChart';
     import type { EntryStats, By } from './helpers';
     import {
@@ -55,9 +55,9 @@
 
     let selectedBucket = initialBucket(days);
 
-    let mainGraphData: ChartData | null;
-    let smallGraph1Data: ChartData | null;
-    let smallGraph2Data: ChartData | null;
+    let mainGraphData: LineChartData | null;
+    let smallGraph1Data: LineChartData | null;
+    let smallGraph2Data: BarChartData | null;
 
     // no data fetching so top level
     $: if (browser) {

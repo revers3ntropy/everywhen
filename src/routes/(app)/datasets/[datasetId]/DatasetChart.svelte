@@ -120,22 +120,6 @@
 <div style="height: 70vh" class="">
     <div class="flex gap-4 py-4">
         <div class="rounded-full bg-vLightAccent py-2 px-4 flex-center gap-2">
-            <span class="text-light"> Group by </span>
-            <Select
-                bind:value={selectedBucket}
-                key={initialBucketName(days)}
-                options={bucketNames}
-            />
-        </div>
-        <div class="rounded-full bg-vLightAccent py-2 px-4 flex-center gap-2">
-            <span class="text-light"> Reduce by </span>
-            <Select
-                bind:value={selectedReductionStrategy}
-                key={ReductionStrategy.Mean}
-                options={reductionStrategyNames}
-            />
-        </div>
-        <div class="rounded-full bg-vLightAccent py-2 px-4 flex-center gap-2">
             {#if numericColumns.length === 0}
                 <span class="text-light"> [No columns] </span>
             {:else if numericColumns.length === 1}
@@ -146,6 +130,24 @@
             <span class="text-light"> against </span>
             <Select bind:value={xAxis} key={'col:0'} options={xAxisOptions} />
         </div>
+        {#if graphType === ChartType.Line}
+            <div class="rounded-full bg-vLightAccent py-2 px-4 flex-center gap-2">
+                <span class="text-light"> Group by </span>
+                <Select
+                    bind:value={selectedBucket}
+                    key={initialBucketName(days)}
+                    options={bucketNames}
+                />
+            </div>
+            <div class="rounded-full bg-vLightAccent py-2 px-4 flex-center gap-2">
+                <span class="text-light"> Reduce by </span>
+                <Select
+                    bind:value={selectedReductionStrategy}
+                    key={ReductionStrategy.Mean}
+                    options={reductionStrategyNames}
+                />
+            </div>
+        {/if}
     </div>
     {#if graphData}
         {#if graphType === ChartType.Scatter}

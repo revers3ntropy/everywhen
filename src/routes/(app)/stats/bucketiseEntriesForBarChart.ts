@@ -3,7 +3,7 @@ import moment from 'moment/moment';
 import { capitalise } from '$lib/utils/text';
 import { dayUtcFromTimestamp, fmtUtc, nowUtc } from '$lib/utils/time';
 import { deviceDataFromEntry, type OsGroup, osGroups } from '$lib/utils/userAgent';
-import type { ChartData, Seconds, TimestampSecs } from '../../../types';
+import type { LineChartData, Seconds, TimestampSecs } from '../../../types';
 import type { EntryStats } from './helpers';
 import { Bucket, By } from './helpers';
 import { Entry } from '$lib/controllers/entry/entry';
@@ -186,7 +186,7 @@ export function getGraphData(
         borderWidth?: number;
         borderRadius?: number;
     } = {}
-): ChartData | null {
+): LineChartData | null {
     if (entries.length < 1) return null;
     const titleLabel = by === By.Entries ? 'Entries' : 'Words';
     const sortedEntries = [...entries].sort((a, b) => a.created - b.created);
