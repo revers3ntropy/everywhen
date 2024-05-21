@@ -4,7 +4,22 @@ import { dayUtcFromTimestamp, fmtUtc, nowUtc } from '$lib/utils/time';
 import type { ChartData, Seconds, TimestampSecs } from '../../../../types';
 import { cssVarValue } from '$lib/utils/getCssVar';
 
+export const timeIdxKey = 'time';
+
+export type XAxisKey = typeof timeIdxKey | `col:${number}`;
+
 type Rows = DatasetRow<(number | null)[]>[];
+
+type DatasetGenerationStrategy = (
+    sortedEntries: Rows,
+    columnIndex: number,
+    reductionStrategy: ReductionStrategy
+) => Record<string | number, number>;
+
+export enum ChartType {
+    Line = 'Line',
+    Scatter = 'Scatter'
+}
 
 export enum Bucket {
     // hour is a little different in that it only looks at the hour, ignores day
@@ -103,12 +118,6 @@ const generateLabels: Record<
         return buckets.map(k => fmtUtc(parseInt(k), 0, 'YYYY'));
     }
 };
-
-type DatasetGenerationStrategy = (
-    sortedEntries: Rows,
-    columnIndex: number,
-    reductionStrategy: ReductionStrategy
-) => Record<string | number, number>;
 
 function datasetFactoryForStandardBuckets(selectedBucket: Bucket): DatasetGenerationStrategy {
     function bucketSize(bucket: Bucket): Seconds {
@@ -225,7 +234,7 @@ const generateDataset: Record<Bucket, DatasetGenerationStrategy> = {
     [Bucket.Year]: datasetFactoryForStandardBuckets(Bucket.Year)
 };
 
-export function generateChartData(
+function generateTimeSeriesData(
     rows: Rows,
     selectedBucket: Bucket,
     columnIndex: number,
@@ -236,10 +245,8 @@ export function generateChartData(
         borderWidth?: number;
         borderRadius?: number;
     } = {}
-): ChartData | null {
-    if (rows.length < 1) return null;
+): ChartData {
     const sortedRows = [...rows].sort((a, b) => a.timestamp - b.timestamp);
-
     const start = sortedRows[0].timestamp;
 
     const bucketsMap = generateDataset[selectedBucket](sortedRows, columnIndex, reductionStrategy);
@@ -262,4 +269,69 @@ export function generateChartData(
             }
         ]
     };
+}
+
+export function generateScatterData(
+    rows: Rows,
+    columnIndex: number,
+    xAxisKey: XAxisKey,
+    style: {
+        backgroundColor?: string;
+        borderColor?: string;
+        borderWidth?: number;
+        borderRadius?: number;
+    } = {}
+): ChartData {
+    let rowToDatapointMapper;
+
+    if (xAxisKey === timeIdxKey) {
+        rowToDatapointMapper = (row: DatasetRow) => ({
+            x: row.timestamp,
+            y: row.elements[columnIndex] as number
+        });
+    } else {
+        const xIdx = parseInt(xAxisKey.split(':')[1]);
+        rowToDatapointMapper = (row: DatasetRow) => ({
+            x: row.elements[xIdx] as number,
+            y: row.elements[columnIndex] as number
+        });
+    }
+
+    const data = rows.map(rowToDatapointMapper);
+
+    return {
+        datasets: [
+            {
+                backgroundColor: cssVarValue('--primary'),
+                borderColor: cssVarValue('--primary'),
+                data,
+                label: 'my title',
+                ...style
+            }
+        ]
+    };
+}
+
+export function generateChartData(
+    rows: Rows,
+    selectedBucket: Bucket,
+    columnIndex: number,
+    xAxisKey: XAxisKey,
+    reductionStrategy: ReductionStrategy,
+    style: {
+        backgroundColor?: string;
+        borderColor?: string;
+        borderWidth?: number;
+        borderRadius?: number;
+    } = {}
+): [ChartType, ChartData | null] {
+    if (rows.length < 1) return [ChartType.Line, null];
+
+    if (xAxisKey === timeIdxKey) {
+        return [
+            ChartType.Line,
+            generateTimeSeriesData(rows, selectedBucket, columnIndex, reductionStrategy, style)
+        ];
+    }
+    return [ChartType.Scatter, generateScatterData(rows, columnIndex, xAxisKey, style)];
 }

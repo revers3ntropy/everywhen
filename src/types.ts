@@ -43,14 +43,21 @@ export type Degrees = number;
 export type Meters = number;
 export type OptionalCoords = [Degrees, Degrees] | [null, null];
 
-export interface ChartData {
-    datasets: {
-        data: number[];
-        label: string;
-        [key: string]: unknown;
-    }[];
-    labels: string[];
-}
+export type ChartData =
+    | {
+          datasets: {
+              data: number[];
+              label: string;
+              [key: string]: unknown;
+          }[];
+          labels: string[];
+      }
+    | {
+          datasets: {
+              data: { x: number; y: number }[];
+              [key: string]: unknown;
+          }[];
+      };
 
 export type EventsSortKey = 'name' | 'start' | 'end' | 'created';
 

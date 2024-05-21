@@ -18,14 +18,17 @@
     } from 'chart.js';
     import { onMount } from 'svelte';
 
-    import { Line } from 'svelte-chartjs';
+    import { Line, Scatter } from 'svelte-chartjs';
     import {
         generateChartData,
         bucketNames,
         initialBucket,
         initialBucketName,
         ReductionStrategy,
-        reductionStrategyNames
+        reductionStrategyNames,
+        type XAxisKey,
+        timeIdxKey,
+        ChartType
     } from './generateChartData';
 
     export let dataset: DatasetMetadata;
@@ -83,10 +86,12 @@
     onMount(async () => {
         await retrieveData();
     });
+
     let datasetRows: DatasetRow[] = [];
     $: days = calculateDaysDatasetCovers(datasetRows);
     $: selectedBucket = initialBucket(days);
-    let selectedColumnIdx = 0;
+    let yAxisSelectedColumnIdx = 0;
+    let xAxis: XAxisKey = timeIdxKey;
     let selectedReductionStrategy = ReductionStrategy.Mean;
 
     // only allow numeric columns to be selected
@@ -95,12 +100,21 @@
         [builtInTypes.number.id, builtInTypes.nullableNumber.id].includes(col.type.id)
     );
 
-    $: graphData = generateChartData(
+    $: [graphType, graphData] = generateChartData(
         datasetRows as DatasetRow<(number | null)[]>[],
         selectedBucket,
-        selectedColumnIdx,
+        yAxisSelectedColumnIdx,
+        xAxis,
         selectedReductionStrategy
     );
+
+    $: yAxisOptions = Object.fromEntries(numericColumns.map((column, idx) => [column.name, idx]));
+
+    // TODO do not show the currently selected Y axis column in the X axis options
+    $: xAxisOptions = {
+        Time: timeIdxKey,
+        ...Object.fromEntries(numericColumns.map((column, idx) => [column.name, `col:${idx}`]))
+    };
 </script>
 
 <div style="height: 70vh" class="">
@@ -127,19 +141,17 @@
             {:else if numericColumns.length === 1}
                 <span class=""> {dataset.columns[0].name} </span>
             {:else}
-                <Select
-                    bind:value={selectedColumnIdx}
-                    key={'0'}
-                    options={Object.fromEntries(
-                        numericColumns.map((column, idx) => [column.name, idx])
-                    )}
-                />
+                <Select bind:value={yAxisSelectedColumnIdx} key={'0'} options={yAxisOptions} />
             {/if}
             <span class="text-light"> against </span>
-            Time
+            <Select bind:value={xAxis} key={'col:0'} options={xAxisOptions} />
         </div>
     </div>
     {#if graphData}
-        <Line data={graphData} options={options()} />
+        {#if graphType === ChartType.Scatter}
+            <Scatter data={graphData} options={options()} />
+        {:else if graphType === ChartType.Line}
+            <Line data={graphData} options={options()} />
+        {/if}
     {/if}
 </div>
