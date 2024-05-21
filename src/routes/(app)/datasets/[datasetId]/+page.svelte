@@ -3,6 +3,7 @@
     import { notify } from '$lib/components/notifications/notifications';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import DeleteOutline from 'svelte-material-icons/DeleteOutline.svelte';
+    import TuneVariant from 'svelte-material-icons/TuneVariant.svelte';
     import type { PageData } from './$types';
     import DatasetChart from './DatasetChart.svelte';
 
@@ -34,15 +35,25 @@
 
 <main class="md:p-4 md:ml-[10.5rem]">
     <div class="pb-4 flex flex-row justify-between">
-        <div>
+        <div class="text-lg">
             <input bind:this={nameInp} value={name} on:change={updateName} />
         </div>
         <div>
-            <button on:click={deleteDataset} class="flex-center gap-2">
+            <button
+                on:click={deleteDataset}
+                class="flex-center gap-2 danger border border-solid border-borderColor py-2 px-4 hover:bg-vLightAccent rounded-full"
+            >
                 <DeleteOutline size="25" /> Delete Dataset
             </button>
         </div>
     </div>
+
+    {#if data.dataset?.preset}
+        <div class="flex justify-start items-center gap-2">
+            <TuneVariant size="20" />
+            <span class="text-light"> From preset '{data.dataset.preset.defaultName}' </span>
+        </div>
+    {/if}
 
     <section>
         {#if data.dataset && data.dataset.columns.length}
