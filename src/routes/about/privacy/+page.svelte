@@ -1,11 +1,11 @@
 <svelte:head>
-    <title>Privacy | Everywhen</title>
+    <title>Privacy Policy | Everywhen</title>
 </svelte:head>
 
 <main class="flex-center">
     <div>
         <h1> Privacy Policy </h1>
-        <i> Last updated: 4th July 2023 </i>
+        <i> Last updated: 22nd May 2024 </i>
         <p class="text-light">
             Responsible for Data Protection (DPO): Joseph Coppin (josephcoppin@gmail.com)
         </p>
@@ -348,17 +348,15 @@
 
         <h3> Strictly necessary </h3>
         <p>
-            <b> Account Username </b> - We use this cookie to allow for user authentication and detect
-            session expiration.
+            <b> Account Username </b> - User authentication and detect session expiration.
         </p>
         <p>
-            <b> Encryption Key </b> - Allow user authentication and store the encryption key for all
-            data
+            <b> Encryption Key </b> - User authentication and the encryption key for all data
         </p>
 
         <h3> Functionality </h3>
         <p>
-            <b> Theme </b> - We use this cookie to let you switch color themes (e.g. light or dark mode)
+            <b> Theme </b> - Store selected color theme (e.g. light or dark mode)
         </p>
     </div>
 </main>
