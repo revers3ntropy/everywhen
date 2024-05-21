@@ -7,7 +7,10 @@
     export let dataset: DatasetMetadata;
 </script>
 
-<a href="datasets/{dataset.id}" class="bg-lightAccent w-fit p-3 rounded-xl">
+<a
+    href="datasets/{dataset.id}"
+    class="bg-vLightAccent w-fit p-3 rounded-xl hover:bg-lightAccent hover:no-underline"
+>
     <span class="flex justify-start items-center gap-2 pb-2">
         {#if dataset.preset}
             <span use:tooltip={{ content: `From preset '${dataset.preset.defaultName}'` }}>
