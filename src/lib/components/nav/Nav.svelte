@@ -5,7 +5,7 @@
     import { obfuscated, passcodeLastEntered, settingsStore } from '$lib/stores';
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
-    import DeleteOutline from 'svelte-material-icons/DeleteOutline.svelte';
+    import ChartLine from 'svelte-material-icons/ChartLine.svelte';
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import Lock from 'svelte-material-icons/Lock.svelte';
@@ -66,10 +66,8 @@
                     href="/journal"
                     aria-label="journal"
                     class={buttonCls}
-                    class:bg-primaryLight={$page.url.pathname.startsWith('/journal') &&
-                        !$page.url.pathname.startsWith('/journal/deleted')}
-                    class:hover:bg-primaryLight={$page.url.pathname.startsWith('/journal') &&
-                        !$page.url.pathname.startsWith('/journal/deleted')}
+                    class:bg-primaryLight={$page.url.pathname.startsWith('/journal')}
+                    class:hover:bg-primaryLight={$page.url.pathname.startsWith('/journal')}
                 >
                     <Notebook size="30" />
                     <div class="text-sm md:text-base"> Journal </div>
@@ -105,14 +103,14 @@
                     <div class="text-sm md:text-base"> Insights </div>
                 </a>
                 <a
-                    href="/journal/deleted"
+                    href="/datasets"
                     class={buttonCls}
-                    class:bg-primaryLight={$page.url.pathname.startsWith('/journal/deleted')}
-                    class:hover:bg-primaryLight={$page.url.pathname.startsWith('/journal/deleted')}
+                    class:bg-primaryLight={$page.url.pathname.startsWith('/datasets')}
+                    class:hover:bg-primaryLight={$page.url.pathname.startsWith('/datasets')}
                     aria-label="bin"
                 >
-                    <DeleteOutline size="30" />
-                    <div class="text-sm md:text-base"> Bin </div>
+                    <ChartLine size="30" />
+                    <div class="text-sm md:text-base"> Trackers </div>
                 </a>
             </div>
         </div>
