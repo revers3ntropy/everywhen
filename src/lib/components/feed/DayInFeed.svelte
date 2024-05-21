@@ -9,6 +9,7 @@
 <script lang="ts">
     import WeatherDialog from '$lib/components/dialogs/WeatherDialog.svelte';
     import EntryForm from '$lib/components/entryForm/EntryForm.svelte';
+    import EnableWeatherWidget from '$lib/components/feed/EnableWeatherWidget.svelte';
     import EntryEditFeedItem from '$lib/components/feed/EntryEditFeedItem.svelte';
     import EntryFeedItem from '$lib/components/feed/EntryFeedItem.svelte';
     import EventEndFeedItem from '$lib/components/feed/EventEndFeedItem.svelte';
@@ -18,6 +19,7 @@
     import WeatherWidget from '$lib/components/weather/WeatherWidget.svelte';
     import { Feed, type FeedItem } from '$lib/controllers/feed/feed';
     import type { Label } from '$lib/controllers/label/label';
+    import { settingsStore } from '$lib/stores';
     import { Day } from '$lib/utils/day';
     import { showPopup } from '$lib/utils/popups';
     import { fly, slide } from 'svelte/transition';
@@ -133,7 +135,7 @@
                     {/if}
                 </button>
             </div>
-            <div class="flex-center gap-2">
+            <div class="flex-center gap-4">
                 {#if day.weather}
                     <button
                         on:click={() =>
@@ -144,6 +146,8 @@
                     >
                         <WeatherWidget weather={day.weather} />
                     </button>
+                {:else if $settingsStore.homeLocation.value[0] === null && isToday}
+                    <EnableWeatherWidget />
                 {/if}
                 {#if isToday && showForms}
                     <HappinessDatasetShortcut dataset={happinessDataset} />

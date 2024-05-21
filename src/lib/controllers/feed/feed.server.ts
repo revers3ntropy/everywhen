@@ -1,4 +1,3 @@
-import { Dataset } from '$lib/controllers/dataset/dataset.server';
 import { entriesProvider } from '$lib/controllers/feed/entriesProvider';
 import { entryEditsProvider } from '$lib/controllers/feed/entryEditsProvider';
 import { eventEndsProvider, eventStartsProvider } from '$lib/controllers/feed/eventsProvider';
@@ -79,8 +78,7 @@ namespace FeedServer {
     }
 
     async function weatherDataForDay(auth: Auth, day: Day): Promise<Result<WeatherForDay>> {
-        if (!(await Dataset.hasDatasetWithPresetId(auth, 'weather')))
-            return Result.err('Invalid day');
+        // could check for existence of 'weather' dataset here
         const setting = await Settings.getValue(auth, 'homeLocation');
         if (!setting.ok) return setting.cast();
         const [lon, lat] = setting.val;
