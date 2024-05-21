@@ -11,3 +11,12 @@ export async function makeFromPreset(presetId: PresetId): Promise<string> {
         })
     ).id;
 }
+
+export async function makeBlank(name: string): Promise<string> {
+    return notify.onErr(
+        await api.post('/datasets', {
+            name,
+            presetId: null
+        })
+    ).id;
+}

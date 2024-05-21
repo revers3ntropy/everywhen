@@ -45,7 +45,7 @@
     </div>
 
     <section>
-        {#if data.dataset}
+        {#if data.dataset && data.dataset.columns.length}
             <DatasetChart dataset={data.dataset} />
         {/if}
     </section>
