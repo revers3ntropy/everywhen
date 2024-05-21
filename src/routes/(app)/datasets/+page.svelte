@@ -1,7 +1,10 @@
 <script lang="ts">
     import Dot from '$lib/components/ui/Dot.svelte';
+    import Dropdown from '$lib/components/ui/Dropdown.svelte';
     import { datasetPresets } from '$lib/controllers/dataset/presets';
     import type { PresetId } from '$lib/controllers/dataset/presets';
+    import Import from 'svelte-material-icons/Import.svelte';
+    import Plus from 'svelte-material-icons/Plus.svelte';
     import type { PageData } from './$types';
     import { makeFromPreset } from './importHelpers';
     import SleepCycleImport from './SleepCycleImport.svelte';
@@ -22,13 +25,40 @@
 </svelte:head>
 
 <main class="mt-4 md:ml-[10.5rem]">
-    {#each unusedPresetIds as presetId}
+    <Dropdown fillWidthMobile width="200px">
+        <button
+            slot="button"
+            class="aspect-square p-2 rounded-full bg-vLightAccent hover:bg-lightAccent"
+        >
+            <Plus size="24" />
+        </button>
         <div class="py-2">
-            <button on:click={() => makeFromPreset(presetId)}>
-                Start Recording '{datasetPresets[presetId].defaultName}'
-            </button>
+            {#each unusedPresetIds as presetId}
+                <div class="p-2">
+                    <button
+                        on:click={() => makeFromPreset(presetId)}
+                        class="w-full flex justify-start items-center gap-2"
+                    >
+                        <TuneVariant size="20" />
+                        {datasetPresets[presetId].defaultName}
+                    </button>
+                </div>
+            {/each}
+            <SleepCycleImport {datasets} {usedPresetIds} className="w-full">
+                <span class="w-full flex justify-start items-center p-2 gap-2">
+                    <Import size="24" />
+                    Sleep Cycle
+                    <img
+                        src="/sleepCycleLogo.png"
+                        width="225"
+                        height="225"
+                        class="rounded-full w-6 h-6"
+                        alt="Sleep Cycle logo"
+                    />
+                </span>
+            </SleepCycleImport>
         </div>
-    {/each}
+    </Dropdown>
 
     <div class="py-4 flex gap-2">
         {#each datasets as dataset}
@@ -56,9 +86,5 @@
                 </span>
             </a>
         {/each}
-    </div>
-
-    <div>
-        <SleepCycleImport {datasets} {usedPresetIds} />
     </div>
 </main>

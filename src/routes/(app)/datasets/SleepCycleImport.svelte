@@ -9,6 +9,7 @@
 
     export let datasets: Dataset[];
     export let usedPresetIds: string[];
+    export let className: string;
 
     const sleepCycleUpload = (async e => {
         if (!e.target || !('files' in e.target)) {
@@ -84,7 +85,9 @@
     let sleepCycleUploadInput: HTMLInputElement;
 </script>
 
-<button on:click={uploadFromSleepCycle}>Import from Sleep Cycle</button>
+<button on:click={uploadFromSleepCycle} class={className}>
+    <slot />
+</button>
 
 <input
     type="file"
