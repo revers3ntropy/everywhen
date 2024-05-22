@@ -145,6 +145,7 @@
                                     showPopup(EntryDialog, {
                                         id: entry.id
                                     })}
+                                aria-label="Open entry in dialog"
                             >
                                 <OpenInApp size="20" />
                             </button>
