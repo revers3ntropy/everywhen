@@ -23,8 +23,8 @@
             open source
             <OpenInNew size="12" />
         </a>
-        journal / life logging app. It's a place to record your thoughts, feelings, and experiences.
-        It's a place to keep track of your life, and invoke a feeling of 'halcyon days'.
+        journal / life logging app. It's a place to record your thoughts, feelings, experiences and keep
+        track of your life.
     </p>
     <p>
         Please note that this is a work in progress, and bug reports and feature requests are
@@ -119,23 +119,6 @@
     <p>
         You can set the starting year of the timeline in
         <a href="/settings">settings</a>.
-    </p>
-
-    <h2>Backups</h2>
-
-    <p>
-        You can download backups from the
-        <a href="/settings">settings</a>
-        page, or by pressing <code>ctrl + s</code>
-        (or <code>cmd + s</code> on Mac). By default the backup is encrypted, meaning you can only recover
-        it with the password of the account it was created with. You can also download an unencrypted
-        backup from settings, which can be recovered by anyone, but can also be recovered from if you
-        lose your password.
-    </p>
-    <p>
-        Recover from a backup file from the
-        <a href="/settings">settings</a>
-        page.
     </p>
 
     <h2>Blurring</h2>
