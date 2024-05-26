@@ -169,47 +169,45 @@
             {/if}
             <div class="w-full">
                 {#each items || [] as item, i (item.id)}
-                    <div class="pb-4">
-                        {#if item.type === 'entry'}
-                            <EntryFeedItem entry={item} {obfuscated} {showLabels} {locations} />
-                        {:else if item.type === 'entry-edit'}
-                            <EntryEditFeedItem
-                                {...(({ type: _, ...rest }) => rest)(item)}
-                                {locations}
-                                {obfuscated}
-                            />
-                        {:else if item.type === 'sleep'}
-                            <SleepInfo
-                                tzOffset={item.startTzOffset}
-                                start={item.start}
-                                duration={item.duration}
-                                quality={item.quality}
-                                regularity={item.regularity}
-                                {obfuscated}
-                            />
-                        {:else if item.type === 'event-start'}
-                            <EventStartFeedItem
-                                {labels}
-                                {item}
-                                nextItem={items[i - 1] ?? null}
-                                {obfuscated}
-                            />
-                        {:else if item.type === 'event-end'}
-                            <EventEndFeedItem
-                                {labels}
-                                {item}
-                                previousItem={items[i + 1] ?? null}
-                                {obfuscated}
-                            />
-                        {:else if item.type === 'happiness'}
-                            <HappinessFeedItem
-                                {obfuscated}
-                                timestamp={item.timestamp}
-                                tzOffset={item.timestampTzOffset}
-                                value={item.value}
-                            />
-                        {/if}
-                    </div>
+                    {#if item.type === 'entry'}
+                        <EntryFeedItem entry={item} {obfuscated} {showLabels} {locations} />
+                    {:else if item.type === 'entry-edit'}
+                        <EntryEditFeedItem
+                            {...(({ type: _, ...rest }) => rest)(item)}
+                            {locations}
+                            {obfuscated}
+                        />
+                    {:else if item.type === 'sleep'}
+                        <SleepInfo
+                            tzOffset={item.startTzOffset}
+                            start={item.start}
+                            duration={item.duration}
+                            quality={item.quality}
+                            regularity={item.regularity}
+                            {obfuscated}
+                        />
+                    {:else if item.type === 'event-start'}
+                        <EventStartFeedItem
+                            {labels}
+                            {item}
+                            nextItem={items[i - 1] ?? null}
+                            {obfuscated}
+                        />
+                    {:else if item.type === 'event-end'}
+                        <EventEndFeedItem
+                            {labels}
+                            {item}
+                            previousItem={items[i + 1] ?? null}
+                            {obfuscated}
+                        />
+                    {:else if item.type === 'happiness'}
+                        <HappinessFeedItem
+                            {obfuscated}
+                            timestamp={item.timestamp}
+                            tzOffset={item.timestampTzOffset}
+                            value={item.value}
+                        />
+                    {/if}
                 {/each}
             </div>
         </div>

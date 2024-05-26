@@ -30,7 +30,7 @@
 
 <FeedItemIcon type="entry-edit" />
 
-<div class="text-sm py-2 flex gap-2 flex-wrap">
+<div class="text-sm pt-2 pb-4 flex gap-2 flex-wrap">
     <TimeInFeed timestamp={created} tzOffset={createdTzOffset} />
     {#if $settingsStore.showAgentWidgetOnEntries.value}
         <AgentWidget data={agentData} />

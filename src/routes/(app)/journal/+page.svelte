@@ -37,7 +37,7 @@
     <title>Journal</title>
 </svelte:head>
 
-<main class="md:flex md:justify-center gap-4 md:ml-[10.5rem] pt-4">
+<main class="md:ml-[9rem] flex flex-row">
     <section>
         <EntriesSidebar
             obfuscated={$obfuscated}
@@ -47,36 +47,40 @@
         />
     </section>
 
-    <section class="w-full max-w-3xl -order-1">
-        <div>
-            <DatasetShortcutWidgets datasets={data.datasets} />
-        </div>
-        {#key $page}
-            {#if $page.url.hash}
-                {#await api.get(apiPath('/entries/?', $page.url.hash.slice(1))).then(notify.onErr)}
-                    <p>Loading...</p>
-                {:then entry}
+    <section class="md:flex md:justify-center gap-4 pt-4 w-full">
+        <div class="max-w-3xl w-full">
+            <div>
+                <DatasetShortcutWidgets datasets={data.datasets} />
+            </div>
+            {#key $page}
+                {#if $page.url.hash}
+                    {#await api
+                        .get(apiPath('/entries/?', $page.url.hash.slice(1)))
+                        .then(notify.onErr)}
+                        <p>Loading...</p>
+                    {:then entry}
+                        <Feed
+                            locations={data.locations}
+                            happinessDataset={data.happinessDataset}
+                            labels={data.labels}
+                            obfuscated={$obfuscated}
+                            fromDay={Entry.dayOf(entry)}
+                            {getScrollContainer}
+                        />
+                    {:catch error}
+                        <p>{error.message}</p>
+                    {/await}
+                {:else}
                     <Feed
                         locations={data.locations}
                         happinessDataset={data.happinessDataset}
                         labels={data.labels}
                         obfuscated={$obfuscated}
-                        fromDay={Entry.dayOf(entry)}
+                        fromDay={Day.today(currentTzOffset())}
                         {getScrollContainer}
                     />
-                {:catch error}
-                    <p>{error.message}</p>
-                {/await}
-            {:else}
-                <Feed
-                    locations={data.locations}
-                    happinessDataset={data.happinessDataset}
-                    labels={data.labels}
-                    obfuscated={$obfuscated}
-                    fromDay={Day.today(currentTzOffset())}
-                    {getScrollContainer}
-                />
-            {/if}
-        {/key}
+                {/if}
+            {/key}
+        </div>
     </section>
 </main>

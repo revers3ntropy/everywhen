@@ -12,7 +12,7 @@
 </script>
 
 <FeedItemIcon type="sleep" />
-<div class="text-sm py-2 flex gap-y-1 gap-4 flex-wrap">
+<div class="text-sm pt-2 pb-4 flex gap-y-1 gap-4 flex-wrap">
     <TimeInFeed timestamp={start} to={start + duration} {tzOffset} />
     <div class="basis-full h-0 md:hidden"></div>
     <div class="flex gap-4 px-2 md:p-0" class:obfuscated>

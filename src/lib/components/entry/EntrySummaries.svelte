@@ -92,7 +92,7 @@
         {#each sortedTitles as [day, date] (date)}
             <div class="day" transition:slide={{ duration: ANIMATION_DURATION, axis: 'x' }}>
                 <h2>
-                    <UtcTime timestamp={day} fmt="dddd DD/MM/YYYY" noTooltip={true} tzOffset={0} />
+                    <UtcTime timestamp={day} fmt="ddd DD/MM/YYYY" noTooltip={true} tzOffset={0} />
                     {#if showTimeAgo}
                         <Dot marginX={2} />
                         <span class="text-light">

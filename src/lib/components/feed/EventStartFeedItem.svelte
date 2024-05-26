@@ -21,7 +21,7 @@
 <!-- if the event starts and then immediately ends, collapse into one item -->
 {#if nextItem?.type === 'event-end' && nextItem?.id === `${item.id}-end` && Day.timestampsAreSameDay(item.start, item.end, item.tzOffset) && !Event.isInstantEvent(item)}
     <FeedItemIcon type="event" />
-    <div class="text-sm py-2 flex gap-4">
+    <div class="text-sm pt-2 pb-4 flex gap-4">
         <TimeInFeed timestamp={item.start} to={item.end} tzOffset={item.tzOffset} />
         <div class:obfuscated>
             {#if label}
@@ -32,7 +32,7 @@
     </div>
 {:else}
     <FeedItemIcon type={!Event.isInstantEvent(item) ? 'event-start' : 'event'} />
-    <div class="text-sm py-2 flex gap-4">
+    <div class="text-sm pt-2 pb-4 flex gap-4">
         <TimeInFeed timestamp={item.start} tzOffset={item.tzOffset} />
         <div>
             {#if !Event.isInstantEvent(item)}

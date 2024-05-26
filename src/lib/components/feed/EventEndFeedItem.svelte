@@ -20,7 +20,7 @@
     <!-- don't show end of event if start of event is shown immediately before -->
 {:else}
     <FeedItemIcon type="event-end" />
-    <div class="text-sm py-2 flex gap-4">
+    <div class="text-sm pt-2 pb-4 flex gap-4">
         <TimeInFeed timestamp={item.end} tzOffset={item.tzOffset} />
         <div>
             <span class="text-textColorLight">end of</span>

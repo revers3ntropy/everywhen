@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { page } from '$app/stores';
     import InfiniteScroller from '$lib/components/ui/InfiniteScroller.svelte';
     import { notify } from '$lib/components/notifications/notifications';
     import { ANIMATION_DURATION } from '$lib/constants';
@@ -37,6 +38,10 @@
 
         titleIds = [...titleIds, ...newEntrySummaries.map(t => t.id)];
     }
+
+    page.subscribe(() => {
+        openOnMobile = false;
+    });
 
     $: pinnedEntries = Entry.groupEntriesByDay(
         showingAllPinned
@@ -89,7 +94,7 @@
 </div>
 
 <div
-    class="h-screen z-10 w-full border-borderColor overflow-y-auto fixed top-0 left-0 md:sticky md:top-4 md:border-none rounded-xl md:z-0 -translate-x-full md:translate-x-0 transition-[300ms]"
+    class="h-screen z-10 w-full md:w-60 border-borderColor overflow-y-auto fixed top-0 left-0 md:sticky md:z-0 -translate-x-full md:translate-x-0 transition-[300ms] border-l-2"
     class:translate-x-0={openOnMobile}
     class:bg-vLightAccent={openOnMobile || !noEntries}
 >
@@ -119,7 +124,7 @@
             {#if Object.keys(pinnedEntries).length}
                 <div class="pb-2">
                     <div
-                        class="p-2 border-l-2 border-b-2 border-borderColor rounded-bl-lg"
+                        class="p-2 border-b-2 border-borderColor"
                         transition:slide={{ duration: ANIMATION_DURATION, axis: 'x' }}
                     >
                         <h3
@@ -157,7 +162,7 @@
         {#if Object.entries(nYearsAgo).length}
             <div class="flex flex-col gap-2">
                 {#each Object.entries(nYearsAgo) as [date, entries] (date)}
-                    <div class="border-l-2 border-b-2 border-borderColor rounded-bl-lg p-2">
+                    <div class="border-b-2 border-borderColor p-2">
                         <h3>
                             {fmtUtcRelative(new Date(date), 'en-full')} since...
                         </h3>
