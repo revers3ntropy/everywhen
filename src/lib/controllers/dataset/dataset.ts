@@ -22,6 +22,7 @@ export interface DatasetColumnType<T> {
     created: TimestampSecs | null;
     name: string;
     unit: string;
+    defaultValue: T;
     validate: (value: T) => boolean;
 }
 

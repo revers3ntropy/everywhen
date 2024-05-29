@@ -6,6 +6,7 @@ export const builtInTypes = {
         created: null,
         name: 'Number',
         unit: '',
+        defaultValue: 0,
         validate: (value: unknown): value is number => typeof value === 'number'
     },
     nullableNumber: {
@@ -13,6 +14,7 @@ export const builtInTypes = {
         created: null,
         name: 'Number',
         unit: '',
+        defaultValue: null,
         validate: (value: unknown): value is number | null =>
             typeof value === 'number' || value === null
     },
@@ -21,6 +23,7 @@ export const builtInTypes = {
         created: null,
         name: 'Text',
         unit: '',
+        defaultValue: '',
         validate: (value: unknown): value is string => typeof value === 'string'
     },
     boolean: {
@@ -28,6 +31,7 @@ export const builtInTypes = {
         created: null,
         name: 'Boolean',
         unit: '',
+        defaultValue: false,
         validate: (value: unknown): value is boolean => typeof value === 'boolean'
     }
 } satisfies Record<string, DatasetColumnType<unknown>>;

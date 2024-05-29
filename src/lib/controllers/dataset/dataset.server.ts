@@ -630,6 +630,33 @@ namespace DatasetServer {
             )
         `;
 
+        // TODO scale this better
+        const rows = await query<{ id: number; rowJson: string }[]>`
+            SELECT id, rowJson
+            FROM datasetRows
+            WHERE datasetId = ${datasetId}
+            AND userId = ${auth.id}
+        `;
+
+        for (const row of rows) {
+            const decryptedJson = decrypt(row.rowJson, auth.key);
+            if (!decryptedJson.ok) return decryptedJson.cast();
+
+            const parsedRowData = JSON.parse(decryptedJson.val);
+            if (!Array.isArray(parsedRowData)) {
+                return Result.err('Invalid row JSON');
+            }
+
+            const updatedRowData = [...parsedRowData, type.defaultValue];
+            const updatedRowJson = encrypt(JSON.stringify(updatedRowData), auth.key);
+
+            await query`
+                UPDATE datasetRows
+                SET rowJson = ${updatedRowJson}
+                WHERE id = ${row.id}
+            `;
+        }
+
         return Result.ok({
             id,
             datasetId,
