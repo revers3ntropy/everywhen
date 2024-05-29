@@ -26,7 +26,7 @@ export interface DatasetColumnType<T> {
 }
 
 export interface DatasetColumn<T> {
-    id: number;
+    id: string;
     datasetId: string;
     created: TimestampSecs | null;
     name: string;

@@ -40,7 +40,7 @@ namespace DatasetServer {
 
         const columns = await query<
             {
-                id: number;
+                id: string;
                 name: string;
                 datasetId: string;
                 created: TimestampSecs;
@@ -102,10 +102,7 @@ namespace DatasetServer {
         });
     }
 
-    export async function getDatasetMetadata(
-        auth: Auth,
-        datasetId: string
-    ): Promise<Result<DatasetMetadata | null>> {
+    export async function getDataset(auth: Auth, datasetId: string): Promise<Result<Dataset>> {
         const rows = await query<
             { id: string; name: string; created: TimestampSecs; presetId: PresetId | null }[]
         >`
@@ -114,15 +111,30 @@ namespace DatasetServer {
             WHERE userId = ${auth.id}
                 AND id = ${datasetId}
         `;
-        if (rows.length === 0) return Result.ok(null);
+        if (rows.length === 0) return Result.err('Dataset not found');
         const [{ id, name, created, presetId }] = rows;
         const nameDecrypted = decrypt(name, auth.key);
         if (!nameDecrypted.ok) return nameDecrypted.cast();
 
+        return Result.ok({
+            id,
+            name: nameDecrypted.val,
+            created,
+            preset: presetId ? datasetPresets[presetId] : null
+        });
+    }
+
+    export async function getDatasetMetadata(
+        auth: Auth,
+        datasetId: string
+    ): Promise<Result<DatasetMetadata>> {
+        const dataset = await getDataset(auth, datasetId);
+        if (!dataset.ok) return dataset.cast();
+
         let columns = [];
 
-        if (presetId) {
-            columns = datasetPresets[presetId].columns;
+        if (dataset.val.preset) {
+            columns = datasetPresets[dataset.val.preset.id as PresetId].columns;
         } else {
             const allCols = await allUserDefinedColumns(auth, datasetId);
             if (!allCols.ok) return allCols.cast();
@@ -138,10 +150,7 @@ namespace DatasetServer {
         `;
 
         return Result.ok({
-            id,
-            name: nameDecrypted.val,
-            created,
-            preset: presetId ? datasetPresets[presetId] : null,
+            ...dataset.val,
             columns,
             rowCount
         });
@@ -594,6 +603,40 @@ namespace DatasetServer {
                 AND userId = ${auth.id}
         `;
         return datasets.length > 0;
+    }
+
+    export async function addColumn(
+        auth: Auth,
+        datasetId: string,
+        name: string,
+        type: DatasetColumnType<unknown>
+    ): Promise<Result<DatasetColumn<unknown>>> {
+        const id = await UId.generate();
+        const encryptedName = encrypt(name, auth.key);
+        const created = nowUtc();
+
+        const dataset = await getDataset(auth, datasetId);
+        if (!dataset.ok) return dataset.cast();
+        if (dataset.val.preset) return Result.err('Cannot add columns to preset datasets');
+
+        await query`
+            INSERT INTO datasetColumns (
+                id, userId, datasetId, ordering, name, typeId, created
+            )
+            VALUES (
+                ${id}, ${auth.id}, ${datasetId}, 
+                (SELECT IFNULL(MAX(ordering) + 1, 0) WHERE datasetId = ${datasetId}),
+                ${encryptedName}, ${type.id}, ${created}
+            )
+        `;
+
+        return Result.ok({
+            id,
+            datasetId,
+            created,
+            name,
+            type
+        });
     }
 }
 

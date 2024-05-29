@@ -8,7 +8,7 @@ export class GenericResponse<T> extends Response {
     }
 }
 
-export function apiResponse<T extends Record<string, unknown>>(
+export function apiResponse<T>(
     encryptionKey: string | Auth | null,
     body: T,
     init: ResponseInit = {}

@@ -9,34 +9,38 @@
 
     export let data: PageData;
 
-    let name = '?';
-    $: if (data.dataset) {
-        name = data.dataset?.name;
-    }
     let nameInp: HTMLInputElement;
 
     async function updateName() {
-        if (!data.dataset) return;
-        name = nameInp.value;
-        await api.put(apiPath(`/datasets/?`, data.dataset.id), { name });
+        data.dataset.name = nameInp.value;
+        await api.put(apiPath(`/datasets/?`, data.dataset.id), { name: data.dataset.name });
     }
 
     async function deleteDataset() {
-        if (!data.dataset) return;
         if (!confirm('Are you sure you want to delete this dataset?')) return;
         notify.onErr(await api.delete(apiPath(`/datasets/?`, data.dataset.id)));
         await goto('/datasets');
     }
+
+    async function addColumn() {
+        const newColumn = notify.onErr(
+            await api.post(apiPath(`/datasets/?/columns`, data.dataset.id), {
+                name: 'New Column',
+                type: 'number'
+            })
+        );
+        data.dataset.columns.push(newColumn);
+    }
 </script>
 
 <svelte:head>
-    <title>{name || 'Unknown'} | View Dataset</title>
+    <title>{data.dataset.name || 'Unknown'} | View Dataset</title>
 </svelte:head>
 
 <main class="md:p-4 md:ml-[10.5rem]">
     <div class="pb-4 flex flex-row justify-between">
         <div class="text-lg">
-            <input bind:this={nameInp} value={name} on:change={updateName} />
+            <input bind:this={nameInp} value={data.dataset.name} on:change={updateName} />
         </div>
         <div>
             <button
@@ -59,5 +63,29 @@
         {#if data.dataset && data.dataset.columns.length}
             <DatasetChart dataset={data.dataset} />
         {/if}
+    </section>
+
+    <section class="pt-8">
+        <div class="flex">
+            <table class="border-borderColor border border-r-0">
+                <tr>
+                    <th class="p-2 border-r border-borderColor"> Timestamp </th>
+                    {#each data.dataset?.columns as column}
+                        <th class="p-2 border-r border-borderColor">
+                            {column.name}
+                        </th>
+                    {/each}
+                </tr>
+            </table>
+
+            {#if !data.dataset.preset}
+                <button
+                    class="border border-solid border-borderColor border-l-0 p-2 bg-vLightAccent hover:bg-lightAccent"
+                    on:click={addColumn}
+                >
+                    +
+                </button>
+            {/if}
+        </div>
     </section>
 </main>

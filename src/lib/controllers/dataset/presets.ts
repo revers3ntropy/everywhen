@@ -13,7 +13,7 @@ export const datasetPresets = {
         defaultName: 'Weight',
         columns: [
             {
-                id: 0,
+                id: '0',
                 name: 'Weight',
                 created: null,
                 type: builtInTypes.number,
@@ -26,7 +26,7 @@ export const datasetPresets = {
         defaultName: 'Happiness',
         columns: [
             {
-                id: 0,
+                id: '0',
                 name: 'Happiness',
                 created: null,
                 type: builtInTypes.number,
@@ -39,21 +39,21 @@ export const datasetPresets = {
         defaultName: 'Sleep Cycle',
         columns: [
             {
-                id: 0,
+                id: '0',
                 name: 'Duration',
                 created: null,
                 type: builtInTypes.number,
                 datasetId: ''
             },
             {
-                id: 1,
+                id: '1',
                 name: 'Sleep Quality',
                 created: null,
                 type: builtInTypes.nullableNumber,
                 datasetId: ''
             },
             {
-                id: 2,
+                id: '2',
                 name: 'Regularity',
                 created: null,
                 type: builtInTypes.nullableNumber,
@@ -71,35 +71,35 @@ export const datasetPresets = {
         defaultName: 'Weather',
         columns: [
             {
-                id: 0,
+                id: '0',
                 name: 'Temperature',
                 created: null,
                 type: builtInTypes.number,
                 datasetId: ''
             },
             {
-                id: 1,
+                id: '1',
                 name: 'Humidity',
                 created: null,
                 type: builtInTypes.number,
                 datasetId: ''
             },
             {
-                id: 2,
+                id: '2',
                 name: 'Precipitation',
                 created: null,
                 type: builtInTypes.number,
                 datasetId: ''
             },
             {
-                id: 3,
+                id: '3',
                 name: 'Cloud Cover',
                 created: null,
                 type: builtInTypes.number,
                 datasetId: ''
             },
             {
-                id: 4,
+                id: '4',
                 name: 'Wind Speed (Max)',
                 created: null,
                 type: builtInTypes.number,

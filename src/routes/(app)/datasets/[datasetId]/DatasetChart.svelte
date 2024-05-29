@@ -117,7 +117,7 @@
     };
 </script>
 
-<div style="height: 70vh" class="">
+<div class="">
     <div class="flex gap-4 py-4">
         <div class="rounded-full bg-vLightAccent py-2 px-4 flex-center gap-2">
             {#if numericColumns.length === 0}
@@ -149,11 +149,13 @@
             </div>
         {/if}
     </div>
-    {#if graphData}
-        {#if graphType === ChartType.Scatter}
-            <Scatter data={graphData} options={options()} />
-        {:else if graphType === ChartType.Line}
-            <Line data={graphData} options={options()} />
+    <div class="h-[70vh]">
+        {#if graphData}
+            {#if graphType === ChartType.Scatter}
+                <Scatter data={graphData} options={options()} />
+            {:else if graphType === ChartType.Line}
+                <Line data={graphData} options={options()} />
+            {/if}
         {/if}
-    {/if}
+    </div>
 </div>
