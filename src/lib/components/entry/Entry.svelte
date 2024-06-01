@@ -308,7 +308,7 @@
         {title}
     </div>
 
-    <div class="body md:p-4 p-2 whitespace-pre-wrap" class:obfuscated>
+    <div class="body md:p-4 md:pb-0 p-2 whitespace-pre-wrap" class:obfuscated>
         {@html entryHtml}
     </div>
 </div>
