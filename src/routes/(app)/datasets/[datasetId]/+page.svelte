@@ -72,7 +72,12 @@
                     <th class="p-2 border-r border-borderColor"> Timestamp </th>
                     {#each data.dataset?.columns as column}
                         <th class="p-2 border-r border-borderColor">
-                            {column.name}
+                            <div class="pb-2">
+                                {column.name}
+                            </div>
+                            <div class="bg-lightAccent rounded-full p-1">
+                                {column.type.name}
+                            </div>
                         </th>
                     {/each}
                 </tr>
