@@ -1,6 +1,8 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import { notify } from '$lib/components/notifications/notifications';
+    import Select from '$lib/components/Select.svelte';
+    import { builtInTypes } from '$lib/controllers/dataset/columnTypes';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import DeleteOutline from 'svelte-material-icons/DeleteOutline.svelte';
     import TuneVariant from 'svelte-material-icons/TuneVariant.svelte';
@@ -31,6 +33,34 @@
         );
         data.dataset.columns.push(newColumn);
     }
+
+    async function updateColumnType(columnId: string, type: string) {
+        const column = data.dataset.columns.find(c => c.id === columnId);
+        if (!column) return;
+        column.type = builtInTypes[type as keyof typeof builtInTypes];
+        console.log({ columnId, type });
+        await api.put(apiPath(`/datasets/?/columns/?`, data.dataset.id, columnId), { type });
+    }
+
+    async function updateColumnName(columnId: string, name: string) {
+        const column = data.dataset.columns.find(c => c.id === columnId);
+        if (!column) return;
+        column.name = name;
+        await api.put(apiPath(`/datasets/?/columns/?`, data.dataset.id, columnId), { name });
+    }
+
+    function castStr(a: unknown) {
+        return a as string;
+    }
+
+    const columnTypesMap = Object.fromEntries(
+        Object.keys(builtInTypes).map(key => [
+            key,
+            builtInTypes[key as keyof typeof builtInTypes].name
+        ])
+    );
+
+    console.log({ columnTypesMap });
 </script>
 
 <svelte:head>
@@ -73,10 +103,26 @@
                     {#each data.dataset?.columns as column}
                         <th class="p-2 border-r border-borderColor">
                             <div class="pb-2">
-                                {column.name}
+                                {#if data.dataset.preset}
+                                    {column.name}
+                                {:else}
+                                    <input
+                                        bind:value={column.name}
+                                        on:change={() => updateColumnName(column.id, column.name)}
+                                    />
+                                {/if}
                             </div>
                             <div class="bg-lightAccent rounded-full p-1">
-                                {column.type.name}
+                                {#if data.dataset.preset}
+                                    {column.type.name}
+                                {:else}
+                                    <Select
+                                        onChange={newType =>
+                                            updateColumnType(column.id, castStr(newType))}
+                                        key={column.type.id}
+                                        options={columnTypesMap}
+                                    />
+                                {/if}
                             </div>
                         </th>
                     {/each}

@@ -7,6 +7,7 @@
     export let options: Record<string, string | number>;
     export let key: string;
     export let open = false;
+    export let onChange: null | ((key: string, oldKey: string) => void) = null;
 
     export let value = options[key];
     $: value = options[key];
@@ -30,6 +31,7 @@
                 class="option"
                 on:click={() => {
                     open = false;
+                    if (onChange && key !== option) onChange(option, key);
                     key = option;
                 }}
             >

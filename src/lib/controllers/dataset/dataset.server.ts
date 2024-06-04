@@ -31,7 +31,7 @@ namespace DatasetServer {
         return Result.ok(Dataset.builtInTypes);
     }
 
-    async function allUserDefinedColumns(
+    async function getUserDefinedColumns(
         auth: Auth,
         datasetId?: string
     ): Promise<Result<DatasetColumn<unknown>[]>> {
@@ -136,7 +136,7 @@ namespace DatasetServer {
         if (dataset.val.preset) {
             columns = datasetPresets[dataset.val.preset.id as PresetId].columns;
         } else {
-            const allCols = await allUserDefinedColumns(auth, datasetId);
+            const allCols = await getUserDefinedColumns(auth, datasetId);
             if (!allCols.ok) return allCols.cast();
 
             columns = allCols.val.filter(c => c.datasetId === datasetId);
@@ -176,7 +176,7 @@ namespace DatasetServer {
             WHERE userId = ${auth.id}
         `;
 
-        const usersColumnsRes = await allUserDefinedColumns(auth);
+        const usersColumnsRes = await getUserDefinedColumns(auth);
         if (!usersColumnsRes.ok) return usersColumnsRes.cast();
 
         for (const dataset of datasets) {
@@ -396,7 +396,7 @@ namespace DatasetServer {
         }
         if (rows.length < 1) return Result.ok(null);
 
-        const allColumnsRes = await allUserDefinedColumns(auth);
+        const allColumnsRes = await getUserDefinedColumns(auth);
         if (!allColumnsRes.ok) return allColumnsRes.cast();
 
         const maxRowId = await query<{ id: number }[]>`
@@ -664,6 +664,89 @@ namespace DatasetServer {
             name,
             type
         });
+    }
+
+    export async function updateColumnType(
+        auth: Auth,
+        datasetId: string,
+        columnId: string,
+        type: DatasetColumnType<unknown>
+    ): Promise<Result<null>> {
+        const dataset = await getDataset(auth, datasetId);
+        if (!dataset.ok) return dataset.cast();
+        if (dataset.val.preset) return Result.err('Cannot update column types in preset datasets');
+
+        const cols = await getUserDefinedColumns(auth, datasetId);
+        if (!cols.ok) return cols.cast();
+        const col = cols.val.find(c => c.id === columnId);
+        if (!col) return Result.err('Column not found');
+        if (col.type.id === type.id) return Result.ok(null);
+
+        await query`
+            UPDATE datasetColumns
+            SET typeId = ${type.id}
+            WHERE id = ${columnId}
+              AND datasetId = ${datasetId}
+              AND userId = ${auth.id}
+        `;
+
+        // TODO scale this better
+        const rows = await query<{ id: number; rowJson: string }[]>`
+            SELECT id, rowJson
+            FROM datasetRows
+            WHERE datasetId = ${datasetId}
+            AND userId = ${auth.id}
+        `;
+
+        for (const row of rows) {
+            const decryptedJson = decrypt(row.rowJson, auth.key);
+            if (!decryptedJson.ok) return decryptedJson.cast();
+
+            const parsedRowData = JSON.parse(decryptedJson.val);
+            if (!Array.isArray(parsedRowData)) {
+                return Result.err('Invalid row JSON');
+            }
+
+            // TODO cast type of element at index *something*
+            const updatedRowData = [...parsedRowData];
+
+            const updatedRowJson = encrypt(JSON.stringify(updatedRowData), auth.key);
+
+            await query`
+                UPDATE datasetRows
+                SET rowJson = ${updatedRowJson}
+                WHERE id = ${row.id}
+            `;
+        }
+
+        return Result.ok();
+    }
+
+    export async function updateColumnName(
+        auth: Auth,
+        datasetId: string,
+        columnId: string,
+        name: string
+    ): Promise<Result<null>> {
+        const dataset = await getDataset(auth, datasetId);
+        if (!dataset.ok) return dataset.cast();
+        if (dataset.val.preset) return Result.err('Cannot update column names in preset datasets');
+
+        const cols = await getUserDefinedColumns(auth, datasetId);
+        if (!cols.ok) return cols.cast();
+        const col = cols.val.find(c => c.id === columnId);
+        if (!col) return Result.err('Column not found');
+
+        const encryptedName = encrypt(name, auth.key);
+        await query`
+            UPDATE datasetColumns
+            SET name = ${encryptedName}
+            WHERE id = ${columnId}
+              AND datasetId = ${datasetId}
+              AND userId = ${auth.id}
+        `;
+
+        return Result.ok(null);
     }
 }
 
