@@ -156,15 +156,6 @@ namespace DatasetServer {
         });
     }
 
-    export async function hasDatasetWithPresetId(auth: Auth, presetId: PresetId): Promise<boolean> {
-        return await query<{ id: string }[]>`
-            SELECT id
-            FROM datasets
-            WHERE userId = ${auth.id}
-                AND presetId = ${presetId}
-        `.then(rows => rows.length > 0);
-    }
-
     export async function allMetaData(auth: Auth): Promise<Result<DatasetMetadata[]>> {
         const metadatas = [] as DatasetMetadata[];
 
@@ -288,7 +279,7 @@ namespace DatasetServer {
                         return Result.err('Invalid row JSON');
                     }
                     elements = parsedRowData;
-                } catch (e) {
+                } catch (_) {
                     return Result.err('Invalid row JSON');
                 }
                 return Result.ok({
@@ -428,6 +419,7 @@ namespace DatasetServer {
             //       if external, cannot add columns
             columns = preset.columns;
         } else {
+            // TODO: order columns the same way as row elements are ordered
             columns = allColumnsRes.val.filter(c => c.datasetId === datasetId);
         }
 

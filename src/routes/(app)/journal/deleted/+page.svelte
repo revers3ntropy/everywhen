@@ -22,10 +22,3 @@
         </div>
     </div>
 </main>
-
-<style lang="scss">
-    h2 {
-        width: 100%;
-        text-align: center;
-    }
-</style>

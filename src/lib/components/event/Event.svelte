@@ -181,7 +181,7 @@
         event.deleted = true;
     });
 
-    $: [selectIfSelected(selectNameId, event.id), obfuscated, nameInput];
+    $: if ([obfuscated, nameInput]) selectIfSelected(selectNameId, event.id);
 </script>
 
 {#if event.deleted}

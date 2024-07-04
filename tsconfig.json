@@ -24,6 +24,7 @@
         "strictPropertyInitialization": true,
         "alwaysStrict": true,
         "importHelpers": true,
-        "allowUmdGlobalAccess": true
+        "allowUmdGlobalAccess": true,
+        "moduleResolution": "bundler"
     }
 }

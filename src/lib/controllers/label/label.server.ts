@@ -217,7 +217,9 @@ namespace LabelServer {
         return Result.ok(label);
     }
 
-    export async function allWithCounts(auth: Auth): Promise<Result<LabelWithCount[]>> {
+    export async function allWithCounts(
+        auth: Auth
+    ): Promise<Result<Record<string, LabelWithCount>>> {
         const allEntryLabelIds = (
             await query<{ labelId: string }[]>`
                 SELECT labelId
@@ -240,19 +242,29 @@ namespace LabelServer {
             `
         ).map(({ labelId }) => labelId);
 
-        return (await all(auth)).map(labels => {
-            return labels.map(label => {
-                // TODO: this is O(n^2) and should be optimized
-                const entryCount = allEntryLabelIds.filter(l => l === label.id).length;
-                const eventCount = allEventLabelIds.filter(l => l === label.id).length;
-                const editCount = allEditLabelIds.filter(l => l === label.id).length;
-                return {
-                    ...label,
-                    entryCount: entryCount + editCount,
-                    eventCount
-                };
-            });
-        });
+        return (await all(auth))
+            .map(labels =>
+                labels.map(label => {
+                    // TODO: this is O(n^2) and should be optimized
+                    const entryCount = allEntryLabelIds.filter(l => l === label.id).length;
+                    const eventCount = allEventLabelIds.filter(l => l === label.id).length;
+                    const editCount = allEditLabelIds.filter(l => l === label.id).length;
+                    return {
+                        ...label,
+                        entryCount: entryCount + editCount,
+                        eventCount
+                    };
+                })
+            )
+            .map(labels =>
+                labels.reduce(
+                    (prev, label) => {
+                        prev[label.id] = label;
+                        return prev;
+                    },
+                    {} as Record<string, LabelWithCount>
+                )
+            );
     }
 
     export async function updateEncryptedFields(

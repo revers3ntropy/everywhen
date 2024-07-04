@@ -99,7 +99,7 @@ export namespace Result {
         if (typeof json !== 'string') return Result.err('JSON is not a string');
         try {
             return Result.ok(JSON.parse(json) as T);
-        } catch (e: unknown) {
+        } catch (_) {
             return Result.err('failed to parse JSON');
         }
     }

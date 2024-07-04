@@ -2,7 +2,7 @@
 
 bun x svelte-kit sync
 
-bun x eslint --config .eslintrc.cjs './src/**/*.{js,ts,svelte}' || exit 1
+bun x eslint . './src/**/*.{js,ts,svelte}' || exit 1
 
 bun x svelte-check \
   --tsconfig ./tsconfig.json \

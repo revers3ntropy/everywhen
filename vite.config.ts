@@ -1,19 +1,18 @@
+import * as fs from 'fs';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vitest/config';
-import * as fs from 'fs';
 
-interface PackageJson {
+const PACKAGE_JSON = JSON.parse(fs.readFileSync('./package.json', 'utf8')) as {
     version: string;
-}
-
-const packageJson = JSON.parse(fs.readFileSync('./package.json', 'utf8')) as PackageJson;
-
-const __VERSION__ = JSON.stringify(packageJson.version);
+};
 
 export default defineConfig({
+    // TODO why does it complain about this type?
     plugins: [sveltekit() as unknown as null],
     define: {
-        __VERSION__
+        // doesn't like '"'s for some reason so use "'"s instead of JSON.stringify,
+        // which is suggested here https://vitejs.dev/config/shared-options.html#define
+        __VERSION__: `'${PACKAGE_JSON.version}'`
     },
     css: {
         preprocessorOptions: {

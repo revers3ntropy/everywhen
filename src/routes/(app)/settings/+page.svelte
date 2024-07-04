@@ -14,11 +14,8 @@
         Settings as SettingsController
     } from '$lib/controllers/settings/settings';
     import Settings from './Settings.svelte';
-    import type { PageData } from './$types';
     import { settingsStore } from '$lib/stores';
     import { Auth } from '$lib/controllers/auth/auth';
-
-    export let data: PageData;
 
     function changePassword() {
         showPopup(ChangePasswordDialog, {});

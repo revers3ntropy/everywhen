@@ -11,7 +11,6 @@
     import { settingsStore } from '$lib/stores';
     import type { OptionalCoords } from '../../../types';
 
-    export let id: string;
     export let key: string;
     export let defaultValue: SettingValue;
     export let name: string;
@@ -20,7 +19,6 @@
     export let unit = '';
     export let value: SettingValue;
     export let created = null as number | null;
-    export let showInSettings = true as boolean;
 
     let saving = false;
 

@@ -42,7 +42,7 @@ export interface DatasetRow<E extends unknown[] = unknown[]> {
     elements: E;
 }
 
-export interface DatasetDataFilter {}
+export type DatasetDataFilter = object;
 
 export namespace Dataset {
     export const datasetPresets = _datasetPresets;

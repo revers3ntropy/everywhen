@@ -12,10 +12,13 @@
     export let end: number;
     export let getY: (centerLineY: number) => number;
     export let height: number;
-    export let updateEvent: (changes: {
-        start?: TimestampSecs;
-        end?: TimestampSecs;
-    }) => Promise<void>;
+    export let updateEvent: (
+        id: string,
+        changes: {
+            start?: TimestampSecs;
+            end?: TimestampSecs;
+        }
+    ) => Promise<void>;
 
     function shouldShow(start: number, end: number, zoom: number) {
         return EventController.duration({ start, end }) * zoom > WIDTH * 2;
@@ -30,7 +33,7 @@
         whenDragReleased(state: RenderProps) {
             this.dragging = false;
             const newEnd = Math.floor(state.mouseTime);
-            void updateEvent({ end: newEnd });
+            void updateEvent(id, { end: newEnd });
         },
 
         setup(state) {

@@ -11,34 +11,35 @@
 
     let { labels } = data;
 
+    $: labelsList = Object.values(labels);
+
     async function newLabel() {
         let name = 'New Label';
         let i = 0;
-        while (labels.some(l => l.name === name)) {
+        while (labelsList.some(l => l.name === name)) {
             name = `New Label ${++i}`;
         }
 
-        const newLabel = {
+        const newLabelData = {
             name,
             color: '#000'
         };
 
-        const { id } = notify.onErr(await api.post('/labels', newLabel));
+        const { id } = notify.onErr(await api.post('/labels', newLabelData));
 
-        labels = [
-            ...labels,
-            {
-                ...newLabel,
-                id,
-                created: nowUtc(),
-                entryCount: 0,
-                eventCount: 0
-            }
-        ];
+        const newLabel = {
+            ...newLabelData,
+            id,
+            created: nowUtc(),
+            entryCount: 0,
+            eventCount: 0
+        };
+        labelsList = [...labelsList, newLabel];
+        labels[id] = newLabel;
     }
 
     listen.label.onDelete(id => {
-        labels = labels.filter(l => l.id !== id);
+        delete labels[id];
     });
 </script>
 
@@ -53,8 +54,8 @@
     </button>
     <div class="labels">
         <div class="label-list">
-            {#each labels as label}
-                <LabelOptions {...label} />
+            {#each labelsList as label}
+                <LabelOptions {...label} {labels} />
             {/each}
         </div>
     </div>

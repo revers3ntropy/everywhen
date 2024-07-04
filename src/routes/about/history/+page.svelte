@@ -1,4 +1,4 @@
-<script lang="ts">
+<script>
     const version = __VERSION__;
 </script>
 

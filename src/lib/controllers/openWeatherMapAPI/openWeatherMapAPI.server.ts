@@ -133,7 +133,7 @@ export namespace OpenWeatherMapAPIServer {
             let textRes = 'could not parse response';
             try {
                 textRes = await res.text();
-            } catch (error) {
+            } catch (_) {
                 // ignore
             }
             await logger.error('getWeatherForDay: Invalid response from OpenWeatherMap', {

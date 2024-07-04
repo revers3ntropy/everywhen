@@ -31,7 +31,7 @@ export async function bodyFromReq<T extends Record<string, ZodType>>(
     let body: unknown;
     try {
         body = JSON.parse(bodyText);
-    } catch (e) {
+    } catch (_e) {
         if (!key) return Result.err('Invalid request body');
 
         const decryptedRes = decrypt(bodyText, key);
@@ -39,7 +39,7 @@ export async function bodyFromReq<T extends Record<string, ZodType>>(
 
         try {
             body = JSON.parse(decryptedRes.val);
-        } catch (e) {
+        } catch (_) {
             return Result.err('Invalid request body');
         }
     }

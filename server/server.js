@@ -33,7 +33,7 @@ const app = express();
 app.use(compression());
 
 // add a route that lives separately from the SvelteKit app
-app.get('/healthcheck', (req, res) => {
+app.get('/healthcheck', (_req, res) => {
     res.end('ok');
 });
 

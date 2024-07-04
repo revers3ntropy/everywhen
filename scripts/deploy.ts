@@ -104,7 +104,7 @@ class Version {
     public static tryFromString(version: string): Version | null {
         try {
             return Version.fromString(version);
-        } catch (_e) {
+        } catch (_) {
             return null;
         }
     }
@@ -311,7 +311,7 @@ async function getRemoteVersion(): Promise<Version | null> {
     let apiVersion: { v: string };
     try {
         apiVersion = (await rawVersion.json()) as { v: string };
-    } catch (e) {
+    } catch (_) {
         return null;
     }
     if (typeof apiVersion !== 'object' || apiVersion === null) {

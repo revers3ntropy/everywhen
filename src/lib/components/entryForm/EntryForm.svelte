@@ -321,8 +321,8 @@
         saveToLS();
     }
 
-    $: if (browser) {
-        newEntryBody;
+    // weird hack so that it is reactive to 'newEntryBody'
+    $: if (browser && (newEntryBody || ' ')) {
         setTimeout(resizeTextAreaToFitContent, 0);
     }
 </script>
@@ -392,9 +392,3 @@
         </div>
     </div>
 </div>
-
-<style lang="scss">
-    .blur {
-        filter: blur(4px);
-    }
-</style>

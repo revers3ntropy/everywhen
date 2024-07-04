@@ -1,13 +1,11 @@
 import type { EntryAsLocation } from '$lib/controllers/entry/entry';
 import Feature from 'ol/Feature';
-import { Circle, type Geometry, Polygon, Point } from 'ol/geom';
+import { Circle, Polygon, Point } from 'ol/geom';
 import { fromLonLat, toLonLat } from 'ol/proj';
 import { Style } from 'ol/style';
 import { Location } from '$lib/controllers/location/location';
-import LayerVector from 'ol/layer/Vector';
-import SourceVector from 'ol/source/Vector';
-import type VectorLayer from 'ol/layer/Vector';
-import type VectorSource from 'ol/source/Vector';
+import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
 import { Modify } from 'ol/interaction';
 import { Collection } from 'ol';
 import { clientLogger } from '$lib/utils/log';
@@ -45,15 +43,13 @@ export function olLayerFromLocations(
         radius: Meters
     ) => void
 ): {
-    layer: VectorLayer<VectorSource<Feature<Geometry>>>;
+    layer: VectorLayer<LocationFeature>;
     interactions: Modify[];
 } {
-    const locationFeatures = locations.map(l => {
-        return olFeatureFromLocation(l, view);
-    });
+    const locationFeatures = locations.map(l => olFeatureFromLocation(l, view));
 
-    const layer = new LayerVector({
-        source: new SourceVector({
+    const layer = new VectorLayer({
+        source: new VectorSource({
             features: locationFeatures
         })
     });
@@ -114,19 +110,19 @@ export function olLayerFromLocations(
 
 export function olFeatureFromLocation(location: Location, view: View): LocationFeature {
     const mPerUnit = view.getProjection().getMetersPerUnit();
-    if (!mPerUnit) {
-        throw new Error('mPerUnit is null');
-    }
-    const resolution = view.getResolution();
-    if (!resolution) {
-        throw new Error('resolution is null');
-    }
-    const geometry = new Circle(
-        fromLonLat([location.longitude, location.latitude]),
-        Location.degreesToMeters(location.radius) / mPerUnit
-    );
+    if (!mPerUnit) throw new Error('mPerUnit is null');
 
-    const feature = new Feature({ geometry }) as LocationFeature;
+    const resolution = view.getResolution();
+    if (!resolution) throw new Error('resolution is null');
+
+    const feature = new Feature({
+        geometry: new Circle(
+            fromLonLat([location.longitude, location.latitude]),
+            Location.degreesToMeters(location.radius) / mPerUnit
+        )
+    }) as LocationFeature;
+
+    feature.location = location;
 
     feature.setStyle(
         new Style({
@@ -192,16 +188,12 @@ export function olFeatureFromLocation(location: Location, view: View): LocationF
         })
     );
 
-    feature.location = location;
-
     return feature;
 }
 
-export function olLayerFromEntries(
-    entries: EntryAsLocation[]
-): VectorLayer<VectorSource<Feature<Geometry>>> {
-    return new LayerVector({
-        source: new SourceVector({
+export function olLayerFromEntries(entries: EntryAsLocation[]): VectorLayer<EntryFeature> {
+    return new VectorLayer({
+        source: new VectorSource({
             features: entries.map(olFeatureFromEntry).filter(Boolean)
         })
     });
@@ -224,7 +216,7 @@ export function olFeatureFromEntry(entry: EntryAsLocation): EntryFeature | null 
 export function olEntryBezierArrows(
     entries: EntryAsLocation[],
     view: View
-): VectorLayer<VectorSource<Feature<Geometry>>> {
+): VectorLayer<Feature<Polygon>> {
     const mPerUnit = view.getProjection().getMetersPerUnit();
     if (!mPerUnit) {
         throw new Error('mPerUnit is null');
@@ -326,8 +318,8 @@ export function olEntryBezierArrows(
         })
     );
 
-    return new LayerVector({
-        source: new SourceVector({
+    return new VectorLayer({
+        source: new VectorSource({
             features: [feature]
         })
     });

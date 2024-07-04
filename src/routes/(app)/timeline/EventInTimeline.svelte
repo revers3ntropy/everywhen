@@ -31,10 +31,13 @@
         return centerLineY - (y + EVENT_BASE_Y) * (HEIGHT + Y_MARGIN);
     }
 
-    async function updateEvent(changes: {
-        start?: TimestampSecs;
-        end?: TimestampSecs;
-    }): Promise<void> {
+    async function updateEvent(
+        id: string,
+        changes: {
+            start?: TimestampSecs;
+            end?: TimestampSecs;
+        }
+    ): Promise<void> {
         notify.onErr(await api.put(apiPath('/events/?', id), changes));
         const event: EventController = {
             id,
@@ -118,7 +121,7 @@
                 return;
             }
 
-            void updateEvent({
+            void updateEvent(id, {
                 start: dragStart,
                 end: dragEnd
             });

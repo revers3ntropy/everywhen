@@ -46,7 +46,7 @@ export namespace ghAPI {
         let accessTokenData: unknown;
         try {
             accessTokenData = await accessTokenRes.json();
-        } catch (error) {
+        } catch (_) {
             await logger.error('Invalid response from gitHub /login/oauth/access_token', {
                 accessTokenRes,
                 accessTokenData,

@@ -1,5 +1,6 @@
 <script lang="ts">
     import LabelDot from '$lib/components/label/LabelDot.svelte';
+    import type { Label } from '$lib/controllers/label/label';
     import { dispatch } from '$lib/dataChangeEvents';
     import Delete from 'svelte-material-icons/DeleteOutline.svelte';
     import { api, apiPath } from '$lib/utils/apiRequest';
@@ -11,6 +12,7 @@
     export let color: string;
     export let name: string;
     export let created: number;
+    export let labels: Record<string, Label>;
 
     export let editable = true;
     export let entryCount: number;
@@ -41,7 +43,8 @@
         showPopup(DeleteLabelDialog, {
             id,
             color,
-            name
+            name,
+            labels
         });
     }
 </script>

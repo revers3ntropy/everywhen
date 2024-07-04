@@ -26,7 +26,7 @@ declare global {
         // interface Platform {}
     }
 
-    // loaded in with Vite on build from package.json
+    // loaded in with Vite on build, got from package.json
     declare const __VERSION__: string;
 
     // Polyfill for filedrop-svelte package

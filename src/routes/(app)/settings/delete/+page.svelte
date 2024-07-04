@@ -3,11 +3,8 @@
     import Skull from 'svelte-material-icons/Skull.svelte';
     import { api } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
-    import type { PageData } from './$types';
     import { encryptionKey, username } from '$lib/stores';
     import { Auth } from '$lib/controllers/auth/auth';
-
-    export let data: PageData;
 
     async function deleteAccount() {
         badUsername = usernameInput.value !== $username;

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { ANIMATION_DURATION } from '$lib/constants';
     import { dispatch } from '$lib/dataChangeEvents';
     import { onMount } from 'svelte';
     import BookSpinner from '$lib/components/ui/BookSpinner.svelte';
@@ -7,15 +8,16 @@
     import { popup } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
+    import { slide } from 'svelte/transition';
 
     export let id: string;
     export let color: string;
     export let name: string;
     export let reloadOnDelete = true;
+    export let labels: Record<string, Label>;
 
     let entryCount = 0;
     let eventCount = 0;
-    let labels: Record<string, Label>;
 
     let loaded = false;
     let changeLabelId: string;
@@ -73,7 +75,10 @@
 </script>
 
 <div>
-    <h1 class="mb-4">Delete Label '{name}'</h1>
+    <div class="pb-4 flex items-center gap-2">
+        <span class="rounded-full aspect-square w-5 h-5 flex" style="background-color: {color}" />
+        <p class="text-xl"> Delete Label '{name}' </p>
+    </div>
     <p>
         There are {entryCount} entries and {eventCount} events with this label.
     </p>
@@ -81,7 +86,7 @@
     {#if !loaded}
         <BookSpinner />
     {:else}
-        <div class="options">
+        <div class="options" in:slide={{ duration: ANIMATION_DURATION }}>
             <div>
                 <LabelSelect bind:value={changeLabelId} {filter} {labels} />
                 <button on:click={reassign}>

@@ -55,7 +55,7 @@ export function userAgentFromEntry(entry: { agentData: string | null }): string 
     let parsed;
     try {
         parsed = JSON.parse(entry.agentData);
-    } catch (e) {
+    } catch (_) {
         // empty
     }
 
