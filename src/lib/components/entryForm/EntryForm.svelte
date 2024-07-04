@@ -321,8 +321,7 @@
         saveToLS();
     }
 
-    // weird hack so that it is reactive to 'newEntryBody'
-    $: if (browser && (newEntryBody || ' ')) {
+    $: if (browser && [newEntryBody]) {
         setTimeout(resizeTextAreaToFitContent, 0);
     }
 </script>
