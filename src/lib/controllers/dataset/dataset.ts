@@ -31,6 +31,8 @@ export interface DatasetColumn<T> {
     datasetId: string;
     created: TimestampSecs | null;
     name: string;
+    ordering: number;
+    jsonOrdering: number;
     type: DatasetColumnType<T>;
 }
 

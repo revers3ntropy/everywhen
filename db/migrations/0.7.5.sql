@@ -1,0 +1,1 @@
+ALTER TABLE datasetColumns ADD COLUMN `jsonOrdering` INT NOT NULL AFTER `ordering`;

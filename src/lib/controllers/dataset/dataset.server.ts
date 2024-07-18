@@ -44,6 +44,8 @@ namespace DatasetServer {
                 name: string;
                 datasetId: string;
                 created: TimestampSecs;
+                ordering: number;
+                jsonOrdering: number;
                 typeId: string;
             }[]
         >`
@@ -51,6 +53,8 @@ namespace DatasetServer {
                    datasetColumns.datasetId,
                    datasetColumns.name,
                    datasetColumns.created,
+                   datasetColumns.ordering,
+                   datasetColumns.jsonOrdering,
                    datasetColumns.typeId
             FROM   datasetColumns, datasets
             WHERE  datasets.userId = ${auth.id}
@@ -71,6 +75,8 @@ namespace DatasetServer {
                     datasetId: column.datasetId,
                     created: column.created,
                     name: decryptedName.val,
+                    ordering: column.ordering,
+                    jsonOrdering: column.ordering,
                     type
                 });
             })
@@ -611,14 +617,23 @@ namespace DatasetServer {
         if (!dataset.ok) return dataset.cast();
         if (dataset.val.preset) return Result.err('Cannot add columns to preset datasets');
 
+        const [{ ordering }] = await query<{ ordering: number }[]>`
+            SELECT IFNULL(MAX(ordering) + 1, 0) as ordering
+            FROM datasetColumns
+            WHERE datasetId = ${datasetId}
+        `;
+        const [{ jsonOrdering }] = await query<{ jsonOrdering: number }[]>`
+            SELECT IFNULL(MAX(jsonOrdering) + 1, 0) as jsonOrdering
+            FROM datasetColumns
+            WHERE datasetId = ${datasetId}
+        `;
+
         await query`
             INSERT INTO datasetColumns (
-                id, userId, datasetId, ordering, name, typeId, created
+                id, userId, datasetId, ordering, jsonOrdering, name, typeId, created
             )
             VALUES (
-                ${id}, ${auth.id}, ${datasetId}, 
-                (SELECT IFNULL(MAX(ordering) + 1, 0) WHERE datasetId = ${datasetId}),
-                ${encryptedName}, ${type.id}, ${created}
+                ${id}, ${auth.id}, ${datasetId}, ${ordering}, ${jsonOrdering}, ${encryptedName}, ${type.id}, ${created}
             )
         `;
 
@@ -653,6 +668,8 @@ namespace DatasetServer {
             id,
             datasetId,
             created,
+            ordering,
+            jsonOrdering,
             name,
             type
         });

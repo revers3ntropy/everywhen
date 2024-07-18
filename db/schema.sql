@@ -194,13 +194,14 @@ CREATE TABLE datasets
 
 CREATE TABLE datasetColumns
 (
-    id        char(32)     NOT NULL,
-    userId    char(32)     NOT NULL,
-    datasetId char(32)     NOT NULL,
-    ordering  int          NOT NULL,
-    created   int          NOT NULL,
-    name      varchar(256) NOT NULL,
-    typeId    char(32)     NOT NULL,
+    id           char(32)     NOT NULL,
+    userId       char(32)     NOT NULL,
+    datasetId    char(32)     NOT NULL,
+    ordering     int          NOT NULL,
+    jsonOrdering int          NOT NULL,
+    created      int          NOT NULL,
+    name         varchar(256) NOT NULL,
+    typeId       char(32)     NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `idx_datasetColumns_userId`    (`userId`),
     INDEX `idx_datasetColumns_datasetId` (`userId`, `datasetId`)

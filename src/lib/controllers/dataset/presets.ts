@@ -16,6 +16,8 @@ export const datasetPresets = {
                 id: '0',
                 name: 'Weight',
                 created: null,
+                ordering: 0,
+                jsonOrdering: 0,
                 type: builtInTypes.number,
                 datasetId: ''
             }
@@ -29,6 +31,8 @@ export const datasetPresets = {
                 id: '0',
                 name: 'Happiness',
                 created: null,
+                ordering: 0,
+                jsonOrdering: 0,
                 type: builtInTypes.number,
                 datasetId: ''
             }
@@ -42,6 +46,8 @@ export const datasetPresets = {
                 id: '0',
                 name: 'Duration',
                 created: null,
+                ordering: 0,
+                jsonOrdering: 0,
                 type: builtInTypes.number,
                 datasetId: ''
             },
@@ -49,6 +55,8 @@ export const datasetPresets = {
                 id: '1',
                 name: 'Sleep Quality',
                 created: null,
+                ordering: 1,
+                jsonOrdering: 1,
                 type: builtInTypes.nullableNumber,
                 datasetId: ''
             },
@@ -56,6 +64,8 @@ export const datasetPresets = {
                 id: '2',
                 name: 'Regularity',
                 created: null,
+                ordering: 2,
+                jsonOrdering: 2,
                 type: builtInTypes.nullableNumber,
                 datasetId: ''
             }
@@ -74,6 +84,8 @@ export const datasetPresets = {
                 id: '0',
                 name: 'Temperature',
                 created: null,
+                ordering: 0,
+                jsonOrdering: 0,
                 type: builtInTypes.number,
                 datasetId: ''
             },
@@ -81,6 +93,8 @@ export const datasetPresets = {
                 id: '1',
                 name: 'Humidity',
                 created: null,
+                ordering: 1,
+                jsonOrdering: 1,
                 type: builtInTypes.number,
                 datasetId: ''
             },
@@ -88,6 +102,8 @@ export const datasetPresets = {
                 id: '2',
                 name: 'Precipitation',
                 created: null,
+                ordering: 2,
+                jsonOrdering: 2,
                 type: builtInTypes.number,
                 datasetId: ''
             },
@@ -95,6 +111,8 @@ export const datasetPresets = {
                 id: '3',
                 name: 'Cloud Cover',
                 created: null,
+                ordering: 3,
+                jsonOrdering: 3,
                 type: builtInTypes.number,
                 datasetId: ''
             },
@@ -102,6 +120,8 @@ export const datasetPresets = {
                 id: '4',
                 name: 'Wind Speed (Max)',
                 created: null,
+                ordering: 4,
+                jsonOrdering: 4,
                 type: builtInTypes.number,
                 datasetId: ''
             }
