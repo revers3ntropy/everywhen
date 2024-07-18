@@ -3,7 +3,9 @@
     import { notify } from '$lib/components/notifications/notifications';
     import Select from '$lib/components/Select.svelte';
     import { builtInTypes } from '$lib/controllers/dataset/columnTypes';
+    import { type DatasetRow, Dataset } from '$lib/controllers/dataset/dataset';
     import { api, apiPath } from '$lib/utils/apiRequest';
+    import { currentTzOffset, nowUtc } from '$lib/utils/time';
     import DeleteOutline from 'svelte-material-icons/DeleteOutline.svelte';
     import TuneVariant from 'svelte-material-icons/TuneVariant.svelte';
     import type { PageData } from './$types';
@@ -34,6 +36,23 @@
         data.dataset.columns.push(newColumn);
     }
 
+    async function addRow() {
+        const row = {
+            elements: Dataset.sortColumnsForJson(data.dataset.columns).map(
+                c => c.type.defaultValue
+            ),
+            created: nowUtc(),
+            timestamp: nowUtc(),
+            timestampTzOffset: currentTzOffset()
+        };
+        notify.onErr(
+            await api.post(apiPath(`/datasets/?`, data.dataset.id), {
+                rows: [row]
+            })
+        );
+        data.dataset.rowCount++;
+    }
+
     async function updateColumnType(columnId: string, type: string) {
         const column = data.dataset.columns.find(c => c.id === columnId);
         if (!column) return;
@@ -49,9 +68,8 @@
         await api.put(apiPath(`/datasets/?/columns/?`, data.dataset.id, columnId), { name });
     }
 
-    function castStr(a: unknown) {
-        return a as string;
-    }
+    // helper to get around no TS in Svelte code
+    const castStr = (a: unknown) => a as string;
 
     const columnTypesMap = Object.fromEntries(
         Object.keys(builtInTypes).map(key => [
@@ -59,8 +77,6 @@
             builtInTypes[key as keyof typeof builtInTypes].name
         ])
     );
-
-    console.log({ columnTypesMap });
 </script>
 
 <svelte:head>
@@ -95,9 +111,9 @@
         {/if}
     </section>
 
-    <section class="pt-8">
-        <div class="flex">
-            <table class="border-borderColor border border-r-0">
+    <section class="pt-8 w-fit">
+        <div class="flex w-full">
+            <table class="border-borderColor border border-r-0 w-full">
                 <tr>
                     <th class="p-2 border-r border-borderColor"> Timestamp </th>
                     {#each data.dataset?.columns as column}
@@ -131,12 +147,18 @@
 
             {#if !data.dataset.preset}
                 <button
-                    class="border border-solid border-borderColor border-l-0 p-2 bg-vLightAccent hover:bg-lightAccent"
+                    class="border border-solid border-borderColor border-l-0 p-2 bg-vLightAccent hover:bg-lightAccent text-light hover:text-textColor"
                     on:click={addColumn}
                 >
                     +
                 </button>
             {/if}
         </div>
+        <button
+            class="border border-solid border-borderColor border-t-0 p-2 bg-vLightAccent hover:bg-lightAccent w-full text-light hover:text-textColor"
+            on:click={addRow}
+        >
+            + Add Row
+        </button>
     </section>
 </main>

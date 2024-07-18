@@ -49,6 +49,12 @@ export type DatasetDataFilter = object;
 export namespace Dataset {
     export const datasetPresets = _datasetPresets;
     export const builtInTypes = _builtInTypes;
+
+    export function sortColumnsForJson(
+        columns: DatasetColumn<unknown>[]
+    ): DatasetColumn<unknown>[] {
+        return [...columns].sort((a, b) => a.jsonOrdering - b.jsonOrdering);
+    }
 }
 
 export type DatasetPresetName = keyof typeof Dataset.datasetPresets;
