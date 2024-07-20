@@ -3,7 +3,7 @@
     import { notify } from '$lib/components/notifications/notifications';
     import Select from '$lib/components/Select.svelte';
     import { builtInTypes } from '$lib/controllers/dataset/columnTypes';
-    import { type DatasetRow, Dataset } from '$lib/controllers/dataset/dataset';
+    import { Dataset } from '$lib/controllers/dataset/dataset';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { currentTzOffset, nowUtc } from '$lib/utils/time';
     import DeleteOutline from 'svelte-material-icons/DeleteOutline.svelte';
