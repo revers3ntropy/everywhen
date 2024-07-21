@@ -7,7 +7,12 @@ export const builtInTypes = {
         name: 'Number',
         unit: '',
         defaultValue: 0,
-        validate: (value: unknown): value is number => typeof value === 'number'
+        validate: (value: unknown): value is number => typeof value === 'number',
+        castTo: (value: unknown) => {
+            const v = Number(value);
+            if (!isNaN(v)) return v;
+            return 0;
+        }
     },
     nullableNumber: {
         id: 'nullableNumber',
@@ -16,7 +21,12 @@ export const builtInTypes = {
         unit: '',
         defaultValue: null,
         validate: (value: unknown): value is number | null =>
-            typeof value === 'number' || value === null
+            typeof value === 'number' || value === null,
+        castTo: (value: unknown) => {
+            const v = Number(value);
+            if (!isNaN(v)) return v;
+            return null;
+        }
     },
     text: {
         id: 'text',
@@ -24,7 +34,8 @@ export const builtInTypes = {
         name: 'Text',
         unit: '',
         defaultValue: '',
-        validate: (value: unknown): value is string => typeof value === 'string'
+        validate: (value: unknown): value is string => typeof value === 'string',
+        castTo: (value: unknown) => String(value)
     },
     boolean: {
         id: 'boolean',
@@ -32,6 +43,7 @@ export const builtInTypes = {
         name: 'Boolean',
         unit: '',
         defaultValue: false,
-        validate: (value: unknown): value is boolean => typeof value === 'boolean'
+        validate: (value: unknown): value is boolean => typeof value === 'boolean',
+        castTo: (value: unknown) => Boolean(value)
     }
 } satisfies Record<string, DatasetColumnType<unknown>>;

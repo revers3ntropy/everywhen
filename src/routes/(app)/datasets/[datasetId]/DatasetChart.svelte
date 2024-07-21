@@ -1,9 +1,7 @@
 <script lang="ts">
-    import { notify } from '$lib/components/notifications/notifications';
     import Select from '$lib/components/Select.svelte';
     import { builtInTypes } from '$lib/controllers/dataset/columnTypes';
     import type { DatasetMetadata, DatasetRow } from '$lib/controllers/dataset/dataset';
-    import { api, apiPath } from '$lib/utils/apiRequest';
     import { cssVarValue } from '$lib/utils/getCssVar';
     import {
         Chart,
@@ -16,7 +14,6 @@
         PointElement,
         LineElement
     } from 'chart.js';
-    import { onMount } from 'svelte';
 
     import { Line, Scatter } from 'svelte-chartjs';
     import {
@@ -32,6 +29,7 @@
     } from './generateChartData';
 
     export let dataset: DatasetMetadata;
+    export let rows: DatasetRow[] | null;
 
     Chart.register(
         Title,
@@ -62,15 +60,10 @@
         }
     });
 
-    async function retrieveData() {
-        const { rows } = notify.onErr(await api.get(apiPath('/datasets/?', dataset.id)));
-        datasetRows = rows;
-    }
+    function calculateDaysDatasetCovers(rows: DatasetRow[] | null): number {
+        if (!rows || !rows.length) return 0;
 
-    function calculateDaysDatasetCovers(rows: DatasetRow[]): number {
-        if (!rows.length) return 0;
-
-        const [min, max] = datasetRows.reduce(
+        const [min, max] = rows.reduce(
             (acc, row) => {
                 const rowTime = row.timestamp + row.timestampTzOffset * 60 * 60;
                 if (acc[0] > rowTime) acc[0] = rowTime;
@@ -83,12 +76,7 @@
         return (max - min) / (60 * 60 * 24);
     }
 
-    onMount(async () => {
-        await retrieveData();
-    });
-
-    let datasetRows: DatasetRow[] = [];
-    $: days = calculateDaysDatasetCovers(datasetRows);
+    $: days = calculateDaysDatasetCovers(rows);
     $: selectedBucket = initialBucket(days);
     let yAxisSelectedColumnIdx = 0;
     let xAxis: XAxisKey = timeIdxKey;
@@ -101,7 +89,7 @@
     );
 
     $: [graphType, graphData] = generateChartData(
-        datasetRows as DatasetRow<(number | null)[]>[],
+        (rows ?? []) as DatasetRow<(number | null)[]>[],
         selectedBucket,
         yAxisSelectedColumnIdx,
         xAxis,
@@ -117,7 +105,7 @@
     };
 </script>
 
-<div class="">
+{#if rows && rows.length > 1}
     <div class="flex gap-4 py-4">
         <div class="rounded-full bg-vLightAccent py-2 px-4 flex-center gap-2">
             {#if numericColumns.length === 0}
@@ -158,4 +146,4 @@
             {/if}
         {/if}
     </div>
-</div>
+{/if}

@@ -24,6 +24,7 @@ export interface DatasetColumnType<T> {
     unit: string;
     defaultValue: T;
     validate: (value: T) => boolean;
+    castTo: <Q>(value: Q) => T;
 }
 
 export interface DatasetColumn<T> {
@@ -54,6 +55,28 @@ export namespace Dataset {
         columns: DatasetColumn<unknown>[]
     ): DatasetColumn<unknown>[] {
         return [...columns].sort((a, b) => a.jsonOrdering - b.jsonOrdering);
+    }
+
+    export function sortColumnsForDisplay(
+        columns: DatasetColumn<unknown>[]
+    ): DatasetColumn<unknown>[] {
+        return [...columns].sort((a, b) => a.ordering - b.ordering);
+    }
+
+    export function sortRowsElementsForDisplay(
+        columns: DatasetColumn<unknown>[],
+        rows: DatasetRow[]
+    ): DatasetRow[] {
+        return rows.map(row => ({
+            ...row,
+            elements: row.elements.sort((a, b) => {
+                const aJsonIndex = row.elements.indexOf(a);
+                const bJsonIndex = row.elements.indexOf(b);
+                const aColumn = columns.find(c => c.jsonOrdering === aJsonIndex);
+                const bColumn = columns.find(c => c.jsonOrdering === bJsonIndex);
+                return aColumn!.ordering - bColumn!.ordering;
+            })
+        }));
     }
 }
 

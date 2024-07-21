@@ -1,9 +1,10 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
     import { notify } from '$lib/components/notifications/notifications';
     import Select from '$lib/components/Select.svelte';
     import { builtInTypes } from '$lib/controllers/dataset/columnTypes';
-    import { Dataset } from '$lib/controllers/dataset/dataset';
+    import { Dataset, type DatasetRow } from '$lib/controllers/dataset/dataset';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { currentTzOffset, nowUtc } from '$lib/utils/time';
     import DeleteOutline from 'svelte-material-icons/DeleteOutline.svelte';
@@ -14,6 +15,7 @@
     export let data: PageData;
 
     let nameInp: HTMLInputElement;
+    let rows: DatasetRow[];
 
     async function updateName() {
         data.dataset.name = nameInp.value;
@@ -68,6 +70,18 @@
         await api.put(apiPath(`/datasets/?/columns/?`, data.dataset.id, columnId), { name });
     }
 
+    async function getDatasetRows() {
+        const { rows } = notify.onErr(await api.get(apiPath(`/datasets/?`, data.dataset.id)));
+        return Dataset.sortRowsElementsForDisplay(data.dataset.columns, rows);
+    }
+
+    onMount(async () => {
+        rows = await getDatasetRows();
+        console.log(rows);
+    });
+
+    console.log(data.dataset.columns);
+
     // helper to get around no TS in Svelte code
     const castStr = (a: unknown) => a as string;
 
@@ -107,58 +121,55 @@
 
     <section>
         {#if data.dataset && data.dataset.columns.length}
-            <DatasetChart dataset={data.dataset} />
+            <DatasetChart dataset={data.dataset} {rows} />
         {/if}
     </section>
 
-    <section class="pt-8 w-fit">
-        <div class="flex w-full">
-            <table class="border-borderColor border border-r-0 w-full">
-                <tr>
-                    <th class="p-2 border-r border-borderColor"> Timestamp </th>
-                    {#each data.dataset?.columns as column}
-                        <th class="p-2 border-r border-borderColor">
-                            <div class="pb-2">
-                                {#if data.dataset.preset}
-                                    {column.name}
-                                {:else}
-                                    <input
-                                        bind:value={column.name}
-                                        on:change={() => updateColumnName(column.id, column.name)}
-                                    />
-                                {/if}
-                            </div>
-                            <div class="bg-lightAccent rounded-full p-1">
-                                {#if data.dataset.preset}
-                                    {column.type.name}
-                                {:else}
-                                    <Select
-                                        onChange={newType =>
-                                            updateColumnType(column.id, castStr(newType))}
-                                        key={column.type.id}
-                                        options={columnTypesMap}
-                                    />
-                                {/if}
-                            </div>
-                        </th>
-                    {/each}
-                </tr>
-            </table>
-
-            {#if !data.dataset.preset}
-                <button
-                    class="border border-solid border-borderColor border-l-0 p-2 bg-vLightAccent hover:bg-lightAccent text-light hover:text-textColor"
-                    on:click={addColumn}
-                >
-                    +
-                </button>
+    <section class="pt-8">
+        <table class="border-borderColor border border-r-0">
+            <tr>
+                <th class="p-2 border-r border-borderColor"> Timestamp </th>
+                {#each Dataset.sortColumnsForDisplay(data.dataset.columns) as column}
+                    <th class="p-2 border-r border-borderColor min-w-[150px]">
+                        <div class="pb-2">
+                            {column.name}
+                        </div>
+                        <div class="bg-lightAccent rounded-full p-1">
+                            {column.type.name}
+                        </div>
+                    </th>
+                {/each}
+                <th>
+                    {#if !data.dataset.preset}
+                        <button
+                            class="border border-solid border-borderColor border-l-0 p-2 bg-vLightAccent hover:bg-lightAccent text-light hover:text-textColor"
+                            on:click={addColumn}
+                        >
+                            +
+                        </button>
+                    {/if}
+                </th>
+            </tr>
+            {#if rows}
+                {#each rows as row}
+                    <tr class="p-2 border-t border-borderColor">
+                        <td class="p-2 border-r border-borderColor">{row.timestamp}</td>
+                        {#each row.elements as element}
+                            <td class="p-2 border-r border-borderColor">{element}</td>
+                        {/each}
+                    </tr>
+                {/each}
             {/if}
-        </div>
-        <button
-            class="border border-solid border-borderColor border-t-0 p-2 bg-vLightAccent hover:bg-lightAccent w-full text-light hover:text-textColor"
-            on:click={addRow}
-        >
-            + Add Row
-        </button>
+            <tr class="p-2 border-t border-borderColor">
+                <td>
+                    <button
+                        class="p-2 bg-vLightAccent hover:bg-lightAccent text-light hover:text-textColor"
+                        on:click={addRow}
+                    >
+                        + Add Row
+                    </button>
+                </td>
+            </tr>
+        </table>
     </section>
 </main>

@@ -689,6 +689,8 @@ namespace DatasetServer {
         if (!cols.ok) return cols.cast();
         const col = cols.val.find(c => c.id === columnId);
         if (!col) return Result.err('Column not found');
+
+        // short circuit on same type
         if (col.type.id === type.id) return Result.ok(null);
 
         await query`
@@ -716,8 +718,8 @@ namespace DatasetServer {
                 return Result.err('Invalid row JSON');
             }
 
-            // TODO cast type of element at index *something*
             const updatedRowData = [...parsedRowData];
+            updatedRowData[col.jsonOrdering] = type.castTo(updatedRowData[col.jsonOrdering]);
 
             const updatedRowJson = encrypt(JSON.stringify(updatedRowData), auth.key);
 
