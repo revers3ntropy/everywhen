@@ -133,3 +133,10 @@ pre {
     white-space: nowrap;
     line-height: normal;
 }
+
+.form-label {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: var(--text-color-light);
+    text-transform: uppercase;
+}

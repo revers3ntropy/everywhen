@@ -1,20 +1,25 @@
 <script lang="ts">
+    import { notify } from '$lib/components/notifications/notifications';
     import Select from '$lib/components/Select.svelte';
     import { builtInTypes } from '$lib/controllers/dataset/columnTypes';
     import type { DatasetColumn, DatasetColumnType } from '$lib/controllers/dataset/dataset';
+    import { popup } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
 
     export let datasetId: string;
     export let column: DatasetColumn<unknown>;
 
-    async function updateColumnType(columnId: string, type: DatasetColumnType<unknown>) {
-        column.type = type;
-        await api.put(apiPath(`/datasets/?/columns/?`, datasetId, columnId), { type });
-    }
+    let newColumnName = column.name;
+    let newColumnType = column.type;
 
-    async function updateColumnName(columnId: string, name: string) {
-        column.name = name;
-        await api.put(apiPath(`/datasets/?/columns/?`, datasetId, columnId), { name });
+    async function save() {
+        notify.onErr(
+            await api.put(apiPath(`/datasets/?/columns/?`, datasetId, column.id), {
+                type: newColumnType.id,
+                name: newColumnName
+            })
+        );
+        $popup = null;
     }
 
     const columnTypesMap = Object.fromEntries(
@@ -24,14 +29,26 @@
         ])
     );
     const builtInTypesAsMap = builtInTypes as Record<string, DatasetColumnType<unknown>>;
+
+    $: areChanges = newColumnName !== column.name || newColumnType !== column.type;
 </script>
 
-<div>
-    <input bind:value={column.name} on:change={() => updateColumnName(column.id, column.name)} />
-
-    <Select
-        onChange={newType => updateColumnType(column.id, builtInTypesAsMap[newType])}
-        key={column.type.id}
-        options={columnTypesMap}
-    />
-</div>
+<form>
+    <div>
+        <p class="form-label">Name</p>
+        <input bind:value={newColumnName} />
+    </div>
+    <div class="spacer" />
+    <div>
+        <p class="form-label">Type</p>
+        <Select
+            onChange={newType => (newColumnType = builtInTypesAsMap[newType])}
+            key={newColumnType.id}
+            options={columnTypesMap}
+        />
+    </div>
+    <div class="spacer" />
+    <div>
+        <button class="button" disabled={!areChanges} on:click={save}>Save</button>
+    </div>
+</form>
