@@ -113,13 +113,13 @@
 </svg>
 
 <Dropdown>
-    <div
-        class="flex-center w-full px-2 md:pl-2.5 md:pr-4 py-2 hover:bg-lightAccent bg-lightAccent rounded-lg gap-2"
+    <span
+        class="flex-center w-full px-2 md:pl-2.5 md:pr-4 py-2 hover:bg-lightAccent bg-lightAccent rounded-full gap-2"
         slot="button"
     >
         <Plus size="25" />
         <span class="hide-mobile"> New <ChevronDown /> </span>
-    </div>
+    </span>
 
     <div class="record-something-buttons">
         <button class="with-icon oneline record-entry" on:click={makeEntry}>

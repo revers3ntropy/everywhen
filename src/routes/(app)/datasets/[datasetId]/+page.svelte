@@ -1,9 +1,8 @@
 <script lang="ts">
+    import { showPopup } from '$lib/utils/popups';
     import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
     import { notify } from '$lib/components/notifications/notifications';
-    import Select from '$lib/components/Select.svelte';
-    import { builtInTypes } from '$lib/controllers/dataset/columnTypes';
     import { Dataset, type DatasetRow } from '$lib/controllers/dataset/dataset';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { currentTzOffset, nowUtc } from '$lib/utils/time';
@@ -11,6 +10,8 @@
     import TuneVariant from 'svelte-material-icons/TuneVariant.svelte';
     import type { PageData } from './$types';
     import DatasetChart from './DatasetChart.svelte';
+    import Pencil from 'svelte-material-icons/Pencil.svelte';
+    import EditDatasetColumnDialog from './EditDatasetColumnDialog.svelte';
 
     export let data: PageData;
 
@@ -55,21 +56,6 @@
         data.dataset.rowCount++;
     }
 
-    async function updateColumnType(columnId: string, type: string) {
-        const column = data.dataset.columns.find(c => c.id === columnId);
-        if (!column) return;
-        column.type = builtInTypes[type as keyof typeof builtInTypes];
-        console.log({ columnId, type });
-        await api.put(apiPath(`/datasets/?/columns/?`, data.dataset.id, columnId), { type });
-    }
-
-    async function updateColumnName(columnId: string, name: string) {
-        const column = data.dataset.columns.find(c => c.id === columnId);
-        if (!column) return;
-        column.name = name;
-        await api.put(apiPath(`/datasets/?/columns/?`, data.dataset.id, columnId), { name });
-    }
-
     async function getDatasetRows() {
         const { rows } = notify.onErr(await api.get(apiPath(`/datasets/?`, data.dataset.id)));
         return Dataset.sortRowsElementsForDisplay(data.dataset.columns, rows);
@@ -77,27 +63,14 @@
 
     onMount(async () => {
         rows = await getDatasetRows();
-        console.log(rows);
     });
-
-    console.log(data.dataset.columns);
-
-    // helper to get around no TS in Svelte code
-    const castStr = (a: unknown) => a as string;
-
-    const columnTypesMap = Object.fromEntries(
-        Object.keys(builtInTypes).map(key => [
-            key,
-            builtInTypes[key as keyof typeof builtInTypes].name
-        ])
-    );
 </script>
 
 <svelte:head>
     <title>{data.dataset.name || 'Unknown'} | View Dataset</title>
 </svelte:head>
 
-<main class="md:p-4 md:ml-[10.5rem]">
+<main class="md:p-4 md:pl-4">
     <div class="pb-4 flex flex-row justify-between">
         <div class="text-lg">
             <input bind:this={nameInp} value={data.dataset.name} on:change={updateName} />
@@ -130,13 +103,22 @@
             <tr>
                 <th class="p-2 border-r border-borderColor"> Timestamp </th>
                 {#each Dataset.sortColumnsForDisplay(data.dataset.columns) as column}
-                    <th class="p-2 border-r border-borderColor min-w-[150px]">
-                        <div class="pb-2">
+                    <th
+                        class="border-r border-borderColor min-w-[150px] bg-vLightAccent hover:bg-lightAccent"
+                    >
+                        <button
+                            class="group p-2"
+                            on:click={() =>
+                                showPopup(EditDatasetColumnDialog, {
+                                    datasetId: data.dataset.id,
+                                    column
+                                })}
+                        >
                             {column.name}
-                        </div>
-                        <div class="bg-lightAccent rounded-full p-1">
-                            {column.type.name}
-                        </div>
+                            <span class="invisible group-hover:visible">
+                                <Pencil size={18} />
+                            </span>
+                        </button>
                     </th>
                 {/each}
                 <th>

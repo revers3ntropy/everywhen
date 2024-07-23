@@ -37,7 +37,7 @@
     <title>Journal</title>
 </svelte:head>
 
-<main class="md:ml-[9rem] flex flex-row">
+<main class="flex flex-row">
     <section>
         <EntriesSidebar
             obfuscated={$obfuscated}

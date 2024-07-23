@@ -24,14 +24,28 @@
 
 <!-- z is 6 so that on mobile the nav buttons are not cut off
      by entry group titles, and is above top navbar -->
-<nav class="md:fixed top-0 md:left-0 right-0 md:bottom-0 z-[6] md:h-full w-36 md:bg-vLightAccent">
+<nav class="md:bg-vLightAccent w-full h-full z-[6]">
     <div class="md:grid grid-cols-1 grid-rows-3 h-16 md:h-full w-full">
         <div class="pt-1 md:pt-2 flex md:block pr-4 pl-[50px] md:pl-0">
             <div class="md:pb-4 pl-1 w-full">
                 <AccountDropdown />
             </div>
-            <div class="md:pb-4 pl-2">
-                <CreateNewButton />
+            <div class="md:pb-4 pl-2 flex justify-between items-center">
+                <span>
+                    <CreateNewButton />
+                </span>
+
+                <button
+                    aria-label={$obfuscated ? 'Show all' : 'Hide all'}
+                    on:click={() => obfuscated.set(!$obfuscated)}
+                    class="inline-flex justify-center items-center gap-2 rounded-full p-2 bg-lightAccent hover:bg-vLightAccent"
+                >
+                    {#if $obfuscated}
+                        <Eye size="25" />
+                    {:else}
+                        <EyeOff size="25" />
+                    {/if}
+                </button>
             </div>
 
             <div class="pl-4 flex md:flex-col gap-3 items-center md:items-start justify-center">
@@ -41,19 +55,6 @@
                         <span class="hide-mobile"> Lock </span>
                     </button>
                 {/if}
-                <button
-                    aria-label={$obfuscated ? 'Show all' : 'Hide all'}
-                    on:click={() => obfuscated.set(!$obfuscated)}
-                    class="flex-center gap-2"
-                >
-                    {#if $obfuscated}
-                        <Eye size="25" />
-                        <span class="hide-mobile"> Show all </span>
-                    {:else}
-                        <EyeOff size="25" />
-                        <span class="hide-mobile"> Hide all </span>
-                    {/if}
-                </button>
             </div>
         </div>
 

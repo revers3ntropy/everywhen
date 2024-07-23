@@ -2,13 +2,17 @@
 @import 'layout';
 
 .popup-background.window {
-    padding: 0.3em 0;
-    border-radius: $border-radius;
+    margin-top: 1rem !important;
+    padding: 0.3rem 0 !important;
+    border-radius: 0.75rem !important;
     background: var(--v-light-accent) !important;
+    height: calc(100vh - 2rem) !important;
 
     @media #{$mobile} {
-        margin: 0.2em;
-        padding: 0.2rem;
+        margin: 0 !important;
+        padding: 0.2rem !important;
+        height: 100vh !important;
+        border-radius: 0 !important;
     }
 
     @media #{$not-mobile} {

@@ -9,7 +9,7 @@
     <title>Deleted Entries</title>
 </svelte:head>
 
-<main class="md:p-4 md:ml-[10.5rem]">
+<main class="md:p-4 md:pl-4">
     <div class="flex-center">
         <div style="width: min(100%, 732px)">
             <Entries

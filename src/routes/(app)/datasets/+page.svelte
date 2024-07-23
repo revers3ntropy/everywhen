@@ -11,7 +11,7 @@
     <title>Datasets</title>
 </svelte:head>
 
-<main class="mt-4 md:ml-[10.5rem]">
+<main class="pt-4 md:pl-4">
     <CreateDatasetButton {datasets} />
 
     <div class="py-4 flex gap-2">

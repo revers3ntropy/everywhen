@@ -144,7 +144,9 @@
     <span class="nav-loader" class:navigating class:finished-navigation={finishedNavigation} />
 </span>
 
-<Nav />
+<div class="md:fixed top-0 md:left-0 right-0 md:bottom-0 md:h-full w-[12rem] z-[6]">
+    <Nav />
+</div>
 
 <div class="page-content">
     <slot />
@@ -153,7 +155,7 @@
 <style lang="scss">
     .page-content {
         min-height: 100vh;
-        padding: 0 0 12rem 0;
+        padding: 0 0 200px 12rem;
 
         @media #{$mobile} {
             padding: 0 0 200px 0;
