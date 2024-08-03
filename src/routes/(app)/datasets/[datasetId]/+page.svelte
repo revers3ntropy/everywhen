@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { builtInTypes } from '$lib/controllers/dataset/columnTypes';
     import { showPopup } from '$lib/utils/popups';
     import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
@@ -17,6 +18,8 @@
 
     let nameInp: HTMLInputElement;
     let rows: DatasetRow[];
+
+    console.log(data.dataset);
 
     async function updateName() {
         data.dataset.name = nameInp.value;
@@ -41,19 +44,28 @@
 
     async function addRow() {
         const row = {
-            elements: Dataset.sortColumnsForJson(data.dataset.columns).map(
-                c => c.type.defaultValue
-            ),
+            elements: columnsOrderedByJsonOrder.map(c => c.type.defaultValue),
             created: nowUtc(),
             timestamp: nowUtc(),
             timestampTzOffset: currentTzOffset()
         };
+
+        console.log('adding row', row);
         notify.onErr(
             await api.post(apiPath(`/datasets/?`, data.dataset.id), {
                 rows: [row]
             })
         );
         data.dataset.rowCount++;
+    }
+
+    async function editDatasetRow(row: DatasetRow, jsonIdx: number, newValue: unknown) {
+        row.elements[jsonIdx] = newValue;
+        notify.onErr(
+            await api.put(apiPath(`/datasets/?`, data.dataset.id), {
+                rows: [row]
+            })
+        );
     }
 
     async function getDatasetRows() {
@@ -63,7 +75,10 @@
 
     onMount(async () => {
         rows = await getDatasetRows();
+        console.log('got rows', rows);
     });
+
+    $: columnsOrderedByJsonOrder = Dataset.sortColumnsForJson(data.dataset.columns);
 </script>
 
 <svelte:head>
@@ -73,7 +88,12 @@
 <main class="md:p-4 md:pl-4">
     <div class="pb-4 flex flex-row justify-between">
         <div class="text-lg">
-            <input bind:this={nameInp} value={data.dataset.name} on:change={updateName} />
+            <input
+                bind:this={nameInp}
+                value={data.dataset.name}
+                on:change={updateName}
+                aria-label="Dataset name"
+            />
         </div>
         <div>
             <button
@@ -107,7 +127,7 @@
                         class="border-r border-borderColor min-w-[150px] bg-vLightAccent hover:bg-lightAccent"
                     >
                         <button
-                            class="group p-2"
+                            class="group p-2 w-full"
                             on:click={() =>
                                 showPopup(EditDatasetColumnDialog, {
                                     datasetId: data.dataset.id,
@@ -136,8 +156,57 @@
                 {#each rows as row}
                     <tr class="p-2 border-t border-borderColor">
                         <td class="p-2 border-r border-borderColor">{row.timestamp}</td>
-                        {#each row.elements as element}
-                            <td class="p-2 border-r border-borderColor">{element}</td>
+                        {#each row.elements as element, i}
+                            {@const column = columnsOrderedByJsonOrder[i]}
+                            {@const colTypeId = column.type.id}
+                            {@const label = `row-${row.id}-col-${column.name}`}
+
+                            <td class="border-r border-borderColor">
+                                {#if colTypeId === builtInTypes.number.id || colTypeId === builtInTypes.nullableNumber.id}
+                                    <input
+                                        type="number"
+                                        aria-label={label}
+                                        value={element}
+                                        class="editable-text px-2"
+                                        placeholder={colTypeId === builtInTypes.number.id
+                                            ? '0'
+                                            : 'null'}
+                                        on:change={e => {
+                                            const num = parseFloat(e.currentTarget.value);
+                                            return editDatasetRow(
+                                                row,
+                                                column.jsonOrdering,
+                                                isNaN(num) ? column.type.defaultValue : num
+                                            );
+                                        }}
+                                    />
+                                {:else if colTypeId === builtInTypes.boolean.id && typeof element === 'boolean'}
+                                    <input
+                                        aria-label={label}
+                                        type="checkbox"
+                                        checked={element}
+                                        class="editable-text px-2"
+                                        on:change={e =>
+                                            editDatasetRow(
+                                                row,
+                                                column.jsonOrdering,
+                                                e.currentTarget.checked
+                                            )}
+                                    />
+                                {:else}
+                                    <input
+                                        aria-label={label}
+                                        value={element}
+                                        class="editable-text px-2"
+                                        on:change={e =>
+                                            editDatasetRow(
+                                                row,
+                                                column.jsonOrdering,
+                                                e.currentTarget.value
+                                            )}
+                                    />
+                                {/if}
+                            </td>
                         {/each}
                     </tr>
                 {/each}

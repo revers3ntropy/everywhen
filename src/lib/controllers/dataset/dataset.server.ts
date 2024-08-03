@@ -426,11 +426,13 @@ namespace DatasetServer {
             columns = preset.columns;
         } else {
             // TODO: order columns the same way as row elements are ordered
-            columns = allColumnsRes.val.filter(c => c.datasetId === datasetId);
+            columns = allColumnsRes.val
+                .filter(c => c.datasetId === datasetId)
+                .sort((a, b) => a.jsonOrdering - b.jsonOrdering);
         }
 
         let nextRowId = maxRowId.length > 0 ? maxRowId[0].id + 1 : 0;
-
+        void logger.log('Appending rows', { datasetId, rows });
         for (const row of rows) {
             if (columns.length !== row.elements.length) {
                 return Result.err(
@@ -575,6 +577,39 @@ namespace DatasetServer {
         `;
 
         return Result.ok(null);
+    }
+
+    export async function updateRows(
+        auth: Auth,
+        datasetId: string,
+        rows: {
+            id: number;
+            elements: unknown[];
+            timestamp: TimestampSecs;
+            timestampTzOffset: Hours;
+            created: TimestampSecs;
+        }[]
+    ): Promise<Result<null>> {
+        const ids = rows.map(r => r.id);
+        const idsInDb = await query<{ id: number }[]>`
+            SELECT id
+            FROM datasetRows
+            WHERE datasetId = ${datasetId}
+                AND userId = ${auth.id}
+                AND id IN (${ids})
+        `;
+        // as id is a primary key, if the lengths are different, then there is an id
+        // in one of the rows to be modified which is not in the DB
+        if (ids.length !== idsInDb.length) {
+            return Result.err('Invalid row IDs');
+        }
+        await query`
+            DELETE FROM datasetRows
+            WHERE datasetId = ${datasetId}
+                AND userId = ${auth.id}
+                AND id IN (${ids})
+        `;
+        return await appendRows(auth, datasetId, rows, 'append');
     }
 
     export async function deleteDataset(auth: Auth, datasetId: string): Promise<void> {

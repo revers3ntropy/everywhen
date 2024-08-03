@@ -87,7 +87,7 @@ input {
 
         &:focus {
             color: var(--text-color);
-            border-bottom: 1px solid transparent;
+            border-bottom: 1px solid var(--primary);
             background: var(--v-light-accent);
             border-radius: $border-radius;
         }

@@ -37,6 +37,7 @@ export const builtInTypes = {
         validate: (value: unknown): value is string => typeof value === 'string',
         castTo: (value: unknown) => String(value)
     },
+
     boolean: {
         id: 'boolean',
         created: null,

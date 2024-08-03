@@ -108,7 +108,7 @@
                     class={buttonCls}
                     class:bg-primaryLight={$page.url.pathname.startsWith('/datasets')}
                     class:hover:bg-primaryLight={$page.url.pathname.startsWith('/datasets')}
-                    aria-label="bin"
+                    aria-label="datasets"
                 >
                     <ChartLine size="30" />
                     <div class="text-sm md:text-base"> Trackers </div>

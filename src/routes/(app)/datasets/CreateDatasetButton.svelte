@@ -17,18 +17,20 @@
     ) as PresetId[];
 </script>
 
-<Dropdown fillWidthMobile width="200px">
-    <button
-        slot="button"
-        class="aspect-square p-2 rounded-full bg-vLightAccent hover:bg-lightAccent"
-    >
+<Dropdown
+    fillWidthMobile
+    width="200px"
+    buttonProps={{ 'aria-label': 'Open popup to create dataset' }}
+>
+    <span slot="button" class="aspect-square p-2 rounded-full bg-vLightAccent hover:bg-lightAccent">
         <Plus size="24" />
-    </button>
+    </span>
     <div class="py-2">
         <div class="p-2">
             <button
-                on:click={() => makeBlank(prompt('Dataset Name') ?? '')}
+                on:click={() => makeBlank('Blank')}
                 class="w-full flex justify-start items-center gap-2"
+                aria-label="Create blank dataset"
             >
                 <FileOutline size="20" />
                 Blank

@@ -9,6 +9,7 @@
 
 <a
     href="datasets/{dataset.id}"
+    aria-label="View dataset '{dataset.name}'"
     class="bg-vLightAccent w-fit p-3 rounded-xl hover:bg-lightAccent hover:no-underline"
 >
     <span class="flex justify-start items-center gap-2 pb-2">

@@ -14,7 +14,7 @@
 <main class="pt-4 md:pl-4">
     <CreateDatasetButton {datasets} />
 
-    <div class="py-4 flex gap-2">
+    <div class="py-4 flex gap-2" aria-label="list of datasets">
         {#each datasets as dataset}
             <DatasetWidget {dataset} />
         {/each}

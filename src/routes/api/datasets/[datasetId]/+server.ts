@@ -53,12 +53,27 @@ export const PUT = (async ({ cookies, request, params }) => {
     const auth = Auth.getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
-    const { name } = await getUnwrappedReqBody(auth, request, {
-        name: z.string().optional()
+    const { name, rows } = await getUnwrappedReqBody(auth, request, {
+        name: z.string().optional(),
+        rows: z
+            .array(
+                z.object({
+                    id: z.number(),
+                    created: z.number().default(nowUtc()),
+                    timestamp: z.number(),
+                    timestampTzOffset: z.number(),
+                    elements: z.array(z.unknown())
+                })
+            )
+            .optional()
     });
 
     if (name) {
         (await Dataset.updateName(auth, params.datasetId, name)).unwrap(e => error(400, e));
+    }
+
+    if (rows) {
+        (await Dataset.updateRows(auth, params.datasetId, rows)).unwrap(e => error(400, e));
     }
 
     // can add more checks/updates for more properties here

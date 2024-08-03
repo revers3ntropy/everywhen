@@ -83,22 +83,22 @@
     let titleIds: string[] = [];
 </script>
 
-<div class="fixed only-mobile z-10 p-1 top-0">
-    <button
-        aria-label="Show sidebar menu"
-        class="bg-lightAccent rounded-lg"
-        on:click={() => (openOnMobile = !openOnMobile)}
-    >
-        <Menu size="40" />
-    </button>
-</div>
+{#if !noEntries}
+    <div class="fixed only-mobile z-10 p-1 top-0">
+        <button
+            aria-label="Show sidebar menu"
+            class="bg-lightAccent rounded-lg"
+            on:click={() => (openOnMobile = !openOnMobile)}
+        >
+            <Menu size="40" />
+        </button>
+    </div>
 
-<div
-    class="h-screen z-10 w-full md:w-60 border-borderColor border-r-2 overflow-y-auto fixed top-0 left-0 md:sticky md:z-0 -translate-x-full md:translate-x-0 transition-[300ms] border-l-2"
-    class:translate-x-0={openOnMobile}
->
-    <div class="p-2 flex justify-end sticky top-0">
-        {#if !noEntries}
+    <div
+        class="h-screen z-10 w-full md:w-60 border-borderColor border-r-2 overflow-y-auto fixed top-0 left-0 md:sticky md:z-0 -translate-x-full md:translate-x-0 transition-[300ms] border-l-2"
+        class:translate-x-0={openOnMobile}
+    >
+        <div class="p-2 flex justify-end sticky top-0">
             <button
                 aria-label={obfuscated ? 'Show entries' : 'Hide entries'}
                 on:click={() => (obfuscated = !obfuscated)}
@@ -109,76 +109,75 @@
                     <EyeOff size="25" />
                 {/if}
             </button>
-        {/if}
-        <button
-            class="only-mobile"
-            aria-label="Close sidebar menu"
-            on:click={() => (openOnMobile = !openOnMobile)}
-        >
-            <Close size="30" />
-        </button>
-    </div>
-    <div>
-        {#key [pinnedEntriesSummaries, showingAllPinned]}
-            {#if Object.keys(pinnedEntries).length}
-                <div class="pb-2">
-                    <div
-                        class="p-2 border-b-2 border-borderColor"
-                        transition:slide={{ duration: ANIMATION_DURATION, axis: 'x' }}
-                    >
-                        <h3
-                            class="gradient-icon flex-center"
-                            style="justify-content: flex-start; gap: 8px;"
+
+            <button
+                class="only-mobile"
+                aria-label="Close sidebar menu"
+                on:click={() => (openOnMobile = !openOnMobile)}
+            >
+                <Close size="30" />
+            </button>
+        </div>
+        <div>
+            {#key [pinnedEntriesSummaries, showingAllPinned]}
+                {#if Object.keys(pinnedEntries).length}
+                    <div class="pb-2">
+                        <div
+                            class="p-2 border-b-2 border-borderColor"
+                            transition:slide={{ duration: ANIMATION_DURATION, axis: 'x' }}
                         >
-                            <Heart size="25" />
-                            Favourites
-                        </h3>
-                        <div>
-                            <EntrySummaries
-                                titles={pinnedEntries}
-                                {obfuscated}
-                                onCreateFilter={Entry.isPinned}
-                                showOnUpdateAndNotAlreadyShownFilter={Entry.isPinned}
-                                hideBlurToggle
-                            />
-                            {#if areHiddenPinnedEntries}
-                                <button
-                                    class="text-light"
-                                    on:click={() => {
-                                        showingAllPinned = !showingAllPinned;
-                                    }}
-                                >
-                                    <ChevronDown />
-                                    Show all entries in favourites ({pinnedEntriesSummaries.length -
-                                        showLimitPinnedEntries})
-                                </button>
-                            {/if}
+                            <h3
+                                class="gradient-icon flex-center"
+                                style="justify-content: flex-start; gap: 8px;"
+                            >
+                                <Heart size="25" />
+                                Favourites
+                            </h3>
+                            <div>
+                                <EntrySummaries
+                                    titles={pinnedEntries}
+                                    {obfuscated}
+                                    onCreateFilter={Entry.isPinned}
+                                    showOnUpdateAndNotAlreadyShownFilter={Entry.isPinned}
+                                    hideBlurToggle
+                                />
+                                {#if areHiddenPinnedEntries}
+                                    <button
+                                        class="text-light"
+                                        on:click={() => {
+                                            showingAllPinned = !showingAllPinned;
+                                        }}
+                                    >
+                                        <ChevronDown />
+                                        Show all entries in favourites ({pinnedEntriesSummaries.length -
+                                            showLimitPinnedEntries})
+                                    </button>
+                                {/if}
+                            </div>
                         </div>
                     </div>
+                {/if}
+            {/key}
+            {#if Object.entries(nYearsAgo).length}
+                <div class="flex flex-col gap-2">
+                    {#each Object.entries(nYearsAgo) as [date, entries] (date)}
+                        <div class="border-b-2 border-borderColor p-2">
+                            <h3>
+                                {fmtUtcRelative(new Date(date), 'en-full')} since...
+                            </h3>
+                            <EntrySummaries
+                                titles={{
+                                    [date]: entries
+                                }}
+                                {obfuscated}
+                                showTimeAgo={false}
+                                onCreateFilter={() => false}
+                                hideBlurToggle
+                            />
+                        </div>
+                    {/each}
                 </div>
             {/if}
-        {/key}
-        {#if Object.entries(nYearsAgo).length}
-            <div class="flex flex-col gap-2">
-                {#each Object.entries(nYearsAgo) as [date, entries] (date)}
-                    <div class="border-b-2 border-borderColor p-2">
-                        <h3>
-                            {fmtUtcRelative(new Date(date), 'en-full')} since...
-                        </h3>
-                        <EntrySummaries
-                            titles={{
-                                [date]: entries
-                            }}
-                            {obfuscated}
-                            showTimeAgo={false}
-                            onCreateFilter={() => false}
-                            hideBlurToggle
-                        />
-                    </div>
-                {/each}
-            </div>
-        {/if}
-        {#if !noEntries}
             <div class="p-2 relative">
                 <InfiniteScroller
                     loadItems={loadMoreTitles}
@@ -188,6 +187,6 @@
                     <EntrySummaries {obfuscated} titles={summaries} hideBlurToggle />
                 </InfiniteScroller>
             </div>
-        {/if}
+        </div>
     </div>
-</div>
+{/if}

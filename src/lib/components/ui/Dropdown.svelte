@@ -21,6 +21,7 @@
     export let fillWidthMobile: boolean | 'mobile' = false;
     export let buttonClass = '';
     export let containerClass = '';
+    export let buttonProps: Record<string, unknown> = {};
 
     export let close = () => {
         open = false;
@@ -69,6 +70,7 @@
         aria-label={label}
         on:click={() => (open = !open)}
         class="dropdown-button {buttonClass}"
+        {...buttonProps}
     >
         <slot name="button" />
     </button>
