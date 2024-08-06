@@ -99,8 +99,9 @@
             <button
                 on:click={deleteDataset}
                 class="flex-center gap-2 danger border border-solid border-borderColor py-2 px-4 hover:bg-vLightAccent rounded-full"
+                aria-label="Delete this dataset"
             >
-                <DeleteOutline size="25" /> Delete Dataset
+                <DeleteOutline size="25" /> Delete
             </button>
         </div>
     </div>

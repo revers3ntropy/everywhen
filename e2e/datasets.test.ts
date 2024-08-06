@@ -72,6 +72,9 @@ test.describe('Datasets', () => {
         await expect(page.getByLabel(`row-1-col-New Column`)).toHaveValue('1');
         await expect(page.getByLabel(`row-2-col-New Column`)).toHaveValue('0');
 
+        // clean up
+        await page.getByRole('button', { name: 'Delete' }).click();
+
         await expectDeleteUser(api, auth);
     });
 });

@@ -22,7 +22,10 @@
     width="200px"
     buttonProps={{ 'aria-label': 'Open popup to create dataset' }}
 >
-    <span slot="button" class="aspect-square p-2 rounded-full bg-vLightAccent hover:bg-lightAccent">
+    <span
+        slot="button"
+        class="aspect-square p-2 rounded-full bg-vLightAccent hover:bg-lightAccent flex-center"
+    >
         <Plus size="24" />
     </span>
     <div class="py-2">

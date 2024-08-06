@@ -431,8 +431,8 @@ namespace DatasetServer {
                 .sort((a, b) => a.jsonOrdering - b.jsonOrdering);
         }
 
-        let nextRowId = maxRowId.length > 0 ? maxRowId[0].id + 1 : 0;
-        void logger.log('Appending rows', { datasetId, rows });
+        let nextRowId = maxRowId.length > 0 ? maxRowId[0].id : -1;
+        await logger.log('Appending rows', { datasetId, rows, rowsLength: rows.length });
         for (const row of rows) {
             if (columns.length !== row.elements.length) {
                 return Result.err(
@@ -448,9 +448,9 @@ namespace DatasetServer {
                 }
             }
 
-            const rowId = nextRowId;
             nextRowId++;
 
+            const rowId = nextRowId;
             const rowTimestamp = row.timestamp ?? nowUtc();
             const rowCreated = row.created ?? nowUtc();
             const rowTimestampTzOffset = row.timestampTzOffset ?? 0;
@@ -461,6 +461,7 @@ namespace DatasetServer {
                     SELECT COUNT(*) AS count
                     FROM datasetRows
                     WHERE datasetId = ${datasetId}
+                        AND userId = ${auth.id}
                         AND timestamp = ${rowTimestamp}
                 `;
                 if (count > 0) {
@@ -474,12 +475,14 @@ namespace DatasetServer {
                         await query`
                             DELETE FROM datasetRows
                             WHERE datasetId = ${datasetId}
+                                AND userId = ${auth.id}
                                 AND timestamp = ${rowTimestamp}
                         `;
                     }
                 }
             }
 
+            await logger.log('Appending row', { datasetId, row, rowId });
             await query`
                 INSERT INTO datasetRows (id, userId, datasetId, created, timestamp, timestampTzOffset, rowJson)
                 VALUES (
@@ -590,6 +593,7 @@ namespace DatasetServer {
             created: TimestampSecs;
         }[]
     ): Promise<Result<null>> {
+        rows = [...rows].sort((a, b) => a.id - b.id);
         const ids = rows.map(r => r.id);
         const idsInDb = await query<{ id: number }[]>`
             SELECT id
@@ -609,6 +613,7 @@ namespace DatasetServer {
                 AND userId = ${auth.id}
                 AND id IN (${ids})
         `;
+        await logger.log('deleted with id', { ids });
         return await appendRows(auth, datasetId, rows, 'append');
     }
 
@@ -656,11 +661,13 @@ namespace DatasetServer {
             SELECT IFNULL(MAX(ordering) + 1, 0) as ordering
             FROM datasetColumns
             WHERE datasetId = ${datasetId}
+                AND userId = ${auth.id}
         `;
         const [{ jsonOrdering }] = await query<{ jsonOrdering: number }[]>`
             SELECT IFNULL(MAX(jsonOrdering) + 1, 0) as jsonOrdering
             FROM datasetColumns
             WHERE datasetId = ${datasetId}
+                AND userId = ${auth.id}
         `;
 
         await query`
