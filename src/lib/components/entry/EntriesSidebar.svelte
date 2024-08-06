@@ -95,7 +95,7 @@
     </div>
 
     <div
-        class="h-screen z-10 w-full md:w-60 border-borderColor border-r-2 overflow-y-auto fixed top-0 left-0 md:sticky md:z-0 -translate-x-full md:translate-x-0 transition-[300ms] border-l-2"
+        class="h-screen z-10 w-full md:w-[25vw] md:min-w-60 md:max-w-80 border-borderColor border-r-2 overflow-y-auto fixed top-0 left-0 md:sticky md:z-0 -translate-x-full md:translate-x-0 transition-[300ms] border-l-2"
         class:translate-x-0={openOnMobile}
     >
         <div class="p-2 flex justify-end sticky top-0">

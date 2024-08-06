@@ -47,7 +47,7 @@
         />
     </section>
 
-    <section class="md:flex md:justify-center gap-4 pt-4 w-full">
+    <section class="md:flex md:justify-center gap-4 w-full">
         <div class="max-w-3xl w-full">
             <div>
                 <DatasetShortcutWidgets datasets={data.datasets} />
