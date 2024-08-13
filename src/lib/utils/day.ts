@@ -18,17 +18,22 @@ export class Day {
         return Day.fromTimestamp(nowUtc(), tzOffset);
     }
 
+    // TODO figure out why this is ever different from today()
+    public static todayUsingNativeDate(): Day {
+        return new Day(new Date().getFullYear(), new Date().getMonth() + 1, new Date().getDate());
+    }
+
     public static fromString(str: string): Result<Day> {
         const parts = str.split('-');
         if (parts.length !== 3) {
-            return Result.err('Invalid day format');
+            return Result.err(`Invalid day format: '${str}'`);
         }
         if (parts[0].length < 4 || parts[1].length !== 2 || parts[2].length !== 2) {
-            return Result.err('Invalid day format');
+            return Result.err(`Invalid day format: '${str}'`);
         }
         const [year, month, date] = parts.map(Number);
         if (isNaN(year) || isNaN(month) || isNaN(date)) {
-            return Result.err('Invalid day format');
+            return Result.err(`Invalid day format: '${str}'`);
         }
         if (year < 0 || year > 99999) {
             return Result.err('Invalid year');

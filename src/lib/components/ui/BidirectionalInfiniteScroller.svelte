@@ -52,7 +52,7 @@
 </script>
 
 <div
-    style="height: {topMargin * 2}px; position: absolute; top: -{topMargin}px"
+    style="height: {topMargin * 2}px; top: -{topMargin}px"
     class="absolute left-0 right-0 pointer-events-none"
     use:inview={{}}
     on:inview_enter={() => load(true)}
@@ -62,7 +62,7 @@
 <slot />
 
 <div
-    style="height: {bottomMargin * 2}px; position: absolute; bottom: -{bottomMargin}px"
+    style="height: {bottomMargin * 2}px; bottom: -{bottomMargin}px"
     class="absolute left-0 right-0 pointer-events-none"
     use:inview={{}}
     on:inview_enter={() => load(false)}
