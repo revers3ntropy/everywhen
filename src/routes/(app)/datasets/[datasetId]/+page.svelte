@@ -160,13 +160,11 @@
                         {#each row.elements as element, i}
                             {@const column = columnsOrderedByJsonOrder[i]}
                             {@const colTypeId = column.type.id}
-                            {@const label = `row-${row.id}-col-${column.name}`}
 
                             <td class="border-r border-borderColor">
                                 {#if colTypeId === builtInTypes.number.id || colTypeId === builtInTypes.nullableNumber.id}
                                     <input
                                         type="number"
-                                        aria-label={label}
                                         value={element}
                                         class="editable-text px-2"
                                         placeholder={colTypeId === builtInTypes.number.id
@@ -183,7 +181,6 @@
                                     />
                                 {:else if colTypeId === builtInTypes.boolean.id && typeof element === 'boolean'}
                                     <input
-                                        aria-label={label}
                                         type="checkbox"
                                         checked={element}
                                         class="editable-text px-2"
@@ -196,7 +193,6 @@
                                     />
                                 {:else}
                                     <input
-                                        aria-label={label}
                                         value={element}
                                         class="editable-text px-2"
                                         on:change={e =>

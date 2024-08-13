@@ -1,6 +1,5 @@
 <script lang="ts">
     import { browser } from '$app/environment';
-    import DatasetShortcutWidgets from '$lib/components/dataset/DatasetShortcutWidgets.svelte';
     import EntriesSidebar from '$lib/components/entry/EntriesSidebar.svelte';
     import { notify } from '$lib/components/notifications/notifications.js';
     import { obfuscated } from '$lib/stores';
@@ -49,9 +48,6 @@
 
     <section class="md:flex md:justify-center gap-4 w-full">
         <div class="max-w-3xl w-full">
-            <div>
-                <DatasetShortcutWidgets datasets={data.datasets} />
-            </div>
             {#key $page}
                 {#if $page.url.hash}
                     {#await api
