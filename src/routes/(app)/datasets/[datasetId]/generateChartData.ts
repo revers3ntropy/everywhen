@@ -43,7 +43,8 @@ export enum ReductionStrategy {
     Mean = 'Mean',
     Count = 'Count',
     Max = 'Max',
-    Min = 'Min'
+    Min = 'Min',
+    MeanDefaultPrev = 'MeanDefaultPrev'
 }
 
 export const reductionStrategyNames: Record<string, ReductionStrategy> = {
@@ -51,14 +52,24 @@ export const reductionStrategyNames: Record<string, ReductionStrategy> = {
     Mean: ReductionStrategy.Mean,
     Count: ReductionStrategy.Count,
     Max: ReductionStrategy.Max,
-    Min: ReductionStrategy.Min
+    Min: ReductionStrategy.Min,
+    'Mean (default previous)': ReductionStrategy.MeanDefaultPrev
 };
 
-const ReductionStrategies: Record<ReductionStrategy, (items: (number | null)[]) => number> = {
+const ReductionStrategies: Record<
+    ReductionStrategy,
+    // previous is null for first item
+    (items: (number | null)[], previous: number | null) => number
+> = {
     [ReductionStrategy.Sum]: items => items.reduce((a: number, b) => a + (b || 0), 0),
     [ReductionStrategy.Mean]: items => {
         if (items.length === 0) return 0;
         return items.reduce((a: number, b) => a + (b || 0), 0) / items.length;
+    },
+    [ReductionStrategy.MeanDefaultPrev]: (items, previous) => {
+        const filteredItems = items.filter(i => i !== null);
+        if (filteredItems.length === 0) return previous ?? 0;
+        return filteredItems.reduce((a: number, b: number) => a + b, 0) / filteredItems.length;
     },
     [ReductionStrategy.Count]: items => items.length,
     [ReductionStrategy.Max]: items =>
@@ -190,19 +201,25 @@ function datasetFactoryForStandardBuckets(selectedBucket: Bucket): DatasetGenera
             buckets[bucket].push(row.elements[columnIndex] as number);
         }
 
-        const lastBucket = Object.keys(buckets)
-            .map(a => parseInt(a))
-            .sort((a, b) => a - b)
-            .pop();
+        const entries = Object.entries(buckets)
+            // sort only so 'previous' is correct, is turned into object again after
+            .sort(([a], [b]) => parseInt(a) - parseInt(b));
+
+        const lastBucket = entries.pop()?.[0];
         if (lastBucket && buckets[lastBucket.toString()].length === 0) {
             delete buckets[lastBucket.toString()];
         }
 
-        return Object.fromEntries(
-            Object.entries(buckets).map(([i, items]) => {
-                return [i, ReductionStrategies[reductionStrategy](items)];
-            })
-        );
+        let previous: number | null = null;
+        const reducedBuckets = [];
+        for (const [i, items] of entries) {
+            console.log(i, previous);
+            const value = ReductionStrategies[reductionStrategy](items, previous);
+            reducedBuckets.push([i, value]);
+            previous = value;
+        }
+
+        return Object.fromEntries(reducedBuckets);
     };
 }
 
@@ -224,9 +241,14 @@ const generateDataset: Record<Bucket, DatasetGenerationStrategy> = {
             buckets[bucket].push(row.elements[columnIndex] as number);
         }
 
-        return buckets.map(items => {
-            return ReductionStrategies[reductionStrategy](items);
-        }) as Record<number, number>;
+        let previous: number | null = null;
+        const reducedBuckets = [];
+        for (const items of buckets) {
+            const value = ReductionStrategies[reductionStrategy](items, previous);
+            reducedBuckets.push(value);
+            previous = value;
+        }
+        return reducedBuckets as Record<number, number>;
     },
     [Bucket.Day]: datasetFactoryForStandardBuckets(Bucket.Day),
     [Bucket.Week]: datasetFactoryForStandardBuckets(Bucket.Week),
