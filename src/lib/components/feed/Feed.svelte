@@ -23,13 +23,6 @@
 
         const scrollHeightDiff = scrollContainer.scrollHeight - scrollHeight;
 
-        console.log(
-            'scrollContainer',
-            scrollContainer.scrollHeight,
-            scrollContainer.clientHeight,
-            scrollHeightDiff
-        );
-
         scrollContainer.scrollTop += scrollHeightDiff;
     }
 
@@ -56,13 +49,13 @@
         }
         if (atTop) {
             if (
-                (!nextDayInFuture || nextDayInFuture.isInFuture()) &&
+                (!nextDayInFuture || nextDayInFuture.gt(Day.todayUsingNativeDate())) &&
                 nextDay &&
-                Day.fromString(nextDay).unwrap().isInPast()
+                Day.fromString(nextDay).unwrap().lt(Day.todayUsingNativeDate())
             ) {
                 // edge case: if we're loading from the top, always load today
                 nextDay = Day.todayUsingNativeDate().fmtIso();
-            } else if (nextDayInFuture && nextDayInFuture.isInFuture()) {
+            } else if (nextDayInFuture && nextDayInFuture.gt(Day.todayUsingNativeDate())) {
                 // don't load days in the future from today
                 nextDay = null;
             } else {

@@ -72,7 +72,7 @@
                         happinessDataset={data.happinessDataset}
                         labels={data.labels}
                         obfuscated={$obfuscated}
-                        fromDay={Day.today(currentTzOffset())}
+                        fromDay={Day.todayUsingNativeDate()}
                         {getScrollContainer}
                     />
                 {/if}

@@ -86,12 +86,20 @@ export class Day {
         return this.date < other.date;
     }
 
+    public lte(other: Day): boolean {
+        return this.lt(other) || this.eq(other);
+    }
+
     public gt(other: Day): boolean {
         if (this.year > other.year) return true;
         if (this.year < other.year) return false;
         if (this.month > other.month) return true;
         if (this.month < other.month) return false;
         return this.date > other.date;
+    }
+
+    public gte(other: Day): boolean {
+        return this.gt(other) || this.eq(other);
     }
 
     public plusDays(days: number): Day {
