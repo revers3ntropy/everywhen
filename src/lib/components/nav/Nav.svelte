@@ -30,8 +30,8 @@
             <div class="md:pb-4 pl-1 w-full">
                 <AccountDropdown />
             </div>
-            <div class="md:pb-4 pl-2 flex justify-between items-center">
-                <span>
+            <div class="md:pb-4 pl-2 flex items-center">
+                <span class="pr-3">
                     <CreateNewButton />
                 </span>
 
@@ -48,7 +48,7 @@
                 </button>
             </div>
 
-            <div class="pl-4 flex md:flex-col gap-3 items-center md:items-start justify-center">
+            <div class="pl-3 flex md:flex-col gap-3 items-center md:items-start justify-center">
                 {#if $settingsStore.passcode.value}
                     <button on:click={lock} class="danger flex-center gap-2" aria-label="Lock">
                         <Lock size="25" />
