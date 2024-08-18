@@ -26,7 +26,7 @@
      by entry group titles, and is above top navbar -->
 <nav class="md:bg-vLightAccent w-full h-full z-[6]">
     <div class="md:grid grid-cols-1 grid-rows-3 h-16 md:h-full w-full">
-        <div class="pt-1 md:pt-2 flex md:block pr-4 pl-[50px] md:pl-0">
+        <div class="pt-1 md:pt-2 flex md:block pr-4">
             <div class="md:pb-4 pl-1 w-full">
                 <AccountDropdown />
             </div>

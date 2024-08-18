@@ -84,7 +84,7 @@
 </script>
 
 {#if !noEntries}
-    <div class="fixed only-mobile z-10 p-1 top-0">
+    <div class="fixed only-mobile z-10 p-1 top-0 right-2">
         <button
             aria-label="Show sidebar menu"
             class="bg-lightAccent rounded-lg"
@@ -95,7 +95,9 @@
     </div>
 
     <div
-        class="h-screen z-10 w-full md:w-[25vw] md:min-w-60 md:max-w-80 border-borderColor border-r-2 overflow-y-auto fixed top-0 left-0 md:sticky md:z-0 -translate-x-full md:translate-x-0 transition-[300ms] border-l-2"
+        class={'h-screen z-10 w-full md:w-[25vw] md:min-w-60 md:max-w-80 border-borderColor border-r-2 overflow-y-auto' +
+            ' fixed top-0 left-0 md:sticky md:z-0 -translate-x-full md:translate-x-0 transition-[300ms] border-l-2' +
+            ' bg-backgroundColor md:bg-transparent'}
         class:translate-x-0={openOnMobile}
     >
         <div class="p-2 flex justify-end sticky top-0">
