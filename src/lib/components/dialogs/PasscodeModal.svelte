@@ -52,8 +52,8 @@
 
 <div class="modal-container {show ? 'show' : ''}">
     {#if loaded}
-        <div class="content">
-            <h1>Enter your passcode</h1>
+        <div class="content bg-vLightAccent">
+            <h1 class="pb-8">Enter your passcode</h1>
             <!-- svelte-ignore a11y-autofocus -->
             <input
                 type="text"
@@ -62,7 +62,7 @@
                 autocomplete="off"
                 autofocus
                 data-lpignore="true"
-                class="password-input"
+                class="password-input px-1 text-xl"
             />
             <button on:click={() => (input = '')} aria-label="Clear passcode">
                 <Close />
@@ -72,7 +72,7 @@
                 <button class="text-light" on:click={() => (showingForgotPassword = true)}>
                     Forgot Passcode?
                 </button>
-                <div>
+                <div class="pt-8">
                     {#if showingForgotPassword}
                         <input
                             type="text"
@@ -80,7 +80,7 @@
                             placeholder="Enter Password"
                             autocomplete="off"
                             data-lpignore="true"
-                            class="password-input"
+                            class="password-input px-1 text-xl"
                             transition:slide={{
                                 axis: 'y',
                                 duration: ANIMATION_DURATION
@@ -124,7 +124,6 @@
 
         .content {
             @extend .container-shadow;
-            background: var(--translucent-bg);
             backdrop-filter: blur(30px);
             padding: 2rem 3rem 3rem 3rem;
             border-radius: $border-radius;
@@ -136,11 +135,9 @@
             }
 
             .password-input {
-                margin-top: 2rem;
-                font-size: 20px;
                 -webkit-text-security: disc;
                 -moz-text-security: disc;
-                max-width: 90vw;
+                max-width: 85vw;
             }
 
             .forgot-passcode {
