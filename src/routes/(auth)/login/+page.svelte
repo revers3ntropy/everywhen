@@ -84,7 +84,7 @@
                 autocomplete="username"
                 bind:this={username}
                 disabled={actionPending}
-                style="font-size: x-large"
+                class="text-xl px-2"
                 on:keypress={usernameInputKeypress}
             />
         </label>
@@ -95,7 +95,7 @@
                 autocomplete="current-password"
                 bind:this={password}
                 disabled={actionPending}
-                style="font-size: x-large"
+                class="text-xl px-2"
                 type="password"
                 on:keypress={passwordInputKeypress}
             />

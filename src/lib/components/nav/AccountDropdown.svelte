@@ -30,13 +30,6 @@
 
     <div class="p-1">
         <div class="flex content-between py-2">
-            <button
-                aria-label="log out"
-                class="account-dropdown-button danger"
-                on:click={() => void Auth.logOut()}
-            >
-                <Logout size="30" />
-            </button>
             <div class="px-2 text-lg">
                 <p class="text-sm text-light">logged in as</p>
                 <p>{$username || '...'}</p>
@@ -63,6 +56,15 @@
             <CogOutline size="30" />
             Settings
         </a>
+
+        <button
+            aria-label="log out"
+            class="flex justify-start items-center p-2 gap-2 danger"
+            on:click={() => void Auth.logOut()}
+        >
+            <Logout size="30" />
+            Sign Out
+        </button>
     </div>
 </Dropdown>
 
