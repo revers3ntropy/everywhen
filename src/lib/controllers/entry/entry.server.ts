@@ -667,6 +667,7 @@ namespace EntryServer {
 
     export const getFromId = entryFromId;
     export const all = getMulti.all;
+    export const search = getMulti.search;
     export const getPage = getMulti.getPage;
     export const onDay = getMulti.onDay;
     export const getSummariesNYearsAgo = getSummary.getSummariesNYearsAgo;

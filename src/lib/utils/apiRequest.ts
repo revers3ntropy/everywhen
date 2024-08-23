@@ -60,6 +60,7 @@ export interface ApiRoutes {
     '/events/?': typeof import('../../routes/api/events/[eventId]/+server');
     '/locations/?': typeof import('../../routes/api/locations/[locationId]/+server');
     '/feed/?': typeof import('../../routes/api/feed/[day]/+server');
+    '/search': typeof import('../../routes/api/search/+server');
 }
 
 export async function makeApiReq<

@@ -3,6 +3,14 @@ import { twMerge } from 'tailwind-merge';
 import { cubicOut } from 'svelte/easing';
 import type { TransitionConfig } from 'svelte/transition';
 
+export function omit<T extends object, K extends keyof T>(obj: T, ...keys: K[]): Omit<T, K> {
+    const copy = { ...obj };
+    for (const key of keys) {
+        delete copy[key];
+    }
+    return copy;
+}
+
 export function cn(...inputs: ClassValue[]): string {
     return twMerge(clsx(inputs));
 }

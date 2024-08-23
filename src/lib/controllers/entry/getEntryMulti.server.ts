@@ -5,8 +5,9 @@ import { Label } from '$lib/controllers/label/label.server';
 import { Location } from '$lib/controllers/location/location.server';
 import { query } from '$lib/db/mysql.server';
 import type { Day } from '$lib/utils/day';
-import { decrypt } from '$lib/utils/encryption';
+import { decrypt, encrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
+import { wordsFromText } from '$lib/utils/text';
 
 export async function all(auth: Auth, filter: EntryFilter = {}): Promise<Result<Entry[]>> {
     let location: Location | null = null;
@@ -282,4 +283,52 @@ async function entriesFromRaw(auth: Auth, raw: RawEntry[]): Promise<Result<Entry
             });
         })
     );
+}
+
+export async function search(auth: Auth, queryString: string): Promise<Result<Entry[]>> {
+    const queryStringParts = wordsFromText(queryString);
+    if (queryStringParts.length === 0) return Result.ok([]);
+    const encryptedWords = queryStringParts.map(word => encrypt(word, auth.key));
+
+    const entries = await query<
+        {
+            id: string;
+            created: number;
+            createdTzOffset: number;
+            title: string;
+            deleted: number | null;
+            pinned: number | null;
+            labelId: string | null;
+            body: string;
+            latitude: number | null;
+            longitude: number | null;
+            agentData: string;
+            wordCount: number;
+        }[]
+    >`
+            SELECT entries.id,
+                   entries.created,
+                   entries.createdTzOffset,
+                   entries.title,
+                   entries.pinned,
+                   entries.deleted,
+                   entries.labelId,
+                   entries.body,
+                   entries.latitude,
+                   entries.longitude,
+                   entries.agentData,
+                   entries.wordCount
+            FROM entries, wordsInEntries
+            WHERE wordsInEntries.word IN (${encryptedWords})
+                AND wordsInEntries.entryId = entries.id
+                AND entries.userId = ${auth.id}
+    `;
+
+    const uniqueEntries = entries.reduce((prev, curr) => {
+        if (prev.filter(e => e.id === curr.id).length > 0) return prev;
+        prev.push(curr);
+        return prev;
+    }, [] as RawEntry[]);
+
+    return await entriesFromRaw(auth, uniqueEntries);
 }
