@@ -20,7 +20,7 @@
             <WeatherIcon {weather} size={30} />
             <h3>{day.dateObj().toDateString()}</h3>
         </div>
-        <span class="text-textColorLight text-sm">
+        <span class="text-textColorLight text-sm hide-mobile">
             (at lat {lat}, lon {lon})
         </span>
     </div>
