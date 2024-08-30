@@ -87,6 +87,7 @@
         class="bg-vLightAccent p-2 {isToday && !$collapsed[day.day]
             ? 'rounded-tr-xl'
             : 'rounded-r-xl'}"
+        class:mb-2={!isToday && !$collapsed[day.day]}
     >
         <div class="flex justify-between">
             <div>
