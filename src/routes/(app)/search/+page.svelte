@@ -39,11 +39,17 @@
     <section class="flex-col flex gap-4">
         {#each results as result}
             <div class="container">
-                <Entry
-                    {...omit(result, 'type')}
-                    locations={data.locations}
-                    obfuscated={$obfuscated}
-                />
+                {#if result.type === 'entry'}
+                    <Entry
+                        {...omit(result, 'type')}
+                        locations={data.locations}
+                        obfuscated={$obfuscated}
+                    />
+                {:else if result.type === 'label'}
+                    label
+                {:else}
+                    ?
+                {/if}
             </div>
         {/each}
     </section>
