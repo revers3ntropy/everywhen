@@ -10,6 +10,7 @@ export const load = cachedPageRoute(async auth => {
             .unwrap(e => error(400, e))
             .map(e => ({
                 created: e.created,
+                createdTzOffset: e.createdTzOffset,
                 id: e.id,
                 latitude: e.latitude,
                 longitude: e.longitude

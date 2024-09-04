@@ -1,5 +1,6 @@
 import { Result } from '$lib/utils/result';
 import { currentTzOffset, nowUtc } from '$lib/utils/time';
+import { type DateValue, CalendarDate } from '@internationalized/date';
 import type { Hours, TimestampSecs } from '../../types';
 
 export class Day {
@@ -78,6 +79,14 @@ export class Day {
         return this.year === other.year && this.month === other.month && this.date === other.date;
     }
 
+    public set(options: { year?: number; month?: number; date?: number }): Day {
+        return new Day(
+            options.year ?? this.year,
+            options.month ?? this.month,
+            options.date ?? this.date
+        );
+    }
+
     public lt(other: Day): boolean {
         if (this.year < other.year) return true;
         if (this.year > other.year) return false;
@@ -143,5 +152,13 @@ export class Day {
             months++;
         }
         return months;
+    }
+
+    public toI18nDate(): DateValue {
+        return new CalendarDate(this.year, this.month, this.date);
+    }
+
+    public static fromI18nDate(d: DateValue) {
+        return new Day(d.year, d.month, d.day);
     }
 }

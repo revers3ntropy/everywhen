@@ -28,7 +28,7 @@
         </span>
     </span>
 
-    <div class="">
+    <div class="py-3">
         <button class="with-icon icon-small" on:click={makeWrapper('**', '**', false)}>
             <FormatBold /> Bold
         </button>

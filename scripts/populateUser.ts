@@ -6,6 +6,7 @@ import { sha256 } from 'js-sha256';
 import mysql from 'mysql2/promise';
 import { LIMITS } from '../src/lib/constants';
 import { Day } from '../src/lib/utils/day';
+import { wordsFromText } from '../src/lib/utils/text';
 import type { TimestampSecs } from '../src/types';
 
 export const { quiet, username, password } = commandLineArgs([
@@ -73,7 +74,8 @@ async function entry(
     created: number,
     wordCount: number,
     body: string,
-    title = '',
+    lat = 0,
+    lon = 0,
     deleted = false
 ) {
     await query(
@@ -83,9 +85,9 @@ async function entry(
         created,
         0,
         Day.fromTimestamp(created, 0).fmtIso(),
-        null,
-        null,
-        encrypt(title),
+        lat,
+        lon,
+        encrypt(''),
         encrypt(body),
         null,
         deleted ? nowUtc() : null,
@@ -93,6 +95,25 @@ async function entry(
         encrypt(''),
         wordCount
     );
+
+    const bodyWords = wordsFromText(body);
+
+    const countMap: Record<string, number> = {};
+
+    for (const word of bodyWords) {
+        countMap[word] ??= 0;
+        countMap[word]++;
+    }
+    for (const word in countMap) {
+        await query(
+            'INSERT INTO wordsInEntries (userId, entryId, entryIsDeleted, word, count) VALUES (?, ?, ?, ?, ?)',
+            userId,
+            id,
+            deleted,
+            encrypt(word),
+            countMap[word]
+        );
+    }
 }
 
 async function main() {
@@ -104,6 +125,7 @@ async function main() {
     log('got user ID', { userId });
 
     await query('DELETE FROM entries WHERE userId = ?', userId);
+    await query('DELETE FROM wordsInEntries WHERE userId = ?', userId);
 
     const years = 32;
     const entriesPerDay = 32;
@@ -114,7 +136,15 @@ async function main() {
         created > nowUtc() - 60 * 60 * 24 * 365 * years && i < LIMITS.entry.maxCount - 1000;
         created -= 60 * 60 * 24
     ) {
-        await entry(`my-entry-${i}`, userId, created, 3, `Sparse Entry ${i}`);
+        await entry(
+            `my-entry-${i}`,
+            userId,
+            created,
+            3,
+            `Sparse ${i}`,
+            i < 100 ? 52.3946613 : undefined,
+            i < 100 ? 0.2557761 + i * 0.0001 : undefined
+        );
         i++;
     }
     for (
