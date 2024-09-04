@@ -16,6 +16,7 @@
     export let titles: Record<string, EntrySummary[]>;
     export let obfuscated = true;
     export let showTimeAgo = true;
+    export let hideDate = false;
     export let blurToggleOnLeft = false;
     export let hideBlurToggle = false;
     export let onCreateFilter: (entry: Entry) => boolean = () => true;
@@ -91,28 +92,40 @@
     {#if sortedTitles}
         {#each sortedTitles as [day, date] (date)}
             <div class="day" transition:slide={{ duration: ANIMATION_DURATION, axis: 'x' }}>
-                <h2>
-                    <UtcTime timestamp={day} fmt="ddd DD/MM/YYYY" noTooltip={true} tzOffset={0} />
-                    {#if showTimeAgo}
-                        <Dot marginX={2} />
-                        <span class="text-light">
-                            {#if utcEq(nowUtc(), day, currentTzOffset(), 0, 'YYYY-MM-DD')}
-                                <span>Today</span>
-                            {:else if utcEq(nowUtc() - 60 * 60 * 24, day, currentTzOffset(), 0, 'YYYY-MM-DD')}
-                                <span>Yesterday</span>
-                            {:else}
-                                <UtcTime relative timestamp={day} noTooltip={true} tzOffset={0} />
-                            {/if}
-                        </span>
-                    {/if}
-                </h2>
+                {#if !hideDate}
+                    <h2>
+                        <UtcTime
+                            timestamp={day}
+                            fmt="ddd DD/MM/YYYY"
+                            noTooltip={true}
+                            tzOffset={0}
+                        />
+                        {#if showTimeAgo}
+                            <Dot marginX={2} />
+                            <span class="text-light">
+                                {#if utcEq(nowUtc(), day, currentTzOffset(), 0, 'YYYY-MM-DD')}
+                                    <span>Today</span>
+                                {:else if utcEq(nowUtc() - 60 * 60 * 24, day, currentTzOffset(), 0, 'YYYY-MM-DD')}
+                                    <span>Yesterday</span>
+                                {:else}
+                                    <UtcTime
+                                        relative
+                                        timestamp={day}
+                                        noTooltip={true}
+                                        tzOffset={0}
+                                    />
+                                {/if}
+                            </span>
+                        {/if}
+                    </h2>
+                {/if}
 
                 {#if (titles || {})[date].length < 1}
                     <i class="text-light flex-center"> No entries on this day </i>
                 {/if}
 
                 {#each (titles || {})[date] as entry (entry.id)}
-                    <span class="flex entry-container">
+                    <span class="flex entry-container group">
                         <a class="entry" href="/journal#{entry.id}">
                             <span class="text-sm text-textColorLight w-full text-right">
                                 <UtcTime
@@ -138,7 +151,7 @@
                         </a>
 
                         <span
-                            class="open-in-dialog-button hover:bg-lightAccent flex-center rounded-md"
+                            class="md:opacity-0 group-hover:opacity-100 hover:bg-lightAccent flex-center rounded-md"
                         >
                             <button
                                 on:click={() =>
@@ -159,13 +172,6 @@
 
 <style lang="scss">
     @import '$lib/styles/text';
-
-    .open-in-dialog-button {
-        opacity: 0;
-    }
-    .entry-container:hover .open-in-dialog-button {
-        opacity: 1;
-    }
 
     .menu {
         display: flex;

@@ -163,7 +163,7 @@
             {#if Object.entries(nYearsAgo).length}
                 <div class="flex flex-col gap-2">
                     {#each Object.entries(nYearsAgo) as [date, entries] (date)}
-                        <div class="border-b-2 border-borderColor p-2">
+                        <div class="p-2">
                             <h3>
                                 {fmtUtcRelative(new Date(date), 'en-full')} since...
                             </h3>
@@ -173,6 +173,7 @@
                                 }}
                                 {obfuscated}
                                 showTimeAgo={false}
+                                hideDate
                                 onCreateFilter={() => false}
                                 hideBlurToggle
                             />
@@ -180,7 +181,7 @@
                     {/each}
                 </div>
             {/if}
-            <div class="p-2 relative">
+            <div class="p-2 relative border-t-2 border-borderColor">
                 <InfiniteScroller
                     loadItems={loadMoreTitles}
                     hasMore={() => titleIds.length < numTitles}
