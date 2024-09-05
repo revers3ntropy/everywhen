@@ -327,7 +327,7 @@
 </script>
 
 <div class="md:bg-vLightAccent rounded-2xl">
-    <div class="md:px-2 pb-2 md:pb-4">
+    <div class="pb-2 md:pb-4">
         <div class="flex items-center bg-lightAccent md:rounded-full md:w-fit">
             <div class="flex items-center gap-2 py-1 px-2 md:px-4 w-fit">
                 <LocationToggle size={23} />
@@ -362,7 +362,7 @@
                 disabled={obfuscated || submitted}
                 aria-label="Entry Body"
                 placeholder={obfuscated ? '' : 'Start writing here...'}
-                class="text-lg py-2 resize-none w-full bg-transparent rounded-lg px-4"
+                class="text-lg py-2 resize-none w-full bg-transparent rounded-lg"
                 class:obfuscated
             />
 
@@ -373,13 +373,13 @@
             -->
             <textarea
                 bind:this={textAreaSizeTester}
-                class="text-lg py-2 resize-none w-full bg-transparent rounded-lg px-4"
+                class="text-lg py-2 resize-none w-full bg-transparent rounded-lg"
                 class:obfuscated
                 style="position: absolute; top: 0; left: -9999px;"
             />
         </div>
 
-        <div class="flex p-2 justify-end">
+        <div class="flex py-2 justify-end">
             <button
                 aria-label="Submit Entry"
                 class="flex-center aspect-square primary"

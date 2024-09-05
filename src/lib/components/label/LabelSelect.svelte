@@ -47,7 +47,7 @@
 </script>
 
 <span
-    class="select-label flex px-1 items-center justify-between rounded-full hover:bg-vLightAccent"
+    class="select-label flex px-1 items-center justify-between rounded-xl hover:bg-vLightAccent"
     class:condensed
 >
     <Dropdown bind:close={closeDropDown} ariaLabel={() => 'Set label'} {fromRight}>
