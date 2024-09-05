@@ -1,5 +1,8 @@
 <script lang="ts">
     import GitHubOauthWidget from '$lib/components/GitHubOAuthWidget.svelte';
+    import { notify } from '$lib/components/notifications/notifications';
+    import { api } from '$lib/utils/apiRequest';
+    import { download } from '$lib/utils/files.client';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import Cog from 'svelte-material-icons/Cog.svelte';
     import Logout from 'svelte-material-icons/Logout.svelte';
@@ -23,6 +26,11 @@
 
     function logOut() {
         void Auth.logOut();
+    }
+
+    async function exportData() {
+        const { html } = notify.onErr(await api.get('/export'));
+        download('everywhen.html', html);
     }
 
     const settingsConfigEntries = Object.entries(SettingsController.config) as [
@@ -54,6 +62,10 @@
                 <Skull size="30" />
                 Delete Account
             </a>
+            <button aria-label="Export data" on:click={exportData}>
+                <Logout size="30" />
+                Export Data
+            </button>
         </div>
         <div class="buttons">
             <GitHubOauthWidget />

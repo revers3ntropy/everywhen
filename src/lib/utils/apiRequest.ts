@@ -61,6 +61,7 @@ export interface ApiRoutes {
     '/locations/?': typeof import('../../routes/api/locations/[locationId]/+server');
     '/feed/?': typeof import('../../routes/api/feed/[day]/+server');
     '/search': typeof import('../../routes/api/search/+server');
+    '/export': typeof import('../../routes/api/export/+server');
 }
 
 export async function makeApiReq<
