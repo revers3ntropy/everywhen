@@ -12,16 +12,19 @@
     export let autofocus = false;
     export let inputProps: HTMLInputAttributes = {};
     export let thinBorder = false;
+    export let fullWidth = false;
+    export let startUnit = '';
+    export let endUnit = '';
 </script>
 
-<label class="group flex flex-col relative mt-2">
+<label class="group flex flex-col relative mt-2 {fullWidth ? 'w-full' : 'max-w-[300px]'}">
     {#if label}
         <span
             class="{value
                 ? 'text-sm translate-y-[-5px] translate-x-[16px]'
                 : 'translate-y-[12px] translate-x-[10px]'}
          translate-x-[10px] text-light
-         group-focus-within:translate-y-[-5px] group-focus-within:translate-x-[16px] z-10 rounded-full w-fit
+         group-focus-within:translate-y-[-5px] group-focus-within:translate-x-[16px] z-10 rounded-full w-full
          transition cursor-text absolute text-lg group-focus-within:text-sm"
             class:cursor-not-allowed={disabled}
             style="transition-property: transform, font-size"
@@ -29,26 +32,30 @@
             {label}
         </span>
     {/if}
-    <!-- svelte-ignore a11y-autofocus -->
-    <input
-        aria-label={ariaLabel}
-        {autocomplete}
-        bind:this={element}
-        bind:value
-        {disabled}
-        autofocus={autofocus ? true : undefined}
-        {id}
-        {...{ type }}
-        class="w-[300px] text-xl p-3 outline-none cursor-text inline-block relative bg-transparent webkit-autofill:bg-transparent"
-        on:keypress
-        on:change
-        on:input
-        on:blur
-        on:keydown
-        on:keyup
-        {...inputProps}
-    />
 
+    <span class="flex flex-row items-center" class:pl-2={!!startUnit} class:pr-2={!!endUnit}>
+        {startUnit}
+        <!-- svelte-ignore a11y-autofocus -->
+        <input
+            aria-label={ariaLabel}
+            {autocomplete}
+            bind:this={element}
+            bind:value
+            {disabled}
+            autofocus={autofocus ? true : undefined}
+            {id}
+            {...{ type }}
+            class="text-xl p-3 outline-none w-full cursor-text inline-block relative bg-transparent webkit-autofill:bg-transparent"
+            on:keypress
+            on:change
+            on:input
+            on:blur
+            on:keydown
+            on:keyup
+            {...inputProps}
+        />
+        {endUnit}
+    </span>
     <fieldset
         aria-hidden="true"
         class="absolute pointer-events-none overflow-hidden min-w-[0%]

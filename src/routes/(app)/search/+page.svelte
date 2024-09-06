@@ -3,6 +3,7 @@
     import { page } from '$app/stores';
     import Entry from '$lib/components/entry/Entry.svelte';
     import { notify } from '$lib/components/notifications/notifications';
+    import Textbox from '$lib/components/ui/Textbox.svelte';
     import type { SearchResults } from '$lib/controllers/search/search';
     import { omit } from '$lib/utils';
     import { api } from '$lib/utils/apiRequest';
@@ -28,11 +29,11 @@
 
 <main class="p-2">
     <div class="py-2 flex">
-        <input
+        <Textbox
             bind:value={search}
             on:change={() => goto(`/search?q=${search}`)}
-            class="text-2xl p-2 w-full border-2 border-borderColor rounded-lg hover:rounded-lg focus:rounded-lg border-solid"
-            placeholder="Search..."
+            label="Search"
+            fullWidth
         />
     </div>
 

@@ -335,7 +335,7 @@
                         Delete
                     </button>
                 </div>
-                <div class="p-4 pb-0 italic">
+                <div class="p-4 pb-0 italic text-textColorLight text-sm">
                     Created <UtcTime timestamp={event.created} relative />, GMT{numberAsSignedStr(
                         event.tzOffset
                     )}
@@ -356,6 +356,7 @@
 
             .event-name-inp {
                 font-size: 1.2rem;
+                line-height: 1.8rem;
                 display: block;
                 width: 100%;
                 padding: 0.25rem 0.5rem;

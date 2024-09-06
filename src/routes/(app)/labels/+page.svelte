@@ -48,13 +48,13 @@
     <title>Labels</title>
 </svelte:head>
 
-<main class="md:p-4 md:pl-4">
-    <button class="ml-2 mb-4 primary flex-center gap-1" on:click={newLabel}>
-        <Plus size="30" />
-        New Label
-    </button>
-    <div class="labels">
-        <div class="label-list">
+<main class="md:p-4 md:pl-4 flex-center">
+    <div class="w-full md:max-w-5xl">
+        <button class="ml-2 mb-4 primary flex-center gap-1" on:click={newLabel}>
+            <Plus size="30" />
+            New Label
+        </button>
+        <div class="w-fit">
             {#each labelsList as label}
                 <LabelOptions {...omit(label, 'created')} />
                 <hr />
@@ -62,14 +62,3 @@
         </div>
     </div>
 </main>
-
-<style lang="scss">
-    .labels {
-        display: grid;
-        place-content: center;
-
-        & > * {
-            max-width: 50rem;
-        }
-    }
-</style>

@@ -17,19 +17,21 @@
 <svelte:head>
     <title>{data.location.name} | Location</title>
 </svelte:head>
-<main class="p-4 md:pl-4">
-    <section class="p-2 md:rounded-lg md:bg-vLightAccent md:p-4">
-        <EditLocation {...data.location} {onChange} />
-    </section>
+<main class="md:p-4 md:pl-4 flex-center">
+    <div class="w-full md:max-w-5xl">
+        <section class="p-2 md:rounded-lg md:bg-vLightAccent md:p-4">
+            <EditLocation {...data.location} {onChange} />
+        </section>
 
-    <section class="pt-4">
-        <Entries
-            options={{
-                locationId: data.location.id
-            }}
-            showLabels
-            locations={data.locations}
-            labels={data.labels}
-        />
-    </section>
+        <section class="pt-4 md:pl-2">
+            <Entries
+                options={{
+                    locationId: data.location.id
+                }}
+                showLabels
+                locations={data.locations}
+                labels={data.labels}
+            />
+        </section>
+    </div>
 </main>

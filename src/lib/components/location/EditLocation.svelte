@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Textbox from '$lib/components/ui/Textbox.svelte';
     import { tooltip } from '@svelte-plugins/tooltips';
     import Syncing from 'svelte-material-icons/CloudArrowUpOutline.svelte';
     import Synced from 'svelte-material-icons/CloudCheckOutline.svelte';
@@ -22,6 +23,10 @@
 
     let synced = true;
 
+    $: radiusMeters = roundToDecimalPlaces(
+        Location.degreesToMetersPrecise(radius, 1, 1, latitude)
+    ).toString();
+
     async function syncWithServer() {
         synced = false;
         notify.onErr(
@@ -36,11 +41,9 @@
         synced = true;
     }
 
-    const onRadiusChange = (async ({ target }) => {
-        if (!target || !('value' in target) || typeof target.value !== 'string') {
-            throw target;
-        }
-        radius = Location.metersToDegreesPrecise(parseFloat(target.value), 1, 1, latitude);
+    const onRadiusChange = (async () => {
+        if (!radiusMeters) return;
+        radius = Location.metersToDegreesPrecise(parseFloat(radiusMeters), 1, 1, latitude);
         await syncWithServer();
     }) satisfies ChangeEventHandler<HTMLInputElement>;
 
@@ -57,67 +60,52 @@
 </script>
 
 <div>
-    <div class="nav">
-        {#if synced}
-            <span
-                use:tooltip={{
-                    content: 'Synced',
-                    position: 'right'
-                }}
-            >
-                <Synced size="25" />
-            </span>
-        {:else}
-            <span
-                use:tooltip={{
-                    content: 'Syncing...',
-                    position: 'right'
-                }}
-            >
-                <Syncing size="25" class="gradient-icon" />
-            </span>
-        {/if}
+    {#if synced}
+        <span
+            use:tooltip={{
+                content: 'Synced',
+                position: 'right'
+            }}
+        >
+            <Synced size="25" />
+        </span>
+    {:else}
+        <span
+            use:tooltip={{
+                content: 'Syncing...',
+                position: 'right'
+            }}
+        >
+            <Syncing size="25" class="gradient-icon" />
+        </span>
+    {/if}
 
-        {#if isInDialog}
-            <button>
-                <a class="flex-center" href="/map/{id}" style="padding: 4px"> See more </a>
-            </button>
-        {/if}
-    </div>
-    <h2 style="margin: 1rem 0;">
-        <label>
-            <input bind:value={name} on:change={syncWithServer} />
-        </label>
-    </h2>
-    <label>
-        <span class="text-light">Radius</span>
-        <input
-            min="0"
-            on:change={onRadiusChange}
-            step="0.1"
-            type="number"
-            value={roundToDecimalPlaces(Location.degreesToMetersPrecise(radius, 1, 1, latitude))}
-            style="width: 100px"
-        />
-        m
-    </label>
-    <div>
-        <button class="with-icon bordered danger" on:click={bin}>
-            <Bin size="25" />
-            Delete
+    {#if isInDialog}
+        <button>
+            <a class="flex-center" href="/map/{id}" style="padding: 4px"> See more </a>
         </button>
-    </div>
+    {/if}
 </div>
-
-<style lang="scss">
-    .nav {
-        position: relative;
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
-    }
-
-    input {
-        max-width: 100%;
-    }
-</style>
+<div class="py-2">
+    <Textbox bind:value={name} label="Name" on:change={syncWithServer} fullWidth thinBorder />
+</div>
+<div>
+    <Textbox
+        on:change={onRadiusChange}
+        bind:value={radiusMeters}
+        type="number"
+        label="Radius"
+        inputProps={{ min: 0, step: 0.1 }}
+        endUnit="m"
+        thinBorder
+    />
+</div>
+<div class="py-4">
+    <button
+        class="with-icon border border-solid border-borderColor p-2 pr-3 danger rounded-xl md:m-0"
+        on:click={bin}
+    >
+        <Bin size="25" />
+        Delete
+    </button>
+</div>
