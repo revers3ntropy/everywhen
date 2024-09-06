@@ -51,10 +51,10 @@
         {:else if daysSinceFirstEntry === null || data.dayOfFirstEntry === null}
             Something went wrong, please try again later
         {:else}
-            <div class="md:flex justify-between p-2">
+            <div class="md:flex justify-between items-center py-2">
                 <div>
                     <button
-                        class="flex-center gap-1 bg-vLightAccent rounded-full px-2"
+                        class="flex-center gap-1 bg-vLightAccent rounded-full px-4 py-2"
                         on:click={toggleBy}
                     >
                         <span class:text-light={by !== By.Words}> By Words </span>

@@ -11,6 +11,7 @@
     export let type = 'text';
     export let autofocus = false;
     export let inputProps: HTMLInputAttributes = {};
+    export let thinBorder = false;
 </script>
 
 <label class="group flex flex-col relative mt-2">
@@ -50,7 +51,8 @@
 
     <fieldset
         aria-hidden="true"
-        class="absolute pointer-events-none overflow-hidden min-w-[0%] border-2 border-borderColor
+        class="absolute pointer-events-none overflow-hidden min-w-[0%]
+               {thinBorder ? 'border' : 'border-2'} border-borderColor
                group-hover:border-borderHeavy group-focus-within:group-hover:border-textColorLight
                group-focus-within:border-textColorLight rounded-xl px-2"
         style="inset: -5px 0px 0px"
