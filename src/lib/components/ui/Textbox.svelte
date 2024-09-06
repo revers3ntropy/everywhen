@@ -3,10 +3,11 @@
     export let value = '';
     export let ariaLabel = label;
     export let autocomplete = 'off';
-    export let disabled = true;
-    export let element: HTMLInputElement;
+    export let disabled = false;
+    export let element: HTMLInputElement = null as unknown as HTMLInputElement;
     export let id = '';
-    export let type = '';
+    export let type = 'text';
+    export let autofocus = false;
 </script>
 
 <label class="group flex flex-col relative mt-2">
@@ -22,11 +23,13 @@
     >
         {label}
     </span>
+    <!-- svelte-ignore a11y-autofocus -->
     <input
         aria-label={ariaLabel}
         {autocomplete}
         bind:this={element}
         bind:value
+        {autofocus}
         {disabled}
         {id}
         {...{ type }}

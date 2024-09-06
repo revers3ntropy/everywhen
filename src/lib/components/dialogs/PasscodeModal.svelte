@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Textbox from '$lib/components/ui/Textbox.svelte';
     import { Auth } from '$lib/controllers/auth/auth';
     import { onMount } from 'svelte';
     import { slide } from 'svelte/transition';
@@ -54,40 +55,36 @@
     {#if loaded}
         <div class="content bg-vLightAccent">
             <h1 class="pb-8">Enter your passcode</h1>
-            <!-- svelte-ignore a11y-autofocus -->
-            <input
-                type="text"
+            <Textbox
+                label="Passcode"
                 bind:value={input}
-                placeholder="Passcode"
-                autocomplete="off"
+                type="password"
                 autofocus
-                data-lpignore="true"
-                class="password-input px-1 text-xl"
+                autocomplete="off"
             />
-            <button on:click={() => (input = '')} aria-label="Clear passcode">
-                <Close />
-            </button>
 
             <div class="forgot-passcode">
                 <button class="text-light" on:click={() => (showingForgotPassword = true)}>
                     Forgot Passcode?
                 </button>
-                <div class="pt-8">
-                    {#if showingForgotPassword}
-                        <input
-                            type="text"
+
+                {#if showingForgotPassword}
+                    <div
+                        class="pt-8"
+                        transition:slide={{
+                            axis: 'y',
+                            duration: ANIMATION_DURATION
+                        }}
+                    >
+                        <Textbox
+                            label="Password"
                             bind:value={passwordInput}
-                            placeholder="Enter Password"
+                            type="password"
+                            autofocus
                             autocomplete="off"
-                            data-lpignore="true"
-                            class="password-input px-1 text-xl"
-                            transition:slide={{
-                                axis: 'y',
-                                duration: ANIMATION_DURATION
-                            }}
                         />
-                    {/if}
-                </div>
+                    </div>
+                {/if}
             </div>
         </div>
     {/if}

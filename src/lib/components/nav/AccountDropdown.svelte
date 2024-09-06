@@ -39,20 +39,11 @@
         </div>
 
         <hr />
-
-        <Streaks tooltipPosition="bottom" />
+        <div class="py-2">
+            <Streaks tooltipPosition="bottom" />
+        </div>
 
         <hr />
-
-        <button on:click={switchTheme} class="flex justify-start items-center p-2 gap-2">
-            {#if $theme === Theme.light}
-                <DarkTheme size="30" />
-                Dark Mode
-            {:else}
-                <LightTheme size="30" />
-                Light Mode
-            {/if}
-        </button>
 
         <a
             aria-label="deleted entries"
@@ -73,6 +64,17 @@
             Settings
         </a>
 
+        <hr />
+
+        <button on:click={switchTheme} class="flex justify-start items-center p-2 gap-2">
+            {#if $theme === Theme.light}
+                <DarkTheme size="30" />
+                Dark Mode
+            {:else}
+                <LightTheme size="30" />
+                Light Mode
+            {/if}
+        </button>
         <button
             aria-label="log out"
             class="flex justify-start items-center p-2 gap-2 danger"

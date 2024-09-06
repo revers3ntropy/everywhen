@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Textbox from '$lib/components/ui/Textbox.svelte';
     import type { Label } from '$lib/controllers/label/label';
     import { dispatch } from '$lib/dataChangeEvents';
     import { nowUtc } from '$lib/utils/time';
@@ -37,20 +38,18 @@
 
 <div>
     <div>
-        <h1>Create New Label</h1>
+        <h2>New Label</h2>
     </div>
     <div class="content">
-        <label>
-            Name <br />
-            <input bind:value={labelName} type="text" />
-        </label>
+        <Textbox label="Name" bind:value={labelName} />
+
         <label>
             Color <br />
             <input bind:value={labelColor} type="color" />
             <input bind:value={labelColor} type="text" />
         </label>
     </div>
-    <div class="actions">
+    <div class="flex-center">
         <button class="primary" on:click={closeHandler} aria-label="Create"> Create </button>
     </div>
 </div>
@@ -58,34 +57,14 @@
 <style lang="scss">
     @import '$lib/styles/text';
 
-    .content {
-        margin-left: 10vw;
+    label {
+        @extend .text-light;
 
-        label {
-            @extend .text-light;
+        display: block;
+        margin: 1rem;
 
-            display: block;
-            margin: 1rem;
-
-            input {
-                margin: 0.2rem 0 0 0;
-            }
-        }
-    }
-
-    .actions {
-        display: flex;
-        justify-content: center;
-
-        button {
-            border: 1px solid var(--border-color);
-            border-radius: $border-radius;
-            padding: 1em;
-            margin: 1em;
-
-            &:hover {
-                background-color: var(--light-accent);
-            }
+        input {
+            margin: 0.2rem 0 0 0;
         }
     }
 </style>
