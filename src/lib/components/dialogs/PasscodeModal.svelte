@@ -57,9 +57,9 @@
             <Textbox
                 label="Passcode"
                 bind:value={input}
-                type="password"
                 autofocus
                 autocomplete="off"
+                inputProps={{ style: '-webkit-text-security: disc; -moz-text-security: disc;' }}
             />
 
             <div class="forgot-passcode">
@@ -128,12 +128,6 @@
                 padding: 2rem 4px 3rem 1rem;
                 width: 100%;
                 border-radius: 0;
-            }
-
-            .password-input {
-                -webkit-text-security: disc;
-                -moz-text-security: disc;
-                max-width: 85vw;
             }
 
             .forgot-passcode {

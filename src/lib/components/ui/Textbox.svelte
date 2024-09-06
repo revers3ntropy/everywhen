@@ -1,4 +1,6 @@
 <script lang="ts">
+    import type { HTMLInputAttributes } from 'svelte/elements';
+
     export let label: string | undefined = undefined;
     export let value = '';
     export let ariaLabel = label;
@@ -8,6 +10,7 @@
     export let id = '';
     export let type = 'text';
     export let autofocus = false;
+    export let inputProps: HTMLInputAttributes = {};
 </script>
 
 <label class="group flex flex-col relative mt-2">
@@ -42,6 +45,7 @@
         on:blur
         on:keydown
         on:keyup
+        {...inputProps}
     />
 
     <fieldset
