@@ -1,5 +1,4 @@
 <script lang="ts">
-    import Textbox from '$lib/components/ui/Textbox.svelte';
     import { ANIMATION_DURATION } from '$lib/constants';
     import { dispatch, listen } from '$lib/dataChangeEvents';
     import { numberAsSignedStr } from '$lib/utils/text';
