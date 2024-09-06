@@ -1,9 +1,11 @@
 <script lang="ts">
+    import Textbox from '$lib/components/ui/Textbox.svelte';
     import { Entry } from '$lib/controllers/entry/entry';
     import { popup, username } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
     import { Auth } from '$lib/controllers/auth/auth';
+    import { AlertCircle } from 'lucide-svelte';
 
     let currentPassword = '';
     let newPassword = '';
@@ -43,49 +45,40 @@
     }
 </script>
 
-<h1>Change Password</h1>
+<h2 class="md:pl-6 pt-4">Change Password</h2>
 
-<div class="content">
-    <div class="pb-8">
-        <div class="text-warning pb-2">Warning!</div>
+<div class="py-4 md:p-6 max-w-[36rem]">
+    <div class="mb-4 flex items-center gap-4">
+        <span class="text-warning"><AlertCircle /></span>
         If you lose your password, your account cannot be recovered
     </div>
 
-    <div class="form">
-        <label>
-            Current Password
-            <input
-                type="password"
-                class="textbox"
-                autocomplete="current-password"
-                bind:value={currentPassword}
-                disabled={submitted}
-            />
-        </label>
-        <label class="pt-4">
-            New Password
-            <input
-                type="password"
-                class="textbox"
-                autocomplete="new-password"
-                bind:value={newPassword}
-                disabled={submitted}
-            />
-        </label>
-        <label>
-            Confirm New Password
-            <input
-                type="password"
-                class="textbox"
-                autocomplete="new-password"
-                bind:value={confirmNewPassword}
-                disabled={submitted}
-            />
-            {#if passwordsDoNotMatch}
-                <span class="text-warning">Passwords do not match</span>
-            {/if}
-        </label>
-        <div class="flex-space-evenly gap-4">
+    <div class="flex flex-col gap-4">
+        <Textbox
+            label="Current Password"
+            type="password"
+            autocomplete="current-password"
+            bind:value={currentPassword}
+            disabled={submitted}
+        />
+        <Textbox
+            label="New Password"
+            type="password"
+            autocomplete="new-password"
+            bind:value={newPassword}
+            disabled={submitted}
+        />
+        <Textbox
+            label="Confirm New Password"
+            type="password"
+            autocomplete="new-password"
+            bind:value={confirmNewPassword}
+            disabled={submitted}
+        />
+        {#if passwordsDoNotMatch}
+            <span class="text-warning">Passwords do not match</span>
+        {/if}
+        <div class="flex justify-between items-center w-full">
             <button
                 class="primary"
                 aria-label="change password submit"
@@ -104,24 +97,3 @@
         </div>
     </div>
 </div>
-
-<style lang="scss">
-    .content {
-        margin: 1rem 0 0 2rem;
-    }
-
-    .form {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 2rem;
-        width: 100%;
-
-        label {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.5rem;
-        }
-    }
-</style>

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Textbox from '$lib/components/ui/Textbox.svelte';
     import { ANIMATION_DURATION } from '$lib/constants';
     import { dispatch, listen } from '$lib/dataChangeEvents';
     import { numberAsSignedStr } from '$lib/utils/text';
@@ -185,11 +186,15 @@
 </script>
 
 {#if event.deleted}
-    <div class="restore-event">
+    <div class="flex flex-row justify-around items-center">
         <div>
             <i>'{event.name}' has been deleted</i>
         </div>
-        <button class="with-icon bordered" on:click={restoreEvent} aria-label="Restore Event">
+        <button
+            class="with-icon bordered rounded-xl"
+            on:click={restoreEvent}
+            aria-label="Restore Event"
+        >
             <Restore />
             Undo Deletion
         </button>
@@ -311,7 +316,7 @@
                 <div>
                     {#if Event.isInstantEvent(event)}
                         <button
-                            class="with-icon bordered icon-gradient-on-hover"
+                            class="with-icon bordered icon-gradient-on-hover rounded-xl"
                             on:click={makeDurationEvent}
                         >
                             <TimelineOutline size="25" />
@@ -319,14 +324,14 @@
                         </button>
                     {:else}
                         <button
-                            class="with-icon bordered icon-gradient-on-hover"
+                            class="with-icon bordered icon-gradient-on-hover rounded-xl"
                             on:click={makeInstantEvent}
                         >
                             <TimelineClockOutline size="25" />
                             Make Instant Event
                         </button>
                     {/if}
-                    <button class="with-icon bordered danger" on:click={deleteEvent}>
+                    <button class="with-icon bordered danger rounded-xl" on:click={deleteEvent}>
                         <Bin size="25" />
                         Delete
                     </button>
@@ -344,17 +349,6 @@
 <style lang="scss">
     @import '$lib/styles/layout';
 
-    .restore-event {
-        @extend .container;
-        border-radius: $border-radius;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-around;
-        align-items: center;
-        margin: 8px;
-        padding: 1.3rem 0.4rem;
-    }
-
     .event {
         .header {
             display: grid;
@@ -362,9 +356,11 @@
             margin: 0 5px;
 
             .event-name-inp {
-                font-size: 1.4rem;
+                font-size: 1.2rem;
                 display: block;
                 width: 100%;
+                padding: 0.25rem 0.5rem;
+                border-radius: calc($border-radius / 2);
             }
         }
 

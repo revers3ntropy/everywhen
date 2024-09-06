@@ -77,13 +77,15 @@
 </svelte:head>
 
 <main class="flex-center">
-    <div class="content">
+    <form class="content">
         <Textbox
             autocomplete="username"
             disabled={actionPending}
             on:keypress={usernameInputKeypress}
             bind:element={username}
             label="Username"
+            autofocus
+            id="username"
         />
         <Textbox
             autocomplete="current-password"
@@ -92,6 +94,7 @@
             bind:element={password}
             label="Password"
             type="password"
+            id="password"
         />
         <div class="pb-4 pt-2 text-right">
             <input type="checkbox" bind:this={rememberMeInput} />
@@ -129,7 +132,7 @@
                 Log In
             </button>
         </div>
-    </div>
+    </form>
 </main>
 
 <style lang="scss">

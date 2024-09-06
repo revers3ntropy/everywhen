@@ -4,7 +4,6 @@
     import { onMount } from 'svelte';
     import { slide } from 'svelte/transition';
     import { browser } from '$app/environment';
-    import Close from 'svelte-material-icons/Close.svelte';
     import { ANIMATION_DURATION } from '$lib/constants';
     import { encryptionKey, passcodeLastEntered } from '$lib/stores';
     import { nowUtc } from '$lib/utils/time';

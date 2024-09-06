@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Textbox from '$lib/components/ui/Textbox.svelte';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import Skull from 'svelte-material-icons/Skull.svelte';
     import { api } from '$lib/utils/apiRequest';
@@ -47,17 +48,15 @@
         <form>
             <h3> Please enter your username and password to confirm </h3>
 
-            <div style="margin: 1rem 0">
-                Username:
-                <input bind:this={usernameInput} type="text" />
+            <div class="py-4 max-w-[20rem]">
+                <Textbox label="Username" bind:element={usernameInput} />
                 {#if badUsername}
                     <p class="text-warning"> Please enter your username </p>
                 {/if}
             </div>
 
-            <div>
-                Password:
-                <input bind:this={passwordInput} type="password" />
+            <div class="max-w-[20rem]">
+                <Textbox label="Password" type="password" bind:element={passwordInput} />
                 {#if badPassword}
                     <p class="text-warning"> Please enter your password </p>
                 {/if}

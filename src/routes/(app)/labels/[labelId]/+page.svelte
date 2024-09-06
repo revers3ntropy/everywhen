@@ -1,6 +1,7 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import EventsList from '$lib/components/event/EventsList.svelte';
+    import Textbox from '$lib/components/ui/Textbox.svelte';
     import { listen } from '$lib/dataChangeEvents';
     import Delete from 'svelte-material-icons/Delete.svelte';
     import Entries from '$lib/components/entry/Entries.svelte';
@@ -14,6 +15,7 @@
     export let data: PageData;
 
     async function updateName() {
+        console.log(data.label.name);
         notify.onErr(
             await api.put(apiPath('/labels/?', data.label.id), {
                 name: data.label.name
@@ -36,7 +38,7 @@
         // label from the entries and events
         if (data.entryCount + eventCount < 1) {
             notify.onErr(await api.delete(apiPath(`/labels/?`, data.label.id)));
-            await goto('../');
+            await goto('/labels');
             return;
         }
 
@@ -86,12 +88,8 @@
             {data.label.color}
             <input type="color" bind:value={data.label.color} on:change={updateColor} />
         </div>
-        <div class="title-line">
-            <input
-                class="font-bold text-[2em] editable-text py-1"
-                bind:value={data.label.name}
-                on:change={updateName}
-            />
+        <div class="overflow-x-hidden md:flex justify-between align-center py-2">
+            <Textbox bind:value={data.label.name} on:change={updateName} label="Name" />
             <button class="with-circled-icon danger" on:click={deleteLabel}>
                 <Delete size="30" />
                 Delete this Label
@@ -115,20 +113,3 @@
         </section>
     </div>
 </main>
-
-<style lang="scss">
-    @import '$lib/styles/layout';
-
-    .title-line {
-        display: grid;
-        grid-template-columns: 1fr auto;
-        justify-content: space-between;
-        align-items: center;
-
-        @media #{$mobile} {
-            display: block;
-            justify-content: left;
-            overflow-x: hidden;
-        }
-    }
-</style>

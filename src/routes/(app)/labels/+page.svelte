@@ -6,6 +6,7 @@
     import { nowUtc } from '$lib/utils/time';
     import { listen } from '$lib/dataChangeEvents';
     import LabelOptions from './LabelOptions.svelte';
+    import { omit } from '$lib/utils';
 
     export let data: PageData;
 
@@ -48,14 +49,15 @@
 </svelte:head>
 
 <main class="md:p-4 md:pl-4">
-    <button class="primary flex-center gap-1" on:click={newLabel}>
+    <button class="ml-2 mb-4 primary flex-center gap-1" on:click={newLabel}>
         <Plus size="30" />
         New Label
     </button>
     <div class="labels">
         <div class="label-list">
             {#each labelsList as label}
-                <LabelOptions {...label} {labels} />
+                <LabelOptions {...omit(label, 'created')} />
+                <hr />
             {/each}
         </div>
     </div>
