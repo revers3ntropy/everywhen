@@ -1,15 +1,12 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
+    import Textbox from '$lib/components/ui/Textbox.svelte';
     import { Auth } from '$lib/controllers/auth/auth';
-    import { encryptionKey, passcodeLastEntered, username as usernameStore } from '$lib/stores';
-    import { nowUtc } from '$lib/utils/time';
-    import { tooltip } from '@svelte-plugins/tooltips';
+    import { encryptionKey, username as usernameStore } from '$lib/stores';
     import ArrowRightThinCircleOutline from 'svelte-material-icons/ArrowRightThinCircleOutline.svelte';
-    import InformationOutline from 'svelte-material-icons/InformationOutline.svelte';
     import type { PageData } from './$types';
     import { api } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
-    import Dot from '$lib/components/ui/Dot.svelte';
 
     export let data: PageData;
     const { redirect } = data;
@@ -34,17 +31,6 @@
 
         usernameStore.set(username.value);
 
-        if (passcode.value) {
-            notify.onErr(
-                await api.put(`/settings`, {
-                    key: 'passcode',
-                    value: passcode.value
-                }),
-                () => (actionPending = false)
-            );
-            passcodeLastEntered.set(nowUtc());
-        }
-
         await Auth.populateCookiesAndSettingsAfterAuth(() => (actionPending = false));
 
         await goto('/' + redirect);
@@ -58,12 +44,6 @@
 
     function passwordInputKeypress(event: { code: string }) {
         if (event.code === 'Enter') {
-            passcode.focus();
-        }
-    }
-
-    function passcodeInputKeypress(event: { code: string }) {
-        if (event.code === 'Enter') {
             void create();
         }
     }
@@ -71,7 +51,6 @@
     // user log in / create account form values
     let password: HTMLInputElement;
     let username: HTMLInputElement;
-    let passcode: HTMLInputElement;
 
     let actionPending = false;
 
@@ -87,64 +66,24 @@
 </svelte:head>
 
 <main class="flex-center">
-    <div class="content">
-        <label>
-            Username
-            <input
-                aria-label="Username"
-                autocomplete="username"
-                bind:this={username}
-                disabled={actionPending}
-                on:keypress={usernameInputKeypress}
-            />
-        </label>
-        <label>
-            <span>
-                Password
-                <Dot />
-                <i
-                    use:tooltip={{
-                        content: 'Your account cannot be recovered ' + 'if you lose your password!'
-                    }}
-                >
-                    <span class="text-warning">Warning</span>
-                    <InformationOutline size="20" />
-                </i>
-            </span>
-            <input
-                aria-label="Password"
-                autocomplete="new-password"
-                bind:this={password}
-                disabled={actionPending}
-                type="password"
-                on:keypress={passwordInputKeypress}
-            />
-        </label>
-        <label>
-            <span>
-                Passcode
-                <Dot />
-                <i
-                    use:tooltip={{
-                        content:
-                            'An optional additional layer of security ' +
-                            'which can be changed later in settings'
-                    }}
-                >
-                    Optional
-                    <InformationOutline size="20" />
-                </i>
-            </span>
-            <input
-                aria-label="Passcode"
-                bind:this={passcode}
-                disabled={actionPending}
-                type="password"
-                placeholder="No passcode"
-                on:keypress={passcodeInputKeypress}
-            />
-        </label>
-        <div class="flex-center" style="justify-content: space-between">
+    <form class="content">
+        <Textbox
+            label="Username"
+            autocomplete="username"
+            bind:element={username}
+            disabled={actionPending}
+            on:keypress={usernameInputKeypress}
+        />
+        <Textbox
+            label="Password"
+            autocomplete="new-password"
+            bind:element={password}
+            disabled={actionPending}
+            on:keypress={passwordInputKeypress}
+            type="password"
+        />
+
+        <div class="flex-center pt-4" style="justify-content: space-between">
             <a href="/login?redirect={data.redirect}">Log In</a>
             <button
                 aria-label="Create Account"
@@ -157,7 +96,7 @@
                 <ArrowRightThinCircleOutline size="25" />
             </button>
         </div>
-    </div>
+    </form>
 </main>
 
 <style lang="scss">

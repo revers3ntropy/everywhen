@@ -81,6 +81,7 @@
             {#each settingsConfigEntries as [key, config] (key)}
                 {#if config.showInSettings}
                     <Settings {...config} {...$settingsStore[key]} />
+                    <hr />
                 {/if}
             {/each}
         </div>

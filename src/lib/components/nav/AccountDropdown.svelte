@@ -6,6 +6,8 @@
     import Dropdown from '$lib/components/ui/Dropdown.svelte';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
+    import Bin from 'svelte-material-icons/Delete.svelte';
+    import ImageArea from 'svelte-material-icons/ImageArea.svelte';
     import LightTheme from 'svelte-material-icons/WhiteBalanceSunny.svelte';
     import Logout from 'svelte-material-icons/Logout.svelte';
     import CogOutline from 'svelte-material-icons/CogOutline.svelte';
@@ -51,6 +53,20 @@
                 Light Mode
             {/if}
         </button>
+
+        <a
+            aria-label="deleted entries"
+            href="/journal/deleted"
+            class="flex justify-start items-center p-2 gap-2"
+        >
+            <Bin size="30" />
+            Deleted Entries
+        </a>
+
+        <a aria-label="images" href="/assets" class="flex justify-start items-center p-2 gap-2">
+            <ImageArea size="30" />
+            Images
+        </a>
 
         <a aria-label="settings" href="/settings" class="flex justify-start items-center p-2 gap-2">
             <CogOutline size="30" />

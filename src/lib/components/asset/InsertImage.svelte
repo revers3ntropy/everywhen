@@ -8,6 +8,7 @@
     import { nowUtc } from '$lib/utils/time';
     import { onMount } from 'svelte';
     import ImageArea from 'svelte-material-icons/ImageArea.svelte';
+    import FolderMultipleImage from 'svelte-material-icons/FolderMultipleImage.svelte';
     import Upload from 'svelte-material-icons/Upload.svelte';
     import Dropdown from '$lib/components/ui/Dropdown.svelte';
     import type { ChangeEventHandler } from 'svelte/elements';
@@ -61,15 +62,9 @@
             <ImageArea {size} />
         </span>
         <div>
-            <a href="/assets">
-                <button class="flex p-3 items-center gap-2">
-                    <ImageArea size="28" />
-                    Open Gallery
-                </button>
-            </a>
             <button
                 on:click={() => fileDropInput.click()}
-                class="flex items-center hover:bg-vLightAccent icon-gradient-on-hover p-3 gap-2 w-full"
+                class="flex items-center hover:bg-vLightAccent icon-gradient-on-hover p-3 gap-3 w-full rounded-2xl"
             >
                 <Upload size="28" />
                 Upload Image
@@ -82,6 +77,13 @@
                 multiple
                 accept={FILE_INPUT_ACCEPT_TYPES}
             />
+
+            <a href="/assets">
+                <button class="flex p-3 items-center gap-3">
+                    <FolderMultipleImage size="28" />
+                    Gallery
+                </button>
+            </a>
 
             <hr />
 

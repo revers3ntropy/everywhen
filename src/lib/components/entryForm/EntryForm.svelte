@@ -383,6 +383,7 @@
             <button
                 aria-label="Submit Entry"
                 class="flex-center aspect-square primary"
+                style="padding: 0.5rem"
                 disabled={submitted}
                 on:click={submit}
             >

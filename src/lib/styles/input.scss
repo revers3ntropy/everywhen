@@ -47,67 +47,59 @@ textarea {
 }
 
 input {
-    border-bottom: 1px solid var(--border-color);
-    position: relative;
-    display: inline-block;
-    line-height: 1.2;
-    text-decoration: none;
-    outline: none;
-    cursor: text;
-    padding: 0.25rem 0;
-
-    &:hover {
-        border-bottom-color: var(--primary);
-    }
-
-    &:focus {
-        border-radius: $border-radius;
-        color: var(--text-color);
-        background: var(--light-accent);
-        border-bottom-color: transparent;
-    }
-
     &[type='color'] {
         border: none;
-    }
-
-    &.editable-text {
-        border: none;
-        border-bottom: 1px solid transparent;
-        background: transparent;
-        outline: none;
-        cursor: text;
-        display: inline-block;
-        line-height: 1.2;
-        text-decoration: none;
-
-        &:hover {
-            border-bottom: 1px solid var(--primary);
-        }
-
-        &:focus {
-            color: var(--text-color);
-            border-bottom: 1px solid var(--primary);
-            background: var(--v-light-accent);
-            border-radius: $border-radius;
-        }
-    }
-
-    &.text-box {
-        border: 1px solid var(--border-heavy);
-        border-radius: 3px;
-        padding: 0.5em;
-        margin: 0.2em;
-        outline: none;
-        cursor: text;
-        color: var(--text-color);
-        background: var(--light-accent);
     }
 
     &[type='checkbox'] {
         width: fit-content;
         display: inline;
         cursor: pointer;
+    }
+}
+
+input.textbox {
+    border: 1px solid var(--border-color);
+    position: relative;
+    display: inline-block;
+    line-height: 1.2;
+    text-decoration: none;
+    outline: none;
+    cursor: text;
+    padding: 0.5rem;
+    border-radius: $border-radius;
+    background: var(--v-light-accent);
+
+    &:hover {
+        border: 1px solid var(--border-light);
+    }
+
+    &:focus {
+        color: var(--text-color);
+        background: var(--light-accent);
+        border: 1px solid var(--border-heavy);
+    }
+}
+
+input.editable-text {
+    border: 1px solid transparent;
+    background: transparent;
+    outline: none;
+    cursor: text;
+    display: inline-block;
+    line-height: 1.2;
+    text-decoration: none;
+    padding: 0.5em;
+    border-radius: $border-radius;
+
+    &:hover {
+        border: 1px solid var(--border-light);
+    }
+
+    &:focus {
+        color: var(--text-color);
+        border: 1px solid var(--border-light);
+        background: var(--v-light-accent);
     }
 }
 
@@ -135,7 +127,8 @@ button {
         // this is what tailwind does ¯\_(ツ)_/¯
         border-radius: 9999px;
         background: var(--accent-gradient);
-        padding: 0.25rem 0.5rem;
+        padding: 0.6em 1em;
+        border: 1px solid transparent;
 
         &, svg, * {
             color: var(--text-colour-on-gradient) !important;
@@ -143,6 +136,9 @@ button {
 
         &:after {
             display: none;
+        }
+        &:hover {
+            border: 1px solid var(--border-heavy);
         }
     }
 

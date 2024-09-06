@@ -1,5 +1,6 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
+    import Textbox from '$lib/components/ui/Textbox.svelte';
     import { NORMAL_COOKIE_TIMEOUT_DAYS, REMEMBER_ME_COOKIE_TIMEOUT_DAYS } from '$lib/constants';
     import { Auth } from '$lib/controllers/auth/auth';
     import ChevronRight from 'svelte-material-icons/ChevronRight.svelte';
@@ -77,30 +78,22 @@
 
 <main class="flex-center">
     <div class="content">
-        <label>
-            Username
-            <input
-                aria-label="Username"
-                autocomplete="username"
-                bind:this={username}
-                disabled={actionPending}
-                class="text-xl px-2"
-                on:keypress={usernameInputKeypress}
-            />
-        </label>
-        <label>
-            Password
-            <input
-                aria-label="Password"
-                autocomplete="current-password"
-                bind:this={password}
-                disabled={actionPending}
-                class="text-xl px-2"
-                type="password"
-                on:keypress={passwordInputKeypress}
-            />
-        </label>
-        <div style="text-align: right; margin-bottom: 1rem">
+        <Textbox
+            autocomplete="username"
+            disabled={actionPending}
+            on:keypress={usernameInputKeypress}
+            bind:element={username}
+            label="Username"
+        />
+        <Textbox
+            autocomplete="current-password"
+            disabled={actionPending}
+            on:keypress={passwordInputKeypress}
+            bind:element={password}
+            label="Password"
+            type="password"
+        />
+        <div class="pb-4 pt-2 text-right">
             <input type="checkbox" bind:this={rememberMeInput} />
             <button
                 class="flex-center oneline text-light"

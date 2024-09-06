@@ -154,7 +154,7 @@
             {:else}
                 <input
                     checked={inputType === 'checkbox' && !!value}
-                    class="text-box"
+                    class="textbox"
                     on:change={onInput}
                     type={inputType}
                     {value}
@@ -172,13 +172,14 @@
     .wrapper {
         display: grid;
         grid-template-columns: 1fr 25rem;
-        padding: 0.8rem;
+        padding-inline: 1rem;
 
         @media #{$mobile} {
             display: block;
         }
 
         border: 1px solid transparent;
+
         &:target {
             border: 1px solid var(--border-light);
             border-radius: $border-radius;
@@ -186,10 +187,10 @@
 
         .left,
         .right {
-            margin: 0.5em;
+            padding: 0 0.5em;
 
             @media #{$mobile} {
-                margin: 0;
+                padding: 0;
             }
         }
     }
@@ -211,7 +212,7 @@
             height: 25px;
             width: 25px;
             background-color: var(--light-accent);
-            border-radius: $border-radius;
+            border-radius: 0.5rem;
 
             &:after {
                 margin: 1px;

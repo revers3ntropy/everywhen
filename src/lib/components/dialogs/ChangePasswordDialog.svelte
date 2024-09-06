@@ -46,25 +46,27 @@
 <h1>Change Password</h1>
 
 <div class="content">
-    <p>
-        <span class="text-warning">Warning!</span>
+    <div class="pb-8">
+        <div class="text-warning pb-2">Warning!</div>
         If you lose your password, your account cannot be recovered
-    </p>
+    </div>
 
     <div class="form">
         <label>
             Current Password
             <input
                 type="password"
+                class="textbox"
                 autocomplete="current-password"
                 bind:value={currentPassword}
                 disabled={submitted}
             />
         </label>
-        <label>
+        <label class="pt-4">
             New Password
             <input
                 type="password"
+                class="textbox"
                 autocomplete="new-password"
                 bind:value={newPassword}
                 disabled={submitted}
@@ -74,6 +76,7 @@
             Confirm New Password
             <input
                 type="password"
+                class="textbox"
                 autocomplete="new-password"
                 bind:value={confirmNewPassword}
                 disabled={submitted}
@@ -82,14 +85,14 @@
                 <span class="text-warning">Passwords do not match</span>
             {/if}
         </label>
-        <div class="flex-space-evenly">
+        <div class="flex-space-evenly gap-4">
             <button
                 class="primary"
                 aria-label="change password submit"
                 disabled={submitted}
                 on:click={change}
             >
-                Change Password
+                <span> Change Password </span>
             </button>
             <button
                 on:click={() => popup.set(null)}
