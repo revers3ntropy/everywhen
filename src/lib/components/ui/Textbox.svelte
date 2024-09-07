@@ -25,7 +25,7 @@
                 : 'translate-y-[12px] translate-x-[10px]'}
          translate-x-[10px] text-light
          group-focus-within:translate-y-[-5px] group-focus-within:translate-x-[16px] z-10 rounded-full w-full
-         transition cursor-text absolute text-lg group-focus-within:text-sm"
+         transition cursor-text absolute text-lg group-focus-within:text-sm pointer-events-none touch-none"
             class:cursor-not-allowed={disabled}
             style="transition-property: transform, font-size"
         >
@@ -58,7 +58,7 @@
     </span>
     <fieldset
         aria-hidden="true"
-        class="absolute pointer-events-none overflow-hidden min-w-[0%]
+        class="absolute pointer-events-none touch-none overflow-hidden min-w-[0%]
                {thinBorder ? 'border' : 'border-2'} border-borderColor
                group-hover:border-borderHeavy group-focus-within:group-hover:border-textColorLight
                group-focus-within:border-textColorLight rounded-xl px-2"
@@ -67,11 +67,11 @@
     >
         {#if label}
             <legend
-                class="transition visibility-hidden overflow-hidden h-4
+                class="transition visibility-hidden overflow-hidden h-4 pointer-events-none touch-none
                 {value ? 'max-w-[100%]' : 'max-w-[0.01px] group-focus-within:max-w-[100%]'}"
                 style="transition-propety: max-width"
             >
-                <span class="px-2 opacity-0 text-sm">{label}</span>
+                <span class="px-2 opacity-0 text-sm pointer-events-none touch-none">{label}</span>
             </legend>
         {/if}
     </fieldset>

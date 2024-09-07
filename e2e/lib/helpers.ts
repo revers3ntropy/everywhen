@@ -90,7 +90,7 @@ export async function generateUserAndSignIn(page: Page): Promise<{
     const { auth, api } = await generateUser();
 
     await page.getByLabel('Username').click();
-    await page.getByLabel('Username').type(auth.username);
+    await page.getByLabel('Username').fill(auth.username);
     await page.getByLabel('Password').fill(auth.password);
     await page.getByRole('button', { name: 'Log In' }).click();
 
