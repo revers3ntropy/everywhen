@@ -83,7 +83,9 @@
                     <EntryHeatMap
                         {by}
                         data={data.heatMapData}
-                        earliestEntryDay={Day.fromString(data.dayOfFirstEntryWithWord).unwrap()}
+                        earliestEntryDay={data.dayOfFirstEntryWithWord
+                            ? Day.fromString(data.dayOfFirstEntryWithWord).unwrap()
+                            : Day.todayUsingNativeDate()}
                     />
                 </div>
                 <div class="container" style="margin: 1rem 0; padding: 1rem;">

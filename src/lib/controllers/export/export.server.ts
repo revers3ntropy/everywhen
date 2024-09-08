@@ -41,18 +41,31 @@ export namespace Export {
     `;
 
     function markdownToHtml(images: Asset[], markdown: string): string {
-        return markdown
-            .replace(/!\[(.*?)]\(\/api\/assets\/(.*?)\)/g, (md, alt, id) => {
-                console.log('!!!', id);
-                const asset = images.find(i => i.publicId === id);
-                if (!asset) return md;
-                return `<img src="data:image/webp;base64,${asset.content}" alt="${alt}" />`;
-            })
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\*(.*?)\*/g, '<em>$1</em>')
-            .replace(/`(.*?)`/g, '<code>$1</code>')
-            .replace(/\n/g, '<br>')
-            .replace(/(https?:\/\/\S+)/g, '<a href="$1">$1</a>');
+        return (
+            markdown
+                .replace(/!\[(.*?)]\(\/api\/assets\/(.*?)\)/g, (md, alt, id) => {
+                    console.log('!!!', id);
+                    const asset = images.find(i => i.publicId === id);
+                    if (!asset) return md;
+                    return `<img src="data:image/webp;base64,${asset.content}" alt="${alt}" />`;
+                })
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                .replace(/~~(.*?)~~/g, '<del>$1</del>')
+                // (?: ) makes a non-capturing group
+                .replace(/# (.*?)(?:$|\n)/g, '<h1>$1</h1>')
+                .replace(/## (.*?)(?:$|\n)/g, '<h2>$1</h2>')
+                .replace(/### (.*?)(?:$|\n)/g, '<h3>$1</h3>')
+                .replace(/#### (.*?)(?:$|\n)/g, '<h4>$1</h4>')
+                .replace(/##### (.*?)(?:$|\n)/g, '<h5>$1</h5>')
+                .replace(/###### (.*?)(?:$|\n)/g, '<h6>$1</h6>')
+                .replace(/---/g, '<hr>')
+                .replace(/```(.*?)```/g, '<code>$1</code>')
+                .replace(/`(.*?)`/g, '<code>$1</code>')
+                .replace(/\n/g, '<br>')
+                .replace(/!\[(.*)]\((.+)\)/g, '<img src="$2" alt="$1">')
+                .replace(/\[(.*)]\((.+)\)/g, '<a href="$2">$1</a>')
+        );
     }
 
     function entryHtml(images: Asset[], entry: Entry): string {
