@@ -1,6 +1,7 @@
 <script lang="ts">
     import LocationSelector from '$lib/components/location/LocationSelector.svelte';
     import Dot from '$lib/components/ui/Dot.svelte';
+    import Textbox from '$lib/components/ui/Textbox.svelte';
     import { tooltip } from '@svelte-plugins/tooltips';
     import CloudCheckOutline from 'svelte-material-icons/CloudCheckOutline.svelte';
     import Sync from 'svelte-material-icons/Sync.svelte';
@@ -151,9 +152,9 @@
                 {:else}
                     Something went wrong!
                 {/if}
-            {:else}
+            {:else if inputType === 'checkbox'}
                 <input
-                    checked={inputType === 'checkbox' && !!value}
+                    checked={!!value}
                     class="textbox"
                     on:change={onInput}
                     type={inputType}
@@ -161,6 +162,14 @@
                 />
                 <span class="checkmark" />
                 {unit}
+            {:else}
+                <Textbox
+                    type={inputType}
+                    value={value.toString()}
+                    on:change={onInput}
+                    endUnit={unit}
+                    thinBorder
+                />
             {/if}
         </label>
     </div>

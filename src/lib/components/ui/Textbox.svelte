@@ -46,6 +46,7 @@
             {id}
             {...{ type }}
             class="text-xl p-3 outline-none w-full cursor-text inline-block relative bg-transparent webkit-autofill:bg-transparent"
+            class:pt-2={!label}
             on:keypress
             on:change
             on:input
