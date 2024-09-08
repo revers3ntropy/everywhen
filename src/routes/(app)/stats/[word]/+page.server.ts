@@ -28,9 +28,12 @@ export const load = cachedPageRoute(async (auth, { params }) => {
         heatMapData: heatMapDataFromEntries(summaries),
         labels: (await Label.allIndexedById(auth)).unwrap(e => error(400, e)),
         days,
-        dayOfFirstEntryWithWord: Day.fromTimestamp(
-            summaries[summaries.length - 1].created,
-            summaries[summaries.length - 1].createdTzOffset
-        ).fmtIso()
+        dayOfFirstEntryWithWord:
+            summaries.length > 0
+                ? Day.fromTimestamp(
+                      summaries[summaries.length - 1].created,
+                      summaries[summaries.length - 1].createdTzOffset
+                  ).fmtIso()
+                : null
     };
 }) satisfies PageServerLoad;
