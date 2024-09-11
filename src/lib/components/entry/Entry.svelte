@@ -321,7 +321,7 @@
         // so images don't appear too large
         :global(img) {
             max-width: 100%;
-            height: 50vh;
+            height: 250px;
             transition: opacity $transition;
             border-radius: 0.5rem;
         }
