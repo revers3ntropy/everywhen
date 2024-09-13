@@ -1,5 +1,4 @@
 import { error } from '@sveltejs/kit';
-import { Entry } from '$lib/controllers/entry/entry.server';
 import { Event } from '$lib/controllers/event/event.server';
 import { Location } from '$lib/controllers/location/location.server';
 import { Label } from '$lib/controllers/label/label.server';
@@ -11,12 +10,7 @@ export const load = cachedPageRoute(async (auth, { params }) => {
     if (!labelId) error(404, 'Not found');
 
     return {
-        label: (await Label.fromId(auth, labelId)).unwrap(e => error(404, e)),
-        entryCount: (
-            await Entry.getPage(auth, 0, 1, {
-                labelId
-            })
-        ).unwrap(e => error(400, e))[1],
+        label: (await Label.withCount(auth, labelId)).unwrap(e => error(404, e)),
         events: (await Event.all(auth))
             .unwrap(e => error(400, e))
             .filter(event => event.label?.id === labelId),

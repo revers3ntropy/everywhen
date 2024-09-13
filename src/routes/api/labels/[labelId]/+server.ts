@@ -43,18 +43,11 @@ export const DELETE = (async ({ cookies, params, request }) => {
         error(404, 'Label with that id not found');
     }
 
-    const [, entriesWithLabel] = (
-        await Entry.getPage(auth, 0, 1, {
-            labelId: params.labelId,
-            deleted: 'both'
-        })
+    const { entryCount, editCount, eventCount } = (
+        await Label.withCount(auth, params.labelId)
     ).unwrap(e => error(400, e));
 
-    const eventsWithLabel = (await Event.withLabel(auth, params.labelId)).unwrap(e =>
-        error(400, e)
-    );
-
-    if (entriesWithLabel < 1 && eventsWithLabel.length < 1) {
+    if (entryCount + editCount + eventCount < 1) {
         await Label.purgeWithId(auth, params.labelId);
         return apiResponse(auth, {});
     }

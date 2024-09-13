@@ -217,6 +217,43 @@ namespace LabelServer {
         return Result.ok(label);
     }
 
+    export async function withCount(auth: Auth, id: string): Promise<Result<LabelWithCount>> {
+        const label = await fromId(auth, id);
+        if (!label.ok) return label.cast();
+
+        const entryCount = (
+            await query<{ count: number }[]>`
+                SELECT count(*) as count
+                FROM entries
+                WHERE userId = ${auth.id}
+                AND labelId = ${id}
+            `
+        )[0].count;
+        const eventCount = (
+            await query<{ count: number }[]>`
+                SELECT count(*) as count
+                FROM events
+                WHERE userId = ${auth.id}
+                AND labelId = ${id}
+            `
+        )[0].count;
+        const editCount = (
+            await query<{ count: number }[]>`
+                SELECT count(*) as count
+                FROM entryEdits
+                WHERE userId = ${auth.id}
+                AND oldLabelId = ${id}
+            `
+        )[0].count;
+
+        return Result.ok({
+            ...label.val,
+            entryCount,
+            eventCount,
+            editCount
+        });
+    }
+
     export async function allWithCounts(
         auth: Auth
     ): Promise<Result<Record<string, LabelWithCount>>> {
@@ -251,8 +288,9 @@ namespace LabelServer {
                     const editCount = allEditLabelIds.filter(l => l === label.id).length;
                     return {
                         ...label,
-                        entryCount: entryCount + editCount,
-                        eventCount
+                        entryCount,
+                        eventCount,
+                        editCount
                     };
                 })
             )

@@ -84,9 +84,7 @@
         const actionFmt = !Entry.isPinned({ pinned }) ? 'favorited' : 'unfavorited';
         notify.success(`Entry ${actionFmt}`);
 
-        pinned = Entry.isPinned({ pinned }) ? null : nowUtc();
-
-        const changed: Entry = {
+        const oldEntry: Entry = {
             id,
             title,
             body,
@@ -101,7 +99,14 @@
             label,
             edits
         };
-        await dispatch.update('entry', changed);
+
+        pinned = Entry.isPinned({ pinned }) ? null : nowUtc();
+
+        const newEntry: Entry = {
+            ...oldEntry,
+            pinned
+        };
+        await dispatch.update('entry', newEntry, oldEntry);
     }
 
     function toggleObfuscation() {

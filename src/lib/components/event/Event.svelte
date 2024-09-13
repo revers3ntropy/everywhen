@@ -44,7 +44,7 @@
         notify.onErr(await api.put(apiPath('/events/?', event.id), changes));
 
         const label = changes.label ? labels[changes.label] || null : event.label;
-
+        const oldEvent = { ...event };
         event = {
             ...event,
             name: changes.name || event.name,
@@ -53,7 +53,7 @@
             tzOffset: event.tzOffset,
             label
         };
-        await dispatch.update('event', event);
+        await dispatch.update('event', event, oldEvent);
     }
 
     const updateName = (async ({ target }) => {

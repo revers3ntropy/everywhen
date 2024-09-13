@@ -36,7 +36,7 @@
         // label, deleting it easy, but if there are then
         // a more complex approach is required to clear the
         // label from the entries and events
-        if (data.entryCount + eventCount < 1) {
+        if (data.label.entryCount + data.label.editCount + eventCount < 1) {
             notify.onErr(await api.delete(apiPath(`/labels/?`, data.label.id)));
             await goto('/labels');
             return;
@@ -48,7 +48,8 @@
                 id: data.label.id,
                 color: data.label.color,
                 name: data.label.name,
-                reloadOnDelete: false
+                reloadOnDelete: false,
+                labels: data.labels
             },
             () => {
                 void goto('/labels');
@@ -68,11 +69,11 @@
             eventCount += 1;
         }
     });
-    listen.event.onUpdate(({ label: l }) => {
+    listen.event.onUpdate(({ label: l }, { label: oldLabel }) => {
         // As all events on this page have this label already,
         // they could only be removed from this label, not added
         // TODO: but what about changed twice...
-        if (l?.id !== data.label.id) {
+        if (l?.id !== data.label.id && oldLabel?.id === data.label.id) {
             eventCount -= 1;
         }
     });
@@ -96,7 +97,7 @@
             </button>
         </div>
         <div class="p-2 md:p-0 md:pb-4 md:pt-1 text-textColorLight italic">
-            {data.entryCount} entries, {eventCount} events have this label
+            {data.label.entryCount} entries, {eventCount} events have this label
         </div>
 
         <section>

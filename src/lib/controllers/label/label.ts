@@ -8,4 +8,5 @@ export interface Label {
 export interface LabelWithCount extends Label {
     entryCount: number;
     eventCount: number;
+    editCount: number;
 }

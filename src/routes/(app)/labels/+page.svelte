@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type { LabelWithCount } from '$lib/controllers/label/label';
     import type { PageData } from './$types';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import { api } from '$lib/utils/apiRequest';
@@ -33,8 +34,9 @@
             id,
             created: nowUtc(),
             entryCount: 0,
-            eventCount: 0
-        };
+            eventCount: 0,
+            editCount: 0
+        } satisfies LabelWithCount;
         labelsList = [...labelsList, newLabel];
         labels[id] = newLabel;
     }
@@ -56,7 +58,7 @@
         </button>
         <div class="w-fit">
             {#each labelsList as label}
-                <LabelOptions {...omit(label, 'created')} />
+                <LabelOptions {...omit(label, 'created', 'editCount')} />
                 <hr />
             {/each}
         </div>

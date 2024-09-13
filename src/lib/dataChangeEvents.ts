@@ -22,7 +22,7 @@ type Update = {
     event: Event;
 };
 
-type UpdateListener<T> = (newValue: T) => MaybePromise<void>;
+type UpdateListener<T> = (newValue: T, oldValue: T) => MaybePromise<void>;
 type DelListener<T> = (value: T) => MaybePromise<void>;
 type CreateListener<T> = (newValue: T) => MaybePromise<void>;
 type SetupListener<Update, Delete, Create> = {
@@ -96,8 +96,8 @@ export const listen = (Object.keys(listeners) as Entities[]).reduce(
 };
 
 export const dispatch = Object.freeze({
-    async update<T extends Entities>(key: T, value: Update[T]) {
-        return await Promise.all(listeners[key].onUpdate.map(l => l(value)));
+    async update<T extends Entities>(key: T, value: Update[T], oldValue: Update[T]) {
+        return await Promise.all(listeners[key].onUpdate.map(l => l(value, oldValue)));
     },
     async delete<T extends Entities>(key: T, value: Delete[T]) {
         return await Promise.all(listeners[key].onDelete.map(l => l(value)));

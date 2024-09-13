@@ -39,18 +39,23 @@
         }
     ): Promise<void> {
         notify.onErr(await api.put(apiPath('/events/?', id), changes));
-        const event: EventController = {
+        const oldEvent: EventController = {
             id,
             name,
-            start: changes.start || start,
-            end: changes.end || end,
+            start,
+            end,
             tzOffset,
             created,
-            label: label || null
+            label
+        };
+        const event: EventController = {
+            ...oldEvent,
+            start: changes.start || start,
+            end: changes.end || end
         };
         start = event.start || start;
         end = event.end || end;
-        await dispatch.update('event', event);
+        await dispatch.update('event', event, oldEvent);
     }
 
     function startEndWhenDragging(
