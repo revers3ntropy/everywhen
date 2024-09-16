@@ -78,6 +78,7 @@ export namespace UserServer {
         await Asset.purgeAll(auth);
         await Event.purgeAll(auth);
         await Settings.purgeAll(auth);
+        await Location.purgeAll(auth);
         Auth.invalidateAllSessionsForUser(auth.id);
 
         await query`

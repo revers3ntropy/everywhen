@@ -7,7 +7,7 @@ import { query } from '$lib/db/mysql.server';
 import type { Day } from '$lib/utils/day';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
-import { wordsFromText } from '$lib/utils/text';
+import { normaliseWordForIndex, wordsFromText } from '$lib/utils/text';
 
 export async function all(auth: Auth, filter: EntryFilter = {}): Promise<Result<Entry[]>> {
     let location: Location | null = null;
@@ -149,12 +149,29 @@ export async function getPage(
         return (await entriesFromRaw(auth, rawEntries)).map(entries => [entries, totalCount]);
     }
 
+    let entries;
+    if (filter.search) {
+        entries = await search(auth, filter.search);
+    } else {
+        entries = await all(auth, filter);
+    }
+    if (!entries.ok) return entries.cast();
+
     const start = offset;
     const end = start + count;
-    return (await all(auth, filter)).map(entries => {
-        const filtered = filterEntriesBySearchTerm(entries, filter.search || '');
-        return [filtered.slice(start, end), filtered.length];
-    });
+
+    if (!filter.locationId) return Result.ok([entries.val.slice(start, end), entries.val.length]);
+
+    const filteredByLocation = await Location.filterByLocationPrecise(
+        auth,
+        entries.val,
+        filter.locationId
+    );
+    if (!filteredByLocation.ok) return filteredByLocation.cast();
+    return Result.ok([
+        filteredByLocation.val.slice(start, end),
+        filteredByLocation.val.length
+    ] as const);
 }
 
 export async function onDay(auth: Auth, day: Day): Promise<Result<Entry[]>> {
@@ -194,15 +211,6 @@ export async function onDay(auth: Auth, day: Day): Promise<Result<Entry[]>> {
     `;
 
     return await entriesFromRaw(auth, rawEntries);
-}
-
-function filterEntriesBySearchTerm(entries: Entry[], searchTerm: string): Entry[] {
-    if (!searchTerm) return entries;
-
-    searchTerm = searchTerm.toLowerCase();
-    return entries.filter(
-        e => e.title.toLowerCase().includes(searchTerm) || e.body.toLowerCase().includes(searchTerm)
-    );
 }
 
 async function entriesFromRaw(auth: Auth, raw: RawEntry[]): Promise<Result<Entry[]>> {
@@ -286,7 +294,7 @@ async function entriesFromRaw(auth: Auth, raw: RawEntry[]): Promise<Result<Entry
 }
 
 export async function search(auth: Auth, queryString: string): Promise<Result<Entry[]>> {
-    const queryStringParts = wordsFromText(queryString);
+    const queryStringParts = wordsFromText(queryString).map(normaliseWordForIndex);
     if (queryStringParts.length === 0) return Result.ok([]);
     const encryptedWords = queryStringParts.map(word => encrypt(word, auth.key));
 
@@ -306,7 +314,7 @@ export async function search(auth: Auth, queryString: string): Promise<Result<En
             wordCount: number;
         }[]
     >`
-            SELECT entries.id,
+            SELECT DISTINCT (entries.id),
                    entries.created,
                    entries.createdTzOffset,
                    entries.title,
@@ -318,17 +326,12 @@ export async function search(auth: Auth, queryString: string): Promise<Result<En
                    entries.longitude,
                    entries.agentData,
                    entries.wordCount
-            FROM entries, wordsInEntries
-            WHERE wordsInEntries.word IN (${encryptedWords})
-                AND wordsInEntries.entryId = entries.id
-                AND entries.userId = ${auth.id}
+        FROM entries, wordsInEntries WHERE
+            entries.id = wordsInEntries.entryId AND
+            wordsInEntries.word IN (${encryptedWords}) AND
+            entries.userId = ${auth.id}
+       ORDER BY created DESC, id
     `;
 
-    const uniqueEntries = entries.reduce((prev, curr) => {
-        if (prev.filter(e => e.id === curr.id).length > 0) return prev;
-        prev.push(curr);
-        return prev;
-    }, [] as RawEntry[]);
-
-    return await entriesFromRaw(auth, uniqueEntries);
+    return await entriesFromRaw(auth, entries);
 }

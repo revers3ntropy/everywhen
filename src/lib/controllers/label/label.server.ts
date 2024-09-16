@@ -3,6 +3,7 @@ import { query } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import { FileLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
+import { normaliseWordForIndex } from '$lib/utils/text';
 import { nowUtc } from '$lib/utils/time';
 import type { PickOptional } from '../../../types';
 import type { Auth } from '../auth/auth.server';
@@ -334,6 +335,23 @@ namespace LabelServer {
                 `;
                 return Result.ok(null);
             })
+        );
+    }
+
+    export async function search(auth: Auth, str: string): Promise<Result<LabelWithCount[]>> {
+        const labelsMap = await Label.allWithCounts(auth);
+        if (!labelsMap.ok) return labelsMap.cast();
+
+        // filter labels if any of the parts of the search query are found in the name
+        const searchStrParts = str.split(' ').map(normaliseWordForIndex);
+
+        return Result.ok(
+            Object.entries(labelsMap.val)
+                .map(([id, label]) => ({ ...label, id }))
+                .filter(l => {
+                    const name = l.name.toLowerCase();
+                    return searchStrParts.find(part => name.includes(part)) !== undefined;
+                })
         );
     }
 }

@@ -6,7 +6,7 @@
     import { notify } from '$lib/components/notifications/notifications';
     import { nowUtc } from '$lib/utils/time';
     import { listen } from '$lib/dataChangeEvents';
-    import LabelOptions from './LabelOptions.svelte';
+    import LabelOptions from '$lib/components/label/LabelLink.svelte';
     import { omit } from '$lib/utils';
 
     export let data: PageData;

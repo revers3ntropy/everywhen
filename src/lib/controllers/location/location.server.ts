@@ -3,6 +3,7 @@ import { query } from '$lib/db/mysql.server';
 import type { ResultSetHeader } from 'mysql2';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
+import type { Degrees } from '../../../types';
 import { Location as _Location } from './location';
 import type { Auth } from '$lib/controllers/auth/auth.server';
 import { UId } from '$lib/controllers/uuid/uuid.server';
@@ -313,6 +314,22 @@ namespace LocationServer {
                 `;
                 return Result.ok(null);
             })
+        );
+    }
+
+    export async function filterByLocationPrecise<
+        T extends { latitude: Degrees | null; longitude: Degrees | null }
+    >(auth: Auth, values: T[], locationId: string): Promise<Result<T[]>> {
+        const location = await fromId(auth, locationId);
+        if (!location.ok) return location.cast();
+        const { latitude, longitude, radius } = location.val;
+        return Result.ok(
+            _Location.filterByCirclePrecise(
+                values,
+                latitude,
+                longitude,
+                _Location.degreesToMeters(radius)
+            )
         );
     }
 }
