@@ -128,7 +128,7 @@ export async function getPage(
                 (deleted IS NULL = ${!filter.deleted})
                 OR ${filter.deleted === 'both'}
               )
-              AND (labelId = ${filter.labelId || ''} OR ${filter.labelId === undefined})
+              AND (labelId = ${filter.labelId || ''} OR ${!filter.labelId})
               AND userId = ${auth.id}
             ORDER BY created DESC, id
             LIMIT ${count}
@@ -147,6 +147,10 @@ export async function getPage(
         `;
 
         return (await entriesFromRaw(auth, rawEntries)).map(entries => [entries, totalCount]);
+    }
+
+    if (filter.search && !filter.locationId) {
+        return await searchPaginated(auth, filter.search, offset, count);
     }
 
     let entries;
@@ -334,4 +338,62 @@ export async function search(auth: Auth, queryString: string): Promise<Result<En
     `;
 
     return await entriesFromRaw(auth, entries);
+}
+
+export async function searchPaginated(
+    auth: Auth,
+    queryString: string,
+    offset: number,
+    count: number
+): Promise<Result<[Entry[], number]>> {
+    const queryStringParts = wordsFromText(queryString).map(normaliseWordForIndex).filter(Boolean);
+    if (queryStringParts.length === 0) return Result.ok([[], 0]);
+    const encryptedWords = queryStringParts.map(word => encrypt(word, auth.key));
+
+    const entries = await query<
+        {
+            id: string;
+            created: number;
+            createdTzOffset: number;
+            title: string;
+            deleted: number | null;
+            pinned: number | null;
+            labelId: string | null;
+            body: string;
+            latitude: number | null;
+            longitude: number | null;
+            agentData: string;
+            wordCount: number;
+        }[]
+    >`
+            SELECT DISTINCT (entries.id),
+                   entries.created,
+                   entries.createdTzOffset,
+                   entries.title,
+                   entries.pinned,
+                   entries.deleted,
+                   entries.labelId,
+                   entries.body,
+                   entries.latitude,
+                   entries.longitude,
+                   entries.agentData,
+                   entries.wordCount
+        FROM entries, wordsInEntries WHERE
+            entries.id = wordsInEntries.entryId AND
+            wordsInEntries.word IN (${encryptedWords}) AND
+            entries.userId = ${auth.id}
+        ORDER BY created DESC, id
+        LIMIT ${count}
+        OFFSET ${offset}
+    `;
+
+    const [{ totalCount }] = await query<{ totalCount: number }[]>`
+        SELECT COUNT(DISTINCT entries.id) as totalCount
+        FROM entries, wordsInEntries WHERE
+            entries.id = wordsInEntries.entryId AND
+            wordsInEntries.word IN (${encryptedWords}) AND
+            entries.userId = ${auth.id}
+    `;
+
+    return (await entriesFromRaw(auth, entries)).map(e => [e, totalCount]);
 }

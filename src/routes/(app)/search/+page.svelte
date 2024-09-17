@@ -51,11 +51,13 @@
                 {/if}
             {/each}
 
-            <Entries
-                options={{ search: browser ? encrypt(search, $encryptionKey) : '' }}
-                locations={data.locations}
-                labels={data.labels}
-            />
+            {#if search}
+                <Entries
+                    options={{ search: browser ? encrypt(search, $encryptionKey) : '' }}
+                    locations={data.locations}
+                    labels={data.labels}
+                />
+            {/if}
         </section>
     </div>
 </main>
