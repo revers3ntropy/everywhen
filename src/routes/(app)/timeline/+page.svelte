@@ -81,6 +81,12 @@
             z-index: 1;
         }
 
+        @media #{$mobile} {
+            canvas {
+                left: 0;
+            }
+        }
+
         footer {
             display: none !important;
         }
