@@ -27,11 +27,9 @@ export const sleepCycleProvider = {
         return Result.collect(
             sleeps.map(item => {
                 return decrypt(item.rowJson, auth.key).map(rowJson => {
-                    const [duration, quality, regularity] = JSON.parse(rowJson) as [
-                        number,
-                        number | null,
-                        number | null
-                    ];
+                    const [duration, quality, regularity, timeAsleep, asleepAfter] = JSON.parse(
+                        rowJson
+                    ) as [number, number | null, number | null, number | null, number | null];
                     return {
                         id: item.id,
                         type: 'sleep' as const,
@@ -39,7 +37,9 @@ export const sleepCycleProvider = {
                         startTzOffset: item.timestampTzOffset,
                         duration,
                         quality,
-                        regularity
+                        regularity,
+                        timeAsleep,
+                        asleepAfter
                     } satisfies FeedItem;
                 });
             })

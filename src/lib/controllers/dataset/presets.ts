@@ -68,6 +68,24 @@ export const datasetPresets = {
                 jsonOrdering: 2,
                 type: builtInTypes.nullableNumber,
                 datasetId: ''
+            },
+            {
+                id: '3',
+                name: 'Time Asleep',
+                created: null,
+                ordering: 3,
+                jsonOrdering: 3,
+                type: builtInTypes.nullableNumber,
+                datasetId: ''
+            },
+            {
+                id: '4',
+                name: 'Asleep After',
+                created: null,
+                ordering: 4,
+                jsonOrdering: 4,
+                type: builtInTypes.nullableNumber,
+                datasetId: ''
             }
         ]
     },

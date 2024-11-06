@@ -28,7 +28,9 @@
 
         const columns = header.split(',');
         const startTsIdx = columns.indexOf('Went to bed');
-        const endTsIdx = columns.indexOf('Woke up');
+        const durationIdx = columns.indexOf('Time in bed (seconds)');
+        const timeAsleepIdx = columns.indexOf('Time asleep (seconds)');
+        const asleepAfterIdx = columns.indexOf('Asleep after (seconds)');
         const sleepQualityIdx = columns.indexOf('Sleep Quality');
         const regularityIdx = columns.indexOf('Regularity');
 
@@ -37,21 +39,23 @@
         for (const lines of dataLines) {
             const linesParts = lines.split(',');
             const startTs = linesParts[startTsIdx];
-            const endTs = linesParts[endTsIdx];
 
             let sleepQuality: number | null = parseFloat(linesParts[sleepQualityIdx]) / 100;
             if (isNaN(sleepQuality)) sleepQuality = null;
             let regularity: number | null = parseFloat(linesParts[regularityIdx]) / 100;
             if (isNaN(regularity)) regularity = null;
+            let duration: number | null = parseFloat(linesParts[durationIdx]);
+            if (isNaN(duration)) duration = null;
+            let asleepAfter: number | null = parseFloat(linesParts[asleepAfterIdx]);
+            if (isNaN(asleepAfter)) asleepAfter = null;
+            let timeAsleep: number | null = parseFloat(linesParts[timeAsleepIdx]);
+            if (isNaN(timeAsleep)) timeAsleep = null;
 
-            const start = new Date(startTs);
-            const end = new Date(endTs);
-            const duration = (end.getTime() - start.getTime()) / 1000;
-            const timestamp = start.getTime() / 1000;
-            if (isNaN(duration) || isNaN(timestamp)) continue;
+            const timestamp = new Date(startTs).getTime() / 1000;
+            if (isNaN(timestamp)) continue;
 
             rows.push({
-                elements: [duration, sleepQuality, regularity],
+                elements: [duration, sleepQuality, regularity, timeAsleep, asleepAfter],
                 created: nowUtc(),
                 timestamp,
                 timestampTzOffset: currentTzOffset()

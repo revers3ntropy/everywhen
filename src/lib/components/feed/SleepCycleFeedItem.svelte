@@ -8,6 +8,9 @@
     export let duration: number;
     export let quality: number | null;
     export let regularity: number | null;
+    // svelte-ignore unused-export-let
+    export let asleepAfter: number | null;
+    export let timeAsleep: number | null;
     export let obfuscated: boolean;
 </script>
 
@@ -16,10 +19,16 @@
     <TimeInFeed timestamp={start} to={start + duration} {tzOffset} />
     <div class="basis-full h-0 md:hidden"></div>
     <div class="flex gap-4 px-2 md:p-0" class:obfuscated>
-        <span>
-            Slept for
-            <b>{fmtDurationHourMin(duration)}</b>
-        </span>
+        {#if timeAsleep !== null}
+            <span>
+                Slept for
+                <b>{fmtDurationHourMin(timeAsleep)}</b>
+            </span>
+        {:else}
+            <span>
+                <b>{fmtDurationHourMin(duration)}</b> in bed
+            </span>
+        {/if}
         {#if quality !== null}
             <span>
                 <b>{(quality * 100).toFixed(0)}</b>% quality

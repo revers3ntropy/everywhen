@@ -29,6 +29,8 @@ export type FeedItemTypes = {
         duration: number;
         quality: number | null;
         regularity: number | null;
+        timeAsleep: number | null;
+        asleepAfter: number | null;
     };
     happiness: {
         type: 'happiness';

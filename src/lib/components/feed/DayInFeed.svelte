@@ -185,6 +185,8 @@
                             duration={item.duration}
                             quality={item.quality}
                             regularity={item.regularity}
+                            asleepAfter={item.asleepAfter}
+                            timeAsleep={item.timeAsleep}
                             {obfuscated}
                         />
                     {:else if item.type === 'event-start'}
