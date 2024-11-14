@@ -106,7 +106,7 @@
 </script>
 
 {#if rows && rows.length > 1}
-    <div class="flex gap-4 py-4">
+    <div class="flex gap-1 md:gap-4 py-4 flex-wrap">
         <div class="rounded-full bg-vLightAccent py-2 px-4 flex-center gap-2">
             {#if numericColumns.length === 0}
                 <span class="text-light"> [No columns] </span>

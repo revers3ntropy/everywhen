@@ -81,7 +81,7 @@
     <title>{data.dataset.name || 'Unknown'} | View Dataset</title>
 </svelte:head>
 
-<main class="md:p-4 md:pl-4">
+<main class="p-1 md:p-4 md:pl-4">
     <div class="pb-4 flex flex-row justify-between">
         <div class="text-lg">
             <input
@@ -116,7 +116,7 @@
             {/if}
         </section>
 
-        <section class="pt-8">
+        <section class="pt-8 overflow-x-auto">
             <table class="border-borderColor border border-r-0">
                 <tr>
                     <th class="p-2 border-r border-borderColor"> Timestamp </th>
@@ -168,7 +168,7 @@
                                         <input
                                             type="number"
                                             value={element}
-                                            class="editable-text px-2"
+                                            class="editable-text px-2 focus:rounded-none"
                                             placeholder={colTypeId === builtInTypes.number.id
                                                 ? '0'
                                                 : 'null'}
@@ -185,7 +185,7 @@
                                         <input
                                             type="checkbox"
                                             checked={element}
-                                            class="editable-text px-2"
+                                            class="editable-text px-2 focus:rounded-none"
                                             on:change={e =>
                                                 editDatasetRow(
                                                     row,
@@ -196,7 +196,7 @@
                                     {:else}
                                         <input
                                             value={element}
-                                            class="editable-text px-2"
+                                            class="editable-text px-2 focus:rounded-none"
                                             on:change={e =>
                                                 editDatasetRow(
                                                     row,
