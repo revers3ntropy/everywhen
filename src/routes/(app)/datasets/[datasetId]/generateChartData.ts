@@ -213,7 +213,6 @@ function datasetFactoryForStandardBuckets(selectedBucket: Bucket): DatasetGenera
         let previous: number | null = null;
         const reducedBuckets = [];
         for (const [i, items] of entries) {
-            console.log(i, previous);
             const value = ReductionStrategies[reductionStrategy](items, previous);
             reducedBuckets.push([i, value]);
             previous = value;

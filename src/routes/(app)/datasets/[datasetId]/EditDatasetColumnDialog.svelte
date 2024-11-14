@@ -1,6 +1,7 @@
 <script lang="ts">
     import { notify } from '$lib/components/notifications/notifications';
     import Select from '$lib/components/Select.svelte';
+    import Textbox from '$lib/components/ui/Textbox.svelte';
     import { builtInTypes } from '$lib/controllers/dataset/columnTypes';
     import type { DatasetColumn, DatasetColumnType } from '$lib/controllers/dataset/dataset';
     import { popup } from '$lib/stores';
@@ -19,8 +20,11 @@
                 name: newColumnName
             })
         );
+        console.log('closing popup');
         $popup = null;
     }
+
+    popup.subscribe(console.trace);
 
     const columnTypesMap = Object.fromEntries(
         Object.keys(builtInTypes).map(key => [
@@ -33,22 +37,17 @@
     $: areChanges = newColumnName !== column.name || newColumnType !== column.type;
 </script>
 
-<form>
-    <div>
-        <p class="form-label">Name</p>
-        <input bind:value={newColumnName} />
-    </div>
-    <div class="spacer" />
-    <div>
-        <p class="form-label">Type</p>
-        <Select
-            onChange={newType => (newColumnType = builtInTypesAsMap[newType])}
-            key={newColumnType.id}
-            options={columnTypesMap}
-        />
-    </div>
-    <div class="spacer" />
-    <div>
-        <button class="button" disabled={!areChanges} on:click={save}>Save</button>
-    </div>
-</form>
+<div>
+    <Textbox bind:value={newColumnName} label="Name" />
+</div>
+<div class="pt-4">
+    <p>Type</p>
+    <Select
+        onChange={newType => (newColumnType = builtInTypesAsMap[newType])}
+        key={newColumnType.id}
+        options={columnTypesMap}
+    />
+</div>
+<div class="pt-4">
+    <button class="button primary" disabled={!areChanges} on:click={save}>Save</button>
+</div>
