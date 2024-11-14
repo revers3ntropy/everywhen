@@ -164,7 +164,7 @@
             }}
         >
             {#if showForms && isToday}
-                <div class="bg-vLightAccent rounded-br-xl px-2">
+                <div class="bg-vLightAccent rounded-br-xl">
                     <EntryForm {obfuscated} {labels} />
                 </div>
             {/if}

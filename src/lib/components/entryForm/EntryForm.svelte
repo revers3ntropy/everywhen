@@ -327,7 +327,7 @@
 </script>
 
 <div class="md:bg-vLightAccent rounded-2xl">
-    <div class="pb-2 md:pb-4">
+    <div class="pb-2 md:pb-4 md:px-2">
         <div class="flex items-center bg-lightAccent md:rounded-full md:w-fit">
             <div class="flex items-center gap-2 py-1 px-2 md:px-4 w-fit">
                 <LocationToggle size={23} />
@@ -352,7 +352,7 @@
             {/if}
         </div>
     </div>
-    <div>
+    <div class="px-2">
         <div>
             <textarea
                 bind:this={newEntryInputElement}
