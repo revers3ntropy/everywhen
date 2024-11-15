@@ -1,5 +1,6 @@
 import { LS_KEYS } from '$lib/constants';
 import { Day } from '$lib/utils/day';
+import { decrypt, encrypt } from '$lib/utils/encryption';
 import { fmtUtc } from '$lib/utils/time';
 import type { Hours, TimestampSecs } from '../../../types';
 import type { Label } from '../label/label';
@@ -215,5 +216,26 @@ export namespace Entry {
 
     export function dayOf(entry: { created: number; createdTzOffset: number }): Day {
         return Day.fromTimestamp(entry.created, entry.createdTzOffset);
+    }
+
+    export function quoteEntryInEntryForm(
+        username: string,
+        encryptionKey: string,
+        entryId: string,
+        quote: string
+    ) {
+        const link = `/journal#${entryId}`;
+        let entryText = `> [${quote.replace(/(\r\n|\n|\r)/gm, ' ')}](${link})`;
+
+        // directly edit local storage and then reload page
+        const encryptedEntryBody = localStorage.getItem(Entry.bodyLsKey(username, null));
+        if (encryptedEntryBody) {
+            const currentEntry = decrypt(encryptedEntryBody, encryptionKey).or('');
+            if (currentEntry) {
+                entryText = `${currentEntry}\n\n${entryText}`;
+            }
+        }
+        localStorage.setItem(Entry.bodyLsKey(username, null), encrypt(entryText, encryptionKey));
+        window.location.assign('/journal');
     }
 }

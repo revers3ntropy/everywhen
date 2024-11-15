@@ -34,7 +34,7 @@
     // as this form is used in entry editing and creating
     export let action: 'create' | 'edit' = 'create';
 
-    export let entry = null as Entry | null;
+    export let entry: Entry | null = null;
     if (entry && action !== 'edit') {
         throw new Error('entry can only be set when action is edit');
     }
@@ -80,7 +80,7 @@
             localStorage.getItem(Entry.bodyLsKey($username, entry)) || '',
             $encryptionKey
         )
-            .mapErr(() => notify.error('Failed to decrypt saved entry title'))
+            .mapErr(() => notify.error('Failed to decrypt saved entry body'))
             .or('');
         newEntryLabel = localStorage.getItem(Entry.labelLsKey($username, entry)) || '';
     }

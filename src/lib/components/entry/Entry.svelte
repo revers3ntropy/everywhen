@@ -2,7 +2,7 @@
     import { page } from '$app/stores';
     import TimeInFeed from '$lib/components/feed/TimeInFeed.svelte';
     import Lazy from '$lib/components/ui/Lazy.svelte';
-    import type { EntryEdit } from '$lib/controllers/entry/entry';
+    import { type EntryEdit } from '$lib/controllers/entry/entry';
     import { fmtUtcRelative, nowUtc } from '$lib/utils/time';
     import { onMount } from 'svelte';
     import ContentCopy from 'svelte-material-icons/ContentCopy.svelte';
@@ -20,7 +20,7 @@
     import type { Label as LabelController } from '../../controllers/label/label';
     import { dispatch } from '$lib/dataChangeEvents';
     import { Entry } from '$lib/controllers/entry/entry';
-    import { popup, settingsStore } from '$lib/stores';
+    import { encryptionKey, popup, settingsStore, username } from '$lib/stores';
     import { ANIMATION_DURATION } from '$lib/constants';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
@@ -123,6 +123,16 @@
 
     $: isFocused = $page.url.hash.endsWith(id);
 
+    // listen for ctrl/cmd + q to quote
+    $: containerDiv?.addEventListener('keydown', e => {
+        if (!(e.ctrlKey || e.metaKey) || e.key !== 'q') return;
+        e.preventDefault();
+
+        const quote = window.getSelection()?.toString();
+        if (!quote) return;
+        Entry.quoteEntryInEntryForm($username!, $encryptionKey!, id, quote);
+    });
+
     // cannot generate HTML server-side
     let entryHtml = '...';
     onMount(() => {
@@ -142,6 +152,7 @@
     {id}
     style={isFocused && !isInDialog ? 'border-color: var(--secondary)' : ''}
     bind:this={containerDiv}
+    tabindex="-1"
 >
     {#if showFullDate}
         <div class="text-light">
