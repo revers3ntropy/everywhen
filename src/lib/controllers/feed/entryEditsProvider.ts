@@ -75,7 +75,10 @@ export const entryEditsProvider = {
         const maxTimestamp = day.utcTimestamp(-24);
         const entries = inFuture
             ? await query<{ day: string }[]>`
-                SELECT DATE_FORMAT(FROM_UNIXTIME(entryEdits.created + (entryEdits.createdTzOffset - TIMESTAMPDIFF(HOUR, UTC_TIMESTAMP(), NOW())) * 60 * 60), '%Y-%m-%d') as day
+                SELECT DATE_FORMAT(FROM_UNIXTIME(
+                    entryEdits.created + (entryEdits.createdTzOffset - TIMESTAMPDIFF(HOUR, UTC_TIMESTAMP(), NOW())) * 60 * 60),
+                    '%Y-%m-%d'
+                ) as day
                 FROM entryEdits, entries
                 WHERE deleted IS NULL
                     AND entryEdits.entryId = entries.id

@@ -36,7 +36,7 @@ namespace FeedServer {
             async (acc, nextRes): Promise<Day | null> => {
                 const accDay = await acc;
                 // short circuit if the next day is yesterday
-                if (accDay !== null && accDay.eq(yesterday)) return accDay;
+                if (accDay?.eq(yesterday)) return accDay;
                 const next = (await nextRes).unwrap(e => error(400, e));
 
                 // treat null as Infinity
@@ -58,11 +58,13 @@ namespace FeedServer {
             async (acc, nextRes): Promise<Day | null> => {
                 const accDay = await acc;
                 // short circuit if the next day is tomorrow
-                if (accDay !== null && accDay.eq(tomorrow)) return accDay;
+                if (accDay?.eq(tomorrow)) return accDay;
                 const next = (await nextRes).unwrap(e => error(400, e));
 
                 if (next && !next.gt(day)) {
-                    throw new Error('Next day is in the past!');
+                    throw new Error(
+                        'Next day is in the past! ' + JSON.stringify({ day, next, accDay })
+                    );
                 }
 
                 // treat null as Infinity
