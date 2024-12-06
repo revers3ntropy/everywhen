@@ -17,7 +17,7 @@
     import HappinessFeedItem from '$lib/components/feed/HappinessFeedItem.svelte';
     import SleepInfo from '$lib/components/feed/SleepCycleFeedItem.svelte';
     import WeatherWidget from '$lib/components/weather/WeatherWidget.svelte';
-    import { Feed, type FeedItem } from '$lib/controllers/feed/feed';
+    import { Feed } from '$lib/controllers/feed/feed';
     import type { Label } from '$lib/controllers/label/label';
     import { settingsStore } from '$lib/stores';
     import { Day } from '$lib/utils/day';
@@ -26,7 +26,6 @@
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import { ANIMATION_DURATION } from '$lib/constants';
-    import { listen } from '$lib/dataChangeEvents';
     import type { Location } from '$lib/controllers/location/location';
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
     import Dot from '../ui/Dot.svelte';
@@ -48,10 +47,9 @@
         $collapsed[day.day] = !$collapsed[day.day];
     }
 
-    let items: FeedItem[];
     $: items = Feed.orderedFeedItems(day.items);
     $: entryCount = items?.filter(item => item.type === 'entry').length ?? 0;
-    $: isToday = fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD') === day.day;
+    $: isToday = Day.todayUsingNativeDate().fmtIso() === day.day;
     $: dayTimestamp = new Date(day.day).getTime() / 1000;
     $: monthsAgo = Day.fromString(day.day).unwrap().monthsAgo();
     $: if ((items?.length > 0 || (isToday && showForms)) && $collapsed[day.day] == 'empty') {
@@ -61,22 +59,6 @@
     onMount(() => {
         if (items?.length < 1 && (!isToday || !showForms)) {
             $collapsed[day.day] = 'empty';
-        }
-    });
-
-    listen.entry.onCreate(entry => {
-        if (!isToday) return;
-        items = Feed.orderedFeedItems([...(items ?? []), { ...entry, type: 'entry' }]);
-    });
-    listen.entry.onDelete(id => {
-        items = items.filter(entry => entry.id !== id);
-    });
-    listen.entry.onUpdate(entry => {
-        items ??= [];
-        // only update if the entry is in this group
-        const i = items.findIndex(e => e.id === entry.id);
-        if (i !== -1) {
-            items[i] = { ...entry, type: 'entry' };
         }
     });
 </script>

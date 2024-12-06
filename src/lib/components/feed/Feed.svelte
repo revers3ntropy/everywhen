@@ -3,11 +3,13 @@
     import type { Label } from '$lib/controllers/label/label';
     import DayInFeed from '$lib/components/feed/DayInFeed.svelte';
     import type { Location } from '$lib/controllers/location/location';
-    import type { FeedDay } from '$lib/controllers/feed/feed';
+    import { Feed, type FeedDay } from '$lib/controllers/feed/feed';
+    import { listen } from '$lib/dataChangeEvents';
     import { Day } from '$lib/utils/day';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
     import type { Dataset } from '$lib/controllers/dataset/dataset';
+    import { fmtUtc } from '$lib/utils/time';
     import { onMount, onDestroy, tick } from 'svelte';
 
     export let locations: Location[];
@@ -68,14 +70,14 @@
                 // without lots of extra logic to get the next day...
 
                 updateScroll();
-                days = [day, ...days];
+                days = { ...days, [day.day]: day };
                 await tick();
                 resetScroll();
                 updateScroll();
             }
         } else {
             prevDay = day.nextDayInPast;
-            days = [...days, day];
+            days = { ...days, [day.day]: day };
             await tick();
             updateScroll();
         }
@@ -97,11 +99,49 @@
         scrollContainerObserver?.disconnect();
     });
 
+    listen.entry.onCreate(entry => {
+        const entryDayFmt = fmtUtc(entry.created, entry.createdTzOffset, 'YYYY-MM-DD');
+        days[entryDayFmt] = {
+            ...days[entryDayFmt],
+            items: Feed.orderedFeedItems([
+                ...(days[entryDayFmt]?.items ?? []),
+                { ...entry, type: 'entry' }
+            ])
+        };
+    });
+    listen.entry.onDelete(id => {
+        // search through each day until we find our entry
+        // TODO make this more efficient
+        for (const [key, day] of Object.entries(days)) {
+            const i = day.items.findIndex(entry => entry.id === id);
+            if (i !== -1) {
+                days[key] = {
+                    ...day,
+                    items: day.items.filter(entry => entry.id !== id)
+                };
+                break;
+            }
+        }
+    });
+    listen.entry.onUpdate(entry => {
+        // TODO make this more efficient
+        for (const [key, day] of Object.entries(days)) {
+            const i = day.items.findIndex(e => e.id === entry.id);
+            if (i !== -1) {
+                days[key] = {
+                    ...day,
+                    items: day.items.map((e, j) => (j === i ? { ...entry, type: 'entry' } : e))
+                };
+                break;
+            }
+        }
+    });
+
     let isLoadingAtTop = false;
     let scrollHeight = 0;
     let scrollContainer: HTMLElement;
     let scrollContainerObserver: MutationObserver;
-    let days = [] as FeedDay[];
+    let days = {} as Record<string, FeedDay>;
     let prevDay: string | null = fromDay.fmtIso();
     let nextDay: string | null = fromDay.fmtIso();
 </script>
@@ -112,7 +152,7 @@
         hasMore={moreDaysToLoad}
         topMargin={500}
     >
-        {#each days as day (day.day)}
+        {#each Object.values(days).sort() as day (day.day)}
             <DayInFeed
                 {day}
                 {obfuscated}

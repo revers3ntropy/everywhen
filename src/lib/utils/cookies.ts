@@ -1,7 +1,7 @@
 import { PUBLIC_ENV } from '$env/static/public';
 import type { Seconds } from '../../types';
 import { NORMAL_COOKIE_TIMEOUT_DAYS, REMEMBER_ME_COOKIE_TIMEOUT_DAYS } from '../constants';
-import type { CookieSerializeOptions } from 'cookie';
+import type { SerializeOptions } from 'cookie';
 
 const insecureCookieEnvironments = ['dev', 'test'];
 
@@ -18,7 +18,7 @@ export function maxAgeFromShouldRememberMe(rememberMe: boolean): Seconds {
 export function cookieOptions({
     rememberMe,
     httpOnly
-}: ICookieOptions): Readonly<CookieSerializeOptions & { path: string }> {
+}: ICookieOptions): Readonly<SerializeOptions & { path: string }> {
     const maxAge = maxAgeFromShouldRememberMe(rememberMe);
     const expires = new Date(Math.floor(Date.now() / 1000) * 1000 + maxAge * 1000);
     return Object.freeze({
@@ -38,6 +38,6 @@ export function cookieOptions({
 
 export function sessionCookieOptions(
     rememberMe: boolean
-): Readonly<CookieSerializeOptions & { path: string }> {
+): Readonly<SerializeOptions & { path: string }> {
     return cookieOptions({ httpOnly: true, rememberMe });
 }
