@@ -26,7 +26,12 @@ export function cookieOptions({
         secure: !insecureCookieEnvironments.includes(PUBLIC_ENV),
         path: '/',
         // Needed for GitHub OAuth callback to work smoothly,
-        // if set to 'strict' then no cookies are sent to the callback page
+        // if set to 'strict' then no cookies are sent to the callback page.
+        // Not a vulnerability for session cookie:
+        //  the cookie is not sent on cross-site requests, such as on requests
+        //  to load images or frames, but is sent when a user is navigating to the origin
+        //  site from an external site
+        // (from https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie)
         sameSite: 'lax',
         // if true, not readable by client JS
         // https://owasp.org/www-community/HttpOnly
