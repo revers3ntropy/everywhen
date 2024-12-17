@@ -144,6 +144,10 @@
     let days = {} as Record<string, FeedDay>;
     let prevDay: string | null = fromDay.fmtIso();
     let nextDay: string | null = fromDay.fmtIso();
+
+    $: sortedDays = Object.values(days).sort((a, b) =>
+        Day.fromString(b.day).unwrap().cmp(Day.fromString(a.day).unwrap())
+    );
 </script>
 
 <div class="md:border-l-2 border-borderColor relative">
@@ -152,7 +156,7 @@
         hasMore={moreDaysToLoad}
         topMargin={500}
     >
-        {#each Object.values(days).sort() as day (day.day)}
+        {#each sortedDays as day (day.day)}
             <DayInFeed
                 {day}
                 {obfuscated}

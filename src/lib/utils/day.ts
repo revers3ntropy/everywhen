@@ -158,6 +158,12 @@ export class Day {
         return new CalendarDate(this.year, this.month, this.date);
     }
 
+    public cmp(other: Day): number {
+        if (this.year !== other.year) return this.year - other.year;
+        if (this.month !== other.month) return this.month - other.month;
+        return this.date - other.date;
+    }
+
     public static fromI18nDate(d: DateValue) {
         return new Day(d.year, d.month, d.day);
     }
