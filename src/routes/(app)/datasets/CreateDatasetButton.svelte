@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { notify } from '$lib/components/notifications/notifications';
     import type { DatasetMetadata } from '$lib/controllers/dataset/dataset';
     import { makeBlank, makeFromPreset } from './importHelpers';
     import { datasetPresets, type PresetId } from '$lib/controllers/dataset/presets';
@@ -43,7 +44,7 @@
         {#each unusedPresetIds as presetId}
             <div class="p-2">
                 <button
-                    on:click={() => makeFromPreset(presetId)}
+                    on:click={() => makeFromPreset(presetId).then(notify.onErr)}
                     class="w-full flex justify-start items-center gap-2"
                 >
                     <TuneVariant size="20" />
