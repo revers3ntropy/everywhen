@@ -11,6 +11,10 @@ export function omit<T extends object, K extends keyof T>(obj: T, ...keys: K[]):
     return copy;
 }
 
+export function range(size: number, startAt = 0): number[] {
+    return [...Array(size).keys()].map(i => i + startAt);
+}
+
 export function cn(...inputs: ClassValue[]): string {
     return twMerge(clsx(inputs));
 }

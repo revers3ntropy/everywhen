@@ -15,7 +15,6 @@
     export let data: PageData;
 
     async function updateName() {
-        console.log(data.label.name);
         notify.onErr(
             await api.put(apiPath('/labels/?', data.label.id), {
                 name: data.label.name

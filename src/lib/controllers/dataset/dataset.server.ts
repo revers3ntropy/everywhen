@@ -5,6 +5,7 @@ import { thirdPartyDatasetProviders } from '$lib/controllers/dataset/thirdPartyD
 import type { ThirdPartyDatasetProvider } from '$lib/controllers/dataset/thirdPartyDatasets.server';
 import type { SettingsConfig } from '$lib/controllers/settings/settings';
 import { query } from '$lib/db/mysql.server';
+import { range } from '$lib/utils';
 import { FileLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 import type { Hours, TimestampSecs } from '../../../types';
@@ -391,32 +392,12 @@ namespace DatasetServer {
         });
     }
 
-    export async function appendRows(
+    export async function validateTypesOfRows(
         auth: Auth,
         datasetId: string,
-        rows: {
-            elements: unknown[];
-            timestamp?: TimestampSecs;
-            timestampTzOffset?: Hours;
-            created?: TimestampSecs;
-        }[],
-        onSameTimestamp: 'override' | 'append' | 'skip' | 'error'
+        rowElements: unknown[][]
     ): Promise<Result<null>> {
-        if (!['override', 'append', 'skip', 'error'].includes(onSameTimestamp)) {
-            return Result.err('Invalid onSameTimestamp value');
-        }
-        if (rows.length < 1) return Result.ok(null);
-
-        const allColumnsRes = await getUserDefinedColumns(auth);
-        if (!allColumnsRes.ok) return allColumnsRes.cast();
-
-        const maxRowId = await query<{ id: number }[]>`
-            SELECT MAX(datasetRows.id) AS id
-            FROM datasetRows, datasets
-            WHERE datasetRows.datasetId = ${datasetId} 
-                AND datasets.userId = ${auth.id}
-                AND datasets.id = datasetRows.datasetId
-        `;
+        if (rowElements.length < 1) return Result.ok(null);
 
         const datasets = await query<{ presetId: string | null }[]>`
             SELECT presetId
@@ -431,7 +412,6 @@ namespace DatasetServer {
             return Result.err('Dataset not found');
         }
         const [{ presetId }] = datasets;
-
         let columns: DatasetColumn<unknown>[];
         if (presetId) {
             const preset = datasetPresets[presetId as PresetId];
@@ -439,29 +419,73 @@ namespace DatasetServer {
             //       if external, cannot add columns
             columns = preset.columns;
         } else {
+            const allColumnsRes = await getUserDefinedColumns(auth);
+            if (!allColumnsRes.ok) return allColumnsRes.cast();
             // TODO: order columns the same way as row elements are ordered
             columns = allColumnsRes.val
                 .filter(c => c.datasetId === datasetId)
                 .sort((a, b) => a.jsonOrdering - b.jsonOrdering);
         }
 
-        let nextRowId = maxRowId.length > 0 ? maxRowId[0].id : -1;
-        await logger.log('Appending rows', { datasetId, rows, rowsLength: rows.length });
-        for (const row of rows) {
-            if (columns.length !== row.elements.length) {
+        for (const row of rowElements) {
+            if (columns.length !== row.length) {
                 return Result.err(
-                    `Invalid number of values in row: expected ${columns.length} but found ${row.elements.length}`
+                    `Invalid number of values in row: expected ${columns.length} but found ${row.length}`
                 );
             }
 
             for (let i = 0; i < columns.length; i++) {
                 const column = columns[i];
-                const value = row.elements[i];
+                const value = row[i];
                 if (!column.type.validate(value)) {
-                    return Result.err(`Invalid value for '${column.name}'`);
+                    return Result.err(`Invalid value in column '${i + 1}'`);
                 }
             }
+        }
 
+        return Result.ok(null);
+    }
+
+    export async function appendRows(
+        auth: Auth,
+        datasetId: string,
+        rows: {
+            elements: unknown[];
+            timestamp?: TimestampSecs;
+            timestampTzOffset?: Hours;
+            created?: TimestampSecs;
+        }[],
+        onSameTimestamp: 'override' | 'append' | 'skip' | 'error'
+    ): Promise<Result<number[]>> {
+        if (!['override', 'append', 'skip', 'error'].includes(onSameTimestamp)) {
+            return Result.err('Invalid onSameTimestamp value');
+        }
+        if (rows.length < 1) return Result.ok([]);
+
+        if (rows.length > LIMITS.dataset.maxAppendCount) {
+            return Result.err(
+                `Cannot append more than ${LIMITS.dataset.maxAppendCount} rows at once`
+            );
+        }
+
+        const validateRowTypes = await validateTypesOfRows(
+            auth,
+            datasetId,
+            rows.map(r => r.elements)
+        );
+        if (!validateRowTypes.ok) return validateRowTypes.cast();
+
+        const maxRowId = await query<{ id: number }[]>`
+            SELECT MAX(datasetRows.id) AS id
+            FROM datasetRows, datasets
+            WHERE datasetRows.datasetId = ${datasetId} 
+                AND datasets.userId = ${auth.id}
+                AND datasets.id = datasetRows.datasetId
+        `;
+
+        let nextRowId = maxRowId.length > 0 ? maxRowId[0].id : -1;
+        const firstRowId = nextRowId + 1;
+        for (const row of rows) {
             nextRowId++;
 
             const rowId = nextRowId;
@@ -496,7 +520,6 @@ namespace DatasetServer {
                 }
             }
 
-            await logger.log('Appending row', { datasetId, row, rowId });
             await query`
                 INSERT INTO datasetRows (id, userId, datasetId, created, timestamp, timestampTzOffset, rowJson)
                 VALUES (
@@ -511,7 +534,7 @@ namespace DatasetServer {
             `;
         }
 
-        return Result.ok(null);
+        return Result.ok(range(rows.length, firstRowId));
     }
 
     export async function updateDatasetColumnsEncryptedFields(
@@ -608,27 +631,25 @@ namespace DatasetServer {
         }[]
     ): Promise<Result<null>> {
         rows = [...rows].sort((a, b) => a.id - b.id);
-        const ids = rows.map(r => r.id);
-        const idsInDb = await query<{ id: number }[]>`
-            SELECT id
-            FROM datasetRows
-            WHERE datasetId = ${datasetId}
-                AND userId = ${auth.id}
-                AND id IN (${ids})
-        `;
-        // as id is a primary key, if the lengths are different, then there is an id
-        // in one of the rows to be modified which is not in the DB
-        if (ids.length !== idsInDb.length) {
-            return Result.err('Invalid row IDs');
+
+        const validateRowTypes = await validateTypesOfRows(
+            auth,
+            datasetId,
+            rows.map(r => r.elements)
+        );
+        if (!validateRowTypes.ok) return validateRowTypes.cast();
+
+        for (const row of rows) {
+            const updatedRowJson = encrypt(JSON.stringify(row.elements), auth.key);
+            await query`
+                UPDATE datasetRows
+                SET rowJson = ${updatedRowJson}
+                WHERE userId = ${auth.id}
+                    AND datasetId = ${datasetId}
+                    AND id = ${row.id}
+            `;
         }
-        await query`
-            DELETE FROM datasetRows
-            WHERE datasetId = ${datasetId}
-                AND userId = ${auth.id}
-                AND id IN (${ids})
-        `;
-        await logger.log('deleted with id', { ids });
-        return await appendRows(auth, datasetId, rows, 'append');
+        return Result.ok(null);
     }
 
     export async function deleteDataset(auth: Auth, datasetId: string): Promise<void> {

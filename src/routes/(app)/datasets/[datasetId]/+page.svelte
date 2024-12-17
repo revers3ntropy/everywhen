@@ -21,15 +21,20 @@
     let rows: DatasetRow[];
 
     async function updateName() {
-        data.dataset.name = nameInp.value;
-        await api.put(apiPath(`/datasets/?`, data.dataset.id), { name: data.dataset.name });
+        notify.onErr(
+            await api.put(apiPath(`/datasets/?`, data.dataset.id), { name: nameInp.value })
+        );
+        await dispatch.update(
+            'dataset',
+            { ...data.dataset },
+            { ...data.dataset, name: nameInp.value }
+        );
     }
 
     async function deleteDataset() {
         if (!confirm('Are you sure you want to delete this dataset?')) return;
         notify.onErr(await api.delete(apiPath(`/datasets/?`, data.dataset.id)));
         await dispatch.delete('dataset', data.dataset.id);
-        await goto('/datasets');
     }
 
     async function addColumn() {
@@ -50,20 +55,39 @@
             timestampTzOffset: currentTzOffset()
         };
 
-        notify.onErr(
+        const { ids } = notify.onErr(
             await api.post(apiPath(`/datasets/?`, data.dataset.id), {
                 rows: [row]
             })
         );
-        data.dataset.rowCount++;
+        if (ids.length !== 1) {
+            notify.error('Failed to add row');
+            return;
+        }
+
+        await dispatch.create('datasetRow', {
+            datasetId: data.dataset.id,
+            row: { ...row, id: ids[0] }
+        });
     }
 
     async function editDatasetRow(row: DatasetRow, jsonIdx: number, newValue: unknown) {
-        row.elements[jsonIdx] = newValue;
+        const newRow = {
+            ...row,
+            elements: row.elements.map((val, i) => (i === jsonIdx ? newValue : val))
+        };
         notify.onErr(
             await api.put(apiPath(`/datasets/?`, data.dataset.id), {
-                rows: [row]
+                rows: [newRow]
             })
+        );
+        await dispatch.update(
+            'datasetRow',
+            { datasetId: data.dataset.id, row },
+            {
+                datasetId: data.dataset.id,
+                row: newRow
+            }
         );
     }
 
@@ -76,9 +100,42 @@
         rows = await getDatasetRows();
     });
 
-    listen.datasetCol.onCreate(async col => {
+    listen.dataset.onDelete(async id => {
+        if (id !== data.dataset.id) return;
+        await goto('/datasets');
+    });
+    listen.dataset.onUpdate((_, newDataset) => {
+        if (newDataset.id !== data.dataset.id) return;
+        data.dataset = newDataset;
+    });
+
+    listen.datasetCol.onCreate(col => {
         if (col.datasetId !== data.dataset.id) return;
         data.dataset.columns = [...data.dataset.columns, col];
+    });
+    listen.datasetCol.onUpdate((_, col) => {
+        if (col.datasetId !== data.dataset.id) return;
+        data.dataset.columns = data.dataset.columns.map(c => (c.id === col.id ? col : c));
+        // TODO update the data types of rows if a column type changes
+    });
+    listen.datasetCol.onDelete(({ datasetId, columnId }) => {
+        if (datasetId !== data.dataset.id) return;
+        data.dataset.columns = data.dataset.columns.filter(c => c.id !== columnId);
+    });
+
+    listen.datasetRow.onCreate(async ({ datasetId, row }) => {
+        if (datasetId !== data.dataset.id) return;
+        // TODO how should this be sorted
+        rows = [...rows, row];
+        data.dataset.rowCount++;
+    });
+    listen.datasetRow.onUpdate(async (_, { datasetId, row }) => {
+        if (datasetId !== data.dataset.id) return;
+        rows = rows.map(r => (r.id === row.id ? row : r));
+    });
+    listen.datasetRow.onDelete(async ({ datasetId, rowId }) => {
+        if (datasetId !== data.dataset.id) return;
+        rows = rows.filter(r => r.id !== rowId);
     });
 
     $: columnsOrderedByJsonOrder = Dataset.sortColumnsForJson(data.dataset.columns);
@@ -116,138 +173,140 @@
         </div>
     {/if}
 
-    {#if rows}
-        <section>
-            {#if data.dataset && data.dataset.columns.length}
-                <DatasetChart dataset={data.dataset} {rows} />
-            {/if}
-        </section>
+    {#key data.dataset.columns}
+        {#if rows}
+            <section>
+                {#if data.dataset && data.dataset.columns.length}
+                    <DatasetChart dataset={data.dataset} {rows} />
+                {/if}
+            </section>
 
-        <section class="pt-8 overflow-x-auto">
-            <table class="border-borderColor border border-r-0">
-                <tr>
-                    <th class="p-2 border-r border-borderColor"> Timestamp </th>
-                    {#each Dataset.sortColumnsForDisplay(data.dataset.columns) as column}
-                        <th
-                            class="border-r border-borderColor min-w-[150px] bg-vLightAccent"
-                            class:hover:bg-lightAccent={!data.dataset.preset}
-                        >
+            <section class="pt-8 overflow-x-auto">
+                <table class="border-borderColor border border-r-0">
+                    <tr>
+                        <th class="p-2 border-r border-borderColor"> Timestamp </th>
+                        {#each Dataset.sortColumnsForDisplay(data.dataset.columns) as column}
+                            <th
+                                class="border-r border-borderColor min-w-[150px] bg-vLightAccent"
+                                class:hover:bg-lightAccent={!data.dataset.preset}
+                            >
+                                {#if !data.dataset.preset}
+                                    <button
+                                        class="group p-2 w-full"
+                                        on:click={() =>
+                                            showPopup(EditDatasetColumnDialog, {
+                                                datasetId: data.dataset.id,
+                                                column
+                                            })}
+                                    >
+                                        {column.name}
+                                        <span class="invisible group-hover:visible">
+                                            <Pencil size={18} />
+                                        </span>
+                                    </button>
+                                {:else}
+                                    {column.name}
+                                {/if}
+                            </th>
+                        {/each}
+                        <th>
                             {#if !data.dataset.preset}
                                 <button
-                                    class="group p-2 w-full"
-                                    on:click={() =>
-                                        showPopup(EditDatasetColumnDialog, {
-                                            datasetId: data.dataset.id,
-                                            column
-                                        })}
+                                    class="border border-solid border-borderColor border-l-0 p-2 bg-vLightAccent hover:bg-lightAccent text-light hover:text-textColor"
+                                    on:click={addColumn}
                                 >
-                                    {column.name}
-                                    <span class="invisible group-hover:visible">
-                                        <Pencil size={18} />
-                                    </span>
+                                    +
                                 </button>
-                            {:else}
-                                {column.name}
                             {/if}
                         </th>
-                    {/each}
-                    <th>
-                        {#if !data.dataset.preset}
-                            <button
-                                class="border border-solid border-borderColor border-l-0 p-2 bg-vLightAccent hover:bg-lightAccent text-light hover:text-textColor"
-                                on:click={addColumn}
-                            >
-                                +
-                            </button>
-                        {/if}
-                    </th>
-                </tr>
-                {#if rows && rows.length}
-                    {#each rows as row}
-                        <tr class="p-2 border-t border-borderColor">
-                            <td class="p-2 border-r border-borderColor">{row.timestamp}</td>
-                            {#each row.elements as element, i}
-                                {@const column = columnsOrderedByJsonOrder[i]}
-                                {@const colTypeId = column.type.id}
+                    </tr>
+                    {#if rows && rows.length}
+                        {#each rows as row}
+                            <tr class="p-2 border-t border-borderColor">
+                                <td class="p-2 border-r border-borderColor">{row.timestamp}</td>
+                                {#each row.elements as element, i}
+                                    {@const column = columnsOrderedByJsonOrder[i]}
+                                    {@const colTypeId = column.type.id}
 
-                                <td class="border-r border-borderColor">
-                                    {#if colTypeId === builtInTypes.number.id || colTypeId === builtInTypes.nullableNumber.id}
-                                        <input
-                                            type="number"
-                                            value={element}
-                                            class="editable-text px-2 focus:rounded-none"
-                                            placeholder={colTypeId === builtInTypes.number.id
-                                                ? '0'
-                                                : 'null'}
-                                            on:change={e => {
-                                                const num = parseFloat(e.currentTarget.value);
-                                                return editDatasetRow(
-                                                    row,
-                                                    column.jsonOrdering,
-                                                    isNaN(num) ? column.type.defaultValue : num
-                                                );
-                                            }}
-                                        />
-                                    {:else if colTypeId === builtInTypes.boolean.id && typeof element === 'boolean'}
-                                        <input
-                                            type="checkbox"
-                                            checked={element}
-                                            class="editable-text px-2 focus:rounded-none"
-                                            on:change={e =>
-                                                editDatasetRow(
-                                                    row,
-                                                    column.jsonOrdering,
-                                                    e.currentTarget.checked
-                                                )}
-                                        />
-                                    {:else}
-                                        <input
-                                            value={element}
-                                            class="editable-text px-2 focus:rounded-none"
-                                            on:change={e =>
-                                                editDatasetRow(
-                                                    row,
-                                                    column.jsonOrdering,
-                                                    e.currentTarget.value
-                                                )}
-                                        />
-                                    {/if}
-                                </td>
-                            {/each}
+                                    <td class="border-r border-borderColor">
+                                        {#if colTypeId === builtInTypes.number.id || colTypeId === builtInTypes.nullableNumber.id}
+                                            <input
+                                                type="number"
+                                                value={element}
+                                                class="editable-text px-2 focus:rounded-none"
+                                                placeholder={colTypeId === builtInTypes.number.id
+                                                    ? '0'
+                                                    : 'null'}
+                                                on:change={e => {
+                                                    const num = parseFloat(e.currentTarget.value);
+                                                    return editDatasetRow(
+                                                        row,
+                                                        column.jsonOrdering,
+                                                        isNaN(num) ? column.type.defaultValue : num
+                                                    );
+                                                }}
+                                            />
+                                        {:else if colTypeId === builtInTypes.boolean.id && typeof element === 'boolean'}
+                                            <input
+                                                type="checkbox"
+                                                checked={element}
+                                                class="editable-text px-2 focus:rounded-none"
+                                                on:change={e =>
+                                                    editDatasetRow(
+                                                        row,
+                                                        column.jsonOrdering,
+                                                        e.currentTarget.checked
+                                                    )}
+                                            />
+                                        {:else}
+                                            <input
+                                                value={element}
+                                                class="editable-text px-2 focus:rounded-none"
+                                                on:change={e =>
+                                                    editDatasetRow(
+                                                        row,
+                                                        column.jsonOrdering,
+                                                        e.currentTarget.value
+                                                    )}
+                                            />
+                                        {/if}
+                                    </td>
+                                {/each}
+                            </tr>
+                        {/each}
+                    {:else if rows}
+                        <tr class="p-2 border-t border-borderColor">
+                            <td
+                                class="p-2 border border-borderColor italic text-light"
+                                colspan={data.dataset.columns.length + 2}
+                            >
+                                No rows
+                            </td>
                         </tr>
-                    {/each}
-                {:else if rows}
+                    {:else}
+                        <tr class="p-2 border-t border-borderColor">
+                            <td
+                                class="p-2 border border-borderColor italic text-light"
+                                colspan={data.dataset.columns.length + 2}
+                            >
+                                Loading...
+                            </td>
+                        </tr>
+                    {/if}
                     <tr class="p-2 border-t border-borderColor">
-                        <td
-                            class="p-2 border border-borderColor italic text-light"
-                            colspan={data.dataset.columns.length + 2}
-                        >
-                            No rows
+                        <td>
+                            <button
+                                class="p-2 bg-vLightAccent hover:bg-lightAccent text-light hover:text-textColor"
+                                on:click={addRow}
+                            >
+                                + Add Row
+                            </button>
                         </td>
                     </tr>
-                {:else}
-                    <tr class="p-2 border-t border-borderColor">
-                        <td
-                            class="p-2 border border-borderColor italic text-light"
-                            colspan={data.dataset.columns.length + 2}
-                        >
-                            Loading...
-                        </td>
-                    </tr>
-                {/if}
-                <tr class="p-2 border-t border-borderColor">
-                    <td>
-                        <button
-                            class="p-2 bg-vLightAccent hover:bg-lightAccent text-light hover:text-textColor"
-                            on:click={addRow}
-                        >
-                            + Add Row
-                        </button>
-                    </td>
-                </tr>
-            </table>
-        </section>
-    {:else}
-        <div class="pt-8"> Loading... </div>
-    {/if}
+                </table>
+            </section>
+        {:else}
+            <div class="pt-8"> Loading... </div>
+        {/if}
+    {/key}
 </main>

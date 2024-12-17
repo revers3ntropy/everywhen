@@ -42,7 +42,6 @@
     export let showLabels = true;
     export let showForms = false;
     export let happinessDataset: Dataset | null = null;
-    export let hideFeedItemTypeIcon = false;
 
     function toggleCollapse() {
         $collapsed[day.day] = !$collapsed[day.day];

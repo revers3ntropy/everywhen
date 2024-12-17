@@ -76,7 +76,8 @@ export const LIMITS = {
     dataset: {
         maxCount: 100,
         nameLenMax: 32,
-        nameLenMin: 1
+        nameLenMin: 1,
+        maxAppendCount: 10_000
     },
     entry: {
         maxCount: 100_000

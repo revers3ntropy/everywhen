@@ -4,6 +4,7 @@
     import Textbox from '$lib/components/ui/Textbox.svelte';
     import { builtInTypes } from '$lib/controllers/dataset/columnTypes';
     import type { DatasetColumn, DatasetColumnType } from '$lib/controllers/dataset/dataset';
+    import { dispatch } from '$lib/dataChangeEvents';
     import { popup } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
 
@@ -20,11 +21,13 @@
                 name: newColumnName
             })
         );
-        console.log('closing popup');
+        await dispatch.update('datasetCol', column, {
+            ...column,
+            name: newColumnName,
+            type: newColumnType
+        });
         $popup = null;
     }
-
-    popup.subscribe(console.trace);
 
     const columnTypesMap = Object.fromEntries(
         Object.keys(builtInTypes).map(key => [

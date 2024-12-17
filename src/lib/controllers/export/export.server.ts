@@ -44,7 +44,6 @@ export namespace Export {
         return (
             markdown
                 .replace(/!\[(.*?)]\(\/api\/assets\/(.*?)\)/g, (md, alt, id) => {
-                    console.log('!!!', id);
                     const asset = images.find(i => i.publicId === id);
                     if (!asset) return md;
                     return `<img src="data:image/webp;base64,${asset.content}" alt="${alt}" />`;

@@ -129,7 +129,6 @@
                 {locations}
                 {showForms}
                 {labels}
-                hideFeedItemTypeIcon
             />
         {/each}
         <div

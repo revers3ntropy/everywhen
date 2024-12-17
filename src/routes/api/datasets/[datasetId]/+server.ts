@@ -1,7 +1,6 @@
 import { Settings } from '$lib/controllers/settings/settings.server';
 import { apiResponse } from '$lib/utils/apiResponse.server';
 import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
-import { FileLogger } from '$lib/utils/log.server';
 import { nowUtc } from '$lib/utils/time';
 import type { RequestHandler } from './$types';
 import { Dataset } from '$lib/controllers/dataset/dataset.server';
@@ -9,8 +8,6 @@ import { error } from '@sveltejs/kit';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import { z } from 'zod';
 import { Auth } from '$lib/controllers/auth/auth.server';
-
-const logger = new FileLogger('/dataset/:id');
 
 export const GET = cachedApiRoute(async (auth, { params }) => {
     const { datasetId } = params;
@@ -45,11 +42,11 @@ export const POST = (async ({ cookies, request, params }) => {
             .optional()
     });
 
-    (await Dataset.appendRows(auth, params.datasetId, rows, onSameTimestamp ?? 'append')).unwrap(
-        e => error(400, e)
-    );
+    const ids = (
+        await Dataset.appendRows(auth, params.datasetId, rows, onSameTimestamp ?? 'append')
+    ).unwrap(e => error(400, e));
 
-    return apiResponse(auth, {});
+    return apiResponse(auth, { ids: ids });
 }) satisfies RequestHandler;
 
 export const PUT = (async ({ cookies, request, params }) => {
@@ -76,7 +73,6 @@ export const PUT = (async ({ cookies, request, params }) => {
     }
 
     if (rows) {
-        await logger.log('updating rows', { rows });
         (await Dataset.updateRows(auth, params.datasetId, rows)).unwrap(e => error(400, e));
     }
 

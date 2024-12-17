@@ -73,7 +73,7 @@
 
     async function uploadFromSleepCycle() {
         if (!usedPresetIds.includes('sleepCycle')) {
-            sleepCycleDatasetId = await makeFromPreset('sleepCycle');
+            sleepCycleDatasetId = notify.onErr(await makeFromPreset('sleepCycle'));
         } else {
             sleepCycleDatasetId =
                 datasets.find(({ preset }) => preset?.id === 'sleepCycle')?.id || '';
