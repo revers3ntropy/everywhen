@@ -60,6 +60,7 @@ namespace DatasetServer {
             WHERE  datasets.userId = ${auth.id}
                AND datasets.id = datasetColumns.datasetId
                AND ((datasets.id = ${datasetId || ''}) OR ${!datasetId})
+            ORDER BY datasetColumns.ordering
         `;
 
         return Result.collect(

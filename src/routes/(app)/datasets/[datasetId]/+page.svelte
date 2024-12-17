@@ -1,5 +1,6 @@
 <script lang="ts">
     import { builtInTypes } from '$lib/controllers/dataset/columnTypes';
+    import { dispatch, listen } from '$lib/dataChangeEvents';
     import { showPopup } from '$lib/utils/popups';
     import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
@@ -38,7 +39,7 @@
                 type: 'number'
             })
         );
-        data.dataset.columns.push(newColumn);
+        await dispatch.create('datasetCol', newColumn);
     }
 
     async function addRow() {
@@ -73,6 +74,11 @@
 
     onMount(async () => {
         rows = await getDatasetRows();
+    });
+
+    listen.datasetCol.onCreate(async col => {
+        if (col.datasetId !== data.dataset.id) return;
+        data.dataset.columns = [...data.dataset.columns, col];
     });
 
     $: columnsOrderedByJsonOrder = Dataset.sortColumnsForJson(data.dataset.columns);
