@@ -1,25 +1,29 @@
+import type { DatasetMetadata } from '$lib/controllers/dataset/dataset';
 import type { Entry } from '$lib/controllers/entry/entry';
 import type { Label } from '$lib/controllers/label/label';
 import type { Event } from '$lib/controllers/event/event';
 import { onDestroy } from 'svelte';
 import type { MaybePromise } from '../types';
 
-type Entities = 'entry' | 'label' | 'event';
+type Entities = 'entry' | 'label' | 'event' | 'dataset';
 
 type Create = {
     entry: Entry;
     label: Label;
     event: Event;
+    dataset: DatasetMetadata;
 };
 type Delete = {
     entry: string;
     label: string;
     event: string;
+    dataset: string;
 };
 type Update = {
     entry: Entry;
     label: Label;
     event: Event;
+    dataset: DatasetMetadata;
 };
 
 type UpdateListener<T> = (newValue: T, oldValue: T) => MaybePromise<void>;
@@ -42,7 +46,8 @@ function emptyListeners(): Readonly<{
 const listeners = {
     entry: emptyListeners(),
     label: emptyListeners(),
-    event: emptyListeners()
+    event: emptyListeners(),
+    dataset: emptyListeners()
 } as {
     [K in Entities]: Readonly<{
         onUpdate: UpdateListener<Update[K]>[];

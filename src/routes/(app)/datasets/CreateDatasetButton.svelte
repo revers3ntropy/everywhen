@@ -15,6 +15,7 @@
     $: unusedPresetIds = Object.keys(datasetPresets).filter(
         presetId => !usedPresetIds.includes(presetId)
     ) as PresetId[];
+    $: datasetNames = datasets.map(({ name }) => name);
 </script>
 
 <Dropdown
@@ -31,7 +32,7 @@
     <div class="py-2">
         <div class="p-2">
             <button
-                on:click={() => makeBlank('Blank')}
+                on:click={() => makeBlank(datasetNames)}
                 class="w-full flex justify-start items-center gap-2"
                 aria-label="Create blank dataset"
             >
