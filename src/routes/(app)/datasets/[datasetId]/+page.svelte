@@ -27,6 +27,7 @@
     async function deleteDataset() {
         if (!confirm('Are you sure you want to delete this dataset?')) return;
         notify.onErr(await api.delete(apiPath(`/datasets/?`, data.dataset.id)));
+        await dispatch.delete('dataset', data.dataset.id);
         await goto('/datasets');
     }
 
