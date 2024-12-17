@@ -155,7 +155,7 @@
                         {/if}
                     </th>
                 </tr>
-                {#if rows}
+                {#if rows && rows.length}
                     {#each rows as row}
                         <tr class="p-2 border-t border-borderColor">
                             <td class="p-2 border-r border-borderColor">{row.timestamp}</td>
@@ -209,6 +209,24 @@
                             {/each}
                         </tr>
                     {/each}
+                {:else if rows}
+                    <tr class="p-2 border-t border-borderColor">
+                        <td
+                            class="p-2 border border-borderColor italic text-light"
+                            colspan={data.dataset.columns.length + 2}
+                        >
+                            No rows
+                        </td>
+                    </tr>
+                {:else}
+                    <tr class="p-2 border-t border-borderColor">
+                        <td
+                            class="p-2 border border-borderColor italic text-light"
+                            colspan={data.dataset.columns.length + 2}
+                        >
+                            Loading...
+                        </td>
+                    </tr>
                 {/if}
                 <tr class="p-2 border-t border-borderColor">
                     <td>
