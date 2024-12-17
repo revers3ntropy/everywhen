@@ -114,7 +114,7 @@
 
 <Dropdown>
     <span
-        class="flex-center w-full px-2 md:pl-2.5 md:pr-4 py-2 hover:bg-lightAccent bg-lightAccent rounded-full gap-2"
+        class="create-button overflow-hidden relative flex-center w-full px-2 md:pl-2.5 md:pr-4 py-2 hover:bg-lightAccent bg-lightAccent rounded-full gap-2"
         slot="button"
     >
         <Plus size="25" />
@@ -150,6 +150,47 @@
 </Dropdown>
 
 <style lang="scss">
+    // https://codepen.io/thebabydino/pen/WNVPdJg
+    @property --angle {
+        syntax: '<angle>';
+        initial-value: 0deg;
+        inherits: false;
+    }
+
+    .create-button:hover::before {
+        position: absolute;
+        inset: -1px;
+        border: solid 3px;
+        border-radius: 9999px;
+        border-image: conic-gradient(
+                from var(--angle),
+                #7d9902,
+                #63cc78,
+                #1db569,
+                #09c693,
+                #158dcd,
+                #5c0099,
+                #eb04c9,
+                #ff0000,
+                #ff6600,
+                #ff9900,
+                #ffcc00
+            )
+            1;
+        filter: blur(5px);
+        animation: a 5s linear infinite;
+        content: '';
+    }
+
+    @keyframes a {
+        from {
+            --angle: 0turn;
+        }
+        to {
+            --angle: 1turn;
+        }
+    }
+
     .record-something-buttons {
         display: block;
         padding: 0.8rem 0 0.8rem 0;
