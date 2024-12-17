@@ -14,6 +14,7 @@
             state.listen('wheel', evt => {
                 evt.preventDefault();
                 state.zoomOnCenter(1 + evt.deltaY * -0.001);
+                state.moveX(evt.deltaX * 0.5);
             });
 
             state.listen('mousemove', evt => {
