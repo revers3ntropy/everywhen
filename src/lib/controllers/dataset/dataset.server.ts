@@ -166,11 +166,30 @@ namespace DatasetServer {
         const metadatas = [] as DatasetMetadata[];
 
         const datasets = await query<
-            { id: string; name: string; created: number; presetId: string | null }[]
+            {
+                id: string;
+                name: string;
+                created: number;
+                presetId: string | null;
+                rowCount: number;
+            }[]
         >`
-            SELECT id, name, created, presetId
+            SELECT
+                datasets.id,
+                datasets.name,
+                datasets.created,
+                datasets.presetId,
+                -- I think faster than using a join,
+                -- 1.3ms vs 2.2ms so not a huge difference
+                (
+                    SELECT COUNT(*) AS rowCount
+                    FROM datasetRows
+                    WHERE datasetId = datasets.id
+                        AND userId = ${auth.id}
+                ) as rowCount
             FROM datasets
-            WHERE userId = ${auth.id}
+            WHERE datasets.userId = ${auth.id}
+            ORDER BY created DESC
         `;
 
         const usersColumnsRes = await getUserDefinedColumns(auth);
@@ -192,16 +211,10 @@ namespace DatasetServer {
             if (preset) {
                 columns = preset.columns;
             } else {
-                columns = usersColumnsRes.val.filter(c => c.datasetId === dataset.id);
+                columns = usersColumnsRes.val
+                    .filter(c => c.datasetId === dataset.id)
+                    .sort((a, b) => b.ordering - a.ordering);
             }
-
-            // TODO remove and add as cached column on Dataset table
-            const [{ rowCount }] = await query<{ rowCount: number }[]>`
-                SELECT COUNT(*) AS rowCount
-                FROM datasetRows
-                WHERE datasetId = ${dataset.id}
-                AND userId = ${auth.id}
-            `;
 
             metadatas.push({
                 id: dataset.id,
@@ -209,7 +222,7 @@ namespace DatasetServer {
                 created: dataset.created,
                 columns,
                 preset,
-                rowCount
+                rowCount: dataset.rowCount
             });
         }
 
