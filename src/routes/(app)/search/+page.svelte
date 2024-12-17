@@ -16,7 +16,12 @@
     export let data;
 
     async function loadSearch() {
-        results = notify.onErr(await api.get('/search', { q: search })).results;
+        let s = search.trim();
+        if (s) {
+            results = notify.onErr(await api.get('/search', { q: s })).results;
+        } else {
+            results = [];
+        }
     }
 
     let search = $page.url.searchParams.get('q') ?? '';
@@ -37,6 +42,7 @@
             <Textbox
                 bind:value={search}
                 on:change={() => goto(`/search?q=${search}`)}
+                on:input={loadSearch}
                 label="Search"
                 fullWidth
             />

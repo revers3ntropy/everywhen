@@ -12,6 +12,7 @@
     import Logout from 'svelte-material-icons/Logout.svelte';
     import CogOutline from 'svelte-material-icons/CogOutline.svelte';
     import DarkTheme from 'svelte-material-icons/WeatherNight.svelte';
+    import ChartLine from 'svelte-material-icons/ChartLine.svelte';
 
     function switchTheme() {
         theme.set($theme === Theme.light ? Theme.dark : Theme.light);
@@ -62,6 +63,11 @@
         <a aria-label="settings" href="/settings" class="flex justify-start items-center p-2 gap-2">
             <CogOutline size="30" />
             Settings
+        </a>
+
+        <a aria-label="datasets" href="/datasets" class="flex justify-start items-center p-2 gap-2">
+            <ChartLine size="30" />
+            Trackers
         </a>
 
         <hr />

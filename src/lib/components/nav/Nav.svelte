@@ -5,12 +5,12 @@
     import { obfuscated, passcodeLastEntered, settingsStore } from '$lib/stores';
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
-    import ChartLine from 'svelte-material-icons/ChartLine.svelte';
     import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import Lock from 'svelte-material-icons/Lock.svelte';
     import MapOutline from 'svelte-material-icons/MapOutline.svelte';
     import Notebook from 'svelte-material-icons/NotebookOutline.svelte';
+    import Search from 'svelte-material-icons/Magnify.svelte';
 
     const buttonCls =
         'w-full inline-flex px-2 py-3 items-center content-center gap-2 flex-col md:flex-row' +
@@ -104,14 +104,14 @@
                     <div class="text-sm md:text-base"> Insights </div>
                 </a>
                 <a
-                    href="/datasets"
+                    href="/search"
                     class={buttonCls}
-                    class:bg-primaryLight={$page.url.pathname.startsWith('/datasets')}
-                    class:hover:bg-primaryLight={$page.url.pathname.startsWith('/datasets')}
-                    aria-label="datasets"
+                    class:bg-primaryLight={$page.url.pathname.startsWith('/search')}
+                    class:hover:bg-primaryLight={$page.url.pathname.startsWith('/search')}
+                    aria-label="search"
                 >
-                    <ChartLine size="30" />
-                    <div class="text-sm md:text-base"> Trackers </div>
+                    <Search size="30" />
+                    <div class="text-sm md:text-base"> Search </div>
                 </a>
             </div>
         </div>

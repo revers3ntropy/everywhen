@@ -42,6 +42,7 @@
     export let showLabels = true;
     export let showForms = false;
     export let happinessDataset: Dataset | null = null;
+    export let hideFeedItemTypeIcon = false;
 
     function toggleCollapse() {
         $collapsed[day.day] = !$collapsed[day.day];
@@ -152,6 +153,12 @@
             {/if}
             <div class="w-full">
                 {#each items || [] as item, i (item.id)}
+                    <div class="relative">
+                        <span
+                            class="absolute top-[18px] left-0 border-borderHeavy border w-4 block"
+                        />
+                    </div>
+                    <span class=""></span>
                     {#if item.type === 'entry'}
                         <EntryFeedItem entry={item} {obfuscated} {showLabels} {locations} />
                     {:else if item.type === 'entry-edit'}
