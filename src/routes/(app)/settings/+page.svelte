@@ -94,7 +94,7 @@
     h1 {
         @extend .flex-center;
         justify-content: flex-start;
-        padding: 1rem 0 2rem 3rem;
+        padding: 1rem 0 2rem 1rem;
         font-size: 24px;
 
         span {
@@ -108,8 +108,6 @@
     }
 
     hr {
-        margin: 1.5rem;
-
         &:last-child {
             display: none;
         }

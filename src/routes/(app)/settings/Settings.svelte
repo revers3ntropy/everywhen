@@ -183,7 +183,7 @@
         grid-template-columns: 1fr 25rem;
         padding-inline: 1rem;
 
-        @media #{$mobile} {
+        @media only screen and (max-width: 1300px) {
             display: block;
         }
 
@@ -196,6 +196,7 @@
 
         .left,
         .right {
+            min-height: 1rem;
             padding: 0 0.5em;
 
             @media #{$mobile} {
