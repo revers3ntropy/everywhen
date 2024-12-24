@@ -1,8 +1,6 @@
 <script lang="ts">
-    import { browser } from '$app/environment';
-    import { notify } from '$lib/components/notifications/notifications.js';
-    import { encryptionKey } from '$lib/stores';
     import { Day } from '$lib/utils/day';
+    import { fmtUtc } from '$lib/utils/time';
     import {
         Chart,
         Title,
@@ -14,18 +12,10 @@
         PointElement,
         LineElement
     } from 'chart.js';
-    import { Line, Bar } from 'svelte-chartjs';
+    import { Line } from 'svelte-chartjs';
     import Select from '$lib/components/Select.svelte';
-    import type { BarChartData, LineChartData } from '../../../types';
-    import { getGraphData } from './bucketiseEntriesForBarChart';
-    import type { EntryStats, By } from './helpers';
-    import {
-        Bucket,
-        bucketNames,
-        decryptUserAgentsBackground,
-        initialBucket,
-        initialBucketName
-    } from './helpers';
+    import { By } from './helpers';
+    import { Bucket } from './helpers';
     import { cssVarValue } from '$lib/utils/getCssVar';
 
     Chart.register(
@@ -39,47 +29,54 @@
         LineElement
     );
 
-    export let entries: EntryStats[];
-    export let by: By;
+    export let timeOfDayData: Record<By, { timeOfDay: number; value: number }[]>;
+    export let bucketisedData: {
+        [key in Bucket]?: Record<By, number[]>;
+    };
     export let days: number;
+    export let earliestEntryDay: Day;
 
-    function entriesExistOnMultipleDays(entries: EntryStats[]) {
-        if (entries.length === 0) return false;
-        let day = Day.fromTimestamp(entries[0].created, entries[0].createdTzOffset);
-        for (let i = 1; i < entries.length; i++) {
-            if (!day.eq(Day.fromTimestamp(entries[i].created, entries[i].createdTzOffset)))
-                return true;
+    export function initialBucket(days: number): Bucket & keyof typeof bucketisedData {
+        if (days < 7 + 3 && bucketisedData[Bucket.Day]) return Bucket.Day;
+        if (days < 7 * 14 && bucketisedData[Bucket.Week]) return Bucket.Week;
+        if (days < 365 * 10 && bucketisedData[Bucket.Month]) return Bucket.Month;
+        if (bucketisedData[Bucket.Year]) return Bucket.Year;
+        throw new Error('No bucket found');
+    }
+
+    export function getLabels(selectedBucket: Bucket, earliestEntryDay: Day): string[] {
+        switch (selectedBucket) {
+            case Bucket.Year:
+                return Array(Day.todayUsingNativeDate().year - earliestEntryDay.year + 1)
+                    .fill(0)
+                    .map((_, i) => i + earliestEntryDay.year + '');
+            case Bucket.Month:
+                return Array((Day.todayUsingNativeDate().year - earliestEntryDay.year + 1) * 12)
+                    .fill(0)
+                    .map((_, i) =>
+                        fmtUtc(
+                            new Day(
+                                Math.floor(earliestEntryDay.year + i / 12),
+                                (i % 12) + 1,
+                                1
+                            ).utcTimestamp(0),
+                            0,
+                            [0, 11].includes(i % 12) ? 'YYYY MMM' : 'MMM'
+                        )
+                    );
+            default:
+                throw new Error('Not implemented');
         }
-        return false;
     }
 
-    let selectedBucket = initialBucket(days);
-
-    let mainGraphData: LineChartData | null;
-    let smallGraph1Data: LineChartData | null;
-    let smallGraph2Data: BarChartData | null;
-
-    // no data fetching so top level
-    $: if (browser) {
-        mainGraphData = getGraphData(entries, selectedBucket, by);
-        smallGraph1Data = getGraphData(entries, Bucket.Hour, by);
-    }
-    $: if (browser && $encryptionKey) {
-        void decryptUserAgentsBackground(entries, $encryptionKey).then(entries => {
-            smallGraph2Data = getGraphData(notify.onErr(entries), Bucket.OperatingSystem, by, {
-                borderColor: 'transparent',
-                borderRadius: 4
-            });
-        });
-    }
-    $: shouldShowMainGraph = entriesExistOnMultipleDays(entries);
+    let selectedBucket: keyof typeof bucketisedData = initialBucket(days);
 
     const options = () => ({
         responsive: true,
         maintainAspectRatio: false,
         scales: {
             y: {
-                border: { color: cssVarValue('--border-light') },
+                border: { color: cssVarValue('var(--border-light') },
                 ticks: { color: cssVarValue('--text-color-light') },
                 grid: { display: false },
                 suggestedMin: 0
@@ -92,65 +89,78 @@
         }
     });
 
-    const optionsForMainChart = { ...bucketNames };
-    // separate graphs for these metrics
-    delete optionsForMainChart['Operating System'];
-    delete optionsForMainChart['Hour'];
+    $: labels = getLabels(selectedBucket, earliestEntryDay);
 </script>
 
-{#if shouldShowMainGraph}
-    {#if mainGraphData !== null}
-        <div style="height: 350px">
-            <Line data={mainGraphData} options={options()} />
-        </div>
-    {/if}
-    <div>
-        <span class="text-light" style="margin: 0.3rem"> Group by </span>
-        <Select
-            bind:value={selectedBucket}
-            key={initialBucketName(days)}
-            options={optionsForMainChart}
+<div class="h-[350px] overflow-x-auto" style="direction: rtl">
+    <div class="h-full min-w-10 px-2" style="width: {labels.length * 25}px">
+        <Line
+            data={{
+                labels,
+                datasets: [
+                    {
+                        backgroundColor: cssVarValue('--primary'),
+                        borderColor: cssVarValue('--primary'),
+                        borderWidth: 1,
+                        data: bucketisedData[selectedBucket][By.Entries],
+                        label: 'Entries'
+                    },
+                    {
+                        backgroundColor: cssVarValue('--primary-light'),
+                        borderColor: cssVarValue('--primary-light'),
+                        borderWidth: 1,
+                        data: bucketisedData[selectedBucket][By.Words],
+                        label: 'Words'
+                    }
+                ]
+            }}
+            options={options()}
         />
     </div>
-{/if}
-
-<div class="smaller-charts" class:showing-main-graph={shouldShowMainGraph}>
-    <div>
-        <h3> Time of Day </h3>
-        <div style="height: 250px; width: calc(100% - 1rem)">
-            {#if smallGraph1Data !== null}
-                <Line data={smallGraph1Data} options={options()} />
-            {:else}
-                <p class="italic text-textColorLight"> No data </p>
-            {/if}
-        </div>
-    </div>
-    <div>
-        <h3> Device </h3>
-        <div style="height: 250px; width: calc(100% - 1rem)">
-            {#if smallGraph2Data !== null}
-                <Bar data={smallGraph2Data} options={options()} />
-            {:else}
-                <p class="italic text-textColorLight"> No data </p>
-            {/if}
-        </div>
-    </div>
+</div>
+<div class="pt-4 px-2">
+    <span class="py-2 px-3 bg-vLightAccent rounded-xl">
+        <span class="text-light mr-1"> Group by </span>
+        <Select
+            bind:value={selectedBucket}
+            key={selectedBucket}
+            options={{
+                Year: Bucket.Year,
+                Month: Bucket.Month
+            }}
+        />
+    </span>
 </div>
 
-<style lang="scss">
-    .smaller-charts {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-gap: 1rem;
-        margin: 1rem 0 0 0;
-
-        @media #{$mobile} {
-            grid-template-columns: 1fr;
-        }
-
-        &.showing-main-graph {
-            border-top: 1px solid var(--border-color);
-            padding-top: 1rem;
-        }
-    }
-</style>
+<div class="mt-4 flex justify-between border-t border-borderColor pt-4">
+    <div class="flex-1">
+        <h3 class="pl-2"> Time of Day </h3>
+        <div class="h-[250px] px-2" style="width: calc(100% - 1rem)">
+            <Line
+                data={{
+                    labels: Array(24)
+                        .fill(0)
+                        .map((_, i) => fmtUtc((i % 24) * 60 * 60, 0, 'ha')),
+                    datasets: [
+                        {
+                            backgroundColor: cssVarValue('--primary'),
+                            borderColor: cssVarValue('--primary'),
+                            borderWidth: 1,
+                            data: timeOfDayData[By.Entries].map(({ value }) => value),
+                            label: 'Entries'
+                        },
+                        {
+                            backgroundColor: cssVarValue('--primary-light'),
+                            borderColor: cssVarValue('--primary-light'),
+                            borderWidth: 1,
+                            data: timeOfDayData[By.Words].map(({ value }) => value),
+                            label: 'Words'
+                        }
+                    ]
+                }}
+                options={options()}
+            />
+        </div>
+    </div>
+    <div class="flex-1"> </div>
+</div>

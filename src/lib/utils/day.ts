@@ -164,6 +164,14 @@ export class Day {
         return this.date - other.date;
     }
 
+    public max(other: Day): Day {
+        return this.gt(other) ? this : other;
+    }
+
+    public min(other: Day): Day {
+        return this.lt(other) ? this : other;
+    }
+
     public static fromI18nDate(d: DateValue) {
         return new Day(d.year, d.month, d.day);
     }

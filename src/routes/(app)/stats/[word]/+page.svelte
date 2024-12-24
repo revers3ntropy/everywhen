@@ -89,7 +89,7 @@
                     />
                 </div>
                 <div class="container" style="margin: 1rem 0; padding: 1rem;">
-                    <EntryChart {by} entries={data.entries} days={data.days} />
+                    <EntryChart entries={data.entries} days={data.days} />
                 </div>
             </section>
 

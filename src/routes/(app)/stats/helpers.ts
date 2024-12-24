@@ -11,8 +11,8 @@ export interface EntryStats {
 }
 
 export enum By {
-    Words,
-    Entries
+    Words = 'by-words',
+    Entries = 'by-entries'
 }
 
 export enum Bucket {
@@ -33,17 +33,6 @@ export const bucketNames: Record<string, Bucket> = {
     Hour: Bucket.Hour,
     'Operating System': Bucket.OperatingSystem
 };
-
-export function initialBucket(days: number): Bucket {
-    if (days < 7 + 3) return Bucket.Day;
-    if (days < 7 * 14) return Bucket.Week;
-    if (days < 365 * 10) return Bucket.Month;
-    return Bucket.Year;
-}
-
-export function initialBucketName(days: number): string {
-    return initialBucket(days);
-}
 
 export function heatMapDataFromEntries(entries: EntryStats[]): Record<By, HeatMapData> {
     return {
