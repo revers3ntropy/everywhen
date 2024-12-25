@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { DAYS_OF_WEEK } from '$lib/constants';
     import { Day } from '$lib/utils/day';
     import { fmtUtc } from '$lib/utils/time';
     import {
@@ -30,6 +31,7 @@
     );
 
     export let timeOfDayData: Record<By, { timeOfDay: number; value: number }[]>;
+    export let entriesByDayOfWeek: Record<By, { timeOfDay: number; value: number }[]>;
     export let bucketisedData: {
         [key in Bucket]?: Record<By, number[]>;
     };
@@ -89,6 +91,7 @@
         }
     });
 
+    $: selectedData = bucketisedData[selectedBucket]!;
     $: labels = getLabels(selectedBucket, earliestEntryDay);
 </script>
 
@@ -102,14 +105,14 @@
                         backgroundColor: cssVarValue('--primary'),
                         borderColor: cssVarValue('--primary'),
                         borderWidth: 1,
-                        data: bucketisedData[selectedBucket][By.Entries],
+                        data: selectedData[By.Entries],
                         label: 'Entries'
                     },
                     {
                         backgroundColor: cssVarValue('--primary-light'),
                         borderColor: cssVarValue('--primary-light'),
                         borderWidth: 1,
-                        data: bucketisedData[selectedBucket][By.Words],
+                        data: selectedData[By.Words],
                         label: 'Words'
                     }
                 ]
@@ -162,5 +165,33 @@
             />
         </div>
     </div>
-    <div class="flex-1"> </div>
+    <div class="flex-1">
+        <h3 class="pl-2"> Day of Week </h3>
+        <div class="h-[250px] px-2" style="width: calc(100% - 1rem)">
+            <Line
+                data={{
+                    labels: Array(7)
+                        .fill(0)
+                        .map((_, i) => DAYS_OF_WEEK[i]),
+                    datasets: [
+                        {
+                            backgroundColor: cssVarValue('--primary'),
+                            borderColor: cssVarValue('--primary'),
+                            borderWidth: 1,
+                            data: entriesByDayOfWeek[By.Entries].map(({ value }) => value),
+                            label: 'Entries'
+                        },
+                        {
+                            backgroundColor: cssVarValue('--primary-light'),
+                            borderColor: cssVarValue('--primary-light'),
+                            borderWidth: 1,
+                            data: entriesByDayOfWeek[By.Words].map(({ value }) => value),
+                            label: 'Words'
+                        }
+                    ]
+                }}
+                options={options()}
+            />
+        </div>
+    </div>
 </div>

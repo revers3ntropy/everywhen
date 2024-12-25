@@ -81,6 +81,7 @@
                     <EntryCharts
                         days={daysSinceFirstEntry}
                         timeOfDayData={data.timeOfDayData}
+                        entriesByDayOfWeek={data.entriesByDayOfWeek}
                         earliestEntryDay={Day.fromString(data.dayOfFirstEntry).unwrap()}
                         bucketisedData={{
                             [Bucket.Year]: data.entriesByYear,

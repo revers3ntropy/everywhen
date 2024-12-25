@@ -65,6 +65,8 @@ export const LOG_FILE_NAME = 'general.log';
 
 export const FILE_INPUT_ACCEPT_TYPES = 'image/png,image/jpeg,image/jpg,image/webp,image/svg+xml';
 
+export const DAYS_OF_WEEK = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] as const;
+
 // all limits are inclusive
 export const LIMITS = {
     asset: {
