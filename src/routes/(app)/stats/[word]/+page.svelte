@@ -4,12 +4,8 @@
     import { Day } from '$lib/utils/day';
     import ArrowLeft from 'svelte-material-icons/ArrowLeft.svelte';
     import Entries from '$lib/components/entry/Entries.svelte';
-    import ToggleSwitch from 'svelte-material-icons/ToggleSwitch.svelte';
-    import ToggleSwitchOff from 'svelte-material-icons/ToggleSwitchOff.svelte';
-    import { By } from '../helpers';
     import SearchForWord from '../SearchForWord.svelte';
     import StatPill from '../StatPill.svelte';
-    import EntryChart from '../EntryChart.svelte';
     import EntryHeatMap from '../EntryHeatMap.svelte';
     import type { PageData } from './$types';
     import { encryptionKey } from '$lib/stores';

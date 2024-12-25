@@ -8,7 +8,7 @@ import { decrypt, encrypt } from '$lib/utils/encryption';
 import { FileLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 import { wordCount, wordsFromText } from '$lib/utils/text';
-import { fmtUtc, nowUtc } from '$lib/utils/time';
+import { nowUtc } from '$lib/utils/time';
 import type { Hours, TimestampSecs } from '../../../types';
 import type { Auth } from '../auth/auth.server';
 import type { Label } from '../label/label';
@@ -324,74 +324,112 @@ namespace EntryServer {
         `;
     }
 
-    export async function getStreaks(auth: Auth, clientTzOffset: Hours): Promise<Result<Streaks>> {
-        const entries = await query<{ created: number; createdTzOffset: number }[]>`
-            SELECT created, createdTzOffset
-            FROM entries
-            WHERE deleted IS NULL
-              AND userId = ${auth.id}
-            ORDER BY created DESC, id
+    export async function getStreaks(auth: Auth, clientTzOffset: Hours): Promise<Streaks> {
+        const today = Day.today(clientTzOffset).fmtIso();
+        const yesterday = Day.today(clientTzOffset).plusDays(-1).fmtIso();
+
+        const streaks = await query<{ start: string; end: string; length: number }[]>`
+            WITH islands AS (
+                SELECT
+                    start,
+                    end, 
+                    DATEDIFF(end, start) + 1 as length
+                FROM (
+                    SELECT 
+                        DATE_FORMAT(MIN(date), '%Y-%m-%d') AS start,
+                        DATE_FORMAT(MAX(date), '%Y-%m-%d') AS end
+                    FROM (
+                        SELECT 
+                            date,
+                            @grp := IF(@prev_day = DATE_ADD(date, INTERVAL 1 DAY), @grp, @grp + 1) AS grp,
+                            @prev_day := date
+                            FROM (
+                                SELECT DISTINCT STR_TO_DATE(day, '%Y-%m-%d') as date
+                                FROM entries
+                                WHERE userId = ${auth.id}
+                                    AND deleted IS NULL
+                                ORDER BY date DESC
+                            ) as days,
+                            (SELECT @grp := 0, @prev_day := NULL) AS init
+                    ) AS grouped
+                    GROUP BY grp
+                ) as islands_without_length
+            ),
+            longest AS (
+                SELECT MAX(length) as longest
+                FROM islands
+            )
+            SELECT
+                start,
+                end,
+                length
+            FROM islands
+            WHERE
+                -- gets the interesting rows:
+                --   the longest streaks,
+                --   a streak starting today
+                --   or a streak starting yesterday
+                -- Note that there can't be a streak starting today 
+                -- and a streak starting yesterday
+                length = (SELECT longest FROM longest)
+                OR end = ${today}
+                OR end = ${yesterday}
         `;
 
-        if (entries.length < 1) {
-            return Result.ok({
+        if (streaks.length < 1) {
+            return {
                 current: 0,
                 longest: 0,
                 runningOut: false
-            });
+            };
         }
 
-        const today = fmtUtc(nowUtc(), clientTzOffset, 'YYYY-MM-DD');
-        const yesterday = fmtUtc(nowUtc() - 86400, clientTzOffset, 'YYYY-MM-DD');
+        let streakFromToday = 0;
+        let streakFromYesterday = 0;
+        let longest = 0;
 
-        let current = 0;
-
-        // group entries by day
-        const entriesOnDay: Record<string, true | undefined> = {};
-        for (const entry of entries) {
-            entriesOnDay[fmtUtc(entry.created, entry.createdTzOffset, 'YYYY-MM-DD')] = true;
-        }
-
-        // streaks are running out when we made an entry yesterday but not today
-        const runningOut = !entriesOnDay[today] && !!entriesOnDay[yesterday];
-
-        let currentDay = today;
-        if (!entriesOnDay[currentDay]) {
-            currentDay = yesterday;
-        }
-        // find the current streak by counting backwards from today until
-        // we find a day without an entry
-        while (entriesOnDay[currentDay]) {
-            current++;
-            currentDay = fmtUtc(new Date(currentDay).getTime() / 1000 - 86400, 0, 'YYYY-MM-DD');
-        }
-
-        let longest = current;
-        let currentStreak = 0;
-
-        const firstEntry = entries[entries.length - 1];
-        const firstDay = fmtUtc(firstEntry.created, firstEntry.createdTzOffset, 'YYYY-MM-DD');
-
-        currentDay = today;
-        // find the longest streak by counting forwards from first entry
-        // until we find a day without an entry
-        while (currentDay !== firstDay) {
-            currentDay = fmtUtc(new Date(currentDay).getTime() / 1000 - 86400, 0, 'YYYY-MM-DD');
-            if (entriesOnDay[currentDay]) {
-                currentStreak++;
-                if (currentStreak > longest) {
-                    longest = currentStreak;
-                }
+        for (const streak of streaks) {
+            if (streak.end === today) {
+                streakFromToday = streak.length;
+            } else if (streak.end === yesterday) {
+                streakFromYesterday = streak.length;
+            } else if (streak.length >= longest) {
+                longest = streak.length;
             } else {
-                currentStreak = 0;
+                await logger.error('unexpected streak', {
+                    streak,
+                    streaks,
+                    streakFromToday,
+                    streakFromYesterday,
+                    yesterday,
+                    today,
+                    longest
+                });
+                throw new Error('Unexpected streak');
             }
         }
 
-        return Result.ok({
+        if (streakFromYesterday > 0 && streakFromToday > 0) {
+            await logger.error('Both streaks are non-zero', {
+                streakFromYesterday,
+                streakFromToday
+            });
+            throw new Error('Both streaks are non-zero');
+        }
+        if (longest < 1) {
+            await logger.error('Longest streak is less than 1', { longest });
+            throw new Error('Longest streak is less than 1');
+        }
+
+        const current = Math.max(streakFromToday, streakFromYesterday);
+
+        return {
             current,
             longest,
-            runningOut
-        });
+            // if we have a streak, but we don't have a streak ending today,
+            // then our streak is running out
+            runningOut: streakFromToday < 1 && current > 0
+        };
     }
 
     export function editFromRaw(

@@ -7,8 +7,7 @@ import { error } from '@sveltejs/kit';
 export const GET = cachedApiRoute(async (auth, { url }) => {
     const tz = parseInt(url.searchParams.get('tz') || '0');
     if (tz < -24 || tz > 24 || isNaN(tz)) error(400, 'Invalid timezone offset (tz)');
-
-    return (await Entry.getStreaks(auth, tz)).unwrap(e => error(400, e));
+    return await Entry.getStreaks(auth, tz);
 }) satisfies RequestHandler;
 
 export const POST = apiRes404;
