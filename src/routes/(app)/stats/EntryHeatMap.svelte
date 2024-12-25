@@ -3,9 +3,9 @@
     import Heatmap from '$lib/components/ui/heatmap/Heatmap.svelte';
     import ToggleSwitch from 'svelte-material-icons/ToggleSwitch.svelte';
     import ToggleSwitchOff from 'svelte-material-icons/ToggleSwitchOff.svelte';
-    import { By, type HeatMapData } from './helpers';
+    import { By } from './helpers';
 
-    export let data: Record<By, HeatMapData>;
+    export let data: Record<By, { date: string; value: number }[]>;
     export let earliestEntryDay: Day;
 
     let by: By = By.Entries;
@@ -15,14 +15,14 @@
     }
 
     $: currentData = data[by];
-    $: goFrom = earliestEntryDay.max(Day.today().plusMonths(-36)).min(Day.today().plusMonths(-6));
+    $: goFrom = earliestEntryDay.min(Day.today().plusMonths(-6));
 </script>
 
 {#if currentData?.length}
     <div class="overflow-x-auto py-2" style="direction: rtl">
         <div style="width: {(goFrom.monthsAgo() + 1) * 100 + 20}px; direction: ltr">
             <Heatmap
-                data={currentData}
+                data={currentData.map(({ date, value }) => ({ date: new Date(date), value }))}
                 view={'weekly'}
                 allowOverflow={false}
                 cellGap={1}

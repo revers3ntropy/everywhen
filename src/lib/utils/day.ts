@@ -48,6 +48,10 @@ export class Day {
         return Result.ok(new Day(year, month, date));
     }
 
+    public static fromDate(date: Date): Day {
+        return new Day(date.getFullYear(), date.getMonth() + 1, date.getDate());
+    }
+
     public static timestampsAreSameDay(
         a: TimestampSecs,
         b: TimestampSecs,

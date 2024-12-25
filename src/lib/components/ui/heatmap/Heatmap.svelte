@@ -1,8 +1,6 @@
 <script lang="ts">
-    import { chunkMonths, chunkWeeks, getCalendar } from './utils/heatmap';
-
-    import Month from './views/Month.svelte';
-    import Week from './views/Week.svelte';
+    import { getWeekIndex, stringifyDate } from '$lib/components/ui/heatmap/date';
+    import { chunkMonths, chunkWeeks, getCalendar } from './heatmap';
 
     export let data: { date: Date; value: number }[];
     export let startDate: Date;
@@ -90,20 +88,32 @@
 <svg viewBox={`0 0 ${width} ${height}`}>
     {#if view === 'monthly'}
         {#each chunks as chunk, index}
-            <Month
-                {cellGap}
-                {cellRadius}
-                {cellRect}
-                {cellSize}
-                days={chunk}
-                {fontColor}
-                {fontFamily}
-                {fontSize}
-                {index}
-                {monthGap}
-                {monthLabelHeight}
-                {monthLabels}
-            />
+            <g transform={`translate(${(7 * cellRect - cellGap + monthGap) * index}, 0)`}>
+                {#each chunk as day}
+                    <rect
+                        data-date={stringifyDate(day.date)}
+                        data-value={day.value}
+                        fill={day.color}
+                        height={cellSize}
+                        rx={cellRadius}
+                        width={cellSize}
+                        x={day.date.getDay() * cellRect}
+                        y={getWeekIndex(day.date) * cellRect + monthLabelHeight}
+                    />
+                {/each}
+                {#if monthLabelHeight > 0}
+                    <text
+                        alignment-baseline="hanging"
+                        fill={fontColor}
+                        font-family={fontFamily}
+                        font-size={fontSize}
+                        x="0"
+                        y="0"
+                    >
+                        {monthLabels[chunk[0].date.getMonth()]}
+                    </text>
+                {/if}
+            </g>
         {/each}
     {:else}
         {#if dayLabelWidth > 0}
@@ -122,7 +132,20 @@
         {/if}
         <g transform={`translate(${dayLabelWidth})`}>
             {#each chunks as chunk, index}
-                <Week {cellRadius} {cellRect} {cellSize} days={chunk} {index} {monthLabelHeight} />
+                <g transform={`translate(${cellRect * index}, ${monthLabelHeight})`}>
+                    {#each chunk as day}
+                        <rect
+                            data-date={stringifyDate(day.date)}
+                            data-value={day.value}
+                            fill={day.color}
+                            height={cellSize}
+                            rx={cellRadius}
+                            width={cellSize}
+                            y={day.date.getDay() * cellRect}
+                            x={0}
+                        />
+                    {/each}
+                </g>
                 {#if monthLabelHeight > 0 && isNewMonth(chunks, index) && chunk.length}
                     <text
                         alignment-baseline="hanging"

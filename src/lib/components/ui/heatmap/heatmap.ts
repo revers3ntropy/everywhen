@@ -1,3 +1,4 @@
+import { Day } from '$lib/utils/day';
 import { getMonthEnd, getMonthStart, getWeekEnd, getWeekStart, normalizeDate } from './date';
 
 /**
@@ -47,9 +48,6 @@ export function chunkWeeks(
     endDate: Date,
     startDate: Date
 ): { date: Date; value: number; color: string }[][] {
-    startDate = normalizeDate(startDate);
-    endDate = normalizeDate(endDate);
-
     return calendar
         .reduce(
             (acc, day, index) => {
@@ -57,10 +55,7 @@ export function chunkWeeks(
                     acc.push([]);
                 }
 
-                if (
-                    allowOverflow ||
-                    ((!startDate || day.date >= startDate) && (!endDate || day.date <= endDate))
-                ) {
+                if (allowOverflow || (day.date >= startDate && day.date <= endDate)) {
                     acc[acc.length - 1].push(day);
                 }
 
@@ -89,27 +84,43 @@ export function getCalendar(
         startDate = getWeekStart(startDate);
         endDate = getWeekEnd(endDate);
     }
+    const startDay = Day.fromDate(startDate);
 
     let max = 0;
-    const startDayOfMonth = startDate.getDate();
     // 86400000 = 1000 * 60 * 60 * 24
     const totalDays = Math.floor((endDate.getTime() - startDate.getTime()) / 86400000) + 1;
-
+    const dataMappedByDay = data.reduce(
+        (acc, { date, value }) => {
+            const day = Day.fromDate(date).fmtIso();
+            if (!(day in acc)) {
+                acc[day] = value;
+            } else {
+                acc[day] += value;
+            }
+            if (acc[day] > max) {
+                max = acc[day];
+            }
+            return acc;
+        },
+        {} as Record<string, number>
+    );
     return new Array(totalDays)
         .fill(null)
-        .map((_, offset) => {
-            const day = getDay(data, offset, startDate, startDayOfMonth);
-            if (day.value > max) {
-                max = day.value;
-            }
-
-            return day;
+        .map((_, index) => {
+            const day = startDay.plusDays(index);
+            return {
+                date: day.dateObj(),
+                value: dataMappedByDay[day.fmtIso()] || 0
+            };
         })
-        .map(({ date, value }) => ({
-            color: getColor(colors, max, value) || emptyColor,
-            date,
-            value
-        }));
+        .map(({ date, value }) => {
+            return {
+                // max must be its final value here
+                color: getColor(colors, max, value) ?? emptyColor,
+                date,
+                value
+            };
+        });
 }
 
 /**
@@ -117,41 +128,6 @@ export function getCalendar(
  */
 export function getColor(colors: string[], max: number, value: number) {
     if (!colors.length || !value) return null;
-    let color = colors[0];
-
-    const intensity = value / max;
-
-    for (let i = 1; i < colors.length; i++) {
-        if (intensity < i / colors.length) {
-            return color;
-        }
-
-        color = colors[i];
-    }
-
-    return colors[colors.length - 1];
-}
-
-/**
- * Aggregate the value of each day.
- */
-export function getDay(
-    data: { date: Date; value: number }[],
-    offset: number,
-    startDate: Date,
-    startDayOfMonth: number
-) {
-    const date = new Date(startDate);
-    date.setDate(startDayOfMonth + offset);
-
-    const nextDate = new Date(date);
-    nextDate.setDate(date.getDate() + 1);
-
-    const value = data.reduce((acc, obj) => {
-        const datapoint = normalizeDate(obj.date);
-
-        return datapoint >= date && datapoint < nextDate ? acc + obj.value : acc;
-    }, 0);
-
-    return { date, value };
+    const index = Math.floor((value / max) * colors.length);
+    return colors[index] ?? colors[colors.length - 1];
 }

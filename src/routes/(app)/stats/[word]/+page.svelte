@@ -16,12 +16,6 @@
 
     export let data: PageData;
 
-    function toggleBy() {
-        by = by === By.Entries ? By.Words : By.Entries;
-    }
-
-    let by: By = By.Entries;
-
     $: theWordDecrypted = browser ? Auth.decryptOrLogOut(data.theWord, $encryptionKey) : '...';
 </script>
 
@@ -33,23 +27,8 @@
     <div class="w-full md:max-w-5xl">
         <div class="flex justify-between items-center">
             <div class="flex align-center gap-2">
-                <a href="/stats" class="flex-center primary">
-                    <ArrowLeft size="25" />
-                </a>
-                <button
-                    class="flex-center gap-1 bg-vLightAccent rounded-full px-4 py-2"
-                    on:click={toggleBy}
-                >
-                    <span class:text-light={by !== By.Words}> By Words </span>
-                    {#if by === By.Entries}
-                        <ToggleSwitch size="30" />
-                    {:else}
-                        <ToggleSwitchOff size="30" />
-                    {/if}
-                    <span class:text-light={by !== By.Entries}> By Entries </span>
-                </button>
-            </div>
-            <div class="pb-4">
+                <ArrowLeft size="25" />
+
                 <SearchForWord word={theWordDecrypted} />
             </div>
         </div>
@@ -58,7 +37,7 @@
                 <div class="flex-center">
                     <p>
                         You've never used that word before!
-                        <a href="/journal">Why not try it out?</a>
+                        <a href="/journal">Why not use it now?</a>
                     </p>
                 </div>
             </section>
@@ -81,15 +60,11 @@
             <section class="charts">
                 <div class="container" style="margin: 0; padding: 1rem;">
                     <EntryHeatMap
-                        {by}
                         data={data.heatMapData}
                         earliestEntryDay={data.dayOfFirstEntryWithWord
                             ? Day.fromString(data.dayOfFirstEntryWithWord).unwrap()
                             : Day.todayUsingNativeDate()}
                     />
-                </div>
-                <div class="container" style="margin: 1rem 0; padding: 1rem;">
-                    <EntryChart entries={data.entries} days={data.days} />
                 </div>
             </section>
 
