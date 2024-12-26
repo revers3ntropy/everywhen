@@ -139,6 +139,10 @@ export class Day {
         return new Day(this.year, this.month, 1);
     }
 
+    public startOfYear(): Day {
+        return new Day(this.year, 1, 1);
+    }
+
     public isInFuture(tzOffset: Hours = currentTzOffset()): boolean {
         return this.gt(Day.today(tzOffset));
     }

@@ -73,6 +73,9 @@
             return;
         }
         selectedBucket = grouping;
+        if (days < 2) {
+            return;
+        }
         mainChartData = await getBucketisedData(
             grouping,
             getMainChartDataFrom(selectedBucket),
@@ -83,9 +86,11 @@
     function getMainChartDataFrom(bucket: Grouping): Day | null {
         switch (bucket) {
             case Grouping.Day:
-                return Day.todayUsingNativeDate().plusDays(-62);
+                return Day.todayUsingNativeDate().plusDays(-31 * 6);
             case Grouping.Month:
-                return Day.todayUsingNativeDate().plusMonths(-12).startOfMonth();
+                return Day.todayUsingNativeDate()
+                    .plusMonths(-12 * 10)
+                    .startOfYear();
             case Grouping.Year:
                 return new Day(0, 1, 1);
             default:
@@ -98,11 +103,10 @@
     let timeOfDayData: StatsData | null = null;
     let dayOfWeekData: StatsData | null = null;
     onMount(async () => {
-        mainChartData = await getBucketisedData(
-            selectedBucket,
-            getMainChartDataFrom(selectedBucket)
-        );
-        timeOfDayData = await getBucketisedData(Grouping.Hour, new Day(0, 1, 1));
+        void changeMainChartGrouping(selectedBucket);
+        getBucketisedData(Grouping.Hour, new Day(0, 1, 1)).then(data => {
+            timeOfDayData = data;
+        });
         dayOfWeekData = await getBucketisedData(Grouping.DayOfWeek, new Day(0, 1, 1));
     });
 </script>
@@ -115,54 +119,56 @@
 -->
 {#key $theme}
     {#if mainChartData}
-        <div class="h-[350px] overflow-x-auto" style="direction: rtl">
-            <div
-                class="h-full min-w-10 px-2"
-                style="width: {mainChartData.labels.length * 25 + 30}px"
-            >
-                <Line
-                    data={{
-                        labels: mainChartData.labels,
-                        datasets: [
-                            {
-                                backgroundColor: cssVarValue('--primary'),
-                                borderColor: cssVarValue('--primary'),
-                                borderWidth: 1,
-                                data: mainChartData.values[By.Entries],
-                                label: 'Entries'
-                            },
-                            {
-                                backgroundColor: cssVarValue('--primary-light'),
-                                borderColor: cssVarValue('--primary-light'),
-                                borderWidth: 1,
-                                data: mainChartData.values[By.Words],
-                                label: 'Words'
-                            }
-                        ]
-                    }}
-                    options={options()}
-                />
+        <div class="border-b border-borderColor pt-4 pb-4">
+            <div class="h-[350px] overflow-x-auto md:px-4 w-fit max-w-full" style="direction: rtl">
+                <div
+                    class="h-full min-w-10 px-2"
+                    style="width: {Math.max(mainChartData.labels.length * 25 + 30, 300)}px"
+                >
+                    <Line
+                        data={{
+                            labels: mainChartData.labels,
+                            datasets: [
+                                {
+                                    backgroundColor: cssVarValue('--primary'),
+                                    borderColor: cssVarValue('--primary'),
+                                    borderWidth: 1,
+                                    data: mainChartData.values[By.Entries],
+                                    label: 'Entries'
+                                },
+                                {
+                                    backgroundColor: cssVarValue('--primary-light'),
+                                    borderColor: cssVarValue('--primary-light'),
+                                    borderWidth: 1,
+                                    data: mainChartData.values[By.Words],
+                                    label: 'Words'
+                                }
+                            ]
+                        }}
+                        options={options()}
+                    />
+                </div>
             </div>
-        </div>
 
-        <div class="pt-4 px-2">
-            <span class="py-2 px-3 bg-vLightAccent rounded-xl">
-                <span class="text-light mr-1"> Group by </span>
-                <Select
-                    value={selectedBucket}
-                    onChange={key => changeMainChartGrouping(key)}
-                    key={selectedBucket}
-                    options={{
-                        Year: Grouping.Year,
-                        Month: Grouping.Month,
-                        Day: Grouping.Day
-                    }}
-                />
-            </span>
+            <div class="pt-4 px-2">
+                <span class="py-2 px-3 bg-vLightAccent rounded-xl">
+                    <span class="text-light mr-1"> Group by </span>
+                    <Select
+                        value={selectedBucket}
+                        onChange={key => changeMainChartGrouping(key)}
+                        key={selectedBucket}
+                        options={{
+                            Year: Grouping.Year,
+                            Month: Grouping.Month,
+                            Day: Grouping.Day
+                        }}
+                    />
+                </span>
+            </div>
         </div>
     {/if}
 
-    <div class="mt-4 md:flex justify-between border-t border-borderColor pt-4">
+    <div class="py-4 md:p-4 md:flex justify-between">
         <div class="flex-1">
             {#if timeOfDayData}
                 <h3 class="pl-2"> Time of Day </h3>

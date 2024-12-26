@@ -10,7 +10,6 @@
     import CommonWordsList from './CommonWordsList.svelte';
     import EntryCharts from './EntryChart.svelte';
     import EntryHeatMap from './EntryHeatMap.svelte';
-    import SearchForWord from './SearchForWord.svelte';
     import StatPill from './StatPill.svelte';
 
     export let data: PageData;

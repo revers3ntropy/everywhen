@@ -19,7 +19,7 @@
     let words: { word: string; count: number }[] = [];
 </script>
 
-{#if uniqueWordCount > 1}
+{#if uniqueWordCount > 0}
     <h2 class="text-left py-2">Common Words</h2>
     <InfiniteScroller
         loadItems={loadMoreWords}

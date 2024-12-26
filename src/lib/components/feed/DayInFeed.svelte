@@ -129,10 +129,15 @@
                     >
                         <WeatherWidget weather={day.weather} />
                     </button>
-                {:else if $settingsStore.homeLocation.value[0] === null && isToday}
+                    <!--
+                        only show widgets if they have made some entries,
+                        otherwise reduce clutter as much as possible
+                        if they have just created the account
+                    -->
+                {:else if $settingsStore.homeLocation.value[0] === null && isToday && entryCount > 0}
                     <EnableWeatherWidget />
                 {/if}
-                {#if isToday && showForms}
+                {#if isToday && showForms && entryCount > 0}
                     <HappinessDatasetShortcut dataset={happinessDataset} />
                 {/if}
             </div>

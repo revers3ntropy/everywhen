@@ -72,8 +72,8 @@ describe('heatmap utils', () => {
                     { date: new Date('2022-12-22T12:00:00'), value: 1 }
                 ],
                 '#000',
-                new Date('2022-12-24T11:00:00'),
                 new Date('2024-12-24T11:00:00'),
+                new Date('2022-12-24T11:00:00'),
                 'weekly'
             );
 

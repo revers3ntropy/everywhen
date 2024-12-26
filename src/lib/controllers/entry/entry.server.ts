@@ -365,15 +365,18 @@ namespace EntryServer {
                 length
             FROM islands
             WHERE
-                -- gets the interesting rows:
-                --   the longest streaks,
-                --   a streak starting today
-                --   or a streak starting yesterday
-                -- Note that there can't be a streak starting today 
-                -- and a streak starting yesterday
-                length = (SELECT longest FROM longest)
-                OR end = ${today}
-                OR end = ${yesterday}
+                (
+                    -- gets the interesting rows:
+                    --   the longest streaks,
+                    --   a streak starting today
+                    --   or a streak starting yesterday
+                    -- Note that there can't be a streak starting today 
+                    -- and a streak starting yesterday
+                    length = (SELECT longest FROM longest)
+                    OR end = ${today}
+                    OR end = ${yesterday}
+                )
+                AND length > 0
         `;
 
         if (streaks.length < 1) {
@@ -393,19 +396,9 @@ namespace EntryServer {
                 streakFromToday = streak.length;
             } else if (streak.end === yesterday) {
                 streakFromYesterday = streak.length;
-            } else if (streak.length >= longest) {
+            }
+            if (streak.length >= longest) {
                 longest = streak.length;
-            } else {
-                await logger.error('unexpected streak', {
-                    streak,
-                    streaks,
-                    streakFromToday,
-                    streakFromYesterday,
-                    yesterday,
-                    today,
-                    longest
-                });
-                throw new Error('Unexpected streak');
             }
         }
 
