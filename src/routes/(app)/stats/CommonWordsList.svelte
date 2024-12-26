@@ -11,7 +11,7 @@
 
     async function loadMoreWords(): Promise<void> {
         const res = notify.onErr(
-            await api.get('/stats/commonWords', { offset: words.length, count: 2 })
+            await api.get('/stats/commonWords', { offset: words.length, count: 50 })
         );
         words = [...words, ...res.words];
     }
@@ -20,31 +20,33 @@
 </script>
 
 {#if uniqueWordCount > 0}
-    <h2 class="text-left py-2">Common Words</h2>
-    <InfiniteScroller
-        loadItems={loadMoreWords}
-        hasMore={() => words.length < uniqueWordCount}
-        margin={500}
-    >
-        <div class="common-words">
-            {#each words as { word, count }, i}
-                <div class="text-light">#{i + 1}</div>
-                <span class="ellipsis" data-sveltekit-preload-data="tap">
-                    {browser ? decrypt(word, $encryptionKey).unwrap() : ''}
-                </span>
+    <div class="relative">
+        <h2 class="text-left py-2">Common Words</h2>
+        <InfiniteScroller
+            loadItems={loadMoreWords}
+            hasMore={() => words.length < uniqueWordCount}
+            margin={500}
+        >
+            <div class="common-words">
+                {#each words as { word, count }, i}
+                    <div class="text-light">#{i + 1}</div>
+                    <span class="ellipsis" data-sveltekit-preload-data="tap">
+                        {browser ? decrypt(word, $encryptionKey).unwrap() : ''}
+                    </span>
 
-                <b class="count text-right">{count}</b>
+                    <b class="count text-right">{count}</b>
 
-                <div class="hide-mobile text-right">
-                    {(count / entryCount).toPrecision(3)} / entry
-                </div>
+                    <div class="hide-mobile text-right">
+                        {(count / entryCount).toPrecision(3)} / entry
+                    </div>
 
-                {#if i < words.length - 1}
-                    <hr />
-                {/if}
-            {/each}
-        </div>
-    </InfiniteScroller>
+                    {#if i < words.length - 1}
+                        <hr />
+                    {/if}
+                {/each}
+            </div>
+        </InfiniteScroller>
+    </div>
 {/if}
 
 <style lang="scss">

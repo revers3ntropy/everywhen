@@ -325,8 +325,7 @@ namespace EntryServer {
     }
 
     export async function getStreaks(auth: Auth, clientTzOffset: Hours): Promise<Streaks> {
-        const today = Day.today(clientTzOffset).fmtIso();
-        const yesterday = Day.today(clientTzOffset).plusDays(-1).fmtIso();
+        const yesterday = Day.today(clientTzOffset).plusDays(-1);
 
         const streaks = await query<{ start: string; end: string; length: number }[]>`
             WITH islands AS (
@@ -370,11 +369,10 @@ namespace EntryServer {
                     --   the longest streaks,
                     --   a streak starting today
                     --   or a streak starting yesterday
-                    -- Note that there can't be a streak starting today 
+                    -- Note that there can't be a streak starting today
                     -- and a streak starting yesterday
                     length = (SELECT longest FROM longest)
-                    OR end = ${today}
-                    OR end = ${yesterday}
+                    OR STR_TO_DATE(end, '%Y-%m-%d')>= STR_TO_DATE(${yesterday.fmtIso()}, '%Y-%m-%d')
                 )
                 AND length > 0
         `;
@@ -392,9 +390,10 @@ namespace EntryServer {
         let longest = 0;
 
         for (const streak of streaks) {
-            if (streak.end === today) {
+            const streakEndDay = Day.fromString(streak.end).unwrap();
+            if (streakEndDay.gt(yesterday)) {
                 streakFromToday = streak.length;
-            } else if (streak.end === yesterday) {
+            } else if (streakEndDay.eq(yesterday)) {
                 streakFromYesterday = streak.length;
             }
             if (streak.length >= longest) {
