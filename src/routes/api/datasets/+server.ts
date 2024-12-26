@@ -1,4 +1,4 @@
-import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
+import { api404Handler, apiResponse } from '$lib/utils/apiResponse.server';
 import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
 import { z } from 'zod';
 import type { RequestHandler } from './$types';
@@ -31,5 +31,5 @@ export const POST = (async ({ request, cookies }) => {
     return apiResponse(auth, { id });
 }) satisfies RequestHandler;
 
-export const DELETE = apiRes404;
-export const PUT = apiRes404;
+export const DELETE = api404Handler;
+export const PUT = api404Handler;

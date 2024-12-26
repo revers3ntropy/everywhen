@@ -17,8 +17,8 @@ export const entriesProvider = {
         day: Day,
         inFuture: boolean
     ): Promise<Result<Day | null>> {
-        const minTimestamp = day.utcTimestamp(24);
-        const maxTimestamp = day.utcTimestamp(-24);
+        const minTimestamp = day.utcTimestampMiddleOfDay(24);
+        const maxTimestamp = day.utcTimestampMiddleOfDay(-24);
         const entries = inFuture
             ? await query<{ day: string }[]>`
                 SELECT day

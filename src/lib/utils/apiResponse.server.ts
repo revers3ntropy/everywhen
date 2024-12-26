@@ -41,9 +41,9 @@ export function apiResponse<T>(
     }) as GenericResponse<T>;
 }
 
-export const apiRes404: RequestHandler & { isApi404: true } = ({ cookies }) => {
+export const api404Handler: RequestHandler & { isApi404: true } = ({ cookies }) => {
     const auth = Auth.tryGetAuthFromCookies(cookies);
     return apiResponse(auth, { status: 404 }, { status: 404 });
 };
 
-apiRes404.isApi404 = true;
+api404Handler.isApi404 = true;

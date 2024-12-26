@@ -71,8 +71,16 @@ export class Day {
         return `${m}-${d}`;
     }
 
-    public utcTimestamp(tzOffset: Hours): TimestampSecs {
+    public utcTimestampMiddleOfDay(tzOffset: Hours): TimestampSecs {
         return new Date(`${this.fmtIso()}T12:00:00Z`).getTime() / 1000 - tzOffset * 60 * 60;
+    }
+
+    public utcTimestampStartOfDay(tzOffset: Hours): TimestampSecs {
+        return new Date(`${this.fmtIso()}T00:00:00Z`).getTime() / 1000 - tzOffset * 60 * 60;
+    }
+
+    public utcTimestampEndOfDay(tzOffset: Hours): TimestampSecs {
+        return new Date(`${this.fmtIso()}T23:59:59Z`).getTime() / 1000 - tzOffset * 60 * 60;
     }
 
     public dateObj(): Date {
@@ -144,7 +152,9 @@ export class Day {
     }
 
     public daysUntil(day: Day, tzOffset: number = currentTzOffset()): number {
-        return Math.floor((day.utcTimestamp(tzOffset) - this.utcTimestamp(tzOffset)) / 86400);
+        return Math.floor(
+            (day.utcTimestampMiddleOfDay(tzOffset) - this.utcTimestampMiddleOfDay(tzOffset)) / 86400
+        );
     }
 
     public monthsAgo(from: Day = Day.today()): number {

@@ -8,8 +8,8 @@ import { Result } from '$lib/utils/result';
 
 export const sleepCycleProvider = {
     async feedItemsOnDay(auth: Auth, day: Day): Promise<Result<FeedItem[]>> {
-        const minTimestamp = day.utcTimestamp(24);
-        const maxTimestamp = day.utcTimestamp(-24);
+        const minTimestamp = day.utcTimestampMiddleOfDay(24);
+        const maxTimestamp = day.utcTimestampMiddleOfDay(-24);
         const sleeps = await query<
             { rowJson: string; timestamp: number; timestampTzOffset: number; id: string }[]
         >`
@@ -51,8 +51,8 @@ export const sleepCycleProvider = {
         day: Day,
         inFuture: boolean
     ): Promise<Result<Day | null>> {
-        const minTimestamp = day.utcTimestamp(24);
-        const maxTimestamp = day.utcTimestamp(-24);
+        const minTimestamp = day.utcTimestampMiddleOfDay(24);
+        const maxTimestamp = day.utcTimestampMiddleOfDay(-24);
         const records = inFuture
             ? await query<{ day: string }[]>`
                 SELECT DATE_FORMAT(FROM_UNIXTIME(datasetRows.timestamp + (datasetRows.timestampTzOffset - TIMESTAMPDIFF(HOUR, UTC_TIMESTAMP(), NOW())) * 60 * 60), '%Y-%m-%d') as day

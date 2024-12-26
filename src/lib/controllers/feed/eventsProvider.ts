@@ -7,8 +7,8 @@ import { Result } from '$lib/utils/result';
 
 export const eventStartsProvider = {
     async feedItemsOnDay(auth: Auth, day: Day): Promise<Result<FeedItem[]>> {
-        const minTimestamp = day.utcTimestamp(24);
-        const maxTimestamp = day.utcTimestamp(-24);
+        const minTimestamp = day.utcTimestampMiddleOfDay(24);
+        const maxTimestamp = day.utcTimestampMiddleOfDay(-24);
         const rawEvents = await query<
             {
                 id: string;
@@ -46,8 +46,8 @@ export const eventStartsProvider = {
         day: Day,
         inFuture: boolean
     ): Promise<Result<Day | null>> {
-        const minTimestamp = day.utcTimestamp(24);
-        const maxTimestamp = day.utcTimestamp(-24);
+        const minTimestamp = day.utcTimestampMiddleOfDay(24);
+        const maxTimestamp = day.utcTimestampMiddleOfDay(-24);
         const events = inFuture
             ? await query<{ start: number; tzOffset: number }[]>`
                 SELECT start, tzOffset
@@ -78,8 +78,8 @@ export const eventStartsProvider = {
 
 export const eventEndsProvider = {
     async feedItemsOnDay(auth: Auth, day: Day): Promise<Result<FeedItem[]>> {
-        const minTimestamp = day.utcTimestamp(24);
-        const maxTimestamp = day.utcTimestamp(-24);
+        const minTimestamp = day.utcTimestampMiddleOfDay(24);
+        const maxTimestamp = day.utcTimestampMiddleOfDay(-24);
         const rawEvents = await query<
             {
                 id: string;
@@ -117,8 +117,8 @@ export const eventEndsProvider = {
         day: Day,
         inFuture: boolean
     ): Promise<Result<Day | null>> {
-        const minTimestamp = day.utcTimestamp(24);
-        const maxTimestamp = day.utcTimestamp(-24);
+        const minTimestamp = day.utcTimestampMiddleOfDay(24);
+        const maxTimestamp = day.utcTimestampMiddleOfDay(-24);
         const events = inFuture
             ? await query<{ end: number; tzOffset: number }[]>`
                 SELECT end, tzOffset

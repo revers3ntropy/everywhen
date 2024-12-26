@@ -6,7 +6,6 @@ import { daysSince } from '$lib/utils/time';
 import { error } from '@sveltejs/kit';
 import { cachedPageRoute } from '$lib/utils/cache.server';
 import { normaliseWordForIndex } from '$lib/utils/text';
-import { heatMapDataFromEntries } from '../helpers';
 import type { PageServerLoad } from './$types';
 import { Entry } from '$lib/controllers/entry/entry.server';
 
@@ -25,7 +24,6 @@ export const load = cachedPageRoute(async (auth, { params }) => {
         theWord: normalisedEncryptedWord,
         totalEntries: (await Entry.counts(auth)).entryCount,
         locations: (await Location.all(auth)).unwrap(e => error(400, e)),
-        heatMapData: heatMapDataFromEntries(summaries),
         labels: (await Label.allIndexedById(auth)).unwrap(e => error(400, e)),
         days,
         dayOfFirstEntryWithWord:

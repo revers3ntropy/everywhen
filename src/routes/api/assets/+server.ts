@@ -1,7 +1,7 @@
 import { Asset } from '$lib/controllers/asset/asset.server';
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
-import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
+import { api404Handler, apiResponse } from '$lib/utils/apiResponse.server';
 import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import { Auth } from '$lib/controllers/auth/auth.server';
@@ -34,5 +34,5 @@ export const POST = (async ({ request, cookies }) => {
     return apiResponse(auth, { publicId, id });
 }) satisfies RequestHandler;
 
-export const DELETE = apiRes404;
-export const PUT = apiRes404;
+export const DELETE = api404Handler;
+export const PUT = api404Handler;

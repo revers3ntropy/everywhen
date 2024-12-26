@@ -2,7 +2,7 @@ import { error } from '@sveltejs/kit';
 import { Entry } from '$lib/controllers/entry/entry.server';
 import { Event } from '$lib/controllers/event/event.server';
 import { Label } from '$lib/controllers/label/label.server';
-import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
+import { api404Handler, apiResponse } from '$lib/utils/apiResponse.server';
 import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import { z } from 'zod';
@@ -77,4 +77,4 @@ export const DELETE = (async ({ cookies, params, request }) => {
     error(400, 'Invalid deletion strategy');
 }) satisfies RequestHandler;
 
-export const POST = apiRes404;
+export const POST = api404Handler;

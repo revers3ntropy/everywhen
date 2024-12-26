@@ -5,7 +5,7 @@ import { encryptionKey } from '$lib/stores';
 import { encrypt } from '$lib/utils/encryption';
 import { Logger } from '$lib/utils/log';
 import { get } from 'svelte/store';
-import type { apiRes404, GenericResponse } from './apiResponse.server';
+import type { api404Handler, GenericResponse } from './apiResponse.server';
 import { serializeGETArgs } from './GETArgs';
 import { Result } from './result';
 import { currentTzOffset, nowUtc } from './time';
@@ -24,7 +24,7 @@ export interface Options {
     doNotLogoutOn401: boolean;
 }
 
-export type ResType<T> = T extends typeof apiRes404
+export type ResType<T> = T extends typeof api404Handler
     ? 'this path gives a 404'
     : T extends (props: infer _) => Promise<GenericResponse<infer R>>
       ? R
@@ -62,6 +62,7 @@ export interface ApiRoutes {
     '/feed/?': typeof import('../../routes/api/feed/[day]/+server');
     '/search': typeof import('../../routes/api/search/+server');
     '/export': typeof import('../../routes/api/export/+server');
+    '/stats': typeof import('../../routes/api/stats/+server');
 }
 
 export async function makeApiReq<

@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 import { Event } from '$lib/controllers/event/event.server';
-import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
+import { api404Handler, apiResponse } from '$lib/utils/apiResponse.server';
 import { invalidateCache } from '$lib/utils/cache.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import { z } from 'zod';
@@ -60,5 +60,5 @@ export const DELETE = (async ({ params, cookies }) => {
     return apiResponse(auth, {});
 }) satisfies RequestHandler;
 
-export const GET = apiRes404;
-export const POST = apiRes404;
+export const GET = api404Handler;
+export const POST = api404Handler;

@@ -1,7 +1,7 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
 import { Entry } from '$lib/controllers/entry/entry.server';
-import { apiRes404 } from '$lib/utils/apiResponse.server';
+import { api404Handler } from '$lib/utils/apiResponse.server';
 import { cachedApiRoute } from '$lib/utils/cache.server';
 
 export const GET = cachedApiRoute(async (auth, { url }) => {
@@ -10,6 +10,6 @@ export const GET = cachedApiRoute(async (auth, { url }) => {
     return (await Entry.getPageOfSummaries(auth, count, offset)).unwrap(err => error(400, err));
 }) satisfies RequestHandler;
 
-export const POST = apiRes404;
-export const DELETE = apiRes404;
-export const PUT = apiRes404;
+export const POST = api404Handler;
+export const DELETE = api404Handler;
+export const PUT = api404Handler;

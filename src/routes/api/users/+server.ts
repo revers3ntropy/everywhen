@@ -2,7 +2,7 @@ import { maxAgeFromShouldRememberMe, sessionCookieOptions } from '$lib/utils/coo
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
 import { COOKIE_KEYS } from '$lib/constants';
-import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
+import { api404Handler, apiResponse } from '$lib/utils/apiResponse.server';
 import { invalidateCache } from '$lib/utils/cache.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import { User } from '$lib/controllers/user/user.server';
@@ -65,5 +65,5 @@ export const DELETE = (async ({ cookies, request, locals: { auth } }) => {
     return apiResponse(null, {});
 }) satisfies RequestHandler;
 
-export const GET = apiRes404;
-export const PUT = apiRes404;
+export const GET = api404Handler;
+export const PUT = api404Handler;

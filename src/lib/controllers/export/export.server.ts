@@ -84,7 +84,7 @@ export namespace Export {
         return `
             <div class="day">
                 <h1 id="${day.fmtIso()}" class="day-header">
-                    ${fmtUtc(day.utcTimestamp(0), 0, 'dddd Do MMMM YYYY')}
+                    ${fmtUtc(day.utcTimestampMiddleOfDay(0), 0, 'dddd Do MMMM YYYY')}
                 </h1>
                 <div class="day-content">
                      ${entries.map(e => entryHtml(images, e)).join('')}

@@ -5,7 +5,7 @@ import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
 import { COOKIE_KEYS } from '$lib/constants';
-import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
+import { api404Handler, apiResponse } from '$lib/utils/apiResponse.server';
 import { User } from '$lib/controllers/user/user.server';
 import { Auth } from '$lib/controllers/auth/auth.server';
 import { z } from 'zod';
@@ -69,4 +69,4 @@ export const DELETE = (({ cookies }) => {
     return apiResponse(null, {});
 }) satisfies RequestHandler;
 
-export const POST = apiRes404;
+export const POST = api404Handler;

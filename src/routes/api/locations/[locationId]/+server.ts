@@ -1,14 +1,14 @@
 import { error } from '@sveltejs/kit';
 import { Location } from '$lib/controllers/location/location.server';
 
-import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
+import { api404Handler, apiResponse } from '$lib/utils/apiResponse.server';
 import { invalidateCache } from '$lib/utils/cache.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import { z } from 'zod';
 import type { RequestHandler } from './$types';
 import { Auth } from '$lib/controllers/auth/auth.server';
 
-export const GET = apiRes404;
+export const GET = api404Handler;
 
 export const PUT = (async ({ cookies, request, params }) => {
     const auth = Auth.getAuthFromCookies(cookies);
@@ -54,4 +54,4 @@ export const DELETE = (async ({ params, cookies }) => {
     return apiResponse(auth, {});
 }) satisfies RequestHandler;
 
-export const POST = apiRes404;
+export const POST = api404Handler;

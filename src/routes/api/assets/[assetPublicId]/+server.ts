@@ -1,6 +1,6 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
-import { apiRes404, apiResponse, type GenericResponse } from '$lib/utils/apiResponse.server';
+import { api404Handler, apiResponse, type GenericResponse } from '$lib/utils/apiResponse.server';
 import { cacheResponse, getCachedResponse, invalidateCache } from '$lib/utils/cache.server';
 import { Auth } from '$lib/controllers/auth/auth.server';
 import { Asset } from '$lib/controllers/asset/asset.server';
@@ -38,5 +38,5 @@ export const DELETE = (async ({ params, cookies }) => {
     return apiResponse(auth, {});
 }) satisfies RequestHandler;
 
-export const POST = apiRes404 satisfies RequestHandler;
-export const PUT = apiRes404 satisfies RequestHandler;
+export const POST = api404Handler satisfies RequestHandler;
+export const PUT = api404Handler satisfies RequestHandler;

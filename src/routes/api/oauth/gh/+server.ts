@@ -1,5 +1,5 @@
 import { ghAPI } from '$lib/controllers/ghAPI/ghAPI.server';
-import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
+import { api404Handler, apiResponse } from '$lib/utils/apiResponse.server';
 import { invalidateCache } from '$lib/utils/cache.server';
 import { FileLogger } from '$lib/utils/log.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
@@ -37,5 +37,5 @@ export const DELETE = (async ({ cookies }) => {
     return apiResponse(auth, {});
 }) satisfies RequestHandler;
 
-export const GET = apiRes404;
-export const PUT = apiRes404;
+export const GET = api404Handler;
+export const PUT = api404Handler;

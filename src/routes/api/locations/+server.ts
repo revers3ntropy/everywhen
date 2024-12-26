@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 import { Location } from '$lib/controllers/location/location.server';
-import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
+import { api404Handler, apiResponse } from '$lib/utils/apiResponse.server';
 import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import { nowUtc } from '$lib/utils/time';
@@ -47,5 +47,5 @@ export const POST = (async ({ request, cookies }) => {
     });
 }) satisfies RequestHandler;
 
-export const PUT = apiRes404;
-export const DELETE = apiRes404;
+export const PUT = api404Handler;
+export const DELETE = api404Handler;

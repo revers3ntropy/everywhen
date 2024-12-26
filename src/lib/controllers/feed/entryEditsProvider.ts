@@ -9,8 +9,8 @@ import { Result } from '$lib/utils/result';
 
 export const entryEditsProvider = {
     async feedItemsOnDay(auth: Auth, day: Day): Promise<Result<FeedItem[]>> {
-        const minTimestamp = day.utcTimestamp(24);
-        const maxTimestamp = day.utcTimestamp(-24);
+        const minTimestamp = day.utcTimestampMiddleOfDay(24);
+        const maxTimestamp = day.utcTimestampMiddleOfDay(-24);
         const rawEdits = await query<
             {
                 id: string;
@@ -71,8 +71,8 @@ export const entryEditsProvider = {
         day: Day,
         inFuture: boolean
     ): Promise<Result<Day | null>> {
-        const minTimestamp = day.utcTimestamp(24);
-        const maxTimestamp = day.utcTimestamp(-24);
+        const minTimestamp = day.utcTimestampMiddleOfDay(24);
+        const maxTimestamp = day.utcTimestampMiddleOfDay(-24);
         const entries = inFuture
             ? await query<{ day: string }[]>`
                 SELECT DATE_FORMAT(FROM_UNIXTIME(

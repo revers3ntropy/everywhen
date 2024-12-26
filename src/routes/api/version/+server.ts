@@ -1,4 +1,4 @@
-import { apiRes404, type GenericResponse } from '$lib/utils/apiResponse.server';
+import { api404Handler, type GenericResponse } from '$lib/utils/apiResponse.server';
 import type { RequestHandler } from './$types';
 
 // Use 'v' over 'version' to save bytes,
@@ -15,6 +15,6 @@ export const GET = (() => {
     return new Response(GET_RES, BODY_INIT) as GenericResponse<{ v: string }>;
 }) satisfies RequestHandler;
 
-export const POST = apiRes404;
-export const DELETE = apiRes404;
-export const PUT = apiRes404;
+export const POST = api404Handler;
+export const DELETE = api404Handler;
+export const PUT = api404Handler;

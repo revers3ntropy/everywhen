@@ -1,5 +1,5 @@
 import { builtInTypes } from '$lib/controllers/dataset/columnTypes';
-import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
+import { api404Handler, apiResponse } from '$lib/utils/apiResponse.server';
 import { invalidateCache } from '$lib/utils/cache.server';
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
@@ -29,6 +29,6 @@ export const POST = (async ({ cookies, request, params }) => {
     return apiResponse(auth, col);
 }) satisfies RequestHandler;
 
-export const GET = apiRes404;
-export const PUT = apiRes404;
-export const DELETE = apiRes404;
+export const GET = api404Handler;
+export const PUT = api404Handler;
+export const DELETE = api404Handler;

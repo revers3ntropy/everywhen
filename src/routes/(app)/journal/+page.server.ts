@@ -17,6 +17,5 @@ export const load = cachedPageRoute(async (auth, { parent }) => {
             error(400, e)
         ),
         labels: (await Label.allIndexedById(auth)).unwrap(e => error(400, e))
-        //entryCountPerDay: await Entry.getEntryCountPerDay(auth)
     };
 }) satisfies PageServerLoad;

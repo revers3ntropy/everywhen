@@ -1,9 +1,12 @@
 <script lang="ts">
+    import { notify } from '$lib/components/notifications/notifications';
+    import type { Grouping } from '$lib/controllers/stats/stats';
+    import { type StatsData } from '$lib/controllers/stats/stats';
+    import { api } from '$lib/utils/apiRequest';
     import { Day } from '$lib/utils/day';
     import type { PageData } from './$types';
     import { fade } from 'svelte/transition';
     import { ANIMATION_DURATION } from '$lib/constants';
-    import { Bucket } from './helpers';
     import EntryCharts from './EntryChart.svelte';
     import EntryHeatMap from './EntryHeatMap.svelte';
     import SearchForWord from './SearchForWord.svelte';
@@ -11,11 +14,28 @@
 
     export let data: PageData;
 
-    $: console.log(data);
+    $: earliestDay = Day.fromString(data.dayOfFirstEntry).unwrap();
+    $: daysSinceFirstEntry = data.dayOfFirstEntry ? earliestDay.daysUntil(Day.today()) + 1 : null;
 
-    $: daysSinceFirstEntry = data.dayOfFirstEntry
-        ? Day.fromString(data.dayOfFirstEntry).unwrap().daysUntil(Day.today()) + 1
-        : null;
+    const bucketisedDataCache = {} as Record<string, StatsData>;
+
+    async function getBucketisedData(
+        bucket: Grouping,
+        from: Day | null = null,
+        to: Day | null = null
+    ): Promise<StatsData> {
+        let cacheKey = `${bucket}-${to?.fmtIso()}-${from?.fmtIso()}`;
+        if (bucketisedDataCache[cacheKey]) return bucketisedDataCache[cacheKey];
+        const res = notify.onErr(
+            await api.get('/stats', {
+                grouping: bucket,
+                from: from?.fmtIso() || undefined,
+                to: to?.fmtIso() || undefined
+            })
+        );
+        bucketisedDataCache[cacheKey] = res;
+        return res;
+    }
 </script>
 
 <svelte:head>
@@ -61,10 +81,7 @@
 
             <div class="container my-4 p-4">
                 {#if data.heatmapData !== null}
-                    <EntryHeatMap
-                        data={data.heatmapData}
-                        earliestEntryDay={Day.fromString(data.dayOfFirstEntry).unwrap()}
-                    />
+                    <EntryHeatMap earliestEntryDay={earliestDay} {getBucketisedData} />
                 {/if}
             </div>
 
@@ -78,16 +95,7 @@
                         delay: ANIMATION_DURATION
                     }}
                 >
-                    <EntryCharts
-                        days={daysSinceFirstEntry}
-                        timeOfDayData={data.timeOfDayData}
-                        entriesByDayOfWeek={data.entriesByDayOfWeek}
-                        earliestEntryDay={Day.fromString(data.dayOfFirstEntry).unwrap()}
-                        bucketisedData={{
-                            [Bucket.Year]: data.entriesByYear,
-                            [Bucket.Month]: data.entriesByMonth
-                        }}
-                    />
+                    <EntryCharts days={daysSinceFirstEntry} {getBucketisedData} />
                 </div>
             {/if}
         {/if}

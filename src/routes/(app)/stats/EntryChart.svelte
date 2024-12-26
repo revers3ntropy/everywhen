@@ -1,5 +1,6 @@
 <script lang="ts">
-    import { DAYS_OF_WEEK } from '$lib/constants';
+    import { notify } from '$lib/components/notifications/notifications.js';
+    import { By, Grouping, Stats, type StatsData } from '$lib/controllers/stats/stats';
     import { Day } from '$lib/utils/day';
     import { fmtUtc } from '$lib/utils/time';
     import {
@@ -13,11 +14,11 @@
         PointElement,
         LineElement
     } from 'chart.js';
+    import { onMount } from 'svelte';
     import { Line } from 'svelte-chartjs';
     import Select from '$lib/components/Select.svelte';
-    import { By } from './helpers';
-    import { Bucket } from './helpers';
     import { cssVarValue } from '$lib/utils/getCssVar';
+    import { theme } from '$lib/stores';
 
     Chart.register(
         Title,
@@ -30,168 +31,197 @@
         LineElement
     );
 
-    export let timeOfDayData: Record<By, { timeOfDay: number; value: number }[]>;
-    export let entriesByDayOfWeek: Record<By, { timeOfDay: number; value: number }[]>;
-    export let bucketisedData: {
-        [key in Bucket]?: Record<By, number[]>;
-    };
     export let days: number;
-    export let earliestEntryDay: Day;
 
-    export function initialBucket(days: number): Bucket & keyof typeof bucketisedData {
-        if (days < 7 + 3 && bucketisedData[Bucket.Day]) return Bucket.Day;
-        if (days < 7 * 14 && bucketisedData[Bucket.Week]) return Bucket.Week;
-        if (days < 365 * 10 && bucketisedData[Bucket.Month]) return Bucket.Month;
-        if (bucketisedData[Bucket.Year]) return Bucket.Year;
-        throw new Error('No bucket found');
+    export let getBucketisedData: (
+        bucket: Grouping,
+        from?: Day | null,
+        to?: Day | null
+    ) => Promise<StatsData>;
+
+    export function initialBucket(days: number): Grouping {
+        if (days < 7 + 3) return Grouping.Day;
+        if (days < 7 * 14) return Grouping.Week;
+        if (days < 365 * 10) return Grouping.Month;
+        return Grouping.Year;
     }
 
-    export function getLabels(selectedBucket: Bucket, earliestEntryDay: Day): string[] {
-        switch (selectedBucket) {
-            case Bucket.Year:
-                return Array(Day.todayUsingNativeDate().year - earliestEntryDay.year + 1)
-                    .fill(0)
-                    .map((_, i) => i + earliestEntryDay.year + '');
-            case Bucket.Month:
-                return Array((Day.todayUsingNativeDate().year - earliestEntryDay.year + 1) * 12)
-                    .fill(0)
-                    .map((_, i) =>
-                        fmtUtc(
-                            new Day(
-                                Math.floor(earliestEntryDay.year + i / 12),
-                                (i % 12) + 1,
-                                1
-                            ).utcTimestamp(0),
-                            0,
-                            [0, 11].includes(i % 12) ? 'YYYY MMM' : 'MMM'
-                        )
-                    );
-            default:
-                throw new Error('Not implemented');
-        }
-    }
-
-    let selectedBucket: keyof typeof bucketisedData = initialBucket(days);
-
-    const options = () => ({
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-            y: {
-                border: { color: cssVarValue('var(--border-light') },
-                ticks: { color: cssVarValue('--text-color-light') },
-                grid: { display: false },
-                suggestedMin: 0
-            },
-            x: {
-                border: { color: cssVarValue('--border-light') },
-                ticks: { color: cssVarValue('--text-color-light') },
-                grid: { display: false }
+    function options() {
+        return {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    border: { color: cssVarValue('var(--border-light') },
+                    ticks: { color: cssVarValue('--text-color-light') },
+                    grid: { display: false },
+                    suggestedMin: 0
+                },
+                x: {
+                    border: { color: cssVarValue('--border-light') },
+                    ticks: { color: cssVarValue('--text-color-light') },
+                    grid: { display: false }
+                }
             }
-        }
-    });
+        };
+    }
 
-    $: selectedData = bucketisedData[selectedBucket]!;
-    $: labels = getLabels(selectedBucket, earliestEntryDay);
+    async function changeMainChartGrouping(newGrouping: string) {
+        const grouping = Stats.groupingFromString(newGrouping);
+        if (!grouping) {
+            notify.error('Invalid grouping');
+            return;
+        }
+        selectedBucket = grouping;
+        mainChartData = await getBucketisedData(
+            grouping,
+            getMainChartDataFrom(selectedBucket),
+            Day.todayUsingNativeDate()
+        );
+    }
+
+    function getMainChartDataFrom(bucket: Grouping): Day | null {
+        switch (bucket) {
+            case Grouping.Day:
+                return Day.todayUsingNativeDate().plusDays(-62);
+            case Grouping.Month:
+                return Day.todayUsingNativeDate().plusMonths(-12).startOfMonth();
+            case Grouping.Year:
+                return new Day(0, 1, 1);
+            default:
+                throw new Error('Invalid bucket');
+        }
+    }
+
+    let selectedBucket = initialBucket(days);
+    let mainChartData: StatsData | null = null;
+    let timeOfDayData: StatsData | null = null;
+    let dayOfWeekData: StatsData | null = null;
+    onMount(async () => {
+        mainChartData = await getBucketisedData(
+            selectedBucket,
+            getMainChartDataFrom(selectedBucket)
+        );
+        timeOfDayData = await getBucketisedData(Grouping.Hour);
+        dayOfWeekData = await getBucketisedData(Grouping.DayOfWeek);
+    });
 </script>
 
-<div class="h-[350px] overflow-x-auto" style="direction: rtl">
-    <div class="h-full min-w-10 px-2" style="width: {labels.length * 25}px">
-        <Line
-            data={{
-                labels,
-                datasets: [
-                    {
-                        backgroundColor: cssVarValue('--primary'),
-                        borderColor: cssVarValue('--primary'),
-                        borderWidth: 1,
-                        data: selectedData[By.Entries],
-                        label: 'Entries'
-                    },
-                    {
-                        backgroundColor: cssVarValue('--primary-light'),
-                        borderColor: cssVarValue('--primary-light'),
-                        borderWidth: 1,
-                        data: selectedData[By.Words],
-                        label: 'Words'
-                    }
-                ]
-            }}
-            options={options()}
-        />
-    </div>
-</div>
-<div class="pt-4 px-2">
-    <span class="py-2 px-3 bg-vLightAccent rounded-xl">
-        <span class="text-light mr-1"> Group by </span>
-        <Select
-            bind:value={selectedBucket}
-            key={selectedBucket}
-            options={{
-                Year: Bucket.Year,
-                Month: Bucket.Month
-            }}
-        />
-    </span>
-</div>
+<!--
+    the styling for the chart uses variables in the config which depend on the theme
+    but do not get updated when the theme changes - i.e. they get the values
+    from the theme when they are rendered - we need to manually update when the theme
+    changes or the chart colours will not update
+-->
+{#key $theme}
+    {#if mainChartData}
+        <div class="h-[350px] overflow-x-auto" style="direction: rtl">
+            <div
+                class="h-full min-w-10 px-2"
+                style="width: {mainChartData.labels.length * 25 + 30}px"
+            >
+                <Line
+                    data={{
+                        labels: mainChartData.labels,
+                        datasets: [
+                            {
+                                backgroundColor: cssVarValue('--primary'),
+                                borderColor: cssVarValue('--primary'),
+                                borderWidth: 1,
+                                data: mainChartData.values[By.Entries],
+                                label: 'Entries'
+                            },
+                            {
+                                backgroundColor: cssVarValue('--primary-light'),
+                                borderColor: cssVarValue('--primary-light'),
+                                borderWidth: 1,
+                                data: mainChartData.values[By.Words],
+                                label: 'Words'
+                            }
+                        ]
+                    }}
+                    options={options()}
+                />
+            </div>
+        </div>
 
-<div class="mt-4 flex justify-between border-t border-borderColor pt-4">
-    <div class="flex-1">
-        <h3 class="pl-2"> Time of Day </h3>
-        <div class="h-[250px] px-2" style="width: calc(100% - 1rem)">
-            <Line
-                data={{
-                    labels: Array(24)
-                        .fill(0)
-                        .map((_, i) => fmtUtc((i % 24) * 60 * 60, 0, 'ha')),
-                    datasets: [
-                        {
-                            backgroundColor: cssVarValue('--primary'),
-                            borderColor: cssVarValue('--primary'),
-                            borderWidth: 1,
-                            data: timeOfDayData[By.Entries].map(({ value }) => value),
-                            label: 'Entries'
-                        },
-                        {
-                            backgroundColor: cssVarValue('--primary-light'),
-                            borderColor: cssVarValue('--primary-light'),
-                            borderWidth: 1,
-                            data: timeOfDayData[By.Words].map(({ value }) => value),
-                            label: 'Words'
-                        }
-                    ]
-                }}
-                options={options()}
-            />
+        <div class="pt-4 px-2">
+            <span class="py-2 px-3 bg-vLightAccent rounded-xl">
+                <span class="text-light mr-1"> Group by </span>
+                <Select
+                    value={selectedBucket}
+                    onChange={key => changeMainChartGrouping(key)}
+                    key={selectedBucket}
+                    options={{
+                        Year: Grouping.Year,
+                        Month: Grouping.Month,
+                        Day: Grouping.Day
+                    }}
+                />
+            </span>
+        </div>
+    {/if}
+
+    <div class="mt-4 flex justify-between border-t border-borderColor pt-4">
+        <div class="flex-1">
+            {#if timeOfDayData}
+                <h3 class="pl-2"> Time of Day </h3>
+                <div class="h-[250px] px-2" style="width: calc(100% - 1rem)">
+                    <Line
+                        data={{
+                            labels: Array(24)
+                                .fill(0)
+                                .map((_, i) => fmtUtc((i % 24) * 60 * 60, 0, 'ha')),
+                            datasets: [
+                                {
+                                    backgroundColor: cssVarValue('--primary'),
+                                    borderColor: cssVarValue('--primary'),
+                                    borderWidth: 1,
+                                    data: timeOfDayData.values[By.Entries],
+                                    label: 'Entries'
+                                },
+                                {
+                                    backgroundColor: cssVarValue('--primary-light'),
+                                    borderColor: cssVarValue('--primary-light'),
+                                    borderWidth: 1,
+                                    data: timeOfDayData.values[By.Words],
+                                    label: 'Words'
+                                }
+                            ]
+                        }}
+                        options={options()}
+                    />
+                </div>
+            {/if}
+        </div>
+        <div class="flex-1">
+            {#if dayOfWeekData}
+                <h3 class="pl-2"> Day of Week </h3>
+                <div class="h-[250px] px-2" style="width: calc(100% - 1rem)">
+                    <Line
+                        data={{
+                            labels: dayOfWeekData.labels,
+                            datasets: [
+                                {
+                                    backgroundColor: cssVarValue('--primary'),
+                                    borderColor: cssVarValue('--primary'),
+                                    borderWidth: 1,
+                                    data: dayOfWeekData.values[By.Entries],
+                                    label: 'Entries'
+                                },
+                                {
+                                    backgroundColor: cssVarValue('--primary-light'),
+                                    borderColor: cssVarValue('--primary-light'),
+                                    borderWidth: 1,
+                                    data: dayOfWeekData.values[By.Words],
+                                    label: 'Words'
+                                }
+                            ]
+                        }}
+                        options={options()}
+                    />
+                </div>
+            {/if}
         </div>
     </div>
-    <div class="flex-1">
-        <h3 class="pl-2"> Day of Week </h3>
-        <div class="h-[250px] px-2" style="width: calc(100% - 1rem)">
-            <Line
-                data={{
-                    labels: Array(7)
-                        .fill(0)
-                        .map((_, i) => DAYS_OF_WEEK[i]),
-                    datasets: [
-                        {
-                            backgroundColor: cssVarValue('--primary'),
-                            borderColor: cssVarValue('--primary'),
-                            borderWidth: 1,
-                            data: entriesByDayOfWeek[By.Entries].map(({ value }) => value),
-                            label: 'Entries'
-                        },
-                        {
-                            backgroundColor: cssVarValue('--primary-light'),
-                            borderColor: cssVarValue('--primary-light'),
-                            borderWidth: 1,
-                            data: entriesByDayOfWeek[By.Words].map(({ value }) => value),
-                            label: 'Words'
-                        }
-                    ]
-                }}
-                options={options()}
-            />
-        </div>
-    </div>
-</div>
+{/key}

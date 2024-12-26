@@ -1,6 +1,7 @@
 <script lang="ts">
     import { browser } from '$app/environment';
     import { Auth } from '$lib/controllers/auth/auth';
+    import { By } from '$lib/controllers/stats/stats';
     import { Day } from '$lib/utils/day';
     import ArrowLeft from 'svelte-material-icons/ArrowLeft.svelte';
     import Entries from '$lib/components/entry/Entries.svelte';
@@ -56,10 +57,14 @@
             <section class="charts">
                 <div class="container" style="margin: 0; padding: 1rem;">
                     <EntryHeatMap
-                        data={data.heatMapData}
                         earliestEntryDay={data.dayOfFirstEntryWithWord
                             ? Day.fromString(data.dayOfFirstEntryWithWord).unwrap()
                             : Day.todayUsingNativeDate()}
+                        getBucketisedData={() =>
+                            Promise.resolve({
+                                labels: [],
+                                values: { [By.Entries]: [], [By.Words]: [] }
+                            })}
                     />
                 </div>
             </section>

@@ -1,4 +1,4 @@
-import { apiRes404 } from '$lib/utils/apiResponse.server';
+import { api404Handler } from '$lib/utils/apiResponse.server';
 import { cachedApiRoute } from '$lib/utils/cache.server';
 import { Day } from '$lib/utils/day';
 import type { RequestHandler } from './$types';
@@ -14,6 +14,6 @@ export const GET = cachedApiRoute(async (auth, { params }) => {
     ).unwrap(e => error(500, e));
 }) satisfies RequestHandler;
 
-export const POST = apiRes404;
-export const DELETE = apiRes404;
-export const PUT = apiRes404;
+export const POST = api404Handler;
+export const DELETE = api404Handler;
+export const PUT = api404Handler;

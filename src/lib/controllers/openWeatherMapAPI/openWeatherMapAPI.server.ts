@@ -110,7 +110,7 @@ export namespace OpenWeatherMapAPIServer {
             lon
         );
         // TODO: deal with timezones here
-        const apiUrl = `https://history.openweathermap.org/data/2.5/history/city?lat=${lowResLat}&lon=${lowResLon}&start=${day.utcTimestamp(0)}&cnt=24&appid=${OPEN_WEATHER_MAP_API_KEY}`;
+        const apiUrl = `https://history.openweathermap.org/data/2.5/history/city?lat=${lowResLat}&lon=${lowResLon}&start=${day.utcTimestampMiddleOfDay(0)}&cnt=24&appid=${OPEN_WEATHER_MAP_API_KEY}`;
         let res;
         try {
             res = await fetch(apiUrl, {

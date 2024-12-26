@@ -690,19 +690,6 @@ namespace EntryServer {
         );
     }
 
-    export async function getEntryCountPerDay(auth: Auth): Promise<Record<string, number>> {
-        return Object.fromEntries(
-            (
-                await query<{ day: string; count: number }[]>`
-                    SELECT day, COUNT(*) as count
-                    FROM entries
-                    WHERE userId = ${auth.id}
-                    GROUP BY day
-                `
-            ).map(({ day, count }) => [day, count])
-        );
-    }
-
     export const getFromId = entryFromId;
     export const all = getMulti.all;
     export const search = getMulti.search;

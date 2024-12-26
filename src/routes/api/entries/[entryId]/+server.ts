@@ -1,6 +1,6 @@
 import { error } from '@sveltejs/kit';
 import { Entry } from '$lib/controllers/entry/entry.server';
-import { apiRes404, apiResponse } from '$lib/utils/apiResponse.server';
+import { api404Handler, apiResponse } from '$lib/utils/apiResponse.server';
 import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import { z } from 'zod';
@@ -61,4 +61,4 @@ export const PUT = (async ({ request, params, cookies }) => {
     return apiResponse(auth, { id: entry.id });
 }) satisfies RequestHandler;
 
-export const POST = apiRes404;
+export const POST = api404Handler;
