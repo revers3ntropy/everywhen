@@ -102,8 +102,8 @@
             selectedBucket,
             getMainChartDataFrom(selectedBucket)
         );
-        timeOfDayData = await getBucketisedData(Grouping.Hour);
-        dayOfWeekData = await getBucketisedData(Grouping.DayOfWeek);
+        timeOfDayData = await getBucketisedData(Grouping.Hour, new Day(0, 1, 1));
+        dayOfWeekData = await getBucketisedData(Grouping.DayOfWeek, new Day(0, 1, 1));
     });
 </script>
 
@@ -162,7 +162,7 @@
         </div>
     {/if}
 
-    <div class="mt-4 flex justify-between border-t border-borderColor pt-4">
+    <div class="mt-4 md:flex justify-between border-t border-borderColor pt-4">
         <div class="flex-1">
             {#if timeOfDayData}
                 <h3 class="pl-2"> Time of Day </h3>

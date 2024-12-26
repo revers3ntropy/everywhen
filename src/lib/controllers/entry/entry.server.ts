@@ -530,31 +530,6 @@ namespace EntryServer {
         `;
     }
 
-    export async function wordFrequencies(auth: Auth): Promise<[string, number][]> {
-        return await query<{ word: string; count: number }[]>`
-            SELECT word, count
-            FROM wordsInEntries
-            WHERE userId = ${auth.id}
-            AND count > 0
-            AND entryIsDeleted = 0
-        `
-            .then(words =>
-                words.reduce(
-                    (map, { word, count }) => {
-                        map[word] ??= 0;
-                        map[word] += count;
-                        return map;
-                    },
-                    {} as Record<string, number>
-                )
-            )
-            .then(wordsMap =>
-                Object.entries(wordsMap)
-                    .sort(([, a], [, b]) => b - a)
-                    .slice(0, 100)
-            );
-    }
-
     export async function counts(auth: Auth): Promise<{ wordCount: number; entryCount: number }> {
         return await query<{ wordCount: number; entryCount: number }[]>`
             SELECT SUM(wordCount) as wordCount, COUNT(*) as entryCount

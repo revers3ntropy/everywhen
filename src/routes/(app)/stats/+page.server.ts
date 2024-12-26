@@ -1,3 +1,4 @@
+import { Stats } from '$lib/controllers/stats/stats.server';
 import { cachedPageRoute } from '$lib/utils/cache.server';
 import { Day } from '$lib/utils/day';
 import type { PageServerLoad } from './$types';
@@ -27,9 +28,12 @@ export const load = cachedPageRoute(async auth => {
 
     const { wordCount, entryCount } = await Entry.counts(auth);
 
+    const uniqueWordCount = await Stats.uniqueWordCount(auth);
+
     return {
         entryCount,
         wordCount,
+        uniqueWordCount,
         dayOfFirstEntry: dayOfFirstEntry.fmtIso(),
         loadTime: performance.now() - start
     };

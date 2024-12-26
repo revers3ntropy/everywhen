@@ -7,12 +7,16 @@
     import type { PageData } from './$types';
     import { fade } from 'svelte/transition';
     import { ANIMATION_DURATION } from '$lib/constants';
+    import CommonWordsList from './CommonWordsList.svelte';
     import EntryCharts from './EntryChart.svelte';
     import EntryHeatMap from './EntryHeatMap.svelte';
     import SearchForWord from './SearchForWord.svelte';
     import StatPill from './StatPill.svelte';
 
     export let data: PageData;
+
+    // TODO why does it think this could be undefined?
+    $: uniqueWordCount = data.uniqueWordCount as number;
 
     $: earliestDay = Day.fromString(data.dayOfFirstEntry).unwrap();
     $: daysSinceFirstEntry = data.dayOfFirstEntry ? earliestDay.daysUntil(Day.today()) + 1 : null;
@@ -57,11 +61,7 @@
         {:else if daysSinceFirstEntry === null || data.dayOfFirstEntry === null}
             Something went wrong, please try again later
         {:else}
-            <div class="pb-4">
-                <SearchForWord />
-            </div>
-
-            <section class="flex flex-wrap gap-8 container md:p-4">
+            <section class="flex flex-wrap gap-8 md:gap-x-16 container md:p-4">
                 <StatPill value={data.entryCount} label="entries" />
                 <StatPill value={daysSinceFirstEntry} label="days" />
                 <StatPill value={data.wordCount} label="words" />
@@ -77,6 +77,7 @@
                     value={(data.entryCount / Math.max(daysSinceFirstEntry / 7, 1)).toFixed(1)}
                     label="entries / week"
                 />
+                <StatPill value={uniqueWordCount} label="unique words" />
             </section>
 
             <div class="container my-4 p-4">
@@ -98,6 +99,10 @@
                     <EntryCharts days={daysSinceFirstEntry} {getBucketisedData} />
                 </div>
             {/if}
+
+            <div class="container mt-4 md:px-6 md:py-4">
+                <CommonWordsList {uniqueWordCount} entryCount={data.entryCount} />
+            </div>
         {/if}
     </div>
 </main>

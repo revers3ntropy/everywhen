@@ -210,6 +210,30 @@ namespace StatsServer {
         }
         return { labels, values: timeOfDayData };
     }
+
+    export async function wordCounts(auth: Auth, offset: number, pageSize: number) {
+        return await query<{ word: string; count: number }[]>`
+            SELECT word, SUM(count) as count
+            FROM wordsInEntries
+            WHERE userId = ${auth.id}
+                AND count > 0
+                AND entryIsDeleted = 0
+            GROUP BY word
+            ORDER BY count DESC
+            LIMIT ${offset}, ${pageSize}
+        `;
+    }
+
+    export async function uniqueWordCount(auth: Auth): Promise<number> {
+        const res = await query<{ count: number }[]>`
+            SELECT COUNT(DISTINCT word) as count
+            FROM wordsInEntries
+            WHERE userId = ${auth.id}
+                AND count > 0
+                AND entryIsDeleted = 0
+        `;
+        return res[0].count;
+    }
 }
 
 export const Stats = {
