@@ -27,6 +27,8 @@ namespace StatsServer {
                     labels: DAYS_OF_WEEK.map(d => d as string),
                     values: await getEntriesByDayOfWeek(auth, from, to)
                 });
+            case Grouping.Week:
+                return Result.ok(await getEntriesByWeek(auth, from, to));
             case Grouping.Month:
                 return Result.ok(await getEntriesByMonth(auth, from, to));
             case Grouping.Year:
@@ -91,6 +93,48 @@ namespace StatsServer {
             timeOfDayData[By.Words].push(entry ? entry.wordCount : 0);
         }
         return timeOfDayData;
+    }
+
+    async function getEntriesByWeek(auth: Auth, from: TimestampSecs, to: TimestampSecs) {
+        const entryDetailsByWeek = await query<
+            { count: number; wordCount: number; firstDayOfWeek: string }[]
+        >`
+            SELECT
+                COUNT(*) as count,
+                SUM(entries.wordCount) as wordCount,
+                -- gets the date of the first day of the week that this entry is in
+                DATE_FORMAT(DATE_ADD(
+                    STR_TO_DATE(day, '%Y-%m-%d'),
+                    INTERVAL(-WEEKDAY(STR_TO_DATE(day, '%Y-%m-%d'))) DAY
+                ), '%Y-%m-%d') as firstDayOfWeek
+            FROM entries
+            WHERE userId = ${auth.id}
+                AND entries.deleted IS NULL
+                AND entries.created >= ${from}
+                AND entries.created <= ${to}
+            GROUP BY firstDayOfWeek
+            ORDER BY STR_TO_DATE(firstDayOfWeek, '%Y-%m-%d')
+        `;
+        const labels: string[] = [];
+        const entriesByMonth = {
+            [By.Entries]: [] as number[],
+            [By.Words]: [] as number[]
+        };
+        if (entryDetailsByWeek.length < 1) {
+            return { labels, values: entriesByMonth };
+        }
+        const firstMonthDay = Day.fromString(entryDetailsByWeek[0].firstDayOfWeek).unwrap();
+        for (
+            let day = firstMonthDay.clone();
+            day.lte(Day.todayUsingNativeDate());
+            day = day.plusDays(7)
+        ) {
+            labels.push(day.fmtIso());
+            const entry = entryDetailsByWeek.find(e => e.firstDayOfWeek === day.fmtIso());
+            entriesByMonth[By.Entries].push(entry ? entry.count : 0);
+            entriesByMonth[By.Words].push(entry ? entry.wordCount : 0);
+        }
+        return { labels, values: entriesByMonth };
     }
 
     async function getEntriesByMonth(auth: Auth, from: TimestampSecs, to: TimestampSecs) {

@@ -190,6 +190,10 @@ export class Day {
         return this.lt(other) ? this : other;
     }
 
+    public clone(): Day {
+        return new Day(this.year, this.month, this.date);
+    }
+
     public static fromI18nDate(d: DateValue) {
         return new Day(d.year, d.month, d.day);
     }

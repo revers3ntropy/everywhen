@@ -87,6 +87,8 @@
         switch (bucket) {
             case Grouping.Day:
                 return Day.todayUsingNativeDate().plusDays(-31 * 6);
+            case Grouping.Week:
+                return Day.todayUsingNativeDate().plusMonths(-12 * 2);
             case Grouping.Month:
                 return Day.todayUsingNativeDate()
                     .plusMonths(-12 * 10)
@@ -160,6 +162,7 @@
                         options={{
                             Year: Grouping.Year,
                             Month: Grouping.Month,
+                            Week: Grouping.Week,
                             Day: Grouping.Day
                         }}
                     />
