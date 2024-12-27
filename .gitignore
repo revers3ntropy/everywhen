@@ -37,3 +37,4 @@ vite.config.ts.timestamp-*
 /test-results/
 /playwright-report/
 /testBackup.json
+/tmp/

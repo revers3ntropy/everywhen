@@ -30,8 +30,7 @@
     }
 
     async function exportData() {
-        const { html } = notify.onErr(await api.get('/export'));
-        download('everywhen.html', html);
+        window.open('/api/export/html', '_blank')!.focus();
     }
 
     const settingsConfigEntries = Object.entries(SettingsController.config) as [

@@ -1,6 +1,6 @@
 {
   "name": "everywhen",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "type": "module",
   "private": true,
   "scripts": {
@@ -9,6 +9,7 @@
   "devDependencies": {
     "@internationalized/date": "3.6.0",
     "@playwright/test": "1.45.0",
+    "@remix-run/node": "^2.15.2",
     "@rollup/plugin-replace": "5.0.7",
     "@svelte-plugins/tooltips": "3.0.1",
     "@sveltejs/adapter-auto": "3.2.2",
