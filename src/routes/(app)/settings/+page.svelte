@@ -1,9 +1,6 @@
 <script lang="ts">
     import GitHubOauthWidget from '$lib/components/GitHubOAuthWidget.svelte';
-    import { notify } from '$lib/components/notifications/notifications';
     import { omit } from '$lib/utils';
-    import { api } from '$lib/utils/apiRequest';
-    import { download } from '$lib/utils/files.client';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import Cog from 'svelte-material-icons/Cog.svelte';
     import Logout from 'svelte-material-icons/Logout.svelte';
