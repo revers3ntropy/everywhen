@@ -11,7 +11,8 @@
         CategoryScale,
         LinearScale,
         PointElement,
-        LineElement
+        LineElement,
+        type ChartOptions
     } from 'chart.js';
     import { onMount } from 'svelte';
     import { Line } from 'svelte-chartjs';
@@ -45,21 +46,39 @@
         return Grouping.Year;
     }
 
-    function options() {
+    function options(): ChartOptions<'line'> {
         return {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                y: {
-                    border: { color: cssVarValue('var(--border-light') },
-                    ticks: { color: cssVarValue('--text-color-light') },
-                    grid: { display: false },
-                    suggestedMin: 0
+                'y-left': {
+                    position: 'left',
+                    border: { color: cssVarValue('--border-heavy') },
+                    ticks: { color: cssVarValue('--text-color') },
+                    grid: { drawOnChartArea: false },
+                    min: 0,
+                    title: {
+                        display: true,
+                        text: 'Entries',
+                        color: cssVarValue('--text-color')
+                    }
+                },
+                'y-right': {
+                    position: 'right',
+                    border: { color: cssVarValue('--border-heavy') },
+                    ticks: { color: cssVarValue('--text-color') },
+                    grid: { drawOnChartArea: false },
+                    min: 0,
+                    title: {
+                        display: true,
+                        text: 'Words',
+                        color: cssVarValue('--text-color')
+                    }
                 },
                 x: {
-                    border: { color: cssVarValue('--border-light') },
-                    ticks: { color: cssVarValue('--text-color-light') },
-                    grid: { display: false }
+                    border: { color: cssVarValue('--border-heavy') },
+                    ticks: { color: cssVarValue('--text-color') },
+                    grid: { drawOnChartArea: false }
                 }
             }
         };
@@ -130,7 +149,7 @@
         <div class="pt-4 pb-4">
             <div class="h-[350px] overflow-x-auto md:px-4 w-fit max-w-full" style="direction: rtl">
                 <div
-                    class="h-full min-w-10 px-2"
+                    class="h-full min-w-10 px-2 pb-4"
                     style="width: {Math.max(chartData.labels.length * 25 + 30, 350)}px"
                 >
                     <Line
@@ -141,6 +160,7 @@
                                     backgroundColor: cssVarValue('--primary'),
                                     borderColor: cssVarValue('--primary'),
                                     borderWidth: 1,
+                                    yAxisID: 'y-left',
                                     data: chartData.values[By.Entries],
                                     label: 'Entries'
                                 },
@@ -148,6 +168,7 @@
                                     backgroundColor: cssVarValue('--primary-light'),
                                     borderColor: cssVarValue('--primary-light'),
                                     borderWidth: 1,
+                                    yAxisID: 'y-right',
                                     data: chartData.values[By.Words],
                                     label: 'Words'
                                 }
