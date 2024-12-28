@@ -18,7 +18,7 @@ export class TempFile {
 
     private static findTempName(): string {
         let i = 0;
-        while (i < 100_000) {
+        while (i < 1_000_000) {
             const name = `temp-${i}`;
             const path = TempFile.pathFromName(name);
             if (!fs.existsSync(path)) {
@@ -52,5 +52,9 @@ export class TempFile {
 
     public delete() {
         fs.unlinkSync(TempFile.pathFromName(this.name));
+    }
+
+    public deleteOnTimer(s: number = 60 * 5) {
+        setTimeout(() => this.delete(), s * 1000);
     }
 }

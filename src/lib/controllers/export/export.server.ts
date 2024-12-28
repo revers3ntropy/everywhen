@@ -142,6 +142,8 @@ export namespace Export {
             </html>
         `);
 
+        tempFile.deleteOnTimer();
+
         return Result.ok([tempFile.readIntoStream(), tempFile.fileLength()]);
     }
 
