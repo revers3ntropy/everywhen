@@ -161,7 +161,7 @@
                 {/if}
             {/key}
             {#if Object.entries(nYearsAgo).length}
-                <div class="flex flex-col gap-2">
+                <div class="flex flex-col gap-2 border-b-2 border-borderColor">
                     {#each Object.entries(nYearsAgo) as [date, entries] (date)}
                         <div class="p-2">
                             <h3>
@@ -181,7 +181,7 @@
                     {/each}
                 </div>
             {/if}
-            <div class="p-2 relative border-t-2 border-borderColor">
+            <div class="p-2 relative">
                 <InfiniteScroller
                     loadItems={loadMoreTitles}
                     hasMore={() => titleIds.length < numTitles}
