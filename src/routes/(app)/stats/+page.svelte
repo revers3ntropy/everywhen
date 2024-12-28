@@ -88,7 +88,7 @@
             {#if data.entryCount > 4}
                 <div
                     class="container"
-                    style="padding: 0 0 0.5rem 0"
+                    style="padding: 0"
                     in:fade={{
                         // stop weird animation when changing buckets
                         duration: ANIMATION_DURATION,
