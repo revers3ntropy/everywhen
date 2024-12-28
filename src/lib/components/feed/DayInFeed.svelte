@@ -134,10 +134,10 @@
                         otherwise reduce clutter as much as possible
                         if they have just created the account
                     -->
-                {:else if $settingsStore.homeLocation.value[0] === null && isToday && entryCount > 0}
+                {:else if $settingsStore.homeLocation.value[0] === null && isToday}
                     <EnableWeatherWidget />
                 {/if}
-                {#if isToday && showForms && entryCount > 0}
+                {#if isToday && showForms}
                     <HappinessDatasetShortcut dataset={happinessDataset} />
                 {/if}
             </div>

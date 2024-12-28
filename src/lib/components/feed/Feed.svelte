@@ -17,6 +17,7 @@
     export let happinessDataset: Dataset | null;
     export let obfuscated: boolean;
     export let fromDay: Day;
+    export let showForms = true;
     export let getScrollContainer: () => HTMLElement;
 
     function resetScroll() {
@@ -163,7 +164,7 @@
                 showLabels
                 {locations}
                 {labels}
-                showForms
+                {showForms}
                 {happinessDataset}
             />
         {/each}
