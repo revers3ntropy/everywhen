@@ -298,10 +298,10 @@ async function entriesFromRaw(auth: Auth, raw: RawEntry[]): Promise<Result<Entry
 }
 
 export async function search(auth: Auth, queryString: string): Promise<Result<Entry[]>> {
-    const queryStringParts = wordsFromText(queryString).map(normaliseWordForIndex);
+    const queryStringParts = [...new Set(wordsFromText(queryString).map(normaliseWordForIndex))];
     if (queryStringParts.length === 0) return Result.ok([]);
     const encryptedWords = queryStringParts.map(word => encrypt(word, auth.key));
-
+    console.log(encryptedWords);
     const entries = await query<
         {
             id: string;
@@ -318,22 +318,30 @@ export async function search(auth: Auth, queryString: string): Promise<Result<En
             wordCount: number;
         }[]
     >`
-            SELECT DISTINCT (entries.id),
-                   entries.created,
-                   entries.createdTzOffset,
-                   entries.title,
-                   entries.pinned,
-                   entries.deleted,
-                   entries.labelId,
-                   entries.body,
-                   entries.latitude,
-                   entries.longitude,
-                   entries.agentData,
-                   entries.wordCount
-        FROM entries, wordsInEntries WHERE
-            entries.id = wordsInEntries.entryId AND
-            wordsInEntries.word IN (${encryptedWords}) AND
-            entries.userId = ${auth.id}
+            SELECT
+                entries.id,
+                entries.created,
+                entries.createdTzOffset,
+                entries.title,
+                entries.pinned,
+                entries.deleted,
+                entries.labelId,
+                entries.body,
+                entries.latitude,
+                entries.longitude,
+                entries.agentData,
+                entries.wordCount
+        FROM entries
+        WHERE
+            entries.deleted IS NULL AND
+            entries.userId = ${auth.id} AND
+            ${encryptedWords.length} = (
+                SELECT COUNT(DISTINCT wordsInEntries.word)
+                FROM wordsInEntries
+                WHERE wordsInEntries.entryId = entries.id
+                    AND wordsInEntries.userId = ${auth.id}
+                    AND wordsInEntries.word IN (${encryptedWords})
+            )
        ORDER BY created DESC, id
     `;
 
@@ -366,33 +374,48 @@ export async function searchPaginated(
             wordCount: number;
         }[]
     >`
-            SELECT DISTINCT (entries.id),
-                   entries.created,
-                   entries.createdTzOffset,
-                   entries.title,
-                   entries.pinned,
-                   entries.deleted,
-                   entries.labelId,
-                   entries.body,
-                   entries.latitude,
-                   entries.longitude,
-                   entries.agentData,
-                   entries.wordCount
-        FROM entries, wordsInEntries WHERE
-            entries.id = wordsInEntries.entryId AND
-            wordsInEntries.word IN (${encryptedWords}) AND
-            entries.userId = ${auth.id}
+        SELECT
+            entries.id,
+            entries.created,
+            entries.createdTzOffset,
+            entries.title,
+            entries.pinned,
+            entries.deleted,
+            entries.labelId,
+            entries.body,
+            entries.latitude,
+            entries.longitude,
+            entries.agentData,
+            entries.wordCount
+        FROM entries
+        WHERE
+            entries.deleted IS NULL AND
+            entries.userId = ${auth.id} AND
+            ${encryptedWords.length} = (
+                SELECT COUNT(DISTINCT wordsInEntries.word)
+                FROM wordsInEntries
+                WHERE wordsInEntries.entryId = entries.id
+                  AND wordsInEntries.userId = ${auth.id}
+                  AND wordsInEntries.word IN (${encryptedWords})
+            )
         ORDER BY created DESC, id
         LIMIT ${count}
         OFFSET ${offset}
     `;
 
     const [{ totalCount }] = await query<{ totalCount: number }[]>`
-        SELECT COUNT(DISTINCT entries.id) as totalCount
-        FROM entries, wordsInEntries WHERE
-            entries.id = wordsInEntries.entryId AND
-            wordsInEntries.word IN (${encryptedWords}) AND
-            entries.userId = ${auth.id}
+        SELECT COUNT(*) as totalCount
+        FROM entries
+        WHERE
+            entries.userId = ${auth.id} AND
+            entries.deleted IS NULL AND
+            ${encryptedWords.length} = (
+                SELECT COUNT(DISTINCT wordsInEntries.word)
+                FROM wordsInEntries
+                WHERE wordsInEntries.entryId = entries.id
+                  AND wordsInEntries.userId = ${auth.id}
+                  AND wordsInEntries.word IN (${encryptedWords})
+            )
     `;
 
     return (await entriesFromRaw(auth, entries)).map(e => [e, totalCount]);
