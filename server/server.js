@@ -24,9 +24,9 @@ console.log('Starting...');
 dotenv.config();
 
 const credentials = {
-    key: fs.readFileSync('./key.pem', 'utf8'),
-    cert: fs.readFileSync('./cert.pem', 'utf8'),
-    ca: fs.readFileSync('./ca.pem', 'utf8')
+    key: fs.readFileSync(`../ssl/${process.env.PUBLIC_ENV}/key.pem`, 'utf8'),
+    cert: fs.readFileSync(`../ssl/${process.env.PUBLIC_ENV}/cert.pem`, 'utf8'),
+    ca: fs.readFileSync(`../ssl/${process.env.PUBLIC_ENV}/ca.pem`, 'utf8')
 };
 
 const app = express();

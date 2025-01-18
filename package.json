@@ -1,6 +1,6 @@
 {
   "name": "everywhen",
-  "version": "0.8.4",
+  "version": "0.8.5",
   "type": "module",
   "private": true,
   "scripts": {
@@ -53,6 +53,7 @@
     "marked": "13.0.1",
     "moment": "2.30.1",
     "mysql2": "3.10.1",
+    "node-fetch": "^3.3.2",
     "ol": "9.2.4",
     "ol-contextmenu": "5.5.0",
     "performance-now": "2.1.0",

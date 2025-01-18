@@ -43,9 +43,6 @@ const replacerValues = {
 const pathsToUseReplacer = [`./server/remote.package.json`, `./server/makeBackup.js`];
 
 const uploadPaths = {
-    [`./secrets/${env}/cert.pem`]: '/cert.pem',
-    [`./secrets/${env}/key.pem`]: '/key.pem',
-    [`./secrets/${env}/ca.pem`]: '/ca.pem',
     [`./secrets/${env}/remote.env`]: '/.env',
     ['./server/server.js']: '/server.js',
     [`./server/remote.package.json`]: '/package.json',
