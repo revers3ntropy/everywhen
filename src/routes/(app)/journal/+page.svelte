@@ -2,7 +2,7 @@
     import { browser } from '$app/environment';
     import EntriesSidebar from '$lib/components/entry/EntriesSidebar.svelte';
     import { notify } from '$lib/components/notifications/notifications.js';
-    import { obfuscated } from '$lib/stores';
+    import { obfuscated, settingsStore } from '$lib/stores';
     import { Day } from '$lib/utils/day';
     import { currentTzOffset } from '$lib/utils/time';
     import { onMount } from 'svelte';
@@ -37,14 +37,16 @@
 </svelte:head>
 
 <main class="flex flex-row">
-    <section>
-        <EntriesSidebar
-            obfuscated={$obfuscated}
-            nYearsAgo={onThisDayData}
-            pinnedEntriesSummaries={data.pinnedEntriesList}
-            openOnMobile={false}
-        />
-    </section>
+    {#if $settingsStore.showSidebar.value}
+        <section>
+            <EntriesSidebar
+                obfuscated={$obfuscated}
+                nYearsAgo={onThisDayData}
+                pinnedEntriesSummaries={data.pinnedEntriesList}
+                openOnMobile={false}
+            />
+        </section>
+    {/if}
 
     <section class="md:flex md:justify-center gap-4 w-full">
         <div class="max-w-3xl w-full">

@@ -10,6 +10,13 @@ export const settingsConfig = {
         description: 'Your home location. Used by Weather.',
         showInSettings: true
     } as SettingConfig<OptionalCoords>,
+    showSidebar: {
+        type: 'boolean',
+        defaultValue: false,
+        name: 'Show entries in Sidebar',
+        description: `Display a summary of entries in a sidebar on the journal page.`,
+        showInSettings: true
+    },
     hideEntriesByDefault: {
         type: 'boolean',
         defaultValue: false,

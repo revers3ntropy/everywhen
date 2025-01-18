@@ -655,13 +655,15 @@ namespace DatasetServer {
         if (!validateRowTypes.ok) return validateRowTypes.cast();
 
         for (const row of rows) {
-            if ('shouldDelete' in row && row.shouldDelete) {
-                await query`
-                    DELETE FROM datasetRows
-                    WHERE userId = ${auth.id}
-                        AND datasetId = ${datasetId}
-                        AND id = ${row.id}
-                `;
+            if ('shouldDelete' in row) {
+                if (row.shouldDelete) {
+                    await query`
+                        DELETE FROM datasetRows
+                        WHERE userId = ${auth.id}
+                            AND datasetId = ${datasetId}
+                            AND id = ${row.id}
+                    `;
+                }
                 continue;
             }
             const updatedRowJson = encrypt(JSON.stringify(row.elements), auth.key);
