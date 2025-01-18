@@ -163,6 +163,9 @@ namespace StatsServer {
         for (let year = firstMonthDay.year; year <= Day.todayUsingNativeDate().year; year++) {
             for (let month = 1; month <= 12; month++) {
                 const startOfMonthDay = new Day(year, month, 1);
+                if (startOfMonthDay.gt(Day.fromTimestamp(to, 0))) {
+                    break;
+                }
                 const yearAndMonth = startOfMonthDay.fmtIso().substring(0, 7);
                 labels.push(
                     fmtUtc(
@@ -177,7 +180,14 @@ namespace StatsServer {
                 entriesByMonth[By.Words].push(entry ? entry.wordCount : 0);
             }
         }
-        // TODO maybe filter off the months at the beginning and end that have no entries?
+
+        // remove empty months from the beginning
+        while (entriesByMonth[By.Entries][0] < 1 && entriesByMonth[By.Words][0] < 1) {
+            labels.shift();
+            entriesByMonth[By.Entries].shift();
+            entriesByMonth[By.Words].shift();
+        }
+
         return { labels, values: entriesByMonth };
     }
 
