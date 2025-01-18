@@ -57,13 +57,19 @@ export const PUT = (async ({ cookies, request, params }) => {
         name: z.string().optional(),
         rows: z
             .array(
-                z.object({
-                    id: z.number(),
-                    created: z.number().default(nowUtc()),
-                    timestamp: z.number(),
-                    timestampTzOffset: z.number(),
-                    elements: z.array(z.unknown())
-                })
+                z.union([
+                    z.object({
+                        id: z.number(),
+                        created: z.number().default(nowUtc()),
+                        timestamp: z.number(),
+                        timestampTzOffset: z.number(),
+                        elements: z.array(z.unknown())
+                    }),
+                    z.object({
+                        id: z.number(),
+                        shouldDelete: z.boolean()
+                    })
+                ])
             )
             .optional()
     });

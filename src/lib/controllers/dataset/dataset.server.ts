@@ -622,24 +622,48 @@ namespace DatasetServer {
     export async function updateRows(
         auth: Auth,
         datasetId: string,
-        rows: {
-            id: number;
-            elements: unknown[];
-            timestamp: TimestampSecs;
-            timestampTzOffset: Hours;
-            created: TimestampSecs;
-        }[]
+        rows: (
+            | {
+                  id: number;
+                  elements: unknown[];
+                  timestamp: TimestampSecs;
+                  timestampTzOffset: Hours;
+                  created: TimestampSecs;
+              }
+            | { id: number; shouldDelete: boolean }
+        )[]
     ): Promise<Result<null>> {
         rows = [...rows].sort((a, b) => a.id - b.id);
 
         const validateRowTypes = await validateTypesOfRows(
             auth,
             datasetId,
-            rows.map(r => r.elements)
+            rows
+                .filter(
+                    (
+                        r
+                    ): r is {
+                        id: number;
+                        elements: unknown[];
+                        timestamp: TimestampSecs;
+                        timestampTzOffset: Hours;
+                        created: TimestampSecs;
+                    } => !('shouldDelete' in r)
+                )
+                .map(r => r.elements)
         );
         if (!validateRowTypes.ok) return validateRowTypes.cast();
 
         for (const row of rows) {
+            if ('shouldDelete' in row && row.shouldDelete) {
+                await query`
+                    DELETE FROM datasetRows
+                    WHERE userId = ${auth.id}
+                        AND datasetId = ${datasetId}
+                        AND id = ${row.id}
+                `;
+                continue;
+            }
             const updatedRowJson = encrypt(JSON.stringify(row.elements), auth.key);
             await query`
                 UPDATE datasetRows
