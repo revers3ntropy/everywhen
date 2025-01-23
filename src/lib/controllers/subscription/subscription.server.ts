@@ -99,9 +99,48 @@ export namespace Subscription {
             )
         `;
     }
-    export async function handleCustomerSubscriptionDeleted() {}
+
+    export async function handleCustomerSubscriptionDeleted(
+        subscriptionId: string,
+        customerId: string
+    ) {
+        await query`
+            DELETE FROM subscriptions
+            WHERE stripeCustomerId = ${customerId}
+              AND stripeSubscriptionId = ${subscriptionId}
+        `;
+    }
+
     export async function handleCustomerSubscriptionUpdated() {}
-    export async function handleCustomerDeleted() {}
-    export async function handleCustomerSubscriptionPaused() {}
-    export async function handleCustomerSubscriptionResumed() {}
+
+    export async function handleCustomerDeleted(customerId: string) {
+        await query`
+            DELETE FROM subscriptions
+            WHERE stripeCustomerId = ${customerId}
+        `;
+    }
+
+    export async function handleCustomerSubscriptionPaused(
+        customerId: string,
+        subscriptionId: string
+    ) {
+        await query`
+            UPDATE subscriptions
+            SET active = null
+            WHERE stripeCustomerId = ${customerId}
+              AND stripeSubscriptionId = ${subscriptionId}
+        `;
+    }
+
+    export async function handleCustomerSubscriptionResumed(
+        customerId: string,
+        subscriptionId: string
+    ) {
+        await query`
+            UPDATE subscriptions
+            SET active = ${nowUtc()}
+            WHERE stripeCustomerId = ${customerId}
+              AND stripeSubscriptionId = ${subscriptionId}
+        `;
+    }
 }

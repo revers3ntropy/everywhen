@@ -38,18 +38,62 @@ export const POST = (async ({ request }) => {
         case 'customer.subscription.updated':
             await Subscription.handleCustomerSubscriptionUpdated();
             break;
-        case 'customer.subscription.deleted':
-            await Subscription.handleCustomerSubscriptionDeleted();
+        case 'customer.subscription.deleted': {
+            const checkedObject = z
+                .object({
+                    id: z.string(),
+                    customer: z.string()
+                })
+                .safeParse(data.object);
+            if (!checkedObject.success) error(400, checkedObject.error.message);
+            await Subscription.handleCustomerSubscriptionDeleted(
+                checkedObject.data.id,
+                checkedObject.data.customer
+            );
             break;
-        case 'customer.subscription.paused':
-            await Subscription.handleCustomerSubscriptionPaused();
+        }
+        case 'customer.subscription.paused': {
+            const checkedObject = z
+                .object({
+                    id: z.string(),
+                    customer: z.string()
+                })
+                .safeParse(data.object);
+            if (!checkedObject.success) error(400, checkedObject.error.message);
+            await Subscription.handleCustomerSubscriptionPaused(
+                checkedObject.data.id,
+                checkedObject.data.customer
+            );
             break;
-        case 'customer.subscription.resumed':
-            await Subscription.handleCustomerSubscriptionResumed();
+        }
+        case 'customer.subscription.resumed': {
+            const checkedObject = z
+                .object({
+                    id: z.string(),
+                    customer: z.string()
+                })
+                .safeParse(data.object);
+            if (!checkedObject.success) error(400, checkedObject.error.message);
+            await Subscription.handleCustomerSubscriptionResumed(
+                checkedObject.data.id,
+                checkedObject.data.customer
+            );
             break;
-        case 'customer.deleted':
-            await Subscription.handleCustomerSubscriptionDeleted();
+        }
+        case 'customer.deleted': {
+            const checkedObject = z
+                .object({
+                    id: z.string(),
+                    customer: z.string()
+                })
+                .safeParse(data.object);
+            if (!checkedObject.success) error(400, checkedObject.error.message);
+            await Subscription.handleCustomerSubscriptionDeleted(
+                checkedObject.data.id,
+                checkedObject.data.customer
+            );
             break;
+        }
         default:
             await stripeWebhooksLogger.error('Unhandled Stripe webhook', {
                 type
