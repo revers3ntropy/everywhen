@@ -56,29 +56,22 @@ function getCookieWritableCookies(cookies: Cookies): App.Locals['__cookieWritabl
 }
 
 export const handle = (async ({ event, resolve }) => {
+    // has already been cloned, 'auth' is not a reference to the stored object
     const auth = Auth.tryGetAuthFromCookies(event.cookies);
-    if (auth) {
-        event.locals.auth = { ...auth };
-    } else {
-        event.locals.auth = null;
-
-        if (event.cookies.get(COOKIE_KEYS.sessionId)) {
-            // unset session cookie if invalid session
-            event.cookies.delete(COOKIE_KEYS.sessionId, sessionCookieOptions(false));
-        }
+    event.locals.auth = auth;
+    if (auth && event.cookies.get(COOKIE_KEYS.sessionId)) {
+        // unset session cookie if invalid session
+        event.cookies.delete(COOKIE_KEYS.sessionId, sessionCookieOptions(false));
     }
 
     event.locals.__cookieWritables = getCookieWritableCookies(event.cookies);
 
-    let result: Response;
     try {
-        result = await resolve(event);
+        return await resolve(event);
     } catch (error) {
-        void reqLogger.error('Uncaught error when resolving response', { error, event });
-        result = new Response('An Error has Occurred', {
+        await reqLogger.error('Uncaught error when resolving response', { error, event });
+        return new Response('An Error has Occurred', {
             status: 500
         });
     }
-
-    return result;
 }) satisfies Handle;

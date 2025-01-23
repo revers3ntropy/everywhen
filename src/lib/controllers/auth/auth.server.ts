@@ -57,7 +57,7 @@ namespace AuthServer {
             sessions.delete(id);
             return null;
         }
-        return session;
+        return { ...session };
     }
 
     export function tryGetAuthFromCookies(cookie: Cookies): Auth | null {
