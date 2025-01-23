@@ -1,9 +1,4 @@
 <script lang="ts">
-    import Streaks from '$lib/components/Streaks.svelte';
-    import { theme, username } from '$lib/stores';
-    import { Theme } from '$lib/constants';
-    import { Auth } from '$lib/controllers/auth/auth';
-    import Dropdown from '$lib/components/ui/Dropdown.svelte';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import Bin from 'svelte-material-icons/Delete.svelte';
@@ -13,6 +8,12 @@
     import CogOutline from 'svelte-material-icons/CogOutline.svelte';
     import DarkTheme from 'svelte-material-icons/WeatherNight.svelte';
     import ChartLine from 'svelte-material-icons/ChartLine.svelte';
+    import Star from 'svelte-material-icons/StarFourPointsOutline.svelte';
+    import Streaks from '$lib/components/Streaks.svelte';
+    import { theme, username } from '$lib/stores';
+    import { Theme } from '$lib/constants';
+    import { Auth } from '$lib/controllers/auth/auth';
+    import Dropdown from '$lib/components/ui/Dropdown.svelte';
 
     function switchTheme() {
         theme.set($theme === Theme.light ? Theme.dark : Theme.light);
@@ -32,11 +33,19 @@
     </div>
 
     <div class="p-1">
-        <div class="flex content-between py-2">
-            <div class="px-2 text-lg">
+        <div class="py-2">
+            <div class="px-2">
                 <p class="text-sm text-light">logged in as</p>
-                <p>{$username || '...'}</p>
+                <p class="text-lg">{$username || '...'}</p>
             </div>
+        </div>
+
+        <hr />
+        <div class="px-2 py-3">
+            <a href="/subscription/buy">
+                <Star size="30" />
+                Upgrade to Plus
+            </a>
         </div>
 
         <hr />

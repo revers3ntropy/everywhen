@@ -1,0 +1,67 @@
+import { z } from 'zod';
+import { error, type RequestHandler } from '@sveltejs/kit';
+import { Subscription } from '$lib/controllers/subscription/subscription.server';
+import { api404Handler } from '$lib/utils/apiResponse.server';
+import { FileLogger } from '$lib/utils/log.server';
+
+const stripeWebhooksLogger = new FileLogger('StripeWebHooks');
+
+export const POST = (async ({ request }) => {
+    const body = (await request.json()) as Record<string, unknown>;
+    const parsedBody = z
+        .object({
+            type: z.string(),
+            data: z.object({
+                object: z.object({})
+            })
+        })
+        .safeParse(body);
+    if (!parsedBody.success) error(400, parsedBody.error.message);
+    const { type, data } = parsedBody.data;
+    switch (type) {
+        case 'customer.subscription.created': {
+            const checkedObject = z
+                .object({
+                    id: z.string(),
+                    status: z.string(),
+                    customer: z.string()
+                })
+                .safeParse(data.object);
+            if (!checkedObject.success) error(400, checkedObject.error.message);
+            await Subscription.handleCustomerSubscriptionCreated(
+                checkedObject.data.id,
+                checkedObject.data.status,
+                checkedObject.data.customer
+            );
+            break;
+        }
+        case 'customer.subscription.updated':
+            await Subscription.handleCustomerSubscriptionUpdated();
+            break;
+        case 'customer.subscription.deleted':
+            await Subscription.handleCustomerSubscriptionDeleted();
+            break;
+        case 'customer.subscription.paused':
+            await Subscription.handleCustomerSubscriptionPaused();
+            break;
+        case 'customer.subscription.resumed':
+            await Subscription.handleCustomerSubscriptionResumed();
+            break;
+        case 'customer.deleted':
+            await Subscription.handleCustomerSubscriptionDeleted();
+            break;
+        default:
+            await stripeWebhooksLogger.error('Unhandled Stripe webhook', {
+                type
+            });
+            error(400, 'unhandled webhook type');
+    }
+
+    console.log(type, body);
+
+    return new Response('ok', { status: 200 });
+}) satisfies RequestHandler;
+
+export const GET = api404Handler;
+export const PUT = api404Handler;
+export const DELETE = api404Handler;
