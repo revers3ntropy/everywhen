@@ -3,15 +3,26 @@ import { error, type RequestHandler } from '@sveltejs/kit';
 import { Subscription } from '$lib/controllers/subscription/subscription.server';
 import { api404Handler } from '$lib/utils/apiResponse.server';
 import { FileLogger } from '$lib/utils/log.server';
+import stripe from 'stripe';
+import { STRIPE_WEBHOOK_SECRET } from '$env/static/private';
 
 const stripeWebhooksLogger = new FileLogger('StripeWebHooks');
 
 // This endpoint accepts webhook requests from Stripe API
 // see https://docs.stripe.com/webhooks?locale=en-GB
-//
 // Handlers for webhooks should run asynchronously, so 'void' is used to
 // disregard the returned promises.
 export const POST = (async ({ request }) => {
+    // validate signature
+    const sig = request.headers.get('stripe-signature');
+    if (!sig) error(400, 'invalid signature')
+    try {
+        stripe.webhooks.constructEvent(request.body?.toString() ?? '', sig, STRIPE_WEBHOOK_SECRET);
+    } catch (err: unknown) {
+        await stripeWebhooksLogger.log('constructing stripe event failed', { err })
+        error(400, 'error');
+    }
+
     const body = (await request.json()) as Record<string, unknown>;
     const parsedBody = z
         .object({
