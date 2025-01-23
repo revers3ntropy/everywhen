@@ -6,6 +6,11 @@ import { FileLogger } from '$lib/utils/log.server';
 
 const stripeWebhooksLogger = new FileLogger('StripeWebHooks');
 
+// This endpoint accepts webhook requests from Stripe API
+// see https://docs.stripe.com/webhooks?locale=en-GB
+//
+// Handlers for webhooks should run asynchronously, so 'void' is used to
+// disregard the returned promises.
 export const POST = (async ({ request }) => {
     const body = (await request.json()) as Record<string, unknown>;
     const parsedBody = z
@@ -28,7 +33,7 @@ export const POST = (async ({ request }) => {
                 })
                 .safeParse(data.object);
             if (!checkedObject.success) error(400, checkedObject.error.message);
-            await Subscription.handleCustomerSubscriptionCreated(
+            void Subscription.handleCustomerSubscriptionCreated(
                 checkedObject.data.id,
                 checkedObject.data.status,
                 checkedObject.data.customer
@@ -36,7 +41,7 @@ export const POST = (async ({ request }) => {
             break;
         }
         case 'customer.subscription.updated':
-            await Subscription.handleCustomerSubscriptionUpdated();
+            void Subscription.handleCustomerSubscriptionUpdated();
             break;
         case 'customer.subscription.deleted': {
             const checkedObject = z
@@ -46,7 +51,7 @@ export const POST = (async ({ request }) => {
                 })
                 .safeParse(data.object);
             if (!checkedObject.success) error(400, checkedObject.error.message);
-            await Subscription.handleCustomerSubscriptionDeleted(
+            void Subscription.handleCustomerSubscriptionDeleted(
                 checkedObject.data.id,
                 checkedObject.data.customer
             );
@@ -60,7 +65,7 @@ export const POST = (async ({ request }) => {
                 })
                 .safeParse(data.object);
             if (!checkedObject.success) error(400, checkedObject.error.message);
-            await Subscription.handleCustomerSubscriptionPaused(
+            void Subscription.handleCustomerSubscriptionPaused(
                 checkedObject.data.id,
                 checkedObject.data.customer
             );
@@ -74,7 +79,7 @@ export const POST = (async ({ request }) => {
                 })
                 .safeParse(data.object);
             if (!checkedObject.success) error(400, checkedObject.error.message);
-            await Subscription.handleCustomerSubscriptionResumed(
+            void Subscription.handleCustomerSubscriptionResumed(
                 checkedObject.data.id,
                 checkedObject.data.customer
             );
@@ -88,7 +93,7 @@ export const POST = (async ({ request }) => {
                 })
                 .safeParse(data.object);
             if (!checkedObject.success) error(400, checkedObject.error.message);
-            await Subscription.handleCustomerSubscriptionDeleted(
+            void Subscription.handleCustomerSubscriptionDeleted(
                 checkedObject.data.id,
                 checkedObject.data.customer
             );
