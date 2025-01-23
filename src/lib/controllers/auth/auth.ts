@@ -6,7 +6,6 @@ import {
     SESSION_KEYS,
     SESSION_TO_CLEAR_ON_LOGOUT
 } from '$lib/constants';
-import type { SubscriptionType } from '$lib/controllers/subscription/subscription';
 import { currentlyUploadingAssets, populateCookieWritablesWithCookies } from '$lib/stores';
 import { decrypt } from '$lib/utils/encryption';
 import { Logger } from '$lib/utils/log';
@@ -21,7 +20,6 @@ export interface Auth {
     id: string;
     username: string;
     key: string;
-    activeSubscriptions: SubscriptionType[];
 }
 
 export namespace Auth {
