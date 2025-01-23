@@ -20,7 +20,7 @@ CREATE TABLE subscriptions
     stripeCustomerId     varchar(256) NOT NULL,
     stripeSubscriptionId varchar(256) NOT NULL,
     subType              varchar(64)  NOT NULL,
-    active               tinyint      NOT NULL,
+    active               int          DEFAULT NULL,
     INDEX `idx_subscriptions_userId` (`userId`)
 )
     ENGINE = InnoDB

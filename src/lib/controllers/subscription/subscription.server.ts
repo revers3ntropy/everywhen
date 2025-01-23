@@ -4,6 +4,7 @@ import { Result } from '$lib/utils/result';
 import { Stripe } from 'stripe';
 import { STRIPE_SECRET_KEY, ROOT_URL } from '$env/static/private';
 import { SubscriptionType } from '$lib/controllers/subscription/subscription';
+import { nowUtc } from '$lib/utils/time';
 
 export {
     SubscriptionType,
@@ -94,7 +95,7 @@ export namespace Subscription {
                 ${checkout.stripeCustomerId},
                 ${checkout.stripeSubscriptionId},
                 ${SubscriptionType.Plus},
-                ${status === 'active'}
+                ${status === 'active' ? nowUtc() : null}
             )
         `;
     }
