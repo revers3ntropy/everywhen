@@ -3,6 +3,12 @@ export enum SubscriptionType {
     Plus = 'subtype-plus'
 }
 
+export interface Pricing {
+    price: number,
+    name: string,
+    lookupKey: string,
+}
+
 export const plusLookupKeys = {
     [SubscriptionType.Free]: '',
     [SubscriptionType.Plus]: 'ew_plus_monthly_v2'

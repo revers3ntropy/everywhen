@@ -3,7 +3,7 @@ import { query } from '$lib/db/mysql.server';
 import { Result } from '$lib/utils/result';
 import { Stripe } from 'stripe';
 import { STRIPE_SECRET_KEY, ROOT_URL } from '$env/static/private';
-import { SubscriptionType } from '$lib/controllers/subscription/subscription';
+import { type Pricing, SubscriptionType } from '$lib/controllers/subscription/subscription';
 import { nowUtc } from '$lib/utils/time';
 
 export {
@@ -20,6 +20,13 @@ export namespace Subscription {
         stripeCustomerId: string;
         stripeSubscriptionId: string;
     }[];
+
+    export async function getPriceList(): Promise<Pricing[]> {
+        const prices = await stripe.prices.list({
+            expand: ['data.product']
+        });
+        return prices.data.map((a) => ({ price: a.unit_amount, name: a.nickname, lookupKey: a.lookup_key }))
+    }
 
     /**
      * @param lookupKey - Stripe price lookup key
