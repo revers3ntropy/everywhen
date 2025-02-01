@@ -23,8 +23,7 @@
     export let data: LayoutData;
 
     function checkObfuscatedTimeout() {
-        // === true to get around a weird TS + Svelte thing
-        if ($obfuscated === true) return;
+        if ($obfuscated) return;
 
         const hideAfter = $settingsStore.autoHideEntriesDelay.value;
         if (hideAfter < 1) return;
