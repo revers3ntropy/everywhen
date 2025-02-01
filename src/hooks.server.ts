@@ -59,7 +59,7 @@ export const handle = (async ({ event, resolve }) => {
     // has already been cloned, 'auth' is not a reference to the stored object
     const auth = Auth.tryGetAuthFromCookies(event.cookies);
     event.locals.auth = auth;
-    if (auth && event.cookies.get(COOKIE_KEYS.sessionId)) {
+    if (!auth && event.cookies.get(COOKIE_KEYS.sessionId)) {
         // unset session cookie if invalid session
         event.cookies.delete(COOKIE_KEYS.sessionId, sessionCookieOptions(false));
     }
