@@ -5,19 +5,13 @@ import { FileLogger } from '$lib/utils/log.server';
 
 const portalSessionLogger = new FileLogger('PortalSession');
 
-export const POST = (async ({ request, locals }) => {
-    if (!locals.auth?.key) error(401, 'Invalid authentication');
+export const POST = (async ({ locals }) => {
+    if (!locals.auth) error(401, 'Invalid authentication');
 
-    const body = Object.fromEntries(await request.formData());
-    if (!('sessionId' in body) || typeof body['sessionId'] !== 'string' || !body['sessionId']) {
-        error(400, 'sessionId is required');
-    }
-    const redirectUrl = await Subscription.createPortalSessionUrl(body['sessionId']);
+    const redirectUrl = await Subscription.createPortalSessionUrl(locals.auth);
 
     if (!redirectUrl) {
-        await portalSessionLogger.error('Failed to create portal session', {
-            body
-        });
+        await portalSessionLogger.error('Failed to create portal session', { redirectUrl });
         error(400, 'something went wrong');
     }
 

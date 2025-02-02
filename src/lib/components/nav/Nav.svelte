@@ -2,6 +2,7 @@
     import { page } from '$app/stores';
     import AccountDropdown from '$lib/components/nav/AccountDropdown.svelte';
     import CreateNewButton from '$lib/components/nav/CreateNewButton.svelte';
+    import type { SubscriptionType } from '$lib/controllers/subscription/subscription';
     import { obfuscated, passcodeLastEntered, settingsStore } from '$lib/stores';
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
@@ -11,6 +12,8 @@
     import MapOutline from 'svelte-material-icons/MapOutline.svelte';
     import Notebook from 'svelte-material-icons/NotebookOutline.svelte';
     import Search from 'svelte-material-icons/Magnify.svelte';
+
+    export let activeSubscriptionType: SubscriptionType;
 
     const buttonCls =
         'w-full inline-flex px-2 py-3 items-center content-center gap-2 flex-col md:flex-row' +
@@ -28,7 +31,7 @@
     <div class="md:grid grid-cols-1 grid-rows-3 h-16 md:h-full w-full">
         <div class="pt-1 md:pt-2 flex md:block pr-4">
             <div class="md:pb-4 pl-1 w-full">
-                <AccountDropdown />
+                <AccountDropdown {activeSubscriptionType} />
             </div>
             <div class="md:pb-4 pl-2 flex items-center">
                 <span class="pr-3">

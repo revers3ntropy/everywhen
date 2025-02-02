@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { SubscriptionType } from '$lib/controllers/subscription/subscription';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import Bin from 'svelte-material-icons/Delete.svelte';
@@ -14,6 +15,8 @@
     import { Theme } from '$lib/constants';
     import { Auth } from '$lib/controllers/auth/auth';
     import Dropdown from '$lib/components/ui/Dropdown.svelte';
+
+    export let activeSubscriptionType: SubscriptionType;
 
     function switchTheme() {
         theme.set($theme === Theme.light ? Theme.dark : Theme.light);
@@ -41,10 +44,14 @@
         </div>
 
         <hr />
-        <div class="px-2 py-3">
-            <a href="/subscription/buy">
+        <div class="py-3">
+            <a href="/subscription/manage" class="flex justify-start items-center p-2 gap-2">
                 <Star size="30" />
-                Upgrade to Plus
+                {#if activeSubscriptionType === SubscriptionType.Plus}
+                    Manage EW Plus
+                {:else}
+                    Upgrade to Plus
+                {/if}
             </a>
         </div>
 

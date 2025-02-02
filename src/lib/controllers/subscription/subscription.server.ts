@@ -21,11 +21,37 @@ export namespace Subscription {
         stripeSubscriptionId: string;
     }[];
 
+    export async function getCurrentSubscription(auth: Auth): Promise<SubscriptionType> {
+        const subs = await query<{ subType: SubscriptionType }[]>`
+            SELECT subType
+            FROM subscriptions
+            WHERE userId = ${auth.id}
+              AND active IS NOT NULL
+        `;
+        if (subs.length === 0) return SubscriptionType.Free;
+        if (subs.length > 1) throw 'Multiple active subscriptions';
+        return subs[0].subType;
+    }
+
     export async function getPriceList(): Promise<Pricing[]> {
-        const prices = await stripe.prices.list({
-            expand: ['data.product']
-        });
-        return prices.data.map((a) => ({ price: a.unit_amount, name: a.nickname, lookupKey: a.lookup_key }))
+        const prices = await stripe.prices.list();
+
+        return prices.data
+            .filter(
+                (
+                    a
+                ): a is Stripe.Price & {
+                    active: true;
+                    unit_amount: number;
+                    nickname: string;
+                    lookup_key: string;
+                } =>
+                    a.active &&
+                    typeof a.unit_amount === 'number' &&
+                    typeof a.nickname === 'string' &&
+                    typeof a.lookup_key === 'string'
+            )
+            .map(a => ({ price: a.unit_amount, name: a.nickname, lookupKey: a.lookup_key }));
     }
 
     /**
@@ -49,7 +75,7 @@ export namespace Subscription {
             ],
             mode: 'subscription',
             success_url: `${ROOT_URL}/subscription/cb?success=true&sessionId={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${ROOT_URL}/subscription/buy?cancelled=true`
+            cancel_url: `${ROOT_URL}/subscription/manage?cancelled=true`
         });
 
         return session.url;
@@ -72,18 +98,40 @@ export namespace Subscription {
         return Result.ok();
     }
 
+    async function getStripeCustomerId(auth: Auth): Promise<string | null> {
+        const subs = await query<{ stripeCustomerId: string }[]>`
+            SELECT stripeCustomerId
+            FROM subscriptions
+            WHERE userId = ${auth.id}
+              AND active IS NOT NULL
+        `;
+        if (subs.length === 0) return null;
+        if (subs.length > 1) throw 'Multiple active subscriptions';
+        return subs[0].stripeCustomerId;
+    }
+
+    export async function createPortalSessionUrl(auth: Auth): Promise<string | null> {
+        const id = await getStripeCustomerId(auth);
+        if (!id) return null;
+        return createPortalSessionUrlFromStripeCustomerId(id);
+    }
+
     /**
      * @returns url to Stripe portal
      */
-    export async function createPortalSessionUrl(sessionId: string): Promise<string> {
+    export async function createPortalSessionUrlFromSessionId(sessionId: string): Promise<string> {
         const checkoutSession = await stripe.checkout.sessions.retrieve(sessionId);
         if (typeof checkoutSession.customer !== 'string') throw 'invalid Stripe session';
+        return createPortalSessionUrlFromStripeCustomerId(checkoutSession.customer);
+    }
 
+    export async function createPortalSessionUrlFromStripeCustomerId(
+        stripeCustomerId: string
+    ): Promise<string> {
         const portalSession = await stripe.billingPortal.sessions.create({
-            customer: checkoutSession.customer,
+            customer: stripeCustomerId,
             return_url: `${ROOT_URL}/subscription/manage`
         });
-
         return portalSession.url;
     }
 

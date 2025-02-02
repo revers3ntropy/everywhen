@@ -1,4 +1,5 @@
 import { Auth } from '$lib/controllers/auth/auth';
+import { Subscription } from '$lib/controllers/subscription/subscription.server';
 import { redirect } from '@sveltejs/kit';
 import type { LayoutServerLoad } from './$types';
 
@@ -11,6 +12,7 @@ export const load = (async ({ url, locals, parent }) => {
     }
 
     return {
-        settings
+        settings,
+        activeSubscriptionType: await Subscription.getCurrentSubscription(auth)
     };
 }) satisfies LayoutServerLoad;
