@@ -24,7 +24,7 @@
             Something went wrong
         {/if}
         <p class="pt-8">
-            <Button on:click={reloadSubscription}>
+            <Button on:click={reloadSubscription} variant="outline">
                 <Reload class="pr-2" size={30} /> Refresh Subscription
             </Button>
         </p>

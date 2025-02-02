@@ -13,7 +13,7 @@ export {
 
 // handlers for integration with Stripe Payments
 export namespace Subscription {
-    const stripe = new Stripe(STRIPE_SECRET_KEY);
+    const stripe = STRIPE_SECRET_KEY ? new Stripe(STRIPE_SECRET_KEY) : null;
 
     const activeCheckouts = [] as {
         userId: string;
@@ -34,6 +34,7 @@ export namespace Subscription {
     }
 
     export async function getPriceList(): Promise<Pricing[]> {
+        if (!stripe) throw 'Stripe not configured';
         const prices = await stripe.prices.list();
 
         return prices.data
@@ -59,6 +60,7 @@ export namespace Subscription {
      * @returns url to redirect users to from Stripe API
      */
     export async function createCheckoutSessionUrl(lookupKey: string): Promise<string | null> {
+        if (!stripe) throw 'Stripe not configured';
         const prices = await stripe.prices.list({
             lookup_keys: [lookupKey],
             expand: ['data.product']
@@ -82,6 +84,7 @@ export namespace Subscription {
     }
 
     export async function checkoutComplete(auth: Auth, sessionId: string): Promise<Result<void>> {
+        if (!stripe) throw 'Stripe not configured';
         const checkoutSession = await stripe.checkout.sessions.retrieve(sessionId);
         if (typeof checkoutSession.customer !== 'string')
             return Result.err('invalid Stripe session');
@@ -116,18 +119,10 @@ export namespace Subscription {
         return createPortalSessionUrlFromStripeCustomerId(id);
     }
 
-    /**
-     * @returns url to Stripe portal
-     */
-    export async function createPortalSessionUrlFromSessionId(sessionId: string): Promise<string> {
-        const checkoutSession = await stripe.checkout.sessions.retrieve(sessionId);
-        if (typeof checkoutSession.customer !== 'string') throw 'invalid Stripe session';
-        return createPortalSessionUrlFromStripeCustomerId(checkoutSession.customer);
-    }
-
     export async function createPortalSessionUrlFromStripeCustomerId(
         stripeCustomerId: string
     ): Promise<string> {
+        if (!stripe) throw 'Stripe not configured';
         const portalSession = await stripe.billingPortal.sessions.create({
             customer: stripeCustomerId,
             return_url: `${ROOT_URL}/subscription/manage`
@@ -166,7 +161,9 @@ export namespace Subscription {
         `;
     }
 
-    export async function handleCustomerSubscriptionUpdated() {}
+    export async function handleCustomerSubscriptionUpdated() {
+        // TODO
+    }
 
     export async function handleCustomerDeleted(customerId: string) {
         await query`
@@ -197,5 +194,72 @@ export namespace Subscription {
             WHERE stripeCustomerId = ${customerId}
               AND stripeSubscriptionId = ${subscriptionId}
         `;
+    }
+
+    export async function validateSubscriptions(auth: Auth) {
+        if (!stripe) throw 'Stripe not configured';
+        const subs = await query<{ stripeSubscriptionId: string; stripeCustomerId: string }[]>`
+            SELECT stripeSubscriptionId, stripeCustomerId
+            FROM subscriptions
+            WHERE userId = ${auth.id}
+        `;
+        if (subs.length === 0) {
+            // TODO check for subscription with Stripe that is not
+            // in the database
+            return;
+        }
+        if (subs.length > 1) {
+            // only allow one subscription at a time, simply delete
+            // all bus the first
+            const firstSubId = subs[0].stripeSubscriptionId;
+            await query`
+                DELETE FROM subscriptions
+                WHERE userId = ${auth.id}
+                    AND stripeSubscriptionId != ${firstSubId}
+            `;
+        }
+        const sub = subs[0].stripeSubscriptionId;
+        let stripeSub;
+        try {
+            stripeSub = await stripe.subscriptions.retrieve(sub);
+        } catch (e: unknown) {
+            if (
+                typeof e === 'object' &&
+                e &&
+                'raw' in e &&
+                typeof e.raw === 'object' &&
+                e.raw &&
+                'message' in e.raw
+            ) {
+                // if we get an error that there is not such subscription,
+                // our DB is not in sync with Stripe and we should clear
+                // subscriptions
+
+                const message = e.raw.message as string;
+                if (message.startsWith('No such subscription')) {
+                    await query`
+                        DELETE
+                        FROM subscriptions
+                        WHERE userId = ${auth.id}
+                    `;
+                    return;
+                }
+            }
+            return;
+        }
+        if (stripeSub.customer !== subs[0].stripeCustomerId) {
+            await query`
+                DELETE FROM subscriptions
+                WHERE userId = ${auth.id}
+            `;
+            return;
+        }
+        if (stripeSub.status !== 'active') {
+            await query`
+                UPDATE subscriptions
+                SET active = null
+                WHERE userId = ${auth.id}
+            `;
+        }
     }
 }

@@ -1,29 +1,28 @@
-import { error, redirect, type RequestHandler } from '@sveltejs/kit';
+import { error, type RequestHandler } from '@sveltejs/kit';
 import { Subscription } from '$lib/controllers/subscription/subscription.server';
-import { api404Handler } from '$lib/utils/apiResponse.server';
+import { api404Handler, apiResponse } from '$lib/utils/apiResponse.server';
 import { FileLogger } from '$lib/utils/log.server';
 
 const checkoutSessionLogger = new FileLogger('CheckoutSession');
 
-export const POST = (async ({ request, locals }) => {
+export const GET = (async ({ locals, url }) => {
     if (!locals.auth?.key) error(401, 'Invalid authentication');
 
-    const body = Object.fromEntries(await request.formData());
-    if (!('lookupKey' in body) || typeof body['lookupKey'] !== 'string' || !body['lookupKey']) {
-        error(400, 'lookupKey is required');
-    }
-    const redirectUrl = await Subscription.createCheckoutSessionUrl(body['lookupKey']);
+    const lookupKey = url.searchParams.get('lookupKey');
+    if (!lookupKey) error(400, 'lookupKey is required');
+
+    const redirectUrl = await Subscription.createCheckoutSessionUrl(lookupKey);
 
     if (!redirectUrl) {
         await checkoutSessionLogger.error('Failed to create checkout session', {
-            body
+            lookupKey
         });
         error(400, 'something went wrong');
     }
 
-    return redirect(303, redirectUrl);
+    return apiResponse(locals.auth, { redirectUrl });
 }) satisfies RequestHandler;
 
-export const GET = api404Handler;
+export const POST = api404Handler;
 export const PUT = api404Handler;
 export const DELETE = api404Handler;

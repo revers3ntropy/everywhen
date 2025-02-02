@@ -66,6 +66,8 @@ export interface ApiRoutes {
     '/stats/commonWords': typeof import('../../routes/api/stats/commonWords/+server');
     '/subscription/pricing': typeof import('../../routes/api/subscription/pricing/+server');
     '/subscription/validate': typeof import('../../routes/api/subscription/validate/+server');
+    '/subscription/create-portal-session': typeof import('../../routes/api/subscription/create-portal-session/+server');
+    '/subscription/create-checkout-session': typeof import('../../routes/api/subscription/create-checkout-session/+server');
 }
 
 export async function makeApiReq<

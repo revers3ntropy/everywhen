@@ -104,10 +104,7 @@ export const POST = (async ({ request }) => {
                 })
                 .safeParse(data.object);
             if (!checkedObject.success) error(400, checkedObject.error.message);
-            void Subscription.handleCustomerSubscriptionDeleted(
-                checkedObject.data.id,
-                checkedObject.data.customer
-            );
+            void Subscription.handleCustomerDeleted(checkedObject.data.customer);
             break;
         }
         default:
