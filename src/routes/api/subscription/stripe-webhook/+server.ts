@@ -15,11 +15,11 @@ const stripeWebhooksLogger = new FileLogger('StripeWebHooks');
 export const POST = (async ({ request }) => {
     // validate signature
     const sig = request.headers.get('stripe-signature');
-    if (!sig) error(400, 'invalid signature')
+    if (!sig) error(400, 'invalid signature');
     try {
         stripe.webhooks.constructEvent(request.body?.toString() ?? '', sig, STRIPE_WEBHOOK_SECRET);
     } catch (err: unknown) {
-        await stripeWebhooksLogger.log('constructing stripe event failed', { err })
+        await stripeWebhooksLogger.log('constructing stripe event failed', { err });
         error(400, 'error');
     }
 
