@@ -28,93 +28,26 @@ export const POST = (async ({ request }) => {
         .object({
             type: z.string(),
             data: z.object({
-                object: z.object({})
+                object: z.object({
+                    customer: z.string()
+                })
             })
         })
         .safeParse(body);
     if (!parsedBody.success) error(400, parsedBody.error.message);
-    const { type, data } = parsedBody.data;
-    switch (type) {
-        case 'customer.subscription.created': {
-            const checkedObject = z
-                .object({
-                    id: z.string(),
-                    status: z.string(),
-                    customer: z.string()
-                })
-                .safeParse(data.object);
-            if (!checkedObject.success) error(400, checkedObject.error.message);
-            void Subscription.handleCustomerSubscriptionCreated(
-                checkedObject.data.id,
-                checkedObject.data.status,
-                checkedObject.data.customer
-            );
-            break;
-        }
-        case 'customer.subscription.updated':
-            void Subscription.handleCustomerSubscriptionUpdated();
-            break;
-        case 'customer.subscription.deleted': {
-            const checkedObject = z
-                .object({
-                    id: z.string(),
-                    customer: z.string()
-                })
-                .safeParse(data.object);
-            if (!checkedObject.success) error(400, checkedObject.error.message);
-            void Subscription.handleCustomerSubscriptionDeleted(
-                checkedObject.data.id,
-                checkedObject.data.customer
-            );
-            break;
-        }
-        case 'customer.subscription.paused': {
-            const checkedObject = z
-                .object({
-                    id: z.string(),
-                    customer: z.string()
-                })
-                .safeParse(data.object);
-            if (!checkedObject.success) error(400, checkedObject.error.message);
-            void Subscription.handleCustomerSubscriptionPaused(
-                checkedObject.data.id,
-                checkedObject.data.customer
-            );
-            break;
-        }
-        case 'customer.subscription.resumed': {
-            const checkedObject = z
-                .object({
-                    id: z.string(),
-                    customer: z.string()
-                })
-                .safeParse(data.object);
-            if (!checkedObject.success) error(400, checkedObject.error.message);
-            void Subscription.handleCustomerSubscriptionResumed(
-                checkedObject.data.id,
-                checkedObject.data.customer
-            );
-            break;
-        }
-        case 'customer.deleted': {
-            const checkedObject = z
-                .object({
-                    id: z.string(),
-                    customer: z.string()
-                })
-                .safeParse(data.object);
-            if (!checkedObject.success) error(400, checkedObject.error.message);
-            void Subscription.handleCustomerDeleted(checkedObject.data.customer);
-            break;
-        }
-        default:
-            await stripeWebhooksLogger.error('Unhandled Stripe webhook', {
-                type
-            });
-            error(400, 'unhandled webhook type');
+    const { data } = parsedBody.data;
+
+    // get user id from stripe customer id
+    const userId = await Subscription.userIdFromStripeCustomerId(data.object.customer);
+
+    if (!userId) {
+        await stripeWebhooksLogger.log('no user found for stripe customer id', { data });
+        error(400, 'no user found');
     }
 
-    console.log(type, body);
+    // don't bother seeing what the webhook actually is,
+    // just sync with Stripe to make sure we're up to date
+    await Subscription.validateSubscriptions(userId, data.object.customer);
 
     return new Response('ok', { status: 200 });
 }) satisfies RequestHandler;

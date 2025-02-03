@@ -6,8 +6,10 @@ CREATE TABLE users
     salt                varchar(255) NOT NULL,
     created             int          NOT NULL,
     versionLastLoggedIn varchar(32)  NOT NULL DEFAULT '0.5.86',
+    stripeCustomerId    varchar(256) DEFAULT NULL,
     PRIMARY KEY (`id`),
-    UNIQUE INDEX `uidx_users_username` (`username`)
+    UNIQUE INDEX `uidx_users_username` (`username`),
+    UNIQUE INDEX `uidx_users_stripe_id` (`stripeCustomerId`)
 )
     ENGINE = InnoDB
     DEFAULT CHARSET = utf8mb4
@@ -20,7 +22,6 @@ CREATE TABLE subscriptions
     stripeCustomerId     varchar(256) NOT NULL,
     stripeSubscriptionId varchar(256) NOT NULL,
     subType              varchar(64)  NOT NULL,
-    active               int          DEFAULT NULL,
     INDEX `idx_subscriptions_userId` (`userId`)
 )
     ENGINE = InnoDB
