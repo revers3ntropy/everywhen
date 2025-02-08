@@ -11,9 +11,7 @@
 </script>
 
 <div class="relative">
-    <span
-        class="flex-center absolute top-0 md:-left-5 bg-backgroundColor rounded-full border-2 border-borderColor w-10 h-10"
-    >
+    <span class="flex-center absolute top-1 md:-left-4 bg-background rounded-full w-8 h-8">
         {#if type === 'entry-edit'}
             <NoteEditOutline size={24} />
         {:else if type === 'entry'}

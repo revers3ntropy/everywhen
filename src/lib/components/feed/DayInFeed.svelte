@@ -157,13 +157,12 @@
             {/if}
             <div class="w-full">
                 {#each items || [] as item, i (item.id)}
-                    <div class="relative">
-                        <span
-                            class="absolute top-[18px] left-0 border-borderHeavy border w-4 block"
-                        />
-                    </div>
-                    <span class=""></span>
                     {#if item.type === 'entry'}
+                        <div class="relative">
+                            <span
+                                class="flex-center rounded-full absolute top-3 md:-left-[9px] bg-border w-4 h-4"
+                            />
+                        </div>
                         <EntryFeedItem entry={item} {obfuscated} {showLabels} {locations} />
                     {:else if item.type === 'entry-edit'}
                         <EntryEditFeedItem
