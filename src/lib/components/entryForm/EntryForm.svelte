@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { Button } from '$lib/components/ui/button';
     import { ANIMATION_DURATION } from '$lib/constants';
     import Tick from 'svelte-material-icons/Check.svelte';
     import UploadMultiple from 'svelte-material-icons/UploadMultiple.svelte';
@@ -380,15 +381,16 @@
         </div>
 
         <div class="flex py-2 justify-end">
-            <button
+            <Button
                 aria-label="Submit Entry"
-                class="flex-center aspect-square primary"
-                style="padding: 0.5rem"
                 disabled={submitted}
                 on:click={submit}
+                variant="outline"
+                class="rounded-full"
             >
                 <Tick size="26" />
-            </button>
+                Submit
+            </Button>
         </div>
     </div>
 </div>
