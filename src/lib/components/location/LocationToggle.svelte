@@ -32,14 +32,12 @@
                 () => {
                     enabledLocation.set(true);
                     resolve(true);
+                    notify.success('Location enabled and will be recorded with each entry');
                 },
                 () => {
                     enabledLocation.set(false);
                     resolve(false);
-                    notify.error(
-                        'Something went wrong enabling location' +
-                            ' - please check your browser settings'
-                    );
+                    notify.error('Failed to get location. Please check your browser settings.');
                 }
             );
         });
@@ -47,6 +45,7 @@
 
     function disableLocation() {
         enabledLocation.set(false);
+        notify.success('Location disabled');
     }
 
     onMount(async () => {
@@ -57,25 +56,11 @@
 {#if $enabledLocation === null}
     ...
 {:else if $enabledLocation === true}
-    <button
-        on:click={disableLocation}
-        use:tooltip={{
-            content: 'Location will be recorded with entry. ' + 'Click to turn off location',
-            position: tooltipPosition
-        }}
-        aria-label="Turn off Location"
-    >
+    <button on:click={disableLocation} aria-label="Turn off Location" class="relative">
         <MapMarkerOutline {size} />
     </button>
 {:else}
-    <button
-        on:click={enableLocation}
-        use:tooltip={{
-            content: 'Location is disabled. Click to record location with entry',
-            position: tooltipPosition
-        }}
-        aria-label="Turn on Location"
-    >
+    <button on:click={enableLocation} aria-label="Turn on Location">
         <MapMarkerOffOutline {size} />
     </button>
 {/if}
