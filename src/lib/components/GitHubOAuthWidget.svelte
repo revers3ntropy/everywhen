@@ -51,9 +51,6 @@
 </script>
 
 {#if $settingsStore.gitHubAccessToken.value}
-    <Button variant="outline" on:click={unlink} class="danger w-full">
-        <GitHub {size} />
-    </Button>
     <Button
         class="h-fit flex gap-4 w-full"
         variant="outline"
