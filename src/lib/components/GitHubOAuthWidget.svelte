@@ -52,7 +52,7 @@
 
 {#if $settingsStore.gitHubAccessToken.value}
     <Button
-        class="h-fit flex gap-4 w-full"
+        class="h-fit flex gap-4 w-full justify-start"
         variant="outline"
         aria-label="unlink with Github"
         on:click={unlink}
@@ -69,7 +69,7 @@
     </Button>
 {:else}
     <Button
-        class="h-fit flex gap-4 w-full"
+        class="h-fit flex gap-4 w-full justify-start"
         variant="outline"
         aria-label="link to Github"
         on:click={doOauth}

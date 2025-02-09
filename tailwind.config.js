@@ -10,8 +10,6 @@ export default {
         colors: {
             transparent: 'transparent',
             current: 'currentColor',
-            primaryLight: 'var(--primary-light)',
-            secondaryLight: 'var(--secondary-light)',
             backgroundColor: 'var(--background-color)',
             navBg: 'var(--nav-bg)',
             blurBgColor: 'var(--blur-bg-color)',
@@ -52,7 +50,7 @@ export default {
                 foreground: 'var(--primary-foreground)'
             },
             secondary: {
-                DEFAULT: 'var(--secondary))',
+                DEFAULT: 'var(--secondary)',
                 foreground: 'var(--secondary-foreground)'
             },
             muted: {

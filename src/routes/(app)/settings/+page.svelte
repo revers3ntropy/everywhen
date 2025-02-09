@@ -21,6 +21,7 @@
     import EditSetting from './EditSetting.svelte';
     import { settingsStore } from '$lib/stores';
     import { Auth } from '$lib/controllers/auth/auth';
+    import UsageCharts from './UsageCharts.svelte';
 
     export let data;
 
@@ -51,84 +52,19 @@
         <section>
             <div class="flex items-center pb-4">
                 <span class="rounded-full w-[35px] h-[35px] bg-accent flex-center">
-                    <Account size="25" />
-                </span>
-                <p class="pl-2 text-lg"> My Account </p>
-            </div>
-            <div class="flex flex-col gap-4">
-                <Button
-                    class="h-fit flex gap-4"
-                    variant="outline"
-                    aria-label="Log out"
-                    on:click={logOut}
-                >
-                    <div>
-                        <Logout size="20" />
-                    </div>
-                    <div class="text-start">
-                        <p> Log Out </p>
-                    </div>
-                </Button>
-                <Button
-                    class="h-fit flex gap-4"
-                    variant="outline"
-                    aria-label="export data as HTML"
-                    on:click={exportData}
-                >
-                    <div>
-                        <Export size="20" />
-                    </div>
-                    <div class="text-start">
-                        <p> Export Data </p>
-                        <p class="text-light"> Generate and open HTML file of entries </p>
-                    </div>
-                </Button>
-                <Button
-                    class="h-fit flex gap-4"
-                    variant="outline"
-                    aria-label="Change password"
-                    on:click={changePassword}
-                >
-                    <div>
-                        <LockOutline size="20" />
-                    </div>
-                    <div class="text-start">
-                        <p> Change Password </p>
-                        <p class="text-light">
-                            Pick a new password and re-encrypt all data with the new password
-                        </p>
-                    </div>
-                </Button>
-                <a aria-label="Delete Account" class="danger" href="/settings/delete">
-                    <Button class="h-fit flex gap-4 w-full" variant="outline">
-                        <div>
-                            <Skull size="20" />
-                        </div>
-                        <div class="text-start">
-                            <p> Delete Account </p>
-                            <p class="text-light">
-                                Delete account, encryption keys and all data on account
-                            </p>
-                        </div>
-                    </Button>
-                </a>
-            </div>
-            <div class="pt-8 border-t border-border mt-8">
-                <GitHubOauthWidget size={20} />
-            </div>
-        </section>
-        <section>
-            <div class="flex items-center pb-4">
-                <span class="rounded-full w-[35px] h-[35px] bg-accent flex-center">
                     <PlusThick size="25" />
                 </span>
                 <p class="pl-2 text-lg">Subscription</p>
             </div>
-
-            <SubscriptionWidget
-                activeSubscriptionType={data.activeSubscriptionType}
-                prices={data.prices}
-            />
+            <div class="pb-4">
+                <SubscriptionWidget
+                    activeSubscriptionType={data.activeSubscriptionType}
+                    prices={data.prices}
+                />
+            </div>
+            <div>
+                <UsageCharts activeSubscriptionType={data.activeSubscriptionType} />
+            </div>
         </section>
         <section>
             <div class="flex items-center pb-4">
@@ -148,6 +84,77 @@
                         <hr />
                     {/if}
                 {/each}
+            </div>
+        </section>
+        <section>
+            <div class="flex items-center pb-4">
+                <span class="rounded-full w-[35px] h-[35px] bg-accent flex-center">
+                    <Account size="25" />
+                </span>
+                <p class="pl-2 text-lg"> My Account </p>
+            </div>
+            <div class="flex flex-col gap-4">
+                <Button
+                    class="h-fit flex gap-4 justify-start"
+                    variant="outline"
+                    aria-label="Log out"
+                    on:click={logOut}
+                >
+                    <div>
+                        <Logout size="22" />
+                    </div>
+                    <div class="text-start">
+                        <p> Log Out </p>
+                    </div>
+                </Button>
+                <Button
+                    class="h-fit flex gap-4 justify-start"
+                    variant="outline"
+                    aria-label="export data as HTML"
+                    on:click={exportData}
+                >
+                    <div>
+                        <Export size="22" />
+                    </div>
+                    <div class="text-start">
+                        <p> Export Data </p>
+                        <p class="text-light"> Generate and open HTML file of entries </p>
+                    </div>
+                </Button>
+            </div>
+            <div class="py-8 border-t border-border mt-8">
+                <GitHubOauthWidget size={22} />
+            </div>
+            <div class="pt-8 border-t border-border flex flex-col gap-4">
+                <Button
+                    class="h-fit flex gap-4 justify-start"
+                    variant="destructive"
+                    aria-label="Change password"
+                    on:click={changePassword}
+                >
+                    <div>
+                        <LockOutline size="22" />
+                    </div>
+                    <div class="text-start">
+                        <p class="text-destructive-foreground font-bold"> Change Password </p>
+                        <p class="text-destructive-foreground text-sm">
+                            Pick a new password and re-encrypt all data with the new password
+                        </p>
+                    </div>
+                </Button>
+                <a aria-label="Delete Account" href="/settings/delete">
+                    <Button class="h-fit flex gap-4 w-full justify-start" variant="destructive">
+                        <div>
+                            <Skull size="22" />
+                        </div>
+                        <div class="text-start">
+                            <p class="text-destructive-foreground font-bold"> Delete Account </p>
+                            <p class="text-destructive-foreground text-sm">
+                                Delete account, encryption keys and all data on account
+                            </p>
+                        </div>
+                    </Button>
+                </a>
             </div>
         </section>
     </div>

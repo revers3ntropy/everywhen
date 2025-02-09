@@ -1,7 +1,6 @@
 <script lang="ts">
     import { Button } from '$lib/components/ui/button';
     import { ANIMATION_DURATION } from '$lib/constants';
-    import Tick from 'svelte-material-icons/Check.svelte';
     import UploadMultiple from 'svelte-material-icons/UploadMultiple.svelte';
     import { browser } from '$app/environment';
     import { onMount } from 'svelte';
@@ -385,11 +384,9 @@
                 aria-label="Submit Entry"
                 disabled={submitted}
                 on:click={submit}
-                variant="outline"
                 class="rounded-full"
             >
-                <Tick size="26" />
-                Submit
+                Submit Entry
             </Button>
         </div>
     </div>

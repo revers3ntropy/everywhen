@@ -70,8 +70,8 @@
                     href="/journal"
                     aria-label="journal"
                     class={buttonCls}
-                    class:bg-primaryLight={$page.url.pathname.startsWith('/journal')}
-                    class:hover:bg-primaryLight={$page.url.pathname.startsWith('/journal')}
+                    class:bg-secondary={$page.url.pathname.startsWith('/journal')}
+                    class:hover:bg-secondary={$page.url.pathname.startsWith('/journal')}
                 >
                     <Notebook size="30" />
                     <div class="text-sm md:text-base"> Journal </div>
@@ -80,8 +80,8 @@
                     href="/timeline"
                     aria-label="timeline"
                     class={buttonCls}
-                    class:bg-primaryLight={$page.url.pathname.startsWith('/timeline')}
-                    class:hover:bg-primaryLight={$page.url.pathname.startsWith('/timeline')}
+                    class:bg-secondary={$page.url.pathname.startsWith('/timeline')}
+                    class:hover:bg-secondary={$page.url.pathname.startsWith('/timeline')}
                 >
                     <ChartTimeline size="30" />
                     <div class="text-sm md:text-base"> Timeline </div>
@@ -90,8 +90,8 @@
                     href="/map"
                     aria-label="map"
                     class={buttonCls}
-                    class:bg-primaryLight={$page.url.pathname.startsWith('/map')}
-                    class:hover:bg-primaryLight={$page.url.pathname.startsWith('/map')}
+                    class:bg-secondary={$page.url.pathname.startsWith('/map')}
+                    class:hover:bg-secondary={$page.url.pathname.startsWith('/map')}
                 >
                     <MapOutline size="30" />
                     <div class="text-sm md:text-base"> Map </div>
@@ -99,8 +99,8 @@
                 <a
                     href="/stats"
                     class={buttonCls}
-                    class:bg-primaryLight={$page.url.pathname.startsWith('/stats')}
-                    class:hover:bg-primaryLight={$page.url.pathname.startsWith('/stats')}
+                    class:bg-secondary={$page.url.pathname.startsWith('/stats')}
+                    class:hover:bg-secondary={$page.url.pathname.startsWith('/stats')}
                     aria-label="insights"
                 >
                     <Counter size="30" />
@@ -109,8 +109,8 @@
                 <a
                     href="/search"
                     class={buttonCls}
-                    class:bg-primaryLight={$page.url.pathname.startsWith('/search')}
-                    class:hover:bg-primaryLight={$page.url.pathname.startsWith('/search')}
+                    class:bg-secondary={$page.url.pathname.startsWith('/search')}
+                    class:hover:bg-secondary={$page.url.pathname.startsWith('/search')}
                     aria-label="search"
                 >
                     <Search size="30" />

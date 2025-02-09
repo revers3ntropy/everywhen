@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { Button } from '$lib/components/ui/button';
     import Logo from '$lib/components/ui/Logo.svelte';
     import ArrowRightThinCircleOutline from 'svelte-material-icons/ArrowRight.svelte';
     import type { PageData } from './$types';
@@ -22,8 +23,10 @@
                 <h1 class="title-font text-left text-[55px] pb-1"> Everywhen </h1>
                 <p class="pb-4"> YOUR JOURNAL AND LIFE LOG </p>
 
-                <a href="./login" class="primary flex-center gap-2">
-                    Start Writing <ArrowRightThinCircleOutline size="20" />
+                <a href="/login" class="hover:no-underline">
+                    <Button class="w-full flex-center gap-2 rounded-full">
+                        Start Writing <ArrowRightThinCircleOutline size="20" />
+                    </Button>
                 </a>
             </div>
         </div>

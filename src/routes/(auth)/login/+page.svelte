@@ -1,5 +1,6 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
+    import { Button } from '$lib/components/ui/button';
     import Textbox from '$lib/components/ui/Textbox.svelte';
     import { NORMAL_COOKIE_TIMEOUT_DAYS, REMEMBER_ME_COOKIE_TIMEOUT_DAYS } from '$lib/constants';
     import { Auth } from '$lib/controllers/auth/auth';
@@ -77,7 +78,7 @@
 </svelte:head>
 
 <main class="flex-center">
-    <form class="content">
+    <div class="content">
         <Textbox
             autocomplete="username"
             disabled={actionPending}
@@ -96,22 +97,14 @@
             type="password"
             id="password"
         />
-        <div class="pb-4 pt-2 text-right">
+        <div class="py-4 text-right">
             <input type="checkbox" bind:this={rememberMeInput} />
             <button
                 class="flex-center oneline text-light"
                 style="display: inline-flex; gap: 4px"
-                use:tooltip={{
-                    content:
-                        `You will have to re-enter your login details after ${REMEMBER_ME_COOKIE_TIMEOUT_DAYS} ` +
-                        `days instead of ${NORMAL_COOKIE_TIMEOUT_DAYS * 24} hours.`
-                }}
                 on:click={() => (rememberMeInput.checked = !rememberMeInput.checked)}
             >
                 Remember me
-                <span class="flex-center" style="display: inline-flex">
-                    <InformationOutline size="20" />
-                </span>
             </button>
         </div>
         <div class="flex-center" style="justify-content: space-between">
@@ -121,18 +114,18 @@
             >
                 Sign Up
             </a>
-            <button
+            <Button
                 aria-label="Log In"
                 class="primary flex-center gap-1"
                 disabled={actionPending}
-                on:click|preventDefault={login}
+                on:click={login}
                 type="button"
             >
                 <ChevronRight size="30" />
                 Log In
-            </button>
+            </Button>
         </div>
-    </form>
+    </div>
 </main>
 
 <style lang="scss">

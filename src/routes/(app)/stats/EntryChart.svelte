@@ -165,8 +165,8 @@
                                     label: 'Entries'
                                 },
                                 {
-                                    backgroundColor: cssVarValue('--primary-light'),
-                                    borderColor: cssVarValue('--primary-light'),
+                                    backgroundColor: cssVarValue('--secondary'),
+                                    borderColor: cssVarValue('--secondary'),
                                     borderWidth: 1,
                                     yAxisID: 'y-right',
                                     data: chartData.values[By.Words],
