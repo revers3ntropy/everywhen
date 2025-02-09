@@ -16,7 +16,9 @@
     import EventStartFeedItem from '$lib/components/feed/EventStartFeedItem.svelte';
     import HappinessFeedItem from '$lib/components/feed/HappinessFeedItem.svelte';
     import SleepInfo from '$lib/components/feed/SleepCycleFeedItem.svelte';
+    import LocationWidgetMulti from '$lib/components/location/LocationWidgetMulti.svelte';
     import WeatherWidget from '$lib/components/weather/WeatherWidget.svelte';
+    import type { Entry } from '$lib/controllers/entry/entry';
     import { Feed } from '$lib/controllers/feed/feed';
     import type { Label } from '$lib/controllers/label/label';
     import { settingsStore } from '$lib/stores';
@@ -55,6 +57,11 @@
     $: if ((items?.length > 0 || (isToday && showForms)) && $collapsed[day.day] == 'empty') {
         $collapsed[day.day] = false;
     }
+    $: entriesWithLocation = items?.filter(
+        // filter out all entries with locations
+        (item): item is { type: 'entry' } & Entry & { latitude: number; longitude: number } =>
+            item.type === 'entry' && item.latitude !== null && item.longitude !== null
+    );
 
     onMount(() => {
         if (items?.length < 1 && (!isToday || !showForms)) {
@@ -98,6 +105,17 @@
                                 <UtcTime relative timestamp={dayTimestamp} tzOffset={0} />
                             </span>
                         {/if}
+                    {/if}
+
+                    {#if entriesWithLocation.length}
+                        <span class="pl-2">
+                            <LocationWidgetMulti
+                                {obfuscated}
+                                {locations}
+                                latitudes={entriesWithLocation.map(e => e.latitude)}
+                                longitudes={entriesWithLocation.map(e => e.longitude)}
+                            />
+                        </span>
                     {/if}
 
                     {#if $collapsed[day.day]}

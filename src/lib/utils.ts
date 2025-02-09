@@ -19,6 +19,18 @@ export function cn(...inputs: ClassValue[]): string {
     return twMerge(clsx(inputs));
 }
 
+/**
+ * Keeps one element from each equivalence class,
+ * where membership is determined by the key function.
+ */
+export function uniqueByKey<T>(a: T[], key: (i: T) => string): T[] {
+    const index: string[] = [];
+    return a.filter(item => {
+        const k = key(item);
+        return index.indexOf(k) >= 0 ? false : index.push(k);
+    });
+}
+
 type FlyAndScaleParams = {
     y?: number;
     x?: number;
