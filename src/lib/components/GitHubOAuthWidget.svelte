@@ -1,6 +1,7 @@
 <script lang="ts">
     import { PUBLIC_GITHUB_AUTH_CLIENT_ID, PUBLIC_ENV } from '$env/static/public';
     import { notify } from '$lib/components/notifications/notifications';
+    import { Button } from '$lib/components/ui/button';
     import { Auth } from '$lib/controllers/auth/auth';
     import type { GitHubUser } from '$lib/controllers/ghAPI/ghAPI.server';
     import { settingsStore } from '$lib/stores';
@@ -50,11 +51,40 @@
 </script>
 
 {#if $settingsStore.gitHubAccessToken.value}
-    <button on:click={unlink} class="danger">
-        <GitHub {size} /> Unlink GitHub ({gitHubUser?.username || '...'})
-    </button>
+    <Button variant="outline" on:click={unlink} class="danger w-full">
+        <GitHub {size} />
+    </Button>
+    <Button
+        class="h-fit flex gap-4 w-full"
+        variant="outline"
+        aria-label="unlink with Github"
+        on:click={unlink}
+    >
+        <div>
+            <GitHub {size} />
+        </div>
+        <div class="text-start">
+            <p> Unlink With GitHub </p>
+            <p class="text-light">
+                Linked to user '{gitHubUser?.username || '[loading...]'}'
+            </p>
+        </div>
+    </Button>
 {:else}
-    <button on:click={doOauth} class="icon-gradient-on-hover">
-        <GitHub {size} /> Link With GitHub
-    </button>
+    <Button
+        class="h-fit flex gap-4 w-full"
+        variant="outline"
+        aria-label="link to Github"
+        on:click={doOauth}
+    >
+        <div>
+            <GitHub {size} />
+        </div>
+        <div class="text-start">
+            <p> Link With GitHub </p>
+            <p class="text-light">
+                Sign in with GitHub and give permission to access account to Everywhen
+            </p>
+        </div>
+    </Button>
 {/if}

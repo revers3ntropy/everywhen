@@ -14,6 +14,9 @@ export {
 export namespace Subscription {
     const stripe = STRIPE_SECRET_KEY ? new Stripe(STRIPE_SECRET_KEY) : null;
 
+    // as the pricing changes very rarely, cache as aggressively as possible
+    let priceCache: Pricing[] | null = null;
+
     export async function getCurrentSubscription(auth: Auth): Promise<SubscriptionType> {
         const subs = await query<{ subType: SubscriptionType }[]>`
             SELECT subType
@@ -27,9 +30,10 @@ export namespace Subscription {
 
     export async function getPriceList(): Promise<Pricing[]> {
         if (!stripe) throw 'Stripe not configured';
+        if (priceCache) return priceCache;
         const prices = await stripe.prices.list();
 
-        return prices.data
+        const filteredprices = prices.data
             .filter(
                 (
                     a
@@ -43,6 +47,9 @@ export namespace Subscription {
                     typeof a.lookup_key === 'string'
             )
             .map(a => ({ price: a.unit_amount, name: a.nickname, lookupKey: a.lookup_key }));
+
+        priceCache = filteredprices;
+        return filteredprices;
     }
 
     async function stripeCustomerId(userId: string): Promise<string | null> {

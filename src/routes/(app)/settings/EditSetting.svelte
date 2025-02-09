@@ -3,8 +3,6 @@
     import Dot from '$lib/components/ui/Dot.svelte';
     import Textbox from '$lib/components/ui/Textbox.svelte';
     import { tooltip } from '@svelte-plugins/tooltips';
-    import CloudCheckOutline from 'svelte-material-icons/CloudCheckOutline.svelte';
-    import Sync from 'svelte-material-icons/Sync.svelte';
     import { api } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
     import { currentTzOffset, fmtDuration, fmtUtc, nowUtc } from '$lib/utils/time';
@@ -20,8 +18,6 @@
     export let unit = '';
     export let value: SettingValue;
     export let created = null as number | null;
-
-    let saving = false;
 
     let inputType: 'text' | 'number' | 'checkbox' | 'select' | 'location';
 
@@ -50,8 +46,6 @@
     }
 
     async function updateValue(newValue: SettingValue) {
-        saving = true;
-
         value = newValue;
         created = nowUtc();
 
@@ -66,7 +60,7 @@
         $settingsStore[k].value = newValue;
         $settingsStore[k].created = nowUtc();
 
-        saving = false;
+        notify.success('Settings updated');
     }
 
     async function onInput(event: Event) {
@@ -89,26 +83,19 @@
 
 <div class="wrapper" id={key}>
     <div class="left">
-        <div class="header">
-            <div>
-                <h2 class="oneline">
-                    {#if saving}
-                        <Sync size={20} class="gradient-icon" />
-                    {:else}
-                        <CloudCheckOutline size={20} />
-                    {/if}
-                    {name}
-                </h2>
-            </div>
+        <div class="flex-center w-fit">
+            <p class="oneline">
+                {name}
+            </p>
 
             {#if created}
                 <p
-                    class="last-updated hide-mobile"
+                    class="text-sm hide-mobile"
                     use:tooltip={{
                         content: fmtUtc(created, currentTzOffset(), 'DD/MM/YYYY h:mma')
                     }}
                 >
-                    <span class="oneline">
+                    <span class="oneline text-light">
                         <Dot light />
                         Last updated
                         {fmtDuration(nowUtc() - created)}
@@ -116,8 +103,8 @@
                     </span>
                 </p>
             {/if}
-            {#if value !== defaultValue}
-                <p class="restore hide-mobile">
+            {#if value !== defaultValue && inputType !== 'checkbox'}
+                <p class="text-sm hide-mobile text-light">
                     <span class="oneline">
                         <Dot light />
                         <button on:click={() => updateValue(defaultValue)}>
@@ -131,7 +118,7 @@
                 </p>
             {/if}
         </div>
-        <p class="description">
+        <p class="text-sm text-light pt-1 pb-2">
             {description}
         </p>
     </div>
@@ -181,9 +168,8 @@
     .wrapper {
         display: grid;
         grid-template-columns: 1fr 25rem;
-        padding-inline: 1rem;
 
-        @media only screen and (max-width: 1300px) {
+        @media only screen and (max-width: 1024px) {
             display: block;
         }
 
@@ -192,16 +178,6 @@
         &:target {
             border: 1px solid var(--border-light);
             border-radius: $border-radius;
-        }
-
-        .left,
-        .right {
-            min-height: 1rem;
-            padding: 0 0.5em;
-
-            @media #{$mobile} {
-                padding: 0;
-            }
         }
     }
 
@@ -287,64 +263,5 @@
         i {
             font-size: 0.8rem;
         }
-    }
-
-    .header {
-        width: fit-content;
-        display: flex;
-        flex-direction: row;
-        margin: 0.1em 0;
-
-        @media #{$mobile} {
-            flex-direction: column;
-        }
-
-        & > * {
-            padding: 0 0.2rem;
-            margin: 0.3em 0;
-            text-align: center;
-            display: grid;
-            place-items: center;
-
-            @media #{$mobile} {
-                display: block;
-                text-align: left;
-                border-right: none;
-            }
-
-            &:last-child {
-                border-right: none;
-            }
-        }
-
-        h2 {
-            font-size: 20px;
-            display: grid;
-            grid-template-columns: 40px 1fr;
-            justify-content: center;
-            align-items: center;
-            margin: 0;
-        }
-
-        .last-updated {
-            font-size: 0.85rem;
-        }
-
-        .restore {
-            font-size: 0.85rem;
-
-            button {
-                color: var(--text-color-accent);
-
-                &:hover {
-                    color: var(--primary);
-                }
-            }
-        }
-    }
-
-    .description {
-        color: var(--text-color-light);
-        margin: 10px 0;
     }
 </style>

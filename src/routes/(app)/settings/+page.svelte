@@ -1,11 +1,15 @@
 <script lang="ts">
+    import SubscriptionWidget from '$lib/components/subscription/SubscriptionWidget.svelte';
+    import { Button } from '$lib/components/ui/button';
+    import Logout from 'svelte-material-icons/Logout.svelte';
+    import Skull from 'svelte-material-icons/Skull.svelte';
+    import Cog from 'svelte-material-icons/Cog.svelte';
+    import PlusThick from 'svelte-material-icons/PlusThick.svelte';
+    import LockOutline from 'svelte-material-icons/LockOutline.svelte';
+    import Export from 'svelte-material-icons/Export.svelte';
+    import Account from 'svelte-material-icons/Account.svelte';
     import GitHubOauthWidget from '$lib/components/GitHubOAuthWidget.svelte';
     import { omit } from '$lib/utils';
-    import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
-    import Cog from 'svelte-material-icons/Cog.svelte';
-    import Logout from 'svelte-material-icons/Logout.svelte';
-    import LockOutline from 'svelte-material-icons/LockOutline.svelte';
-    import Skull from 'svelte-material-icons/Skull.svelte';
     import ChangePasswordDialog from '$lib/components/dialogs/ChangePasswordDialog.svelte';
     import { showPopup } from '$lib/utils/popups';
     import {
@@ -14,9 +18,11 @@
         type SettingValue,
         Settings as SettingsController
     } from '$lib/controllers/settings/settings';
-    import Settings from './Settings.svelte';
+    import EditSetting from './EditSetting.svelte';
     import { settingsStore } from '$lib/stores';
     import { Auth } from '$lib/controllers/auth/auth';
+
+    export let data;
 
     function changePassword() {
         showPopup(ChangePasswordDialog, {});
@@ -40,72 +46,115 @@
     <title>Settings</title>
 </svelte:head>
 
-<main class="md:p-4 md:pl-4">
-    <section>
-        <h1>
-            <AccountCircleOutline size="35" />
-            <span> My Account </span>
-        </h1>
-        <div class="buttons">
-            <button aria-label="Change password" on:click={changePassword}>
-                <LockOutline size="30" />
-                Change Password
-            </button>
-            <button aria-label="Log Out" class="danger" on:click={logOut}>
-                <Logout size="30" />
-                Log Out
-            </button>
-            <a aria-label="Delete Account" class="danger" href="/settings/delete">
-                <Skull size="30" />
-                Delete Account
-            </a>
-            <button aria-label="Export data" on:click={exportData}>
-                <Logout size="30" />
-                Export Data
-            </button>
-        </div>
-        <div class="buttons">
-            <GitHubOauthWidget />
-        </div>
-    </section>
-    <section>
-        <h1>
-            <Cog size="35" />
-            <span>General Settings</span>
-        </h1>
+<main class="md:p-4 md:pl-4 flex-center">
+    <div class="w-full md:max-w-4xl">
+        <section>
+            <div class="flex items-center pb-4">
+                <span class="rounded-full w-[35px] h-[35px] bg-accent flex-center">
+                    <Account size="25" />
+                </span>
+                <p class="pl-2 text-lg"> My Account </p>
+            </div>
+            <div class="flex flex-col gap-4">
+                <Button
+                    class="h-fit flex gap-4"
+                    variant="outline"
+                    aria-label="Log out"
+                    on:click={logOut}
+                >
+                    <div>
+                        <Logout size="20" />
+                    </div>
+                    <div class="text-start">
+                        <p> Log Out </p>
+                    </div>
+                </Button>
+                <Button
+                    class="h-fit flex gap-4"
+                    variant="outline"
+                    aria-label="export data as HTML"
+                    on:click={exportData}
+                >
+                    <div>
+                        <Export size="20" />
+                    </div>
+                    <div class="text-start">
+                        <p> Export Data </p>
+                        <p class="text-light"> Generate and open HTML file of entries </p>
+                    </div>
+                </Button>
+                <Button
+                    class="h-fit flex gap-4"
+                    variant="outline"
+                    aria-label="Change password"
+                    on:click={changePassword}
+                >
+                    <div>
+                        <LockOutline size="20" />
+                    </div>
+                    <div class="text-start">
+                        <p> Change Password </p>
+                        <p class="text-light">
+                            Pick a new password and re-encrypt all data with the new password
+                        </p>
+                    </div>
+                </Button>
+                <a aria-label="Delete Account" class="danger" href="/settings/delete">
+                    <Button class="h-fit flex gap-4 w-full" variant="outline">
+                        <div>
+                            <Skull size="20" />
+                        </div>
+                        <div class="text-start">
+                            <p> Delete Account </p>
+                            <p class="text-light">
+                                Delete account, encryption keys and all data on account
+                            </p>
+                        </div>
+                    </Button>
+                </a>
+            </div>
+            <div class="pt-8 border-t border-border mt-8">
+                <GitHubOauthWidget size={20} />
+            </div>
+        </section>
+        <section>
+            <div class="flex items-center pb-4">
+                <span class="rounded-full w-[35px] h-[35px] bg-accent flex-center">
+                    <PlusThick size="25" />
+                </span>
+                <p class="pl-2 text-lg">Subscription</p>
+            </div>
 
-        <div class="settings">
-            {#each settingsConfigEntries as [key, config] (key)}
-                {#if config.showInSettings}
-                    <Settings
-                        {...omit(config, 'showInSettings')}
-                        {...omit($settingsStore[key], 'id')}
-                    />
-                    <hr />
-                {/if}
-            {/each}
-        </div>
-    </section>
+            <SubscriptionWidget
+                activeSubscriptionType={data.activeSubscriptionType}
+                prices={data.prices}
+            />
+        </section>
+        <section>
+            <div class="flex items-center pb-4">
+                <span class="rounded-full w-[35px] h-[35px] bg-accent flex-center">
+                    <Cog size="25" />
+                </span>
+                <p class="pl-2 text-lg">Journal Settings</p>
+            </div>
+
+            <div class="settings">
+                {#each settingsConfigEntries as [key, config] (key)}
+                    {#if config.showInSettings}
+                        <EditSetting
+                            {...omit(config, 'showInSettings')}
+                            {...omit($settingsStore[key], 'id')}
+                        />
+                        <hr />
+                    {/if}
+                {/each}
+            </div>
+        </section>
+    </div>
 </main>
 
 <style lang="scss">
     @import '$lib/styles/layout';
-
-    h1 {
-        @extend .flex-center;
-        justify-content: flex-start;
-        padding: 1rem 0 2rem 1rem;
-        font-size: 24px;
-
-        span {
-            margin-left: 0.2em;
-        }
-
-        @media #{$mobile} {
-            font-size: 30px;
-            padding: 1rem 0 1rem 1rem;
-        }
-    }
 
     hr {
         &:last-child {
@@ -119,31 +168,10 @@
         .buttons {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
+            grid-gap: 0.75rem;
 
             @media #{$mobile} {
                 grid-template-columns: 1fr;
-            }
-
-            // global for the backup buttons,
-            // which are in a child component but should have consistent style
-            // with the other buttons
-            a,
-            :global(button) {
-                border-radius: $border-radius;
-                padding: 0.8rem;
-                margin: 0.5rem;
-                display: grid;
-                align-items: center;
-                justify-content: flex-start;
-                text-align: left;
-                grid-template-columns: 35px 1fr;
-                color: var(--text-color-accent);
-
-                &:hover {
-                    text-decoration: none;
-                    color: var(--primary);
-                    background: var(--v-light-accent);
-                }
             }
         }
     }

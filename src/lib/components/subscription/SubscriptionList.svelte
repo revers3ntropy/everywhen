@@ -5,13 +5,8 @@
     import { api } from '$lib/utils/apiRequest';
 
     export let prices: Pricing[];
-    const priceFormatter = new Intl.NumberFormat('en-GB', {
-        style: 'currency',
-        currency: 'GBP'
-    });
 
     $: price = prices[0];
-    $: priceAsPounds = priceFormatter.format(price.price / 100);
 
     async function subscribeWithStripe() {
         const response = notify.onErr(
@@ -21,7 +16,7 @@
     }
 </script>
 
-<h2 class="py-1">Upgrade to Everywhen Plus</h2>
-<h5 class="py-4">{priceAsPounds} / month</h5>
+<p class="text-lg">Upgrade to Everywhen Plus</p>
+<p class="py-2 text-light">{(price.price / 100).toFixed(2)} GBP / month</p>
 
-<Button type="submit" on:click={subscribeWithStripe}>Buy now</Button>
+<Button type="submit" on:click={subscribeWithStripe}>Upgrade now</Button>

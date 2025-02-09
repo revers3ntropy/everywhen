@@ -1,13 +1,11 @@
 <script lang="ts">
     import { notify } from '$lib/components/notifications/notifications';
-    import { tooltip } from '@svelte-plugins/tooltips';
     import { onMount } from 'svelte';
     import MapMarkerOffOutline from 'svelte-material-icons/MapMarkerOffOutline.svelte';
     import MapMarkerOutline from 'svelte-material-icons/MapMarkerOutline.svelte';
     import { enabledLocation } from '$lib/stores';
-    import type { Pixels, TooltipPosition } from '../../../types';
+    import type { Pixels } from '../../../types';
 
-    export let tooltipPosition: TooltipPosition = 'bottom';
     export let size = 25 as Pixels;
 
     async function watchLocationPermissions() {
