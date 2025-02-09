@@ -407,7 +407,7 @@ async function getAndCheckVersions(): Promise<{ localVersion: Version; remoteVer
 }
 
 async function checkAndTest() {
-    await $`bin/precommit --reporter=line`;
+    await $`scripts/precommit --reporter=line`;
 }
 
 async function build() {
@@ -424,7 +424,7 @@ async function build() {
     $.env = { ...$.env, ...remoteEnv };
 
     try {
-        await $`bin/build`;
+        await $`scripts/build`;
     } catch (e) {
         await cleanup();
         throw e;

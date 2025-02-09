@@ -2,12 +2,10 @@
 
 rm -r ./.svelte-kit
 rm -r ./node_modules
-rm -r ./bin/node_modules
 rm -r ./playwright-report
 rm -r ./test-results
 rm -r ./build
 rm ./package-lock.json
-rm ./bin/package-lock.json
 rm ./general.log
 rm ./testBackup.json
 

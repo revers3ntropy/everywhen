@@ -1,0 +1,4 @@
+#!/bin/bash
+
+scripts/test-spec || exit 1
+scripts/test-e2e || exit 1

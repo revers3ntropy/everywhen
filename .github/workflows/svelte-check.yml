@@ -19,4 +19,4 @@ jobs:
         run: bun i
 
       - name: Run svelte-check
-        run: bin/check --output machine
+        run: scripts/check --output machine

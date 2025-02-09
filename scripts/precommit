@@ -1,0 +1,4 @@
+#!/bin/bash
+
+scripts/check || exit 1
+scripts/test "$@" || exit 1

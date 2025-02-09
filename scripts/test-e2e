@@ -2,6 +2,6 @@
 
 bun x svelte-kit sync || exit 1
 
-bin/build || exit 1
+scripts/build || exit 1
 
 node --no-experimental-strip-types node_modules/playwright/cli.js test "$@" || exit 1

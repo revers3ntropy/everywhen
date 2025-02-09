@@ -4,7 +4,20 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "svelte-check": "svelte-check"
+    "build": "scripts/build",
+    "check": "scripts/check",
+    "deploy-staging": "scripts/deploy staging",
+    "deploy-prod": "scripts/deploy prod",
+    "dev": "scripts/dev",
+    "fmt": "scripts/fmt",
+    "make-tests": "scripts/make-tests",
+    "populate-local-acc": "scripts/populate-account",
+    "precommit": "scripts/precommit",
+    "reset-dev-db": "scripts/reset_db_dev",
+    "setup": "scripts/setup",
+    "test": "scripts/test",
+    "test-e2e": "scripts/test-e2e",
+    "test-vitest": "scripts/test-spec"
   },
   "devDependencies": {
     "@internationalized/date": "3.6.0",

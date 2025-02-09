@@ -36,11 +36,11 @@ jobs:
         run: bun x playwright install-deps
 
       - name: Run Playwright tests
-        run: bin/test-e2e
+        run: scripts/test-e2e
 
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: playwright-report
           path: playwright-report/
-          retention-days: 30
+          retention-days: 2
