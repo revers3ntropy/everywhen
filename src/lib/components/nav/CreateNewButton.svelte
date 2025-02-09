@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { Button } from '$lib/components/ui/button';
     import { Entry } from '$lib/controllers/entry/entry';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
@@ -113,13 +114,10 @@
 </svg>
 
 <Dropdown>
-    <span
-        class="create-button overflow-hidden relative flex-center w-full px-2 md:pl-2.5 md:pr-4 py-2 hover:bg-lightAccent bg-lightAccent rounded-full gap-2"
-        slot="button"
-    >
+    <Button class="rounded-full flex-center gap-2 py-5" slot="button" variant="outline">
         <Plus size="25" />
-        <span class="hide-mobile"> New <ChevronDown /> </span>
-    </span>
+        <span class="hide-mobile block"> New </span>
+    </Button>
 
     <div class="record-something-buttons">
         <button class="with-icon oneline record-entry" on:click={makeEntry}>

@@ -2,6 +2,7 @@
     import { page } from '$app/stores';
     import AccountDropdown from '$lib/components/nav/AccountDropdown.svelte';
     import CreateNewButton from '$lib/components/nav/CreateNewButton.svelte';
+    import { Button } from '$lib/components/ui/button';
     import type { SubscriptionType } from '$lib/controllers/subscription/subscription';
     import { obfuscated, passcodeLastEntered, settingsStore } from '$lib/stores';
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
@@ -33,30 +34,37 @@
             <div class="md:pb-4 pl-1 w-full">
                 <AccountDropdown {activeSubscriptionType} />
             </div>
-            <div class="md:pb-4 pl-2 flex items-center">
+            <div class="pb-2 pl-2 flex items-center">
                 <span class="pr-3">
                     <CreateNewButton />
                 </span>
-
-                <button
-                    aria-label={$obfuscated ? 'Show all' : 'Hide all'}
-                    on:click={() => obfuscated.set(!$obfuscated)}
-                    class="inline-flex justify-center items-center gap-2 rounded-full p-2 bg-lightAccent hover:bg-vLightAccent"
-                >
-                    {#if $obfuscated}
-                        <Eye size="25" />
-                    {:else}
-                        <EyeOff size="25" />
-                    {/if}
-                </button>
+                <span>
+                    <Button
+                        aria-label={$obfuscated ? 'Show all' : 'Hide all'}
+                        on:click={() => obfuscated.set(!$obfuscated)}
+                        class="flex-center rounded-full px-2 py-5 aspect-square"
+                        variant="outline"
+                    >
+                        {#if $obfuscated}
+                            <Eye size="25" />
+                        {:else}
+                            <EyeOff size="25" />
+                        {/if}
+                    </Button>
+                </span>
             </div>
 
-            <div class="pl-3 flex md:flex-col gap-3 items-center md:items-start justify-center">
+            <div class="pl-2 flex md:flex-col gap-3 items-center md:items-start justify-center">
                 {#if $settingsStore.passcode.value}
-                    <button on:click={lock} class="danger flex-center gap-2" aria-label="Lock">
-                        <Lock size="25" />
+                    <Button
+                        variant="outline"
+                        on:click={lock}
+                        class="danger flex-center gap-2 rounded-full py-5 w-full"
+                        aria-label="Lock"
+                    >
+                        <Lock size="22" />
                         <span class="hide-mobile"> Lock </span>
-                    </button>
+                    </Button>
                 {/if}
             </div>
         </div>
