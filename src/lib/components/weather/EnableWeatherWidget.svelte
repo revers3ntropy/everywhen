@@ -1,5 +1,6 @@
 <script lang="ts">
     import { notify } from '$lib/components/notifications/notifications';
+    import { Button } from '$lib/components/ui/button';
     import { settingsStore } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { getLocation, isNullLocation } from '$lib/utils/geolocation';
@@ -11,9 +12,8 @@
         'Your current location will be used to provide weather information. Continue?';
 
     async function enable() {
-        if (!confirm(confirmMessage)) {
-            return;
-        }
+        if (!confirm(confirmMessage)) return;
+
         if (!navigator.geolocation) {
             notify.error('Geolocation is not supported by your browser');
             return;
@@ -36,10 +36,13 @@
     }
 </script>
 
-<button on:click={enable} class="flex-center relative">
+<Button
+    variant="link"
+    on:click={enable}
+    class="flex-center relative rounded-full p-2 hover:bg-accent"
+>
     <WeatherPartlyCloudy size={24} />
-
-    <span class="absolute text-light top-0 left-0" style="transform: translate(17px, 10px)">
+    <span class="absolute text-light top-0 left-0" style="transform: translate(26px, 0px)">
         <Plus size={16} />
     </span>
-</button>
+</Button>

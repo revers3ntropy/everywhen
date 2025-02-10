@@ -9,7 +9,7 @@
 <script lang="ts">
     import WeatherDialog from '$lib/components/dialogs/WeatherDialog.svelte';
     import EntryForm from '$lib/components/entryForm/EntryForm.svelte';
-    import EnableWeatherWidget from '$lib/components/feed/EnableWeatherWidget.svelte';
+    import EnableWeatherWidget from '$lib/components/weather/EnableWeatherWidget.svelte';
     import EntryEditFeedItem from '$lib/components/feed/EntryEditFeedItem.svelte';
     import EntryFeedItem from '$lib/components/feed/EntryFeedItem.svelte';
     import EventEndFeedItem from '$lib/components/feed/EventEndFeedItem.svelte';
@@ -147,11 +147,6 @@
                     >
                         <WeatherWidget weather={day.weather} />
                     </button>
-                    <!--
-                        only show widgets if they have made some entries,
-                        otherwise reduce clutter as much as possible
-                        if they have just created the account
-                    -->
                 {:else if $settingsStore.homeLocation.value[0] === null && isToday}
                     <EnableWeatherWidget />
                 {/if}
@@ -226,11 +221,3 @@
         </div>
     {/if}
 </div>
-
-<style lang="scss">
-    @import '$lib/styles/layout';
-
-    .entry-group {
-        transition: height #{$transition};
-    }
-</style>

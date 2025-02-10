@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { Button } from '$lib/components/ui/button';
     import { settingsStore } from '$lib/stores';
     import EmoticonOutline from 'svelte-material-icons/EmoticonOutline.svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
@@ -59,13 +60,13 @@
     <HappinessValueIcon value={submitted} size={24} />
 {:else}
     <Dropdown fromRight>
-        <div slot="button" class="bg-lightAccent rounded-full w-fit hover:bg-transparent">
+        <Button variant="link" slot="button" class="rounded-full p-2 hover:bg-accent">
             <EmoticonOutline size={24} />
 
-            <div class="absolute text-light top-0 left-0" style="transform: translate(17px, 10px)">
+            <div class="absolute text-light top-0 left-0" style="transform: translate(26px, 0px)">
                 <Plus size={16} />
             </div>
-        </div>
+        </Button>
         <div class="flex-center gap-2 p-4">
             {#if $settingsStore.happinessInputStyle.value === 'likert'}
                 <button on:click={() => submit(0)}>
