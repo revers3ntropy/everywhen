@@ -1,5 +1,6 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
+    import { Button } from '$lib/components/ui/button';
     import Textbox from '$lib/components/ui/Textbox.svelte';
     import { Auth } from '$lib/controllers/auth/auth';
     import { encryptionKey, username as usernameStore } from '$lib/stores';
@@ -66,7 +67,7 @@
 </svelte:head>
 
 <main class="flex-center">
-    <form class="content">
+    <div class="max-w-[90vw]">
         <Textbox
             label="Username"
             autocomplete="username"
@@ -85,18 +86,18 @@
 
         <div class="flex-center pt-4" style="justify-content: space-between">
             <a href="/login?redirect={data.redirect}">Log In</a>
-            <button
+            <Button
                 aria-label="Create Account"
                 disabled={actionPending}
-                on:click|preventDefault={create}
+                on:click={create}
                 type="button"
                 class="primary flex-center gap-1"
             >
-                Create Account
                 <ArrowRightThinCircleOutline size="25" />
-            </button>
+                Create Account
+            </Button>
         </div>
-    </form>
+    </div>
 </main>
 
 <style lang="scss">
@@ -106,14 +107,6 @@
     main {
         @extend .flex-center;
         height: 100vh;
-    }
-
-    .content {
-        max-width: 90vw;
-
-        button {
-            margin: 0;
-        }
     }
 
     input {
