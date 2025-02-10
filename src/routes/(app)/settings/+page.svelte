@@ -63,7 +63,7 @@
                 />
             </div>
             <div>
-                <UsageCharts activeSubscriptionType={data.activeSubscriptionType} />
+                <UsageCharts usageData={data.usageData} />
             </div>
         </section>
         <section>

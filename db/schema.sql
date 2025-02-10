@@ -199,6 +199,7 @@ CREATE TABLE datasets
     created  int          NOT NULL,
     name     varchar(256) NOT NULL,
     presetId char(32)     DEFAULT NULL,
+    rowCount int          NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `idx_datasets_userId` (`userId`)
 )

@@ -1,4 +1,4 @@
-import { LIMITS } from '$lib/constants';
+import { UsageLimits } from '$lib/controllers/usageLimits/usageLimits';
 import { query } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
@@ -16,7 +16,7 @@ import { Asset } from '$lib/controllers/asset/asset.server';
 import { Dataset } from '../dataset/dataset.server';
 import { Location } from '../location/location.server';
 
-export namespace UserServer {
+namespace UserServer {
     type User = _User;
 
     const SALT_LENGTH = 10;
@@ -34,17 +34,17 @@ export namespace UserServer {
         username: string,
         password: string
     ): Promise<string | true> {
-        if (username.length < LIMITS.user.usernameLenMin)
-            return `Username must be at least ${LIMITS.user.usernameLenMin} characters`;
+        if (username.length < UsageLimits.LIMITS.user.usernameLenMin)
+            return `Username must be at least ${UsageLimits.LIMITS.user.usernameLenMin} characters`;
 
-        if (password.length < LIMITS.user.passwordLenMin)
-            return `Password must be at least ${LIMITS.user.usernameLenMin} characters`;
+        if (password.length < UsageLimits.LIMITS.user.passwordLenMin)
+            return `Password must be at least ${UsageLimits.LIMITS.user.usernameLenMin} characters`;
 
-        if (username.length > LIMITS.user.usernameLenMax)
-            return `Username must be at most ${LIMITS.user.usernameLenMax} characters`;
+        if (username.length > UsageLimits.LIMITS.user.usernameLenMax)
+            return `Username must be at most ${UsageLimits.LIMITS.user.usernameLenMax} characters`;
 
-        if (password.length > LIMITS.user.passwordLenMax)
-            return `Password must be at most ${LIMITS.user.usernameLenMax} characters`;
+        if (password.length > UsageLimits.LIMITS.user.passwordLenMax)
+            return `Password must be at most ${UsageLimits.LIMITS.user.usernameLenMax} characters`;
 
         if (await userExistsWithUsername(username)) return 'Username already in use';
 

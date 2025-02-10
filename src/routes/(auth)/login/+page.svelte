@@ -2,14 +2,11 @@
     import { goto } from '$app/navigation';
     import { Button } from '$lib/components/ui/button';
     import Textbox from '$lib/components/ui/Textbox.svelte';
-    import { NORMAL_COOKIE_TIMEOUT_DAYS, REMEMBER_ME_COOKIE_TIMEOUT_DAYS } from '$lib/constants';
     import { Auth } from '$lib/controllers/auth/auth';
     import ChevronRight from 'svelte-material-icons/ChevronRight.svelte';
     import { api } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
-    import InformationOutline from 'svelte-material-icons/InformationOutline.svelte';
     import type { PageData } from './$types';
-    import { tooltip } from '@svelte-plugins/tooltips';
     import { encryptionKey, username as usernameStore } from '$lib/stores';
 
     export let data: PageData;

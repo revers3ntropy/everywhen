@@ -1,30 +1,27 @@
 <script lang="ts">
     import { Progress } from '$lib/components/ui/progress/index.js';
-    import type { SubscriptionType } from '$lib/controllers/subscription/subscription';
+    import { capitalise } from '$lib/utils/text';
 
-    export let activeSubscriptionType: SubscriptionType;
+    export let usageData: Record<string, [number, number]>;
 </script>
 
 <div>
-    <p class="text-lg">Usage</p>
+    <p class="text-xl">Usage</p>
+    <p class="text-light">Upgrade your plan to increase limits</p>
     <div>
-        <p class="py-2">
-            Entries: <span class="font-bold">30</span> / 100
-            <Progress value={30} max={100} />
-        </p>
-        <p class="py-2">
-            Images: <span class="font-bold">2</span> / 10
-            <Progress value={2} max={10} />
-        </p>
-        <p class="py-2">
-            Labels: <span class="font-bold">5</span> / 10
-            <Progress value={5} max={10} />
-        </p>
-        <p class="py-2">
-            Events: <span class="text-accentDanger">
-                <span class="font-bold text-accentDanger">20</span> / 20
-            </span>
-            <Progress value={20} max={20} />
-        </p>
+        {#each Object.entries(usageData) as [key, [value, max]]}
+            <div class="py-2">
+                <div class="flex items-center justify-between">
+                    <p class="text-lg">
+                        {capitalise(key)}
+                    </p>
+                    <div class:text-warning={value >= max}>
+                        <span class="font-bold">{value}</span>
+                        / {max}
+                    </div>
+                </div>
+                <Progress {value} {max} />
+            </div>
+        {/each}
     </div>
 </div>

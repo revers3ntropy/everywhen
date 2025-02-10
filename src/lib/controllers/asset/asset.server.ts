@@ -1,4 +1,5 @@
-import { LIMITS } from '$lib/constants';
+import { Subscription } from '$lib/controllers/subscription/subscription.server';
+import { UsageLimits } from '$lib/controllers/usageLimits/usageLimits.server';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import { FileLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
@@ -21,21 +22,20 @@ namespace AssetServer {
         contentsPlainText: string,
         fileNamePlainText: string
     ): Promise<string | true> {
-        if (contentsPlainText.length > LIMITS.asset.contentLenMax)
-            return `Too big (max ${fmtBytes(LIMITS.asset.contentLenMax)})`;
+        if (contentsPlainText.length > UsageLimits.LIMITS.asset.contentLenMax)
+            return `File is too big (max ${fmtBytes(UsageLimits.LIMITS.asset.contentLenMax)})`;
 
-        if (fileNamePlainText.length < LIMITS.asset.nameLenMin) return `File name too short`;
+        if (fileNamePlainText.length < UsageLimits.LIMITS.asset.nameLenMin)
+            return `File name too short`;
 
-        if (fileNamePlainText.length > LIMITS.asset.nameLenMax)
-            return `File name too long (max ${LIMITS.asset.nameLenMax})`;
+        if (fileNamePlainText.length > UsageLimits.LIMITS.asset.nameLenMax)
+            return `File name too long (max ${UsageLimits.LIMITS.asset.nameLenMax})`;
 
-        const [{ count }] = await query<{ count: number }[]>`
-            SELECT COUNT(*) as count
-            FROM assets
-            WHERE userId = ${auth.id}
-        `;
-        if (count >= LIMITS.asset.maxCount)
-            return `Maximum number of assets (${LIMITS.asset.maxCount}) reached`;
+        const [count, max] = await UsageLimits.assetsUsage(
+            auth,
+            await Subscription.getCurrentSubscription(auth)
+        );
+        if (count >= max) return `Maximum number of assets (${max}) reached`;
 
         return true;
     }

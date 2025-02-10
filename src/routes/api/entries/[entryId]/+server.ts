@@ -24,7 +24,7 @@ export const DELETE = (async ({ request, params, cookies }) => {
         restore: z.boolean().default(false)
     });
 
-    (await Entry.del(auth, params.entryId, body.restore)).unwrap(e => error(400, e));
+    (await Entry.deleteOrRestore(auth, params.entryId, body.restore)).unwrap(e => error(400, e));
 
     return apiResponse(auth, { id: params.entryId });
 }) satisfies RequestHandler;

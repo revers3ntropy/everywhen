@@ -1,4 +1,5 @@
-import { LIMITS } from '$lib/constants';
+import { Subscription } from '$lib/controllers/subscription/subscription.server';
+import { UsageLimits } from '$lib/controllers/usageLimits/usageLimits.server';
 import { query } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import { FileLogger } from '$lib/utils/log.server';
@@ -123,22 +124,19 @@ namespace EventServer {
         start: number,
         end: number
     ): Promise<string | true> {
-        const numEvents = await query<{ count: number }[]>`
-            SELECT COUNT(*) as count
-            FROM events
-            WHERE userId = ${auth.id}
-        `;
+        if (name.length < UsageLimits.LIMITS.event.nameLenMin) return 'Event name too short';
 
-        if (numEvents[0].count > LIMITS.event.maxCount)
-            return `Maximum number of events (${LIMITS.event.maxCount}) reached`;
-
-        if (name.length < LIMITS.event.nameLenMin) return 'Event name too short';
-
-        if (name.length > LIMITS.event.nameLenMax) return 'Event name too long';
+        if (name.length > UsageLimits.LIMITS.event.nameLenMax) return 'Event name too long';
 
         if (start > end) return 'Start time cannot be after end time';
         if (eventEndTooFarInFuture(end)) return 'Too far in future';
         if (eventStartTooFarInPast(start)) return 'Too far in past';
+
+        const [count, max] = await UsageLimits.eventUsage(
+            auth,
+            await Subscription.getCurrentSubscription(auth)
+        );
+        if (count >= max) return `Maximum number of events (${max}) reached`;
 
         return true;
     }
@@ -321,13 +319,6 @@ namespace EventServer {
               AND userId = ${auth.id}
         `;
         return Result.ok(null);
-    }
-
-    export async function withLabel(auth: Auth, labelId: string): Promise<Result<Event[]>> {
-        const fromIdRes = await Label.fromId(auth, labelId);
-        if (!fromIdRes.ok) return fromIdRes.cast();
-
-        return (await all(auth)).map(events => events.filter(evt => evt.label?.id === labelId));
     }
 
     export async function reassignAllLabels(

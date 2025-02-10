@@ -1,4 +1,5 @@
-import { LIMITS } from '$lib/constants';
+import { Subscription } from '$lib/controllers/subscription/subscription.server';
+import { UsageLimits } from '$lib/controllers/usageLimits/usageLimits.server';
 import { query } from '$lib/db/mysql.server';
 import type { ResultSetHeader } from 'mysql2';
 import { decrypt, encrypt } from '$lib/utils/encryption';
@@ -13,21 +14,17 @@ namespace LocationServer {
 
     async function canCreateWithName(auth: Auth, name: string): Promise<true | string> {
         if (!name) return 'Location name too short';
-        if (name.length > LIMITS.location.nameLenMax)
-            return `Location name too long (> ${LIMITS.location.nameLenMax} characters)`;
+        if (name.length > UsageLimits.LIMITS.location.nameLenMax)
+            return `Location name too long (> ${UsageLimits.LIMITS.location.nameLenMax} characters)`;
 
         const encryptedName = encrypt(name, auth.key);
         if (encryptedName.length > 256) return 'Location name too long';
 
-        const numLocations = await query<{ count: number }[]>`
-            SELECT COUNT(*) as count
-            FROM locations
-            WHERE userId = ${auth.id}
-        `;
-
-        if (numLocations[0].count >= LIMITS.location.maxCount) {
-            return 'Maximum number of locations reached';
-        }
+        const [count, max] = await UsageLimits.locationUsage(
+            auth,
+            await Subscription.getCurrentSubscription(auth)
+        );
+        if (count >= max) return 'Maximum number of locations reached';
 
         return true;
     }
@@ -203,8 +200,10 @@ namespace LocationServer {
 
         const encryptedName = encrypt(newName, auth.key);
 
-        if (newName.length > LIMITS.location.nameLenMax) return Result.err('Name too long');
-        if (newName.length < LIMITS.location.nameLenMin) return Result.err('Name too short');
+        if (newName.length > UsageLimits.LIMITS.location.nameLenMax)
+            return Result.err('Name too long');
+        if (newName.length < UsageLimits.LIMITS.location.nameLenMin)
+            return Result.err('Name too short');
 
         await query`
             UPDATE locations

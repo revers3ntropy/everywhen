@@ -1,9 +1,10 @@
-import { LIMITS } from '$lib/constants';
 import type { DatasetPreset, PresetId } from '$lib/controllers/dataset/presets';
 import { datasetPresets } from '$lib/controllers/dataset/presets';
 import { thirdPartyDatasetProviders } from '$lib/controllers/dataset/thirdPartyDatasets.server';
 import type { ThirdPartyDatasetProvider } from '$lib/controllers/dataset/thirdPartyDatasets.server';
 import type { SettingsConfig } from '$lib/controllers/settings/settings';
+import { Subscription } from '$lib/controllers/subscription/subscription.server';
+import { UsageLimits } from '$lib/controllers/usageLimits/usageLimits.server';
 import { query } from '$lib/db/mysql.server';
 import { range } from '$lib/utils';
 import { FileLogger } from '$lib/utils/log.server';
@@ -90,37 +91,50 @@ namespace DatasetServer {
         presetId: PresetId
     ): Promise<Result<Dataset | null>> {
         return await query<
-            { id: string; name: string; created: TimestampSecs; presetId: PresetId | null }[]
+            {
+                id: string;
+                name: string;
+                created: TimestampSecs;
+                presetId: PresetId | null;
+                rowCount: number;
+            }[]
         >`
-            SELECT id, name, created, presetId
+            SELECT id, name, created, presetId, rowCount
             FROM datasets
             WHERE userId = ${auth.id}
                 AND presetId = ${presetId}
         `.then(rows => {
             if (rows.length === 0) return Result.ok(null);
-            const [{ id, name, created, presetId }] = rows;
+            const [{ id, name, created, presetId, rowCount }] = rows;
             const nameDecrypted = decrypt(name, auth.key);
             if (!nameDecrypted.ok) return nameDecrypted.cast();
             return Result.ok({
                 id,
                 name: nameDecrypted.val,
                 created,
-                preset: presetId ? datasetPresets[presetId] : null
+                preset: presetId ? datasetPresets[presetId] : null,
+                rowCount
             });
         });
     }
 
     export async function getDataset(auth: Auth, datasetId: string): Promise<Result<Dataset>> {
         const rows = await query<
-            { id: string; name: string; created: TimestampSecs; presetId: PresetId | null }[]
+            {
+                id: string;
+                name: string;
+                created: TimestampSecs;
+                presetId: PresetId | null;
+                rowCount: number;
+            }[]
         >`
-            SELECT id, name, created, presetId
+            SELECT id, name, created, presetId, rowCount
             FROM datasets
             WHERE userId = ${auth.id}
                 AND id = ${datasetId}
         `;
         if (rows.length === 0) return Result.err('Dataset not found');
-        const [{ id, name, created, presetId }] = rows;
+        const [{ id, name, created, presetId, rowCount }] = rows;
         const nameDecrypted = decrypt(name, auth.key);
         if (!nameDecrypted.ok) return nameDecrypted.cast();
 
@@ -128,7 +142,8 @@ namespace DatasetServer {
             id,
             name: nameDecrypted.val,
             created,
-            preset: presetId ? datasetPresets[presetId] : null
+            preset: presetId ? datasetPresets[presetId] : null,
+            rowCount
         });
     }
 
@@ -326,14 +341,11 @@ namespace DatasetServer {
             return 'Name must be at most 100 characters long';
         }
 
-        const numDatasets = await query<{ count: number }[]>`
-            SELECT COUNT(*) AS count
-            FROM datasets
-            WHERE datasets.userId = ${auth.id}
-        `;
-        if (numDatasets[0].count >= LIMITS.dataset.maxCount) {
-            return `Maximum number of datasets (${LIMITS.dataset.maxCount}) reached`;
-        }
+        const [count, max] = await UsageLimits.datasetUsage(
+            auth,
+            await Subscription.getCurrentSubscription(auth)
+        );
+        if (count >= max) return `Maximum number of datasets (${max}) reached`;
 
         const encryptedName = encrypt(namePlaintext, auth.key);
 
@@ -380,15 +392,16 @@ namespace DatasetServer {
         if (canCreate !== true) return Result.err(canCreate);
 
         await query`
-            INSERT INTO datasets (id, userId, name, created, presetId)
-            VALUES (${id}, ${auth.id}, ${encrypt(name, auth.key)}, ${created}, ${presetId})
+            INSERT INTO datasets (id, userId, name, created, presetId, rowCount)
+            VALUES (${id}, ${auth.id}, ${encrypt(name, auth.key)}, ${created}, ${presetId}, 0)
         `;
 
         return Result.ok({
             id,
             name,
             created,
-            preset: presetId ? datasetPresets[presetId as PresetId] : null
+            preset: presetId ? datasetPresets[presetId as PresetId] : null,
+            rowCount: 0
         });
     }
 
@@ -446,6 +459,33 @@ namespace DatasetServer {
         return Result.ok(null);
     }
 
+    async function validateRowUsage(
+        auth: Auth,
+        datasetId: string,
+        rowAppendCount: number
+    ): Promise<Result<string>> {
+        const currentActiveSubscription = await Subscription.getCurrentSubscription(auth);
+        const datasetUsageLimits = UsageLimits.usageLimits(currentActiveSubscription).dataset;
+        if (rowAppendCount > datasetUsageLimits.maxAppendCount)
+            return Result.err(
+                `Appending more than the maximum allowed number of rows (${datasetUsageLimits.maxAppendCount}) at once`
+            );
+
+        const [{ count: currentRowCount }] = await query<{ count: number }[]>`
+            SELECT COUNT(*) AS count
+            FROM datasetRows
+            WHERE datasetId = ${datasetId}
+                AND userId = ${auth.id}
+        `;
+        const newRowCount = currentRowCount + rowAppendCount;
+        if (newRowCount > datasetUsageLimits.maxRowCount)
+            return Result.err(
+                `Appending these (${rowAppendCount}) rows would exceed the maximum allowed number of rows (${datasetUsageLimits.maxRowCount})`
+            );
+
+        return Result.ok();
+    }
+
     export async function appendRows(
         auth: Auth,
         datasetId: string,
@@ -462,11 +502,8 @@ namespace DatasetServer {
         }
         if (rows.length < 1) return Result.ok([]);
 
-        if (rows.length > LIMITS.dataset.maxAppendCount) {
-            return Result.err(
-                `Cannot append more than ${LIMITS.dataset.maxAppendCount} rows at once`
-            );
-        }
+        const validateRowUsageRes = await validateRowUsage(auth, datasetId, rows.length);
+        if (!validateRowUsageRes.ok) return validateRowUsageRes.cast();
 
         const validateRowTypes = await validateTypesOfRows(
             auth,
@@ -533,6 +570,19 @@ namespace DatasetServer {
                 )
             `;
         }
+
+        // update row count cache
+        await query`
+            UPDATE datasets
+            SET rowCount = (
+                SELECT COUNT(*)
+                FROM datasetRows
+                WHERE datasetId = ${datasetId}
+                    AND userId = ${auth.id}
+            )
+            WHERE id = ${datasetId}
+              AND userId = ${auth.id}
+        `;
 
         return Result.ok(range(rows.length, firstRowId));
     }

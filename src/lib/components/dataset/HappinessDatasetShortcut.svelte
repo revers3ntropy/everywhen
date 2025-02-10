@@ -17,12 +17,14 @@
         submitted = value;
 
         if (!dataset) {
+            // happiness dataset does not exist yet, so make it
             const id = await makeFromPreset();
             dataset = {
                 id,
                 name: datasetPresets.happiness.defaultName,
                 created: nowUtc(),
-                preset: datasetPresets.happiness
+                preset: datasetPresets.happiness,
+                rowCount: 0
             };
         }
 

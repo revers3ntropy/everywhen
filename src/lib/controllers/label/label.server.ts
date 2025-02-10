@@ -1,4 +1,5 @@
-import { LIMITS } from '$lib/constants';
+import { Subscription } from '$lib/controllers/subscription/subscription.server';
+import { UsageLimits } from '$lib/controllers/usageLimits/usageLimits.server';
 import { query } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import { FileLogger } from '$lib/utils/log.server';
@@ -128,21 +129,18 @@ namespace LabelServer {
     }
 
     async function canCreateWithName(auth: Auth, name: string): Promise<string | true> {
+        if (name.length > UsageLimits.LIMITS.label.nameLenMax)
+            return `Name too long (> ${UsageLimits.LIMITS.label.nameLenMax} characters)`;
+
+        if (name.length < UsageLimits.LIMITS.label.nameLenMin) return `Name too short`;
+
         if (await userHasLabelWithName(auth, name)) return 'Label with that name already exists';
 
-        if (name.length > LIMITS.label.nameLenMax)
-            return `Name too long (> ${LIMITS.label.nameLenMax} characters)`;
-
-        if (name.length < LIMITS.label.nameLenMin) return `Name too short`;
-
-        const numLabels = await query<{ count: number }[]>`
-            SELECT COUNT(*) as count    
-            FROM labels
-            WHERE userId = ${auth.id}
-        `;
-
-        if (numLabels[0].count >= LIMITS.label.maxCount)
-            return `Maximum number of labels (${LIMITS.label.maxCount}) reached`;
+        const [count, max] = await UsageLimits.labelUsage(
+            auth,
+            await Subscription.getCurrentSubscription(auth)
+        );
+        if (count >= max) return `Maximum number of labels reached`;
 
         return true;
     }

@@ -1,7 +1,8 @@
-import { LIMITS } from '$lib/constants';
 import { entryFromId } from '$lib/controllers/entry/getEntrySingle.server';
 import * as getMulti from '$lib/controllers/entry/getEntryMulti.server';
 import * as getSummary from '$lib/controllers/entry/getEntrySummaries.server';
+import { Subscription } from '$lib/controllers/subscription/subscription.server';
+import { UsageLimits } from '$lib/controllers/usageLimits/usageLimits.server';
 import { query } from '$lib/db/mysql.server';
 import { Day } from '$lib/utils/day';
 import { decrypt, encrypt } from '$lib/utils/encryption';
@@ -20,7 +21,11 @@ const logger = new FileLogger('Entry');
 namespace EntryServer {
     type Entry = _Entry;
 
-    export async function del(auth: Auth, id: string, restore: boolean): Promise<Result<null>> {
+    export async function deleteOrRestore(
+        auth: Auth,
+        id: string,
+        restore: boolean
+    ): Promise<Result<null>> {
         const entries = await query<{ deleted: number | null }[]>`
             SELECT deleted
             FROM entries
@@ -125,13 +130,12 @@ namespace EntryServer {
         wordCount: number,
         edits: Omit<RawEntryEdit, 'id' | 'entryId'>[]
     ): Promise<Result<Entry>> {
-        const numEntries = await query<{ count: number }[]>`
-            SELECT COUNT(*) as count
-            FROM entries
-            WHERE userId = ${auth.id}
-        `;
-        if (numEntries[0].count >= LIMITS.entry.maxCount) {
-            return Result.err(`Maximum number of entries (${LIMITS.entry.maxCount}) reached`);
+        const [entryCount, maxCount] = await UsageLimits.entryUsage(
+            auth,
+            await Subscription.getCurrentSubscription(auth)
+        );
+        if (entryCount >= maxCount) {
+            return Result.err(`Maximum number of entries reached`);
         }
 
         if (labelId && !labels.find(l => l.id === labelId)) {

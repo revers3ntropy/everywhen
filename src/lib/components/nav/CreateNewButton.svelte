@@ -2,7 +2,6 @@
     import { Button } from '$lib/components/ui/button';
     import { Entry } from '$lib/controllers/entry/entry';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
-    import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import Pencil from 'svelte-material-icons/Pencil.svelte';
     import Moon from 'svelte-material-icons/MoonWaningCrescent.svelte';
     import Lightbulb from 'svelte-material-icons/Lightbulb.svelte';

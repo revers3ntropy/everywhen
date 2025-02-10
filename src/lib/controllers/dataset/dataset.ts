@@ -8,11 +8,11 @@ export interface Dataset {
     created: TimestampSecs;
     name: string;
     preset: DatasetPreset | null;
+    rowCount: number;
 }
 
 export interface DatasetMetadata extends Dataset {
     columns: DatasetColumn<unknown>[];
-    rowCount: number;
 }
 
 export type DatasetData = DatasetRow[];
