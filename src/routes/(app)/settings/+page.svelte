@@ -47,7 +47,7 @@
     <title>Settings</title>
 </svelte:head>
 
-<main class="md:p-4 md:pl-4 flex-center">
+<main class="p-2 md:p-4 md:pl-4 flex-center">
     <div class="w-full md:max-w-4xl">
         <section>
             <div class="flex items-center pb-4">

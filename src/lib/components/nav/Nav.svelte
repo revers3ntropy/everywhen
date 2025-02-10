@@ -30,15 +30,15 @@
      by entry group titles, and is above top navbar -->
 <nav class="md:bg-vLightAccent w-full h-full z-[6]">
     <div class="md:grid grid-cols-1 grid-rows-3 h-16 md:h-full w-full">
-        <div class="pt-1 md:pt-2 flex md:block pr-4">
-            <div class="md:pb-4 pl-1 w-full">
+        <div class="pt-1 md:pt-2 px-1 flex md:block">
+            <div class="md:pb-2 w-full">
                 <AccountDropdown {activeSubscriptionType} />
             </div>
-            <div class="pb-2 pl-2 flex items-center">
-                <span class="pr-3">
+            <div class="pl-2 md:pl-0 md:pb-2 flex items-center justify-between w-full">
+                <span class="w-full">
                     <CreateNewButton />
                 </span>
-                <span>
+                <span class="pl-2 md:pl-0">
                     <Button
                         aria-label={$obfuscated ? 'Show all' : 'Hide all'}
                         on:click={() => obfuscated.set(!$obfuscated)}
@@ -46,23 +46,25 @@
                         variant="outline"
                     >
                         {#if $obfuscated}
-                            <Eye size="25" />
+                            <Eye size="20" />
                         {:else}
-                            <EyeOff size="25" />
+                            <EyeOff size="20" />
                         {/if}
                     </Button>
                 </span>
             </div>
 
-            <div class="pl-2 flex md:flex-col gap-3 items-center md:items-start justify-center">
+            <div
+                class="flex md:flex-col pl-2 md:pl-0 gap-3 items-center md:items-start justify-center h-fit"
+            >
                 {#if $settingsStore.passcode.value}
                     <Button
                         variant="outline"
                         on:click={lock}
-                        class="danger flex-center gap-2 rounded-full py-5 w-full"
+                        class="flex-center rounded-full px-2 py-5 aspect-square md:gap-2 md:w-full"
                         aria-label="Lock"
                     >
-                        <Lock size="22" />
+                        <Lock size="20" />
                         <span class="hide-mobile"> Lock </span>
                     </Button>
                 {/if}

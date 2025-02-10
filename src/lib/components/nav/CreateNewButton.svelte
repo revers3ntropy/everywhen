@@ -113,7 +113,11 @@
 </svg>
 
 <Dropdown>
-    <Button class="rounded-full flex-center gap-2 py-5" slot="button" variant="outline">
+    <Button
+        class="flex-center rounded-full px-2 py-5 aspect-square md:gap-2 md:w-full md:pr-4"
+        slot="button"
+        variant="outline"
+    >
         <Plus size="25" />
         <span class="hide-mobile block"> New </span>
     </Button>
