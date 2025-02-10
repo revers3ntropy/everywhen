@@ -44,21 +44,29 @@
         </div>
 
         <hr />
-        <div class="py-3">
-            <a href="/subscription/manage" class="flex justify-start items-center p-2 gap-2">
-                <PlusThick size="30" />
-                {#if activeSubscriptionType === SubscriptionType.Plus}
-                    Manage EW Plus
-                {:else}
-                    Upgrade to Plus
-                {/if}
-            </a>
-        </div>
-
-        <hr />
         <div class="py-2">
             <Streaks tooltipPosition="bottom" />
         </div>
+
+        <hr />
+
+        <a
+            aria-label="manage subscription"
+            href="/subscription/manage"
+            class="flex justify-start items-center p-2 gap-2"
+        >
+            <PlusThick size="30" />
+            {#if activeSubscriptionType === SubscriptionType.Plus}
+                Manage EW Plus
+            {:else}
+                Upgrade to Plus
+            {/if}
+        </a>
+
+        <a aria-label="settings" href="/settings" class="flex justify-start items-center p-2 gap-2">
+            <CogOutline size="30" />
+            Settings
+        </a>
 
         <hr />
 
@@ -74,11 +82,6 @@
         <a aria-label="images" href="/assets" class="flex justify-start items-center p-2 gap-2">
             <ImageArea size="30" />
             Images
-        </a>
-
-        <a aria-label="settings" href="/settings" class="flex justify-start items-center p-2 gap-2">
-            <CogOutline size="30" />
-            Settings
         </a>
 
         <a aria-label="datasets" href="/datasets" class="flex justify-start items-center p-2 gap-2">
