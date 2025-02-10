@@ -135,7 +135,12 @@
             {:else if inputType === 'location'}
                 <!-- value is always an array, but need a check to satisfy the type system -->
                 {#if Array.isArray(value)}
-                    <LocationSelector {value} on:change={onInput} height="25vh" />
+                    <LocationSelector
+                        {value}
+                        on:change={onInput}
+                        height="25vh"
+                        mobileHeight="25vh"
+                    />
                 {:else}
                     Something went wrong!
                 {/if}
