@@ -1,8 +1,9 @@
 <script lang="ts">
     import InfiniteScroller from '$lib/components/ui/InfiniteScroller.svelte';
     import { FILE_INPUT_ACCEPT_TYPES } from '$lib/constants';
-    import { Asset } from '$lib/controllers/asset/asset';
+    import { Asset, type AssetMetadata } from '$lib/controllers/asset/asset';
     import { notify } from '$lib/components/notifications/notifications';
+    import { dispatch, listen } from '$lib/dataChangeEvents';
     import { api } from '$lib/utils/apiRequest';
     import { Result } from '$lib/utils/result';
     import { nowUtc } from '$lib/utils/time';
@@ -14,6 +15,7 @@
     import type { ChangeEventHandler } from 'svelte/elements';
 
     export let size = '30';
+    // should NOT trigger a 'create' event
     export let onInput: (markdown: string) => void;
 
     async function loadMoreAssets(): Promise<void> {
@@ -31,17 +33,9 @@
 
         notify.error(errors);
 
-        assets = [
-            ...uploadedImages.map(({ id, publicId, fileName }) => ({
-                id,
-                publicId,
-                fileName,
-                created: nowUtc()
-            })),
-            ...assets
-        ];
-        for (const { publicId, fileName } of uploadedImages) {
+        for (const { publicId, fileName, id } of uploadedImages) {
             onInput(Asset.generateMarkdownLink(fileName, publicId));
+            await dispatch.create('asset', { id, created: nowUtc(), publicId, fileName });
         }
         closePopup();
     }) as ChangeEventHandler<HTMLInputElement>;
@@ -50,9 +44,24 @@
         await loadMoreAssets();
     });
 
+    listen.asset.onCreate(asset => {
+        assets = [asset, ...assets];
+        assetCount++;
+    });
+    listen.asset.onDelete(assetId => {
+        assets = assets.filter(a => a.id !== assetId);
+        assetCount--;
+    });
+    listen.asset.onUpdate(asset => {
+        // no emitters for update events yet,
+        // not sure why there ever would be...
+        const index = assets.findIndex(a => a.id === asset.id);
+        if (index !== -1) assets[index] = asset;
+    });
+
     let closePopup: () => void;
     let fileDropInput: HTMLInputElement;
-    let assets = [] as Omit<Asset, 'content'>[];
+    let assets = [] as AssetMetadata[];
     let assetCount = Infinity;
 </script>
 

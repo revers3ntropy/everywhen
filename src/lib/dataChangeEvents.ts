@@ -1,3 +1,4 @@
+import type { AssetMetadata } from '$lib/controllers/asset/asset';
 import type { DatasetColumn, DatasetMetadata, DatasetRow } from '$lib/controllers/dataset/dataset';
 import type { Entry } from '$lib/controllers/entry/entry';
 import type { Label } from '$lib/controllers/label/label';
@@ -5,28 +6,33 @@ import type { Event } from '$lib/controllers/event/event';
 import { onDestroy } from 'svelte';
 import type { MaybePromise } from '../types';
 
-type Entities = 'entry' | 'label' | 'event' | 'dataset' | 'datasetCol' | 'datasetRow';
+type Entities = 'entry' | 'label' | 'event' | 'asset' | 'dataset' | 'datasetCol' | 'datasetRow';
 
 type Create = {
     entry: Entry;
     label: Label;
     event: Event;
+    asset: AssetMetadata;
     dataset: DatasetMetadata;
     datasetCol: DatasetColumn<unknown>;
     datasetRow: { datasetId: string; row: DatasetRow };
 };
+
 type Delete = {
     entry: string;
     label: string;
     event: string;
+    asset: string; // id
     dataset: string;
     datasetCol: { datasetId: string; columnId: string };
     datasetRow: { datasetId: string; rowId: number };
 };
+
 type Update = {
     entry: Entry;
     label: Label;
     event: Event;
+    asset: AssetMetadata;
     dataset: DatasetMetadata;
     datasetCol: DatasetColumn<unknown>;
     datasetRow: { datasetId: string; row: DatasetRow };
@@ -53,6 +59,7 @@ const listeners = {
     entry: emptyListeners(),
     label: emptyListeners(),
     event: emptyListeners(),
+    asset: emptyListeners(),
     dataset: emptyListeners(),
     datasetCol: emptyListeners(),
     datasetRow: emptyListeners()

@@ -241,10 +241,6 @@
         newEntryInputElement.focus();
     }
 
-    function onNewImage(md: string) {
-        insertAtCursor(newEntryInputElement, `\n${md}\n`);
-    }
-
     function resizeTextAreaToFitContent() {
         textAreaSizeTester.value = newEntryBody;
         textAreaSizeTester.style.height = '0px';
@@ -283,9 +279,14 @@
 
         notify.error(errors);
 
-        for (const { publicId, fileName } of uploadedImages) {
-            onNewImage(Asset.generateMarkdownLink(fileName, publicId));
+        for (const { publicId, fileName, id } of uploadedImages) {
+            insertImage(Asset.generateMarkdownLink(fileName, publicId));
+            await dispatch.create('asset', { id, created: nowUtc(), publicId, fileName });
         }
+    }
+
+    function insertImage(md: string) {
+        insertAtCursor(newEntryInputElement, `\n${md}\n`);
     }
 
     onMount(() => {
@@ -334,7 +335,7 @@
 
                 <FormatOptions {makeWrapper} />
 
-                <InsertImage onInput={onNewImage} />
+                <InsertImage onInput={insertImage} />
 
                 <div class="pl-2">
                     <LabelSelect bind:value={newEntryLabel} {labels} fromRight />
