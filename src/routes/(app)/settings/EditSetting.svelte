@@ -1,6 +1,7 @@
 <script lang="ts">
     import LocationSelector from '$lib/components/location/LocationSelector.svelte';
     import Dot from '$lib/components/ui/Dot.svelte';
+    import { Switch } from '$lib/components/ui/switch';
     import Textbox from '$lib/components/ui/Textbox.svelte';
     import { tooltip } from '@svelte-plugins/tooltips';
     import { api } from '$lib/utils/apiRequest';
@@ -79,6 +80,10 @@
 
         await updateValue(newValue);
     }
+
+    async function onCheckedChange(value: boolean) {
+        await updateValue(value);
+    }
 </script>
 
 <div class="wrapper" id={key}>
@@ -145,14 +150,7 @@
                     Something went wrong!
                 {/if}
             {:else if inputType === 'checkbox'}
-                <input
-                    checked={!!value}
-                    class="textbox"
-                    on:change={onInput}
-                    type={inputType}
-                    {value}
-                />
-                <span class="checkmark" />
+                <Switch checked={!!value} {onCheckedChange} />
                 {unit}
             {:else}
                 <Textbox
