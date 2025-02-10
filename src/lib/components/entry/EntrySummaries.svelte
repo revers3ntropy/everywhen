@@ -151,7 +151,7 @@
                         </a>
 
                         <span
-                            class="md:opacity-0 group-hover:opacity-100 hover:bg-lightAccent flex-center rounded-md"
+                            class="hide-mobile opacity-0 group-hover:opacity-100 hover:bg-lightAccent flex-center rounded-md"
                         >
                             <button
                                 on:click={() =>
