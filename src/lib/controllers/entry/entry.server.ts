@@ -465,66 +465,6 @@ namespace EntryServer {
             agentData: agentDataRes.val
         });
     }
-    export async function allBasicSummaries(auth: Auth): Promise<
-        {
-            created: number;
-            createdTzOffset: number;
-            wordCount: number;
-            agentData: string;
-        }[]
-    > {
-        return await query<
-            {
-                created: number;
-                createdTzOffset: number;
-                wordCount: number;
-                agentData: string;
-            }[]
-        >`
-            SELECT
-                created,
-                createdTzOffset,
-                wordCount,
-                agentData
-            FROM entries
-            WHERE userId = ${auth.id}
-              AND deleted IS NULL
-            ORDER BY created DESC, id
-        `;
-    }
-
-    export async function basicSummariesForEntriesWithWord(
-        auth: Auth,
-        encryptedWord: string
-    ): Promise<
-        {
-            created: number;
-            createdTzOffset: number;
-            wordCount: number;
-            agentData: string;
-        }[]
-    > {
-        return await query<
-            {
-                created: number;
-                createdTzOffset: number;
-                wordCount: number;
-                agentData: string;
-            }[]
-        >`
-            SELECT
-                entries.created,
-                entries.createdTzOffset,
-                entries.agentData,
-                wordsInEntries.count as wordCount
-            FROM entries, wordsInEntries
-            WHERE entries.deleted IS NULL
-                AND entries.userId = ${auth.id}
-                AND wordsInEntries.word = ${encryptedWord}
-                AND wordsInEntries.entryId = entries.id
-            ORDER BY entries.created DESC, entries.id
-        `;
-    }
 
     export async function counts(auth: Auth): Promise<{ wordCount: number; entryCount: number }> {
         return await query<{ wordCount: number; entryCount: number }[]>`
@@ -543,20 +483,9 @@ namespace EntryServer {
             FROM entries
             WHERE userId = ${auth.id}
             AND deleted IS NULL
-            ORDER BY created ASC
+            ORDER BY created
             LIMIT 1
         `.then(res => res[0] ?? null);
-    }
-
-    export async function wordCountForEncryptedWord(auth: Auth, word: string): Promise<number> {
-        return await query<{ wordInstances: number }[]>`
-            SELECT SUM(count) as wordInstances
-            FROM wordsInEntries
-            WHERE userId = ${auth.id}
-            AND word = ${word}
-            AND count > 0
-            AND entryIsDeleted = 0
-        `.then(([res]) => res.wordInstances ?? 0);
     }
 
     export async function updateEncryptedFields(
