@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Textbox from '$lib/components/ui/Textbox.svelte';
     import { dispatch, listen } from '$lib/dataChangeEvents';
     import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
@@ -85,45 +86,48 @@
     <title>{data.dataset.name || 'Unknown'} | View Dataset</title>
 </svelte:head>
 
-<main class="p-1 md:p-4 md:pl-4">
-    <div class="pb-4 flex flex-row justify-between">
-        <div class="text-lg">
-            <input
-                bind:this={nameInp}
-                value={data.dataset.name}
-                on:change={updateName}
-                aria-label="Dataset name"
-            />
+<main class="p-2 md:p-4 md:pl-4 flex-center">
+    <div class="w-full md:max-w-6xl">
+        <div class="pb-4 md:flex flex-row justify-between">
+            <div class="text-lg">
+                <Textbox
+                    label="Name"
+                    value={data.dataset.name}
+                    on:change={updateName}
+                    bind:element={nameInp}
+                    ariaLabel="dataset name"
+                />
+            </div>
+            <div class="pt-2">
+                <button
+                    on:click={deleteDataset}
+                    class="flex-center gap-2 danger border border-solid border-borderColor py-2 px-4 hover:bg-vLightAccent rounded-full"
+                    aria-label="Delete this dataset"
+                >
+                    <DeleteOutline size="25" /> Delete
+                </button>
+            </div>
         </div>
-        <div>
-            <button
-                on:click={deleteDataset}
-                class="flex-center gap-2 danger border border-solid border-borderColor py-2 px-4 hover:bg-vLightAccent rounded-full"
-                aria-label="Delete this dataset"
-            >
-                <DeleteOutline size="25" /> Delete
-            </button>
-        </div>
-    </div>
 
-    {#if data.dataset?.preset}
-        <div class="flex justify-start items-center gap-2">
-            <TuneVariant size="20" />
-            <span class="text-light"> From preset '{data.dataset.preset.defaultName}' </span>
-        </div>
-    {/if}
-
-    {#key data.dataset.columns}
-        {#if rows}
-            <section>
-                {#if data.dataset && data.dataset.columns.length}
-                    <DatasetChart dataset={data.dataset} {rows} />
-                {/if}
-            </section>
-
-            <TableOfDatapoints dataset={data.dataset} {rows} />
-        {:else}
-            <div class="pt-8"> Loading... </div>
+        {#if data.dataset?.preset}
+            <div class="flex justify-start items-center gap-2">
+                <TuneVariant size="20" />
+                <span class="text-light"> From preset '{data.dataset.preset.defaultName}' </span>
+            </div>
         {/if}
-    {/key}
+
+        {#key data.dataset.columns}
+            {#if rows}
+                <section>
+                    {#if data.dataset && data.dataset.columns.length}
+                        <DatasetChart dataset={data.dataset} {rows} />
+                    {/if}
+                </section>
+
+                <TableOfDatapoints dataset={data.dataset} {rows} />
+            {:else}
+                <div class="pt-8"> Loading... </div>
+            {/if}
+        {/key}
+    </div>
 </main>

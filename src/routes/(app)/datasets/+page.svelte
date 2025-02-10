@@ -24,12 +24,14 @@
     <title>Datasets</title>
 </svelte:head>
 
-<main class="pt-4 px-2 md:px-4">
-    <CreateDatasetButton datasets={data.datasets} />
+<main class="p-2 md:p-4 md:pl-4 flex-center">
+    <div class="w-full md:max-w-4xl">
+        <CreateDatasetButton datasets={data.datasets} />
 
-    <div class="py-4 flex gap-2 flex-wrap" aria-label="list of datasets">
-        {#each data.datasets as dataset}
-            <DatasetWidget {dataset} />
-        {/each}
+        <div class="py-4 flex gap-2 flex-wrap" aria-label="list of datasets">
+            {#each data.datasets as dataset}
+                <DatasetWidget {dataset} />
+            {/each}
+        </div>
     </div>
 </main>
