@@ -4,12 +4,12 @@
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import Bin from 'svelte-material-icons/Delete.svelte';
     import ImageArea from 'svelte-material-icons/ImageArea.svelte';
+    import PlusThick from 'svelte-material-icons/PlusThick.svelte';
     import LightTheme from 'svelte-material-icons/WhiteBalanceSunny.svelte';
     import Logout from 'svelte-material-icons/Logout.svelte';
     import CogOutline from 'svelte-material-icons/CogOutline.svelte';
     import DarkTheme from 'svelte-material-icons/WeatherNight.svelte';
     import ChartLine from 'svelte-material-icons/ChartLine.svelte';
-    import Star from 'svelte-material-icons/StarFourPointsOutline.svelte';
     import Streaks from '$lib/components/Streaks.svelte';
     import { theme, username } from '$lib/stores';
     import { Theme } from '$lib/constants';
@@ -46,7 +46,7 @@
         <hr />
         <div class="py-3">
             <a href="/subscription/manage" class="flex justify-start items-center p-2 gap-2">
-                <Star size="30" />
+                <PlusThick size="30" />
                 {#if activeSubscriptionType === SubscriptionType.Plus}
                     Manage EW Plus
                 {:else}
