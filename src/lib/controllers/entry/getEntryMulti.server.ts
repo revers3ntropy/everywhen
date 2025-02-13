@@ -1,7 +1,6 @@
 import type { Auth } from '$lib/controllers/auth/auth.server';
 import type { EntryEdit, EntryFilter, RawEntry } from '$lib/controllers/entry/entry';
 import { Entry } from '$lib/controllers/entry/entry.server';
-import { Label } from '$lib/controllers/label/label.server';
 import { Location } from '$lib/controllers/location/location.server';
 import { query } from '$lib/db/mysql.server';
 import type { Day } from '$lib/utils/day';
@@ -247,10 +246,7 @@ async function entriesFromRaw(auth: Auth, raw: RawEntry[]): Promise<Result<Entry
         WHERE entryEdits.userId = ${auth.id}
     `;
 
-    const labels = await Label.allIndexedById(auth);
-    if (!labels.ok) return labels.cast();
-
-    const edits = Result.collect(rawEdits.map(e => Entry.editFromRaw(auth, labels.val, e)));
+    const edits = Result.collect(rawEdits.map(e => Entry.editFromRaw(auth, e)));
     if (!edits.ok) return edits.cast();
 
     const groupedEdits = edits.val.reduce(
@@ -290,7 +286,7 @@ async function entriesFromRaw(auth: Auth, raw: RawEntry[]): Promise<Result<Entry
                 longitude: rawEntry.longitude,
                 agentData: decryptedAgentData,
                 wordCount: rawEntry.wordCount,
-                label: labels.val[rawEntry?.labelId || ''] || null,
+                labelId: rawEntry?.labelId || null,
                 edits: groupedEdits[rawEntry.id] ?? []
             });
         })

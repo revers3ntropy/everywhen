@@ -7,6 +7,6 @@ import type { PageServerLoad } from './$types';
 export const load = cachedPageRoute(async (auth, { params }) => {
     return {
         entry: (await Entry.getFromId(auth, params.entryId, true)).unwrap(e => error(404, e)),
-        labels: (await Label.allIndexedById(auth)).unwrap(e => error(500, e))
+        labels: await Label.allIndexedById(auth)
     };
 }) satisfies PageServerLoad;

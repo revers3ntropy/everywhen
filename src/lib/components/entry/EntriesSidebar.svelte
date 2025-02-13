@@ -3,6 +3,8 @@
     import InfiniteScroller from '$lib/components/ui/InfiniteScroller.svelte';
     import { notify } from '$lib/components/notifications/notifications';
     import { ANIMATION_DURATION } from '$lib/constants';
+    import type { Label } from '$lib/controllers/label/label';
+    import type { Location } from '$lib/controllers/location/location';
     import { listen } from '$lib/dataChangeEvents';
     import { api } from '$lib/utils/apiRequest';
     import { fmtUtcRelative } from '$lib/utils/time';
@@ -21,6 +23,8 @@
     export let nYearsAgo: Record<string, EntrySummary[]>;
     export let pinnedEntriesSummaries: EntrySummary[];
     export let openOnMobile = false;
+    export let locations: Location[];
+    export let labels: Record<string, Label>;
 
     const showLimitPinnedEntries = 10;
 
@@ -142,6 +146,8 @@
                                     onCreateFilter={Entry.isPinned}
                                     showOnUpdateAndNotAlreadyShownFilter={Entry.isPinned}
                                     hideBlurToggle
+                                    {labels}
+                                    {locations}
                                 />
                                 {#if areHiddenPinnedEntries}
                                     <button
@@ -176,6 +182,8 @@
                                 hideDate
                                 onCreateFilter={() => false}
                                 hideBlurToggle
+                                {labels}
+                                {locations}
                             />
                         </div>
                     {/each}
@@ -187,7 +195,13 @@
                     hasMore={() => titleIds.length < numTitles}
                     margin={500}
                 >
-                    <EntrySummaries {obfuscated} titles={summaries} hideBlurToggle />
+                    <EntrySummaries
+                        {obfuscated}
+                        titles={summaries}
+                        hideBlurToggle
+                        {labels}
+                        {locations}
+                    />
                 </InfiniteScroller>
             </div>
         </div>

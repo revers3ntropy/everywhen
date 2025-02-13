@@ -3,7 +3,6 @@ import { Day } from '$lib/utils/day';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import { fmtUtc } from '$lib/utils/time';
 import type { Hours, TimestampSecs } from '../../../types';
-import type { Label } from '../label/label';
 
 // assumed not deleted
 export interface EntryAsLocation {
@@ -50,7 +49,7 @@ export interface EntryEdit {
     agentData: string;
     oldTitle: string;
     oldBody: string;
-    oldLabel: Label | null;
+    oldLabelId: string | null;
 }
 
 // RawEntry is the raw data from the database,
@@ -82,7 +81,7 @@ export interface Entry {
     longitude: number | null;
     agentData: string;
     wordCount: number;
-    label: Label | null;
+    labelId: string | null;
     edits: EntryEdit[];
 }
 
@@ -98,7 +97,7 @@ export interface EntrySummary {
     longitude: number | null;
     agentData: string;
     wordCount: number;
-    label: Label | null;
+    labelId: string | null;
 }
 
 // assumed not deleted
@@ -167,7 +166,7 @@ export namespace Entry {
             longitude: entry.longitude,
             agentData: entry.agentData,
             wordCount: entry.wordCount,
-            label: entry.label
+            labelId: entry.labelId
         };
     }
 
@@ -176,19 +175,6 @@ export namespace Entry {
         createdTzOffset: Hours;
     }): TimestampSecs {
         return entry.created + entry.createdTzOffset * 60 * 60;
-    }
-
-    export function compareLocalTimes(
-        a: {
-            created: TimestampSecs;
-            createdTzOffset: Hours;
-        },
-        b: {
-            created: TimestampSecs;
-            createdTzOffset: Hours;
-        }
-    ): number {
-        return localTime(a) - localTime(b);
     }
 
     export function titleLsKey(username: string | null, editing: Entry | null): string {

@@ -9,6 +9,6 @@ export const load = cachedPageRoute(async (auth, { parent }) => {
 
     return {
         locations: (await Location.all(auth)).unwrap(e => error(400, e)),
-        labels: (await Label.allIndexedById(auth)).unwrap(e => error(400, e))
+        labels: await Label.allIndexedById(auth)
     };
 }) satisfies PageServerLoad;

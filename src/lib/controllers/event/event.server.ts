@@ -25,8 +25,7 @@ namespace EventServer {
     }
 
     export async function all(auth: Auth): Promise<Result<Event[]>> {
-        const labelsRes = await Label.allIndexedById(auth);
-        if (!labelsRes.ok) return labelsRes.cast();
+        const labels = await Label.allIndexedById(auth);
 
         const rawEvents = await query<
             {
@@ -51,7 +50,7 @@ namespace EventServer {
             ORDER BY created DESC
         `;
 
-        return Result.collect(rawEvents.map(e => fromRaw(auth, e, labelsRes.val)));
+        return Result.collect(rawEvents.map(e => fromRaw(auth, e, labels)));
     }
 
     export async function fromId(auth: Auth, id: string): Promise<Result<Event>> {
@@ -78,7 +77,7 @@ namespace EventServer {
         }
         const [event] = events;
 
-        return (await Label.allIndexedById(auth)).pipe(labels => fromRaw(auth, event, labels));
+        return fromRaw(auth, event, await Label.allIndexedById(auth));
     }
 
     export function fromRaw(

@@ -2,7 +2,6 @@ import { decrypt } from '$lib/utils/encryption';
 import { wordCount } from '$lib/utils/text';
 import { error } from '@sveltejs/kit';
 import { Entry } from '$lib/controllers/entry/entry.server';
-import { Label } from '$lib/controllers/label/label.server';
 import { api404Handler, apiResponse } from '$lib/utils/apiResponse.server';
 import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
 import { GETParamIsTruthy } from '$lib/utils/GETArgs';
@@ -60,12 +59,9 @@ export const POST = (async ({ request, cookies }) => {
         wordCount: z.number().optional()
     });
 
-    const labels = (await Label.all(auth)).unwrap(e => error(400, e));
-
     const entry = (
         await Entry.create(
             auth,
-            labels,
             body.title,
             body.body,
             body.created,

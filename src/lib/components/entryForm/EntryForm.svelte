@@ -44,14 +44,14 @@
 
     export let newEntryTitle = '';
     export let newEntryBody = '';
-    export let newEntryLabel = '';
+    export let newEntryLabelId = '';
     export let labels: Record<string, Label>;
     export let obfuscated = true;
 
     function resetEntryForm() {
         newEntryTitle = '';
         newEntryBody = '';
-        newEntryLabel = '';
+        newEntryLabelId = '';
     }
 
     function saveToLS() {
@@ -63,7 +63,7 @@
             Entry.bodyLsKey($username, entry),
             encrypt(newEntryBody, $encryptionKey)
         );
-        localStorage.setItem(Entry.labelLsKey($username, entry), newEntryLabel);
+        localStorage.setItem(Entry.labelLsKey($username, entry), newEntryLabelId);
     }
 
     function restoreFromLS() {
@@ -82,7 +82,7 @@
         )
             .mapErr(() => notify.error('Failed to decrypt saved entry body'))
             .or('');
-        newEntryLabel = localStorage.getItem(Entry.labelLsKey($username, entry)) || '';
+        newEntryLabelId = localStorage.getItem(Entry.labelLsKey($username, entry)) || '';
     }
 
     function areUnsavedChanges() {
@@ -92,7 +92,7 @@
         return (
             entry.title !== newEntryTitle ||
             entry.body !== newEntryBody ||
-            (entry.label?.id || '') !== newEntryLabel
+            (entry.labelId || '') !== newEntryLabelId
         );
     }
 
@@ -163,12 +163,6 @@
             return;
         }
 
-        let label: null | Label = null;
-        if (body.labelId) {
-            label = labels[body.labelId] ?? null;
-            if (!label) notify.error('label not found');
-        }
-
         await dispatch.create('entry', {
             id,
             title: body.title,
@@ -181,7 +175,7 @@
             longitude: body.longitude,
             agentData: body.agentData,
             wordCount: body.wordCount,
-            label,
+            labelId: body.labelId,
             edits: []
         });
     }
@@ -218,7 +212,7 @@
         const body = {
             title: newEntryTitle,
             body: newEntryBody,
-            labelId: newEntryLabel,
+            labelId: newEntryLabelId,
             latitude: currentLocation[0],
             longitude: currentLocation[1],
             created: nowUtc(),
@@ -318,7 +312,7 @@
 
     let submitted = false;
 
-    $: if (mounted && browser && [newEntryTitle, newEntryBody, newEntryLabel]) {
+    $: if (mounted && browser && [newEntryTitle, newEntryBody, newEntryLabelId]) {
         saveToLS();
     }
 
@@ -338,7 +332,7 @@
                 <InsertImage onInput={insertImage} />
 
                 <div class="pl-2">
-                    <LabelSelect bind:value={newEntryLabel} {labels} fromRight />
+                    <LabelSelect bind:value={newEntryLabelId} {labels} fromRight />
                 </div>
             </div>
 

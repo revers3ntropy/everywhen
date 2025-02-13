@@ -137,7 +137,6 @@ namespace UserServer {
             Dataset.updateDatasetColumnsEncryptedFields(auth.id, oldDecrypt, newEncrypt),
             Entry.updateEncryptedFields(auth.id, oldDecrypt, newEncrypt),
             Event.updateEncryptedFields(auth.id, oldDecrypt, newEncrypt),
-            Label.updateEncryptedFields(auth.id, oldDecrypt, newEncrypt),
             Location.updateEncryptedFields(auth.id, oldDecrypt, newEncrypt)
         ]);
         if (!result.ok) return result.cast();

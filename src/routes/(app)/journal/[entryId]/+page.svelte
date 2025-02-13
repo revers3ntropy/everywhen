@@ -37,6 +37,7 @@
             on:updated={() => location.reload()}
             showFullDate={true}
             locations={data.locations}
+            labels={data.labels}
         />
     </div>
     {#if data.entry.edits?.length}
@@ -65,7 +66,7 @@
                                 body={edit.oldBody}
                                 created={edit.created}
                                 createdTzOffset={edit.createdTzOffset}
-                                label={edit.oldLabel}
+                                labelId={edit.oldLabelId}
                                 latitude={edit.latitude}
                                 longitude={edit.longitude}
                                 deleted={null}
@@ -77,6 +78,7 @@
                                 showFullDate
                                 obfuscated={$obfuscated}
                                 locations={data.locations}
+                                labels={data.labels}
                             />
                         {/each}
                     </div>

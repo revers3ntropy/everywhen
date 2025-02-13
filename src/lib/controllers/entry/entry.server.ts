@@ -12,7 +12,6 @@ import { wordCount, wordsFromText } from '$lib/utils/text';
 import { nowUtc } from '$lib/utils/time';
 import type { Hours, TimestampSecs } from '../../../types';
 import type { Auth } from '../auth/auth.server';
-import type { Label } from '../label/label';
 import { UId } from '$lib/controllers/uuid/uuid.server';
 import { Entry as _Entry, type EntryEdit, type RawEntryEdit, type Streaks } from './entry';
 
@@ -116,7 +115,6 @@ namespace EntryServer {
 
     export async function create(
         auth: Auth,
-        labels: Label[],
         title: string,
         body: string,
         created: TimestampSecs,
@@ -136,11 +134,6 @@ namespace EntryServer {
         );
         if (entryCount >= maxCount) {
             return Result.err(`Maximum number of entries reached`);
-        }
-
-        if (labelId && !labels.find(l => l.id === labelId)) {
-            await logger.error('Label not found', { labelId, username: auth.username });
-            return Result.err('Label not found');
         }
 
         const id = await UId.generate();
@@ -210,7 +203,7 @@ namespace EntryServer {
             pinned,
             latitude,
             longitude,
-            label: labels.find(l => l.id === labelId) ?? null,
+            labelId,
             agentData,
             wordCount,
             edits: editsWithIds.map(edit => ({
@@ -223,7 +216,7 @@ namespace EntryServer {
                 agentData: edit.agentData,
                 oldTitle: edit.oldTitle,
                 oldBody: edit.oldBody,
-                oldLabel: labels.find(l => l.id === labelId) ?? null
+                oldLabelId: edit.oldLabelId
             }))
         });
     }
@@ -279,7 +272,7 @@ namespace EntryServer {
                 ${editLongitude ?? null},
                 ${encrypt(entry.title, auth.key)},
                 ${encrypt(entry.body, auth.key)},
-                ${entry.label?.id ?? null},
+                ${entry.labelId ?? null},
                 ${encrypt(editAgentData || '', auth.key)}
             );
 
@@ -428,11 +421,7 @@ namespace EntryServer {
         };
     }
 
-    export function editFromRaw(
-        auth: Auth,
-        labels: Record<string, Label>,
-        rawEdit: RawEntryEdit
-    ): Result<EntryEdit> {
+    export function editFromRaw(auth: Auth, rawEdit: RawEntryEdit): Result<EntryEdit> {
         const oldTitleRes = decrypt(rawEdit.oldTitle, auth.key);
         if (!oldTitleRes.ok) return oldTitleRes.cast();
 
@@ -442,22 +431,12 @@ namespace EntryServer {
         const agentDataRes = decrypt(rawEdit.agentData, auth.key);
         if (!agentDataRes.ok) return agentDataRes.cast();
 
-        let oldLabel = null as Label | null;
-        if (rawEdit.oldLabelId) {
-            const label = labels[rawEdit.oldLabelId];
-            if (!label) {
-                void logger.error('Label not found', { rawEdit, labels });
-                return Result.err('Label not found');
-            }
-            oldLabel = label;
-        }
-
         return Result.ok({
             id: rawEdit.id,
             entryId: rawEdit.entryId,
             oldTitle: oldTitleRes.val,
             oldBody: oldBodyRes.val,
-            oldLabel,
+            oldLabelId: rawEdit.oldLabelId,
             created: rawEdit.created,
             createdTzOffset: rawEdit.createdTzOffset,
             latitude: rawEdit.latitude,

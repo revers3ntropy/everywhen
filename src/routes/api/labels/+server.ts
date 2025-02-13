@@ -9,7 +9,7 @@ import { Auth } from '$lib/controllers/auth/auth.server';
 
 export const GET = cachedApiRoute(async auth => {
     return {
-        labels: (await Label.all(auth)).unwrap(e => error(400, e))
+        labels: await Label.all(auth)
     };
 }) satisfies RequestHandler;
 

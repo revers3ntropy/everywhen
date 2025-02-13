@@ -1,5 +1,7 @@
 <script lang="ts">
     import EntryDialog from '$lib/components/dialogs/EntryDialog.svelte';
+    import type { Label } from '$lib/controllers/label/label';
+    import type { Location } from '$lib/controllers/location/location';
     import { showPopup } from '$lib/utils/popups';
     import { slide } from 'svelte/transition';
     import LabelDot from '$lib/components/label/LabelDot.svelte';
@@ -19,6 +21,8 @@
     export let hideDate = false;
     export let blurToggleOnLeft = false;
     export let hideBlurToggle = false;
+    export let locations: Location[];
+    export let labels: Record<string, Label>;
     export let onCreateFilter: (entry: Entry) => boolean = () => true;
     export let showOnUpdateAndNotAlreadyShownFilter: (entry: Entry) => boolean = () => false;
 
@@ -136,7 +140,7 @@
                                 />
                             </span>
 
-                            <LabelDot name={entry.label?.name} color={entry.label?.color || null} />
+                            <LabelDot color={entry.labelId ? labels[entry.labelId]?.color : null} />
 
                             <span class="ellipsis max-w-[20vw]" class:obfuscated>
                                 {#if entry.titleShortened}
@@ -156,7 +160,9 @@
                             <button
                                 on:click={() =>
                                     showPopup(EntryDialog, {
-                                        id: entry.id
+                                        id: entry.id,
+                                        locations,
+                                        labels
                                     })}
                                 aria-label="Open entry in dialog"
                             >

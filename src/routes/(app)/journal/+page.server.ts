@@ -16,6 +16,6 @@ export const load = cachedPageRoute(async (auth, { parent }) => {
         happinessDataset: (await Dataset.getDatasetFromPresetId(auth, 'happiness')).unwrap(e =>
             error(400, e)
         ),
-        labels: (await Label.allIndexedById(auth)).unwrap(e => error(400, e))
+        labels: await Label.allIndexedById(auth)
     };
 }) satisfies PageServerLoad;

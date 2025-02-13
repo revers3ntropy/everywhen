@@ -10,11 +10,11 @@ export const load = cachedPageRoute(async (auth, { params }) => {
     if (!labelId) error(404, 'Not found');
 
     return {
-        label: (await Label.withCount(auth, labelId)).unwrap(e => error(404, e)),
+        label: (await Label.fromIdWithUsageCounts(auth, labelId)).unwrap(e => error(404, e)),
         events: (await Event.all(auth))
             .unwrap(e => error(400, e))
             .filter(event => event.label?.id === labelId),
-        labels: (await Label.allIndexedById(auth)).unwrap(e => error(400, e)),
+        labels: await Label.allIndexedById(auth),
         locations: (await Location.all(auth)).unwrap(e => error(400, e))
     };
 }) satisfies PageServerLoad;

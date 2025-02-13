@@ -1,4 +1,6 @@
 <script lang="ts">
+    import EncryptedText from '$lib/components/ui/EncryptedText.svelte';
+    import { tryDecryptText } from '$lib/utils/encryption.client.js';
     import CogOutline from 'svelte-material-icons/CogOutline.svelte';
     import LabelDot from '$lib/components/label/LabelDot.svelte';
     import { notify } from '$lib/components/notifications/notifications';
@@ -57,9 +59,7 @@
                     <LabelDot big color={labels[value]?.color || null} />
 
                     {#if !condensed}
-                        <span class="label-name">
-                            {labels[value].name}
-                        </span>
+                        <EncryptedText text={labels[value].name} />
                     {/if}
                 {:else}
                     <LabelOutline size="20" />
@@ -93,13 +93,13 @@
             </button>
             {#each Object.values(labels)
                 .filter(filter)
-                .sort((a, b) => a.name.localeCompare(b.name)) as label (label.id)}
+                .sort( (a, b) => tryDecryptText(a.name).localeCompare(tryDecryptText(b.name)) ) as label (label.id)}
                 <button
                     on:click={() => {
                         value = label.id;
                     }}
                     class="label-button"
-                    aria-label="Select label {label.name}"
+                    aria-label="Select label {tryDecryptText(label.name)}"
                 >
                     <span class="flex-center">
                         <span
@@ -108,13 +108,10 @@
                             style="--label-color: {label.color}"
                         />
                     </span>
-                    <span class="label-name">
-                        {#if value === label.id}
-                            <b>{label.name}</b>
-                        {:else}
-                            {label.name}
-                        {/if}
-                    </span>
+                    <EncryptedText
+                        text={label.name}
+                        class={`text-left ${value === label.id ? 'text-bold' : ''}`}
+                    />
                 </button>
             {/each}
             {#if showAddButton}

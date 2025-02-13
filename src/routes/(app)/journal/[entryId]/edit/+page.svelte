@@ -32,7 +32,7 @@
             action="edit"
             entry={data.entry}
             newEntryBody={data.entry.body}
-            newEntryLabel={data.entry?.label?.id || ''}
+            newEntryLabelId={data.entry?.labelId || ''}
             newEntryTitle={data.entry.title}
             obfuscated={$obfuscated}
             labels={data.labels}

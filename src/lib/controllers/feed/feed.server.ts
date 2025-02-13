@@ -3,7 +3,6 @@ import { entryEditsProvider } from '$lib/controllers/feed/entryEditsProvider';
 import { eventEndsProvider, eventStartsProvider } from '$lib/controllers/feed/eventsProvider';
 import { happinessProvider } from '$lib/controllers/feed/happinessProvidor';
 import { sleepCycleProvider } from '$lib/controllers/feed/sleepCycleProvider';
-import { Label } from '$lib/controllers/label/label.server';
 import {
     OpenWeatherMapAPI,
     type WeatherForDay
@@ -89,9 +88,6 @@ namespace FeedServer {
     }
 
     export async function getDay(auth: Auth, day: Day): Promise<Result<FeedDay>> {
-        const labels = await Label.allIndexedById(auth);
-        if (!labels.ok) return labels.cast();
-
         const [items, nextDayInPast, nextDayInFuture, weather] = await Promise.all([
             Result.collectAsync(PROVIDERS.map(p => p.feedItemsOnDay(auth, day))).then(r =>
                 r

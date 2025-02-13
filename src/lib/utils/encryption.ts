@@ -6,7 +6,7 @@ import { Result } from './result';
 
 const wordArrayIv = crypto.enc.Utf8.parse(PUBLIC_INIT_VECTOR);
 
-export const encryptionLogger = new Logger('CLIENT', chalk.blue);
+export const encryptionLogger = new Logger('ENC', chalk.blue);
 
 export function encrypt(plaintext: string, key: string | null, emptyOnNoKey = false): string {
     if (!key) {

@@ -25,7 +25,7 @@
         <TimeInFeed timestamp={item.start} to={item.end} tzOffset={item.tzOffset} />
         <div class:obfuscated>
             {#if label}
-                <LabelDot color={label.color} name={label.name} />
+                <LabelDot color={label.color} />
             {/if}
             {name}
         </div>
@@ -40,7 +40,7 @@
             {/if}
             {#if label}
                 <span class="pl-1">
-                    <LabelDot color={label.color} name={label.name} />
+                    <LabelDot color={label.color} />
                 </span>
             {/if}
             <span class:obfuscated>

@@ -44,6 +44,8 @@
                 nYearsAgo={onThisDayData}
                 pinnedEntriesSummaries={data.pinnedEntriesList}
                 openOnMobile={false}
+                labels={data.labels}
+                locations={data.locations}
             />
         </section>
     {/if}
@@ -51,16 +53,16 @@
     <section class="md:flex md:justify-center gap-4 w-full">
         <div class="max-w-3xl w-full">
             {#key $page}
-                {#if $page.url.hash}
+                {#if $page.url.hash.length > 1}
                     {#await api
                         .get(apiPath('/entries/?', $page.url.hash.slice(1)))
                         .then(notify.onErr)}
                         <p>Loading...</p>
                     {:then entry}
                         <Feed
+                            labels={data.labels}
                             locations={data.locations}
                             happinessDataset={data.happinessDataset}
-                            labels={data.labels}
                             obfuscated={$obfuscated}
                             fromDay={Entry.dayOf(entry)}
                             {getScrollContainer}

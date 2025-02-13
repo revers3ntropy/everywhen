@@ -1,7 +1,6 @@
 import type { Auth } from '$lib/controllers/auth/auth.server';
 import type { EntrySummary, RawEntrySummary } from '$lib/controllers/entry/entry';
 import { Entry } from '$lib/controllers/entry/entry.server';
-import { Label } from '$lib/controllers/label/label.server';
 import { query } from '$lib/db/mysql.server';
 import { Day } from '$lib/utils/day';
 import { decrypt } from '$lib/utils/encryption';
@@ -158,9 +157,6 @@ async function summariesFromRaw(
     auth: Auth,
     raw: RawEntrySummary[]
 ): Promise<Result<EntrySummary[]>> {
-    const labelsRes = await Label.allIndexedById(auth);
-    if (!labelsRes.ok) return labelsRes.cast();
-
     return Result.collect(
         raw.map(rawEntry => {
             const titleRes = decrypt(rawEntry.title, auth.key);
@@ -185,7 +181,7 @@ async function summariesFromRaw(
                 longitude: rawEntry.longitude,
                 agentData: agentDataRes.val,
                 wordCount: rawEntry.wordCount,
-                label: rawEntry.labelId ? labelsRes.val[rawEntry.labelId] : null
+                labelId: rawEntry.labelId
             });
         })
     );

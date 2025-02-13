@@ -26,7 +26,7 @@
             <span class="text-textColorLight">end of</span>
             {#if label}
                 <span class="pl-1">
-                    <LabelDot color={label.color} name={label.name} />
+                    <LabelDot color={label.color} />
                 </span>
             {/if}
             <span class:obfuscated>

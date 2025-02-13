@@ -1,7 +1,6 @@
 import type { Auth } from '$lib/controllers/auth/auth.server';
 import type { EntryEdit, RawEntry } from '$lib/controllers/entry/entry';
 import { Entry } from '$lib/controllers/entry/entry.server';
-import { Label } from '$lib/controllers/label/label.server';
 import { query } from '$lib/db/mysql.server';
 import { decrypt } from '$lib/utils/encryption';
 import { FileLogger } from '$lib/utils/log.server';
@@ -60,14 +59,10 @@ export async function entryFromId(
     const [entry] = entries;
     if (mustNotBeDeleted && Entry.isDeleted(entry)) return Result.err('Entry is deleted');
 
-    return (await Label.allIndexedById(auth)).pipeAsync(labels => fromRaw(auth, entry, labels));
+    return fromRaw(auth, entry);
 }
 
-async function fromRaw(
-    auth: Auth,
-    rawEntry: RawEntry,
-    labels: Record<string, Label>
-): Promise<Result<Entry>> {
+async function fromRaw(auth: Auth, rawEntry: RawEntry): Promise<Result<Entry>> {
     const decryptedTitle = decrypt(rawEntry.title, auth.key);
     if (!decryptedTitle.ok) return decryptedTitle.cast();
 
@@ -81,16 +76,7 @@ async function fromRaw(
         decryptedAgent = res.val;
     }
 
-    let label: null | Label = null;
-    if (rawEntry.labelId) {
-        label = labels[rawEntry.labelId];
-        if (!label) {
-            void logger.error('Label not found', { rawEntry, label, labels });
-            return Result.err('Label not found');
-        }
-    }
-
-    const editsRes = await getEditsForEntry(auth, rawEntry.id, labels);
+    const editsRes = await getEditsForEntry(auth, rawEntry.id);
     if (!editsRes.ok) return editsRes.cast();
 
     return Result.ok({
@@ -105,16 +91,12 @@ async function fromRaw(
         longitude: rawEntry.longitude,
         agentData: decryptedAgent,
         wordCount: rawEntry.wordCount,
-        label,
+        labelId: rawEntry.labelId,
         edits: editsRes.val
     });
 }
 
-async function getEditsForEntry(
-    auth: Auth,
-    entryId: string,
-    labels: Record<string, Label>
-): Promise<Result<EntryEdit[]>> {
+async function getEditsForEntry(auth: Auth, entryId: string): Promise<Result<EntryEdit[]>> {
     const rawEdits = await query<
         {
             id: string;
@@ -146,5 +128,5 @@ async function getEditsForEntry(
         ORDER BY created DESC
     `;
 
-    return Result.collect(rawEdits.map(e => Entry.editFromRaw(auth, labels, e)));
+    return Result.collect(rawEdits.map(e => Entry.editFromRaw(auth, e)));
 }

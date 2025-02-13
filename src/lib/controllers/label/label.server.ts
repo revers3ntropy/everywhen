@@ -1,7 +1,6 @@
 import { Subscription } from '$lib/controllers/subscription/subscription.server';
 import { UsageLimits } from '$lib/controllers/usageLimits/usageLimits.server';
 import { query } from '$lib/db/mysql.server';
-import { decrypt, encrypt } from '$lib/utils/encryption';
 import { FileLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 import { normaliseWordForIndex } from '$lib/utils/text';
@@ -28,30 +27,20 @@ namespace LabelServer {
             return Result.err('Label not found');
         }
 
-        const nameDecrypted = decrypt(res[0].name, auth.key);
-        if (!nameDecrypted.ok) return nameDecrypted.cast();
-
-        return Result.ok({
-            id: res[0].id,
-            color: res[0].color,
-            name: nameDecrypted.val,
-            created: res[0].created
-        });
+        return Result.ok(res[0]);
     }
 
-    export async function fromName(auth: Auth, nameDecrypted: string): Promise<Result<Label>> {
-        const encryptedName = encrypt(nameDecrypted, auth.key);
-
+    export async function fromName(auth: Auth, name: string): Promise<Result<Label>> {
         const res = await query<{ id: string; color: string; name: string; created: number }[]>`
             SELECT id, color, name, created
             FROM labels
-            WHERE name = ${encryptedName}
+            WHERE name = ${name}
               AND userId = ${auth.id}
         `;
         if (res.length !== 1) {
             if (res.length !== 0) {
                 void labelLogger.error(`Got ${res.length} rows for label name`, {
-                    nameDecrypted,
+                    name,
                     res,
                     userId: auth.id
                 });
@@ -59,44 +48,31 @@ namespace LabelServer {
             return Result.err('Label not found');
         }
 
-        return Result.ok({
-            id: res[0].id,
-            color: res[0].color,
-            name: nameDecrypted,
-            created: res[0].created
-        });
+        return Result.ok(res[0]);
     }
 
-    export async function all(auth: Auth): Promise<Result<Label[]>> {
-        const res = await query<{ id: string; color: string; name: string; created: number }[]>`
+    export async function all(auth: Auth): Promise<Label[]> {
+        return await query<
+            {
+                id: string;
+                color: string;
+                name: string;
+                created: number;
+            }[]
+        >`
             SELECT id, color, name, created
             FROM labels
             WHERE userId = ${auth.id}
         `;
-
-        return Result.collect(
-            res.map(label => {
-                const nameDecrypted = decrypt(label.name, auth.key);
-                if (!nameDecrypted.ok) return nameDecrypted.cast();
-                return Result.ok({
-                    id: label.id,
-                    color: label.color,
-                    name: nameDecrypted.val,
-                    created: label.created
-                });
-            })
-        );
     }
 
-    export async function allIndexedById(auth: Auth): Promise<Result<Record<string, Label>>> {
-        return (await Label.all(auth)).map(labels =>
-            labels.reduce(
-                (prev, label) => {
-                    prev[label.id] = label;
-                    return prev;
-                },
-                {} as Record<string, Label>
-            )
+    export async function allIndexedById(auth: Auth): Promise<Record<string, Label>> {
+        return (await Label.all(auth)).reduce(
+            (prev, label) => {
+                prev[label.id] = label;
+                return prev;
+            },
+            {} as Record<string, Label>
         );
     }
 
@@ -155,19 +131,20 @@ namespace LabelServer {
         const id = await UId.generate();
         const created = json.created ?? nowUtc();
 
-        const encryptedName = encrypt(json.name, auth.key);
+        if (json.name.length > UsageLimits.LIMITS.label.nameLenMax)
+            return Result.err('Label name too long');
+        if (json.name.length < UsageLimits.LIMITS.label.nameLenMin)
+            return Result.err('Label name too short');
 
-        if (encryptedName.length > 256) {
-            return Result.err('Name too long');
-        }
+        const [count, max] = await UsageLimits.labelUsage(
+            auth,
+            await Subscription.getCurrentSubscription(auth)
+        );
+        if (count >= max) return Result.err(`Maximum number of labels (${max}) reached`);
 
         await query`
             INSERT INTO labels (id, userId, name, color, created)
-            VALUES (${id},
-                    ${auth.id},
-                    ${encryptedName},
-                    ${json.color},
-                    ${created})
+            VALUES (${id}, ${auth.id}, ${json.name}, ${json.color}, ${created})
         `;
 
         return Result.ok({
@@ -187,15 +164,14 @@ namespace LabelServer {
             return Result.err('Label with that name already exists');
         }
 
-        const encryptedName = encrypt(name, auth.key);
-
-        if (encryptedName.length > 256) {
-            return Result.err('Name too long');
-        }
+        if (name.length > UsageLimits.LIMITS.label.nameLenMax)
+            return Result.err('Label name too long');
+        if (name.length < UsageLimits.LIMITS.label.nameLenMin)
+            return Result.err('Label name too short');
 
         await query`
             UPDATE labels
-            SET name = ${encryptedName}
+            SET name = ${name}
             WHERE id = ${label.id}
         `;
 
@@ -204,19 +180,18 @@ namespace LabelServer {
         return Result.ok(label);
     }
 
-    export async function updateColor(label: Label, color: string): Promise<Result<Label>> {
+    export async function updateColor(label: Label, color: string): Promise<void> {
         await query`
             UPDATE labels
             SET color = ${color}
             WHERE id = ${label.id}
         `;
-
-        label.color = color;
-
-        return Result.ok(label);
     }
 
-    export async function withCount(auth: Auth, id: string): Promise<Result<LabelWithCount>> {
+    export async function fromIdWithUsageCounts(
+        auth: Auth,
+        id: string
+    ): Promise<Result<LabelWithCount>> {
         const label = await fromId(auth, id);
         if (!label.ok) return label.cast();
 
@@ -253,9 +228,7 @@ namespace LabelServer {
         });
     }
 
-    export async function allWithCounts(
-        auth: Auth
-    ): Promise<Result<Record<string, LabelWithCount>>> {
+    export async function allWithCounts(auth: Auth): Promise<Record<string, LabelWithCount>> {
         const allEntryLabelIds = (
             await query<{ labelId: string }[]>`
                 SELECT labelId
@@ -279,78 +252,39 @@ namespace LabelServer {
         ).map(({ labelId }) => labelId);
 
         return (await all(auth))
-            .map(labels =>
-                labels.map(label => {
-                    // TODO: this is O(n^2) and should be optimized
-                    const entryCount = allEntryLabelIds.filter(l => l === label.id).length;
-                    const eventCount = allEventLabelIds.filter(l => l === label.id).length;
-                    const editCount = allEditLabelIds.filter(l => l === label.id).length;
-                    return {
-                        ...label,
-                        entryCount,
-                        eventCount,
-                        editCount
-                    };
-                })
-            )
-            .map(labels =>
-                labels.reduce(
-                    (prev, label) => {
-                        prev[label.id] = label;
-                        return prev;
-                    },
-                    {} as Record<string, LabelWithCount>
-                )
+            .map(label => {
+                // TODO: this is O(n^2) and should be optimized
+                const entryCount = allEntryLabelIds.filter(l => l === label.id).length;
+                const eventCount = allEventLabelIds.filter(l => l === label.id).length;
+                const editCount = allEditLabelIds.filter(l => l === label.id).length;
+                return {
+                    ...label,
+                    entryCount,
+                    eventCount,
+                    editCount
+                };
+            })
+            .reduce(
+                (prev, label) => {
+                    prev[label.id] = label;
+                    return prev;
+                },
+                {} as Record<string, LabelWithCount>
             );
     }
 
-    export async function updateEncryptedFields(
-        userId: string,
-        oldDecrypt: (a: string) => Result<string>,
-        newEncrypt: (a: string) => string
-    ): Promise<Result<null[], string>> {
-        const labels = await query<
-            {
-                id: string;
-                name: string;
-            }[]
-        >`
-            SELECT id, name
-            FROM labels
-            WHERE userId = ${userId}
-        `;
-
-        return await Result.collectAsync(
-            labels.map(async (label): Promise<Result<null>> => {
-                const nameRes = oldDecrypt(label.name);
-                if (!nameRes.ok) return nameRes.cast();
-
-                await query`
-                    UPDATE labels
-                    SET name = ${newEncrypt(nameRes.val)}
-                    WHERE id = ${label.id}
-                      AND userId = ${userId}
-                `;
-                return Result.ok(null);
-            })
-        );
-    }
-
-    export async function search(auth: Auth, str: string): Promise<Result<LabelWithCount[]>> {
+    export async function search(auth: Auth, str: string): Promise<LabelWithCount[]> {
         const labelsMap = await Label.allWithCounts(auth);
-        if (!labelsMap.ok) return labelsMap.cast();
 
         // filter labels if any of the parts of the search query are found in the name
         const searchStrParts = str.split(' ').map(normaliseWordForIndex);
 
-        return Result.ok(
-            Object.entries(labelsMap.val)
-                .map(([id, label]) => ({ ...label, id }))
-                .filter(l => {
-                    const name = l.name.toLowerCase();
-                    return searchStrParts.find(part => name.includes(part)) !== undefined;
-                })
-        );
+        return Object.entries(labelsMap)
+            .map(([id, label]) => ({ ...label, id }))
+            .filter(l => {
+                const name = l.name.toLowerCase();
+                return searchStrParts.find(part => name.includes(part)) !== undefined;
+            });
     }
 }
 

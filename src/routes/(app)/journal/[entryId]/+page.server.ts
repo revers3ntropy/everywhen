@@ -1,3 +1,4 @@
+import { Label } from '$lib/controllers/label/label.server';
 import { error } from '@sveltejs/kit';
 import { Entry } from '$lib/controllers/entry/entry.server';
 import { Location } from '$lib/controllers/location/location.server';
@@ -9,6 +10,7 @@ export const load = cachedPageRoute(async (auth, { params, url }) => {
     return {
         entry: (await Entry.getFromId(auth, params.entryId, false)).unwrap(e => error(404, e)),
         locations: (await Location.all(auth)).unwrap(e => error(500, e)),
-        showHistory: GETParamIsTruthy(url.searchParams.get('history'))
+        showHistory: GETParamIsTruthy(url.searchParams.get('history')),
+        labels: await Label.allIndexedById(auth)
     };
 }) satisfies PageServerLoad;

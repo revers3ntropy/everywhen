@@ -22,6 +22,7 @@
     import { Feed } from '$lib/controllers/feed/feed';
     import type { Label } from '$lib/controllers/label/label';
     import { settingsStore } from '$lib/stores';
+    import { omit } from '$lib/utils';
     import { Day } from '$lib/utils/day';
     import { showPopup } from '$lib/utils/popups';
     import { fly, slide } from 'svelte/transition';
@@ -176,13 +177,15 @@
                                 class="flex-center rounded-full absolute top-3 md:-left-[9px] bg-border w-4 h-4"
                             />
                         </div>
-                        <EntryFeedItem entry={item} {obfuscated} {showLabels} {locations} />
-                    {:else if item.type === 'entry-edit'}
-                        <EntryEditFeedItem
-                            {...(({ type: _, ...rest }) => rest)(item)}
-                            {locations}
+                        <EntryFeedItem
+                            entry={item}
                             {obfuscated}
+                            {showLabels}
+                            {locations}
+                            {labels}
                         />
+                    {:else if item.type === 'entry-edit'}
+                        <EntryEditFeedItem {...omit(item, 'type')} {locations} {obfuscated} />
                     {:else if item.type === 'sleep'}
                         <SleepInfo
                             tzOffset={item.startTzOffset}

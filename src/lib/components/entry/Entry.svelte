@@ -37,7 +37,7 @@
     export let body: string;
     export let created: number;
     export let createdTzOffset: number;
-    export let label: LabelController | null;
+    export let labelId: string | null;
     export let latitude: number | null;
     export let longitude: number | null;
     export let deleted: null | number;
@@ -54,6 +54,7 @@
     export let isInDialog = false;
 
     export let locations: Location[];
+    export let labels: Record<string, LabelController>;
 
     async function deleteSelf() {
         const thisIsDeleted = Entry.isDeleted({ deleted });
@@ -96,7 +97,7 @@
             longitude,
             agentData,
             wordCount,
-            label,
+            labelId,
             edits
         };
 
@@ -200,7 +201,7 @@
             {/if}
 
             {#if showLabels}
-                <Label {label} {obfuscated} />
+                <Label label={labelId ? labels[labelId] : null} {obfuscated} />
             {/if}
 
             <div class="title" class:obfuscated>

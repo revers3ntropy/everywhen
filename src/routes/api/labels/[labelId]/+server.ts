@@ -29,7 +29,7 @@ export const PUT = (async ({ cookies, request, params }) => {
     }
 
     if (body.color) {
-        (await Label.updateColor(label, body.color)).unwrap(e => error(400, e));
+        await Label.updateColor(label, body.color);
     }
 
     return apiResponse(auth, {});
@@ -44,7 +44,7 @@ export const DELETE = (async ({ cookies, params, request }) => {
     }
 
     const { entryCount, editCount, eventCount } = (
-        await Label.withCount(auth, params.labelId)
+        await Label.fromIdWithUsageCounts(auth, params.labelId)
     ).unwrap(e => error(400, e));
 
     if (entryCount + editCount + eventCount < 1) {

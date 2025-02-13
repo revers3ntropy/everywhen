@@ -1,4 +1,5 @@
 <script lang="ts">
+    import type { Label } from '$lib/controllers/label/label';
     import { onMount } from 'svelte';
     import { popup } from '$lib/stores';
     import type { Location } from '$lib/controllers/location/location';
@@ -10,38 +11,33 @@
 
     export let id: string;
     export let obfuscated = false;
+    export let locations: Location[];
+    export let labels: Record<string, Label>;
 
     let entry = null as EntryController | null;
-
-    // TODO receive this as a prop
-    let locations: Location[] = [];
 
     async function loadEntry() {
         entry = notify.onErr(await api.get(apiPath('/entries/?', id)), () => popup.set(null));
     }
 
-    async function loadLocations() {
-        locations = notify.onErr(await api.get('/locations')).locations;
-    }
-
-    onMount(() => {
-        void loadEntry();
-        void loadLocations();
+    onMount(async () => {
+        await loadEntry();
     });
 </script>
 
-<div>
+<div class="min-h-[calc(100vh - 100px)]">
     {#if entry}
         {#key locations}
-            <Entry {...entry} isInDialog={true} {obfuscated} showFullDate={true} {locations} />
+            <Entry
+                {...entry}
+                isInDialog={true}
+                {obfuscated}
+                showFullDate={true}
+                {locations}
+                {labels}
+            />
         {/key}
     {:else}
         <BookSpinner />
     {/if}
 </div>
-
-<style lang="scss">
-    div {
-        min-height: calc(100vh - 100px);
-    }
-</style>

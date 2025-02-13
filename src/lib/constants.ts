@@ -5,6 +5,9 @@ export const REMEMBER_ME_COOKIE_TIMEOUT_DAYS = 365;
 
 export const UUID_LEN = 32;
 
+export const ENCRYPTED_TEXT_PREFIX = '~#';
+export const NON_ENCRYPTED_TEXT_PREFIX = '!:';
+
 const KEY_PREFIX = '__everywhen_' as const;
 
 export const LS_KEYS = {
