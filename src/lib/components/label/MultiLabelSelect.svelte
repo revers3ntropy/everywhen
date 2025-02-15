@@ -6,6 +6,9 @@
     import type { Label } from '$lib/controllers/label/label';
     import { showPopup } from '$lib/utils/popups';
     import NewLabelDialog from '$lib/components/dialogs/NewLabelDialog.svelte';
+    import { tryDecryptText } from '$lib/utils/encryption.client';
+    import EncryptedText from '../ui/EncryptedText.svelte';
+    import Button from '../ui/button/button.svelte';
 
     export let labels: Record<string, Label>;
     export let value = [] as string[];
@@ -41,49 +44,53 @@
 </script>
 
 <span class="select-label">
-    <button on:click={() => toggleLabel('')} class="label-button" aria-label="Remove label">
+    <button
+        on:click={() => toggleLabel('')}
+        class="flex gap-2 hover:bg-vLightAccent w-full p-1"
+        aria-label="toggle no label"
+    >
         <span class="flex-center">
             <span
                 class="entry-color"
                 class:selected={value.includes('')}
-                style="--label-color: var(--text-color)"
+                class:bg-foreground={value.includes('')}
             />
         </span>
-        <span
-            class="flex-center"
-            style="justify-content: flex-start; width: 100%; padding: 0 0.5rem"
-        >
-            <span class="flex-center">
-                <LabelOffOutline size="25" />
-            </span>
-            <span class="label-name"> No Label </span>
+        <span class="flex items-center w-full">
+            <LabelOffOutline size="25" />
+            No Label
         </span>
     </button>
     {#each Object.keys(labels).sort((a, b) => a.localeCompare(b)) as label (label)}
+        {@const selected = value.includes(label)}
         <button
             on:click={() => toggleLabel(label)}
-            class="label-button"
-            aria-label="Select label {labels[label].name}"
+            class="flex gap-2 hover:bg-vLightAccent w-full p-1"
+            aria-label="toggle label {tryDecryptText(labels[label].name)}"
         >
             <span class="flex-center">
                 <span
                     class="entry-color"
-                    class:selected={value.includes(label)}
-                    style="--label-color: {labels[label].color}"
+                    class:selected
+                    style="border: 3px solid {labels[label].color}; {selected
+                        ? `background: ${labels[label].color}`
+                        : ''}"
                 />
             </span>
-            <span class="ellipsis w-full text-left px-2 label-name">
-                {labels[label].name}
-            </span>
+            <EncryptedText text={labels[label].name} class="ellipsis w-full text-left" />
         </button>
     {/each}
     {#if showAddButton}
-        <button on:click={showNewLabelPopup} class="label-button" aria-label="Create new label">
-            <span class="flex-center">
+        <div class="pt-2">
+            <Button
+                on:click={showNewLabelPopup}
+                class="flex items-center justify-start w-full gap-2"
+                aria-label="Create new label"
+            >
                 <Plus size="25" />
-            </span>
-            <span class="label-name"> New Label </span>
-        </button>
+                New Label
+            </Button>
+        </div>
     {/if}
 </span>
 
@@ -97,33 +104,19 @@
         align-items: center;
         padding: 1rem 0;
 
-        .label-button {
-            padding: 4px;
-            width: 100%;
-            display: grid;
-            grid-template-columns: auto 1fr;
-            place-items: center;
+        .entry-color {
+            border-radius: $border-radius;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--label-color);
 
-            &:hover {
-                background: var(--v-light-accent);
-            }
-
-            .entry-color {
-                border-radius: $border-radius;
-                width: 20px;
-                height: 20px;
-                border: 3px solid var(--label-color);
-
-                &.selected {
-                    background: var(--label-color);
-
-                    &::after {
-                        content: '\2713';
-                        display: block;
-                        width: 100%;
-                        height: 100%;
-                        color: var(--text-color-light);
-                    }
+            &.selected {
+                &::after {
+                    content: '\2713';
+                    display: block;
+                    width: 100%;
+                    height: 100%;
+                    color: var(--text-color-light);
                 }
             }
         }
