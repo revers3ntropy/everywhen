@@ -19,15 +19,21 @@
             notify.error('Invalid Name');
             return;
         }
+        const encryptedName = tryEncryptText(labelName);
 
         const { id } = notify.onErr(
             await api.post('/labels', {
-                name: tryEncryptText(labelName),
+                name: encryptedName,
                 color: labelColor
             })
         );
 
-        const label = { id, color: labelColor, name: labelName, created: nowUtc() } satisfies Label;
+        const label = {
+            id,
+            color: labelColor,
+            name: encryptedName,
+            created: nowUtc()
+        } satisfies Label;
         await dispatch.create('label', label);
 
         labelName = '';

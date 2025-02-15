@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Button } from '$lib/components/ui/button';
     import { Entry } from '$lib/controllers/entry/entry';
+    import { tryEncryptText } from '$lib/utils/encryption.client';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
     import Pencil from 'svelte-material-icons/Pencil.svelte';
     import Moon from 'svelte-material-icons/MoonWaningCrescent.svelte';
@@ -22,14 +23,14 @@
         name: string,
         defaultColor: string
     ): Promise<string> {
+        const nameEncrypted = tryEncryptText(name);
         const { labels } = notify.onErr(await api.get('/labels'));
-        const label = labels.find(label => label.name === name);
-        if (label) {
-            return label.id;
-        }
+        const label = labels.find(label => label.name === nameEncrypted);
+        if (label) return label.id;
+
         const res = notify.onErr(
             await api.post('/labels', {
-                name,
+                name: nameEncrypted,
                 color: defaultColor
             })
         );

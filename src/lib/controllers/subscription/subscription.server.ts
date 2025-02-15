@@ -29,7 +29,9 @@ export namespace Subscription {
     }
 
     export async function getPriceList(): Promise<Pricing[]> {
-        if (!stripe) throw 'Stripe not configured';
+        // for dev environment, don't want to have to give Stripe
+        // secret key for settings page and others to work
+        if (!stripe) return [];
         if (priceCache) return priceCache;
         const prices = await stripe.prices.list();
 

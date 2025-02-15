@@ -3,6 +3,7 @@
     import EventsList from '$lib/components/event/EventsList.svelte';
     import Textbox from '$lib/components/ui/Textbox.svelte';
     import { listen } from '$lib/dataChangeEvents';
+    import { tryDecryptText, tryEncryptText } from '$lib/utils/encryption.client.js';
     import Delete from 'svelte-material-icons/Delete.svelte';
     import Entries from '$lib/components/entry/Entries.svelte';
     import { obfuscated } from '$lib/stores';
@@ -14,10 +15,12 @@
 
     export let data: PageData;
 
+    let nameDecrypted = tryDecryptText(data.label.name);
+
     async function updateName() {
         notify.onErr(
             await api.put(apiPath('/labels/?', data.label.id), {
-                name: data.label.name
+                name: tryEncryptText(nameDecrypted)
             })
         );
     }
@@ -79,7 +82,7 @@
 </script>
 
 <svelte:head>
-    <title>{data.label.name} | Label</title>
+    <title>{nameDecrypted} | Label</title>
 </svelte:head>
 
 <main class="md:p-4 md:pl-4 flex-center">
@@ -89,7 +92,7 @@
             <input type="color" bind:value={data.label.color} on:change={updateColor} />
         </div>
         <div class="overflow-x-hidden md:flex justify-between align-center py-2">
-            <Textbox bind:value={data.label.name} on:change={updateName} label="Name" />
+            <Textbox bind:value={nameDecrypted} on:change={updateName} label="Name" />
             <button class="with-circled-icon danger" on:click={deleteLabel}>
                 <Delete size="30" />
                 Delete this Label

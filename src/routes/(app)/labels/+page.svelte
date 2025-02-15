@@ -1,48 +1,38 @@
 <script lang="ts">
-    import type { LabelWithCount } from '$lib/controllers/label/label';
+    import { goto } from '$app/navigation';
+    import { Button } from '$lib/components/ui/button';
+    import { tryEncryptText } from '$lib/utils/encryption.client';
     import type { PageData } from './$types';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import { api } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
-    import { nowUtc } from '$lib/utils/time';
     import { listen } from '$lib/dataChangeEvents';
     import LabelOptions from '$lib/components/label/LabelLink.svelte';
     import { omit } from '$lib/utils';
 
     export let data: PageData;
 
-    let { labels } = data;
-
-    $: labelsList = Object.values(labels);
+    $: labelsList = Object.values(data.labels);
 
     async function newLabel() {
-        let name = 'New Label';
+        let name = tryEncryptText('New Label');
         let i = 0;
         while (labelsList.some(l => l.name === name)) {
-            name = `New Label ${++i}`;
+            name = tryEncryptText(`New Label ${++i}`);
         }
 
-        const newLabelData = {
-            name,
-            color: '#000'
-        };
+        const { id } = notify.onErr(
+            await api.post('/labels', {
+                name,
+                color: '#000'
+            })
+        );
 
-        const { id } = notify.onErr(await api.post('/labels', newLabelData));
-
-        const newLabel = {
-            ...newLabelData,
-            id,
-            created: nowUtc(),
-            entryCount: 0,
-            eventCount: 0,
-            editCount: 0
-        } satisfies LabelWithCount;
-        labelsList = [...labelsList, newLabel];
-        labels[id] = newLabel;
+        await goto(`/labels/${id}`);
     }
 
     listen.label.onDelete(id => {
-        delete labels[id];
+        delete data.labels[id];
     });
 </script>
 
@@ -52,15 +42,31 @@
 
 <main class="md:p-4 md:pl-4 flex-center">
     <div class="w-full md:max-w-5xl">
-        <button class="ml-2 mb-4 primary flex-center gap-1" on:click={newLabel}>
-            <Plus size="30" />
-            New Label
-        </button>
-        <div class="w-fit">
-            {#each labelsList as label}
-                <LabelOptions {...omit(label, 'created', 'editCount')} />
-                <hr />
-            {/each}
+        <div class="flex justify-between items-end pb-2 px-2">
+            <div>
+                <h2>Labels</h2>
+            </div>
+            <div class="">
+                <Button class="primary flex-center gap-1" on:click={newLabel}>
+                    <Plus size="30" />
+                    New Label
+                </Button>
+            </div>
+        </div>
+
+        <div class="w-full">
+            {#if labelsList.length}
+                <div class="md:border border-border md:rounded-xl overflow-hidden">
+                    {#each labelsList as label, i}
+                        <LabelOptions {...omit(label, 'created', 'editCount')} />
+                        {#if i < labelsList.length - 1}
+                            <hr />
+                        {/if}
+                    {/each}
+                </div>
+            {:else}
+                <p class="text-light italic">No labels</p>
+            {/if}
         </div>
     </div>
 </main>

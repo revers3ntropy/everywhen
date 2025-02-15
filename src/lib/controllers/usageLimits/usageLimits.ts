@@ -1,27 +1,29 @@
 import { SubscriptionType } from '$lib/controllers/subscription/subscription';
 
 export namespace UsageLimits {
+    // 130 characters gives 4 32-char 'chunks' of encryption plus the 2 character
+    // encryption prefix
     export const LIMITS = {
         asset: {
             contentLenMax: (8 * 1024 * 1024) as number,
             nameLenMin: 1 as number,
-            nameLenMax: 128 as number
+            nameLenMax: 130 as number
         },
         dataset: {
-            nameLenMax: 32 as number,
+            nameLenMax: 130 as number,
             nameLenMin: 1 as number
         },
         entry: {},
         event: {
-            nameLenMax: 64 as number,
+            nameLenMax: 130 as number,
             nameLenMin: 1 as number
         },
         label: {
-            nameLenMax: 64 as number,
+            nameLenMax: 130 as number,
             nameLenMin: 1 as number
         },
         location: {
-            nameLenMax: 64 as number,
+            nameLenMax: 130 as number,
             nameLenMin: 1 as number
         },
         user: {

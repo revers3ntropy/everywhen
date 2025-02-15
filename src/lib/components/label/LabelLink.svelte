@@ -1,5 +1,6 @@
 <script lang="ts">
     import LabelDot from '$lib/components/label/LabelDot.svelte';
+    import EncryptedText from '$lib/components/ui/EncryptedText.svelte';
 
     export let id: string;
     export let color: string;
@@ -11,7 +12,9 @@
 
 <a href="/labels/{id}" class="label">
     <LabelDot {color} big />
-    <span class="px-4">{name}</span>
+    <span class="pl-4">
+        <EncryptedText text={name} />
+    </span>
     <span class="text-textColorLight">
         {entryCount}
         {entryCount === 1 ? 'entry' : 'entries'}{#if eventCount > 0},

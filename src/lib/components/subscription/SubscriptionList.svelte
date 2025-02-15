@@ -16,7 +16,11 @@
     }
 </script>
 
-<p class="text-lg">Upgrade to Everywhen Plus</p>
-<p class="py-2 text-light">{(price.price / 100).toFixed(2)} GBP / month</p>
+{#if price}
+    <p class="text-lg">Upgrade to Everywhen Plus</p>
+    <p class="py-2 text-light">{(price.price / 100).toFixed(2)} GBP / month</p>
 
-<Button type="submit" on:click={subscribeWithStripe}>Upgrade now</Button>
+    <Button type="submit" on:click={subscribeWithStripe}>Upgrade now</Button>
+{:else}
+    <p>Payments with Stripe don't seem to be working!</p>
+{/if}

@@ -1,6 +1,6 @@
 {
   "name": "everywhen",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "type": "module",
   "private": true,
   "scripts": {
@@ -59,7 +59,6 @@
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-prettier": "5.1.3",
     "eslint-plugin-svelte": "2.41.0",
-    "filedrop-svelte": "0.1.2",
     "js-cookie": "3.0.5",
     "js-sha256": "0.11.0",
     "lucide-svelte": "0.438.0",
