@@ -61,9 +61,9 @@
             Something went wrong, please try again later
         {:else}
             <section class="flex flex-wrap gap-8 md:gap-x-16 container md:p-4">
-                <StatPill value={data.entryCount} label="entries" />
-                <StatPill value={daysSinceFirstEntry} label="days" />
-                <StatPill value={data.wordCount} label="words" />
+                <StatPill value={data.entryCount.toLocaleString()} label="entries" />
+                <StatPill value={daysSinceFirstEntry.toLocaleString()} label="days" />
+                <StatPill value={data.wordCount.toLocaleString()} label="words" />
                 <StatPill
                     value={(data.wordCount / daysSinceFirstEntry).toFixed(1)}
                     label="words / day"
@@ -76,7 +76,7 @@
                     value={(data.entryCount / Math.max(daysSinceFirstEntry / 7, 1)).toFixed(1)}
                     label="entries / week"
                 />
-                <StatPill value={uniqueWordCount} label="unique words" />
+                <StatPill value={uniqueWordCount.toLocaleString()} label="unique words" />
             </section>
 
             <div class="container my-4 p-4">
