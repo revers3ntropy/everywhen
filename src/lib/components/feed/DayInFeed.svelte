@@ -7,7 +7,12 @@
 </script>
 
 <script lang="ts">
-    import WeatherDialog from '$lib/components/dialogs/WeatherDialog.svelte';
+    import { onMount } from 'svelte';
+    import { fly, slide } from 'svelte/transition';
+    import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
+    import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
+    import * as Popover from '$lib/components/ui/popover';
+    import WeatherDialog from '$lib/components/dataset/WeatherDialog.svelte';
     import EntryForm from '$lib/components/entryForm/EntryForm.svelte';
     import EnableWeatherWidget from '$lib/components/weather/EnableWeatherWidget.svelte';
     import EntryEditFeedItem from '$lib/components/feed/EntryEditFeedItem.svelte';
@@ -24,17 +29,12 @@
     import { settingsStore } from '$lib/stores';
     import { omit } from '$lib/utils';
     import { Day } from '$lib/utils/day';
-    import { showPopup } from '$lib/utils/popups';
-    import { fly, slide } from 'svelte/transition';
-    import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
-    import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import { ANIMATION_DURATION } from '$lib/constants';
     import type { Location } from '$lib/controllers/location/location';
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
     import Dot from '../ui/Dot.svelte';
     import UtcTime from '../ui/UtcTime.svelte';
     import type { FeedDay } from '$lib/controllers/feed/feed';
-    import { onMount } from 'svelte';
     import HappinessDatasetShortcut from '$lib/components/dataset/HappinessDatasetShortcut.svelte';
     import type { Dataset } from '$lib/controllers/dataset/dataset';
 
@@ -139,15 +139,15 @@
             </div>
             <div class="flex-center gap-4">
                 {#if day.weather}
-                    <button
-                        on:click={() =>
-                            showPopup(WeatherDialog, {
-                                day: Day.fromString(day.day).unwrap(),
-                                weather: day.weather
-                            })}
-                    >
-                        <WeatherWidget weather={day.weather} />
-                    </button>
+                    <Popover.Root>
+                        <Popover.Trigger><WeatherWidget weather={day.weather} /></Popover.Trigger>
+                        <Popover.Content>
+                            <WeatherDialog
+                                day={Day.fromString(day.day).unwrap()}
+                                weather={day.weather}
+                            />
+                        </Popover.Content>
+                    </Popover.Root>
                 {:else if $settingsStore.homeLocation.value[0] === null && isToday}
                     <EnableWeatherWidget />
                 {/if}

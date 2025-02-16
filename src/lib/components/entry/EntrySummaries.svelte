@@ -1,15 +1,15 @@
 <script lang="ts">
-    import EntryDialog from '$lib/components/dialogs/EntryDialog.svelte';
+    import { slide } from 'svelte/transition';
+    import EyeOff from 'svelte-material-icons/EyeOff.svelte';
+    import Eye from 'svelte-material-icons/Eye.svelte';
+    import OpenInApp from 'svelte-material-icons/OpenInApp.svelte';
+    import * as Dialog from '$lib/components/ui/dialog';
+    import EntryDialog from '$lib/components/entry/EntryDialog.svelte';
     import type { Label } from '$lib/controllers/label/label';
     import type { Location } from '$lib/controllers/location/location';
-    import { showPopup } from '$lib/utils/popups';
-    import { slide } from 'svelte/transition';
     import LabelDot from '$lib/components/label/LabelDot.svelte';
     import { ANIMATION_DURATION } from '$lib/constants';
     import { listen } from '$lib/dataChangeEvents';
-    import Eye from 'svelte-material-icons/Eye.svelte';
-    import OpenInApp from 'svelte-material-icons/OpenInApp.svelte';
-    import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import { Entry, type EntrySummary } from '$lib/controllers/entry/entry';
     import { currentTzOffset, fmtUtc, nowUtc, utcEq } from '$lib/utils/time';
     import Dot from '../ui/Dot.svelte';
@@ -157,17 +157,14 @@
                         <span
                             class="hide-mobile opacity-0 group-hover:opacity-100 hover:bg-lightAccent flex-center rounded-md"
                         >
-                            <button
-                                on:click={() =>
-                                    showPopup(EntryDialog, {
-                                        id: entry.id,
-                                        locations,
-                                        labels
-                                    })}
-                                aria-label="Open entry in dialog"
-                            >
-                                <OpenInApp size="20" />
-                            </button>
+                            <Dialog.Root>
+                                <Dialog.Trigger aria-label="Open entry in dialog">
+                                    <OpenInApp size="20" />
+                                </Dialog.Trigger>
+                                <Dialog.Content>
+                                    <EntryDialog id={entry.id} {locations} {labels} />
+                                </Dialog.Content>
+                            </Dialog.Root>
                         </span>
                     </span>
                 {/each}

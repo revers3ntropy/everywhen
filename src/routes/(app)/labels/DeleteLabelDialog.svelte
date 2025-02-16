@@ -3,7 +3,6 @@
     import { dispatch } from '$lib/dataChangeEvents';
     import LabelSelect from '$lib/components/label/LabelSelect.svelte';
     import type { Label } from '$lib/controllers/label/label';
-    import { popup } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
     import { slide } from 'svelte/transition';

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import * as Dialog from '$lib/components/ui/dialog';
     import { canvasState, type RenderProps, START_ZOOM } from '$lib/components/canvas/canvasState';
     import { DurationRectCollider } from '$lib/components/canvas/collider';
     import { interactable } from '$lib/components/canvas/interactable';
@@ -9,7 +10,6 @@
     import { dispatch, listen } from '$lib/dataChangeEvents';
     import { obfuscated } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
-    import { showPopup } from '$lib/utils/popups';
     import { limitStrLen } from '$lib/utils/text';
     import type { Pixels, TimestampSecs } from '../../../types';
     import EventDragHandle from './EventDragHandle.svelte';
@@ -25,6 +25,8 @@
     export let label: Label | null;
     export let yLevel = 0;
     export let eventTextParityHeight: boolean;
+
+    let popupOpen = false;
 
     function yRenderPos(centerLineY: number): number {
         const y = isInstantEvent ? 0 : yLevel;
@@ -108,21 +110,7 @@
 
             if (Math.abs(state.timeToX(dragStart) - state.timeToX(start)) < (4 as Pixels)) {
                 // click
-                showPopup(Event, {
-                    obfuscated: false,
-                    event: {
-                        id,
-                        start,
-                        end,
-                        tzOffset,
-                        name,
-                        label,
-                        created
-                    },
-                    labels,
-                    expanded: true,
-                    allowCollapseChange: false
-                });
+                popupOpen = true;
                 return;
             }
 
@@ -275,6 +263,26 @@
         thisIsDeleted = true;
     });
 </script>
+
+<Dialog.Root bind:open={popupOpen}>
+    <Dialog.Content>
+        <Event
+            obfuscated={false}
+            event={{
+                id,
+                start,
+                end,
+                tzOffset,
+                name,
+                label,
+                created
+            }}
+            {labels}
+            expanded
+            allowCollapseChange={false}
+        />
+    </Dialog.Content>
+</Dialog.Root>
 
 {#if !isInstantEvent && !thisIsDeleted}
     <EventDragHandle {id} {start} {end} height={HEIGHT} getY={getYForDragHandle} {updateEvent} />

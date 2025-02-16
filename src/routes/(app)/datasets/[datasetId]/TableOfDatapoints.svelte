@@ -1,6 +1,7 @@
 <script lang="ts">
     import Delete from 'svelte-material-icons/DeleteOutline.svelte';
     import Pencil from 'svelte-material-icons/Pencil.svelte';
+    import * as Popover from '$lib/components/ui/popover';
     import { notify } from '$lib/components/notifications/notifications';
     import { dispatch } from '$lib/dataChangeEvents';
     import { api, apiPath } from '$lib/utils/apiRequest';
@@ -10,7 +11,6 @@
         type DatasetMetadata,
         type DatasetRow
     } from '$lib/controllers/dataset/dataset';
-    import { showPopup } from '$lib/utils/popups';
     import { builtInTypes } from '$lib/controllers/dataset/columnTypes';
     import EditDatasetColumnDialog from './EditDatasetColumnDialog.svelte';
 
@@ -93,19 +93,19 @@
                     class:hover:bg-lightAccent={!dataset.preset}
                 >
                     {#if !dataset.preset}
-                        <button
-                            class="group p-2 w-full"
-                            on:click={() =>
-                                showPopup(EditDatasetColumnDialog, {
-                                    datasetId: dataset.id,
-                                    column
-                                })}
-                        >
-                            {column.name}
-                            <span class="invisible group-hover:visible">
-                                <Pencil size={18} />
-                            </span>
-                        </button>
+                        <Popover.Root>
+                            <Popover.Trigger>
+                                <span class="group p-2 w-full">
+                                    {column.name}
+                                    <span class="invisible group-hover:visible">
+                                        <Pencil size={18} />
+                                    </span>
+                                </span>
+                            </Popover.Trigger>
+                            <Popover.Content>
+                                <EditDatasetColumnDialog datasetId={dataset.id} {column} />
+                            </Popover.Content>
+                        </Popover.Root>
                     {:else}
                         {column.name}
                     {/if}

@@ -1,6 +1,6 @@
 <script lang="ts">
     import { afterNavigate, beforeNavigate } from '$app/navigation';
-    import AllowCookies from '$lib/components/AllowCookies.svelte';
+    import AllowCookies from '$lib/components/auth/AllowCookies.svelte';
     import { Auth } from '$lib/controllers/auth/auth';
     import { Result } from '$lib/utils/result';
     import type { LayoutData } from './$types';
@@ -18,7 +18,7 @@
     import { notify } from '$lib/components/notifications/notifications';
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
     import Nav from '$lib/components/nav/Nav.svelte';
-    import PasscodeModal from '$lib/components/dialogs/PasscodeModal.svelte';
+    import PasscodeModal from '$lib/components/auth/PasscodeModal.svelte';
 
     export let data: LayoutData;
 

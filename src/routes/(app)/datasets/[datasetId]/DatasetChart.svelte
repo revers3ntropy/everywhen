@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Select from '$lib/components/Select.svelte';
+    import Select from '$lib/components/ui/Select.svelte';
     import { builtInTypes } from '$lib/controllers/dataset/columnTypes';
     import type { DatasetMetadata, DatasetRow } from '$lib/controllers/dataset/dataset';
     import { cssVarValue } from '$lib/utils/getCssVar';

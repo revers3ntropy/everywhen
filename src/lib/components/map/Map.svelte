@@ -26,12 +26,11 @@
     import type { EntryAsLocation } from '$lib/controllers/entry/entry';
     import { Location } from '$lib/controllers/location/location';
     import { notify } from '$lib/components/notifications/notifications';
-    import { popup, settingsStore } from '$lib/stores';
+    import { settingsStore } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
-    import { showPopup } from '$lib/utils/popups';
     import type { Degrees, Meters, OlCallbackObject } from '../../../types';
     import EditLocation from '../location/EditLocation.svelte';
-    import EntryDialog from '$lib/components/dialogs/EntryDialog.svelte';
+    import EntryDialog from '$lib/components/entry/EntryDialog.svelte';
     import {
         type EntryFeature,
         lastEntry,

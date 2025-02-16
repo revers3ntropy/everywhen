@@ -332,7 +332,7 @@
                 <InsertImage onInput={insertImage} />
 
                 <div class="pl-2">
-                    <LabelSelect bind:value={newEntryLabelId} {labels} fromRight />
+                    <LabelSelect bind:value={newEntryLabelId} {labels} />
                 </div>
             </div>
 

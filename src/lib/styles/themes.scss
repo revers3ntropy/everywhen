@@ -42,8 +42,8 @@
     --foreground: var(--text-color);
     --card: rgb(255, 0, 0);
     --card-foreground: rgb(255, 0, 0);
-    --popover: rgb(255, 0, 0);
-    --popover-foreground: rgb(255, 0, 0);
+    --popover: var(--light-accent);
+    --popover-foreground: var(--text-color);
     --primary-foreground: var(--text-color-invert);
     --secondary-foreground: rgb(255, 0, 0);
     --muted: var(--light-accent);
@@ -54,7 +54,7 @@
     --destructive-foreground: hsl(210 40% 98%);
     --border: var(--border-color);
     --input: var(--light-accent);
-    --ring: rgb(255, 0, 0);
+    --ring: var(--border-light);
     --chart-1: rgb(255, 0, 0);
     --chart-2: rgb(255, 0, 0);
     --chart-3: rgb(255, 0, 0);
@@ -100,8 +100,8 @@
     --foreground: var(--text-color);
     --card: rgb(255, 0, 0);
     --card-foreground: rgb(255, 0, 0);
-    --popover: rgb(255, 0, 0);
-    --popover-foreground: rgb(255, 0, 0);
+    --popover: var(--light-accent);
+    --popover-foreground: var(--text-color);
     --primary-foreground: var(--text-color-invert);
     --secondary-foreground: rgb(255, 0, 0);
     --muted: var(--light-accent);
@@ -112,7 +112,7 @@
     --destructive-foreground: hsl(210 40% 98%);
     --border: var(--border-color);
     --input: var(--light-accent);
-    --ring: rgb(255, 0, 0);
+    --ring: var(--border-light);
     --chart-1: rgb(255, 0, 0);
     --chart-2: rgb(255, 0, 0);
     --chart-3: rgb(255, 0, 0);

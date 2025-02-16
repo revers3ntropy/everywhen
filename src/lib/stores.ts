@@ -2,14 +2,12 @@ import { Settings } from '$lib/controllers/settings/settings';
 import type { SettingsConfig } from '$lib/controllers/settings/settings';
 import { cookieWritable } from '$lib/cookieWritable';
 import { Result } from '$lib/utils/result';
-import type { SvelteComponent } from 'svelte';
 import { writable } from 'svelte/store';
 import type { EventsSortKey } from '../types';
 import { COOKIE_KEYS, LS_KEYS, SESSION_KEYS, Theme } from './constants';
 import { persisted } from 'svelte-local-storage-store';
 
 // ephemeral
-export const popup = writable<typeof SvelteComponent | null | undefined>(null);
 export const settingsStore = writable<SettingsConfig>(Settings.fillWithDefaults({}));
 export const currentlyUploadingAssets = writable<number>(0);
 export const pageInView = writable<boolean>(true);

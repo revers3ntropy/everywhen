@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Select from '$lib/components/Select.svelte';
+    import Select from '$lib/components/ui/Select.svelte';
     import { By, Grouping, type StatsData } from '$lib/controllers/stats/stats';
     import { Day } from '$lib/utils/day';
     import Heatmap from '$lib/components/ui/heatmap/Heatmap.svelte';

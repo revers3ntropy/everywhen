@@ -1,5 +1,5 @@
 <script lang="ts">
-    import AllowCookies from '$lib/components/AllowCookies.svelte';
+    import AllowCookies from '$lib/components/auth/AllowCookies.svelte';
     import { allowedCookies, encryptionKey, username } from '$lib/stores';
     import { onMount } from 'svelte';
 

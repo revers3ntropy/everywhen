@@ -2,7 +2,7 @@
     import EventsList from '$lib/components/event/EventsList.svelte';
     import { dispatch } from '$lib/dataChangeEvents';
     import Plus from 'svelte-material-icons/Plus.svelte';
-    import Select from '$lib/components/Select.svelte';
+    import Select from '$lib/components/ui/Select.svelte';
     import { Event } from '$lib/controllers/event/event';
     import { eventsSortKey, obfuscated } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';

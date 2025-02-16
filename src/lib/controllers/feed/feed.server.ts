@@ -100,7 +100,7 @@ namespace FeedServer {
             // .or(null) throws away any errors generated,
             // the user will see no weather rather than an error if
             // something goes wrong
-            weatherDataForDay(auth, day).then(w => w.or(null))
+            weatherDataForDay(auth, day).then(w => w.mapErr(console.log).or(null))
         ]);
 
         return Result.ok({

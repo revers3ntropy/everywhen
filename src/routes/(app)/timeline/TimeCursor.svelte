@@ -7,7 +7,6 @@
     import { Event as EventController } from '$lib/controllers/event/event';
     import { dispatch } from '$lib/dataChangeEvents';
     import { api } from '$lib/utils/apiRequest';
-    import { showPopup } from '$lib/utils/popups';
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
     import { notify } from '$lib/components/notifications/notifications';
     import type { Pixels, TimestampSecs } from '../../../types';

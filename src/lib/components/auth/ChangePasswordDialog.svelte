@@ -1,11 +1,12 @@
 <script lang="ts">
+    import { AlertCircle } from 'lucide-svelte';
+    //import * as Dialog from '$lib/components/ui/dialog';
     import Textbox from '$lib/components/ui/Textbox.svelte';
     import { Entry } from '$lib/controllers/entry/entry';
-    import { popup, username } from '$lib/stores';
+    import { username } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
     import { Auth } from '$lib/controllers/auth/auth';
-    import { AlertCircle } from 'lucide-svelte';
 
     let currentPassword = '';
     let newPassword = '';

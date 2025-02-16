@@ -16,7 +16,7 @@
     } from 'chart.js';
     import { onMount } from 'svelte';
     import { Line } from 'svelte-chartjs';
-    import Select from '$lib/components/Select.svelte';
+    import Select from '$lib/components/ui/Select.svelte';
     import { cssVarValue } from '$lib/utils/getCssVar';
     import { theme } from '$lib/stores';
 

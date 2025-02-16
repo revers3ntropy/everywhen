@@ -10,8 +10,7 @@
     import Account from 'svelte-material-icons/Account.svelte';
     import GitHubOauthWidget from '$lib/components/GitHubOAuthWidget.svelte';
     import { omit } from '$lib/utils';
-    import ChangePasswordDialog from '$lib/components/dialogs/ChangePasswordDialog.svelte';
-    import { showPopup } from '$lib/utils/popups';
+    import ChangePasswordDialog from '$lib/components/auth/ChangePasswordDialog.svelte';
     import {
         type SettingsKey,
         type SettingConfig,

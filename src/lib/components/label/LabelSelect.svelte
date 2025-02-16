@@ -1,4 +1,6 @@
 <script lang="ts">
+    import NewLabelForm from '$lib/components/label/NewLabelForm.svelte';
+    import * as Popover from '$lib/components/ui/popover';
     import EncryptedText from '$lib/components/ui/EncryptedText.svelte';
     import { tryDecryptText } from '$lib/utils/encryption.client.js';
     import CogOutline from 'svelte-material-icons/CogOutline.svelte';
@@ -9,26 +11,19 @@
     import Plus from 'svelte-material-icons/Plus.svelte';
     import LabelOffOutline from 'svelte-material-icons/LabelOffOutline.svelte';
     import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
-    import Dropdown from '$lib/components/ui/Dropdown.svelte';
     import type { Label } from '$lib/controllers/label/label';
-    import { showPopup } from '$lib/utils/popups';
-    import NewLabelDialog from '$lib/components/dialogs/NewLabelDialog.svelte';
     import MenuDown from 'svelte-material-icons/MenuDown.svelte';
 
-    export let fromRight = false;
     export let labels: Record<string, Label>;
     export let value = '';
     export let showAddButton = true;
     export let filter: (l: Label, i: number, arr: Label[]) => boolean = () => true;
     export let condensed = false;
 
-    function showNewLabelPopup() {
-        showPopup(NewLabelDialog, {});
-    }
+    let open = false;
+    let createNewOpen = false;
 
     const dispatchEvent = createEventDispatcher();
-
-    let closeDropDown: () => void;
 
     $: dispatchEvent('change', { id: value });
     $: if (labels && value && !labels[value]) {
@@ -48,34 +43,49 @@
     });
 </script>
 
-<span
-    class="select-label flex px-1 items-center justify-between rounded-xl hover:bg-vLightAccent"
-    class:condensed
->
-    <Dropdown bind:close={closeDropDown} ariaLabel={() => 'Set label'} {fromRight}>
-        <span slot="button" class="select-button rounded-full">
-            {#key value}
-                {#if value && labels[value]}
-                    <LabelDot big color={labels[value]?.color || null} />
+<Popover.Root bind:open>
+    <Popover.Trigger class="flex gap-2 items-center rounded-full hover:bg-vLightAccent p-2">
+        {#key value}
+            {#if value && labels[value]}
+                <LabelDot big color={labels[value]?.color || null} />
 
-                    {#if !condensed}
-                        <EncryptedText text={labels[value].name} />
-                    {/if}
-                {:else}
-                    <LabelOutline size="20" />
-                    {#if !condensed}
-                        Add Label
-                    {/if}
-                {/if}
                 {#if !condensed}
-                    <MenuDown size="20" />
+                    <EncryptedText text={labels[value].name} />
                 {/if}
-            {/key}
-        </span>
-        <div class="list-container">
-            <a href="/labels" class="flex items-center gap-2 px-2 py-1">
+            {:else}
+                <LabelOutline size="20" />
+                {#if !condensed}
+                    Add Label
+                {/if}
+            {/if}
+            {#if !condensed}
+                <MenuDown size="20" />
+            {/if}
+        {/key}
+    </Popover.Trigger>
+    <Popover.Content>
+        <div class="flex flex-col max-h-[500px] overflow-y-auto">
+            <a href="/labels" class="flex items-center gap-2 p-2 rounded-xl hover:bg-vLightAccent">
                 <CogOutline size="22" /> Manage Labels
             </a>
+
+            {#if showAddButton}
+                <Popover.Root bind:open={createNewOpen}>
+                    <Popover.Trigger aria-label="Create new label" class="w-full">
+                        <span class="flex items-center gap-2 p-2 rounded-xl hover:bg-vLightAccent">
+                            <Plus size="25" /> New Label
+                        </span>
+                    </Popover.Trigger>
+                    <Popover.Content>
+                        <NewLabelForm
+                            on:submit={() => {
+                                open = false;
+                                createNewOpen = false;
+                            }}
+                        />
+                    </Popover.Content>
+                </Popover.Root>
+            {/if}
 
             <hr class="border-backgroundColor m-2" />
 
@@ -83,129 +93,32 @@
                 on:click={() => {
                     value = '';
                 }}
-                class="label-button"
+                class="flex items-center gap-2 p-2 rounded-xl hover:bg-vLightAccent"
                 aria-label="Remove label"
             >
-                <span class="flex-center">
-                    <LabelOffOutline size="25" />
-                </span>
-                <span class="label-name"> No Label </span>
+                <LabelOffOutline size="25" />
+                No Label
             </button>
             {#each Object.values(labels)
                 .filter(filter)
                 .sort( (a, b) => tryDecryptText(a.name).localeCompare(tryDecryptText(b.name)) ) as label (label.id)}
                 <button
-                    on:click={() => {
-                        value = label.id;
-                    }}
-                    class="label-button"
+                    on:click={() => (value = label.id)}
+                    class="flex items-center gap-2 p-2 rounded-xl hover:bg-vLightAccent"
                     aria-label="Select label {tryDecryptText(label.name)}"
                 >
-                    <span class="flex-center">
-                        <span
-                            class="entry-label-color"
-                            class:selected={value === label.id}
-                            style="--label-color: {label.color}"
-                        />
-                    </span>
+                    <span
+                        class="w-[20px] h-[20px] border-4 inline-block rounded-full"
+                        style="border-color: {label.color}; background-color: {value === label.id
+                            ? label.color
+                            : 'transparent'}"
+                    />
                     <EncryptedText
                         text={label.name}
                         class={`text-left ${value === label.id ? 'text-bold' : ''}`}
                     />
                 </button>
             {/each}
-            {#if showAddButton}
-                <button
-                    on:click={showNewLabelPopup}
-                    class="label-button"
-                    aria-label="Create new label"
-                >
-                    <span class="flex-center">
-                        <Plus size="25" />
-                    </span>
-                    <span class="label-name"> New Label </span>
-                </button>
-            {/if}
         </div>
-    </Dropdown>
-</span>
-
-<style lang="scss">
-    @import '$lib/styles/text';
-    @import '$lib/styles/layout';
-
-    .entry-label-color {
-        width: 20px;
-        height: 20px;
-        border: 4px solid var(--label-color);
-        background: var(--background);
-        display: inline-block;
-        border-radius: 50%;
-
-        &.selected {
-            background: var(--label-color);
-        }
-    }
-
-    .select-label {
-        .icon-button {
-            background: transparent;
-            padding: 0.2em;
-            border-radius: $border-radius;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid var(--light-accent);
-
-            &:hover {
-                background: var(--background-color);
-            }
-        }
-
-        .select-button {
-            display: inline-grid;
-            grid-template-columns: 25px 1fr 15px;
-            align-items: center;
-            justify-items: left;
-            background: none;
-            padding: 0.4rem 0.4rem 0.4rem 0.1rem;
-        }
-
-        &.condensed {
-            .select-button {
-                padding: 0.3rem;
-                grid-template-columns: 1fr;
-            }
-        }
-    }
-
-    .label-button {
-        height: 2em;
-        margin: 0;
-        text-align: center;
-        display: inline-grid;
-        grid-template-columns: 30px 1fr;
-        justify-content: center;
-        align-items: center;
-        width: 100%;
-
-        &:hover {
-            background: var(--v-light-accent);
-        }
-    }
-
-    .list-container {
-        max-height: 30vh;
-        overflow-y: auto;
-        width: 200px;
-        padding: 0.5em 0;
-    }
-
-    .label-name {
-        @extend .ellipsis;
-        @extend .flex-center;
-        max-width: 100%;
-        text-align: left;
-        justify-content: flex-start;
-    }
-</style>
+    </Popover.Content>
+</Popover.Root>

@@ -3,11 +3,10 @@
     import { browser } from '$app/environment';
     import { navigating } from '$app/stores';
     import { onMount } from 'svelte';
-    import Modal from 'svelte-simple-modal';
     import '../app.scss';
     import Notifications from '$lib/components/notifications/Notifications.svelte';
     import { POLL_FOR_UPDATE_INTERVAL, Theme } from '$lib/constants';
-    import { pageInView, populateCookieWritablesWithCookies, popup, theme } from '$lib/stores';
+    import { pageInView, populateCookieWritablesWithCookies, theme } from '$lib/stores';
     import { notify } from '$lib/components/notifications/notifications';
     import { api } from '$lib/utils/apiRequest';
     import Footer from '$lib/components/Footer.svelte';
@@ -76,9 +75,7 @@
     if (browser) {
         navigating.subscribe(navigating => {
             if (!navigating) return;
-            // when the page changes, close the popup
-            // and scroll to the top
-            popup.set(null);
+            // when the page changes, scroll to the top
             if (root) {
                 root.scrollTop = 0;
             }
@@ -117,8 +114,6 @@
     </svg>
 
     <Notifications />
-
-    <Modal classContent="popup-background" classWindow="popup-background" show={$popup} />
 
     <slot />
 

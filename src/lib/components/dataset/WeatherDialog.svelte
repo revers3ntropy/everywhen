@@ -1,5 +1,4 @@
 <script lang="ts">
-    import WeatherIcon from '$lib/components/weather/WeatherIcon.svelte';
     import { kelvinToCelsius } from '$lib/components/weather/weatherUtils';
     import { OpenWeatherMapAPI } from '$lib/controllers/openWeatherMapAPI/openWeatherMapAPI';
     import type { Day } from '$lib/utils/day';
@@ -15,11 +14,8 @@
 </script>
 
 <div>
-    <div class="flex justify-between pb-2">
-        <div class="flex-center gap-2">
-            <WeatherIcon {weather} size={30} />
-            <h3>{day.dateObj().toDateString()}</h3>
-        </div>
+    <div class="pb-2">
+        <p>{day.dateObj().toDateString()}</p>
         <span class="text-textColorLight text-sm hide-mobile">
             (at lat {lat}, lon {lon})
         </span>
@@ -32,11 +28,11 @@
     <p> <span class="text-textColorLight">Snow:</span> {weather.snowTotal.toFixed(1)}mm </p>
     <p>
         <span class="text-textColorLight">Humidity:</span>
-        {weather.humidityMean.toPrecision(3)}%
+        {weather.humidityMean.toFixed(0)}%
     </p>
     <p>
         <span class="text-textColorLight">Cloud cover:</span>
-        {weather.cloudCoverMean.toPrecision(2)}%
+        {weather.cloudCoverMean.toFixed(0)}%
     </p>
     <p>
         <span class="text-textColorLight">Max wind speed:</span>

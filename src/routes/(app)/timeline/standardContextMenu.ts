@@ -5,7 +5,6 @@ import { Event } from '$lib/controllers/event/event';
 import type { Label } from '$lib/controllers/label/label';
 import { dispatch } from '$lib/dataChangeEvents';
 import { api } from '$lib/utils/apiRequest';
-import { showPopup } from '$lib/utils/popups';
 import { currentTzOffset, nowUtc } from '$lib/utils/time';
 import type { Writable } from 'svelte/store';
 import type { TimestampSecs } from '../../../types';

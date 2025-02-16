@@ -102,7 +102,7 @@ export namespace OpenWeatherMapAPIServer {
             return Result.err('Cannot get weather for the future');
         }
         if (!OPEN_WEATHER_MAP_API_KEY) {
-            return Result.err('Cannot fetch weather data at this time');
+            return Result.err('Cannot fetch weather data');
         }
 
         const [lowResLat, lowResLon] = _OpenWeatherMapAPI.decreaseResolutionOfCoordsForWeather(

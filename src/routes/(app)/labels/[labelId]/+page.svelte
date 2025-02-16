@@ -9,7 +9,6 @@
     import { obfuscated } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
-    import { showPopup } from '$lib/utils/popups';
     import DeleteLabelDialog from '../DeleteLabelDialog.svelte';
     import type { PageData } from './$types';
 

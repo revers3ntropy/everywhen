@@ -1,11 +1,10 @@
 <script lang="ts">
     import { notify } from '$lib/components/notifications/notifications';
-    import Select from '$lib/components/Select.svelte';
+    import Select from '$lib/components/ui/Select.svelte';
     import Textbox from '$lib/components/ui/Textbox.svelte';
     import { builtInTypes } from '$lib/controllers/dataset/columnTypes';
     import type { DatasetColumn, DatasetColumnType } from '$lib/controllers/dataset/dataset';
     import { dispatch } from '$lib/dataChangeEvents';
-    import { popup } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
 
     export let datasetId: string;
@@ -26,7 +25,6 @@
             name: newColumnName,
             type: newColumnType
         });
-        $popup = null;
     }
 
     const columnTypesMap = Object.fromEntries(

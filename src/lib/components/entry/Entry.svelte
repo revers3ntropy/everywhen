@@ -20,7 +20,7 @@
     import type { Label as LabelController } from '../../controllers/label/label';
     import { dispatch } from '$lib/dataChangeEvents';
     import { Entry } from '$lib/controllers/entry/entry';
-    import { encryptionKey, popup, settingsStore, username } from '$lib/stores';
+    import { encryptionKey, settingsStore, username } from '$lib/stores';
     import { ANIMATION_DURATION } from '$lib/constants';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
@@ -68,7 +68,7 @@
             })
         );
 
-        if (isInDialog) popup.set(null);
+        // TODO how to clear dialog if this entry is in one?
 
         notify.success(`Entry ${thisIsDeleted ? 'restored' : 'deleted'}`);
         await dispatch.delete('entry', id);
@@ -156,9 +156,9 @@
     tabindex="-1"
 >
     {#if showFullDate}
-        <div class="text-light">
+        <div class="text-light pb-2">
             <UtcTime
-                fmt={'ddd DD MMM YYYY, h:mma'}
+                fmt={'h:mma ddd DD MMM YYYY'}
                 timestamp={created}
                 tooltipPosition="right"
                 tzOffset={createdTzOffset}
@@ -325,7 +325,11 @@
         {title}
     </div>
 
-    <div class="body md:p-4 md:pb-0 p-2 whitespace-pre-wrap" class:obfuscated>
+    <div
+        class="body md:p-4 md:pb-0 p-2 whitespace-pre-wrap"
+        class:obfuscated
+        class:md:pl-0={showFullDate}
+    >
         {@html entryHtml}
     </div>
 </div>
