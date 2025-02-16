@@ -18,11 +18,11 @@
     $: to = Day.fromI18nDate(toI18nDate);
 </script>
 
-<div class="bg-lightAccent rounded-lg border-borderColor border">
+<div class="bg-lightAccent rounded-lg border-borderColor border p-1 flex items-center gap-1">
     <Popover.Root>
         <Popover.Trigger asChild let:builder>
             <Button class={cn('justify-start')} builders={[builder]}>
-                {from.fmtIso()}
+                {from.fmtIso('/')}
             </Button>
         </Popover.Trigger>
         <Popover.Content class="w-auto p-0">
@@ -33,13 +33,14 @@
     <Popover.Root>
         <Popover.Trigger asChild let:builder>
             <Button class={cn('justify-start')} builders={[builder]}>
-                {to.fmtIso()}
+                {to.fmtIso('/')}
             </Button>
         </Popover.Trigger>
         <Popover.Content class="w-auto p-0">
             <Calendar bind:value={toI18nDate} initialFocus />
         </Popover.Content>
     </Popover.Root>
+
     <Popover.Root>
         <Popover.Trigger asChild let:builder>
             <Button

@@ -45,9 +45,9 @@
     --popover: var(--light-accent);
     --popover-foreground: var(--text-color);
     --primary-foreground: var(--text-color-invert);
-    --secondary-foreground: rgb(255, 0, 0);
+    --secondary-foreground: var(--text-color);
     --muted: var(--light-accent);
-    --muted-foreground: rgb(255, 0, 0);
+    --muted-foreground: var(--text-color-light);
     --accent: var(--light-accent);
     --accent-foreground: var(--text-color-accent);
     --destructive: hsl(0 84.2% 60.2%);
@@ -103,9 +103,9 @@
     --popover: var(--light-accent);
     --popover-foreground: var(--text-color);
     --primary-foreground: var(--text-color-invert);
-    --secondary-foreground: rgb(255, 0, 0);
+    --secondary-foreground: var(--text-color);
     --muted: var(--light-accent);
-    --muted-foreground: rgb(255, 0, 0);
+    --muted-foreground: var(--text-color-light);
     --accent: var(--light-accent);
     --accent-foreground: var(--text-color-accent);
     --destructive: hsl(0 62.8% 30.6%);

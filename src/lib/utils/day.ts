@@ -60,15 +60,15 @@ export class Day {
         return Day.fromTimestamp(a, tzOffset).eq(Day.fromTimestamp(b, tzOffset));
     }
 
-    public fmtIso(): string {
+    public fmtIso(delimiter = '-'): string {
         const y = this.year.toString().padStart(4, '0');
-        return `${y}-${this.fmtIsoNoYear()}`;
+        return `${y}${delimiter}${this.fmtIsoNoYear(delimiter)}`;
     }
 
-    public fmtIsoNoYear(): string {
+    public fmtIsoNoYear(delimiter = '-'): string {
         const m = this.month.toString().padStart(2, '0');
         const d = this.date.toString().padStart(2, '0');
-        return `${m}-${d}`;
+        return `${m}${delimiter}${d}`;
     }
 
     public utcTimestampMiddleOfDay(tzOffset: Hours): TimestampSecs {

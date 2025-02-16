@@ -17,6 +17,6 @@ export const load = cachedPageRoute(async auth => {
                 longitude: e.longitude
             })),
         locations: (await Location.all(auth)).unwrap(e => error(400, e)),
-        labels: await Label.all(auth)
+        labels: await Label.allIndexedById(auth)
     };
 }) satisfies PageServerLoad;
