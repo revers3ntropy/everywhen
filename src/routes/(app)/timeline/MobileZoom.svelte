@@ -77,7 +77,7 @@
             this.dragging = true;
         },
 
-        contextMenu: makeStandardContextMenu(labels, canvasState)
+        contextMenu: makeStandardContextMenu(canvasState)
     });
 </script>
 

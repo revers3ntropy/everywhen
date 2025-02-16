@@ -1,18 +1,13 @@
 import type { ContextMenuOptions, CanvasState } from '$lib/components/canvas/canvasState';
-import EventComponent from '$lib/components/event/Event.svelte';
 import { notify } from '$lib/components/notifications/notifications';
 import { Event } from '$lib/controllers/event/event';
-import type { Label } from '$lib/controllers/label/label';
 import { dispatch } from '$lib/dataChangeEvents';
 import { api } from '$lib/utils/apiRequest';
 import { currentTzOffset, nowUtc } from '$lib/utils/time';
 import type { Writable } from 'svelte/store';
 import type { TimestampSecs } from '../../../types';
 
-export function makeStandardContextMenu(
-    labels: Record<string, Label>,
-    canvasState: Writable<CanvasState>
-): ContextMenuOptions {
+export function makeStandardContextMenu(canvasState: Writable<CanvasState>): ContextMenuOptions {
     let state: CanvasState;
     canvasState.subscribe(s => (state = s));
 
@@ -35,14 +30,6 @@ export function makeStandardContextMenu(
             label: null
         };
         await dispatch.create('event', event);
-
-        showPopup(EventComponent, {
-            obfuscated: false,
-            event,
-            labels,
-            expanded: true,
-            allowCollapseChange: false
-        });
     }
 
     function resetCamera() {

@@ -7,7 +7,7 @@
     import { Event as EventController } from '$lib/controllers/event/event';
     import Event from '$lib/components/event/Event.svelte';
     import type { Label } from '$lib/controllers/label/label';
-    import { dispatch, listen } from '$lib/dataChangeEvents';
+    import { dispatch } from '$lib/dataChangeEvents';
     import { obfuscated } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { limitStrLen } from '$lib/utils/text';
@@ -246,21 +246,15 @@
                 action(state) {
                     state.zoomTo(start, end);
                 }
+            },
+            {
+                label: 'Delete',
+                async action() {
+                    notify.onErr(await api.delete(apiPath('/events/?', id)));
+                    await dispatch.delete('event', id);
+                }
             }
         ]
-    });
-
-    listen.event.onUpdate(e => {
-        if (e.id !== id) return;
-        start = e.start;
-        end = e.end;
-        name = e.name;
-        label = e.label || null;
-        created = e.created;
-    });
-    listen.event.onDelete(id => {
-        if (id !== id) return;
-        thisIsDeleted = true;
     });
 </script>
 

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import * as Dialog from '$lib/components/ui/dialog';
     import { canvasState, type RenderProps, START_ZOOM } from '$lib/components/canvas/canvasState';
     import { RectCollider } from '$lib/components/canvas/collider';
     import { interactable } from '$lib/components/canvas/interactable';
@@ -14,6 +15,8 @@
 
     export let labels: Record<string, Label>;
 
+    let eventInDialog: EventController | null = null;
+
     async function newEvent(start: TimestampSecs, end: TimestampSecs) {
         const { id } = notify.onErr(
             await api.post('/events', {
@@ -23,7 +26,7 @@
                 tzOffset: currentTzOffset()
             })
         );
-        const event: EventController = {
+        const event = {
             id,
             name: EventController.NEW_EVENT_NAME,
             start,
@@ -31,16 +34,9 @@
             tzOffset: currentTzOffset(),
             created: nowUtc(), // not precise but fine
             label: null
-        };
+        } satisfies EventController;
         await dispatch.create('event', event);
-
-        showPopup(Event, {
-            obfuscated: false,
-            event,
-            labels,
-            expanded: true,
-            allowCollapseChange: false
-        });
+        eventInDialog = event;
     }
 
     const COLLIDER_ABOVE = 60;
@@ -135,8 +131,32 @@
             this.dragging = true;
         },
 
-        contextMenu: makeStandardContextMenu(labels, canvasState)
+        contextMenu: makeStandardContextMenu(canvasState)
     });
 </script>
+
+<Dialog.Root
+    open={!!eventInDialog}
+    onOpenChange={open => {
+        if (!open) eventInDialog = null;
+        else notify.error('Something went wrong');
+    }}
+>
+    <Dialog.Content>
+        <div class="pr-4">
+            {#if eventInDialog}
+                <Event
+                    event={eventInDialog}
+                    {labels}
+                    allowCollapseChange={false}
+                    obfuscated={false}
+                    expanded
+                />
+            {:else}
+                Something went wrong
+            {/if}
+        </div>
+    </Dialog.Content>
+</Dialog.Root>
 
 <slot />

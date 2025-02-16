@@ -51,6 +51,7 @@
     });
     listen.label.onCreate(label => {
         labels[label.id] = label;
+        selectedLabels = [...selectedLabels, label.id];
     });
     listen.label.onUpdate(label => {
         labels[label.id] = label;
