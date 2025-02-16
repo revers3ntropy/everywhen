@@ -2,10 +2,7 @@
     import { canvasState } from '$lib/components/canvas/canvasState';
     import { RectCollider } from '$lib/components/canvas/collider';
     import { interactable } from '$lib/components/canvas/interactable';
-    import type { Label } from '$lib/controllers/label/label';
     import { makeStandardContextMenu } from './standardContextMenu';
-
-    export let labels: Record<string, Label>;
 
     interactable({
         dragging: false,

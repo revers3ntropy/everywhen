@@ -105,8 +105,8 @@
 
 <main>
     <Canvas>
-        <Controls {labels} />
-        <MobileZoom {labels} />
+        <Controls />
+        <MobileZoom />
         <Background />
 
         <TimeMarkers startYear={$settingsStore.yearOfBirth.value} />

@@ -5,7 +5,6 @@
     import { tryDecryptText } from '$lib/utils/encryption.client.js';
     import CogOutline from 'svelte-material-icons/CogOutline.svelte';
     import LabelDot from '$lib/components/label/LabelDot.svelte';
-    import { notify } from '$lib/components/notifications/notifications';
     import { listen } from '$lib/dataChangeEvents';
     import { createEventDispatcher } from 'svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
