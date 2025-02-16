@@ -8,6 +8,8 @@
     import { notify } from '$lib/components/notifications/notifications';
     import { Auth } from '$lib/controllers/auth/auth';
 
+    export let cancel: () => void;
+
     let currentPassword = '';
     let newPassword = '';
     let confirmNewPassword = '';
@@ -35,7 +37,10 @@
                 currentPassword,
                 newPassword
             }),
-            () => (submitted = false)
+            () => {
+                submitted = false;
+                finished = true;
+            }
         );
 
         finished = true;
@@ -88,11 +93,7 @@
             >
                 <span> Change Password </span>
             </button>
-            <button
-                on:click={() => popup.set(null)}
-                aria-label="cancel change password"
-                disabled={submitted}
-            >
+            <button on:click={cancel} aria-label="cancel change password" disabled={submitted}>
                 Cancel
             </button>
         </div>

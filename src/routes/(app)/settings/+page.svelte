@@ -1,4 +1,5 @@
 <script lang="ts">
+    import * as Dialog from '$lib/components/ui/dialog';
     import SubscriptionWidget from '$lib/components/subscription/SubscriptionWidget.svelte';
     import { Button } from '$lib/components/ui/button';
     import Logout from 'svelte-material-icons/Logout.svelte';
@@ -24,9 +25,7 @@
 
     export let data;
 
-    function changePassword() {
-        showPopup(ChangePasswordDialog, {});
-    }
+    let changePasswordDialogOpen = false;
 
     function logOut() {
         void Auth.logOut();
@@ -125,24 +124,30 @@
                 <GitHubOauthWidget size={22} />
             </div>
             <div class="pt-8 border-t border-border flex flex-col gap-4">
-                <Button
-                    class="h-fit flex gap-4 justify-start"
-                    variant="destructive"
-                    aria-label="Change password"
-                    on:click={changePassword}
-                >
-                    <div>
-                        <LockOutline size="22" />
-                    </div>
-                    <div class="text-start">
-                        <p class="text-destructive-foreground font-bold"> Change Password </p>
-                        <p class="text-destructive-foreground text-sm">
-                            Pick a new password and re-encrypt all data with the new password
-                        </p>
-                    </div>
-                </Button>
+                <Dialog.Root bind:open={changePasswordDialogOpen}>
+                    <Dialog.Trigger
+                        class="h-fit flex items-center gap-4 justify-start bg-destructive hover:bg-accentDanger rounded-md py-2 px-4"
+                        aria-label="Change password"
+                    >
+                        <div class="invert-icon">
+                            <LockOutline size="22" />
+                        </div>
+                        <div class="text-start">
+                            <p class="text-destructive-foreground font-bold"> Change Password </p>
+                            <p class="text-destructive-foreground text-sm">
+                                Pick a new password and re-encrypt all data with the new password
+                            </p>
+                        </div>
+                    </Dialog.Trigger>
+                    <Dialog.Content>
+                        <ChangePasswordDialog cancel={() => (changePasswordDialogOpen = false)} />
+                    </Dialog.Content>
+                </Dialog.Root>
                 <a aria-label="Delete Account" href="/settings/delete">
-                    <Button class="h-fit flex gap-4 w-full justify-start" variant="destructive">
+                    <Button
+                        class="h-fit flex gap-4 w-full justify-start hover:bg-accentDanger"
+                        variant="destructive"
+                    >
                         <div>
                             <Skull size="22" />
                         </div>
