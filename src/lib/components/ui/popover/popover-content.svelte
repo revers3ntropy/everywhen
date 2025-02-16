@@ -20,7 +20,7 @@
     {sideOffset}
     {...$$restProps}
     class={cn(
-        'bg-popover text-popover-foreground z-50 w-72 rounded-md border border-borderLight p-4 shadow-md outline-none',
+        'bg-popover text-popover-foreground z-50 w-72 rounded-xl border border-borderLight p-4 shadow-md outline-none',
         className
     )}
     data-theme={$theme}

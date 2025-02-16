@@ -33,7 +33,7 @@
             <LocationDisabledBanner />
         {/if}
         <div class="fixed top-0 left-0 h-screen w-full">
-            <Map entries={showedEntries} locations={data.locations} />
+            <Map entries={showedEntries} locations={data.locations} labels={data.labels} />
 
             <div class="fixed top-2 right-2" data-theme="light">
                 <DayRangeSelector bind:dateRange {earliestDate} />

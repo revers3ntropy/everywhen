@@ -8,9 +8,12 @@
 </script>
 
 <script lang="ts">
+    import type { Label } from '$lib/controllers/label/label';
+    import { dispatch, listen } from '$lib/dataChangeEvents';
+    import { nowUtc } from '$lib/utils/time';
+    import { writable } from 'svelte/store';
     import ContextMenu from 'ol-contextmenu';
     import 'ol-contextmenu/ol-contextmenu.css';
-
     import type { MapBrowserEvent } from 'ol';
     import Map from 'ol/Map';
     import TileLayer from 'ol/layer/Tile';
@@ -20,9 +23,7 @@
     import { fromLonLat, toLonLat } from 'ol/proj';
     import type { Control } from 'ol/control';
     import type { FeatureLike } from 'ol/Feature';
-
-    import { writable } from 'svelte/store';
-
+    import * as Dialog from '$lib/components/ui/dialog';
     import type { EntryAsLocation } from '$lib/controllers/entry/entry';
     import { Location } from '$lib/controllers/location/location';
     import { notify } from '$lib/components/notifications/notifications';
@@ -44,6 +45,7 @@
 
     export let entries = [] as EntryAsLocation[];
     export let locations = [] as Location[];
+    export let labels: Record<string, Label>;
     export let entriesInteractable = true;
     export let width = '100%';
     export let height = '100vh';
@@ -51,10 +53,8 @@
     export let mobileHeight = '100vh';
     export let roundedCorners = false;
 
-    async function reloadLocations() {
-        const res = notify.onErr(await api.get('/locations'));
-        locations = res.locations;
-    }
+    let entryIdForDialog: string | null = null;
+    let locationForDialog: Location | null = null;
 
     async function syncLocationInBackground(
         id: string,
@@ -72,7 +72,7 @@
     }
 
     async function addNamedLocation(lat: number, lng: number) {
-        notify.onErr(
+        const { id } = notify.onErr(
             await api.post('/locations', {
                 latitude: lat,
                 longitude: lng,
@@ -81,7 +81,14 @@
             })
         );
 
-        await reloadLocations();
+        await dispatch.create('location', {
+            id,
+            latitude: lat,
+            longitude: lng,
+            name: 'New Location',
+            radius: Location.metersToDegrees(50),
+            created: nowUtc()
+        });
     }
 
     function sortFeatures(features: (LocationFeature | EntryFeature | FeatureLike)[]) {
@@ -182,7 +189,8 @@
             let features = map.getFeaturesAtPixel(event.pixel);
 
             if (features.length < 1) {
-                popup.set(null);
+                entryIdForDialog = null;
+                locationForDialog = null;
                 return;
             }
 
@@ -195,19 +203,12 @@
             const hovering = features[0] as EntryFeature | LocationFeature;
 
             if ('entry' in hovering) {
-                showPopup(EntryDialog, {
-                    id: hovering.entry.id,
-                    obfuscated: false
-                });
+                entryIdForDialog = hovering.entry.id;
                 return;
             }
 
             if ('location' in hovering) {
-                showPopup(EditLocation, {
-                    ...hovering.location,
-                    onChange: reloadLocations,
-                    isInDialog: true
-                });
+                locationForDialog = hovering.location;
             }
         });
 
@@ -302,6 +303,20 @@
         }[]
     > = {};
 
+    listen.location.onCreate(location => {
+        locations = [...locations, location];
+        locationForDialog = location;
+    });
+    listen.location.onUpdate(location => {
+        locations = locations.map(l => (l.id === location.id ? location : l));
+    });
+    listen.location.onDelete(id => {
+        locations = locations.filter(l => l.id !== id);
+        if (locationForDialog?.id === id) {
+            locationForDialog = null;
+        }
+    });
+
     setInterval(() => {
         for (const [id, changes] of Object.entries(locationChangeQueue)) {
             const last = changes[changes.length - 1];
@@ -310,6 +325,25 @@
         locationChangeQueue = {};
     }, 500);
 </script>
+
+<Dialog.Root open={!!entryIdForDialog}>
+    <Dialog.Content>
+        {#if entryIdForDialog}
+            <EntryDialog id={entryIdForDialog} obfuscated={false} {locations} {labels} />
+        {:else}
+            <p> Something went wrong </p>
+        {/if}
+    </Dialog.Content>
+</Dialog.Root>
+<Dialog.Root open={!!locationForDialog}>
+    <Dialog.Content>
+        {#if locationForDialog}
+            <EditLocation {...locationForDialog} isInDialog />
+        {:else}
+            <p> Something went wrong </p>
+        {/if}
+    </Dialog.Content>
+</Dialog.Root>
 
 <div
     class="map"
