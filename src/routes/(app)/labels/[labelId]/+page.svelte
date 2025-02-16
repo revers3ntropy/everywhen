@@ -1,4 +1,5 @@
 <script lang="ts">
+    import * as Dialog from '$lib/components/ui/dialog';
     import { goto } from '$app/navigation';
     import EventsList from '$lib/components/event/EventsList.svelte';
     import Textbox from '$lib/components/ui/Textbox.svelte';
@@ -14,6 +15,7 @@
 
     export let data: PageData;
 
+    let deleteDialogOpen = false;
     let nameDecrypted = tryDecryptText(data.label.name);
 
     async function updateName() {
@@ -32,30 +34,13 @@
         );
     }
 
+    // if there are no entries or events tied to this
+    // label, deleting it easy, but if there are then
+    // a more complex approach is required to clear the
+    // label from the entries and events
     async function deleteLabel() {
-        // if there are no entries or events tied to this
-        // label, deleting it easy, but if there are then
-        // a more complex approach is required to clear the
-        // label from the entries and events
-        if (data.label.entryCount + data.label.editCount + eventCount < 1) {
-            notify.onErr(await api.delete(apiPath(`/labels/?`, data.label.id)));
-            await goto('/labels');
-            return;
-        }
-
-        showPopup(
-            DeleteLabelDialog,
-            {
-                id: data.label.id,
-                color: data.label.color,
-                name: data.label.name,
-                reloadOnDelete: false,
-                labels: data.labels
-            },
-            () => {
-                void goto('/labels');
-            }
-        );
+        notify.onErr(await api.delete(apiPath(`/labels/?`, data.label.id)));
+        await goto('/labels');
     }
 
     let eventCount = data.events.length;
@@ -92,10 +77,29 @@
         </div>
         <div class="overflow-x-hidden md:flex justify-between align-center py-2">
             <Textbox bind:value={nameDecrypted} on:change={updateName} label="Name" />
-            <button class="with-circled-icon danger" on:click={deleteLabel}>
-                <Delete size="30" />
-                Delete this Label
-            </button>
+            {#if data.label.entryCount + data.label.editCount + eventCount < 1}
+                <button class="with-circled-icon danger" on:click={deleteLabel}>
+                    <Delete size="30" />
+                    Delete this Label
+                </button>
+            {:else}
+                <Dialog.Root bind:open={deleteDialogOpen}>
+                    <Dialog.Trigger>
+                        <Delete size="30" />
+                        Delete this Label
+                    </Dialog.Trigger>
+                    <Dialog.Content>
+                        <DeleteLabelDialog
+                            id={data.label.id}
+                            color={data.label.color}
+                            name={data.label.name}
+                            onDelete={() => goto('/labels')}
+                            cancel={() => (deleteDialogOpen = false)}
+                            labels={data.labels}
+                        />
+                    </Dialog.Content>
+                </Dialog.Root>
+            {/if}
         </div>
         <div class="p-2 md:p-0 md:pb-4 md:pt-1 text-textColorLight italic">
             {data.label.entryCount} entries, {eventCount} events have this label

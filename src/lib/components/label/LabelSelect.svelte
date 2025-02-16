@@ -17,6 +17,7 @@
     export let labels: Record<string, Label>;
     export let value = '';
     export let showAddButton = true;
+    export let keepOpenOnSelect = false;
     export let filter: (l: Label, i: number, arr: Label[]) => boolean = () => true;
     export let condensed = false;
 
@@ -25,11 +26,19 @@
 
     const dispatchEvent = createEventDispatcher();
 
-    $: dispatchEvent('change', { id: value });
+    function onChange(value: string) {
+        dispatchEvent('change', { id: value });
+        if (!keepOpenOnSelect) open = false;
+    }
+    $: onChange(value);
+
+    // if the user deletes a label but the value has been stored
+    // in localStorage so does not get updated,
+    // can be in a state where the value is not valid, so reset it silently
     $: if (labels && value && !labels[value]) {
-        notify.error(`Label not found`);
         value = '';
     }
+
     listen.label.onCreate(label => {
         labels[label.id] = label;
         value = label.id;
