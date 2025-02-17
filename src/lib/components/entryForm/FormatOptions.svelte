@@ -23,7 +23,7 @@
 
 <Dropdown openOnHover>
     <span slot="button">
-        <span>
+        <span class="p-1.5 rounded-full hover:bg-vLightAccent flex-center">
             <FormatText size="25" />
         </span>
     </span>

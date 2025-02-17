@@ -304,7 +304,7 @@
 
 <div class="md:bg-vLightAccent rounded-2xl">
     <div class="pb-2 md:pb-4 md:px-2">
-        <MenuBar {labels} {wrapSelectedWith} bind:newEntryLabelId />
+        <MenuBar {labels} {wrapSelectedWith} bind:newEntryLabelId bind:entryTitle={newEntryTitle} />
     </div>
     <div class="px-2">
         <div>

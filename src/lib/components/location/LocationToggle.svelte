@@ -54,11 +54,19 @@
 {#if $enabledLocation === null}
     ...
 {:else if $enabledLocation === true}
-    <button on:click={disableLocation} aria-label="Turn off Location" class="relative">
+    <button
+        on:click={disableLocation}
+        aria-label="Turn off Location"
+        class="hover:bg-vLightAccent rounded-full p-1.5 flex-center"
+    >
         <MapMarkerOutline {size} />
     </button>
 {:else}
-    <button on:click={enableLocation} aria-label="Turn on Location">
+    <button
+        on:click={enableLocation}
+        aria-label="Turn on Location"
+        class="hover:bg-vLightAccent rounded-full p-1.5 flex-center"
+    >
         <MapMarkerOffOutline {size} />
     </button>
 {/if}

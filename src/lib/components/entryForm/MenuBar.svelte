@@ -1,6 +1,11 @@
 <script lang="ts">
+    import Close from 'svelte-material-icons/Close.svelte';
     import { slide } from 'svelte/transition';
+    import Plus from 'svelte-material-icons/Plus.svelte';
     import UploadMultiple from 'svelte-material-icons/UploadMultiple.svelte';
+    import * as Tooltip from '$lib/components/ui/tooltip';
+    import { Button } from '$lib/components/ui/button/index.js';
+    import Textbox from '$lib/components/ui/Textbox.svelte';
     import InsertImage from '$lib/components/asset/InsertImage.svelte';
     import FormatOptions from '$lib/components/entryForm/FormatOptions.svelte';
     import LabelSelect from '$lib/components/label/LabelSelect.svelte';
@@ -16,6 +21,11 @@
         insertSpaceIfEmpty: boolean
     ) => void;
     export let newEntryLabelId: string;
+    export let entryTitle: string;
+
+    let userHasShownTitle = false;
+
+    $: showingEntryTitle = userHasShownTitle || !!entryTitle;
 
     function insertImage(md: string) {
         wrapSelectedWith(md, '', false);
@@ -29,16 +39,25 @@
 </script>
 
 <div class="flex items-center bg-lightAccent md:rounded-full md:w-fit">
-    <div class="flex items-center gap-2 py-1 px-2 md:px-4 w-fit">
+    <div class="flex items-center py-1 md:px-2 w-fit">
         <LocationToggle size={23} />
 
         <FormatOptions {makeWrapper} />
 
         <InsertImage onInput={insertImage} />
 
-        <div class="pl-2">
-            <LabelSelect bind:value={newEntryLabelId} {labels} />
+        <div>
+            <Button
+                variant="outline"
+                class="bg-transparent px-2 text-md gap-1 hover:bg-vLightAccent rounded-full hover:text-textColor"
+                on:click={() => (userHasShownTitle = true)}
+                disabled={showingEntryTitle}
+            >
+                <Plus size="26" /> Title
+            </Button>
         </div>
+
+        <LabelSelect bind:value={newEntryLabelId} {labels} />
     </div>
 
     {#if $currentlyUploadingAssets > 0}
@@ -51,3 +70,24 @@
         </div>
     {/if}
 </div>
+
+{#if showingEntryTitle}
+    <div class="px-1 flex items-center justify-start gap-2">
+        <Textbox bind:value={entryTitle} label="Title" />
+
+        {#if !entryTitle}
+            <Tooltip.Root>
+                <Tooltip.Trigger>
+                    <Button
+                        variant="outline"
+                        class="bg-transparent border-none flex-center hover:bg-lightAccent rounded-full p-2 mt-2"
+                        on:click={() => (userHasShownTitle = false)}
+                    >
+                        <Close size={20} />
+                    </Button>
+                </Tooltip.Trigger>
+                <Tooltip.Content>Hide title</Tooltip.Content>
+            </Tooltip.Root>
+        {/if}
+    </div>
+{/if}

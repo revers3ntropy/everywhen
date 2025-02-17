@@ -68,7 +68,9 @@
 <div>
     <Dropdown openOnHover fillWidthMobile stayOpenWhenClicked bind:close={closePopup}>
         <span slot="button">
-            <ImageArea {size} />
+            <span class="p-1.5 rounded-full hover:bg-vLightAccent flex-center">
+                <ImageArea {size} />
+            </span>
         </span>
         <div>
             <button
