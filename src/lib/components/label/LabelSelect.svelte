@@ -52,7 +52,10 @@
 </script>
 
 <Popover.Root bind:open>
-    <Popover.Trigger class="flex gap-2 items-center rounded-full hover:bg-vLightAccent p-2">
+    <Popover.Trigger
+        class="flex gap-2 items-center rounded-full hover:bg-vLightAccent p-2"
+        aria-label="Pick label"
+    >
         {#key value}
             {#if value && labels[value]}
                 <LabelDot big color={labels[value]?.color || null} />

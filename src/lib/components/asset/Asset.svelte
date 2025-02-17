@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { tooltip } from '@svelte-plugins/tooltips';
     import { createEventDispatcher } from 'svelte';
     import Check from 'svelte-material-icons/Check.svelte';
     import ContentCopy from 'svelte-material-icons/ContentCopy.svelte';
@@ -67,28 +66,14 @@
                 {#if recentlyCopied}
                     <Check size="30" />
                 {:else}
-                    <button
-                        on:click={copyToClipBoard}
-                        class="icon-button"
-                        style="padding: 0.2rem"
-                        use:tooltip={{
-                            content: 'Copy link',
-                            // `overflow: hidden` so needs to show below
-                            position: 'bottom'
-                        }}
-                    >
+                    <button on:click={copyToClipBoard} class="icon-button p-1">
                         <ContentCopy size="30" />
                     </button>
                 {/if}
             </div>
             <div>
                 {#if !obfuscated}
-                    <UtcTime
-                        relative
-                        timestamp={created}
-                        fmt="MMMM Do YYYY, h:mma"
-                        tooltipPosition="bottom"
-                    />
+                    <UtcTime relative timestamp={created} fmt="MMMM Do YYYY, h:mma" />
                 {/if}
             </div>
             <div>

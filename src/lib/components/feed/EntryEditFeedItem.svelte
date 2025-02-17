@@ -1,7 +1,7 @@
 <script lang="ts">
     import FeedItemIcon from '$lib/components/feed/FeedItemIcon.svelte';
     import { slide } from 'svelte/transition';
-    import AgentWidget from '$lib/components/entry/AgentWidget.svelte';
+    import AgentWidget from '$lib/components/entry/UserAgentWidget.svelte';
     import TimeInFeed from '$lib/components/feed/TimeInFeed.svelte';
     import Lazy from '$lib/components/ui/Lazy.svelte';
     import LocationWidget from '$lib/components/location/LocationWidget.svelte';

@@ -136,7 +136,6 @@
                                     timestamp={entry.created}
                                     fmt="h:mma"
                                     tzOffset={entry.createdTzOffset}
-                                    tooltipPosition="right"
                                 />
                             </span>
 

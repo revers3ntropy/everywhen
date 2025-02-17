@@ -7,9 +7,9 @@
 </script>
 
 <span class="text-textColorLight text-sm flex-center gap-1 pl-12 md:pl-6 md:m-0">
-    <UtcTime fmt={'h:mma'} {timestamp} tooltipPosition="right" {tzOffset} />
+    <UtcTime fmt={'h:mma'} {timestamp} {tzOffset} />
     {#if to}
         <span>-</span>
-        <UtcTime fmt={'h:mma'} timestamp={to} tooltipPosition="right" {tzOffset} />
+        <UtcTime fmt={'h:mma'} timestamp={to} {tzOffset} />
     {/if}
 </span>

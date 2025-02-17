@@ -45,7 +45,7 @@
 
         <hr />
         <div class="py-2">
-            <Streaks tooltipPosition="bottom" />
+            <Streaks />
         </div>
 
         <hr />

@@ -2,7 +2,6 @@
     import { ANIMATION_DURATION } from '$lib/constants';
     import { dispatch, listen } from '$lib/dataChangeEvents';
     import { numberAsSignedStr } from '$lib/utils/text';
-    import { tooltip } from '@svelte-plugins/tooltips';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
     import Bin from 'svelte-material-icons/Delete.svelte';
@@ -181,7 +180,9 @@
         event.deleted = true;
     });
 
-    $: if ([obfuscated, nameInput]) selectIfSelected(selectNameId, event.id);
+    // weird hack to have extra dependencies,
+    // so selectIfSelected will run when nameInput changes
+    $: [obfuscated, nameInput, selectIfSelected(selectNameId, event.id)].toString();
 </script>
 
 {#if event.deleted}
@@ -241,10 +242,6 @@
                         <button
                             on:click={() => (expanded = !expanded)}
                             class="icon-button"
-                            use:tooltip={{
-                                content: expanded ? 'Collapse' : 'Expand',
-                                position: 'left'
-                            }}
                             aria-label="Toggle event info"
                         >
                             {#if expanded}

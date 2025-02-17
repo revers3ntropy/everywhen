@@ -64,12 +64,12 @@
 <div>
     <h3 class="pl-2">New Event</h3>
     <div>
-        <Textbox bind:value={name} label="Name" />
+        <Textbox bind:value={name} label="Name" ariaLabel="Event Name" />
     </div>
     <div class="py-2">
         <LabelSelect bind:value={labelId} {labels} />
     </div>
     <div class="pl-2">
-        <Button on:click={submit} class="mt-4">Create</Button>
+        <Button on:click={submit} class="mt-4" aria-label="Create Event">Create</Button>
     </div>
 </div>

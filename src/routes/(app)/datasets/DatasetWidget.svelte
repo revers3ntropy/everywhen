@@ -1,7 +1,7 @@
 <script lang="ts">
     import TuneVariant from 'svelte-material-icons/TuneVariant.svelte';
+    import * as Tooltip from '$lib/components/ui/tooltip';
     import Dot from '$lib/components/ui/Dot.svelte';
-    import { tooltip } from '@svelte-plugins/tooltips';
     import type { DatasetMetadata } from '$lib/controllers/dataset/dataset.server';
 
     export let dataset: DatasetMetadata;
@@ -14,13 +14,18 @@
 >
     <span class="flex justify-start items-center gap-2 pb-2">
         {#if dataset.preset}
-            <span use:tooltip={{ content: `From preset '${dataset.preset.defaultName}'` }}>
-                <span
-                    class="border border-borderHeavy rounded-full p-1 inline-flex content-center justify-center"
-                >
-                    <TuneVariant size="20" />
-                </span>
-            </span>
+            <Tooltip.Root>
+                <Tooltip.Trigger>
+                    <span
+                        class="border border-borderHeavy rounded-full p-1 inline-flex content-center justify-center"
+                    >
+                        <TuneVariant size="20" />
+                    </span>
+                </Tooltip.Trigger>
+                <Tooltip.Content>
+                    From preset '{dataset.preset.defaultName}'
+                </Tooltip.Content>
+            </Tooltip.Root>
         {/if}
         {dataset.name}
     </span>

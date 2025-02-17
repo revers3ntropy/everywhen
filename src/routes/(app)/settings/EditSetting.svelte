@@ -3,10 +3,9 @@
     import Dot from '$lib/components/ui/Dot.svelte';
     import { Switch } from '$lib/components/ui/switch';
     import Textbox from '$lib/components/ui/Textbox.svelte';
-    import { tooltip } from '@svelte-plugins/tooltips';
     import { api } from '$lib/utils/apiRequest';
     import { notify } from '$lib/components/notifications/notifications';
-    import { currentTzOffset, fmtDuration, fmtUtc, nowUtc } from '$lib/utils/time';
+    import { fmtDuration, nowUtc } from '$lib/utils/time';
     import type { SettingsConfig, SettingValue } from '$lib/controllers/settings/settings';
     import { settingsStore } from '$lib/stores';
     import type { OptionalCoords } from '../../../types';
@@ -94,12 +93,7 @@
             </p>
 
             {#if created}
-                <p
-                    class="text-sm hide-mobile"
-                    use:tooltip={{
-                        content: fmtUtc(created, currentTzOffset(), 'DD/MM/YYYY h:mma')
-                    }}
-                >
+                <p class="text-sm hide-mobile">
                     <span class="oneline text-light">
                         <Dot light />
                         Last updated

@@ -65,8 +65,6 @@ export type ChartData = LineChartData | ScatterChartData;
 
 export type EventsSortKey = 'name' | 'start' | 'end' | 'created';
 
-export type TooltipPosition = 'top' | 'bottom' | 'left' | 'right';
-
 export type CursorStyle =
     | 'pointer'
     | 'default'

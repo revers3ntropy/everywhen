@@ -1,6 +1,6 @@
 {
   "name": "everywhen",
-  "version": "0.9.6",
+  "version": "0.9.7",
   "type": "module",
   "private": true,
   "scripts": {
@@ -24,7 +24,6 @@
     "@playwright/test": "1.45.0",
     "@remix-run/node": "^2.15.2",
     "@rollup/plugin-replace": "5.0.7",
-    "@svelte-plugins/tooltips": "3.0.1",
     "@sveltejs/adapter-auto": "3.2.2",
     "@sveltejs/adapter-node": "5.2.0",
     "@sveltejs/kit": "2.9.0",

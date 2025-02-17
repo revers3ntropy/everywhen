@@ -1,13 +1,7 @@
 <script lang="ts">
-    import { page } from '$app/stores';
-    import TimeInFeed from '$lib/components/feed/TimeInFeed.svelte';
-    import Lazy from '$lib/components/ui/Lazy.svelte';
-    import { type EntryEdit } from '$lib/controllers/entry/entry';
-    import { fmtUtcRelative, nowUtc } from '$lib/utils/time';
     import { onMount } from 'svelte';
     import ContentCopy from 'svelte-material-icons/ContentCopy.svelte';
     import { slide } from 'svelte/transition';
-    import { tooltip } from '@svelte-plugins/tooltips';
     import Bin from 'svelte-material-icons/Delete.svelte';
     import Restore from 'svelte-material-icons/DeleteRestore.svelte';
     import Eye from 'svelte-material-icons/Eye.svelte';
@@ -16,6 +10,13 @@
     import DotsVertical from 'svelte-material-icons/DotsVertical.svelte';
     import Heart from 'svelte-material-icons/Heart.svelte';
     import HeartOffOutline from 'svelte-material-icons/HeartOffOutline.svelte';
+    import Pencil from 'svelte-material-icons/Pencil.svelte';
+    import * as Tooltip from '$lib/components/ui/tooltip';
+    import { page } from '$app/stores';
+    import TimeInFeed from '$lib/components/feed/TimeInFeed.svelte';
+    import Lazy from '$lib/components/ui/Lazy.svelte';
+    import { type EntryEdit } from '$lib/controllers/entry/entry';
+    import { fmtUtcRelative, nowUtc } from '$lib/utils/time';
     import type { Location } from '$lib/controllers/location/location';
     import type { Label as LabelController } from '../../controllers/label/label';
     import { dispatch } from '$lib/dataChangeEvents';
@@ -27,8 +28,7 @@
     import { rawMdToHtml } from '$lib/utils/text';
     import UtcTime from '$lib/components/ui/UtcTime.svelte';
     import Dropdown from '$lib/components/ui/Dropdown.svelte';
-    import AgentWidget from './AgentWidget.svelte';
-    import Pencil from 'svelte-material-icons/Pencil.svelte';
+    import AgentWidget from './UserAgentWidget.svelte';
     import Label from '$lib/components/label/Label.svelte';
     import LocationWidget from '../location/LocationWidget.svelte';
 
@@ -157,12 +157,7 @@
 >
     {#if showFullDate}
         <div class="text-light pb-2">
-            <UtcTime
-                fmt={'h:mma ddd DD MMM YYYY'}
-                timestamp={created}
-                tooltipPosition="right"
-                tzOffset={createdTzOffset}
-            />
+            <UtcTime fmt={'h:mma ddd DD MMM YYYY'} timestamp={created} tzOffset={createdTzOffset} />
         </div>
     {/if}
     <div class="flex justify-between">
@@ -173,14 +168,12 @@
                 </div>
             {/if}
             {#if pinned !== null}
-                <span
-                    class="gradient-icon"
-                    use:tooltip={{
-                        content: `Added to favourites ${fmtUtcRelative(pinned)}`
-                    }}
-                >
-                    <Heart size="20" />
-                </span>
+                <Tooltip.Root>
+                    <Tooltip.Trigger class="gradient-icon"><Heart size="20" /></Tooltip.Trigger>
+                    <Tooltip.Content>
+                        Added to favourites {fmtUtcRelative(pinned)}
+                    </Tooltip.Content>
+                </Tooltip.Root>
             {/if}
 
             {#if $settingsStore.showAgentWidgetOnEntries.value}

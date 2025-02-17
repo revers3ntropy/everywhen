@@ -2,14 +2,12 @@
     import { listen } from '$lib/dataChangeEvents';
     import { clientLogger } from '$lib/utils/log';
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
-    import { tooltip } from '@svelte-plugins/tooltips';
     import { onMount } from 'svelte';
     import Fire from 'svelte-material-icons/Fire.svelte';
     import TimerSand from 'svelte-material-icons/TimerSand.svelte';
     import type { Streaks } from '../controllers/entry/entry';
     import { api } from '../utils/apiRequest';
 
-    export let tooltipPosition: 'top' | 'bottom' | 'left' | 'right' = 'right';
     export let condensed = false;
 
     function madeEntry() {
@@ -59,16 +57,6 @@
     let streaks = null as Streaks | null;
     let loaded = false;
     let error: string | null;
-
-    let tooltipContent = 'Loading...';
-    $: if (streaks) {
-        tooltipContent =
-            (!streaks.runningOut && !(streaks.current < 1)
-                ? '<div>Come back tomorrow to continue your streak!</div>'
-                : '') +
-            (streaks.runningOut ? '<div>Make an entry today to continue the Streak!</div>' : '') +
-            (streaks.current < 1 ? '<div>Make an entry to start a Streak!</div>' : '');
-    }
 </script>
 
 {#key streaks}
@@ -90,13 +78,7 @@
                     </span>
                 </span>
             {:else}
-                <div
-                    class="flex-center full text-sm"
-                    use:tooltip={{
-                        content: tooltipContent,
-                        position: tooltipPosition
-                    }}
-                >
+                <div class="flex-center full text-sm">
                     {#if streaks.runningOut}
                         <TimerSand size="25" />
                     {:else if streaks.current > 0}
@@ -119,16 +101,19 @@
                         </div>
                     </div>
                 </div>
+                <p class="text-sm text-muted-foreground p-1">
+                    {#if !streaks.runningOut && !(streaks.current < 1)}
+                        Come back tomorrow to continue your streak!
+                    {:else if streaks.runningOut}
+                        Make an entry today to continue the Streak!
+                    {:else if streaks.current < 1}
+                        Make an entry to start a Streak!
+                    {/if}
+                </p>
             {/if}
         {/if}
     {:else}
-        <span
-            class="flex-center text-sm"
-            use:tooltip={{
-                content: '...',
-                position: tooltipPosition
-            }}
-        >
+        <span class="flex-center text-sm">
             <Fire size="25" />
             <b>...</b>
         </span>

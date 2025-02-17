@@ -1,6 +1,5 @@
 <script lang="ts">
     import Info from 'svelte-material-icons/InformationOutline.svelte';
-    import { tooltip } from '@svelte-plugins/tooltips';
     import Close from 'svelte-material-icons/Close.svelte';
     import { doesNotWantToEnableLocation, enabledLocation, settingsStore } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
@@ -56,14 +55,7 @@
             {/if}
         </span>
 
-        <button
-            use:tooltip={{
-                content: `<span class="oneline"> Don't show again </span>`,
-                position: 'bottom'
-            }}
-            on:click={close}
-            style="z-index: 2"
-        >
+        <button on:click={close} style="z-index: 2">
             <Close />
         </button>
     </button>
