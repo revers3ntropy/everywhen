@@ -1,35 +1,24 @@
 <script lang="ts">
+    import MenuBar from '$lib/components/entryForm/MenuBar.svelte';
     import { Button } from '$lib/components/ui/button';
-    import { ANIMATION_DURATION } from '$lib/constants';
-    import UploadMultiple from 'svelte-material-icons/UploadMultiple.svelte';
     import { browser } from '$app/environment';
     import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
-    import InsertImage from '$lib/components/asset/InsertImage.svelte';
     import { Asset } from '$lib/controllers/asset/asset';
     import { dispatch, listen } from '$lib/dataChangeEvents';
     import { Result } from '$lib/utils/result';
     import { serializedAgentData } from '$lib/utils/userAgent';
-    import LabelSelect from '$lib/components/label/LabelSelect.svelte';
     import { Entry } from '$lib/controllers/entry/entry';
     import type { Label } from '$lib/controllers/label/label';
-    import {
-        currentlyUploadingAssets,
-        enabledLocation,
-        encryptionKey,
-        username
-    } from '$lib/stores';
+    import { enabledLocation, encryptionKey, username } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { getLocation, nullLocation } from '$lib/utils/geolocation';
     import { clientLogger } from '$lib/utils/log';
     import { notify } from '$lib/components/notifications/notifications';
     import { wordCount } from '$lib/utils/text';
     import { currentTzOffset, nowUtc } from '$lib/utils/time';
-    import FormatOptions from './FormatOptions.svelte';
-    import LocationToggle from '../location/LocationToggle.svelte';
     import { paste } from './paste';
     import { decrypt, encrypt } from '$lib/utils/encryption';
-    import { slide } from 'svelte/transition';
 
     // as this form is used in entry editing and creating
     export let action: 'create' | 'edit' = 'create';
@@ -117,26 +106,18 @@
         newEntryBody = input.value;
     }
 
-    function wrapSelectedWith(
-        input: HTMLInputElement | HTMLTextAreaElement,
-        before: string,
-        after: string,
-        insertSpaceIfEmpty = true
-    ) {
+    function wrapSelectedWith(before: string, after: string, insertSpaceIfEmpty = true) {
+        const input = newEntryInputElement;
+        if (!input) {
+            clientLogger.error('input element not found');
+            return;
+        }
         const selected = input.value.substring(input.selectionStart ?? 0, input.selectionEnd ?? 0);
         if (selected.length === 0 && insertSpaceIfEmpty) {
             insertAtCursor(input, `${before} ${after}`);
             return;
         }
         insertAtCursor(input, before + selected + after);
-    }
-
-    function makeWrapper(before: string, after: string, insertSpaceIfEmpty = true): () => void {
-        return () => {
-            if (newEntryInputElement) {
-                wrapSelectedWith(newEntryInputElement, before, after, insertSpaceIfEmpty);
-            }
-        };
     }
 
     interface EntryPostPayload {
@@ -280,7 +261,7 @@
     }
 
     function insertImage(md: string) {
-        insertAtCursor(newEntryInputElement, `\n${md}\n`);
+        wrapSelectedWith(md, '', false);
     }
 
     onMount(() => {
@@ -323,29 +304,7 @@
 
 <div class="md:bg-vLightAccent rounded-2xl">
     <div class="pb-2 md:pb-4 md:px-2">
-        <div class="flex items-center bg-lightAccent md:rounded-full md:w-fit">
-            <div class="flex items-center gap-2 py-1 px-2 md:px-4 w-fit">
-                <LocationToggle size={23} />
-
-                <FormatOptions {makeWrapper} />
-
-                <InsertImage onInput={insertImage} />
-
-                <div class="pl-2">
-                    <LabelSelect bind:value={newEntryLabelId} {labels} />
-                </div>
-            </div>
-
-            {#if $currentlyUploadingAssets > 0}
-                <div
-                    class="flex-center h-full px-2 py-1 border border-textColor rounded-full"
-                    transition:slide={{ duration: ANIMATION_DURATION, axis: 'x' }}
-                >
-                    <UploadMultiple size="26" />
-                    {$currentlyUploadingAssets}
-                </div>
-            {/if}
-        </div>
+        <MenuBar {labels} {wrapSelectedWith} bind:newEntryLabelId />
     </div>
     <div class="px-2">
         <div>
