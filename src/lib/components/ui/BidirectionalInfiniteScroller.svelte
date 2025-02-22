@@ -59,7 +59,15 @@
     on:inview_leave={() => (pageEndInViewTop = false)}
 />
 
+{#if currentlyLoading === 'top'}
+    <slot name="loader-top"></slot>
+{/if}
+
 <slot />
+
+{#if currentlyLoading === 'bottom'}
+    <slot name="loader-bottom"></slot>
+{/if}
 
 <div
     style="height: {bottomMargin * 2}px; bottom: -{bottomMargin}px"

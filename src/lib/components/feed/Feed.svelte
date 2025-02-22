@@ -1,5 +1,6 @@
 <script lang="ts">
     import BidirectionalInfiniteScroller from '$lib/components/ui/BidirectionalInfiniteScroller.svelte';
+    import EntrySkeleton from '$lib/components/ui/skeleton/EntrySkeleton.svelte';
     import type { Label } from '$lib/controllers/label/label';
     import DayInFeed from '$lib/components/feed/DayInFeed.svelte';
     import type { Location } from '$lib/controllers/location/location';
@@ -157,6 +158,8 @@
         hasMore={moreDaysToLoad}
         topMargin={500}
     >
+        <div slot="loader-top"> <EntrySkeleton /> </div>
+
         {#each sortedDays as day (day.day)}
             <DayInFeed
                 {day}
@@ -168,5 +171,7 @@
                 {happinessDataset}
             />
         {/each}
+
+        <div slot="loader-bottom"> <EntrySkeleton /> </div>
     </BidirectionalInfiniteScroller>
 </div>
