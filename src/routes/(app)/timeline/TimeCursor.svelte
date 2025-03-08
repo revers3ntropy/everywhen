@@ -145,13 +145,7 @@
     <Dialog.Content>
         <div class="pr-4">
             {#if eventInDialog}
-                <Event
-                    event={eventInDialog}
-                    {labels}
-                    allowCollapseChange={false}
-                    obfuscated={false}
-                    expanded
-                />
+                <Event event={eventInDialog} {labels} obfuscated={false} />
             {:else}
                 Something went wrong
             {/if}

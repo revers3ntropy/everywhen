@@ -272,8 +272,6 @@
                 created
             }}
             {labels}
-            expanded
-            allowCollapseChange={false}
         />
     </Dialog.Content>
 </Dialog.Root>

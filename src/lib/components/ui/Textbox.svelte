@@ -15,6 +15,7 @@
     export let fullWidth = false;
     export let startUnit = '';
     export let endUnit = '';
+    export let onChange: (value: string) => void = () => {};
 </script>
 
 <label class="group flex flex-col relative mt-2 {fullWidth ? 'w-full' : 'max-w-[300px]'}">
@@ -48,7 +49,7 @@
             class="text-xl p-3 outline-none w-full cursor-text inline-block relative bg-transparent webkit-autofill:bg-transparent"
             class:pt-2={!label}
             on:keypress
-            on:change
+            on:change={() => onChange(value)}
             on:input
             on:blur
             on:keydown

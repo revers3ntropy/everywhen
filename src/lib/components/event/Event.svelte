@@ -1,13 +1,12 @@
 <script lang="ts">
+    import { Button } from '$lib/components/ui/button';
+    import { Switch } from '$lib/components/ui/switch';
+    import Textbox from '$lib/components/ui/Textbox.svelte';
     import { ANIMATION_DURATION } from '$lib/constants';
     import { dispatch, listen } from '$lib/dataChangeEvents';
     import { numberAsSignedStr } from '$lib/utils/text';
-    import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
-    import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
     import Bin from 'svelte-material-icons/Delete.svelte';
     import Restore from 'svelte-material-icons/Restore.svelte';
-    import TimelineClockOutline from 'svelte-material-icons/TimelineClockOutline.svelte';
-    import TimelineOutline from 'svelte-material-icons/TimelineOutline.svelte';
     import type { ChangeEventHandler } from 'svelte/elements';
     import LabelSelect from '$lib/components/label/LabelSelect.svelte';
     import type { TimestampSecs } from '../../../types';
@@ -29,8 +28,6 @@
 
     export let event: Event & { deleted?: boolean };
     export let selectNameId: string | null = null;
-    export let expanded = false;
-    export let allowCollapseChange = true;
 
     let nameInput: HTMLInputElement;
 
@@ -55,14 +52,11 @@
         await dispatch.update('event', event, oldEvent);
     }
 
-    const updateName = (async ({ target }) => {
-        if (!target || !('value' in target) || typeof target.value !== 'string') {
-            throw target;
-        }
+    const updateName = async (newName: string) => {
         await updateEvent({
-            name: target.value
+            name: newName
         });
-    }) satisfies ChangeEventHandler<HTMLInputElement>;
+    };
 
     const updateStart = (async ({ target }) => {
         if (!target || !('value' in target) || typeof target.value !== 'string') {
@@ -148,9 +142,6 @@
         if (nameInput) {
             nameInput.focus();
             nameInput.select();
-            if (!expanded && allowCollapseChange) {
-                expanded = true;
-            }
         }
     }
 
@@ -200,197 +191,93 @@
         </button>
     </div>
 {:else}
-    <div class="event" transition:slide|local={{ axis: 'y', duration: 0 }}>
-        <div class="header">
-            <div class="flex-center">
-                {#if !expanded}
-                    <div
-                        transition:slide|local={{
-                            axis: 'x',
-                            duration: ANIMATION_DURATION,
-                            delay: 100
-                        }}
-                    >
-                        <LabelSelect
-                            on:change={updateLabel}
-                            value={event.label?.id || ''}
-                            {labels}
-                            condensed
-                        />
-                    </div>
-                {/if}
-            </div>
-            <div>
-                {#if obfuscated}
-                    <p class="event-name-inp obfuscated">
-                        {event.name}
-                    </p>
-                {:else}
-                    <input
-                        bind:this={nameInput}
-                        class="editable-text event-name-inp"
-                        on:change={updateName}
-                        placeholder="Event Name"
-                        aria-label="Event Name"
-                        value={event.name}
-                    />
-                {/if}
-            </div>
-            <div class="flex-center">
-                {#key expanded}
-                    {#if allowCollapseChange}
-                        <button
-                            on:click={() => (expanded = !expanded)}
-                            class="icon-button"
-                            aria-label="Toggle event info"
-                        >
-                            {#if expanded}
-                                <ChevronUp size="30" />
-                            {:else}
-                                <ChevronDown size="30" />
-                            {/if}
-                        </button>
-                    {/if}
-                {/key}
-            </div>
+    <div class="" transition:slide|local={{ axis: 'y', duration: 0 }}>
+        <div class="flex items-center justify-between">
+            {#if obfuscated}
+                <p class=" obfuscated">
+                    {event.name}
+                </p>
+            {:else}
+                <Textbox value={event.name} onChange={updateName} label="Event Name" />
+            {/if}
+            <Button
+                variant="outline"
+                class="border-none danger bg-transparent"
+                on:click={deleteEvent}
+            >
+                <Bin size="25" />
+            </Button>
         </div>
 
-        {#if expanded}
-            <div
-                class="expanded-content"
-                transition:slide|local={{
-                    axis: 'y',
-                    duration: ANIMATION_DURATION
-                }}
-            >
-                <div class="top-row">
-                    <div
-                        class="flex-center"
-                        transition:fly|local={{
-                            y: -50,
-                            duration: ANIMATION_DURATION,
-                            delay: ANIMATION_DURATION / 2
-                        }}
-                    >
-                        <LabelSelect
-                            on:change={updateLabel}
-                            value={event.label?.id || ''}
-                            {labels}
-                        />
-                    </div>
+        <div
+            class=""
+            transition:slide|local={{
+                axis: 'y',
+                duration: ANIMATION_DURATION
+            }}
+        >
+            <div class="py-4">
+                <div
+                    transition:fly|local={{
+                        y: -50,
+                        duration: ANIMATION_DURATION,
+                        delay: ANIMATION_DURATION / 2
+                    }}
+                >
+                    <LabelSelect on:change={updateLabel} value={event.label?.id || ''} {labels} />
                 </div>
-                <div class="from-to-menu">
-                    {#if Event.isInstantEvent(event)}
+            </div>
+            <div class="block">
+                {#if Event.isInstantEvent(event)}
+                    <div class="flex gap-4 items-center">
+                        <Switch on:click={makeDurationEvent} />
+                        Has duration
+                    </div>
+                    <span class="border rounded-xl border-border p-2 hover:bg-vLightAccent">
                         <input
-                            class="editable-text"
                             on:change={updateStartAndEnd}
                             placeholder="Start"
                             type="datetime-local"
+                            class="my-4"
                             value={fmtTimestampForInput(event.start, currentTzOffset())}
                         />
-                    {:else}
-                        <input
-                            class="editable-text"
-                            on:change={updateStart}
-                            placeholder="Start"
-                            type="datetime-local"
-                            value={fmtTimestampForInput(event.start, currentTzOffset())}
-                        />
-                        to
-                        <input
-                            class="editable-text"
-                            on:change={updateEnd}
-                            placeholder="End"
-                            type="datetime-local"
-                            value={fmtTimestampForInput(event.end, currentTzOffset())}
-                        />
-                        <i>
-                            ({fmtDuration(event.end - event.start)})
-                        </i>
-                    {/if}
-                </div>
-                <div>
-                    {#if Event.isInstantEvent(event)}
-                        <button
-                            class="with-icon bordered icon-gradient-on-hover rounded-xl"
-                            on:click={makeDurationEvent}
-                        >
-                            <TimelineOutline size="25" />
-                            Make Duration Event
-                        </button>
-                    {:else}
-                        <button
-                            class="with-icon bordered icon-gradient-on-hover rounded-xl"
-                            on:click={makeInstantEvent}
-                        >
-                            <TimelineClockOutline size="25" />
-                            Make Instant Event
-                        </button>
-                    {/if}
-                    <button class="with-icon bordered danger rounded-xl" on:click={deleteEvent}>
-                        <Bin size="25" />
-                        Delete
-                    </button>
-                </div>
-                <div class="p-4 pb-0 italic text-textColorLight text-sm">
-                    Created <UtcTime timestamp={event.created} relative />, GMT{numberAsSignedStr(
-                        event.tzOffset
-                    )}
-                </div>
+                    </span>
+                {:else}
+                    <div class="flex gap-4 items-center">
+                        <Switch on:click={makeInstantEvent} checked />
+                        Has duration
+                    </div>
+                    <div>
+                        <span class="border rounded-xl border-border p-2 hover:bg-vLightAccent">
+                            <input
+                                on:change={updateStart}
+                                placeholder="Start"
+                                type="datetime-local"
+                                class="my-4"
+                                value={fmtTimestampForInput(event.start, currentTzOffset())}
+                            />
+                        </span>
+                        <span class="italic text-light"> to </span>
+                        <span class="border rounded-xl border-border p-2 hover:bg-vLightAccent">
+                            <input
+                                on:change={updateEnd}
+                                placeholder="End"
+                                type="datetime-local"
+                                class="my-4"
+                                value={fmtTimestampForInput(event.end, currentTzOffset())}
+                            />
+                        </span>
+                    </div>
+                    <span class="italic text-light">
+                        ({fmtDuration(event.end - event.start)})
+                    </span>
+                {/if}
             </div>
-        {/if}
+            <div class="pt-4 italic text-textColorLight text-sm">
+                Created <UtcTime timestamp={event.created} relative />, GMT{numberAsSignedStr(
+                    event.tzOffset
+                )}
+            </div>
+        </div>
     </div>
 {/if}
-
-<style lang="scss">
-    @import '$lib/styles/layout';
-
-    .event {
-        .header {
-            display: grid;
-            grid-template-columns: auto 1fr auto;
-            margin: 0 5px;
-
-            .event-name-inp {
-                font-size: 1.2rem;
-                line-height: 1.8rem;
-                display: block;
-                width: 100%;
-                padding: 0.25rem 0.5rem;
-                border-radius: calc($border-radius / 2);
-            }
-        }
-
-        .expanded-content {
-            .top-row {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-
-                margin: 0.5rem 0.8rem;
-
-                @media #{$mobile} {
-                    margin: 0.5rem 0;
-                }
-            }
-        }
-
-        .from-to-menu {
-            display: block;
-            margin: 0 0.5rem;
-
-            input[type='datetime-local'] {
-                margin: 0.5rem;
-            }
-
-            * {
-                margin: 0 0.3em;
-            }
-        }
-    }
-
-    i {
-        font-size: 0.9em;
-        color: var(--text-color-light);
-    }
-</style>
