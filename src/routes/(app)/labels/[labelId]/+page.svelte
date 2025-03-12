@@ -1,4 +1,6 @@
 <script lang="ts">
+    import ChevronLeft from 'svelte-material-icons/ChevronLeft.svelte';
+    import { Button } from '$lib/components/ui/button';
     import * as Dialog from '$lib/components/ui/dialog';
     import { goto } from '$app/navigation';
     import EventsList from '$lib/components/event/EventsList.svelte';
@@ -71,12 +73,27 @@
 
 <main class="md:p-4 md:pl-4 flex-center">
     <div class="w-full md:max-w-5xl">
-        <div class="w-100 border-b-4 font-bold py-1" style="border-color: {data.label.color}">
-            {data.label.color}
-            <input type="color" bind:value={data.label.color} on:change={updateColor} />
+        <div>
+            <a href="/labels">
+                <Button variant="outline" class="border-border border-2 text-textColor">
+                    <ChevronLeft /> All Labels
+                </Button>
+            </a>
         </div>
-        <div class="overflow-x-hidden md:flex justify-between align-center py-2">
-            <Textbox bind:value={nameDecrypted} on:change={updateName} label="Name" />
+        <div class="overflow-x-hidden md:flex justify-between items-center py-2">
+            <div class="flex-center gap-2">
+                <Textbox bind:value={nameDecrypted} on:change={updateName} label="Name" />
+                <span class="border-2 border-border p-2 rounded-xl w-fit h-fit mt-2">
+                    {data.label.color}
+                    <input
+                        class="mb-1"
+                        type="color"
+                        bind:value={data.label.color}
+                        on:change={updateColor}
+                    />
+                </span>
+            </div>
+
             {#if data.label.entryCount + data.label.editCount + eventCount < 1}
                 <button class="with-circled-icon danger" on:click={deleteLabel}>
                     <Delete size="30" />
@@ -101,6 +118,7 @@
                 </Dialog.Root>
             {/if}
         </div>
+
         <div class="p-2 md:p-0 md:pb-4 md:pt-1 text-textColorLight italic">
             {data.label.entryCount} entries, {eventCount} events have this label
         </div>
