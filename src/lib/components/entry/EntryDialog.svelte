@@ -24,7 +24,7 @@
     });
 </script>
 
-<div class="min-h-[calc(100vh - 100px)]">
+<div class="min-h-[calc(100vh - 100px)] max-w-full overflow-x-hidden">
     {#if entry && entry.ok}
         {#key locations}
             <Entry
