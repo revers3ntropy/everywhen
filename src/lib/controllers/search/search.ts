@@ -1,6 +1,6 @@
-import type { LabelWithCount } from '$lib/controllers/label/label';
+import type { Label } from '$lib/controllers/label/label';
 
-interface LabelSearchResult extends LabelWithCount {
+interface LabelSearchResult extends Label {
     type: 'label';
 }
 

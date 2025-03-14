@@ -3,7 +3,6 @@ import { UsageLimits } from '$lib/controllers/usageLimits/usageLimits.server';
 import { query } from '$lib/db/mysql.server';
 import { FileLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
-import { normaliseWordForIndex } from '$lib/utils/text';
 import { nowUtc } from '$lib/utils/time';
 import type { PickOptional } from '../../../types';
 import type { Auth } from '../auth/auth.server';
@@ -82,9 +81,9 @@ namespace LabelServer {
 
     export async function userHasLabelWithName(
         auth: Auth,
-        nameDecrypted: string
+        nameEncrypted: string
     ): Promise<boolean> {
-        return (await fromName(auth, nameDecrypted)).ok;
+        return (await fromName(auth, nameEncrypted)).ok;
     }
 
     export async function purgeWithId(auth: Auth, id: string): Promise<void> {
@@ -271,20 +270,6 @@ namespace LabelServer {
                 },
                 {} as Record<string, LabelWithCount>
             );
-    }
-
-    export async function search(auth: Auth, str: string): Promise<LabelWithCount[]> {
-        const labelsMap = await Label.allWithCounts(auth);
-
-        // filter labels if any of the parts of the search query are found in the name
-        const searchStrParts = str.split(' ').map(normaliseWordForIndex);
-
-        return Object.entries(labelsMap)
-            .map(([id, label]) => ({ ...label, id }))
-            .filter(l => {
-                const name = l.name.toLowerCase();
-                return searchStrParts.find(part => name.includes(part)) !== undefined;
-            });
     }
 }
 

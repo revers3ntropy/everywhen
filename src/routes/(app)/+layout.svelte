@@ -144,7 +144,11 @@
 </span>
 
 <div class="md:fixed top-0 md:left-0 right-0 md:bottom-0 md:h-full w-[12rem] z-[6]">
-    <Nav activeSubscriptionType={data.activeSubscriptionType} />
+    <Nav
+        activeSubscriptionType={data.activeSubscriptionType}
+        locations={data.locations}
+        labels={data.labels}
+    />
 </div>
 
 <div class="page-content">

@@ -1,13 +1,10 @@
 import type { Auth } from '$lib/controllers/auth/auth';
-import { Label } from '$lib/controllers/label/label.server';
 import type { SearchResults } from '$lib/controllers/search/search';
 import { Result } from '$lib/utils/result';
 
 namespace SearchServer {
-    export async function search(auth: Auth, query: string): Promise<Result<SearchResults>> {
-        const labels = await Label.search(auth, query);
-
-        return Result.ok([...labels.map(l => ({ ...l, type: 'label' as const }))]);
+    export async function search(_auth: Auth, _query: string): Promise<Result<SearchResults>> {
+        return Result.ok([]);
     }
 }
 

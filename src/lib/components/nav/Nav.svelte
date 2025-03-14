@@ -1,8 +1,12 @@
 <script lang="ts">
     import { page } from '$app/stores';
+    import SearchPage from '$lib/components/SearchPage.svelte';
+    import * as Dialog from '$lib/components/ui/dialog';
     import AccountDropdown from '$lib/components/nav/AccountDropdown.svelte';
     import CreateNewButton from '$lib/components/nav/CreateNewButton.svelte';
     import { Button } from '$lib/components/ui/button';
+    import type { Label } from '$lib/controllers/label/label';
+    import type { Location } from '$lib/controllers/location/location';
     import type { SubscriptionType } from '$lib/controllers/subscription/subscription';
     import { obfuscated, passcodeLastEntered, settingsStore } from '$lib/stores';
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
@@ -14,6 +18,8 @@
     import Notebook from 'svelte-material-icons/NotebookOutline.svelte';
     import Search from 'svelte-material-icons/Magnify.svelte';
 
+    export let locations: Location[];
+    export let labels: Record<string, Label>;
     export let activeSubscriptionType: SubscriptionType;
 
     const buttonCls =
@@ -34,11 +40,29 @@
             <div class="md:pb-2 w-full">
                 <AccountDropdown {activeSubscriptionType} />
             </div>
-            <div class="pl-2 md:pl-0 md:pb-2 flex items-center justify-between w-full">
-                <span class="w-full">
+            <div class="pl-2 md:pl-0 md:pb-2 flex items-center justify-between gap-1 w-full">
+                <span>
                     <CreateNewButton />
                 </span>
-                <span class="pl-2 md:pl-0">
+                <span>
+                    <Dialog.Root>
+                        <Dialog.Trigger>
+                            <Button
+                                aria-label="Search"
+                                class="flex-center rounded-full px-2 py-5 aspect-square"
+                                variant="outline"
+                            >
+                                <Search size="20" />
+                            </Button>
+                        </Dialog.Trigger>
+                        <Dialog.Content>
+                            <div class="h-[90vh] overflow-y-auto overflow-x-hidden">
+                                <SearchPage {locations} {labels} />
+                            </div>
+                        </Dialog.Content>
+                    </Dialog.Root>
+                </span>
+                <span>
                     <Button
                         aria-label={$obfuscated ? 'Show all' : 'Hide all'}
                         on:click={() => obfuscated.set(!$obfuscated)}
@@ -115,16 +139,6 @@
                 >
                     <Counter size="30" />
                     <div class="text-sm md:text-base"> Insights </div>
-                </a>
-                <a
-                    href="/search"
-                    class={buttonCls}
-                    class:bg-secondary={$page.url.pathname.startsWith('/search')}
-                    class:hover:bg-secondary={$page.url.pathname.startsWith('/search')}
-                    aria-label="search"
-                >
-                    <Search size="30" />
-                    <div class="text-sm md:text-base"> Search </div>
                 </a>
             </div>
         </div>
