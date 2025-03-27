@@ -150,7 +150,7 @@
                 <Textbox
                     type={inputType}
                     value={value.toString()}
-                    on:change={onInput}
+                    onChange={updateValue}
                     endUnit={unit}
                     thinBorder
                 />

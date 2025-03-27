@@ -56,11 +56,11 @@
 
 <div>
     <div class="py-2">
-        <Textbox bind:value={name} label="Name" on:change={syncWithServer} fullWidth thinBorder />
+        <Textbox bind:value={name} label="Name" onChange={syncWithServer} fullWidth thinBorder />
     </div>
     <div>
         <Textbox
-            on:change={onRadiusChange}
+            onChange={onRadiusChange}
             bind:value={radiusMeters}
             type="number"
             label="Radius"

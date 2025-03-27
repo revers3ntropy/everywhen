@@ -82,7 +82,7 @@
         </div>
         <div class="overflow-x-hidden md:flex justify-between items-center py-2">
             <div class="flex-center gap-2">
-                <Textbox bind:value={nameDecrypted} on:change={updateName} label="Name" />
+                <Textbox bind:value={nameDecrypted} onChange={updateName} label="Name" />
                 <span class="border-2 border-border p-2 rounded-xl w-fit h-fit mt-2">
                     {data.label.color}
                     <input

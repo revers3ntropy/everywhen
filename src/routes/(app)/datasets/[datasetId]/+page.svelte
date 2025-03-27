@@ -93,7 +93,7 @@
                 <Textbox
                     label="Name"
                     value={data.dataset.name}
-                    on:change={updateName}
+                    onChange={updateName}
                     bind:element={nameInp}
                     ariaLabel="dataset name"
                 />

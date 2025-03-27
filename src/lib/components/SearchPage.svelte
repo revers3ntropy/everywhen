@@ -44,7 +44,7 @@
 </script>
 
 <div class="py-2 flex">
-    <Textbox bind:value={search} on:change={() => loadSearch(search)} label="Search" fullWidth />
+    <Textbox bind:value={search} onChange={() => loadSearch(search)} label="Search" fullWidth />
 </div>
 
 <section class="flex-col flex gap-4">

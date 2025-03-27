@@ -17,4 +17,4 @@
     }) satisfies ChangeEventHandler<HTMLInputElement>;
 </script>
 
-<Textbox bind:value={word} on:change={searchWordChange} label="Search" thinBorder fullWidth />
+<Textbox bind:value={word} onChange={searchWordChange} label="Search" thinBorder fullWidth />
