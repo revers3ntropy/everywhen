@@ -130,9 +130,17 @@ export class Day {
     }
 
     public plusMonths(months: number): Day {
-        const date = new Date(`${this.fmtIso()}T12:00:00Z`);
-        date.setMonth(date.getMonth() + months);
-        return Day.fromTimestamp(date.getTime() / 1000, currentTzOffset());
+        let newYear = this.year;
+        let newMonth = this.month + months;
+        while (newMonth > 12) {
+            newMonth -= 12;
+            newYear++;
+        }
+        while (newMonth < 1) {
+            newMonth += 12;
+            newYear--;
+        }
+        return new Day(newYear, newMonth, this.date);
     }
 
     public startOfMonth(): Day {
