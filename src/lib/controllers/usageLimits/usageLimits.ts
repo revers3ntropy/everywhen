@@ -65,7 +65,7 @@ export namespace UsageLimits {
         dataset: {
             maxCount: 5,
             maxAppendCount: 100,
-            maxRowCount: 10000000
+            maxRowCount: 1000
         },
         entry: {
             maxCount: 100
