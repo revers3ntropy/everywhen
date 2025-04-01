@@ -20,7 +20,7 @@
     import EventEndFeedItem from '$lib/components/feed/EventEndFeedItem.svelte';
     import EventStartFeedItem from '$lib/components/feed/EventStartFeedItem.svelte';
     import HappinessFeedItem from '$lib/components/feed/HappinessFeedItem.svelte';
-    import SleepInfo from '$lib/components/feed/SleepCycleFeedItem.svelte';
+    import SleepFeedItem from '$lib/components/feed/SleepFeedItem.svelte';
     import LocationWidgetMulti from '$lib/components/location/LocationWidgetMulti.svelte';
     import WeatherWidget from '$lib/components/weather/WeatherWidget.svelte';
     import type { Entry } from '$lib/controllers/entry/entry';
@@ -187,7 +187,7 @@
                     {:else if item.type === 'entry-edit'}
                         <EntryEditFeedItem {...omit(item, 'type')} {locations} {obfuscated} />
                     {:else if item.type === 'sleep'}
-                        <SleepInfo
+                        <SleepFeedItem
                             tzOffset={item.startTzOffset}
                             start={item.start}
                             duration={item.duration}

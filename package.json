@@ -1,6 +1,6 @@
 {
   "name": "everywhen",
-  "version": "0.9.9",
+  "version": "0.9.10",
   "type": "module",
   "private": true,
   "scripts": {

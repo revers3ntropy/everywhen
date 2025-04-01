@@ -6,7 +6,7 @@ import { Day } from '$lib/utils/day';
 import { decrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
 
-export const sleepCycleProvider = {
+export const sleepProvider = {
     async feedItemsOnDay(auth: Auth, day: Day): Promise<Result<FeedItem[]>> {
         const minTimestamp = day.utcTimestampMiddleOfDay(24);
         const maxTimestamp = day.utcTimestampMiddleOfDay(-24);
@@ -18,7 +18,7 @@ export const sleepCycleProvider = {
             WHERE datasets.id = datasetRows.datasetId
                 AND datasets.userId = ${auth.id}
                 AND datasetRows.userId = ${auth.id}
-                AND datasets.presetId = 'sleepCycle'
+                AND datasets.presetId = 'sleep'
                 AND datasetRows.timestamp > ${minTimestamp}
                 AND datasetRows.timestamp < ${maxTimestamp}
                 AND DATE_FORMAT(FROM_UNIXTIME(datasetRows.timestamp + (datasetRows.timestampTzOffset - TIMESTAMPDIFF(HOUR, UTC_TIMESTAMP(), NOW())) * 60 * 60), '%Y-%m-%d') 
@@ -60,7 +60,7 @@ export const sleepCycleProvider = {
                 WHERE datasets.id = datasetRows.datasetId
                   AND datasets.userId = ${auth.id}
                   AND datasetRows.userId = ${auth.id}
-                  AND datasets.presetId = 'sleepCycle'
+                  AND datasets.presetId = 'sleep'
                   AND datasetRows.timestamp > ${minTimestamp}
                   AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(datasetRows.timestamp + (datasetRows.timestampTzOffset - TIMESTAMPDIFF(HOUR, UTC_TIMESTAMP(), NOW())) * 60 * 60), '%Y-%m-%d'), DATE)
                     > CONVERT(${day.fmtIso()}, DATE)
@@ -73,7 +73,7 @@ export const sleepCycleProvider = {
                 WHERE datasets.id = datasetRows.datasetId
                   AND datasets.userId = ${auth.id}
                   AND datasetRows.userId = ${auth.id}
-                  AND datasets.presetId = 'sleepCycle'
+                  AND datasets.presetId = 'sleep'
                   AND datasetRows.timestamp < ${maxTimestamp}
                   AND CONVERT(DATE_FORMAT(FROM_UNIXTIME(datasetRows.timestamp + (datasetRows.timestampTzOffset - TIMESTAMPDIFF(HOUR, UTC_TIMESTAMP(), NOW())) * 60 * 60), '%Y-%m-%d'), DATE)
                     < CONVERT(${day.fmtIso()}, DATE)

@@ -7,6 +7,7 @@
     import TuneVariant from 'svelte-material-icons/TuneVariant.svelte';
     import Dropdown from '$lib/components/ui/Dropdown.svelte';
     import SleepCycleImport from './SleepCycleImport.svelte';
+    import FitbitSleep from './FitbitSleep.svelte';
     import Import from 'svelte-material-icons/Import.svelte';
     import FileOutline from 'svelte-material-icons/FileOutline.svelte';
 
@@ -65,5 +66,18 @@
                 />
             </span>
         </SleepCycleImport>
+        <FitbitSleep {datasets} {usedPresetIds} className="w-full">
+            <span class="w-full flex justify-start items-center p-2 gap-2">
+                <Import size="24" />
+                Fitbit Sleep
+                <img
+                    src="/fitbit.png"
+                    width="225"
+                    height="224"
+                    class="rounded-full w-6 h-6"
+                    alt="Fitbit logo"
+                />
+            </span>
+        </FitbitSleep>
     </div>
 </Dropdown>

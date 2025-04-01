@@ -28,6 +28,6 @@ export const thirdPartyDatasetProviders: Record<PresetId, ThirdPartyDatasetProvi
     weight: null,
     gitHubCommits: githubCommitsProvider,
     happiness: null,
-    sleepCycle: null,
+    sleep: null,
     weather: weatherProvider
 };

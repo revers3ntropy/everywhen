@@ -38,9 +38,9 @@ export const datasetPresets = {
             }
         ]
     },
-    sleepCycle: {
-        id: 'sleepCycle',
-        defaultName: 'Sleep Cycle',
+    sleep: {
+        id: 'sleep',
+        defaultName: 'Sleep',
         columns: [
             {
                 id: '0',

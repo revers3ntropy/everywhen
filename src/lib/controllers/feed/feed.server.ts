@@ -2,7 +2,7 @@ import { entriesProvider } from '$lib/controllers/feed/entriesProvider';
 import { entryEditsProvider } from '$lib/controllers/feed/entryEditsProvider';
 import { eventEndsProvider, eventStartsProvider } from '$lib/controllers/feed/eventsProvider';
 import { happinessProvider } from '$lib/controllers/feed/happinessProvidor';
-import { sleepCycleProvider } from '$lib/controllers/feed/sleepCycleProvider';
+import { sleepProvider } from '$lib/controllers/feed/sleepProvider';
 import {
     OpenWeatherMapAPI,
     type WeatherForDay
@@ -21,7 +21,7 @@ export interface FeedProvider {
 
 namespace FeedServer {
     const PROVIDERS = [
-        sleepCycleProvider,
+        sleepProvider,
         entriesProvider,
         entryEditsProvider,
         eventEndsProvider,
