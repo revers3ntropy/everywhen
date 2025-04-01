@@ -69,12 +69,10 @@ export namespace Dataset {
     ): DatasetRow[] {
         return rows.map(row => ({
             ...row,
-            elements: row.elements.sort((a, b) => {
-                const aJsonIndex = row.elements.indexOf(a);
-                const bJsonIndex = row.elements.indexOf(b);
-                const aColumn = columns.find(c => c.jsonOrdering === aJsonIndex);
-                const bColumn = columns.find(c => c.jsonOrdering === bJsonIndex);
-                return aColumn!.ordering - bColumn!.ordering;
+            elements: new Array(columns.length).fill(null).map((_, i) => {
+                const col = columns.find(c => c.ordering === i);
+                if (!col) return null;
+                return row.elements[col.jsonOrdering];
             })
         }));
     }
