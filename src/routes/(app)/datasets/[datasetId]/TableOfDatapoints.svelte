@@ -122,6 +122,16 @@
                 {/if}
             </th>
         </tr>
+        <tr class="p-2 border-t border-borderColor">
+            <td>
+                <button
+                    class="p-2 bg-vLightAccent hover:bg-lightAccent text-light hover:text-textColor"
+                    on:click={addRow}
+                >
+                    + Add Row
+                </button>
+            </td>
+        </tr>
         {#if rows && rows.length}
             {#each rows as row}
                 <tr class="p-2 border-t border-borderColor">
@@ -203,15 +213,5 @@
                 </td>
             </tr>
         {/if}
-        <tr class="p-2 border-t border-borderColor">
-            <td>
-                <button
-                    class="p-2 bg-vLightAccent hover:bg-lightAccent text-light hover:text-textColor"
-                    on:click={addRow}
-                >
-                    + Add Row
-                </button>
-            </td>
-        </tr>
     </table>
 </div>

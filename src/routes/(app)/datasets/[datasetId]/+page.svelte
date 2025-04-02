@@ -55,6 +55,11 @@
     listen.datasetCol.onCreate(col => {
         if (col.datasetId !== data.dataset.id) return;
         data.dataset.columns = [...data.dataset.columns, col];
+        rows = rows.map(r => {
+            const newRow = { ...r };
+            newRow.elements = [...newRow.elements, col.type.defaultValue];
+            return newRow;
+        });
     });
     listen.datasetCol.onUpdate((_, col) => {
         if (col.datasetId !== data.dataset.id) return;
@@ -69,7 +74,7 @@
     listen.datasetRow.onCreate(async ({ datasetId, row }) => {
         if (datasetId !== data.dataset.id) return;
         // TODO how should this be sorted
-        rows = [...rows, row];
+        rows = [row, ...rows];
         data.dataset.rowCount++;
     });
     listen.datasetRow.onUpdate(async (_, { datasetId, row }) => {
