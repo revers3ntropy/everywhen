@@ -1,13 +1,15 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
+    import TuneVariant from 'svelte-material-icons/TuneVariant.svelte';
+    import DeleteOutline from 'svelte-material-icons/DeleteOutline.svelte';
+    import ArrowLeft from 'svelte-material-icons/ArrowLeft.svelte';
+    import { Button } from '$lib/components/ui/button';
     import Textbox from '$lib/components/ui/Textbox.svelte';
     import { dispatch, listen } from '$lib/dataChangeEvents';
-    import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
     import { notify } from '$lib/components/notifications/notifications';
     import { Dataset, type DatasetRow } from '$lib/controllers/dataset/dataset';
     import { api, apiPath } from '$lib/utils/apiRequest';
-    import DeleteOutline from 'svelte-material-icons/DeleteOutline.svelte';
-    import TuneVariant from 'svelte-material-icons/TuneVariant.svelte';
     import type { PageData } from './$types';
     import DatasetChart from './DatasetChart.svelte';
     import TableOfDatapoints from './TableOfDatapoints.svelte';
@@ -93,6 +95,13 @@
 
 <main class="p-2 md:p-4 md:pl-4 flex-center">
     <div class="w-full md:max-w-6xl">
+        <div class="pb-2">
+            <a href="/datasets">
+                <Button variant="outline" class="border-border text-textColor rounded-xl gap-2">
+                    <ArrowLeft size={24} /> View All
+                </Button>
+            </a>
+        </div>
         <div class="pb-4 md:flex flex-row justify-between">
             <div class="text-lg">
                 <Textbox
@@ -106,7 +115,7 @@
             <div class="pt-2">
                 <button
                     on:click={deleteDataset}
-                    class="flex-center gap-2 danger border border-solid border-borderColor py-2 px-4 hover:bg-vLightAccent rounded-full"
+                    class="flex-center gap-2 danger border border-solid border-borderColor py-2 px-4 hover:bg-vLightAccent rounded-xl"
                     aria-label="Delete this dataset"
                 >
                     <DeleteOutline size="25" /> Delete

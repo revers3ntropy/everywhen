@@ -106,8 +106,8 @@
     $: columnsOrderedByJsonOrder = Dataset.sortColumnsForJson(dataset.columns);
 </script>
 
-<div class="pt-8 overflow-x-auto">
-    <table class="border-borderColor border border-r-0">
+<div class="pt-8">
+    <table class="w-full block border-borderColor border overflow-x-auto">
         <tr>
             <th class="p-2 border-r border-borderColor"> Timestamp </th>
             {#each Dataset.sortColumnsForDisplay(dataset.columns) as column}
