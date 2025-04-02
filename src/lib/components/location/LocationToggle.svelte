@@ -14,7 +14,9 @@
         });
 
         function checkPermission() {
-            // enable location if we don't have a preference and location is granted
+            // enable location if we don't have a preference set locally but we
+            // do prefer location on or the local preference is enabled,
+            // and location permission is granted by browser
             $enabledLocation =
                 permissionStatus.state === 'granted' &&
                 (($enabledLocation === null && $settingsStore.preferLocationOn.value) ||
