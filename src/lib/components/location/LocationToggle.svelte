@@ -3,7 +3,7 @@
     import { onMount } from 'svelte';
     import MapMarkerOffOutline from 'svelte-material-icons/MapMarkerOffOutline.svelte';
     import MapMarkerOutline from 'svelte-material-icons/MapMarkerOutline.svelte';
-    import { enabledLocation } from '$lib/stores';
+    import { enabledLocation, settingsStore } from '$lib/stores';
     import type { Pixels } from '../../../types';
 
     export let size = 25 as Pixels;
@@ -14,9 +14,11 @@
         });
 
         function checkPermission() {
-            if (permissionStatus.state !== 'granted') {
-                enabledLocation.set(false);
-            }
+            // enable location if we don't have a preference and location is granted
+            $enabledLocation =
+                permissionStatus.state === 'granted' &&
+                (($enabledLocation === null && $settingsStore.preferLocationOn.value) ||
+                    !!$enabledLocation);
         }
 
         permissionStatus.onchange = checkPermission;
@@ -28,12 +30,12 @@
             // trigger the permission request
             navigator.geolocation.getCurrentPosition(
                 () => {
-                    enabledLocation.set(true);
+                    $enabledLocation = true;
                     resolve(true);
                     notify.success('Location enabled and will be recorded with each entry');
                 },
                 () => {
-                    enabledLocation.set(false);
+                    $enabledLocation = false;
                     resolve(false);
                     notify.error('Failed to get location. Please check your browser settings.');
                 }
@@ -42,8 +44,12 @@
     }
 
     function disableLocation() {
-        enabledLocation.set(false);
-        notify.success('Location disabled');
+        $enabledLocation = false;
+        if ($settingsStore.preferLocationOn.value) {
+            notify.success('Location disabled temporarily');
+        } else {
+            notify.error('Location disabled');
+        }
     }
 
     onMount(async () => {
