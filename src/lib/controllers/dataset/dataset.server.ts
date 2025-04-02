@@ -719,7 +719,9 @@ namespace DatasetServer {
             const updatedRowJson = encrypt(JSON.stringify(row.elements), auth.key);
             await query`
                 UPDATE datasetRows
-                SET rowJson = ${updatedRowJson}
+                SET rowJson = ${updatedRowJson},
+                    timestamp = ${row.timestamp},
+                    timestampTzOffset = ${row.timestampTzOffset}
                 WHERE userId = ${auth.id}
                     AND datasetId = ${datasetId}
                     AND id = ${row.id}

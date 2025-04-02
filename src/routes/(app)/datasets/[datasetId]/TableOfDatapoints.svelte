@@ -71,6 +71,27 @@
         );
     }
 
+    async function editDatasetRowTimestamp(row: DatasetRow, newTimestamp: number) {
+        const newRow = {
+            ...row,
+            timestampTzOffset: currentTzOffset(),
+            timestamp: newTimestamp
+        };
+        notify.onErr(
+            await api.put(apiPath(`/datasets/?`, dataset.id), {
+                rows: [newRow]
+            })
+        );
+        await dispatch.update(
+            'datasetRow',
+            { datasetId: dataset.id, row },
+            {
+                datasetId: dataset.id,
+                row: newRow
+            }
+        );
+    }
+
     async function deleteDatasetRow(row: DatasetRow) {
         if (!confirm('Are you sure you want to delete this row?')) return;
         notify.onErr(
@@ -136,7 +157,17 @@
         {#if rows && rows.length}
             {#each rows as row}
                 <tr class="p-2 border-t border-borderColor">
-                    <td class="p-2 border-r border-borderColor">{row.timestamp}</td>
+                    <td class="border-r border-borderColor">
+                        <input
+                            type="datetime-local"
+                            value={new Date(row.timestamp * 1000).toISOString().slice(0, 16)}
+                            class="editable-text px-2 focus:rounded-none"
+                            on:change={e => {
+                                const date = new Date(e.currentTarget.value);
+                                return editDatasetRowTimestamp(row, date.getTime() / 1000);
+                            }}
+                        />
+                    </td>
                     {#each row.elements as element, i}
                         {@const column = columnsOrderedByJsonOrder[i]}
                         {@const colTypeId = column.type.id}
