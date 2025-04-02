@@ -239,7 +239,7 @@
                             placeholder="Start"
                             type="datetime-local"
                             class="my-4"
-                            value={fmtTimestampForInput(event.start, currentTzOffset())}
+                            value={fmtTimestampForInput(event.start, event.tzOffset)}
                         />
                     </span>
                 {:else}
@@ -254,7 +254,7 @@
                                 placeholder="Start"
                                 type="datetime-local"
                                 class="my-4"
-                                value={fmtTimestampForInput(event.start, currentTzOffset())}
+                                value={fmtTimestampForInput(event.start, event.tzOffset)}
                             />
                         </span>
                         <span class="italic text-light"> to </span>
@@ -264,7 +264,7 @@
                                 placeholder="End"
                                 type="datetime-local"
                                 class="my-4"
-                                value={fmtTimestampForInput(event.end, currentTzOffset())}
+                                value={fmtTimestampForInput(event.end, event.tzOffset)}
                             />
                         </span>
                     </div>

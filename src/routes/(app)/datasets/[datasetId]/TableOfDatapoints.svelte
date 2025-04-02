@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { fmtTimestampForInput } from '$lib/utils/time.js';
     import Delete from 'svelte-material-icons/DeleteOutline.svelte';
     import Pencil from 'svelte-material-icons/Pencil.svelte';
     import * as Popover from '$lib/components/ui/popover';
@@ -160,7 +161,7 @@
                     <td class="border-r border-borderColor">
                         <input
                             type="datetime-local"
-                            value={new Date(row.timestamp * 1000).toISOString().slice(0, 16)}
+                            value={fmtTimestampForInput(row.timestamp, row.timestampTzOffset)}
                             class="editable-text px-2 focus:rounded-none"
                             on:change={e => {
                                 const date = new Date(e.currentTarget.value);
