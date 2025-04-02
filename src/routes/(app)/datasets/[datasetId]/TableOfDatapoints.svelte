@@ -72,6 +72,7 @@
     }
 
     async function deleteDatasetRow(row: DatasetRow) {
+        if (!confirm('Are you sure you want to delete this row?')) return;
         notify.onErr(
             await api.put(apiPath(`/datasets/?`, dataset.id), {
                 rows: [{ id: row.id, shouldDelete: true }]
