@@ -8,6 +8,7 @@
     import DonateWidget from '$lib/components/DonateWidget.svelte';
     import Logo from '$lib/components/ui/Logo.svelte';
     import { PUBLIC_ENV } from '$env/static/public';
+    import { isProd } from '$lib/utils/env';
 
     const version = __VERSION__;
 </script>
@@ -74,7 +75,7 @@
 
     <div class="flex-center text-light pt-4">
         Everywhen v{version}
-        {PUBLIC_ENV === 'prod' ? `` : `(${PUBLIC_ENV})`}
+        {isProd() ? `` : `(${PUBLIC_ENV})`}
     </div>
 </footer>
 

@@ -1,6 +1,7 @@
 import type { Auth } from '$lib/controllers/auth/auth';
 import { query } from '$lib/db/mysql.server';
 import { invalidateCache } from '$lib/utils/cache.server';
+import { isProd } from '$lib/utils/env';
 import { Stripe } from 'stripe';
 import { STRIPE_SECRET_KEY, ROOT_URL } from '$env/static/private';
 import { type Pricing, SubscriptionType } from '$lib/controllers/subscription/subscription';
@@ -237,5 +238,27 @@ export namespace Subscription {
             `;
             return;
         }
+    }
+
+    export async function upgradeAccountWithoutPayment(userId: string) {
+        if (isProd()) return;
+        await clearSubscriptionsWithoutChecking(userId);
+        await query`
+            INSERT INTO subscriptions
+                (userId, stripeCustomerId, stripeSubscriptionId, subType)
+            VALUES (
+                ${userId},
+                ${''},
+                ${''},
+                ${SubscriptionType.Plus}
+            )
+        `;
+    }
+
+    export async function clearSubscriptionsWithoutChecking(userId: string) {
+        await query<{ stripeSubscriptionId: string }[]>`
+            DELETE FROM subscriptions
+            WHERE userId = ${userId}
+        `;
     }
 }

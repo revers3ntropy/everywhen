@@ -1,11 +1,12 @@
 <script lang="ts">
-    import { PUBLIC_GITHUB_AUTH_CLIENT_ID, PUBLIC_ENV } from '$env/static/public';
+    import { PUBLIC_GITHUB_AUTH_CLIENT_ID } from '$env/static/public';
     import { notify } from '$lib/components/notifications/notifications';
     import { Button } from '$lib/components/ui/button';
     import { Auth } from '$lib/controllers/auth/auth';
     import type { GitHubUser } from '$lib/controllers/ghAPI/ghAPI.server';
     import { settingsStore } from '$lib/stores';
     import { api } from '$lib/utils/apiRequest';
+    import { isProd } from '$lib/utils/env';
     import { serializeGETArgs } from '$lib/utils/GETArgs';
     import { onMount } from 'svelte';
     import GitHub from 'svelte-material-icons/Github.svelte';
@@ -26,7 +27,7 @@
     }
 
     function doOauth() {
-        if (PUBLIC_ENV !== 'prod') {
+        if (!isProd()) {
             notify.error('Not in prod!');
             return;
         }

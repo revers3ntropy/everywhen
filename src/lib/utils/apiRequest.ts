@@ -67,6 +67,7 @@ export interface ApiRoutes {
     '/subscription/pricing': typeof import('../../routes/api/subscription/pricing/+server');
     '/subscription/create-portal-session': typeof import('../../routes/api/subscription/create-portal-session/+server');
     '/subscription/create-checkout-session': typeof import('../../routes/api/subscription/create-checkout-session/+server');
+    '/subscription/upgrade': typeof import('../../routes/api/subscription/upgrade/+server');
 }
 
 export async function makeApiReq<

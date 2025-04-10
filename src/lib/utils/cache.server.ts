@@ -1,5 +1,5 @@
-import { PUBLIC_ENV } from '$env/static/public';
 import { ENABLE_CACHING } from '$lib/constants';
+import { isDev } from '$lib/utils/env';
 import { error, redirect } from '@sveltejs/kit';
 import type { RequestEvent, ServerLoadEvent } from '@sveltejs/kit';
 import chalk from 'chalk';
@@ -16,7 +16,7 @@ const cacheLogger = new FileLogger('CACHE', chalk.magentaBright);
 const cache: Record<string, Record<string, unknown> | undefined> = {};
 const cacheLastUsed: Record<string, number> = {};
 
-const doCache = ENABLE_CACHING && PUBLIC_ENV !== 'dev';
+const doCache = ENABLE_CACHING && !isDev();
 
 function roughSizeOfObject(object: unknown): number {
     const objectList: unknown[] = [];
