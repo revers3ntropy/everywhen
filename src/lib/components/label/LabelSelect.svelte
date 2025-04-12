@@ -74,8 +74,8 @@
             {/if}
         {/key}
     </Popover.Trigger>
-    <Popover.Content>
-        <div class="flex flex-col max-h-[500px] overflow-y-auto">
+    <Popover.Content class="py-1">
+        <div class="py-3 flex flex-col max-h-[440px] overflow-y-auto">
             <a href="/labels" class="flex items-center gap-2 p-2 rounded-xl hover:bg-vLightAccent">
                 <CogOutline size="22" /> Manage Labels
             </a>
