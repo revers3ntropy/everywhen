@@ -83,7 +83,7 @@ export namespace UsageLimits {
 
     export const LIMITS_PLUS = {
         asset: {
-            maxCount: 500
+            maxCount: 1000
         },
         dataset: {
             maxCount: 100,
