@@ -19,11 +19,11 @@
 
 <main class="w-screen flex justify-center">
     <div class="pt-20 md:pt-[30vh]">
-        <div class="flex-center gap-4 flex-wrap">
+        <div class="flex flex-col md:flex-center gap-4 flex-wrap">
             <div class="flex-center">
                 <Logo scale={0.28} />
             </div>
-            <div>
+            <div class="flex flex-col items-center">
                 <!-- 50px so that the title is same width as tagline -->
                 <h1 class="title-font text-left text-[55px] pb-1"> Everywhen </h1>
                 <p class="pb-4"> YOUR JOURNAL AND LIFE LOG </p>
@@ -99,6 +99,14 @@
                     Log your mood and get insights into your mental health over time
                 </p>
             </div>
+        </div>
+
+        <div class="pb-16 flex-center px-4">
+            <a href="/login" class="hover:no-underline w-fit max-w-full">
+                <Button class="w-full flex-center gap-2 rounded-full">
+                    Start Writing <ArrowRightThinCircleOutline size="20" />
+                </Button>
+            </a>
         </div>
     </div>
 </main>
