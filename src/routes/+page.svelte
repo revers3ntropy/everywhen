@@ -2,6 +2,11 @@
     import { Button } from '$lib/components/ui/button';
     import Logo from '$lib/components/ui/Logo.svelte';
     import ArrowRightThinCircleOutline from 'svelte-material-icons/ArrowRight.svelte';
+    import EmoticonOutline from 'svelte-material-icons/EmoticonOutline.svelte';
+    import Poll from 'svelte-material-icons/Poll.svelte';
+    import LockOutline from 'svelte-material-icons/LockOutline.svelte';
+    import ChartGantt from 'svelte-material-icons/ChartGantt.svelte';
+    import MapOutline from 'svelte-material-icons/MapOutline.svelte';
     import type { PageData } from './$types';
 
     export let data: PageData & { entryCount: number; wordCount: number };
@@ -12,7 +17,7 @@
     <meta content="Journaling and Life Logging App" name="description" />
 </svelte:head>
 
-<main class="w-screen h-screen flex justify-center">
+<main class="w-screen flex justify-center">
     <div class="pt-20 md:pt-[30vh]">
         <div class="flex-center gap-4 flex-wrap">
             <div class="flex-center">
@@ -31,13 +36,69 @@
             </div>
         </div>
 
-        <div class="pt-20 flex-center gap-4 flex-wrap p-4">
+        <div class="pt-20 flex-center gap-4 flex-wrap pb-10">
             <p class="border rounded-full border-borderColor py-2 px-4">
                 <b>{data.entryCount}</b> entries recorded
             </p>
             <p class="border rounded-full border-borderColor py-2 px-4">
                 <b>{data.wordCount}</b> words written
             </p>
+        </div>
+
+        <div class="">
+            <div class="border-t border-border pt-8 pb-16">
+                <div class="flex-center p-2">
+                    <span class="border border-borderLight rounded-full p-2">
+                        <LockOutline size="40" />
+                    </span>
+                </div>
+                <p class="title-font text-2xl">End-to-end Encryption</p>
+                <p class="text-light">
+                    Every word you write is encrypted, so no-one else can read your journal entries
+                </p>
+            </div>
+            <div class="border-t border-border pt-8 pb-16">
+                <div class="flex-center p-2">
+                    <span class="border border-borderLight rounded-full p-2">
+                        <ChartGantt size="40" />
+                    </span>
+                </div>
+                <p class="title-font text-2xl">Timeline</p>
+                <p class="text-light"> View your entries and events on a timeline </p>
+            </div>
+            <div class="border-t border-border pt-8 pb-16">
+                <div class="flex-center p-2">
+                    <span class="border border-borderLight rounded-full p-2">
+                        <MapOutline size="40" />
+                    </span>
+                </div>
+                <p class="title-font text-2xl">Map</p>
+                <p class="text-light">
+                    View your entries on a map and give names to meaningful locations
+                </p>
+            </div>
+            <div class="border-t border-border pt-8 pb-16">
+                <div class="flex-center p-2">
+                    <span class="border border-borderLight rounded-full p-2">
+                        <Poll size="40" />
+                    </span>
+                </div>
+                <p class="title-font text-2xl">Insights</p>
+                <p class="text-light">
+                    Get powerful insights into your journaling habits and language use over time
+                </p>
+            </div>
+            <div class="border-t border-border pt-8 pb-24">
+                <div class="flex-center p-2">
+                    <span class="border border-borderLight rounded-full p-2">
+                        <EmoticonOutline size="40" />
+                    </span>
+                </div>
+                <p class="title-font text-2xl">Mood Tracking</p>
+                <p class="text-light">
+                    Log your mood and get insights into your mental health over time
+                </p>
+            </div>
         </div>
     </div>
 </main>
