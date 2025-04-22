@@ -5,6 +5,7 @@
     import EmoticonOutline from 'svelte-material-icons/EmoticonOutline.svelte';
     import Poll from 'svelte-material-icons/Poll.svelte';
     import LockOutline from 'svelte-material-icons/LockOutline.svelte';
+    import AccountGroup from 'svelte-material-icons/AccountGroup.svelte';
     import ChartGantt from 'svelte-material-icons/ChartGantt.svelte';
     import MapOutline from 'svelte-material-icons/MapOutline.svelte';
     import type { PageData } from './$types';
@@ -18,16 +19,15 @@
 </svelte:head>
 
 <main class="w-screen flex justify-center">
-    <div class="pt-20 md:pt-[30vh]">
+    <div class="pt-20 md:pt-8">
         <div class="flex flex-col md:flex-center gap-4 flex-wrap">
             <div class="flex-center">
-                <Logo scale={0.28} />
+                <Logo scale={0.3} />
             </div>
             <div class="flex flex-col items-center">
                 <!-- 50px so that the title is same width as tagline -->
-                <h1 class="title-font text-left text-[55px] pb-1"> Everywhen </h1>
-                <p class="pb-4"> YOUR JOURNAL AND LIFE LOG </p>
-
+                <h1 class="title-font text-[58px] pb-1"> Everywhen </h1>
+                <p class="pb-6 tracking-widest"> YOUR JOURNAL AND LIFE LOG </p>
                 <a href="/login" class="hover:no-underline">
                     <Button class="w-full flex-center gap-2 rounded-full">
                         Start Writing <ArrowRightThinCircleOutline size="20" />
@@ -36,17 +36,8 @@
             </div>
         </div>
 
-        <div class="pt-20 flex-center gap-4 flex-wrap pb-10">
-            <p class="border rounded-full border-borderColor py-2 px-4">
-                <b>{data.entryCount}</b> entries recorded
-            </p>
-            <p class="border rounded-full border-borderColor py-2 px-4">
-                <b>{data.wordCount}</b> words written
-            </p>
-        </div>
-
-        <div class="">
-            <div class="border-t border-border pt-8 pb-16">
+        <div class="pt-14">
+            <div class="border-t border-border pt-8 pb-14">
                 <div class="flex-center p-2">
                     <span class="border border-borderLight rounded-full p-2">
                         <LockOutline size="40" />
@@ -57,7 +48,22 @@
                     Every word you write is encrypted, so no-one else can read your journal entries
                 </p>
             </div>
-            <div class="border-t border-border pt-8 pb-16">
+            <div class="border-t border-border pt-8 pb-14">
+                <div class="flex-center p-2">
+                    <span class="border border-borderLight rounded-full p-2">
+                        <AccountGroup size="40" />
+                    </span>
+                </div>
+                <p class="title-font text-2xl">Trusted</p>
+                <p class="text-light">
+                    Everywhen users trust us to store their <b>
+                        {data.entryCount?.toLocaleString()}
+                    </b>
+                    entries, containing
+                    <b>{data.wordCount?.toLocaleString()}</b> words
+                </p>
+            </div>
+            <div class="border-t border-border pt-8 pb-14">
                 <div class="flex-center p-2">
                     <span class="border border-borderLight rounded-full p-2">
                         <ChartGantt size="40" />
@@ -66,7 +72,7 @@
                 <p class="title-font text-2xl">Timeline</p>
                 <p class="text-light"> View your entries and events on a timeline </p>
             </div>
-            <div class="border-t border-border pt-8 pb-16">
+            <div class="border-t border-border pt-8 pb-14">
                 <div class="flex-center p-2">
                     <span class="border border-borderLight rounded-full p-2">
                         <MapOutline size="40" />
@@ -77,7 +83,7 @@
                     View your entries on a map and give names to meaningful locations
                 </p>
             </div>
-            <div class="border-t border-border pt-8 pb-16">
+            <div class="border-t border-border pt-8 pb-14">
                 <div class="flex-center p-2">
                     <span class="border border-borderLight rounded-full p-2">
                         <Poll size="40" />
@@ -88,7 +94,7 @@
                     Get powerful insights into your journaling habits and language use over time
                 </p>
             </div>
-            <div class="border-t border-border pt-8 pb-24">
+            <div class="border-t border-border pt-8 pb-20">
                 <div class="flex-center p-2">
                     <span class="border border-borderLight rounded-full p-2">
                         <EmoticonOutline size="40" />
@@ -120,14 +126,6 @@
             justify-content: center;
             grid-template-columns: 1fr;
             grid-template-rows: auto 1fr;
-        }
-    }
-
-    p {
-        letter-spacing: 1px;
-
-        @media (max-width: 350px) {
-            font-size: 0.9rem;
         }
     }
 

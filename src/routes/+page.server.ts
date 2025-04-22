@@ -9,11 +9,14 @@ export const load = (async () => {
                 FROM entries
             `
         )[0].count,
-        wordCount: (
-            await query<{ count: number }[]>`
+        // not sure why 'count' is coming out as a string
+        wordCount: parseInt(
+            (
+                await query<{ count: string }[]>`
                 SELECT sum(wordCount) as count
                 FROM entries
             `
-        )[0].count
+            )[0].count
+        )
     };
 }) satisfies PageServerLoad;
