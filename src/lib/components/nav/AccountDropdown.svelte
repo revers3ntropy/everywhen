@@ -2,6 +2,8 @@
     import { SubscriptionType } from '$lib/controllers/subscription/subscription';
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
+    import LabelMultipleOutline from 'svelte-material-icons/LabelMultipleOutline.svelte';
+    import CalendarMultiple from 'svelte-material-icons/CalendarMultiple.svelte';
     import Bin from 'svelte-material-icons/Delete.svelte';
     import ImageArea from 'svelte-material-icons/ImageArea.svelte';
     import PlusThick from 'svelte-material-icons/PlusThick.svelte';
@@ -70,6 +72,13 @@
 
         <hr />
 
+        <a aria-label="datasets" href="/datasets" class="flex justify-start items-center p-2 gap-2">
+            <ChartLine size="30" />
+            Trackers
+        </a>
+
+        <hr />
+
         <a
             aria-label="deleted entries"
             href="/journal/deleted"
@@ -84,9 +93,14 @@
             Images
         </a>
 
-        <a aria-label="datasets" href="/datasets" class="flex justify-start items-center p-2 gap-2">
-            <ChartLine size="30" />
-            Trackers
+        <a aria-label="labels" href="/labels" class="flex justify-start items-center p-2 gap-2">
+            <LabelMultipleOutline size="30" />
+            Labels
+        </a>
+
+        <a aria-label="events" href="/events" class="flex justify-start items-center p-2 gap-2">
+            <CalendarMultiple size="30" />
+            Events
         </a>
 
         <hr />
