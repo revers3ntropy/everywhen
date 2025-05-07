@@ -1,6 +1,7 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
     import { Button } from '$lib/components/ui/button';
+    import Logo from '$lib/components/ui/Logo.svelte';
     import Textbox from '$lib/components/ui/Textbox.svelte';
     import { Auth } from '$lib/controllers/auth/auth';
     import { encryptionKey, username as usernameStore } from '$lib/stores';
@@ -66,78 +67,44 @@
     <meta content="Sign up to Everywhen" name="description" />
 </svelte:head>
 
-<main class="flex-center">
-    <div class="max-w-[90vw]">
-        <Textbox
-            label="Username"
-            autocomplete="username"
-            bind:element={username}
-            disabled={actionPending}
-            on:keypress={usernameInputKeypress}
-        />
-        <Textbox
-            label="Password"
-            autocomplete="new-password"
-            bind:element={password}
-            disabled={actionPending}
-            on:keypress={passwordInputKeypress}
-            type="password"
-        />
-
-        <div class="flex-center pt-4" style="justify-content: space-between">
-            <a href="/login?redirect={data.redirect}">Log In</a>
-            <Button
-                aria-label="Create Account"
+<main class="flex-center h-screen">
+    <div class="px-2">
+        <section class="pb-4 md:flex md:justify-center">
+            <p class="text-left title-font text-3xl pb-4 flex items-center gap-2 w-fit">
+                <Logo scale={0.1} /> Everywhen
+            </p>
+        </section>
+        <section class="md:border rounded-xl md:p-6 md:pt-4 md:bg-vLightAccent">
+            <p class="text-left text-md pb-2">Create new account</p>
+            <Textbox
+                label="Username"
+                autocomplete="username"
+                bind:element={username}
                 disabled={actionPending}
-                on:click={create}
-                type="button"
-                class="primary flex-center gap-1"
-            >
-                <ArrowRightThinCircleOutline size="25" />
-                Create Account
-            </Button>
-        </div>
+                on:keypress={usernameInputKeypress}
+            />
+            <Textbox
+                label="Password"
+                autocomplete="new-password"
+                bind:element={password}
+                disabled={actionPending}
+                on:keypress={passwordInputKeypress}
+                type="password"
+            />
+
+            <div class="flex-center pt-4" style="justify-content: space-between">
+                <a href="/login?redirect={data.redirect}">Log In</a>
+                <Button
+                    aria-label="Create Account"
+                    disabled={actionPending}
+                    on:click={create}
+                    type="button"
+                    class="primary flex-center gap-1"
+                >
+                    <ArrowRightThinCircleOutline size="25" />
+                    Create
+                </Button>
+            </div>
+        </section>
     </div>
 </main>
-
-<style lang="scss">
-    @import '$lib/styles/layout';
-    @import '$lib/styles/text';
-
-    main {
-        @extend .flex-center;
-        height: 100vh;
-    }
-
-    input {
-        width: 300px;
-        font-size: 1.3rem;
-        margin-top: 0.1rem;
-    }
-
-    label {
-        display: flex;
-        flex-direction: column;
-        margin: 3rem 0;
-
-        & > span {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            gap: 0.3rem;
-        }
-
-        i {
-            @extend .text-light;
-            display: flex;
-            flex-direction: row;
-            gap: 0.3rem;
-            align-items: center;
-            font-size: 0.98rem;
-
-            :global(svg) {
-                height: 100%;
-            }
-        }
-    }
-</style>
