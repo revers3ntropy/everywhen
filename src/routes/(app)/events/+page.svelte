@@ -90,7 +90,7 @@
             <span class="text-light">Sort by</span>
             {#if $eventsSortKey !== null}
                 <span class="sort-by-select">
-                    <Select bind:key={$eventsSortKey} options={sortEventsKeys} fromRight />
+                    <Select bind:key={$eventsSortKey} options={sortEventsKeys} />
                 </span>
             {:else}
                 ...
