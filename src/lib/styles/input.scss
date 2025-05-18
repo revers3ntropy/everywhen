@@ -228,23 +228,6 @@ button {
     }
 }
 
-.dropzone {
-    @extend .bordered;
-
-    border-style: dashed;
-    border-radius: $border-radius;
-
-    padding: 2em;
-    margin: 2em;
-
-    cursor: pointer;
-
-    &:hover {
-        border-style: double;
-        color: var(--text-color-light);
-    }
-}
-
 .danger:hover {
     svg, svg * {
         color: var(--accent-danger);
