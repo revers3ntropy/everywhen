@@ -57,14 +57,6 @@ input {
         cursor: pointer;
     }
 
-    &:-webkit-autofill,
-    &:-webkit-autofill:hover,
-    &:-webkit-autofill:focus,
-    &:-webkit-autofill:active {
-        -webkit-box-shadow: 0 0 0 30px var(--accent) inset !important;
-        border-radius: $border-radius;
-    }
-
     &:-webkit-autofill {
         -webkit-text-fill-color: var(--text-color) !important;
     }

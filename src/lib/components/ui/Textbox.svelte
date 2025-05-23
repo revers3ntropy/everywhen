@@ -5,6 +5,8 @@
     export let value = '';
     export let ariaLabel = label;
     export let autocomplete = 'off';
+    // should be background color of the input
+    export let autofillBgColor = 'var(--v-light-accent)';
     export let disabled = false;
     export let element: HTMLInputElement = null as unknown as HTMLInputElement;
     export let id = '';
@@ -34,7 +36,12 @@
         </span>
     {/if}
 
-    <span class="flex flex-row items-center" class:pl-2={!!startUnit} class:pr-2={!!endUnit}>
+    <span
+        class="flex flex-row items-center"
+        class:pl-2={!!startUnit}
+        class:pr-2={!!endUnit}
+        style="--autofill-bg: {autofillBgColor}"
+    >
         {startUnit}
         <!-- svelte-ignore a11y-autofocus -->
         <input
@@ -84,7 +91,6 @@
     input:-webkit-autofill:hover,
     input:-webkit-autofill:focus,
     input:-webkit-autofill:active {
-        -webkit-box-shadow: 0 0 0 30px var(--v-light-accent) inset !important;
-        margin-top: 2px;
+        -webkit-box-shadow: 0 0 0 30px var(--autofill-bg) inset !important;
     }
 </style>
