@@ -33,9 +33,7 @@
     async function loadMoreDays(atTop: boolean): Promise<void> {
         isLoadingAtTop = atTop;
         const loadingDay = atTop ? nextDay : prevDay;
-        if (!loadingDay) {
-            throw new Error('day is null');
-        }
+        if (!loadingDay) throw new Error('day is null');
 
         const day = notify.onErr(await api.get(apiPath('/feed/?', loadingDay)));
         const dayDay = Day.fromString(day.day).unwrap();
@@ -86,7 +84,11 @@
     }
 
     function moreDaysToLoad(atTop: boolean): boolean {
-        return atTop ? nextDay !== null : prevDay !== null;
+        if (atTop) {
+            // prevent a loading icon/skeleton above 'today', as we never load future days
+            return nextDay !== null && nextDay !== Day.todayUsingNativeDate().fmtIso();
+        }
+        return prevDay !== null;
     }
 
     function updateScroll() {
