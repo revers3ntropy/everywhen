@@ -6,6 +6,7 @@ import {
     SESSION_KEYS,
     SESSION_TO_CLEAR_ON_LOGOUT
 } from '$lib/constants';
+import { UsageLimits } from '$lib/controllers/usageLimits/usageLimits';
 import { currentlyUploadingAssets, populateCookieWritablesWithCookies } from '$lib/stores';
 import { decrypt } from '$lib/utils/encryption';
 import { Logger } from '$lib/utils/log';
@@ -104,5 +105,23 @@ export namespace Auth {
         const cookies = Cookie.get() as RawCookies;
         const { settings } = notify.onErr(await api.get('/settings'), onErr);
         populateCookieWritablesWithCookies(cookies, settings);
+    }
+
+    export function usernameIsValid(username: string): true | string {
+        if (!username) return 'Username cannot be empty';
+        if (username.length < UsageLimits.LIMITS.user.usernameLenMin)
+            return `Username must be at least ${UsageLimits.LIMITS.user.usernameLenMin} characters long`;
+        if (username.length > UsageLimits.LIMITS.user.usernameLenMax)
+            return `Username must be at most ${UsageLimits.LIMITS.user.usernameLenMax} characters long`;
+        return true;
+    }
+
+    export function passwordIsValid(password: string): boolean | string {
+        if (!password) return 'Password cannot be empty';
+        if (password.length < UsageLimits.LIMITS.user.passwordLenMin)
+            return `Password must be at least ${UsageLimits.LIMITS.user.passwordLenMin} characters long`;
+        if (password.length > UsageLimits.LIMITS.user.passwordLenMax)
+            return `Password must be at most ${UsageLimits.LIMITS.user.passwordLenMax} characters long`;
+        return true;
     }
 }
