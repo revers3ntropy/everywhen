@@ -1,10 +1,4 @@
 <script lang="ts">
-    import * as Accordion from '$lib/components/ui/accordion';
-    import { Checkbox } from '$lib/components/ui/checkbox/index.js';
-    import Select from '$lib/components/ui/Select.svelte';
-    import { builtInTypes } from '$lib/controllers/dataset/columnTypes';
-    import type { DatasetMetadata, DatasetRow } from '$lib/controllers/dataset/dataset';
-    import { cssVarValue } from '$lib/utils/getCssVar';
     import {
         Chart,
         Title,
@@ -14,10 +8,19 @@
         CategoryScale,
         LinearScale,
         PointElement,
-        LineElement
+        LineElement,
+        type ChartOptions,
+        type AnimationsSpec
     } from 'chart.js';
-
     import { Line, Scatter } from 'svelte-chartjs';
+    import * as Accordion from '$lib/components/ui/accordion';
+    import { Checkbox } from '$lib/components/ui/checkbox/index.js';
+    import { Label } from '$lib/components/ui/label';
+    import Select from '$lib/components/ui/Select.svelte';
+    import { builtInTypes } from '$lib/controllers/dataset/columnTypes';
+    import type { DatasetMetadata, DatasetRow } from '$lib/controllers/dataset/dataset';
+    import { cssVarValue } from '$lib/utils/getCssVar';
+    import { undefined } from 'zod';
     import {
         generateChartData,
         bucketNames,
@@ -27,7 +30,8 @@
         reductionStrategyNames,
         type XAxisKey,
         timeIdxKey,
-        ChartType
+        ChartType,
+        DefaultValueStrategy
     } from './generateChartData';
 
     export let dataset: DatasetMetadata;
@@ -45,23 +49,25 @@
     );
 
     let fitScaleToData = false;
-    const options = (fitScaleToData: boolean) => ({
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-            y: {
-                border: { color: cssVarValue('--border-light') },
-                ticks: { color: cssVarValue('--text-color-light') },
-                grid: { display: false },
-                suggestedMin: fitScaleToData ? undefined : 0
-            },
-            x: {
-                border: { color: cssVarValue('--border-light') },
-                ticks: { color: cssVarValue('--text-color-light') },
-                grid: { display: false }
+    const options = (fitScaleToData: boolean) =>
+        ({
+            responsive: true,
+            // not sure why it doesn't allow false, the types seem to suggest it is allowed
+            animations: false as unknown as AnimationsSpec<'line'> & AnimationsSpec<'scatter'>,
+            scales: {
+                y: {
+                    border: { color: cssVarValue('--border-light') },
+                    ticks: { color: cssVarValue('--text-color-light') },
+                    grid: { display: false },
+                    suggestedMin: fitScaleToData ? undefined : 0
+                },
+                x: {
+                    border: { color: cssVarValue('--border-light') },
+                    ticks: { color: cssVarValue('--text-color-light') },
+                    grid: { display: false }
+                }
             }
-        }
-    });
+        }) satisfies ChartOptions;
 
     function calculateDaysDatasetCovers(rows: DatasetRow[] | null): number {
         if (!rows || !rows.length) return 0;
@@ -84,6 +90,7 @@
     let yAxisSelectedColumnIdx = 0;
     let xAxis: XAxisKey = timeIdxKey;
     let selectedReductionStrategy = ReductionStrategy.Mean;
+    let defaultValueStrategy = DefaultValueStrategy.Zero;
 
     // only allow numeric columns to be selected
     // TODO remove this constraint
@@ -96,7 +103,8 @@
         selectedBucket,
         yAxisSelectedColumnIdx,
         xAxis,
-        selectedReductionStrategy
+        selectedReductionStrategy,
+        defaultValueStrategy
     );
 
     $: yAxisOptions = Object.fromEntries(numericColumns.map((column, idx) => [column.name, idx]));
@@ -109,65 +117,71 @@
 </script>
 
 {#if rows && rows.length > 1}
-    <div class="">
-        <div class="py-4">
-            <div class="rounded-xl bg-vLightAccent py-2 px-4 flex-center gap-2 w-fit">
-                {#if numericColumns.length === 0}
-                    <span class="text-light"> [No columns] </span>
-                {:else if numericColumns.length === 1}
-                    <span class=""> {dataset.columns[0].name} </span>
-                {:else}
-                    <Select bind:value={yAxisSelectedColumnIdx} key={'0'} options={yAxisOptions} />
-                {/if}
-                <span class="text-light"> against </span>
-                <Select bind:value={xAxis} key={'col:0'} options={xAxisOptions} />
-            </div>
+    <div class="py-4">
+        <div class="rounded-xl bg-vLightAccent py-2 px-4 flex-center gap-2 w-fit">
+            {#if numericColumns.length === 0}
+                <span class="text-light"> [No columns] </span>
+            {:else if numericColumns.length === 1}
+                <span> {dataset.columns[0].name} </span>
+            {:else}
+                <Select bind:value={yAxisSelectedColumnIdx} key={'0'} options={yAxisOptions} />
+            {/if}
+            <span class="text-light"> against </span>
+            <Select bind:value={xAxis} key={'col:0'} options={xAxisOptions} />
         </div>
+    </div>
 
-        <div>
-            <Accordion.Root class="bg-vLightAccent rounded-xl">
-                <Accordion.Item value="item-1" class="border-none">
-                    <Accordion.Trigger
-                        class="rounded-xl hover:no-underline hover:bg-lightAccent px-4"
-                    >
-                        <span class="text-[1.1rem]">Chart Options</span>
-                    </Accordion.Trigger>
-                    <Accordion.Content>
-                        <div class="p-2 md:p-4 flex gap-4">
-                            {#if graphType === ChartType.Line}
-                                <div
-                                    class="w-fit rounded-full bg-lightAccent py-2 px-4 flex-center gap-2"
-                                >
-                                    <span class="text-light"> Group by </span>
-                                    <Select
-                                        bind:value={selectedBucket}
-                                        key={initialBucketName(days)}
-                                        options={bucketNames}
-                                    />
-                                </div>
-                                <div
-                                    class="w-fit rounded-full bg-lightAccent py-2 px-4 flex-center gap-2"
-                                >
-                                    <span class="text-light"> Reduce by </span>
-                                    <Select
-                                        bind:value={selectedReductionStrategy}
-                                        key={ReductionStrategy.Mean}
-                                        options={reductionStrategyNames}
-                                    />
-                                </div>
-                            {/if}
+    <div>
+        <Accordion.Root class="bg-vLightAccent rounded-xl">
+            <Accordion.Item value="item-1" class="border-none">
+                <Accordion.Trigger
+                    class="rounded-xl hover:no-underline hover:bg-lightAccent px-4 text-[1rem]"
+                >
+                    Chart Options
+                </Accordion.Trigger>
+                <Accordion.Content>
+                    <div class="p-2 md:p-4 flex gap-4">
+                        {#if graphType === ChartType.Line}
                             <div
                                 class="w-fit rounded-full bg-lightAccent py-2 px-4 flex-center gap-2"
                             >
-                                <span class="text-light"> Fit scale to data </span>
-                                <Checkbox bind:checked={fitScaleToData} />
+                                <span class="text-light"> Group by </span>
+                                <Select
+                                    bind:value={selectedBucket}
+                                    key={initialBucketName(days)}
+                                    options={bucketNames}
+                                />
                             </div>
+                            <div
+                                class="w-fit rounded-full bg-lightAccent py-2 px-4 flex-center gap-2"
+                            >
+                                <span class="text-light"> Reduce by </span>
+                                <Select
+                                    bind:value={selectedReductionStrategy}
+                                    key={ReductionStrategy.Mean}
+                                    options={reductionStrategyNames}
+                                />
+                            </div>
+                        {/if}
+                        <div class="w-fit rounded-full bg-lightAccent py-2 px-4 flex-center gap-2">
+                            <Checkbox id="fit-scale-to-data" bind:checked={fitScaleToData} />
+                            <Label for="fit-scale-to-data" class="text-light">
+                                Fit scale to data
+                            </Label>
                         </div>
-                    </Accordion.Content>
-                </Accordion.Item>
-            </Accordion.Root>
-        </div>
+                        <div class="w-fit rounded-full bg-lightAccent py-2 px-4 flex-center gap-2">
+                            <span class="text-light"> Default value</span>
+                            <Select
+                                bind:key={defaultValueStrategy}
+                                options={{ Zero: 'Zero', Previous: 'Previous' }}
+                            />
+                        </div>
+                    </div>
+                </Accordion.Content>
+            </Accordion.Item>
+        </Accordion.Root>
     </div>
+
     <div class="h-[70vh]">
         {#if graphData}
             {#if graphType === ChartType.Scatter}

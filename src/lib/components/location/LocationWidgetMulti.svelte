@@ -28,7 +28,7 @@
             <MapMarker size="20" />
         </span>
 
-        <span class="">
+        <span>
             {#each touchingLocations as location, i}
                 <a href="/map/{location.id}" class="ellipsis" class:obfuscated>
                     {location.name}{#if i < touchingLocations.length - 1},{/if}

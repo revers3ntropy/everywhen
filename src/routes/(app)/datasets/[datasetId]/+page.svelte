@@ -98,7 +98,7 @@
         <div class="pb-2">
             <a href="/datasets">
                 <Button variant="outline" class="border-border text-textColor rounded-xl gap-2">
-                    <ArrowLeft size={24} /> View All
+                    <ArrowLeft size={24} /> All Strands
                 </Button>
             </a>
         </div>

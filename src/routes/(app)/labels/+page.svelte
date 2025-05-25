@@ -46,7 +46,7 @@
             <div>
                 <h2>Labels</h2>
             </div>
-            <div class="">
+            <div>
                 <Button class="primary flex-center gap-1" on:click={newLabel}>
                     <Plus size="30" />
                     New Label

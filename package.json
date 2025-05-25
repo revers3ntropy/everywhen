@@ -1,13 +1,11 @@
 {
   "name": "everywhen",
-  "version": "0.9.14",
+  "version": "0.9.15",
   "type": "module",
   "private": true,
   "scripts": {
     "build": "scripts/build",
     "check": "scripts/check",
-    "deploy-staging": "scripts/deploy staging",
-    "deploy-prod": "scripts/deploy prod",
     "dev": "scripts/dev",
     "fmt": "scripts/fmt",
     "make-tests": "scripts/make-tests",

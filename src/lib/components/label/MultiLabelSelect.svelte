@@ -49,7 +49,7 @@
         aria-label="toggle no label"
     >
         <Switch checked={value.includes('')} />
-        <span class="">
+        <span>
             <LabelOffOutline size="25" />
             No Label
         </span>

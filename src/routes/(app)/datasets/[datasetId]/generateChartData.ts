@@ -13,7 +13,8 @@ type Rows = DatasetRow<(number | null)[]>[];
 type DatasetGenerationStrategy = (
     sortedEntries: Rows,
     columnIndex: number,
-    reductionStrategy: ReductionStrategy
+    reductionStrategy: ReductionStrategy,
+    defaultValueStrategy: DefaultValueStrategy
 ) => Record<string | number, number>;
 
 export enum ChartType {
@@ -43,8 +44,12 @@ export enum ReductionStrategy {
     Mean = 'Mean',
     Count = 'Count',
     Max = 'Max',
-    Min = 'Min',
-    MeanDefaultPrev = 'MeanDefaultPrev'
+    Min = 'Min'
+}
+
+export enum DefaultValueStrategy {
+    Zero = 'Zero',
+    Previous = 'Previous'
 }
 
 export const reductionStrategyNames: Record<string, ReductionStrategy> = {
@@ -52,30 +57,65 @@ export const reductionStrategyNames: Record<string, ReductionStrategy> = {
     Mean: ReductionStrategy.Mean,
     Count: ReductionStrategy.Count,
     Max: ReductionStrategy.Max,
-    Min: ReductionStrategy.Min,
-    'Mean (default previous)': ReductionStrategy.MeanDefaultPrev
+    Min: ReductionStrategy.Min
 };
 
 const ReductionStrategies: Record<
     ReductionStrategy,
     // previous is null for first item
-    (items: (number | null)[], previous: number | null) => number
+    (
+        items: (number | null)[],
+        previous: number | null,
+        defaultValueStrategy: DefaultValueStrategy
+    ) => number
 > = {
-    [ReductionStrategy.Sum]: items => items.reduce((a: number, b) => a + (b || 0), 0),
-    [ReductionStrategy.Mean]: items => {
-        if (items.length === 0) return 0;
-        return items.reduce((a: number, b) => a + (b || 0), 0) / items.length;
+    [ReductionStrategy.Sum]: (items, previous, defaultStrat) => {
+        if (
+            defaultStrat === DefaultValueStrategy.Previous &&
+            items.length < 1 &&
+            previous !== null
+        ) {
+            return previous;
+        }
+        return items.reduce((a: number, b) => a + (b || 0), 0);
     },
-    [ReductionStrategy.MeanDefaultPrev]: (items, previous) => {
+    [ReductionStrategy.Mean]: (items, previous, defaultStrat) => {
         const filteredItems = items.filter(i => i !== null);
-        if (filteredItems.length === 0) return previous ?? 0;
-        return filteredItems.reduce((a: number, b: number) => a + b, 0) / filteredItems.length;
+        if (
+            defaultStrat === DefaultValueStrategy.Previous &&
+            filteredItems.length < 1 &&
+            previous !== null
+        ) {
+            return previous;
+        }
+        if (filteredItems.length < 1) return 0;
+        return filteredItems.reduce((a: number, b) => a + (b || 0), 0) / filteredItems.length;
     },
-    [ReductionStrategy.Count]: items => items.length,
-    [ReductionStrategy.Max]: items =>
-        items.length ? Math.max(...items.filter((i): i is number => i !== null)) : 0,
-    [ReductionStrategy.Min]: items =>
-        items.length ? Math.min(...items.filter((i): i is number => i !== null)) : 0
+    [ReductionStrategy.Count]: items => {
+        // should we return previous if there are no items and defaultStrat is Previous?
+        // I think probably not...
+        return items.length;
+    },
+    [ReductionStrategy.Max]: (items, previous, defaultStrat) => {
+        if (
+            defaultStrat === DefaultValueStrategy.Previous &&
+            items.length < 1 &&
+            previous !== null
+        ) {
+            return previous;
+        }
+        return items.length ? Math.max(...items.filter((i): i is number => i !== null)) : 0;
+    },
+    [ReductionStrategy.Min]: (items, previous, defaultStrat) => {
+        if (
+            defaultStrat === DefaultValueStrategy.Previous &&
+            items.length < 1 &&
+            previous !== null
+        ) {
+            return previous;
+        }
+        return items.length ? Math.min(...items.filter((i): i is number => i !== null)) : 0;
+    }
 };
 
 export function initialBucket(days: number): Bucket {
@@ -163,7 +203,8 @@ function datasetFactoryForStandardBuckets(selectedBucket: Bucket): DatasetGenera
     return (
         sortedRows: Rows,
         columnIndex: number,
-        reductionStrategy: ReductionStrategy
+        reductionStrategy: ReductionStrategy,
+        defaultValueStrategy: DefaultValueStrategy
     ): Record<string | number, number> => {
         const start = sortedRows[0].timestamp + sortedRows[0].timestampTzOffset * 60 * 60;
 
@@ -213,7 +254,11 @@ function datasetFactoryForStandardBuckets(selectedBucket: Bucket): DatasetGenera
         let previous: number | null = null;
         const reducedBuckets = [];
         for (const [i, items] of entries) {
-            const value = ReductionStrategies[reductionStrategy](items, previous);
+            const value = ReductionStrategies[reductionStrategy](
+                items,
+                previous,
+                defaultValueStrategy
+            );
             reducedBuckets.push([i, value]);
             previous = value;
         }
@@ -226,7 +271,8 @@ const generateDataset: Record<Bucket, DatasetGenerationStrategy> = {
     [Bucket.Hour]: (
         sortedEntries: DatasetRow[],
         columnIndex: number,
-        reductionStrategy: ReductionStrategy
+        reductionStrategy: ReductionStrategy,
+        defaultValueStrategy: DefaultValueStrategy
     ): Record<string | number, number> => {
         // Entries at 3pm on different days go in the same bucket
 
@@ -243,7 +289,11 @@ const generateDataset: Record<Bucket, DatasetGenerationStrategy> = {
         let previous: number | null = null;
         const reducedBuckets = [];
         for (const items of buckets) {
-            const value = ReductionStrategies[reductionStrategy](items, previous);
+            const value = ReductionStrategies[reductionStrategy](
+                items,
+                previous,
+                defaultValueStrategy
+            );
             reducedBuckets.push(value);
             previous = value;
         }
@@ -260,6 +310,7 @@ function generateTimeSeriesData(
     selectedBucket: Bucket,
     columnIndex: number,
     reductionStrategy: ReductionStrategy,
+    defaultValueStrategy: DefaultValueStrategy,
     style: {
         backgroundColor?: string;
         borderColor?: string;
@@ -270,7 +321,12 @@ function generateTimeSeriesData(
     const sortedRows = [...rows].sort((a, b) => a.timestamp - b.timestamp);
     const start = sortedRows[0].timestamp;
 
-    const bucketsMap = generateDataset[selectedBucket](sortedRows, columnIndex, reductionStrategy);
+    const bucketsMap = generateDataset[selectedBucket](
+        sortedRows,
+        columnIndex,
+        reductionStrategy,
+        defaultValueStrategy
+    );
     const labels = generateLabels[selectedBucket](start, Object.keys(bucketsMap), selectedBucket);
     return {
         labels,
@@ -339,6 +395,7 @@ export function generateChartData(
     columnIndex: number,
     xAxisKey: XAxisKey,
     reductionStrategy: ReductionStrategy,
+    defaultValueStrategy: DefaultValueStrategy,
     style: {
         backgroundColor?: string;
         borderColor?: string;
@@ -351,7 +408,14 @@ export function generateChartData(
     if (xAxisKey === timeIdxKey) {
         return [
             ChartType.Line,
-            generateTimeSeriesData(rows, selectedBucket, columnIndex, reductionStrategy, style)
+            generateTimeSeriesData(
+                rows,
+                selectedBucket,
+                columnIndex,
+                reductionStrategy,
+                defaultValueStrategy,
+                style
+            )
         ];
     }
     return [ChartType.Scatter, generateScatterData(rows, columnIndex, xAxisKey, style)];

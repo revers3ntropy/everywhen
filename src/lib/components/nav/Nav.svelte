@@ -9,6 +9,7 @@
     import type { Location } from '$lib/controllers/location/location';
     import type { SubscriptionType } from '$lib/controllers/subscription/subscription';
     import { obfuscated, passcodeLastEntered, settingsStore } from '$lib/stores';
+    import ChartLine from 'svelte-material-icons/ChartLine.svelte';
     import ChartTimeline from 'svelte-material-icons/ChartTimeline.svelte';
     import Counter from 'svelte-material-icons/Counter.svelte';
     import Eye from 'svelte-material-icons/Eye.svelte';
@@ -139,6 +140,19 @@
                 >
                     <Counter size="30" />
                     <div class="text-sm md:text-base"> Insights </div>
+                </a>
+                <a
+                    aria-label="strands"
+                    href="/datasets"
+                    class={buttonCls}
+                    class:bg-secondary={$page.url.pathname.startsWith('/datasets')}
+                    class:hover:bg-secondary={$page.url.pathname.startsWith('/datasets')}
+                >
+                    <ChartLine size="30" />
+                    Strands
+                    <span class="text-light font-bold border border-border rounded-full py-1 px-2">
+                        beta
+                    </span>
                 </a>
             </div>
         </div>

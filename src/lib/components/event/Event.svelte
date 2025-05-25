@@ -191,7 +191,7 @@
         </button>
     </div>
 {:else}
-    <div class="" transition:slide|local={{ axis: 'y', duration: 0 }}>
+    <div transition:slide|local={{ axis: 'y', duration: 0 }}>
         <div class="flex items-center justify-between">
             {#if obfuscated}
                 <p class=" obfuscated">
@@ -210,7 +210,6 @@
         </div>
 
         <div
-            class=""
             transition:slide|local={{
                 axis: 'y',
                 duration: ANIMATION_DURATION

@@ -26,7 +26,7 @@
         {/if}
     </span>
     {#if touching.length}
-        <span class="">
+        <span>
             <a href="/map/{touching[0].id}" class="ellipsis" class:obfuscated>
                 {touching[0].name}
             </a>
