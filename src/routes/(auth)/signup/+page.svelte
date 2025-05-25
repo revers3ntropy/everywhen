@@ -106,13 +106,13 @@
 
 <main class="flex-center h-screen">
     <div class="px-2">
-        <section class="pb-4 md:flex md:justify-center">
-            <p class="text-left title-font text-3xl pb-4 flex items-center gap-2 w-fit">
+        <section class="pb-4 md:flex md:justify-center pl-4 md:pl-0">
+            <p class="text-left title-font text-3xl pb-2 flex items-center gap-2 w-fit">
                 <Logo scale={0.1} /> Everywhen
             </p>
         </section>
-        <section class="md:border rounded-xl md:p-6 md:pt-4 md:bg-vLightAccent">
-            <p class="text-left text-md pb-2">Create new account</p>
+        <section class="md:border rounded-xl p-4 md:py-6 md:bg-vLightAccent">
+            <p class="text-left text-md pb-2 pl-2">Create new account</p>
             <div class="px-2 {usernameError ? 'border-destructive border-l-2' : ''}">
                 <Textbox
                     label="Username"
@@ -149,7 +149,7 @@
                     </p>
                 {/if}
             </div>
-            <div class="flex items-center justify-between pt-4">
+            <div class="flex items-center justify-between pt-4 px-2">
                 <a href="/login?redirect={data.redirect}">Log In</a>
                 <Button
                     aria-label="Create Account"

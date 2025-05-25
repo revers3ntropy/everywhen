@@ -107,8 +107,8 @@
 
 <main class="flex-center h-screen">
     <div class="px-2">
-        <section class="pb-4 md:flex md:justify-center">
-            <p class="text-left title-font text-3xl pb-4 flex items-center gap-2 w-fit">
+        <section class="pl-4 md:pl-0 pb-3 md:pb-4 md:flex md:justify-center">
+            <p class="text-left title-font text-3xl pb-2 flex items-center gap-2 w-fit">
                 <Logo scale={0.1} /> Everywhen
             </p>
         </section>
