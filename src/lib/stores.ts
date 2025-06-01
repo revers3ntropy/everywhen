@@ -21,6 +21,7 @@ export const enabledLocation = persisted<boolean>(LS_KEYS.enabledLocation, false
 export const passcodeLastEntered = persisted<number>(LS_KEYS.passcodeLastEntered, 0);
 export const eventsSortKey = persisted<EventsSortKey>(LS_KEYS.sortEventsKey, 'created');
 export const obfuscated = persisted<boolean>(LS_KEYS.obfuscated, false);
+export const searchHistory = persisted<string[]>(LS_KEYS.searchHistory, []);
 
 // session storage
 export const username = persisted<string | null>(SESSION_KEYS.username, null);

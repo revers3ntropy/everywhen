@@ -18,6 +18,7 @@ export const LS_KEYS = {
     enabledLocation: `${KEY_PREFIX}enabled_location`,
     sortEventsKey: `${KEY_PREFIX}events_sort_key`,
     obfuscated: `${KEY_PREFIX}obfuscated`,
+    searchHistory: `${KEY_PREFIX}search_history`,
     doesNotWantToEnableLocation: `${KEY_PREFIX}does_not_want_to_enable_location`,
     navbarOpen: `${KEY_PREFIX}navbar_open`
 } as const;
@@ -51,6 +52,8 @@ export const COOKIES_TO_CLEAR_ON_LOGOUT = Object.freeze([]);
 
 // possible characters to show when the text is blurred
 export const OBFUSCATE_CHARS = 'abcdefghijklmnopqrstuvwxyz ';
+
+export const SEARCH_HISTORY_LEN = 10;
 
 export const MAX_IMAGE_SIZE: Bytes = 1024 * 1024 * 8; // 8MiB
 

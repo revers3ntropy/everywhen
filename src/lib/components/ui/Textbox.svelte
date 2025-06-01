@@ -61,6 +61,8 @@
             on:blur
             on:keydown
             on:keyup
+            on:focusout
+            on:focusin
             {...inputProps}
         />
         {endUnit}
