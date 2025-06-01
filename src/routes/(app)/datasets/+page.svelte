@@ -26,7 +26,15 @@
 
 <main class="p-2 md:p-4 md:pl-4 flex-center">
     <div class="w-full md:max-w-4xl">
-        <CreateDatasetButton datasets={data.datasets} />
+        <div class="flex items-center gap-4">
+            <CreateDatasetButton datasets={data.datasets} />
+            <p>
+                Strands of Everywhen
+                <span class="text-light font-bold border border-border rounded-full py-1 px-2">
+                    beta
+                </span>
+            </p>
+        </div>
 
         <div class="py-4 flex gap-2 flex-wrap" aria-label="list of datasets">
             {#each data.datasets as dataset}
