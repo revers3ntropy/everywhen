@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Button } from '$lib/components/ui/button';
+    import { buttonVariants } from '$lib/components/ui/button';
     import { Entry } from '$lib/controllers/entry/entry';
     import { tryEncryptText } from '$lib/utils/encryption.client';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
@@ -7,7 +7,6 @@
     import Moon from 'svelte-material-icons/MoonWaningCrescent.svelte';
     import Lightbulb from 'svelte-material-icons/Lightbulb.svelte';
     import Brain from 'svelte-material-icons/Brain.svelte';
-    import Dropdown from '$lib/components/ui/Dropdown.svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
     import { notify } from '$lib/components/notifications/notifications';
     import { api } from '$lib/utils/apiRequest';
@@ -16,6 +15,8 @@
     import { eventsSortKey, username } from '$lib/stores';
     import { currentTzOffset, nowUtc } from '$lib/utils/time';
     import { Event as EventController } from '$lib/controllers/event/event';
+    import { cn } from '$lib/utils';
+    import * as Popover from '$lib/components/ui/popover';
 
     const iconSize = 25;
 
@@ -92,6 +93,8 @@
 
         await gotoIfNotAt('/events');
     }
+
+    const buttonClass = 'flex justify-start items-center gap-2 p-2 hover:bg-vLightAccent w-full';
 </script>
 
 <svg class="accent-gradient-svg" height={0} width={0}>
@@ -113,43 +116,38 @@
     </linearGradient>
 </svg>
 
-<Dropdown>
-    <Button
-        class="flex-center rounded-full px-2 py-5 aspect-square md:gap-2 md:w-full md:pr-4"
-        slot="button"
-        variant="outline"
-    >
+<Popover.Root>
+    <Popover.Trigger class={cn(buttonVariants({ variant: 'outline' }), 'rounded-full h-full')}>
         <Plus size="25" />
         <span class="hide-mobile block"> New </span>
-    </Button>
-
-    <div class="record-something-buttons">
-        <button class="with-icon oneline record-entry" on:click={makeEntry}>
+    </Popover.Trigger>
+    <Popover.Content class="py-2 px-0">
+        <button class="{buttonClass} record-entry" on:click={makeEntry}>
             <Pencil size={iconSize} />
             Record Entry
         </button>
 
-        <button class="with-icon oneline record-dream" on:click={makeDream}>
+        <button class="{buttonClass} record-dream" on:click={makeDream}>
             <Moon size={iconSize} />
             Record Dream
         </button>
 
-        <button class="with-icon oneline record-idea" on:click={makeIdea}>
+        <button class="{buttonClass} record-idea" on:click={makeIdea}>
             <Lightbulb size={iconSize} />
             Record Idea
         </button>
 
-        <button class="with-icon oneline record-thought" on:click={makeThought}>
+        <button class="{buttonClass} record-thought" on:click={makeThought}>
             <Brain size={iconSize} />
             Record Thought
         </button>
 
-        <button class="with-icon oneline new-event" on:click={makeEvent}>
+        <button class="{buttonClass} new-event" on:click={makeEvent}>
             <Calendar size={iconSize} />
             New Event
         </button>
-    </div>
-</Dropdown>
+    </Popover.Content>
+</Popover.Root>
 
 <style lang="scss">
     // https://codepen.io/thebabydino/pen/WNVPdJg

@@ -4,7 +4,6 @@
     import FormatItalic from 'svelte-material-icons/FormatItalic.svelte';
     import FormatBold from 'svelte-material-icons/FormatBold.svelte';
     import FormatHeader1 from 'svelte-material-icons/FormatHeader1.svelte';
-    import Dropdown from '$lib/components/ui/Dropdown.svelte';
     import Link from 'svelte-material-icons/Link.svelte';
     import CodeTags from 'svelte-material-icons/CodeTags.svelte';
     import ImageArea from 'svelte-material-icons/ImageArea.svelte';
@@ -13,73 +12,67 @@
     import FormatQuoteClose from 'svelte-material-icons/FormatQuoteClose.svelte';
     import CodeBrackets from 'svelte-material-icons/CodeBrackets.svelte';
     import FormatText from 'svelte-material-icons/FormatText.svelte';
+    import * as Popover from '$lib/components/ui/popover';
 
     export let makeWrapper: (
         before: string,
         after: string,
         insertSpaceIfEmpty?: boolean
     ) => () => void;
+
+    function onClickFactory(before: string, after: string, insertSpaceIfEmpty = true): () => void {
+        return () => {
+            makeWrapper(before, after, insertSpaceIfEmpty)();
+            popoverOpen = false;
+        };
+    }
+
+    let popoverOpen = false;
+
+    const iconSize = 20;
+    const buttonClass = 'flex items-center gap-3 hover:bg-vLightAccent p-2';
 </script>
 
-<Dropdown openOnHover>
-    <span slot="button">
-        <span class="p-1.5 rounded-full hover:bg-vLightAccent flex-center">
-            <FormatText size="25" />
-        </span>
-    </span>
-
-    <div class="py-3">
-        <button class="with-icon icon-small" on:click={makeWrapper('**', '**', false)}>
-            <FormatBold /> Bold
+<Popover.Root bind:open={popoverOpen}>
+    <Popover.Trigger class="p-1.5 rounded-full hover:bg-vLightAccent flex-center">
+        <FormatText size="25" />
+    </Popover.Trigger>
+    <Popover.Content class="py-3 px-0 flex flex-col">
+        <button class={buttonClass} on:click={onClickFactory('**', '**', false)}>
+            <FormatBold size={iconSize} /> Bold
         </button>
-        <button class="with-icon icon-small" on:click={makeWrapper('*', '*', false)}>
-            <FormatItalic /> Italic
+        <button class={buttonClass} on:click={onClickFactory('*', '*', false)}>
+            <FormatItalic size={iconSize} /> Italic
         </button>
-        <button class="with-icon icon-small" on:click={makeWrapper('~~', '~~', false)}>
-            <FormatStrikethrough /> Strikethrough
+        <button class={buttonClass} on:click={onClickFactory('~~', '~~', false)}>
+            <FormatStrikethrough size={iconSize} /> Strikethrough
         </button>
-        <button class="with-icon icon-small" on:click={makeWrapper('# ', '', false)}>
-            <FormatHeader1 /> Header
+        <button class={buttonClass} on:click={onClickFactory('# ', '', false)}>
+            <FormatHeader1 size={iconSize} /> Header
         </button>
-        <button class="with-icon icon-small" on:click={makeWrapper('`', '`')}>
-            <CodeTags /> Code
+        <button class={buttonClass} on:click={onClickFactory('`', '`')}>
+            <CodeTags size={iconSize} /> Code
         </button>
-        <button class="with-icon icon-small" on:click={makeWrapper('```', '```')}>
-            <CodeBrackets /> Code Block
+        <button class={buttonClass} on:click={onClickFactory('```', '```')}>
+            <CodeBrackets size={iconSize} /> Code Block
         </button>
-        <button class="with-icon icon-small" on:click={makeWrapper('\n > ', '', false)}>
-            <FormatQuoteClose /> Quote
+        <button class={buttonClass} on:click={onClickFactory('\n > ', '', false)}>
+            <FormatQuoteClose size={iconSize} /> Quote
         </button>
-        <button class="with-icon icon-small" on:click={makeWrapper('\n - ', '', false)}>
-            <FormatListBulleted /> Bullet List
+        <button class={buttonClass} on:click={onClickFactory('\n - ', '', false)}>
+            <FormatListBulleted size={iconSize} /> Bullet List
         </button>
-        <button class="with-icon icon-small" on:click={makeWrapper('\n 1. ', '', false)}>
-            <FormatListNumbered /> Numbered List
+        <button class={buttonClass} on:click={onClickFactory('\n 1. ', '', false)}>
+            <FormatListNumbered size={iconSize} /> Numbered List
         </button>
-        <button class="with-icon icon-small" on:click={makeWrapper('[', '](url)')}>
-            <Link /> Link
+        <button class={buttonClass} on:click={onClickFactory('[', '](url)')}>
+            <Link size={iconSize} /> Link
         </button>
-        <button class="with-icon icon-small" on:click={makeWrapper('![', '](url)')}>
-            <ImageArea /> Image
+        <button class={buttonClass} on:click={onClickFactory('![', '](url)')}>
+            <ImageArea size={iconSize} /> Image
         </button>
-        <button class="with-icon icon-small" on:click={makeWrapper('\n---\n', '', false)}>
-            <HorizontalRule /> Break
+        <button class={buttonClass} on:click={onClickFactory('\n---\n', '', false)}>
+            <HorizontalRule size={iconSize} /> Break
         </button>
-    </div>
-</Dropdown>
-
-<style lang="scss">
-    button {
-        white-space: nowrap;
-        color: var(--text-color);
-        padding: 0.4rem 1rem;
-        margin: 0;
-        width: 100%;
-        text-align: left;
-
-        &:hover,
-        &:focus {
-            background: var(--v-light-accent);
-        }
-    }
-</style>
+    </Popover.Content>
+</Popover.Root>

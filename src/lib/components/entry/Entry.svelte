@@ -1,18 +1,18 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import ContentCopy from 'svelte-material-icons/ContentCopy.svelte';
     import { slide } from 'svelte/transition';
+    import ContentCopy from 'svelte-material-icons/ContentCopy.svelte';
     import Bin from 'svelte-material-icons/Delete.svelte';
     import Restore from 'svelte-material-icons/DeleteRestore.svelte';
-    import Eye from 'svelte-material-icons/Eye.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
     import NoteEditOutline from 'svelte-material-icons/NoteEditOutline.svelte';
     import DotsVertical from 'svelte-material-icons/DotsVertical.svelte';
     import Heart from 'svelte-material-icons/Heart.svelte';
     import HeartOffOutline from 'svelte-material-icons/HeartOffOutline.svelte';
     import Pencil from 'svelte-material-icons/Pencil.svelte';
-    import * as Tooltip from '$lib/components/ui/tooltip';
     import { page } from '$app/stores';
+    import * as Tooltip from '$lib/components/ui/tooltip';
+    import * as Popover from '$lib/components/ui/popover';
     import TimeInFeed from '$lib/components/feed/TimeInFeed.svelte';
     import Lazy from '$lib/components/ui/Lazy.svelte';
     import { type EntryEdit } from '$lib/controllers/entry/entry';
@@ -27,7 +27,6 @@
     import { notify } from '$lib/components/notifications/notifications';
     import { rawMdToHtml } from '$lib/utils/text';
     import UtcTime from '$lib/components/ui/UtcTime.svelte';
-    import Dropdown from '$lib/components/ui/Dropdown.svelte';
     import AgentWidget from './UserAgentWidget.svelte';
     import Label from '$lib/components/label/Label.svelte';
     import LocationWidget from '../location/LocationWidget.svelte';
@@ -160,131 +159,121 @@
             <UtcTime fmt={'h:mma ddd DD MMM YYYY'} timestamp={created} tzOffset={createdTzOffset} />
         </div>
     {/if}
-    <div class="flex justify-between">
-        <div class="flex items-center gap-2" style="max-width: calc(100% - 60px)">
-            {#if !showFullDate}
-                <div class="h-full pr-2">
-                    <TimeInFeed timestamp={created} tzOffset={createdTzOffset} />
-                </div>
-            {/if}
-            {#if pinned !== null}
-                <Tooltip.Root>
-                    <Tooltip.Trigger class="gradient-icon"><Heart size="20" /></Tooltip.Trigger>
-                    <Tooltip.Content>
-                        Added to favourites {fmtUtcRelative(pinned)}
-                    </Tooltip.Content>
-                </Tooltip.Root>
-            {/if}
-
-            {#if $settingsStore.showAgentWidgetOnEntries.value}
-                <AgentWidget data={agentData} />
-            {/if}
-
-            {#if latitude && longitude}
-                <button on:click={() => (showingMap = !showingMap)} aria-label="Expand map">
-                    <LocationWidget {locations} {showingMap} {latitude} {longitude} {obfuscated} />
-                </button>
-            {/if}
-
-            {#if !isEdit && edits?.length}
-                <a href="/journal/{id}?history=on" class="edits-link link flex-center">
-                    <Pencil />
-                    {edits.length} edit{edits.length > 1 ? 's' : ''}
-                </a>
-            {/if}
-
-            {#if showLabels}
-                <Label label={labelId ? labels[labelId] : null} {obfuscated} />
-            {/if}
-
-            <div class="title" class:obfuscated>
-                {title}
+    <div class="flex items-center gap-2" style="max-width: calc(100% - 60px)">
+        {#if !showFullDate}
+            <div class="h-full pr-2">
+                <TimeInFeed timestamp={created} tzOffset={createdTzOffset} />
             </div>
-        </div>
+        {/if}
 
-        <div class="flex-center pr-2">
-            {#if !isEdit}
-                <Dropdown fromRight buttonClass="flex-center">
-                    <span slot="button" class="flex-center">
-                        <DotsVertical size="22" />
-                    </span>
-                    <div>
-                        <div class="text-light flex-center py-3">
-                            {wordCount} words
-                        </div>
+        {#if !isEdit}
+            <Popover.Root>
+                <Popover.Trigger class="flex-center">
+                    <DotsVertical size="22" />
+                </Popover.Trigger>
+                <Popover.Content class="p-0 -y-2">
+                    <div class="text-light flex-center py-3">
+                        {wordCount} words
+                    </div>
 
-                        <div class="border-t border-backgroundColor"></div>
+                    <div class="border-t border-backgroundColor"></div>
 
-                        <div class="options-dropdown">
-                            <button
-                                class="with-icon icon-gradient-on-hover"
-                                aria-label="Copy link to entry"
-                                on:click={copyToClipBoard}
-                            >
-                                <ContentCopy size="25" />
-                                Copy link
-                            </button>
+                    <div class="options-dropdown">
+                        <button
+                            class="with-icon icon-gradient-on-hover"
+                            aria-label="Copy link to entry"
+                            on:click={copyToClipBoard}
+                        >
+                            <ContentCopy size="25" />
+                            Copy link
+                        </button>
 
-                            {#if !Entry.isDeleted({ deleted })}
-                                {#key pinned}
-                                    <button
-                                        on:click={togglePinned}
-                                        class="with-icon icon-gradient-on-hover"
-                                        aria-label={Entry.isPinned({ pinned })
-                                            ? 'Remove from Favourites'
-                                            : 'Add to Favourites'}
-                                    >
-                                        {#if Entry.isPinned({ pinned })}
-                                            <HeartOffOutline size="25" />
-                                            Remove from Favourites
-                                        {:else}
-                                            <Heart size="25" />
-                                            Add to Favourites
-                                        {/if}
-                                    </button>
-                                {/key}
-                                <a
-                                    href="/journal/{id}/edit"
-                                    class="with-icon"
-                                    aria-label="edit entry"
-                                >
-                                    <NoteEditOutline size="25" />
-                                    Edit
-                                </a>
-                            {/if}
-                            {#key deleted}
+                        {#if !Entry.isDeleted({ deleted })}
+                            {#key pinned}
                                 <button
-                                    on:click={deleteSelf}
-                                    class="with-icon danger"
-                                    aria-label={Entry.isDeleted({ deleted })
-                                        ? 'Restore Entry'
-                                        : 'Move Entry to Bin'}
+                                    on:click={togglePinned}
+                                    class="with-icon icon-gradient-on-hover"
+                                    aria-label={Entry.isPinned({ pinned })
+                                        ? 'Remove from Favourites'
+                                        : 'Add to Favourites'}
                                 >
-                                    {#if Entry.isDeleted({ deleted })}
-                                        <Restore size="25" />
-                                        Remove from Bin
+                                    {#if Entry.isPinned({ pinned })}
+                                        <HeartOffOutline size="25" />
+                                        Remove from Favourites
                                     {:else}
-                                        <Bin size="25" />
-                                        Move to Bin
+                                        <Heart size="25" />
+                                        Add to Favourites
                                     {/if}
                                 </button>
                             {/key}
-                        </div>
+                            <a href="/journal/{id}/edit" class="with-icon" aria-label="edit entry">
+                                <NoteEditOutline size="25" />
+                                Edit
+                            </a>
+                        {/if}
+                        {#key deleted}
+                            <button
+                                on:click={deleteSelf}
+                                class="with-icon danger"
+                                aria-label={Entry.isDeleted({ deleted })
+                                    ? 'Restore Entry'
+                                    : 'Move Entry to Bin'}
+                            >
+                                {#if Entry.isDeleted({ deleted })}
+                                    <Restore size="25" />
+                                    Remove from Bin
+                                {:else}
+                                    <Bin size="25" />
+                                    Move to Bin
+                                {/if}
+                            </button>
+                        {/key}
                     </div>
-                </Dropdown>
-            {/if}
+                </Popover.Content>
+            </Popover.Root>
+        {/if}
 
-            <button
-                aria-label={obfuscated ? 'Show entry' : 'Hide entry'}
-                on:click={toggleObfuscation}
-            >
-                {#if obfuscated}
-                    <Eye size="20" />
-                {:else}
-                    <EyeOff size="20" />
-                {/if}
+        {#if pinned !== null}
+            <Tooltip.Root>
+                <Tooltip.Trigger class="gradient-icon"><Heart size="20" /></Tooltip.Trigger>
+                <Tooltip.Content>
+                    Added to favourites {fmtUtcRelative(pinned)}
+                </Tooltip.Content>
+            </Tooltip.Root>
+        {/if}
+
+        {#if $settingsStore.showAgentWidgetOnEntries.value}
+            <AgentWidget data={agentData} />
+        {/if}
+
+        {#if latitude && longitude}
+            <button on:click={() => (showingMap = !showingMap)} aria-label="Expand map">
+                <LocationWidget {locations} {showingMap} {latitude} {longitude} {obfuscated} />
             </button>
+        {/if}
+
+        {#if !isEdit && edits?.length}
+            <a href="/journal/{id}?history=on" class="edits-link link flex-center">
+                <Pencil />
+                {edits.length} edit{edits.length > 1 ? 's' : ''}
+            </a>
+        {/if}
+
+        {#if showLabels}
+            <Label label={labelId ? labels[labelId] : null} {obfuscated} />
+        {/if}
+
+        <div class="title" class:obfuscated>
+            {title}
         </div>
+
+        {#if !obfuscated}
+            <div class="pl-2">
+                <button aria-label="Show entry" on:click={toggleObfuscation}>
+                    <EyeOff size="20" />
+                </button>
+            </div>
+        {/if}
     </div>
 
     {#if showingMap}
@@ -318,13 +307,26 @@
         {title}
     </div>
 
-    <div
-        class="body md:p-4 md:pb-0 p-2 whitespace-pre-wrap"
-        class:obfuscated
-        class:md:pl-0={showFullDate}
-    >
-        {@html entryHtml}
-    </div>
+    {#if obfuscated}
+        <Tooltip.Root>
+            <Tooltip.Trigger>
+                <button
+                    class="body md:p-4 md:pb-0 p-2 whitespace-pre-wrap obfuscated text-left"
+                    class:md:pl-0={showFullDate}
+                    on:click={toggleObfuscation}
+                >
+                    {@html entryHtml}
+                </button>
+            </Tooltip.Trigger>
+            <Tooltip.Content>
+                <p>Click to show</p>
+            </Tooltip.Content>
+        </Tooltip.Root>
+    {:else}
+        <div class="body md:p-4 md:pb-0 p-2 whitespace-pre-wrap" class:md:pl-0={showFullDate}>
+            {@html entryHtml}
+        </div>
+    {/if}
 </div>
 
 <style lang="scss">

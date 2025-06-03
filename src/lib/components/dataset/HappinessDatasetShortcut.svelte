@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { Button } from '$lib/components/ui/button';
     import { settingsStore } from '$lib/stores';
     import EmoticonOutline from 'svelte-material-icons/EmoticonOutline.svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
@@ -8,8 +7,8 @@
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { currentTzOffset, nowUtc } from '$lib/utils/time';
     import HappinessValueIcon from '$lib/components/dataset/HappinessValueIcon.svelte';
-    import Dropdown from '$lib/components/ui/Dropdown.svelte';
     import { datasetPresets } from '$lib/controllers/dataset/presets';
+    import * as Popover from '$lib/components/ui/popover';
 
     export let dataset: Dataset | null;
 
@@ -59,15 +58,15 @@
 {#if submitted}
     <HappinessValueIcon value={submitted} size={24} />
 {:else}
-    <Dropdown fromRight>
-        <Button variant="link" slot="button" class="rounded-full p-2 hover:bg-accent">
+    <Popover.Root>
+        <Popover.Trigger class="static">
             <EmoticonOutline size={24} />
 
-            <div class="absolute text-light top-0 left-0" style="transform: translate(26px, 0px)">
+            <div class="relative text-light top-0 left-0" style="transform: translate(10px, -10px)">
                 <Plus size={16} />
             </div>
-        </Button>
-        <div class="flex-center gap-2 p-4">
+        </Popover.Trigger>
+        <Popover.Content class="flex-center gap-2 p-4 w-fit">
             {#if $settingsStore.happinessInputStyle.value === 'likert'}
                 <button on:click={() => submit(0)}>
                     <HappinessValueIcon value={0} size={32} />
@@ -96,6 +95,6 @@
                     {/each}
                 </div>
             {/if}
-        </div>
-    </Dropdown>
+        </Popover.Content>
+    </Popover.Root>
 {/if}

@@ -1,4 +1,9 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
+    import type { ChangeEventHandler } from 'svelte/elements';
+    import ImageArea from 'svelte-material-icons/ImageArea.svelte';
+    import Upload from 'svelte-material-icons/Upload.svelte';
+    import FolderMultipleImage from 'svelte-material-icons/FolderMultipleImage.svelte';
     import InfiniteScroller from '$lib/components/ui/InfiniteScroller.svelte';
     import { FILE_INPUT_ACCEPT_TYPES } from '$lib/constants';
     import { Asset, type AssetMetadata } from '$lib/controllers/asset/asset';
@@ -7,12 +12,7 @@
     import { api } from '$lib/utils/apiRequest';
     import { Result } from '$lib/utils/result';
     import { nowUtc } from '$lib/utils/time';
-    import { onMount } from 'svelte';
-    import ImageArea from 'svelte-material-icons/ImageArea.svelte';
-    import FolderMultipleImage from 'svelte-material-icons/FolderMultipleImage.svelte';
-    import Upload from 'svelte-material-icons/Upload.svelte';
-    import Dropdown from '$lib/components/ui/Dropdown.svelte';
-    import type { ChangeEventHandler } from 'svelte/elements';
+    import * as Popover from '$lib/components/ui/popover';
 
     export let size = '30';
     // should NOT trigger a 'create' event
@@ -37,7 +37,7 @@
             onInput(Asset.generateMarkdownLink(fileName, publicId));
             await dispatch.create('asset', { id, created: nowUtc(), publicId, fileName });
         }
-        closePopup();
+        popoverOpen = false;
     }) as ChangeEventHandler<HTMLInputElement>;
 
     onMount(async () => {
@@ -59,87 +59,70 @@
         if (index !== -1) assets[index] = asset;
     });
 
-    let closePopup: () => void;
     let fileDropInput: HTMLInputElement;
     let assets = [] as AssetMetadata[];
     let assetCount = Infinity;
+    let popoverOpen = false;
 </script>
 
-<div>
-    <Dropdown openOnHover fillWidthMobile stayOpenWhenClicked bind:close={closePopup}>
-        <span slot="button">
-            <span class="p-1.5 rounded-full hover:bg-vLightAccent flex-center">
-                <ImageArea {size} />
-            </span>
-        </span>
-        <div>
-            <button
-                on:click={() => fileDropInput.click()}
-                class="flex items-center hover:bg-vLightAccent icon-gradient-on-hover p-3 gap-3 w-full rounded-2xl"
-            >
-                <Upload size="28" />
-                Upload Image
+<Popover.Root bind:open={popoverOpen}>
+    <Popover.Trigger class="p-1.5 rounded-full hover:bg-vLightAccent flex-center">
+        <ImageArea {size} />
+    </Popover.Trigger>
+    <Popover.Content class="w-fit py-2 px-0">
+        <button
+            on:click={() => fileDropInput.click()}
+            class="flex items-center hover:bg-vLightAccent p-2 gap-3 w-full"
+        >
+            <Upload size="28" />
+            Upload Image
+        </button>
+        <input
+            type="file"
+            on:change={upload}
+            bind:this={fileDropInput}
+            style="display: none"
+            multiple
+            accept={FILE_INPUT_ACCEPT_TYPES}
+        />
+
+        <a href="/assets">
+            <button class="flex items-center hover:bg-vLightAccent p-2 gap-3 w-full">
+                <FolderMultipleImage size="28" />
+                Gallery
             </button>
-            <input
-                type="file"
-                on:change={upload}
-                bind:this={fileDropInput}
-                style="display: none"
-                multiple
-                accept={FILE_INPUT_ACCEPT_TYPES}
-            />
+        </a>
 
-            <a href="/assets">
-                <button class="flex p-3 items-center gap-3">
-                    <FolderMultipleImage size="28" />
-                    Gallery
-                </button>
-            </a>
-
-            <hr />
-
-            <div style="width: 300px; max-height: 500px" class="overflow-y-auto">
-                <div class="relative">
-                    {#if assetCount > -1 && assets.length}
-                        <InfiniteScroller
-                            loadItems={loadMoreAssets}
-                            hasMore={() => assets.length < assetCount}
-                            margin={100}
-                        >
-                            {#each assets as asset}
-                                <button
-                                    class="asset"
-                                    on:click={() => {
-                                        onInput(
-                                            Asset.generateMarkdownLink(
-                                                asset.fileName,
-                                                asset.publicId
-                                            )
-                                        );
-                                        closePopup();
-                                    }}
-                                >
-                                    <img
-                                        src="/api/assets/{asset.publicId}"
-                                        alt={asset.fileName}
-                                        loading="lazy"
-                                    />
-                                </button>
-                            {/each}
-                        </InfiniteScroller>
-                    {:else}
-                        <div class="text-light m-4"> No images in gallery yet </div>
-                    {/if}
-                </div>
+        <div class="overflow-y-auto w-[300px] max-h-[500px] pt-4">
+            <div class="relative">
+                {#if assetCount > -1 && assets.length}
+                    <InfiniteScroller
+                        loadItems={loadMoreAssets}
+                        hasMore={() => assets.length < assetCount}
+                        margin={100}
+                    >
+                        {#each assets as asset}
+                            <button
+                                class="asset hover:brightness-75"
+                                on:click={() => {
+                                    onInput(
+                                        Asset.generateMarkdownLink(asset.fileName, asset.publicId)
+                                    );
+                                    popoverOpen = false;
+                                }}
+                            >
+                                <img
+                                    src="/api/assets/{asset.publicId}"
+                                    alt={asset.fileName}
+                                    loading="lazy"
+                                />
+                            </button>
+                        {/each}
+                    </InfiniteScroller>
+                {:else}
+                    <div class="text-light m-4"> No images in gallery yet </div>
+                {/if}
             </div>
         </div>
-    </Dropdown>
-</div>
-
-<style lang="scss">
-    .asset {
-        &:hover {
-            filter: brightness(0.85);
-        }
-    }
-</style>
+    </Popover.Content>
+</Popover.Root>

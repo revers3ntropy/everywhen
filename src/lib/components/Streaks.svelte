@@ -73,12 +73,12 @@
                     {:else}
                         <Fire size="25" />
                     {/if}
-                    <span class="flex-center" style="height: 100%;">
+                    <span class="flex-center" style="height: 100%">
                         <b>{streaks.current}</b>
                     </span>
                 </span>
             {:else}
-                <div class="flex-center full text-sm">
+                <div class="flex items-center gap-3 text-sm">
                     {#if streaks.runningOut}
                         <TimerSand size="25" />
                     {:else if streaks.current > 0}
@@ -101,7 +101,7 @@
                         </div>
                     </div>
                 </div>
-                <p class="text-sm text-muted-foreground p-1">
+                <p class="text-sm text-muted-foreground py-1">
                     {#if !streaks.runningOut && !(streaks.current < 1)}
                         Come back tomorrow to continue your streak!
                     {:else if streaks.runningOut}
@@ -119,11 +119,3 @@
         </span>
     {/if}
 {/key}
-
-<style lang="scss">
-    .full {
-        display: grid;
-        grid-template-columns: 35px 1fr;
-        margin: 0 0.5em;
-    }
-</style>

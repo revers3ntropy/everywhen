@@ -1,15 +1,15 @@
 <script lang="ts">
+    import FileOutline from 'svelte-material-icons/FileOutline.svelte';
+    import Plus from 'svelte-material-icons/Plus.svelte';
+    import Import from 'svelte-material-icons/Import.svelte';
+    import TuneVariant from 'svelte-material-icons/TuneVariant.svelte';
+    import * as Popover from '$lib/components/ui/popover';
     import { notify } from '$lib/components/notifications/notifications';
     import type { DatasetMetadata } from '$lib/controllers/dataset/dataset';
-    import { makeBlank, makeFromPreset } from './importHelpers';
     import { datasetPresets, type PresetId } from '$lib/controllers/dataset/presets';
-    import Plus from 'svelte-material-icons/Plus.svelte';
-    import TuneVariant from 'svelte-material-icons/TuneVariant.svelte';
-    import Dropdown from '$lib/components/ui/Dropdown.svelte';
     import SleepCycleImport from './SleepCycleImport.svelte';
     import FitbitSleep from './FitbitSleep.svelte';
-    import Import from 'svelte-material-icons/Import.svelte';
-    import FileOutline from 'svelte-material-icons/FileOutline.svelte';
+    import { makeBlank, makeFromPreset } from './importHelpers';
 
     export let datasets: DatasetMetadata[];
 
@@ -20,41 +20,34 @@
     $: datasetNames = datasets.map(({ name }) => name);
 </script>
 
-<Dropdown
-    fillWidthMobile
-    width="200px"
-    buttonProps={{ 'aria-label': 'Open popup to create dataset' }}
->
-    <span
-        slot="button"
+<Popover.Root>
+    <Popover.Trigger
         class="aspect-square p-2 rounded-full bg-vLightAccent hover:bg-lightAccent flex-center"
     >
         <Plus size="24" />
-    </span>
-    <div class="py-2">
-        <div class="p-2">
-            <button
-                on:click={() => makeBlank(datasetNames)}
-                class="w-full flex justify-start items-center gap-2"
-                aria-label="Create blank dataset"
-            >
-                <FileOutline size="20" />
-                Blank
-            </button>
-        </div>
+    </Popover.Trigger>
+    <Popover.Content class="py-2 px-0">
+        <p class="font-bold p-2">Create new Strand</p>
+        <button
+            on:click={() => makeBlank(datasetNames)}
+            class="w-full flex justify-start items-center gap-2 hover:bg-vLightAccent p-2"
+            aria-label="Create blank dataset"
+        >
+            <FileOutline size="20" />
+            Blank
+        </button>
+
         {#each unusedPresetIds as presetId}
-            <div class="p-2">
-                <button
-                    on:click={() => makeFromPreset(presetId).then(notify.onErr)}
-                    class="w-full flex justify-start items-center gap-2"
-                >
-                    <TuneVariant size="20" />
-                    {datasetPresets[presetId].defaultName}
-                </button>
-            </div>
+            <button
+                on:click={() => makeFromPreset(presetId).then(notify.onErr)}
+                class="w-full flex justify-start items-center gap-2 p-2 hover:bg-vLightAccent"
+            >
+                <TuneVariant size="20" />
+                {datasetPresets[presetId].defaultName}
+            </button>
         {/each}
         <SleepCycleImport {datasets} {usedPresetIds} className="w-full">
-            <span class="w-full flex justify-start items-center p-2 gap-2">
+            <span class="w-full flex justify-start items-center p-2 gap-2 hover:bg-vLightAccent">
                 <Import size="24" />
                 Sleep Cycle
                 <img
@@ -67,7 +60,7 @@
             </span>
         </SleepCycleImport>
         <FitbitSleep {datasets} {usedPresetIds} className="w-full">
-            <span class="w-full flex justify-start items-center p-2 gap-2">
+            <span class="w-full flex justify-start items-center p-2 gap-2 hover:bg-vLightAccent">
                 <Import size="24" />
                 Fitbit Sleep
                 <img
@@ -79,5 +72,5 @@
                 />
             </span>
         </FitbitSleep>
-    </div>
-</Dropdown>
+    </Popover.Content>
+</Popover.Root>

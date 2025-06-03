@@ -4,7 +4,7 @@
     import * as Dialog from '$lib/components/ui/dialog';
     import AccountDropdown from '$lib/components/nav/AccountDropdown.svelte';
     import CreateNewButton from '$lib/components/nav/CreateNewButton.svelte';
-    import { Button } from '$lib/components/ui/button';
+    import { Button, buttonVariants } from '$lib/components/ui/button';
     import type { Label } from '$lib/controllers/label/label';
     import type { Location } from '$lib/controllers/location/location';
     import type { SubscriptionType } from '$lib/controllers/subscription/subscription';
@@ -18,6 +18,7 @@
     import MapOutline from 'svelte-material-icons/MapOutline.svelte';
     import Notebook from 'svelte-material-icons/NotebookOutline.svelte';
     import Search from 'svelte-material-icons/Magnify.svelte';
+    import { cn } from '$lib/utils';
 
     export let locations: Location[];
     export let labels: Record<string, Label>;
@@ -47,14 +48,14 @@
                 </span>
                 <span>
                     <Dialog.Root>
-                        <Dialog.Trigger>
-                            <Button
-                                aria-label="Search"
-                                class="flex-center rounded-full px-2 py-5 aspect-square"
-                                variant="outline"
-                            >
-                                <Search size="20" />
-                            </Button>
+                        <Dialog.Trigger
+                            aria-label="Search"
+                            class={cn(
+                                buttonVariants({ variant: 'outline' }),
+                                'flex-center rounded-full px-2 py-5 aspect-square'
+                            )}
+                        >
+                            <Search size="20" />
                         </Dialog.Trigger>
                         <Dialog.Content>
                             <div class="h-[90vh] overflow-y-auto overflow-x-hidden">
