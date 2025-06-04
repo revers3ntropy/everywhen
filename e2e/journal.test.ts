@@ -66,23 +66,32 @@ test.describe('/journal', () => {
         await expect(page.getByText(entryBody)).toBeAttached();
 
         // can pin entry
-        await page.locator(`[id="${id}"]`).getByRole('button', { name: 'Open popup' }).click();
+        await page
+            .locator(`[id="${id}"]`)
+            .getByRole('button', { name: 'Open options for entry' })
+            .click();
         await page.getByRole('button', { name: 'Add to Favourites' }).click();
 
         // can then unpin without reloading page
-        await page.locator(`[id="${id}"]`).getByRole('button', { name: 'Open popup' }).click();
+        // popover should stay open after adding to favourites
         await page.getByRole('button', { name: 'Remove from Favourites' }).click();
 
         await page.reload();
 
         // can pin entry
-        await page.locator(`[id="${id}"]`).getByRole('button', { name: 'Open popup' }).click();
+        await page
+            .locator(`[id="${id}"]`)
+            .getByRole('button', { name: 'Open options for entry' })
+            .click();
         await page.getByRole('button', { name: 'Add to Favourites' }).click();
 
         await page.reload();
 
         // can then unpin after reloading page
-        await page.locator(`[id="${id}"]`).getByRole('button', { name: 'Open popup' }).click();
+        await page
+            .locator(`[id="${id}"]`)
+            .getByRole('button', { name: 'Open options for entry' })
+            .click();
         await page.getByRole('button', { name: 'Remove from Favourites' }).click();
     });
 });

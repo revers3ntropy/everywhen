@@ -23,6 +23,7 @@
 <Popover.Root>
     <Popover.Trigger
         class="aspect-square p-2 rounded-full bg-vLightAccent hover:bg-lightAccent flex-center"
+        aria-label="Open popup to create dataset"
     >
         <Plus size="24" />
     </Popover.Trigger>

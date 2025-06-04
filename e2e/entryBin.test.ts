@@ -16,7 +16,7 @@ test.describe('/journal/deleted', () => {
         await expect(page).toHaveURL('/journal/deleted');
 
         await page.getByLabel('journal').click();
-        await page.locator(`[id="${id}"]`).getByLabel('Open popup').click();
+        await page.locator(`[id="${id}"]`).getByLabel('Open options for entry').click();
         page.once('dialog', dialog => {
             void dialog.accept();
         });

@@ -168,7 +168,7 @@
 
         {#if !isEdit}
             <Popover.Root>
-                <Popover.Trigger class="flex-center">
+                <Popover.Trigger class="flex-center" aria-label="Open options for entry">
                     <DotsVertical size="22" />
                 </Popover.Trigger>
                 <Popover.Content class="p-0 -y-2">
@@ -189,23 +189,25 @@
                         </button>
 
                         {#if !Entry.isDeleted({ deleted })}
-                            {#key pinned}
+                            {#if Entry.isPinned({ pinned })}
                                 <button
                                     on:click={togglePinned}
                                     class="with-icon icon-gradient-on-hover"
-                                    aria-label={Entry.isPinned({ pinned })
-                                        ? 'Remove from Favourites'
-                                        : 'Add to Favourites'}
+                                    aria-label="Remove from Favourites"
                                 >
-                                    {#if Entry.isPinned({ pinned })}
-                                        <HeartOffOutline size="25" />
-                                        Remove from Favourites
-                                    {:else}
-                                        <Heart size="25" />
-                                        Add to Favourites
-                                    {/if}
+                                    <HeartOffOutline size="25" />
+                                    Remove from Favourites
                                 </button>
-                            {/key}
+                            {:else}
+                                <button
+                                    on:click={togglePinned}
+                                    class="with-icon icon-gradient-on-hover"
+                                    aria-label="Add to Favourites"
+                                >
+                                    <Heart size="25" />
+                                    Add to Favourites
+                                </button>
+                            {/if}
                             <a href="/journal/{id}/edit" class="with-icon" aria-label="edit entry">
                                 <NoteEditOutline size="25" />
                                 Edit
