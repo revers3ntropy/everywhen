@@ -27,7 +27,12 @@
     let onThisDayData: Record<string, EntrySummary[]> = {};
     onMount(async () => {
         onThisDayData = notify.onErr(
-            await api.get('/entries/onThisDay', { tz: currentTzOffset() })
+            await api.get('/entries/onThisDay', {
+                tz: currentTzOffset(),
+                // used as index for cache, not required by API
+                // otherwise have to have a cache clear before getting the correct day
+                day: Day.todayUsingNativeDate().fmtIso()
+            })
         );
     });
 </script>
