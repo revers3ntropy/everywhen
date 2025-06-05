@@ -1,4 +1,7 @@
 <script lang="ts">
+    import TimerSand from 'svelte-material-icons/TimerSand.svelte';
+    import FountainPen from 'svelte-material-icons/FountainPenTip.svelte';
+    import BookOpenVariantOutline from '$lib/components/ui/icons/BookOpenVariantOutline.svelte';
     import { notify } from '$lib/components/notifications/notifications';
     import type { Grouping } from '$lib/controllers/stats/stats';
     import { type StatsData } from '$lib/controllers/stats/stats';
@@ -60,30 +63,39 @@
         {:else if daysSinceFirstEntry === null || data.dayOfFirstEntry === null}
             Something went wrong, please try again later
         {:else}
-            <section class="flex flex-wrap gap-8 md:gap-x-16 container md:p-4">
-                <StatPill value={data.entryCount.toLocaleString()} label="entries" />
-                <StatPill value={daysSinceFirstEntry.toLocaleString()} label="days" />
-                <StatPill value={data.wordCount.toLocaleString()} label="words" />
-                <StatPill
-                    value={(data.wordCount / daysSinceFirstEntry).toFixed(1)}
-                    label="words / day"
-                />
-                <StatPill
-                    value={(data.wordCount / (data.entryCount || 1)).toFixed(1)}
-                    label="words / entry"
-                />
-                <StatPill
-                    value={(data.entryCount / Math.max(daysSinceFirstEntry / 7, 1)).toFixed(1)}
-                    label="entries / week"
-                />
-                <StatPill value={uniqueWordCount.toLocaleString()} label="unique words" />
-            </section>
-
-            <div class="container my-4 p-4">
+            <div class="container mb-4 p-4">
                 {#if data.heatmapData !== null}
                     <EntryHeatMap earliestEntryDay={earliestDay} {getBucketisedData} />
                 {/if}
             </div>
+
+            <section class="container md:p-4 mb-4">
+                <div class="flex flex-wrap items-center gap-4 md:gap-8 pb-4 md:pb-8">
+                    <TimerSand size="2rem" />
+                    <StatPill value={daysSinceFirstEntry.toLocaleString()} label="days" />
+                    <StatPill
+                        value={(data.wordCount / daysSinceFirstEntry).toFixed(1)}
+                        label="words / day"
+                    />
+                </div>
+                <div class="flex flex-wrap items-center gap-4 md:gap-8 pb-4 md:pb-8">
+                    <BookOpenVariantOutline size="2rem" />
+                    <StatPill value={data.entryCount.toLocaleString()} label="entries" />
+                    <StatPill
+                        value={(data.entryCount / Math.max(daysSinceFirstEntry / 7, 1)).toFixed(1)}
+                        label="entries / week"
+                    />
+                </div>
+                <div class="flex flex-wrap items-center gap-4 md:gap-8 pb-4">
+                    <FountainPen size="2rem" />
+                    <StatPill value={data.wordCount.toLocaleString()} label="words" />
+                    <StatPill
+                        value={(data.wordCount / (data.entryCount || 1)).toFixed(1)}
+                        label="words / entry"
+                    />
+                    <StatPill value={uniqueWordCount.toLocaleString()} label="unique words" />
+                </div>
+            </section>
 
             {#if data.entryCount > 4}
                 <div

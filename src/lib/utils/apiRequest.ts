@@ -64,6 +64,7 @@ export interface ApiRoutes {
     '/export': typeof import('../../routes/api/export/html/+server');
     '/stats': typeof import('../../routes/api/stats/+server');
     '/stats/commonWords': typeof import('../../routes/api/stats/commonWords/+server');
+    '/stats/commonWords/?': typeof import('../../routes/api/stats/commonWords/[word]/+server');
     '/subscription/pricing': typeof import('../../routes/api/subscription/pricing/+server');
     '/subscription/create-portal-session': typeof import('../../routes/api/subscription/create-portal-session/+server');
     '/subscription/create-checkout-session': typeof import('../../routes/api/subscription/create-checkout-session/+server');

@@ -4,6 +4,9 @@ import { type DateValue, CalendarDate } from '@internationalized/date';
 import type { Hours, TimestampSecs } from '../../types';
 
 export class Day {
+    /**
+     * numbers as they appear in the calendar, eg. 1-12 for months, 1-31 for dates
+     */
     public constructor(
         public readonly year: number,
         public readonly month: number,

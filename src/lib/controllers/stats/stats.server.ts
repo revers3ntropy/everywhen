@@ -3,7 +3,7 @@ import { query } from '$lib/db/mysql.server';
 import { Day } from '$lib/utils/day';
 import { Result } from '$lib/utils/result';
 import { fmtUtc } from '$lib/utils/time';
-import type { TimestampSecs } from '../../../types';
+import type { BarChartData, TimestampSecs } from '../../../types';
 import type { Auth } from '../auth/auth.server';
 import { By, Grouping, Stats as _Stats, type StatsData } from './stats';
 
@@ -287,6 +287,110 @@ namespace StatsServer {
                 AND entryIsDeleted = 0
         `;
         return res[0].count;
+    }
+
+    /**
+     * Expects word to be encrypted
+     *
+     * returns chart data with appropriate grouping,
+     * based on how long ago the word was first used
+     */
+    export async function chartDataForWord(auth: Auth, word: string): Promise<BarChartData | null> {
+        const usages = await query<{ day: string; count: number }[]>`
+            SELECT day, SUM(count) as count
+            FROM wordsInEntries, entries
+            WHERE entries.userId = ${auth.id}
+                AND entries.userId = ${auth.id}
+                AND wordsInEntries.entryId = entries.id
+                AND word = ${word}
+                AND entryIsDeleted = 0
+            GROUP BY day
+            ORDER BY STR_TO_DATE(day, '%Y-%m-%d')
+        `;
+        console.log(usages);
+
+        if (usages.length < 1) return null;
+
+        const firstDay = Day.fromString(usages[0]?.day || Day.today().fmtIso()).unwrap();
+
+        const firstUsedDaysAgo = firstDay.daysUntil(Day.today());
+        if (firstUsedDaysAgo < 3) return null;
+
+        let grouping: Grouping.Day | Grouping.Month | Grouping.Year;
+        // about 30 bars maximum for each grouping
+        if (firstUsedDaysAgo < 30) {
+            grouping = Grouping.Day;
+        } else if (firstUsedDaysAgo < 365 * 3) {
+            grouping = Grouping.Month;
+        } else {
+            grouping = Grouping.Year;
+        }
+
+        const chartData = {
+            labels: [] as string[],
+            datasets: [
+                {
+                    label: 'Word Occurrences',
+                    data: [] as number[]
+                }
+            ]
+        } satisfies BarChartData;
+
+        if (grouping === Grouping.Day) {
+            const indexedByDay = usages.reduce(
+                (acc, stats) => {
+                    acc[stats.day] = stats.count;
+                    return acc;
+                },
+                {} as Record<string, number>
+            );
+            for (let d = firstDay; d.lte(Day.today()); d = d.plusDays(1)) {
+                const dFmtIso = d.fmtIso();
+                chartData.labels.push(dFmtIso);
+                chartData.datasets[0].data.push(indexedByDay[dFmtIso] || 0);
+            }
+        } else if (grouping === Grouping.Month) {
+            let isFirst = true;
+            for (let year = firstDay.year; year <= Day.today().year; year++) {
+                const startMonth = year === firstDay.year ? firstDay.month : 1;
+                for (let month = startMonth; month <= 12; month++) {
+                    const startOfMonthDay = new Day(year, month, 1);
+                    if (startOfMonthDay.gt(Day.today())) break;
+
+                    const yearAndMonth = startOfMonthDay.fmtIso().substring(0, 7);
+                    chartData.labels.push(
+                        fmtUtc(
+                            startOfMonthDay.utcTimestampMiddleOfDay(0),
+                            0,
+                            // show year for January and December
+                            1 === month || isFirst ? 'MMM YYYY' : 'MMM'
+                        )
+                    );
+                    const sumForMonth = usages.reduce((acc, stats) => {
+                        if (stats.day.startsWith(yearAndMonth)) return acc + stats.count;
+                        return acc;
+                    }, 0);
+                    chartData.datasets[0].data.push(sumForMonth);
+                    isFirst = false;
+                }
+            }
+        } else if (grouping === Grouping.Year) {
+            for (let year = firstDay.year; year <= Day.today().year; year++) {
+                const startOfYearDay = new Day(year, 1, 1);
+                if (startOfYearDay.gt(Day.today())) break;
+                const yearFmt = fmtUtc(startOfYearDay.utcTimestampMiddleOfDay(0), 0, 'YYYY');
+                chartData.labels.push(yearFmt);
+                const sumForMonth = usages.reduce((acc, stats) => {
+                    if (stats.day.startsWith(yearFmt)) return acc + stats.count;
+                    return acc;
+                }, 0);
+                chartData.datasets[0].data.push(sumForMonth);
+            }
+        } else {
+            throw new Error(`Unsupported grouping: ${grouping}`);
+        }
+
+        return chartData;
     }
 }
 
