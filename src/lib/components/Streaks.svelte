@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { Skeleton } from '$lib/components/ui/skeleton';
     import { listen } from '$lib/dataChangeEvents';
     import { clientLogger } from '$lib/utils/log';
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
@@ -113,9 +114,9 @@
             {/if}
         {/if}
     {:else}
-        <span class="flex-center text-sm">
+        <span class="flex-center gap-2">
             <Fire size="25" />
-            <b>...</b>
+            <Skeleton class="h-8 bg-borderLight {condensed ? 'w-4' : 'w-full'}" />
         </span>
     {/if}
 {/key}

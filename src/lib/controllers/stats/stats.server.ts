@@ -307,7 +307,6 @@ namespace StatsServer {
             GROUP BY day
             ORDER BY STR_TO_DATE(day, '%Y-%m-%d')
         `;
-        console.log(usages);
 
         if (usages.length < 1) return null;
 
