@@ -112,7 +112,7 @@
                 <Logo scale={0.1} /> Everywhen
             </p>
         </section>
-        <form class="md:border rounded-xl p-4 md:py-6 md:bg-vLightAccent">
+        <form class="md:border border-border rounded-xl p-4 md:py-6 md:bg-vLightAccent">
             <p class="text-left text-md pb-2 pl-2">Login to continue</p>
             <div class="px-2 {usernameError ? 'border-destructive border-l-2' : ''}">
                 <Textbox
