@@ -50,6 +50,14 @@
         return {
             responsive: true,
             maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    labels: {
+                        color: cssVarValue('--text-color')
+                    }
+                }
+            },
             scales: {
                 'y-left': {
                     position: 'left',
