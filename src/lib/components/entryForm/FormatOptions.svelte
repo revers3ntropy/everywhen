@@ -13,6 +13,8 @@
     import CodeBrackets from 'svelte-material-icons/CodeBrackets.svelte';
     import FormatText from 'svelte-material-icons/FormatText.svelte';
     import * as Popover from '$lib/components/ui/popover';
+    import { cn } from "$lib/utils";
+    import { buttonVariants } from "$lib/components/ui/button";
 
     export let makeWrapper: (
         before: string,
@@ -34,7 +36,10 @@
 </script>
 
 <Popover.Root bind:open={popoverOpen}>
-    <Popover.Trigger class="p-1.5 rounded-full hover:bg-vLightAccent flex-center">
+    <Popover.Trigger         class={cn(
+            buttonVariants({ variant: 'outline' }),
+            'bg-transparent px-2 text-md gap-1 hover:bg-vLightAccent rounded-full hover:text-textColor'
+        )}>
         <FormatText size="25" />
     </Popover.Trigger>
     <Popover.Content class="py-3 px-0 flex flex-col">

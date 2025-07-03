@@ -12,6 +12,8 @@
     import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
     import type { Label } from '$lib/controllers/label/label';
     import MenuDown from 'svelte-material-icons/MenuDown.svelte';
+    import { cn } from '$lib/utils';
+    import { buttonVariants } from '$lib/components/ui/button';
 
     export let labels: Record<string, Label>;
     export let value = '';
@@ -53,7 +55,10 @@
 
 <Popover.Root bind:open>
     <Popover.Trigger
-        class="flex gap-2 items-center rounded-full hover:bg-vLightAccent p-2"
+        class={cn(
+            buttonVariants({ variant: 'outline' }),
+            'bg-transparent px-2 text-md gap-1 hover:bg-vLightAccent rounded-full hover:text-textColor'
+        )}
         aria-label="Pick label"
     >
         {#key value}

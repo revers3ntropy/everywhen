@@ -13,6 +13,8 @@
     import { Result } from '$lib/utils/result';
     import { nowUtc } from '$lib/utils/time';
     import * as Popover from '$lib/components/ui/popover';
+    import { cn } from '$lib/utils';
+    import { buttonVariants } from '$lib/components/ui/button';
 
     export let size = '30';
     // should NOT trigger a 'create' event
@@ -66,7 +68,12 @@
 </script>
 
 <Popover.Root bind:open={popoverOpen}>
-    <Popover.Trigger class="p-1.5 rounded-full hover:bg-vLightAccent flex-center">
+    <Popover.Trigger
+        class={cn(
+            buttonVariants({ variant: 'outline' }),
+            'bg-transparent px-2 text-md gap-1 hover:bg-vLightAccent rounded-full hover:text-textColor'
+        )}
+    >
         <ImageArea {size} />
     </Popover.Trigger>
     <Popover.Content class="w-fit py-2 px-0">

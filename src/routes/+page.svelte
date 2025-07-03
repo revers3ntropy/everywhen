@@ -114,8 +114,7 @@
                 </div>
                 <p class="title-font text-2xl">Hand-crafted</p>
                 <p class="text-light">
-                    No Vibe Coding, Cursor or LLMs -
-                    high quality code written with love by an
+                    No Vibe Coding, Cursor or LLMs - high quality code written with love by an
                     <a href="https://josephcoppin.com">experienced engineer</a>
                 </p>
             </div>

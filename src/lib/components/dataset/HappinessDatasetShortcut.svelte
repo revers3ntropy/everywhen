@@ -62,7 +62,10 @@
         <Popover.Trigger class="static">
             <EmoticonOutline size={24} />
 
-            <div class="relative text-light top-0 left-0 h-0" style="transform: translate(10px, -11px)">
+            <div
+                class="relative text-light top-0 left-0 h-0"
+                style="transform: translate(10px, -11px)"
+            >
                 <Plus size={16} />
             </div>
         </Popover.Trigger>

@@ -151,7 +151,9 @@
                 >
                     <ChartLine size="30" />
                     Strands
-                    <span class="text-light font-bold border border-border rounded-full py-1 px-2 hide-mobile">
+                    <span
+                        class="text-light font-bold border border-border rounded-full py-1 px-2 hide-mobile"
+                    >
                         beta
                     </span>
                 </a>

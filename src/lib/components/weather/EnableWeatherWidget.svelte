@@ -36,11 +36,7 @@
     }
 </script>
 
-<Button
-    variant="link"
-    on:click={enable}
-    class="rounded-full block p-2 hover:bg-accent static"
->
+<Button variant="link" on:click={enable} class="rounded-full block p-2 hover:bg-accent static">
     <WeatherPartlyCloudy size={24} />
     <div class="relative text-light top-0 left-0 h-0" style="transform: translate(14px, -13px)">
         <Plus size={16} />
