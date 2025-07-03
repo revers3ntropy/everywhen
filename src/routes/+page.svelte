@@ -2,6 +2,7 @@
     import { Button } from '$lib/components/ui/button';
     import Logo from '$lib/components/ui/Logo.svelte';
     import ArrowRightThinCircleOutline from 'svelte-material-icons/ArrowRight.svelte';
+    import HeadHeart from 'svelte-material-icons/HeadHeart.svelte';
     import EmoticonOutline from 'svelte-material-icons/EmoticonOutline.svelte';
     import Poll from 'svelte-material-icons/Poll.svelte';
     import LockOutline from 'svelte-material-icons/LockOutline.svelte';
@@ -103,6 +104,19 @@
                 <p class="title-font text-2xl">Mood Tracking</p>
                 <p class="text-light">
                     Log your mood and get insights into your mental health over time
+                </p>
+            </div>
+            <div class="border-t border-border pt-8 pb-20">
+                <div class="flex-center p-2">
+                    <span class="border border-borderLight rounded-full p-2">
+                        <HeadHeart size="40" />
+                    </span>
+                </div>
+                <p class="title-font text-2xl">Hand-crafted</p>
+                <p class="text-light">
+                    No Vibe Coding, Cursor or LLMs -
+                    high quality code written with love by an
+                    <a href="https://josephcoppin.com">experienced engineer</a>
                 </p>
             </div>
         </div>
