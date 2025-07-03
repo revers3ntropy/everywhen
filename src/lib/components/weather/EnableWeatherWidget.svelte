@@ -39,10 +39,10 @@
 <Button
     variant="link"
     on:click={enable}
-    class="flex-center relative rounded-full p-2 hover:bg-accent"
+    class="rounded-full block p-2 hover:bg-accent static"
 >
     <WeatherPartlyCloudy size={24} />
-    <span class="absolute text-light top-0 left-0" style="transform: translate(26px, 0px)">
+    <div class="relative text-light top-0 left-0 h-0" style="transform: translate(14px, -13px)">
         <Plus size={16} />
-    </span>
+    </div>
 </Button>
