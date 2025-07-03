@@ -1,10 +1,10 @@
 #!/bin/bash
 
-bun x svelte-kit sync
+npx svelte-kit sync
 
-bun x eslint . './src/**/*.{js,ts,svelte}' || exit 1
+npx eslint . './src/**/*.{js,ts,svelte}' || exit 1
 
-bun x svelte-check \
+npx svelte-check \
   --tsconfig ./tsconfig.json \
   --compiler-warnings "css-unused-selector:ignore,unused-export-let:ignore" \
   "$@" || exit 1

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-bun x svelte-kit sync || exit 1
+npx svelte-kit sync || exit 1
 
 scripts/build || exit 1
 

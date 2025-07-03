@@ -12,6 +12,6 @@ rm ./testBackup.json
 export PLAYWRIGHT_SKIP_BROWSER_GC=1
 bun i
 
-bun x playwright install
+npx playwright install
 
-bun x svelte-kit sync
+npx svelte-kit sync

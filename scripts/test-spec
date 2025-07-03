@@ -1,5 +1,5 @@
 #!/bin/bash
 
-bun x svelte-kit sync || exit 1
+npx svelte-kit sync || exit 1
 
-bun x vitest run || exit 1
+npx vitest run || exit 1
