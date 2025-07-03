@@ -17,6 +17,6 @@ export const load = (async () => {
                 FROM entries
             `
             )[0].count
-        )
+        ) || 0
     };
 }) satisfies PageServerLoad;
