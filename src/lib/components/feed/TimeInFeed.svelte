@@ -6,7 +6,7 @@
     export let to: number | null = null;
 </script>
 
-<span class="text-textColorLight text-sm flex-center gap-1 pl-12 md:pl-6 md:m-0">
+<span class="text-textColorLight text-sm flex items-center justify-center gap-1 pl-8 md:pl-6 md:m-0">
     <UtcTime fmt={'h:mma'} {timestamp} {tzOffset} />
     {#if to}
         <span>-</span>
