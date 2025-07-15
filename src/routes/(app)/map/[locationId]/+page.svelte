@@ -4,6 +4,7 @@
     import Entries from '$lib/components/entry/Entries.svelte';
     import { listen } from '$lib/dataChangeEvents';
     import type { PageData } from './$types';
+    import Mapbox from '$lib/components/map/Mapbox.svelte';
 
     export let data: PageData;
 
@@ -22,6 +23,10 @@
         <section class="p-2 md:rounded-lg md:bg-vLightAccent md:p-4">
             <EditLocation {...data.location} />
         </section>
+
+        <div class="h-[300px] md:rounded-lg py-4">
+            <Mapbox locations={[data.location]} locationsAreEditable />
+        </div>
 
         <section class="pt-4 md:pl-2">
             <Entries
