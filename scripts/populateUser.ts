@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv';
 import fs from 'fs';
 import { sha256 } from 'js-sha256';
 import mysql from 'mysql2/promise';
-import { LIMITS } from '../src/lib/constants';
+import { UsageLimits } from '../src/lib/controllers/usageLimits/usageLimits';
 import { Day } from '../src/lib/utils/day';
 import { wordsFromText } from '../src/lib/utils/text';
 import type { TimestampSecs } from '../src/types';
@@ -133,7 +133,8 @@ async function main() {
     let i = 0;
     for (
         let created = nowUtc();
-        created > nowUtc() - 60 * 60 * 24 * 365 * years && i < LIMITS.entry.maxCount - 1000;
+        created > nowUtc() - 60 * 60 * 24 * 365 * years &&
+        i < UsageLimits.LIMITS_PLUS.entry.maxCount - 1000;
         created -= 60 * 60 * 24
     ) {
         await entry(
@@ -149,7 +150,8 @@ async function main() {
     }
     for (
         let created = nowUtc() - 60 * 60 * 24 * 365 * years;
-        created > nowUtc() - 60 * 60 * 24 * 365 * years * 2 && i < LIMITS.entry.maxCount - 1000;
+        created > nowUtc() - 60 * 60 * 24 * 365 * years * 2 &&
+        i < UsageLimits.LIMITS_PLUS.entry.maxCount - 1000;
         created -= 60 * 60 * (24 / entriesPerDay)
     ) {
         await entry(`my-entry-${i}`, userId, created, 2, `Entry ${i}`);
