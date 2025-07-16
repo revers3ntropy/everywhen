@@ -1,10 +1,10 @@
 <script lang="ts">
-    import Map from '$lib/components/map/Map.svelte';
     import DayRangeSelector from '$lib/components/ui/DayRangeSelector.svelte';
     import { Day } from '$lib/utils/day';
     import type { PageData } from './$types';
     import { enabledLocation, settingsStore } from '$lib/stores';
     import LocationDisabledBanner from './LocationDisabledBanner.svelte';
+    import Mapbox from '$lib/components/map/Mapbox.svelte';
 
     export let data: PageData;
 
@@ -32,10 +32,10 @@
         {#if !$settingsStore.preferLocationOn.value || !$enabledLocation}
             <LocationDisabledBanner />
         {/if}
-        <div class="fixed top-0 left-0 h-screen w-full">
-            <Map entries={showedEntries} locations={data.locations} labels={data.labels} />
+        <div class="fixed top-0 left-0 md:left-[192px] h-screen w-full">
+            <Mapbox entries={showedEntries} locations={data.locations} />
 
-            <div class="fixed top-2 right-2" data-theme="light">
+            <div class="fixed top-2 right-12" data-theme="light">
                 <DayRangeSelector bind:dateRange {earliestDate} />
             </div>
         </div>

@@ -41,7 +41,7 @@
 </script>
 
 {#if (!$enabledLocation || !$settingsStore.preferLocationOn.value) && !$doesNotWantToEnableLocation}
-    <button on:click={enable} class="outer bottom-14 md:bottom-0">
+    <button on:click={enable} class="outer bottom-14 md:bottom-0 left-0 md:left-[192px] right-0">
         <span class="hide-mobile">
             <Info />
         </span>
@@ -63,7 +63,6 @@
 
 <style lang="scss">
     button.outer {
-        width: 100vw;
         padding: 0.5rem 0;
         margin: 0;
         position: fixed;

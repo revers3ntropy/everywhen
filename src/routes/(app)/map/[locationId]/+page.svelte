@@ -35,7 +35,7 @@
                     {
                         lat: data.location.latitude - data.location.radius * 1.2,
                         lng: data.location.longitude + data.location.radius * 1.2
-                    },
+                    }
                 ]}
                 locationsAreEditable
                 class="rounded-lg"

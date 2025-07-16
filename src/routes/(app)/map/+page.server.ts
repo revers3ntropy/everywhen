@@ -13,8 +13,8 @@ export const load = cachedPageRoute(async auth => {
                 created: e.created,
                 createdTzOffset: e.createdTzOffset,
                 id: e.id,
-                latitude: e.latitude,
-                longitude: e.longitude
+                latitude: e.latitude!,
+                longitude: e.longitude!
             })),
         locations: (await Location.all(auth)).unwrap(e => error(400, e)),
         labels: await Label.allIndexedById(auth)

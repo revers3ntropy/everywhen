@@ -17,6 +17,7 @@ export interface EntryFilter {
     readonly labelId?: string;
     readonly locationId?: string;
     readonly deleted?: boolean | 'both';
+    // only entries with locations: numeric longitude and latitude
     readonly onlyWithLocation?: boolean;
 }
 

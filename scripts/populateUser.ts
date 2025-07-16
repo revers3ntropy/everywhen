@@ -128,13 +128,13 @@ async function main() {
     await query('DELETE FROM wordsInEntries WHERE userId = ?', userId);
 
     const years = 32;
-    const entriesPerDay = 32;
+    //const entriesPerDay = 32;
 
     let i = 0;
     for (
         let created = nowUtc();
         created > nowUtc() - 60 * 60 * 24 * 365 * years &&
-        i < UsageLimits.LIMITS_PLUS.entry.maxCount - 1000;
+        i < UsageLimits.LIMITS_PLUS.entry.maxCount * 0.5;
         created -= 60 * 60 * 24
     ) {
         await entry(
@@ -143,20 +143,20 @@ async function main() {
             created,
             3,
             `Sparse ${i}`,
-            i < 100 ? 52.3946613 : undefined,
-            i < 100 ? 0.2557761 + i * 0.0001 : undefined
+            52.3946613 + (Math.random() - 0.5) * 0.8,
+            0.2557761 + (Math.random() - 0.5) * 2
         );
         i++;
     }
-    for (
-        let created = nowUtc() - 60 * 60 * 24 * 365 * years;
-        created > nowUtc() - 60 * 60 * 24 * 365 * years * 2 &&
-        i < UsageLimits.LIMITS_PLUS.entry.maxCount - 1000;
-        created -= 60 * 60 * (24 / entriesPerDay)
-    ) {
-        await entry(`my-entry-${i}`, userId, created, 2, `Entry ${i}`);
-        i++;
-    }
+    // for (
+    //     let created = nowUtc() - 60 * 60 * 24 * 365 * years;
+    //     created > nowUtc() - 60 * 60 * 24 * 365 * years * 2 &&
+    //     i < UsageLimits.LIMITS_PLUS.entry.maxCount - 1000;
+    //     created -= 60 * 60 * (24 / entriesPerDay)
+    // ) {
+    //     await entry(`my-entry-${i}`, userId, created, 2, `Entry ${i}`);
+    //     i++;
+    // }
     log(`created ${i} entries`);
 
     console.log('done');
