@@ -2,14 +2,18 @@
     import mapboxgl, { type LngLatBoundsLike, type LngLatLike } from 'mapbox-gl';
     import type { Map } from 'mapbox-gl';
     import 'mapbox-gl/dist/mapbox-gl.css';
+    // this module can't be SSR'ed so can only import as type
+    import type MapboxCircle from 'mapbox-gl-circle';
+    import * as Dialog from '$lib/components/ui/dialog';
     import { theme } from '$lib/stores';
     import { Theme } from '$lib/constants';
     import { Location } from '$lib/controllers/location/location';
     import { notify } from '$lib/components/notifications/notifications';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import type { Meters, Degrees } from '../../../types';
-    // this module can't be SSR'ed so can only import as type
-    import type MapboxCircle from 'mapbox-gl-circle';
+    import EditLocation from "$lib/components/location/EditLocation.svelte";
+    import EntryDialog from "$lib/components/entry/EntryDialog.svelte";
+    import type { Label } from "$lib/controllers/label/label";
 
     // default to the UK :)
     export let defaultCenter: LngLatLike = { lat: -4, lng: 53 };
@@ -18,6 +22,7 @@
 
     export let locations: Location[] = [];
     export let entries: { id: string; latitude: Degrees; longitude: Degrees }[] = [];
+    export let labels: Record<string, Label> = {};
 
     export let locationsAreEditable = false;
 
@@ -29,6 +34,9 @@
         'pk.eyJ1IjoicmV2ZXJzM250cm9weSIsImEiOiJja3NxNmhjZ3EwOXZpMnFvM2Znd3puZmZyIn0.og-Btcduk-VzD4XAEsuZcQ';
 
     let map: Map;
+
+    let locationForDialog: Location | null = null;
+    let entryIdForDialog: string | null = null;
 
     theme.subscribe(newTheme => {
         // update map when theme changes
@@ -83,6 +91,11 @@
                     refineStroke: true
                 }
             ).addTo(map);
+
+          locationCircle.on('click', () => {
+            locationForDialog = location;
+          });
+
             if (!locationsAreEditable) continue;
 
             locationCircle.on('centerchanged', circle => {
@@ -94,7 +107,7 @@
         }
     }
 
-    function updateEntriesSourceData(entries: { latitude: Degrees; longitude: Degrees }[]) {
+    function updateEntriesSourceData(entries: { id: string, latitude: Degrees; longitude: Degrees }[]) {
         if (!map) return;
         // not sure why the types don't like a bunch of stuff (have to do similar casts below too)
       // the docs show this is fine and it works
@@ -106,12 +119,12 @@
                     type: 'Point',
                     coordinates: [e.longitude, e.latitude]
                 },
-                properties: {}
+                properties: { entryId: e.id}
             }))
         });
     }
 
-    function addEntriesToMap(_MapboxCircle: typeof MapboxCircle, map: Map, entries: { latitude: Degrees, longitude: Degrees}[]) {
+    function addEntriesToMap(_MapboxCircle: typeof MapboxCircle, map: Map, entries: { id: string, latitude: Degrees, longitude: Degrees}[]) {
       // example cluster implementation
       // https://docs.mapbox.com/mapbox-gl-js/example/cluster/
         map.addSource('entries', {
@@ -244,6 +257,14 @@
                 map.getCanvas().style.cursor = '';
             }
         });
+
+      map.addInteraction('unclustered-click', {
+        type: 'mouseleave',
+        target: { layerId: 'unclustered-point' },
+        handler: (evt) => {
+          entryIdForDialog = (evt.feature!.properties as { entryId: string}).entryId;
+        }
+      });
     }
 
     async function initMap(container: HTMLDivElement) {
@@ -278,7 +299,26 @@
     }
 </script>
 
-<div use:_map class="w-full h-full overflow-hidden {className}"></div>
+<div use:_map class="w-full h-full overflow-hidden {className}"/>
+
+<Dialog.Root open={!!entryIdForDialog}>
+  <Dialog.Content>
+    {#if entryIdForDialog}
+      <EntryDialog id={entryIdForDialog} obfuscated={false} {locations} {labels} />
+    {:else}
+      <p> Something went wrong </p>
+    {/if}
+  </Dialog.Content>
+</Dialog.Root>
+<Dialog.Root open={!!locationForDialog}>
+  <Dialog.Content>
+    {#if locationForDialog}
+      <EditLocation {...locationForDialog} isInDialog />
+    {:else}
+      <p> Something went wrong </p>
+    {/if}
+  </Dialog.Content>
+</Dialog.Root>
 
 <style lang="scss">
     // hide mapbox feedback stuff
