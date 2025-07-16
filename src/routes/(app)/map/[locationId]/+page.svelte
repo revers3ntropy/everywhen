@@ -20,12 +20,26 @@
 </svelte:head>
 <main class="md:p-4 md:pl-4 flex-center">
     <div class="w-full md:max-w-5xl">
-        <section class="p-2 md:rounded-lg md:bg-vLightAccent md:p-4">
+        <section class="md:rounded-lg md:bg-vLightAccent px-2">
             <EditLocation {...data.location} />
         </section>
 
-        <div class="h-[300px] md:rounded-lg py-4">
-            <Mapbox locations={[data.location]} locationsAreEditable />
+        <div class="h-[50vh] md:rounded-lg py-4">
+            <Mapbox
+                locations={[data.location]}
+                bounds={[
+                    {
+                        lat: data.location.latitude + data.location.radius * 1.2,
+                        lng: data.location.longitude - data.location.radius * 1.2
+                    },
+                    {
+                        lat: data.location.latitude - data.location.radius * 1.2,
+                        lng: data.location.longitude + data.location.radius * 1.2
+                    },
+                ]}
+                locationsAreEditable
+                class="rounded-lg"
+            />
         </div>
 
         <section class="pt-4 md:pl-2">
