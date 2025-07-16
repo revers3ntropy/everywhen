@@ -83,9 +83,15 @@
         locations: Location[]
     ) {
         for (const location of locations) {
+            const radius: Meters = Location.degreesToMeters(location.radius);
+            if (!radius) {
+                console.error('no radius', { location, radius});
+                notify.error('Failed to load location');
+                continue;
+            }
             const locationCircle = new _MapboxCircle(
                 { lat: location.latitude, lng: location.longitude },
-                Location.degreesToMeters(location.radius),
+                radius,
                 {
                     editable: locationsAreEditable,
                     fillColor: 'rgba(255, 0, 200, 0.1)',
