@@ -1,15 +1,16 @@
 <script lang="ts">
     import mapboxgl from 'mapbox-gl';
     import type { Map } from 'mapbox-gl';
+    import 'mapbox-gl/dist/mapbox-gl.css';
     import { theme } from '$lib/stores';
     import { Theme } from '$lib/constants';
     import { Location } from '$lib/controllers/location/location';
     import { notify } from '$lib/components/notifications/notifications';
     import { api, apiPath } from '$lib/utils/apiRequest';
-    import type { Meters, Degrees } from "../../../types";
+    import type { Meters, Degrees } from '../../../types';
 
     // Default to look at the UK :)
-    export let defaultCenter: [number, number] = [-4, 53];
+    export let defaultCenter: [number, number] | null = null;
     export let defaultZoom = 4;
     export let locations: Location[] = [];
     export let locationsAreEditable = false;
@@ -51,14 +52,22 @@
         notify.success('Updated location radius');
     }
 
+    theme.subscribe(newTheme => {
+        // update map when theme changes
+        if (map) map.setStyle(themeToMapStyle(newTheme));
+    });
+
     async function initMap(container: HTMLDivElement) {
         // looks for 'window' at top level (ugh) so have to import dynamically
         const { default: MapboxCircle } = await import('mapbox-gl-circle');
 
+        let center: [number, number] = [-4, 53];
+        if (defaultCenter) center = defaultCenter;
+        else if (locations.length === 1) center = [locations[0].longitude, locations[0].latitude];
         map = new mapboxgl.Map({
             container: container,
             style: themeToMapStyle($theme),
-            center: defaultCenter,
+            center,
             zoom: defaultZoom
         });
         map.addControl(new mapboxgl.NavigationControl());
@@ -73,7 +82,7 @@
         );
         map.on('load', () => {
             for (const location of locations) {
-                const myCircle = new MapboxCircle(
+                const locationCircle = new MapboxCircle(
                     { lat: location.latitude, lng: location.longitude },
                     Location.degreesToMeters(location.radius),
                     {
@@ -84,14 +93,17 @@
                 ).addTo(map);
                 if (!locationsAreEditable) continue;
 
-                myCircle.on(
+                locationCircle.on(
                     'centerchanged',
-                    (circleObj: { getCenter: () => { lat: number; lng: number } }) => {
-                        updateLocationCenter(location.id, circleObj.getCenter());
+                    (circle) => {
+                        updateLocationCenter(location.id, circle.getCenter());
                     }
                 );
-                myCircle.on('radiuschanged', (circleObj: { getRadius: () => number }) => {
-                    updateLocationRadius(location.id, Location.metersToDegrees(circleObj.getRadius()));
+                locationCircle.on('radiuschanged', (circle) => {
+                    updateLocationRadius(
+                        location.id,
+                        Location.metersToDegrees(circle.getRadius())
+                    );
                 });
             }
         });
@@ -111,6 +123,6 @@
     }
 
     :global(canvas) {
-      overflow: hidden;
+        overflow: hidden;
     }
 </style>
