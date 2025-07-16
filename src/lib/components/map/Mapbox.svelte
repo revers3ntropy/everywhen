@@ -11,9 +11,9 @@
     import { notify } from '$lib/components/notifications/notifications';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import type { Meters, Degrees } from '../../../types';
-    import EditLocation from "$lib/components/location/EditLocation.svelte";
-    import EntryDialog from "$lib/components/entry/EntryDialog.svelte";
-    import type { Label } from "$lib/controllers/label/label";
+    import EditLocation from '$lib/components/location/EditLocation.svelte';
+    import EntryDialog from '$lib/components/entry/EntryDialog.svelte';
+    import type { Label } from '$lib/controllers/label/label';
 
     // default to the UK :)
     export let defaultCenter: LngLatLike = { lat: -4, lng: 53 };
@@ -25,6 +25,7 @@
     export let labels: Record<string, Label> = {};
 
     export let locationsAreEditable = false;
+    export let entriesInteractable = true;
 
     let className: string | undefined = undefined;
     export { className as class };
@@ -92,9 +93,9 @@
                 }
             ).addTo(map);
 
-          locationCircle.on('click', () => {
-            locationForDialog = location;
-          });
+            locationCircle.on('click', () => {
+                locationForDialog = location;
+            });
 
             if (!locationsAreEditable) continue;
 
@@ -107,11 +108,13 @@
         }
     }
 
-    function updateEntriesSourceData(entries: { id: string, latitude: Degrees; longitude: Degrees }[]) {
+    function updateEntriesSourceData(
+        entries: { id: string; latitude: Degrees; longitude: Degrees }[]
+    ) {
         if (!map) return;
         // not sure why the types don't like a bunch of stuff (have to do similar casts below too)
-      // the docs show this is fine and it works
-      (map.getSource('entries')! as { setData: (data: unknown) => void}).setData({
+        // the docs show this is fine and it works
+        (map.getSource('entries')! as { setData: (data: unknown) => void }).setData({
             type: 'FeatureCollection',
             features: entries.map(e => ({
                 type: 'Feature',
@@ -119,14 +122,18 @@
                     type: 'Point',
                     coordinates: [e.longitude, e.latitude]
                 },
-                properties: { entryId: e.id}
+                properties: { entryId: e.id }
             }))
         });
     }
 
-    function addEntriesToMap(_MapboxCircle: typeof MapboxCircle, map: Map, entries: { id: string, latitude: Degrees, longitude: Degrees}[]) {
-      // example cluster implementation
-      // https://docs.mapbox.com/mapbox-gl-js/example/cluster/
+    function addEntriesToMap(
+        _MapboxCircle: typeof MapboxCircle,
+        map: Map,
+        entries: { id: string; latitude: Degrees; longitude: Degrees }[]
+    ) {
+        // example cluster implementation
+        // https://docs.mapbox.com/mapbox-gl-js/example/cluster/
         map.addSource('entries', {
             type: 'geojson',
             generateId: true,
@@ -258,13 +265,14 @@
             }
         });
 
-      map.addInteraction('unclustered-click', {
-        type: 'mouseleave',
-        target: { layerId: 'unclustered-point' },
-        handler: (evt) => {
-          entryIdForDialog = (evt.feature!.properties as { entryId: string}).entryId;
-        }
-      });
+        if (entriesInteractable)
+            map.addInteraction('unclustered-click', {
+                type: 'mouseleave',
+                target: { layerId: 'unclustered-point' },
+                handler: evt => {
+                    entryIdForDialog = (evt.feature!.properties as { entryId: string }).entryId;
+                }
+            });
     }
 
     async function initMap(container: HTMLDivElement) {
@@ -299,25 +307,25 @@
     }
 </script>
 
-<div use:_map class="w-full h-full overflow-hidden {className}"/>
+<div use:_map class="w-full h-full overflow-hidden {className}" />
 
 <Dialog.Root open={!!entryIdForDialog}>
-  <Dialog.Content>
-    {#if entryIdForDialog}
-      <EntryDialog id={entryIdForDialog} obfuscated={false} {locations} {labels} />
-    {:else}
-      <p> Something went wrong </p>
-    {/if}
-  </Dialog.Content>
+    <Dialog.Content>
+        {#if entryIdForDialog}
+            <EntryDialog id={entryIdForDialog} obfuscated={false} {locations} {labels} />
+        {:else}
+            <p> Something went wrong </p>
+        {/if}
+    </Dialog.Content>
 </Dialog.Root>
 <Dialog.Root open={!!locationForDialog}>
-  <Dialog.Content>
-    {#if locationForDialog}
-      <EditLocation {...locationForDialog} isInDialog />
-    {:else}
-      <p> Something went wrong </p>
-    {/if}
-  </Dialog.Content>
+    <Dialog.Content>
+        {#if locationForDialog}
+            <EditLocation {...locationForDialog} isInDialog />
+        {:else}
+            <p> Something went wrong </p>
+        {/if}
+    </Dialog.Content>
 </Dialog.Root>
 
 <style lang="scss">

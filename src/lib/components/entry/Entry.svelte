@@ -278,31 +278,32 @@
         {/if}
     </div>
 
-    {#if showingMap}
+    {#if showingMap && latitude && longitude}
         <div transition:slide={{ duration: ANIMATION_DURATION, axis: 'y' }} class="map-container">
             <i class="text-light text-sm pb-1">
-                lat {latitude}, lng {longitude}
+                lat {latitude.toFixed(5)}, lng {longitude.toFixed(5)}
             </i>
-            <Lazy
-                shouldLoad={showingMap}
-                key="$lib/components/map/Map.svelte"
-                component={() => import('$lib/components/map/Map.svelte')}
-                props={{
-                    entriesInteractable: false,
-                    roundedCorners: true,
-                    width: '100%',
-                    height: '300px',
-                    mobileHeight: '200px',
-                    entries: [
-                        {
-                            id,
-                            created,
-                            latitude,
-                            longitude
-                        }
-                    ]
-                }}
-            />
+            <div class="h-[200px] md:h-[300px]">
+                <Lazy
+                    shouldLoad={showingMap}
+                    key="$lib/components/map/Mapbox.svelte"
+                    component={() => import('$lib/components/map/Mapbox.svelte')}
+                    props={{
+                        entriesInteractable: false,
+                        class: 'rounded-lg',
+                        defaultCenter: { lat: latitude, lng: longitude },
+                        defaultZoom: 15,
+                        entries: [
+                            {
+                                id,
+                                created,
+                                latitude,
+                                longitude
+                            }
+                        ]
+                    }}
+                />
+            </div>
         </div>
     {/if}
     <div class="text-lg only-mobile p-2" class:obfuscated>
