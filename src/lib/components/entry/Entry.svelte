@@ -168,7 +168,7 @@
 
         {#if !isEdit}
             <Popover.Root>
-                <Popover.Trigger class="flex-center" aria-label="Open options for entry">
+                <Popover.Trigger class="flex-center hover:bg-lightAccent rounded-full" aria-label="Open options for entry">
                     <DotsVertical size="22" />
                 </Popover.Trigger>
                 <Popover.Content class="p-0 -y-2">
