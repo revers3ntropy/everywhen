@@ -91,7 +91,7 @@
             }
             const locationCircle = new _MapboxCircle(
                 { lat: location.latitude, lng: location.longitude },
-                radius,
+                Math.max(1, radius),
                 {
                     editable: locationsAreEditable,
                     fillColor: 'rgba(255, 0, 200, 0.1)',
