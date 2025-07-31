@@ -42,4 +42,7 @@
         <span class="text-textColorLight">Pressure:</span>
         {weather.pressureMean.toPrecision(4)} mb
     </p>
+    <p>
+        Source: <a href="https://openweathermap.org/">openweathermap.org/</a>
+    </p>
 </div>
