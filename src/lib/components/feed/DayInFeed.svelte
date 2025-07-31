@@ -11,22 +11,17 @@
     import { fly, slide } from 'svelte/transition';
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
-    import * as Popover from '$lib/components/ui/popover';
-    import WeatherDialog from '$lib/components/dataset/WeatherDialog.svelte';
     import EntryForm from '$lib/components/entryForm/EntryForm.svelte';
-    import EnableWeatherWidget from '$lib/components/weather/EnableWeatherWidget.svelte';
     import EntryEditFeedItem from '$lib/components/feed/EntryEditFeedItem.svelte';
     import EntryFeedItem from '$lib/components/feed/EntryFeedItem.svelte';
     import EventEndFeedItem from '$lib/components/feed/EventEndFeedItem.svelte';
     import EventStartFeedItem from '$lib/components/feed/EventStartFeedItem.svelte';
     import HappinessFeedItem from '$lib/components/feed/HappinessFeedItem.svelte';
     import SleepFeedItem from '$lib/components/feed/SleepFeedItem.svelte';
-    import LocationWidgetMulti from '$lib/components/location/LocationWidgetMulti.svelte';
-    import WeatherWidget from '$lib/components/weather/WeatherWidget.svelte';
+    import LocationsWithWeather from '$lib/components/location/LocationsWithWeather.svelte';
     import type { Entry } from '$lib/controllers/entry/entry';
     import { Feed } from '$lib/controllers/feed/feed';
     import type { Label } from '$lib/controllers/label/label';
-    import { settingsStore } from '$lib/stores';
     import { omit } from '$lib/utils';
     import { Day } from '$lib/utils/day';
     import { ANIMATION_DURATION } from '$lib/constants';
@@ -80,7 +75,7 @@
         class:mb-2={!isToday && !$collapsed[day.day]}
     >
         <div class="flex justify-between">
-            <div>
+            <div class="flex">
                 <button class="flex-center" on:click={toggleCollapse}>
                     {#if $collapsed[day.day]}
                         <ChevronDown size="25" />
@@ -107,50 +102,38 @@
                             </span>
                         {/if}
                     {/if}
-
-                    {#if entriesWithLocation.length}
-                        <span class="pl-2">
-                            <LocationWidgetMulti
-                                {obfuscated}
-                                {locations}
-                                latitudes={entriesWithLocation.map(e => e.latitude)}
-                                longitudes={entriesWithLocation.map(e => e.longitude)}
-                            />
-                        </span>
-                    {/if}
-
-                    {#if $collapsed[day.day]}
-                        <div
-                            transition:fly|local={{
-                                // local transition to avoid affecting other groups
-                                x: -50,
-                                duration: ANIMATION_DURATION
-                            }}
-                            class="flex-center hide-mobile"
-                        >
-                            <Dot light marginX={10} />
-                            <p class="text-textColorLight">
-                                {entryCount}
-                                {entryCount === 1 ? 'entry' : 'entries'}
-                            </p>
-                        </div>
-                    {/if}
                 </button>
+
+                {#if entriesWithLocation.length}
+                    <span class="pl-2">
+                        <LocationsWithWeather
+                            {obfuscated}
+                            {locations}
+                            latitudes={entriesWithLocation.map(e => e.latitude)}
+                            longitudes={entriesWithLocation.map(e => e.longitude)}
+                            dayOfWeather={Day.fromString(day.day).unwrap()}
+                        />
+                    </span>
+                {/if}
+
+                {#if $collapsed[day.day]}
+                    <div
+                        transition:fly|local={{
+                            // local transition to avoid affecting other groups
+                            x: -50,
+                            duration: ANIMATION_DURATION
+                        }}
+                        class="flex-center hide-mobile"
+                    >
+                        <Dot light marginX={10} />
+                        <p class="text-textColorLight">
+                            {entryCount}
+                            {entryCount === 1 ? 'entry' : 'entries'}
+                        </p>
+                    </div>
+                {/if}
             </div>
             <div class="flex-center gap-4">
-                {#if day.weather}
-                    <Popover.Root>
-                        <Popover.Trigger><WeatherWidget weather={day.weather} /></Popover.Trigger>
-                        <Popover.Content>
-                            <WeatherDialog
-                                day={Day.fromString(day.day).unwrap()}
-                                weather={day.weather}
-                            />
-                        </Popover.Content>
-                    </Popover.Root>
-                {:else if $settingsStore.homeLocation.value[0] === null && isToday}
-                    <EnableWeatherWidget />
-                {/if}
                 {#if isToday && showForms}
                     <HappinessDatasetShortcut dataset={happinessDataset} />
                 {/if}

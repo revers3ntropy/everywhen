@@ -85,7 +85,7 @@
         for (const location of locations) {
             const radius: Meters = Location.degreesToMeters(location.radius);
             if (!radius) {
-                console.error('no radius', { location, radius});
+                console.error('no radius', { location, radius });
                 notify.error('Failed to load location');
                 continue;
             }

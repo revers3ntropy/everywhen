@@ -72,7 +72,7 @@
                     entriesInteractable: false,
                     class: 'rounded-lg',
                     defaultCenter: { lat: latitude, lng: longitude },
-                        defaultZoom: 15,
+                    defaultZoom: 15,
                     entries: [
                         {
                             id,

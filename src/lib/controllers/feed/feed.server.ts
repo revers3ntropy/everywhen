@@ -3,11 +3,6 @@ import { entryEditsProvider } from '$lib/controllers/feed/entryEditsProvider';
 import { eventEndsProvider, eventStartsProvider } from '$lib/controllers/feed/eventsProvider';
 import { happinessProvider } from '$lib/controllers/feed/happinessProvidor';
 import { sleepProvider } from '$lib/controllers/feed/sleepProvider';
-import {
-    OpenWeatherMapAPI,
-    type WeatherForDay
-} from '$lib/controllers/openWeatherMapAPI/openWeatherMapAPI.server';
-import { Settings } from '$lib/controllers/settings/settings.server';
 import type { Day } from '$lib/utils/day';
 import { Result } from '$lib/utils/result';
 import { Feed as _Feed, type FeedItem, type FeedDay } from './feed';
@@ -78,17 +73,8 @@ namespace FeedServer {
         );
     }
 
-    async function weatherDataForDay(auth: Auth, day: Day): Promise<Result<WeatherForDay>> {
-        // could check for existence of 'weather' dataset here
-        const setting = await Settings.getValue(auth, 'homeLocation');
-        if (!setting.ok) return setting.cast();
-        const [lon, lat] = setting.val;
-        if (lat === null || lon === null) return Result.err('No home location set');
-        return OpenWeatherMapAPI.getWeatherForDay(day, lat, lon);
-    }
-
     export async function getDay(auth: Auth, day: Day): Promise<Result<FeedDay>> {
-        const [items, nextDayInPast, nextDayInFuture, weather] = await Promise.all([
+        const [items, nextDayInPast, nextDayInFuture] = await Promise.all([
             Result.collectAsync(PROVIDERS.map(p => p.feedItemsOnDay(auth, day))).then(r =>
                 r
                     .map(items => items.flat())
@@ -96,19 +82,14 @@ namespace FeedServer {
                     .unwrap(e => error(400, e))
             ),
             getNextDayInPast(auth, day).then(d => d?.fmtIso() ?? null),
-            getNextDayInFuture(auth, day).then(d => d?.fmtIso() ?? null),
-            // .or(null) throws away any errors generated,
-            // the user will see no weather rather than an error if
-            // something goes wrong
-            weatherDataForDay(auth, day).then(w => w.mapErr(console.log).or(null))
+            getNextDayInFuture(auth, day).then(d => d?.fmtIso() ?? null)
         ]);
 
         return Result.ok({
             items,
             nextDayInPast,
             nextDayInFuture,
-            day: day.fmtIso(),
-            weather
+            day: day.fmtIso()
         } satisfies FeedDay);
     }
 }

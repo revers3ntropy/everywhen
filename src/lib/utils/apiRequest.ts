@@ -53,6 +53,7 @@ export interface ApiRoutes {
     '/oauth/gh/user': typeof import('../../routes/api/oauth/gh/user/+server');
     '/datasets': typeof import('../../routes/api/datasets/+server');
     '/datasets/?': typeof import('../../routes/api/datasets/[datasetId]/+server');
+    '/datasets/weather': typeof import('../../routes/api/datasets/weather/+server');
     '/datasets/?/columns': typeof import('../../routes/api/datasets/[datasetId]/columns/+server');
     '/datasets/?/columns/?': typeof import('../../routes/api/datasets/[datasetId]/columns/[columnId]/+server');
     '/users': typeof import('../../routes/api/users/+server');
