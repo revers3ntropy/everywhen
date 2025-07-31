@@ -63,31 +63,4 @@ describe('wordCount', () => {
         expectInvalid('number', Symbol());
         expectInvalid('number', () => {});
     });
-
-    it('validates locations correctly', () => {
-        expectValid('location', [1, 1]);
-        expectValid('location', [0, 0]);
-        expectValid('location', [0.1, 0.9]);
-        expectValid('location', [null, null]);
-        expectInvalid('location', null);
-        expectInvalid('location', []);
-        expectInvalid('location', [1, 'fish']);
-        expectInvalid('location', [1, 2, 'fish']);
-        expectInvalid('location', [1, 2, 3]);
-        expectInvalid('location', [1]);
-        expectInvalid('location', ['fish']);
-        expectInvalid('location', [1, 2, 3, 4]);
-        expectInvalid('location', [1, null]);
-        expectInvalid('location', [null, 2]);
-        expectInvalid('location', undefined);
-        expectInvalid('location', {});
-        expectInvalid('location', '');
-        expectInvalid('location', 'my string');
-        expectInvalid('location', true);
-        expectInvalid('location', false);
-        expectInvalid('location', new Date());
-        expectInvalid('location', /a/);
-        expectInvalid('location', Symbol());
-        expectInvalid('location', () => {});
-    });
 });

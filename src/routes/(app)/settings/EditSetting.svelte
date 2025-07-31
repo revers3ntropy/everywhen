@@ -1,5 +1,4 @@
 <script lang="ts">
-    import LocationSelector from '$lib/components/location/LocationSelector.svelte';
     import Dot from '$lib/components/ui/Dot.svelte';
     import { Switch } from '$lib/components/ui/switch';
     import Textbox from '$lib/components/ui/Textbox.svelte';
@@ -8,7 +7,6 @@
     import { fmtDuration, nowUtc } from '$lib/utils/time';
     import type { SettingsConfig, SettingValue } from '$lib/controllers/settings/settings';
     import { settingsStore } from '$lib/stores';
-    import type { OptionalCoords } from '../../../types';
 
     export let key: string;
     export let defaultValue: SettingValue;
@@ -32,9 +30,6 @@
             break;
         case 'boolean':
             inputType = 'checkbox';
-            break;
-        case 'location':
-            inputType = type;
             break;
         default:
             if (Array.isArray(type)) {
@@ -64,10 +59,6 @@
     }
 
     async function onInput(event: Event) {
-        if (type === 'location') {
-            await updateValue((event as CustomEvent<OptionalCoords>).detail);
-            return;
-        }
         let target = event.target as HTMLInputElement;
         let newValue: boolean | string | number = target.value;
         if (type === 'boolean') {
@@ -131,18 +122,6 @@
                         </option>
                     {/each}
                 </select>
-            {:else if inputType === 'location'}
-                <!-- value is always an array, but need a check to satisfy the type system -->
-                {#if Array.isArray(value)}
-                    <LocationSelector
-                        {value}
-                        on:change={onInput}
-                        height="25vh"
-                        mobileHeight="25vh"
-                    />
-                {:else}
-                    Something went wrong!
-                {/if}
             {:else if inputType === 'checkbox'}
                 <Switch checked={!!value} {onCheckedChange} />
                 {unit}

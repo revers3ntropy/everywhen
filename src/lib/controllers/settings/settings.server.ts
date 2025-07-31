@@ -22,16 +22,7 @@ namespace SettingsServer {
         expectedType: SettingConfig<string>['type'],
         value: unknown
     ): null | string {
-        if (expectedType === 'location') {
-            if (!Array.isArray(value) || value.length !== 2) {
-                return 'Invalid setting value, expected [number, number]';
-            }
-
-            if (typeof value[0] !== 'number' || typeof value[1] !== 'number') {
-                if (!(value[1] === null && value[0] === null))
-                    return 'Invalid setting value, expected [number, number]';
-            }
-        } else if (typeof expectedType === 'string' && typeof value !== expectedType) {
+        if (typeof expectedType === 'string' && typeof value !== expectedType) {
             return `Invalid setting value, expected ${expectedType} but got ${typeof value}`;
         }
         // enum type

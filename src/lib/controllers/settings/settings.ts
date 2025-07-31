@@ -1,8 +1,7 @@
-import type { OptionalCoords } from '../../../types';
 import { settingsConfig } from './settingsConfig';
 
-export type SettingValue = string | boolean | number | OptionalCoords;
-export type SettingTypeSpecifier = 'string' | 'boolean' | 'number' | 'location' | string[];
+export type SettingValue = string | boolean | number;
+export type SettingTypeSpecifier = 'string' | 'boolean' | 'number' | string[];
 export interface SettingConfig<T extends SettingValue> {
     type: SettingTypeSpecifier;
     name: string;
