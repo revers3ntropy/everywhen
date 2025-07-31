@@ -15,6 +15,7 @@ node_modules
 /*.log
 
 # Secrets
+/.env
 /secrets/**/*.pem
 /secrets/**/*.env
 /secrets/**/sshpass.txt
