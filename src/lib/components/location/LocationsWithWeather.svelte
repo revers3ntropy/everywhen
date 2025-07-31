@@ -3,7 +3,7 @@
     import MapMarker from 'svelte-material-icons/MapMarkerOutline.svelte';
     import { Location } from '$lib/controllers/location/location';
     import type { OpenWeatherMapAPI } from '$lib/controllers/openWeatherMapAPI/openWeatherMapAPI';
-    import { Day } from '$lib/utils/day';
+    import type { Day } from '$lib/utils/day';
     import { notify } from '$lib/components/notifications/notifications';
     import { api } from '$lib/utils/apiRequest';
     import WeatherWidget from '$lib/components/weather/WeatherWidget.svelte';
