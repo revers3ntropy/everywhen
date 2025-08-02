@@ -208,4 +208,27 @@ export class Day {
     public static fromI18nDate(d: DateValue) {
         return new Day(d.year, d.month, d.day);
     }
+
+    public fmt(format: string): string {
+        // subset of Moment.js format tokens
+        const replacements: { [key: string]: string } = {
+            YYYY: String(this.year),
+            YY: String(this.year).slice(-2),
+            MMMM: new Intl.DateTimeFormat('en-GB', { month: 'long' }).format(this.dateObj()),
+            MMM: new Intl.DateTimeFormat('en-GB', { month: 'short' }).format(this.dateObj()),
+            MM: String(this.month).padStart(2, '0'),
+            M: String(this.month),
+            DD: String(this.date).padStart(2, '0'),
+            Do: new Intl.DateTimeFormat('en-GB', { day: 'numeric' }).format(this.dateObj()),
+            D: String(this.date),
+            dddd: new Intl.DateTimeFormat('en-GB', { weekday: 'long' }).format(this.dateObj()),
+            ddd: new Intl.DateTimeFormat('en-GB', { weekday: 'short' }).format(this.dateObj()),
+            dd: new Intl.DateTimeFormat('en-GB', { weekday: 'narrow' }).format(this.dateObj())
+        };
+
+        return format.replace(
+            /YYYY|YY|MMMM|MMM|MM|M|DD|Do|D|dddd|ddd|dd|HH|H|hh|h|a|mm|m|ss|s|ZZ/g,
+            match => replacements[match]
+        );
+    }
 }

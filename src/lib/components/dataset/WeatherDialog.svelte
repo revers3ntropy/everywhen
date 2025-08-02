@@ -15,7 +15,7 @@
 
 <div>
     <div class="pb-2">
-        <p>{day.dateObj().toDateString()}</p>
+        <p>Weather on {day.fmt('ddd Do MMM, YYYY')}</p>
         <span class="text-textColorLight text-sm hide-mobile">
             (at lat {lat}, lon {lon})
         </span>
@@ -42,7 +42,7 @@
         <span class="text-textColorLight">Pressure:</span>
         {weather.pressureMean.toPrecision(4)} mb
     </p>
-    <p>
-        Source: <a href="https://openweathermap.org/">openweathermap.org/</a>
+    <p class="pt-4 text-sm">
+        Source: <a href="https://openweathermap.org/" target="_blank">openweathermap.org</a>
     </p>
 </div>

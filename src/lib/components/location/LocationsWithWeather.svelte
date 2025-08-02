@@ -42,26 +42,30 @@
 
 {#if touchingLocations.length}
     <span class="flex items-center max-w-full text-sm">
-        <span class="flex-center">
-            <MapMarker size="20" />
-        </span>
-
-        <span>
-            {#each touchingLocations as location, i}
-                <a href="/map/{location.id}" class="ellipsis pr-1" class:obfuscated>
-                    {location.name}
-                </a>
-                {#await getWeather(location)}
-                    ?
-                {:then weather}
-                    <Popover.Root>
-                        <Popover.Trigger><WeatherWidget {weather} /></Popover.Trigger>
-                        <Popover.Content>
-                            <WeatherDialog day={dayOfWeather} {weather} />
-                        </Popover.Content>
-                    </Popover.Root>
-                {/await}
-                {#if i < touchingLocations.length - 1},{/if}
+        <span class="flex gap-2 pl-1">
+            {#each touchingLocations as location}
+                <span class="bg-lightAccent pl-2 rounded-full flex items-center">
+                    <span class="flex-center">
+                        <MapMarker size="20" />
+                    </span>
+                    <a href="/map/{location.id}" class="ellipsis pl-1" class:obfuscated>
+                        {location.name}
+                    </a>
+                    {#await getWeather(location)}
+                        ?
+                    {:then weather}
+                        <Popover.Root>
+                            <Popover.Trigger
+                                class="hover:bg-backgroundColor rounded-full px-2 py-1"
+                            >
+                                <WeatherWidget {weather} />
+                            </Popover.Trigger>
+                            <Popover.Content>
+                                <WeatherDialog day={dayOfWeather} {weather} />
+                            </Popover.Content>
+                        </Popover.Root>
+                    {/await}
+                </span>
             {/each}
         </span>
     </span>
