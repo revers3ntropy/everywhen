@@ -1,22 +1,25 @@
 <script lang="ts">
-    import { buttonVariants } from '$lib/components/ui/button';
-    import { Entry } from '$lib/controllers/entry/entry';
-    import { tryEncryptText } from '$lib/utils/encryption.client';
+    import MapMarkerRadiusOutline from 'svelte-material-icons/MapMarkerRadiusOutline.svelte';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
     import Pencil from 'svelte-material-icons/Pencil.svelte';
     import Moon from 'svelte-material-icons/MoonWaningCrescent.svelte';
     import Lightbulb from 'svelte-material-icons/Lightbulb.svelte';
     import Brain from 'svelte-material-icons/Brain.svelte';
     import Plus from 'svelte-material-icons/Plus.svelte';
+    import { enabledLocation } from '$lib/stores';
     import { notify } from '$lib/components/notifications/notifications';
     import { api } from '$lib/utils/apiRequest';
     import { page } from '$app/stores';
+    import { Entry } from '$lib/controllers/entry/entry';
+    import { buttonVariants } from '$lib/components/ui/button';
+    import { tryEncryptText } from '$lib/utils/encryption.client';
     import { goto } from '$app/navigation';
     import { eventsSortKey, username } from '$lib/stores';
     import { currentTzOffset, nowUtc } from '$lib/utils/time';
     import { Event as EventController } from '$lib/controllers/event/event';
     import { cn } from '$lib/utils';
     import * as Popover from '$lib/components/ui/popover';
+    import { getLocation, nullLocation } from '$lib/utils/geolocation';
 
     const iconSize = 25;
 
@@ -94,6 +97,19 @@
         await gotoIfNotAt('/events');
     }
 
+    async function createLocation() {
+        const currentLocation = $enabledLocation ? await getLocation() : nullLocation();
+        const { id } = notify.onErr(
+            await api.post('/locations', {
+                latitude: currentLocation[0] ?? 0,
+                longitude: currentLocation[1] ?? 0,
+                radius: 0.1,
+                name: 'New Location'
+            })
+        );
+        await goto(`/map/${id}`);
+    }
+
     const buttonClass = 'flex justify-start items-center gap-2 p-2 hover:bg-vLightAccent w-full';
 </script>
 
@@ -145,6 +161,11 @@
         <button class="{buttonClass} new-event" on:click={makeEvent}>
             <Calendar size={iconSize} />
             New Event
+        </button>
+
+        <button class="{buttonClass} new-event" on:click={createLocation}>
+            <MapMarkerRadiusOutline size={iconSize} />
+            New Location
         </button>
     </Popover.Content>
 </Popover.Root>

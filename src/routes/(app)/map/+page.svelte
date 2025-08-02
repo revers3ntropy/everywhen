@@ -86,7 +86,7 @@
                         entries={showedEntries}
                         locations={data.locations}
                         defaultZoom={15}
-                        defaultCenter={{ lat: lat ?? 0, lon: lon ?? 0}}
+                        defaultCenter={{ lat: lat ?? 0, lon: lon ?? 0 }}
                     />
                 {/await}
             {:else}
