@@ -10,10 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - uses: oven-sh/setup-bun@v1
+      - uses: actions/setup-node@v4
         with:
-          bun-version: latest
+          node-version: 22
 
       - uses: mirromutth/mysql-action@v1.1
         with:
@@ -21,7 +20,7 @@ jobs:
           mysql root password: 'Pass'
 
       - name: Install dependencies
-        run: bun i && sudo apt update && sudo apt install mysql-server
+        run: npm i && sudo apt update && sudo apt install mysql-server
 
       - name: Set root password
         run: sudo mysql -h 127.0.0.1 -u root -pPass -e "ALTER USER 'root'@'%' IDENTIFIED BY ''"
@@ -30,10 +29,10 @@ jobs:
         run: sudo mysql -h 127.0.0.1 -u root halcyon_land_dev < ./db/schema.sql
 
       - name: Install Playwright browsers
-        run: bun x playwright install msedge && bun x playwright install chromium && bun x playwright install firefox
+        run: npx playwright install msedge && npx playwright install chromium && npx playwright install firefox
 
       - name: Install Playwright system dependencies
-        run: bun x playwright install-deps
+        run: npx playwright install-deps
 
       - name: Run Playwright tests
         run: scripts/test-e2e
