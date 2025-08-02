@@ -78,6 +78,17 @@
                         }
                     ]}
                 />
+            {:else if $enabledLocation}
+                {#await getLocation()}
+                    Loading...
+                {:then [lat, lon]}
+                    <Mapbox
+                        entries={showedEntries}
+                        locations={data.locations}
+                        defaultZoom={15}
+                        defaultCenter={{ lat: lat ?? 0, lon: lon ?? 0}}
+                    />
+                {/await}
             {:else}
                 <Mapbox entries={showedEntries} locations={data.locations} defaultZoom={0} />
             {/if}
