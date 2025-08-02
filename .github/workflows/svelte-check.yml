@@ -18,5 +18,8 @@ jobs:
       - name: Install dependencies
         run: bun i
 
+      - name: Create .env file
+        run: cp .env.example .env
+
       - name: Run svelte-check
         run: scripts/check --output machine
