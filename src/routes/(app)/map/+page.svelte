@@ -1,10 +1,15 @@
 <script lang="ts">
+    import { slide } from 'svelte/transition';
+    import { page } from '$app/stores';
     import DayRangeSelector from '$lib/components/ui/DayRangeSelector.svelte';
     import { Day } from '$lib/utils/day';
     import type { PageData } from './$types';
     import { enabledLocation, settingsStore } from '$lib/stores';
     import LocationDisabledBanner from './LocationDisabledBanner.svelte';
     import Mapbox from '$lib/components/map/Mapbox.svelte';
+    import LocationsMenu from './LocationsMenu.svelte';
+    import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
+    import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
 
     export let data: PageData;
 
@@ -21,6 +26,13 @@
         const entryDay = Day.fromTimestamp(entry.created, entry.createdTzOffset);
         return dateRange[0].lte(entryDay) && dateRange[1].gte(entryDay);
     });
+
+    $: focusedLocation =
+        $page.url.hash.length > 1
+            ? data.locations.find(l => l.id === $page.url.hash.slice(1)) ?? null
+            : null;
+
+    let locationsMenuOpen = true;
 </script>
 
 <svelte:head>
@@ -33,10 +45,48 @@
             <LocationDisabledBanner />
         {/if}
         <div class="fixed top-0 left-0 md:left-[192px] h-screen w-full">
-            <Mapbox entries={showedEntries} locations={data.locations} defaultZoom={0} />
+            {#if focusedLocation}
+                <Mapbox
+                    entries={showedEntries}
+                    locations={data.locations}
+                    defaultZoom={0}
+                    bounds={[
+                        {
+                            lat: focusedLocation.latitude + focusedLocation.radius * 1.2,
+                            lng: focusedLocation.longitude - focusedLocation.radius * 1.2
+                        },
+                        {
+                            lat: focusedLocation.latitude - focusedLocation.radius * 1.2,
+                            lng: focusedLocation.longitude + focusedLocation.radius * 1.2
+                        }
+                    ]}
+                />
+            {:else}
+                <Mapbox entries={showedEntries} locations={data.locations} defaultZoom={0} />
+            {/if}
 
-            <div class="fixed top-2 right-12" data-theme="light">
-                <DayRangeSelector bind:dateRange {earliestDate} />
+            <div class="fixed top-2 right-2" data-theme="light">
+                <div class="rounded-xl bg-backgroundColor" class:pb-4={locationsMenuOpen}>
+                    <div class="flex">
+                        <DayRangeSelector bind:dateRange {earliestDate} />
+                        <button
+                            on:click={() => (locationsMenuOpen = !locationsMenuOpen)}
+                            class="px-2"
+                        >
+                            {#if locationsMenuOpen}
+                                <ChevronUp />
+                            {:else}
+                                <ChevronDown />
+                            {/if}
+                        </button>
+                    </div>
+
+                    {#if locationsMenuOpen}
+                        <div transition:slide={{}}>
+                            <LocationsMenu locations={data.locations} />
+                        </div>
+                    {/if}
+                </div>
             </div>
         </div>
     </section>

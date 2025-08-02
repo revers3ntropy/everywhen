@@ -4,7 +4,7 @@
     import { Day } from '$lib/utils/day';
     import * as Popover from '$lib/components/ui/popover';
     import { Button } from '$lib/components/ui/button';
-    import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
+    import CalendarRange from 'svelte-material-icons/CalendarRange.svelte';
 
     export let earliestDate: Day;
     export let dateRange: [Day, Day];
@@ -47,7 +47,7 @@
                 class={cn('justify-start', !to && 'text-muted-foreground')}
                 builders={[builder]}
             >
-                <ChevronDown />
+                <CalendarRange size={22} />
             </Button>
         </Popover.Trigger>
         <Popover.Content
