@@ -19,7 +19,3 @@ export async function getLocation(): Promise<OptionalCoords> {
 export function nullLocation(): OptionalCoords {
     return [null, null];
 }
-
-export function isNullLocation(loc: OptionalCoords): loc is [number, number] {
-    return loc[0] === null || loc[1] === null;
-}

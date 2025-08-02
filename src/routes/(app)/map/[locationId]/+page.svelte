@@ -5,6 +5,8 @@
     import { listen } from '$lib/dataChangeEvents';
     import type { PageData } from './$types';
     import Mapbox from '$lib/components/map/Mapbox.svelte';
+    import { Button } from '$lib/components/ui/button';
+    import ChevronLeft from 'svelte-material-icons/ChevronLeft.svelte';
 
     export let data: PageData;
 
@@ -20,11 +22,22 @@
 </svelte:head>
 <main class="md:p-4 md:pl-4 flex-center">
     <div class="w-full md:max-w-5xl">
+        <div class="pb-4">
+            <a href="/map#{data.location.id}">
+                <Button variant="outline" class="border-border border-2 text-textColor pl-2">
+                    <ChevronLeft size={20} /> Back to Map
+                </Button>
+            </a>
+        </div>
+
         <section class="md:rounded-lg md:bg-vLightAccent px-2">
             <EditLocation {...data.location} />
         </section>
 
         <div class="h-[50vh] md:rounded-lg py-4">
+            <p class="italic text-light"
+                >Drag the handles to change the size and placement of the Location</p
+            >
             <Mapbox
                 locations={[data.location]}
                 bounds={[

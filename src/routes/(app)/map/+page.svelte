@@ -10,6 +10,10 @@
     import LocationsMenu from './LocationsMenu.svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
+    import { notify } from '$lib/components/notifications/notifications';
+    import { api } from '$lib/utils/apiRequest';
+    import { getLocation, nullLocation } from '$lib/utils/geolocation';
+    import { goto } from '$app/navigation';
 
     export let data: PageData;
 
@@ -33,6 +37,19 @@
             : null;
 
     let locationsMenuOpen = true;
+
+    async function createLocation() {
+        const currentLocation = $enabledLocation ? await getLocation() : nullLocation();
+        const { id } = notify.onErr(
+            await api.post('/locations', {
+                latitude: currentLocation[0] ?? 0,
+                longitude: currentLocation[1] ?? 0,
+                radius: 0.1,
+                name: 'New Location'
+            })
+        );
+        await goto(`/map/${id}`);
+    }
 </script>
 
 <svelte:head>
@@ -83,7 +100,7 @@
 
                     {#if locationsMenuOpen}
                         <div transition:slide={{}}>
-                            <LocationsMenu locations={data.locations} />
+                            <LocationsMenu locations={data.locations} {createLocation} />
                         </div>
                     {/if}
                 </div>

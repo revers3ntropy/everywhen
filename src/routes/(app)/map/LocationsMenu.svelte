@@ -1,8 +1,14 @@
 <script lang="ts">
     import CrosshairsGps from 'svelte-material-icons/CrosshairsGps.svelte';
+    import PencilOutline from 'svelte-material-icons/PencilOutline.svelte';
+    import Plus from 'svelte-material-icons/Plus.svelte';
+    import { Button } from '$lib/components/ui/button';
     import { Location } from '$lib/controllers/location/location';
 
     export let locations: Location[];
+    export let createLocation: () => Promise<void>;
+
+    let creatingLocationLoading = false;
 </script>
 
 <div class="py-2">
@@ -14,11 +20,33 @@
                 <CrosshairsGps size={20} />
             </a>
             <a
-                class="p-2 hover:bg-lightAccent w-full text-left block hover:no-underline"
+                class="p-2 hover:bg-lightAccent w-full flex items-center justify-between hover:no-underline"
                 href="/map/{location.id}"
             >
-                {location.name} ({Location.degreesToMeters(location.radius)}m)
+                <span>
+                    {location.name}
+                    <span class="text-light">({Location.degreesToMeters(location.radius)}m)</span>
+                </span>
+                <PencilOutline size={18} />
             </a>
         </div>
     {/each}
+    <div class="p-2">
+        {#if creatingLocationLoading}
+            Creating New Location...
+        {:else}
+            <Button
+                variant="outline"
+                class="w-full text-left flex items-center gap-2"
+                on:click={() => {
+                    creatingLocationLoading = true;
+                    // never actually finishes as we redirect to the location page
+                    createLocation().then(() => (creatingLocationLoading = false));
+                }}
+            >
+                New Location
+                <Plus />
+            </Button>
+        {/if}
+    </div>
 </div>
