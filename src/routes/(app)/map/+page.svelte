@@ -93,8 +93,8 @@
                 <Mapbox entries={showedEntries} locations={data.locations} defaultZoom={0} />
             {/if}
 
-            <div class="fixed top-2 right-2" data-theme="light">
-                <div class="rounded-xl bg-backgroundColor" class:pb-4={locationsMenuOpen}>
+            <div class="fixed top-2 right-2">
+                <div class="rounded-xl bg-backgroundColor border-border border">
                     <div class="flex">
                         <DayRangeSelector bind:dateRange {earliestDate} />
                         <button
