@@ -33,7 +33,13 @@
     {/each}
     <div class="p-2">
         {#if creatingLocationLoading}
-            Creating New Location...
+            <Button
+              disabled
+              variant="outline"
+              class="w-full text-left flex items-center gap-2"
+            >
+                Creating New Location...
+            </Button>
         {:else}
             <Button
                 variant="outline"
