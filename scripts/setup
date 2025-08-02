@@ -10,7 +10,7 @@ rm ./general.log
 rm ./testBackup.json
 
 export PLAYWRIGHT_SKIP_BROWSER_GC=1
-bun i
+npm i
 
 npx playwright install
 

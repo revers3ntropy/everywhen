@@ -1,4 +1,4 @@
 #!/bin/bash
 
-bun i -g vite
+npm i -g vite
 vite build -l warn --minify
