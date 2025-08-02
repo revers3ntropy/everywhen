@@ -52,7 +52,9 @@
                         {location.name}
                     </a>
                     {#await getWeather(location)}
-                        ?
+                        <span class="w-[72px] h-[32px] flex-center">
+                            ?
+                        </span>
                     {:then weather}
                         <Popover.Root>
                             <Popover.Trigger
