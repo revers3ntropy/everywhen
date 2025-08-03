@@ -32,6 +32,7 @@
     import type { FeedDay } from '$lib/controllers/feed/feed';
     import HappinessDatasetShortcut from '$lib/components/dataset/HappinessDatasetShortcut.svelte';
     import type { Dataset } from '$lib/controllers/dataset/dataset';
+    import type { OpenWeatherMapAPI } from '$lib/controllers/openWeatherMapAPI/openWeatherMapAPI';
 
     export let locations: Location[];
     export let labels: Record<string, Label>;
@@ -40,6 +41,7 @@
     export let showLabels = true;
     export let showForms = false;
     export let happinessDataset: Dataset | null = null;
+    export let getWeather: (location: Location) => Promise<OpenWeatherMapAPI.WeatherForDay | null>;
 
     function toggleCollapse() {
         $collapsed[day.day] = !$collapsed[day.day];
@@ -112,6 +114,7 @@
                             latitudes={entriesWithLocation.map(e => e.latitude)}
                             longitudes={entriesWithLocation.map(e => e.longitude)}
                             dayOfWeather={Day.fromString(day.day).unwrap()}
+                            {getWeather}
                         />
                     </span>
                 {/if}

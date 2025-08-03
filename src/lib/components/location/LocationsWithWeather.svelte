@@ -4,8 +4,6 @@
     import { Location } from '$lib/controllers/location/location';
     import type { OpenWeatherMapAPI } from '$lib/controllers/openWeatherMapAPI/openWeatherMapAPI';
     import type { Day } from '$lib/utils/day';
-    import { notify } from '$lib/components/notifications/notifications';
-    import { api } from '$lib/utils/apiRequest';
     import WeatherWidget from '$lib/components/weather/WeatherWidget.svelte';
     import WeatherDialog from '$lib/components/dataset/WeatherDialog.svelte';
     import * as Popover from '$lib/components/ui/popover';
@@ -15,6 +13,7 @@
     export let latitudes: number[];
     export let longitudes: number[];
     export let dayOfWeather: Day;
+    export let getWeather: (location: Location) => Promise<OpenWeatherMapAPI.WeatherForDay | null>;
 
     $: touchingLocations = uniqueByKey(
         latitudes
@@ -28,16 +27,6 @@
             .filter(Boolean),
         l => l.id
     );
-
-    async function getWeather(location: Location): Promise<OpenWeatherMapAPI.WeatherForDay> {
-        return notify.onErr(
-            await api.get('/datasets/weather', {
-                day: dayOfWeather.fmtIso(),
-                latitude: location.latitude,
-                longitude: location.longitude
-            })
-        );
-    }
 </script>
 
 {#if touchingLocations.length}
@@ -52,20 +41,22 @@
                         {location.name}
                     </a>
                     {#await getWeather(location)}
-                        <span class="w-[72px] h-[32px] flex-center">
-                            ?
-                        </span>
+                        <span class="w-[4.5rem] h-8 flex-center"> ? </span>
                     {:then weather}
-                        <Popover.Root>
-                            <Popover.Trigger
-                                class="hover:bg-backgroundColor rounded-full px-2 py-1"
-                            >
-                                <WeatherWidget {weather} />
-                            </Popover.Trigger>
-                            <Popover.Content>
-                                <WeatherDialog day={dayOfWeather} {weather} />
-                            </Popover.Content>
-                        </Popover.Root>
+                        {#if weather}
+                            <Popover.Root>
+                                <Popover.Trigger
+                                    class="hover:bg-backgroundColor rounded-full px-3 py-1"
+                                >
+                                    <WeatherWidget {weather} />
+                                </Popover.Trigger>
+                                <Popover.Content>
+                                    <WeatherDialog day={dayOfWeather} {weather} />
+                                </Popover.Content>
+                            </Popover.Root>
+                        {:else}
+                            <span class="h-[28px] w-4" />
+                        {/if}
                     {/await}
                 </span>
             {/each}

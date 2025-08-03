@@ -12,6 +12,7 @@
     import type { Dataset } from '$lib/controllers/dataset/dataset';
     import { fmtUtc } from '$lib/utils/time';
     import { onMount, onDestroy, tick } from 'svelte';
+    import type { OpenWeatherMapAPI } from '$lib/controllers/openWeatherMapAPI/openWeatherMapAPI';
 
     export let locations: Location[];
     export let labels: Record<string, Label>;
@@ -28,6 +29,26 @@
         const scrollHeightDiff = scrollContainer.scrollHeight - scrollHeight;
 
         scrollContainer.scrollTop += scrollHeightDiff;
+    }
+
+    async function getWeather(
+        day: string,
+        location: Location
+    ): Promise<OpenWeatherMapAPI.WeatherForDay | null> {
+        if (day === '2025-08-03') return null;
+        const cacheKey = `${day}#${location.id}`;
+        if (weatherCache.has(cacheKey)) return weatherCache.get(cacheKey)!;
+
+        const data = await api.get('/datasets/weather', {
+            day,
+            latitude: location.latitude,
+            longitude: location.longitude
+        });
+        if (data.ok) {
+            weatherCache.set(cacheKey, data.val);
+            return data.val;
+        }
+        return null;
     }
 
     async function loadMoreDays(atTop: boolean): Promise<void> {
@@ -141,6 +162,8 @@
         }
     });
 
+    const weatherCache: Map<string, OpenWeatherMapAPI.WeatherForDay> = new Map();
+
     let isLoadingAtTop = false;
     let scrollHeight = 0;
     let scrollContainer: HTMLElement;
@@ -171,6 +194,7 @@
                 {labels}
                 {showForms}
                 {happinessDataset}
+                getWeather={l => getWeather(day.day, l)}
             />
         {/each}
 
