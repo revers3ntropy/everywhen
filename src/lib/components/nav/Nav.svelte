@@ -3,7 +3,6 @@
     import SearchPage from '$lib/components/SearchPage.svelte';
     import * as Dialog from '$lib/components/ui/dialog';
     import AccountDropdown from '$lib/components/nav/AccountDropdown.svelte';
-    import CreateNewButton from '$lib/components/nav/CreateNewButton.svelte';
     import { Button, buttonVariants } from '$lib/components/ui/button';
     import type { Label } from '$lib/controllers/label/label';
     import type { Location } from '$lib/controllers/location/location';
@@ -44,17 +43,15 @@
             </div>
             <div class="pl-2 md:pl-0 md:pb-2 flex items-center justify-between gap-1 w-full">
                 <span>
-                    <CreateNewButton />
-                </span>
-                <span>
                     <Dialog.Root>
                         <Dialog.Trigger
                             aria-label="Search"
                             class={cn(
                                 buttonVariants({ variant: 'outline' }),
-                                'flex-center rounded-full px-2 py-5 aspect-square'
+                                'flex-center gap-2 rounded-full p-5'
                             )}
                         >
+                            Search
                             <Search size="20" />
                         </Dialog.Trigger>
                         <Dialog.Content>
