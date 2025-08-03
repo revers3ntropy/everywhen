@@ -10,6 +10,9 @@ import type { Auth } from '$lib/controllers/auth/auth.server';
 import { UId } from '$lib/controllers/uuid/uuid.server';
 import { z } from 'zod';
 import { MAPBOX_ACCESS_TOK } from '$env/static/private';
+import { FileLogger } from '$lib/utils/log.server';
+
+const locationLogger = new FileLogger('LOC');
 
 namespace LocationServer {
     type Location = _Location;
@@ -394,13 +397,25 @@ namespace LocationServer {
         const res = await fetch(
             `https://api.mapbox.com/search/geocode/v6/reverse?longitude=${lon}&latitude=${lat}&access_token=${MAPBOX_ACCESS_TOK}`
         );
-        if (!res.ok) return Result.err('failed to get response from Mapbox');
+        if (!res.ok) {
+            void locationLogger.log('failed to get response from Mapbox', {
+                res,
+                resText: await res.text(),
+                lat,
+                lon,
+                MAPBOX_ACCESS_TOK
+            });
+            return Result.err('failed to get response from Mapbox');
+        }
         const resTxt = await res.text();
         const resJson = Result.tryJsonParse(resTxt);
-        if (!resJson.ok) return Result.err('invalid data from Mapbox');
+        if (!resJson.ok) {
+            void locationLogger.log('failed to get response from Mapbox', { lat, lon, resTxt });
+            return Result.err('invalid data from Mapbox');
+        }
         const validateRes = API_RES_TYPE.safeParse(resJson);
         if (validateRes.error) {
-            console.error('invalid mapbox res', { validateRes, resJson, lat, lon });
+            void locationLogger.log('invalid mapbox res', { validateRes, resJson, lat, lon });
             return Result.err('invalid address from Mapbox');
         }
         const features = validateRes.data.val['features'];
