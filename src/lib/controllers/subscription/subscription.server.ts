@@ -1,10 +1,10 @@
 import type { Auth } from '$lib/controllers/auth/auth';
 import { query } from '$lib/db/mysql.server';
 import { invalidateCache } from '$lib/utils/cache.server';
-import { isProd } from '$lib/utils/env';
 import { Stripe } from 'stripe';
-import { STRIPE_SECRET_KEY, ROOT_URL } from '$env/static/private';
+import { ROOT_URL, STRIPE_SECRET_KEY } from '$env/static/private';
 import { type Pricing, SubscriptionType } from '$lib/controllers/subscription/subscription';
+import { isProd } from '$lib/utils/env';
 
 export {
     SubscriptionType,
@@ -13,12 +13,26 @@ export {
 
 // handlers for integration with Stripe Payments
 export namespace Subscription {
-    const stripe = STRIPE_SECRET_KEY ? new Stripe(STRIPE_SECRET_KEY) : null;
+    const stripe = new Stripe(STRIPE_SECRET_KEY);
 
     // as the pricing changes very rarely, cache as aggressively as possible
     let priceCache: Pricing[] | null = null;
 
+    export async function shouldGetPlusWithoutSubscription(userId: string) {
+        if (!isProd()) return false;
+        const [{ created }] = await query<{ created: number }[]>`
+            SELECT created
+            FROM users
+            WHERE id = ${userId}
+        `;
+        // TODO update when 1.0 is released
+        return created < 1754256651;
+    }
+
     export async function getCurrentSubscription(auth: Auth): Promise<SubscriptionType> {
+        if (await shouldGetPlusWithoutSubscription(auth.id)) {
+            return SubscriptionType.Plus;
+        }
         const subs = await query<{ subType: SubscriptionType }[]>`
             SELECT subType
             FROM subscriptions
@@ -30,9 +44,6 @@ export namespace Subscription {
     }
 
     export async function getPriceList(): Promise<Pricing[]> {
-        // for dev environment, don't want to have to give Stripe
-        // secret key for settings page and others to work
-        if (!stripe) return [];
         if (priceCache) return priceCache;
         const prices = await stripe.prices.list();
 
@@ -81,7 +92,6 @@ export namespace Subscription {
      * @returns {string} - Stripe customer Id
      */
     export async function ensureValidStripeCustomerId(userId: string): Promise<string> {
-        if (!stripe) throw 'Stripe not configured';
         const customerId = await stripeCustomerId(userId);
         if (customerId !== null) return customerId;
         const customer = await stripe.customers.create({
@@ -102,7 +112,6 @@ export namespace Subscription {
         userId: string,
         lookupKey: string
     ): Promise<string | null> {
-        if (!stripe) throw 'Stripe not configured';
         const prices = await stripe.prices.list({
             lookup_keys: [lookupKey],
             expand: ['data.product']
@@ -135,7 +144,6 @@ export namespace Subscription {
     export async function createPortalSessionUrlFromStripeCustomerId(
         stripeCustomerId: string
     ): Promise<string> {
-        if (!stripe) throw 'Stripe not configured';
         const portalSession = await stripe.billingPortal.sessions.create({
             customer: stripeCustomerId,
             return_url: `${ROOT_URL}/subscription/manage`
@@ -150,7 +158,6 @@ export namespace Subscription {
      * if none found in DB
      */
     export async function validateSubscriptions(userId: string, stripeCustomerId: string) {
-        if (!stripe) throw 'Stripe not configured';
         const subs = await query<{ stripeSubscriptionId: string; stripeCustomerId: string }[]>`
             SELECT stripeSubscriptionId, stripeCustomerId
             FROM subscriptions
@@ -238,27 +245,5 @@ export namespace Subscription {
             `;
             return;
         }
-    }
-
-    export async function upgradeAccountWithoutPayment(userId: string) {
-        if (isProd()) return;
-        await clearSubscriptionsWithoutChecking(userId);
-        await query`
-            INSERT INTO subscriptions
-                (userId, stripeCustomerId, stripeSubscriptionId, subType)
-            VALUES (
-                ${userId},
-                ${''},
-                ${''},
-                ${SubscriptionType.Plus}
-            )
-        `;
-    }
-
-    export async function clearSubscriptionsWithoutChecking(userId: string) {
-        await query<{ stripeSubscriptionId: string }[]>`
-            DELETE FROM subscriptions
-            WHERE userId = ${userId}
-        `;
     }
 }

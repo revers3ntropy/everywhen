@@ -6,8 +6,6 @@
 </script>
 
 <div>
-    <p class="text-xl">Usage</p>
-    <p class="text-light">Upgrade your plan to increase limits</p>
     <div>
         {#each Object.entries(usageData) as [key, [value, max]]}
             <div class="py-2">
