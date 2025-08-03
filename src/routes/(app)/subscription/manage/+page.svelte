@@ -4,8 +4,6 @@
     import { SubscriptionType } from '$lib/controllers/subscription/subscription';
 
     export let data;
-
-    console.log(data)
 </script>
 
 <main class="md:p-4 md:pl-4 flex-center">
