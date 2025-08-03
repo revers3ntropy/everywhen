@@ -13,6 +13,7 @@ export {
 
 // handlers for integration with Stripe Payments
 export namespace Subscription {
+    if (!STRIPE_SECRET_KEY) throw 'Stripe API Secret Key not configured';
     const stripe = new Stripe(STRIPE_SECRET_KEY);
 
     // as the pricing changes very rarely, cache as aggressively as possible
