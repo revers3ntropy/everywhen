@@ -29,14 +29,16 @@ export class FileLogger extends Logger {
     public override async warn(msg: string, context?: Record<string, unknown>): Promise<void> {
         super.warn(msg, context);
         await write(
-            removeAnsi(this.fmt(true, LogLevel.WARN, msg + this.fmtContext(context))) + '\n'
+            removeAnsi(this.fmt(true, LogLevel.WARN, msg + this.fmtContext(context, false))) + '\n'
         );
     }
 
     public override async error(msg: string, context?: Record<string, unknown>): Promise<void> {
         super.error(msg, context);
         await write(
-            removeAnsi(this.fmt(true, LogLevel.ERROR, msg + this.fmtContext(context), false)) + '\n'
+            removeAnsi(
+                this.fmt(true, LogLevel.ERROR, msg + this.fmtContext(context, false), false)
+            ) + '\n'
         );
     }
 }

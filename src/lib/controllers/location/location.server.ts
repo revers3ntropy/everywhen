@@ -398,7 +398,7 @@ namespace LocationServer {
             `https://api.mapbox.com/search/geocode/v6/reverse?longitude=${lon}&latitude=${lat}&access_token=${MAPBOX_ACCESS_TOK}`
         );
         if (!res.ok) {
-            void locationLogger.log('failed to get response from Mapbox', {
+            void locationLogger.error('failed to get response from Mapbox', {
                 res,
                 resText: await res.text(),
                 lat,
@@ -410,12 +410,12 @@ namespace LocationServer {
         const resTxt = await res.text();
         const resJson = Result.tryJsonParse(resTxt);
         if (!resJson.ok) {
-            void locationLogger.log('failed to get response from Mapbox', { lat, lon, resTxt });
+            void locationLogger.error('failed to get response from Mapbox', { lat, lon, resTxt });
             return Result.err('invalid data from Mapbox');
         }
         const validateRes = API_RES_TYPE.safeParse(resJson);
         if (validateRes.error) {
-            void locationLogger.log('invalid mapbox res', { validateRes, resJson, lat, lon });
+            void locationLogger.error('invalid mapbox res', { validateRes, resJson, lat, lon });
             return Result.err('invalid address from Mapbox');
         }
         const features = validateRes.data.val['features'];
