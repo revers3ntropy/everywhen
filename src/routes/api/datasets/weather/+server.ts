@@ -12,7 +12,7 @@ export const GET = cachedApiRoute(async (_auth, { url }) => {
     if (isNaN(lat)) error(400, 'invalid latitude');
     const lon = parseFloat(url.searchParams.get('longitude') ?? '');
     if (isNaN(lon)) error(400, 'invalid longitude');
-    console.log({ lat, lon, day: day.val });
+
     return (await OpenWeatherMapAPI.getWeatherForDay(day.val, lat, lon)).unwrap(e => error(400, e));
 }) satisfies RequestHandler;
 

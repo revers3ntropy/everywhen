@@ -77,7 +77,12 @@ export namespace OpenWeatherMapAPIServer {
         lat: number,
         lon: number
     ): Promise<Result<WeatherForDay>> {
-        const cacheKey = `${day.fmtIso()}-${lat}-${lon}`;
+        const [lowResLat, lowResLon] = _OpenWeatherMapAPI.decreaseResolutionOfCoordsForWeather(
+            lat,
+            lon
+        );
+
+        const cacheKey = `${day.fmtIso()}-${lowResLat}-${lowResLon}`;
         if (cache.has(cacheKey)) {
             return Result.ok(cache.get(cacheKey));
         }
@@ -105,10 +110,6 @@ export namespace OpenWeatherMapAPIServer {
             return Result.err('Cannot fetch weather data');
         }
 
-        const [lowResLat, lowResLon] = _OpenWeatherMapAPI.decreaseResolutionOfCoordsForWeather(
-            lat,
-            lon
-        );
         // TODO: deal with timezones here
         const apiUrl = `https://history.openweathermap.org/data/2.5/history/city?lat=${lowResLat}&lon=${lowResLon}&start=${day.utcTimestampMiddleOfDay(0)}&cnt=24&appid=${OPEN_WEATHER_MAP_API_KEY}`;
         let res;
@@ -121,7 +122,9 @@ export namespace OpenWeatherMapAPIServer {
                 error,
                 day,
                 lat,
-                lon
+                lowResLat,
+                lon,
+                lowResLon
             });
             return Result.err('Error connecting to OpenWeatherMap');
         }
@@ -151,7 +154,7 @@ export namespace OpenWeatherMapAPIServer {
             return Result.err('Invalid response from OpenWeatherMap');
         }
 
-        const weather = cleanWeatherData(parseResult.data, lat, lon);
+        const weather = cleanWeatherData(parseResult.data, lowResLat, lowResLon);
         if (!weather.ok) {
             await logger.error('getWeatherForDay: Invalid weather data', { data });
             return Result.err('Invalid weather data');

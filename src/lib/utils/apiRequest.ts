@@ -60,6 +60,7 @@ export interface ApiRoutes {
     '/oauth/gh': typeof import('../../routes/api/oauth/gh/+server');
     '/events/?': typeof import('../../routes/api/events/[eventId]/+server');
     '/locations/?': typeof import('../../routes/api/locations/[locationId]/+server');
+    '/locations/reverse-geocode': typeof import('../../routes/api/locations/reverse-geocode/+server');
     '/feed/?': typeof import('../../routes/api/feed/[day]/+server');
     '/search': typeof import('../../routes/api/search/+server');
     '/export': typeof import('../../routes/api/export/html/+server');

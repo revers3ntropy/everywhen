@@ -1,8 +1,30 @@
+<script context="module" lang="ts">
+    import type { AddressLookupResults } from '$lib/controllers/location/location';
+    import { api } from '$lib/utils/apiRequest';
+    import type { Degrees } from '../../../types';
+
+    const addressLookupCache: Map<string, AddressLookupResults | null> = new Map();
+
+    async function lookupAddress(lat: Degrees, lon: Degrees): Promise<AddressLookupResults | null> {
+        const key = `${lat}#${lon}`;
+        if (addressLookupCache.has(key)) return addressLookupCache.get(key)!;
+
+        const res = await api.get('/locations/reverse-geocode', { lat, lon });
+        if (!res.ok) {
+            addressLookupCache.set(key, null);
+            return null;
+        }
+        addressLookupCache.set(key, res.val);
+        return res.val;
+    }
+</script>
+
 <script lang="ts">
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
     import MapMarker from 'svelte-material-icons/MapMarkerOutline.svelte';
     import { Location } from '$lib/controllers/location/location';
+    import { browser } from '$app/environment';
 
     export let obfuscated = false;
     export let locations: Location[];
@@ -14,6 +36,11 @@
         latitude,
         longitude
     });
+
+    $: lookedupAddress =
+        near.length > 0 || touching.length > 0 || !browser
+            ? null
+            : lookupAddress(latitude, longitude);
 </script>
 
 <span class="flex items-center max-w-full text-sm">
@@ -38,5 +65,16 @@
                 {near[0].name}
             </a>
         </span>
+    {:else if lookedupAddress}
+        {#await lookedupAddress}
+            ?
+        {:then addr}
+            {#if addr}
+                <span class="text-light italic">
+                    {addr.place},
+                    {addr.country}
+                </span>
+            {/if}
+        {/await}
     {/if}
 </span>

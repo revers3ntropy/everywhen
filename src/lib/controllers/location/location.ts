@@ -1,4 +1,5 @@
 import type { Degrees, Meters, TimestampSecs } from '../../../types';
+import { roundToDecimalPlaces } from '$lib/utils/text';
 
 export interface Location {
     id: string;
@@ -9,7 +10,29 @@ export interface Location {
     radius: Degrees;
 }
 
+export interface AddressLookupResults {
+    number: string | null;
+    street: string | null;
+    postcode: string | null;
+    place: string | null;
+    region: string | null;
+    country: string | null;
+}
+
 export namespace Location {
+    /**
+     * @param lat
+     * @param lon
+     * @param decimalPlaces the lower the less precise the location will be
+     */
+    export function decreaseResolutionOfCoords(
+        lat: number,
+        lon: number,
+        decimalPlaces = 3
+    ): [number, number] {
+        return [roundToDecimalPlaces(lat, decimalPlaces), roundToDecimalPlaces(lon, decimalPlaces)];
+    }
+
     export function metersToDegrees(m: Meters): Degrees {
         return m / 111_111;
     }

@@ -5,9 +5,11 @@ import type { ResultSetHeader } from 'mysql2';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
 import type { Degrees } from '../../../types';
-import { Location as _Location } from './location';
+import { type AddressLookupResults, Location as _Location } from './location';
 import type { Auth } from '$lib/controllers/auth/auth.server';
 import { UId } from '$lib/controllers/uuid/uuid.server';
+import { z } from 'zod';
+import { MAPBOX_ACCESS_TOK } from '$env/static/private';
 
 namespace LocationServer {
     type Location = _Location;
@@ -330,6 +332,118 @@ namespace LocationServer {
                 _Location.degreesToMeters(radius)
             )
         );
+    }
+
+    const API_RES_TYPE = z.object({
+        val: z.object({
+            features: z.array(
+                z.object({
+                    properties: z.object({
+                        feature_type: z.string(),
+                        context: z.object({
+                            address: z
+                                .object({
+                                    address_number: z.string()
+                                })
+                                .optional(),
+                            street: z
+                                .object({
+                                    name: z.string()
+                                })
+                                .optional(),
+                            postcode: z
+                                .object({
+                                    name: z.string()
+                                })
+                                .optional(),
+                            place: z
+                                .object({
+                                    name: z.string()
+                                })
+                                .optional(),
+                            region: z
+                                .object({
+                                    name: z.string()
+                                })
+                                .optional(),
+                            country: z
+                                .object({
+                                    name: z.string(),
+                                    country_code: z.string()
+                                })
+                                .optional()
+                        })
+                    })
+                })
+            )
+        })
+    });
+
+    const addrLookupCache = new Map<string, AddressLookupResults>();
+
+    export async function addressLookupFromCoords(
+        lat: Degrees,
+        lon: Degrees
+    ): Promise<Result<AddressLookupResults>> {
+        const cacheKey = `${lat}#${lon}`;
+        if (addrLookupCache.has(cacheKey)) return Result.ok(addrLookupCache.get(cacheKey)!);
+
+        if (!MAPBOX_ACCESS_TOK) return Result.err('no Mapbox access token found');
+
+        // https://docs.mapbox.com/api/search/geocoding/#example-request-reverse-geocoding
+        const res = await fetch(
+            `https://api.mapbox.com/search/geocode/v6/reverse?longitude=${lon}&latitude=${lat}&access_token=${MAPBOX_ACCESS_TOK}`
+        );
+        if (!res.ok) return Result.err('failed to get response from Mapbox');
+        const resTxt = await res.text();
+        const resJson = Result.tryJsonParse(resTxt);
+        if (!resJson.ok) return Result.err('invalid data from Mapbox');
+        const validateRes = API_RES_TYPE.safeParse(resJson);
+        if (validateRes.error) {
+            console.error('invalid mapbox res', { validateRes, resJson, lat, lon });
+            return Result.err('invalid address from Mapbox');
+        }
+        const features = validateRes.data.val['features'];
+
+        let number = null;
+        let street = null;
+        let postcode = null;
+        let place = null;
+        let region = null;
+        let country = null;
+
+        for (const feature of features) {
+            const details = feature['properties']['context'];
+            if (details['address'] && !number) {
+                number = details['address']['address_number'];
+            }
+            if (details['street'] && !street) {
+                street = details['street']['name'];
+            }
+            if (details['postcode'] && !postcode) {
+                postcode = details['postcode']['name'];
+            }
+            if (details['place'] && !place) {
+                place = details['place']['name'];
+            }
+            if (details['region'] && !region) {
+                region = details['region']['name'];
+            }
+            if (details['country'] && !country) {
+                country = details['country']['name'];
+            }
+        }
+
+        const address = {
+            number,
+            street,
+            postcode,
+            place,
+            region,
+            country
+        } satisfies AddressLookupResults;
+        addrLookupCache.set(cacheKey, address);
+        return Result.ok(address);
     }
 }
 

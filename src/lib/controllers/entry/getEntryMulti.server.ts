@@ -297,7 +297,6 @@ export async function search(auth: Auth, queryString: string): Promise<Result<En
     const queryStringParts = [...new Set(wordsFromText(queryString).map(normaliseWordForIndex))];
     if (queryStringParts.length === 0) return Result.ok([]);
     const encryptedWords = queryStringParts.map(word => encrypt(word, auth.key));
-    console.log(encryptedWords);
     const entries = await query<
         {
             id: string;

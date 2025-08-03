@@ -11,6 +11,7 @@
     import type { Mutable } from '../../../types';
     import Spinner from '../ui/BookSpinner.svelte';
     import DayInFeed from '$lib/components/feed/DayInFeed.svelte';
+    import type { OpenWeatherMapAPI } from '$lib/controllers/openWeatherMapAPI/openWeatherMapAPI';
 
     interface IOptions extends EntryFilter {
         readonly count?: number;
@@ -23,6 +24,26 @@
     export let showForms = false;
     export let numberOfEntries = Infinity;
     export let options: IOptions = {};
+
+    async function getWeather(
+        day: string,
+        location: Location
+    ): Promise<OpenWeatherMapAPI.WeatherForDay | null> {
+        if (day === '2025-08-03') return null;
+        const cacheKey = `${day}#${location.id}`;
+        if (weatherCache.has(cacheKey)) return weatherCache.get(cacheKey)!;
+
+        const data = await api.get('/datasets/weather', {
+            day,
+            latitude: location.latitude,
+            longitude: location.longitude
+        });
+        if (data.ok) {
+            weatherCache.set(cacheKey, data.val);
+            return data.val;
+        }
+        return null;
+    }
 
     function getEntriesOptions(): IOptions {
         const entriesOptions = {
@@ -98,6 +119,8 @@
         };
     }
 
+    const weatherCache: Map<string, OpenWeatherMapAPI.WeatherForDay> = new Map();
+
     const batchSize = 10;
     let pageEndInView = false;
     let entries = emptyEntries();
@@ -128,6 +151,7 @@
                 {locations}
                 {showForms}
                 {labels}
+                getWeather={l => getWeather(day, l)}
             />
         {/each}
         <div

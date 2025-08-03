@@ -1,4 +1,4 @@
-import { roundToDecimalPlaces } from '$lib/utils/text';
+import { Location } from '$lib/controllers/location/location';
 
 export namespace OpenWeatherMapAPI {
     export type WeatherForDay = {
@@ -24,6 +24,6 @@ export namespace OpenWeatherMapAPI {
     ): [number, number] {
         // makes caching more efficient and doesn't really effect UX,
         // as weather changes only over a larger area
-        return [roundToDecimalPlaces(lat, 1), roundToDecimalPlaces(lon, 1)];
+        return Location.decreaseResolutionOfCoords(lat, lon, 1);
     }
 }

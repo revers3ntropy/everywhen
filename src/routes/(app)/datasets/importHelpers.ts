@@ -105,7 +105,6 @@ export async function importFromSleepCycle(
         const timestamp = new Date(startTs).getTime() / 1000;
         if (isNaN(timestamp)) continue;
 
-        console.log([duration, sleepQuality, regularity, timeAsleep, asleepAfter]);
         rows.push({
             elements: [duration, sleepQuality, regularity, timeAsleep, asleepAfter],
             created: nowUtc(),
