@@ -47,18 +47,10 @@
     function keydown(e: KeyboardEvent) {
         lastActivity = nowUtc();
 
-        if (e.key === 'Pause') {
+        if (e.key === 'Pause' || e.key === 'Escape') {
             obfuscated.set(!$obfuscated);
             e.preventDefault();
             return;
-        }
-
-        if (e.ctrlKey || e.metaKey) {
-            if (e.key === 'Escape') {
-                obfuscated.set(!$obfuscated);
-                e.preventDefault();
-                return;
-            }
         }
     }
 
