@@ -5,6 +5,7 @@
     import { Result } from '$lib/utils/result';
     import type { ChangeEventHandler } from 'svelte/elements';
     import { importSleepFromFitbit, makeFromPreset } from './importHelpers';
+    import { CSLogger } from '$lib/controllers/logs/logger.client';
 
     export let datasets: Dataset[];
     export let usedPresetIds: string[];
@@ -31,6 +32,11 @@
         } else {
             sleepDatasetId = datasets.find(({ preset }) => preset?.id === 'sleep')?.id || '';
             if (!sleepDatasetId) {
+                void CSLogger.error('no Sleep dataset found', {
+                    usedPresetIds,
+                    sleepDatasetId,
+                    datasets
+                });
                 notify.error('Could not find Sleep dataset, try refreshing the page');
                 return;
             }

@@ -2,7 +2,6 @@ import { browser } from '$app/environment';
 import { writable } from 'svelte/store';
 import type { Result } from '$lib/utils/result';
 import type { Milliseconds, TimestampMilliseconds } from '../../../types';
-import { CSLogger } from '$lib/controllers/logs/logger.client';
 
 export enum NotificationType {
     ERROR = 'error',
@@ -60,9 +59,6 @@ notify.info = (text: string | string[], timeout: Milliseconds = 4000) =>
 notify.success = (text: string | string[], timeout: Milliseconds = 2000) =>
     notify(text, NotificationType.SUCCESS, timeout);
 notify.error = (text: string | string[], timeout: Milliseconds = 5000) => {
-    if (text.length) {
-        void CSLogger.error('error notification', { text, timeout });
-    }
     notify(text, NotificationType.ERROR, timeout);
 };
 notify.onErr = <T, E>(

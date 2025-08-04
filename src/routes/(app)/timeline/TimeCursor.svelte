@@ -12,6 +12,7 @@
     import { notify } from '$lib/components/notifications/notifications';
     import type { Pixels, TimestampSecs } from '../../../types';
     import { makeStandardContextMenu } from './standardContextMenu';
+    import { CSLogger } from "$lib/controllers/logs/logger.client";
 
     export let labels: Record<string, Label>;
 
@@ -138,8 +139,12 @@
 <Dialog.Root
     open={!!eventInDialog}
     onOpenChange={open => {
-        if (!open) eventInDialog = null;
-        else notify.error('Something went wrong');
+        if (!open) {
+            eventInDialog = null;
+        } else {
+            void CSLogger.error('open', { open, eventInDialog });
+            notify.error('Something went wrong');
+        }
     }}
 >
     <Dialog.Content>

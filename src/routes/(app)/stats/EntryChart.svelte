@@ -19,6 +19,7 @@
     import Select from '$lib/components/ui/Select.svelte';
     import { cssVarValue } from '$lib/utils/getCssVar';
     import { theme } from '$lib/stores';
+    import { CSLogger } from '$lib/controllers/logs/logger.client';
 
     Chart.register(
         Title,
@@ -97,6 +98,7 @@
             selectGroupingOptions[newGrouping as keyof typeof selectGroupingOptions]
         );
         if (!grouping) {
+            void CSLogger.error('invalid grouping', { grouping, newGrouping });
             notify.error('Invalid grouping');
             return;
         }
