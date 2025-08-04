@@ -267,7 +267,7 @@ CREATE TABLE logs
     context    longtext     DEFAULT NULL,
     PRIMARY KEY (`id`),
     INDEX `idx_logs_userId` (`userId`),
-    INDEX `idx_logs_created` (`created`),
+    INDEX `idx_logs_created` (`created`)
 )
     ENGINE = InnoDB
     DEFAULT CHARSET = utf8mb4
