@@ -11,7 +11,7 @@
         key,
         type Listener
     } from './canvasState';
-    import { CSLogger } from "$lib/controllers/logs/logger.client";
+    import { CSLogger } from '$lib/controllers/logs/logger.client';
 
     export let killLoopOnError = true;
     export let attributes: CanvasRenderingContext2DSettings = {};

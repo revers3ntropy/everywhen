@@ -7,7 +7,7 @@
     import TimerSand from 'svelte-material-icons/TimerSand.svelte';
     import type { Streaks } from '../controllers/entry/entry';
     import { api } from '../utils/apiRequest';
-    import { CSLogger } from "$lib/controllers/logs/logger.client";
+    import { CSLogger } from '$lib/controllers/logs/logger.client';
 
     export let condensed = false;
 

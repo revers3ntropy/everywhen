@@ -13,7 +13,7 @@
     import { fmtUtc } from '$lib/utils/time';
     import { onMount, onDestroy, tick } from 'svelte';
     import type { OpenWeatherMapAPI } from '$lib/controllers/openWeatherMapAPI/openWeatherMapAPI';
-    import { CSLogger } from "$lib/controllers/logs/logger.client";
+    import { CSLogger } from '$lib/controllers/logs/logger.client';
 
     export let locations: Location[];
     export let labels: Record<string, Label>;
@@ -63,12 +63,12 @@
             ? Day.fromString(day.nextDayInFuture).unwrap()
             : null;
         if (nextDayInFuture && !nextDayInFuture.gt(dayDay)) {
-            void CSLogger.error('next day is not in future', { nextDayInFuture, dayDay, day});
+            void CSLogger.error('next day is not in future', { nextDayInFuture, dayDay, day });
             throw new Error('next day is not in future');
         }
         const nextDayInPast = day.nextDayInPast ? Day.fromString(day.nextDayInPast).unwrap() : null;
         if (nextDayInPast && !nextDayInPast.lt(dayDay)) {
-            void CSLogger.error('next day is not in past', { nextDayInPast, dayDay, day});
+            void CSLogger.error('next day is not in past', { nextDayInPast, dayDay, day });
             throw new Error('next day is not in past');
         }
         if (atTop) {

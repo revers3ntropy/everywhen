@@ -18,7 +18,7 @@
     import { currentTzOffset, nowUtc } from '$lib/utils/time';
     import { paste } from './paste';
     import { decrypt, encrypt } from '$lib/utils/encryption';
-    import { CSLogger } from "$lib/controllers/logs/logger.client";
+    import { CSLogger } from '$lib/controllers/logs/logger.client';
 
     // as this form is used in entry editing and creating
     export let action: 'create' | 'edit' = 'create';
