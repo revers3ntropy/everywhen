@@ -6,8 +6,6 @@ rm -r ./playwright-report
 rm -r ./test-results
 rm -r ./build
 rm ./package-lock.json
-rm ./general.log
-rm ./testBackup.json
 
 export PLAYWRIGHT_SKIP_BROWSER_GC=1
 npm i
