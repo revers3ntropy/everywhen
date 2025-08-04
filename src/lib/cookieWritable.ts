@@ -1,7 +1,7 @@
 import { browser } from '$app/environment';
-import { clientLogger } from '$lib/utils/log';
 import { type Writable, writable } from 'svelte/store';
 import Cookie from 'js-cookie';
+import { CSLogger } from '$lib/controllers/logs/logger.client';
 
 export interface CookieWritableOptions {
     cookieOptions?: Cookies.CookieAttributes;
@@ -33,7 +33,7 @@ export function cookieWritable<T>(
             try {
                 initialValue = JSON.parse(lsVal) as T;
             } catch (error) {
-                clientLogger.error('Error parsing cookie value', { error, lsVal, cookieKey });
+                void CSLogger.error('Error parsing cookie value', { error, lsVal, cookieKey });
             }
         }
 

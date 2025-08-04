@@ -1,36 +1,18 @@
 import { PUBLIC_INIT_VECTOR } from '$env/static/public';
-import chalk from 'chalk';
 import crypto from 'crypto-js';
-import { Logger } from './log';
 import { Result } from './result';
 
 const wordArrayIv = crypto.enc.Utf8.parse(PUBLIC_INIT_VECTOR);
 
-export const encryptionLogger = new Logger('ENC', chalk.blue);
-
 export function encrypt(plaintext: string, key: string | null, emptyOnNoKey = false): string {
     if (!key) {
         if (emptyOnNoKey) return '';
-        encryptionLogger.error('no key provided for encryption', {
-            plaintext: { type: typeof plaintext, length: plaintext?.length },
-            key,
-            emptyOnNoKey
-        });
         throw new Error('No key');
     }
-    try {
-        const encrypted = crypto.AES.encrypt(plaintext, crypto.enc.Utf8.parse(key), {
-            iv: wordArrayIv
-        });
-        return crypto.enc.Hex.stringify(encrypted.ciphertext);
-    } catch (error) {
-        encryptionLogger.trace('failed to encrypt data', {
-            plaintext,
-            keyLen: key.length,
-            error
-        });
-        throw error;
-    }
+    const encrypted = crypto.AES.encrypt(plaintext, crypto.enc.Utf8.parse(key), {
+        iv: wordArrayIv
+    });
+    return crypto.enc.Hex.stringify(encrypted.ciphertext);
 }
 
 export function decrypt(ciphertext: string, key: string | null): Result<string> {

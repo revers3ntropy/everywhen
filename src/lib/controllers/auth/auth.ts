@@ -9,13 +9,11 @@ import {
 import { UsageLimits } from '$lib/controllers/usageLimits/usageLimits';
 import { currentlyUploadingAssets, populateCookieWritablesWithCookies } from '$lib/stores';
 import { decrypt } from '$lib/utils/encryption';
-import { Logger } from '$lib/utils/log';
 import Cookie from 'js-cookie';
 import { api } from '$lib/utils/apiRequest';
 import { goto } from '$app/navigation';
 import { sha256 } from 'js-sha256';
-
-const logger = new Logger('AuthC');
+import { CSLogger } from '$lib/controllers/logs/logger.client';
 
 export interface Auth {
     id: string;
@@ -79,7 +77,7 @@ export namespace Auth {
     export function decryptOrLogOut(ciphertext: string, key: string | null): string {
         const decryptRes = decrypt(ciphertext, key);
         if (!decryptRes.ok) {
-            logger.error('Could not decrypt', { decryptRes });
+            void CSLogger.error('could not decrypt', { decryptRes });
             void logOut();
             notify.error('Something went wrong. Please log in again.');
             throw new Error('Could not decrypt');

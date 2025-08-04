@@ -1,11 +1,11 @@
 import { browser } from '$app/environment';
 import { theme } from '$lib/stores';
 import { writable } from 'svelte/store';
-import { clientLogger } from '$lib/utils/log';
 import { nowUtc } from '$lib/utils/time';
 import type { Interactable } from './interactable';
 import { cssVarValue } from '$lib/utils/getCssVar';
 import type { CursorStyle, Pixels, TimestampSecs } from '../../../types';
+import { CSLogger } from '$lib/controllers/logs/logger.client';
 
 export const START_ZOOM = 1 / (60 * 60);
 
@@ -583,7 +583,7 @@ export class CanvasState implements CanvasListeners {
 
     public asRenderProps(): RenderProps {
         if (!this.ctx) {
-            clientLogger.error('Canvas not set');
+            void CSLogger.error('canvas not set', {});
             throw new Error('Canvas not set');
         }
         return this as unknown as RenderProps;

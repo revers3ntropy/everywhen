@@ -1,6 +1,5 @@
 import { query } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/utils/encryption';
-import { FileLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 import { nowUtc } from '$lib/utils/time';
 import {
@@ -11,8 +10,9 @@ import {
 } from './settings';
 import { UId } from '$lib/controllers/uuid/uuid.server';
 import type { Auth } from '$lib/controllers/auth/auth';
+import { SSLogger } from '$lib/controllers/logs/logs.server';
 
-const logger = new FileLogger('Stngs');
+const logger = new SSLogger('Settings');
 
 namespace SettingsServer {
     const Settings = _Settings;

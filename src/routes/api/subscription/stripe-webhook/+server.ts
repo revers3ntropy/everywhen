@@ -2,9 +2,9 @@ import { z } from 'zod';
 import { error, type RequestHandler } from '@sveltejs/kit';
 import { Subscription } from '$lib/controllers/subscription/subscription.server';
 import { api404Handler } from '$lib/utils/apiResponse.server';
-import { FileLogger } from '$lib/utils/log.server';
+import { SSLogger } from '$lib/controllers/logs/logs.server';
 
-const stripeWebhooksLogger = new FileLogger('StripeWebHooks');
+const stripeWebhooksLogger = new SSLogger('StripeWebHooks');
 
 // This endpoint accepts webhook requests from Stripe API
 // see https://docs.stripe.com/webhooks?locale=en-GB

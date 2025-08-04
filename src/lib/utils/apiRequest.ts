@@ -3,14 +3,12 @@ import { notify } from '$lib/components/notifications/notifications';
 import { Auth } from '$lib/controllers/auth/auth';
 import { encryptionKey } from '$lib/stores';
 import { encrypt } from '$lib/utils/encryption';
-import { Logger } from '$lib/utils/log';
 import { get } from 'svelte/store';
 import type { api404Handler, GenericResponse } from './apiResponse.server';
 import { serializeGETArgs } from './GETArgs';
 import { Result } from './result';
 import { currentTzOffset, nowUtc } from './time';
-
-const logger = new Logger('ApiRq');
+import { CSLogger } from '$lib/controllers/logs/logger.client';
 
 export interface ReqBody {
     timezoneUtcOffset?: number;
@@ -70,6 +68,7 @@ export interface ApiRoutes {
     '/subscription/pricing': typeof import('../../routes/api/subscription/pricing/+server');
     '/subscription/create-portal-session': typeof import('../../routes/api/subscription/create-portal-session/+server');
     '/subscription/create-checkout-session': typeof import('../../routes/api/subscription/create-checkout-session/+server');
+    '/log': typeof import('../../routes/api/log/+server');
 }
 
 export async function makeApiReq<
@@ -108,7 +107,7 @@ export async function makeApiReq<
     if (body) {
         if (!options.doNotEncryptBody) {
             if (!latestEncryptionKey) {
-                logger.error('no encryption key found', { latestEncryptionKey });
+                void CSLogger.error('no encryption key found', { latestEncryptionKey });
                 notify.error('Failed to make API call');
                 throw new Error();
             }
@@ -144,7 +143,7 @@ async function handleOkResponse<T>(
     try {
         textResult = await response.text();
     } catch (e) {
-        logger.error(`Error getting text from fetch`, { response, method, url });
+        void CSLogger.error(`Error getting text from fetch`, { response, method, url });
         return Result.err('Invalid response from server');
     }
 
@@ -153,7 +152,7 @@ async function handleOkResponse<T>(
         jsonRes = JSON.parse(textResult);
     } catch (e) {
         if (options.doNotTryToDecryptResponse) {
-            logger.error('Response is not JSON: ', { textResult, e });
+            void CSLogger.error('Response is not JSON: ', { textResult, e });
             return Result.err('Invalid response from server');
         }
         if (!key) {
@@ -166,7 +165,7 @@ async function handleOkResponse<T>(
         try {
             jsonRes = JSON.parse(decryptedRes);
         } catch (error) {
-            logger.error(`Can't parse response`, {
+            void CSLogger.error(`Can't parse response`, {
                 method,
                 url,
                 textResult,
@@ -178,7 +177,7 @@ async function handleOkResponse<T>(
     }
 
     if (typeof jsonRes !== 'object' || jsonRes === null) {
-        logger.error(`non-object returned`, { jsonRes, method, url });
+        void CSLogger.error(`non-object returned`, { jsonRes, method, url });
         return Result.err('Invalid response from server');
     }
     return Result.ok(jsonRes as T);
@@ -197,7 +196,10 @@ async function handleErrorResponse(
         if (!options.doNotLogoutOn401) await Auth.logOut(true);
         return 'Invalid log in';
     }
-    logger.error(`Error on api fetch`, { response, url, method, options });
+    if (!url.endsWith('log')) {
+        // avoid infinite cycle of API errors
+        void CSLogger.warn(`Error on api fetch`, { response, url, method, options });
+    }
 
     try {
         const resTxt = await response.text();

@@ -13,12 +13,12 @@
     import { enabledLocation, encryptionKey, username } from '$lib/stores';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { getLocation, nullLocation } from '$lib/utils/geolocation';
-    import { clientLogger } from '$lib/utils/log';
     import { notify } from '$lib/components/notifications/notifications';
     import { wordCount } from '$lib/utils/text';
     import { currentTzOffset, nowUtc } from '$lib/utils/time';
     import { paste } from './paste';
     import { decrypt, encrypt } from '$lib/utils/encryption';
+    import { CSLogger } from "$lib/controllers/logs/logger.client";
 
     // as this form is used in entry editing and creating
     export let action: 'create' | 'edit' = 'create';
@@ -109,7 +109,7 @@
     function wrapSelectedWith(before: string, after: string, insertSpaceIfEmpty = true) {
         const input = newEntryInputElement;
         if (!input) {
-            clientLogger.error('input element not found');
+            void CSLogger.error('input element not found', { before, after, entry, action });
             return;
         }
         const selected = input.value.substring(input.selectionStart ?? 0, input.selectionEnd ?? 0);
@@ -139,7 +139,7 @@
             resetEntryForm();
             saveToLS();
         } else {
-            clientLogger.error('failed to make entry', { id, body });
+            void CSLogger.error('failed to make entry', { id, body, entry, action });
             notify.error(`Failed to create entry`);
             return;
         }
@@ -163,7 +163,7 @@
 
     async function onEntryEdit(body: EntryPostPayload) {
         if (!entry) {
-            clientLogger.error('entry must be set when action is edit');
+            void CSLogger.error('entry must be set when action is edit', { entry, action });
             return;
         }
         if (!areUnsavedChanges()) {

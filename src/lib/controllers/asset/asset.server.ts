@@ -1,7 +1,6 @@
 import { Subscription } from '$lib/controllers/subscription/subscription.server';
 import { UsageLimits } from '$lib/controllers/usageLimits/usageLimits.server';
 import { decrypt, encrypt } from '$lib/utils/encryption';
-import { FileLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 import { fmtBytes } from '$lib/utils/text';
 import { nowUtc } from '$lib/utils/time';
@@ -11,8 +10,9 @@ import { Asset as _Asset, type AssetMetadata } from './asset';
 import { UId } from '$lib/controllers/uuid/uuid.server';
 import type { Auth } from '$lib/controllers/auth/auth';
 import { query } from '$lib/db/mysql.server';
+import { SSLogger } from '$lib/controllers/logs/logs.server';
 
-const logger = new FileLogger('Asset');
+const logger = new SSLogger('Asset');
 
 namespace AssetServer {
     type Asset = _Asset;

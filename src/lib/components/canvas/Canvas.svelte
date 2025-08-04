@@ -1,7 +1,6 @@
 <script lang="ts">
     import { beforeNavigate } from '$app/navigation';
     import { onMount, setContext } from 'svelte';
-    import { clientLogger } from '$lib/utils/log';
     import {
         type CanvasContext,
         CanvasState,
@@ -12,6 +11,7 @@
         key,
         type Listener
     } from './canvasState';
+    import { CSLogger } from "$lib/controllers/logs/logger.client";
 
     export let killLoopOnError = true;
     export let attributes: CanvasRenderingContext2DSettings = {};
@@ -87,10 +87,10 @@
                     void entity.render($canvasState.asRenderProps(), dt);
                 }
             } catch (err) {
-                clientLogger.error('Animation loop stopped due to an error', { err });
+                void CSLogger.error('Animation loop stopped due to an error', { err });
                 if (killLoopOnError) {
                     cancelAnimationFrame(frame);
-                    clientLogger.warn('killed loop due to error');
+                    void CSLogger.warn('killed loop due to error', {});
                 }
             }
         }
@@ -130,7 +130,7 @@
         if (!Array.isArray(listeners)) throw `Listeners for ${fn} is not an array`;
         for (const listener of listeners) {
             if (!listener || typeof listener !== 'function') {
-                clientLogger.error(`Invalid listener for ${fn}`, listener);
+                void CSLogger.error(`invalid listener`, { fn, listener, event });
                 throw new Error();
             }
             listener(event as MouseEvent & TouchEvent & WheelEvent);

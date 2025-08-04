@@ -2,8 +2,8 @@ import { MAX_IMAGE_SIZE } from '$lib/constants';
 import { currentlyUploadingAssets } from '$lib/stores';
 import { api } from '$lib/utils/apiRequest';
 import { getFileContents } from '$lib/utils/files.client';
-import { clientLogger } from '$lib/utils/log';
 import { Result } from '$lib/utils/result';
+import { CSLogger } from '$lib/controllers/logs/logger.client';
 
 export interface Asset {
     id: string;
@@ -42,7 +42,7 @@ export namespace Asset {
                 resolve(Result.ok(imageWebpNoHeader));
             };
             image.onerror = e => {
-                clientLogger.error('Failed to load image', { e });
+                void CSLogger.error('Failed to load image', { e });
                 resolve(Result.err('Failed to load image'));
             };
             image.src = imageFileContentB64;

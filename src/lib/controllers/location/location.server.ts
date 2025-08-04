@@ -10,9 +10,9 @@ import type { Auth } from '$lib/controllers/auth/auth.server';
 import { UId } from '$lib/controllers/uuid/uuid.server';
 import { z } from 'zod';
 import { MAPBOX_ACCESS_TOK } from '$env/static/private';
-import { FileLogger } from '$lib/utils/log.server';
+import { SSLogger } from '$lib/controllers/logs/logs.server';
 
-const locationLogger = new FileLogger('LOC');
+const locationLogger = new SSLogger('Location');
 
 namespace LocationServer {
     type Location = _Location;

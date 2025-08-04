@@ -1,12 +1,12 @@
 import { OPEN_WEATHER_MAP_API_KEY } from '$env/static/private';
 import { Day } from '$lib/utils/day';
-import { FileLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 import { roundToDecimalPlaces } from '$lib/utils/text';
 import { z } from 'zod';
 import { OpenWeatherMapAPI as _OpenWeatherMapAPI } from '$lib/controllers/openWeatherMapAPI/openWeatherMapAPI';
+import { SSLogger } from '$lib/controllers/logs/logs.server';
 
-const logger = new FileLogger('OpenWeatherMapAPI');
+const logger = new SSLogger('OpenWeatherMapAPI');
 
 export type WeatherForDay = _OpenWeatherMapAPI.WeatherForDay;
 

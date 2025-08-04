@@ -1,10 +1,9 @@
 import mysql, { type FieldPacket } from 'mysql2/promise';
-import chalk from 'chalk';
 import '../require';
 import { DB, DB_HOST, DB_PASS, DB_PORT, DB_USER } from '$env/static/private';
-import { collapseWhitespace, fmtTimePrecise, recursivelyTrimAndStringify } from '$lib/utils/text';
+import { collapseWhitespace } from '$lib/utils/text';
 import type { Expand, Milliseconds, NonFunctionProperties } from '../../types';
-import { FileLogger } from '../utils/log.server';
+import { SSLogger } from '$lib/controllers/logs/logs.server';
 
 export type QueryResult =
     | mysql.RowDataPacket[][]
@@ -13,7 +12,7 @@ export type QueryResult =
     | Record<string, unknown>[]
     | object[];
 
-export const logger = new FileLogger('MySQL', chalk.yellow);
+export const logger = new SSLogger('MySQL');
 
 export let dbConnection: mysql.Connection | null = null;
 
@@ -38,29 +37,12 @@ export function getConfig(): mysql.ConnectionOptions {
 }
 
 async function logQuery(query: string, params: unknown[], result: unknown, time: Milliseconds) {
-    const paramsFmt = recursivelyTrimAndStringify(params);
-    let resultStr = recursivelyTrimAndStringify(result);
-
-    if (
-        typeof result === 'object' &&
-        result !== null &&
-        'info' in result &&
-        typeof result.info === 'string'
-    ) {
-        resultStr = result.info;
-    }
-
-    await logger.log(
-        `\`${collapseWhitespace(query)}\`` +
-            `\n     ${paramsFmt}` +
-            `\n     (${fmtTimePrecise(time)}) => ${resultStr}`
-    );
-
-    if (time > 50) {
-        await logger.warn(`Slow query: ${time}ms`, {
+    if (time > 500) {
+        await logger.warn(`very slow query`, {
             query: collapseWhitespace(query),
-            params: paramsFmt,
-            result: resultStr
+            time,
+            params,
+            result
         });
     }
 }

@@ -14,6 +14,7 @@
     import EditLocation from '$lib/components/location/EditLocation.svelte';
     import EntryDialog from '$lib/components/entry/EntryDialog.svelte';
     import type { Label } from '$lib/controllers/label/label';
+    import { CSLogger } from "$lib/controllers/logs/logger.client";
 
     // default to the UK :)
     export let defaultCenter: LngLatLike = { lat: -4, lng: 53 };
@@ -85,7 +86,7 @@
         for (const location of locations) {
             const radius: Meters = Location.degreesToMeters(location.radius);
             if (!radius) {
-                console.error('no radius', { location, radius });
+                void CSLogger.error('no radius', { location, radius });
                 notify.error('Failed to load location');
                 continue;
             }

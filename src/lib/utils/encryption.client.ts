@@ -1,9 +1,9 @@
+import { get } from 'svelte/store';
 import { browser } from '$app/environment';
 import { notify } from '$lib/components/notifications/notifications';
 import { ENCRYPTED_TEXT_PREFIX, NON_ENCRYPTED_TEXT_PREFIX } from '$lib/constants';
 import { encryptionKey } from '$lib/stores';
 import { decrypt, encrypt } from '$lib/utils/encryption';
-import { get } from 'svelte/store';
 
 export function tryDecryptText(text: string): string {
     if (!browser || !get(encryptionKey)) return '';

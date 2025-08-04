@@ -1,15 +1,15 @@
 import { Subscription } from '$lib/controllers/subscription/subscription.server';
 import { UsageLimits } from '$lib/controllers/usageLimits/usageLimits.server';
 import { query } from '$lib/db/mysql.server';
-import { FileLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 import { nowUtc } from '$lib/utils/time';
 import type { PickOptional } from '../../../types';
 import type { Auth } from '../auth/auth.server';
 import type { Label as _Label, LabelWithCount } from './label';
 import { UId } from '$lib/controllers/uuid/uuid.server';
+import { SSLogger } from '$lib/controllers/logs/logs.server';
 
-const labelLogger = new FileLogger('Label');
+const labelLogger = new SSLogger('Label');
 
 namespace LabelServer {
     type Label = _Label;

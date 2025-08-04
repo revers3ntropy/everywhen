@@ -1,17 +1,16 @@
 import { COOKIE_KEYS } from '$lib/constants';
 import { sessionCookieOptions } from '$lib/utils/cookies';
 import type { Cookies, Handle } from '@sveltejs/kit';
-import chalk from 'chalk';
 import { cleanupCache } from '$lib/utils/cache.server';
-import { FileLogger } from '$lib/utils/log.server';
 import { Auth } from '$lib/controllers/auth/auth.server';
 import type { Mutable } from './types';
+import { SSLogger } from '$lib/controllers/logs/logs.server';
 
 // makes time zone offset always 0
 process.env.TZ = 'Etc/UTC';
 
-const reqLogger = new FileLogger('REQ', chalk.bgWhite.black);
-const processLogger = new FileLogger('PROC', chalk.black.bgRedBright);
+const reqLogger = new SSLogger('Request');
+const processLogger = new SSLogger('Process');
 
 setInterval(() => {
     try {

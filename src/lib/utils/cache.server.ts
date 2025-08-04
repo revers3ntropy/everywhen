@@ -1,16 +1,11 @@
 import { isStaging, isProd } from '$lib/utils/env';
 import { error, redirect } from '@sveltejs/kit';
 import type { RequestEvent, ServerLoadEvent } from '@sveltejs/kit';
-import chalk from 'chalk';
 import type { Bytes, MaybePromise, Seconds } from '../../types';
 import type { GenericResponse } from './apiResponse.server';
-import { FileLogger } from './log.server';
-import { fmtBytes } from './text';
 import { nowUtc } from './time';
 import { Auth } from '$lib/controllers/auth/auth';
 import { encrypt } from '$lib/utils/encryption';
-
-const cacheLogger = new FileLogger('CACHE', chalk.magentaBright);
 
 const cache: Record<string, Record<string, unknown> | undefined> = {};
 const cacheLastUsed: Record<string, number> = {};
@@ -42,10 +37,6 @@ function roughSizeOfObject(object: unknown): number {
     return bytes;
 }
 
-function logCacheReq(hit: boolean, url: URL) {
-    void cacheLogger.log(hit ? chalk.green('HIT ') : chalk.red('MISS'), { path: url.pathname });
-}
-
 export function cacheResponse<T>(url: string, userId: string, response: T): void {
     if (!doCache) return;
 
@@ -62,10 +53,8 @@ export function getCachedResponse<T>(url: string, userId: string): T | undefined
     cacheLastUsed[userId] = nowUtc();
     const userCache = cache[userId] || {};
     if (url in userCache) {
-        logCacheReq(true, new URL(url));
         return userCache[url] as T;
     }
-    logCacheReq(false, new URL(url));
     return undefined;
 }
 
@@ -83,25 +72,14 @@ export function cleanupCache(): number {
     const cacheSize = roughSizeOfObject(cache);
     const timeout = cacheTimeout(cacheSize);
 
-    let cleared = 0;
-
     for (const userId of Object.keys(cacheLastUsed)) {
         const timeSinceLastUsed = now - cacheLastUsed[userId];
         if (timeSinceLastUsed > timeout) {
             invalidateCache(userId);
-            cleared++;
         }
     }
 
-    const cacheSizeAfter = roughSizeOfObject(cache);
-
-    void cacheLogger.log(chalk.yellow('CLEANUP'), {
-        cacheSize: chalk.yellow(fmtBytes(cacheSize)),
-        timeout,
-        changeSize: chalk.yellow(fmtBytes(cacheSizeAfter - cacheSize)),
-        cleared
-    });
-    return cacheSizeAfter;
+    return roughSizeOfObject(cache);
 }
 
 export function cacheTimeout(size: Bytes): Seconds {

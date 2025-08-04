@@ -3,10 +3,10 @@ import type { EntryEdit, RawEntry } from '$lib/controllers/entry/entry';
 import { Entry } from '$lib/controllers/entry/entry.server';
 import { query } from '$lib/db/mysql.server';
 import { decrypt } from '$lib/utils/encryption';
-import { FileLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
+import { SSLogger } from '$lib/controllers/logs/logs.server';
 
-const logger = new FileLogger('1Entry');
+const logger = new SSLogger('SingleEntry');
 
 /**
  * Returns a decrypted `Entry` with (optional) decrypted `Label`.

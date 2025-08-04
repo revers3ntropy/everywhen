@@ -6,7 +6,6 @@ import { UsageLimits } from '$lib/controllers/usageLimits/usageLimits.server';
 import { query } from '$lib/db/mysql.server';
 import { Day } from '$lib/utils/day';
 import { decrypt, encrypt } from '$lib/utils/encryption';
-import { FileLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 import { wordCount, wordsFromText } from '$lib/utils/text';
 import { nowUtc } from '$lib/utils/time';
@@ -14,8 +13,9 @@ import type { Hours, TimestampSecs } from '../../../types';
 import type { Auth } from '../auth/auth.server';
 import { UId } from '$lib/controllers/uuid/uuid.server';
 import { Entry as _Entry, type EntryEdit, type RawEntryEdit, type Streaks } from './entry';
+import { SSLogger } from '$lib/controllers/logs/logs.server';
 
-const logger = new FileLogger('Entry');
+const logger = new SSLogger('Entry');
 
 namespace EntryServer {
     type Entry = _Entry;

@@ -7,7 +7,6 @@ import { Subscription } from '$lib/controllers/subscription/subscription.server'
 import { UsageLimits } from '$lib/controllers/usageLimits/usageLimits.server';
 import { query } from '$lib/db/mysql.server';
 import { range } from '$lib/utils';
-import { FileLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 import type { Hours, TimestampSecs } from '../../../types';
 import type { DatasetDataFilter } from './dataset';
@@ -22,8 +21,9 @@ import { nowUtc } from '$lib/utils/time';
 import { decrypt, encrypt } from '$lib/utils/encryption';
 import type { Auth } from '$lib/controllers/auth/auth';
 import { UId } from '$lib/controllers/uuid/uuid.server';
+import { SSLogger } from '$lib/controllers/logs/logs.server';
 
-const logger = new FileLogger('Dataset');
+const logger = new SSLogger('Dataset');
 
 namespace DatasetServer {
     const Dataset = _Dataset;

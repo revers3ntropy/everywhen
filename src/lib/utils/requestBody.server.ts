@@ -1,12 +1,12 @@
 import type { Auth } from '$lib/controllers/auth/auth';
 import { decrypt } from '$lib/utils/encryption';
-import { FileLogger } from '$lib/utils/log.server';
 import { error } from '@sveltejs/kit';
 import { z } from 'zod';
 import type { ZodObject, ZodType } from 'zod';
 import { Result } from './result';
+import { SSLogger } from '$lib/controllers/logs/logs.server';
 
-const reqLogger = new FileLogger('RequestBody');
+const reqLogger = new SSLogger('RequestBody');
 
 export async function bodyFromReq<T extends Record<string, ZodType>>(
     key: Auth | string | null,

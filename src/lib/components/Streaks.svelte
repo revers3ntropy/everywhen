@@ -1,13 +1,13 @@
 <script lang="ts">
     import { Skeleton } from '$lib/components/ui/skeleton';
     import { listen } from '$lib/dataChangeEvents';
-    import { clientLogger } from '$lib/utils/log';
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
     import { onMount } from 'svelte';
     import Fire from 'svelte-material-icons/Fire.svelte';
     import TimerSand from 'svelte-material-icons/TimerSand.svelte';
     import type { Streaks } from '../controllers/entry/entry';
     import { api } from '../utils/apiRequest';
+    import { CSLogger } from "$lib/controllers/logs/logger.client";
 
     export let condensed = false;
 
@@ -38,7 +38,7 @@
             x: fmtUtc(nowUtc(), currentTzOffset(), 'YYYY-MM-DD')
         });
         if (!streaksRes.ok) {
-            clientLogger.error('Failed to get streaks', { streaksRes });
+            void CSLogger.error('Failed to get streaks', { streaksRes });
             error = streaksRes.err;
         } else {
             streaks = streaksRes.val;

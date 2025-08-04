@@ -1,7 +1,6 @@
 import { Auth as _Auth } from '$lib/controllers/auth/auth';
 import { migrateUser } from '$lib/controllers/user/accountMigration.server';
 import type { User } from '$lib/controllers/user/user';
-import { FileLogger } from '$lib/utils/log.server';
 import { SemVer } from '$lib/utils/semVer';
 import { type Cookies, error } from '@sveltejs/kit';
 import { COOKIE_KEYS } from '$lib/constants';
@@ -11,8 +10,9 @@ import { UId } from '$lib/controllers/uuid/uuid.server';
 import { nowUtc } from '$lib/utils/time';
 import type { Seconds, TimestampSecs } from '../../../types';
 import crypto from 'crypto';
+import { SSLogger } from '$lib/controllers/logs/logs.server';
 
-const logger = new FileLogger('Auth');
+const logger = new SSLogger('Auth');
 
 namespace AuthServer {
     type Auth = _Auth;

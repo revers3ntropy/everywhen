@@ -1,12 +1,12 @@
 import { GITHUB_AUTH_CLIENT_SECRET } from '$env/static/private';
 import { PUBLIC_GITHUB_AUTH_CLIENT_ID } from '$env/static/public';
 import { Settings } from '$lib/controllers/settings/settings.server';
-import { FileLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 import type { Auth } from '$lib/controllers/auth/auth';
 import { z } from 'zod';
+import { SSLogger } from '$lib/controllers/logs/logs.server';
 
-const logger = new FileLogger('GHOAuth');
+const logger = new SSLogger('GHOAuth');
 
 export interface GitHubUser {
     id: number;

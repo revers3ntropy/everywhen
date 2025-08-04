@@ -2,7 +2,6 @@ import { Subscription } from '$lib/controllers/subscription/subscription.server'
 import { UsageLimits } from '$lib/controllers/usageLimits/usageLimits.server';
 import { query } from '$lib/db/mysql.server';
 import { decrypt, encrypt } from '$lib/utils/encryption';
-import { FileLogger } from '$lib/utils/log.server';
 import { Result } from '$lib/utils/result';
 import { nowUtc } from '$lib/utils/time';
 import type { TimestampSecs } from '../../../types';
@@ -10,8 +9,9 @@ import type { Auth } from '../auth/auth.server';
 import { Label } from '../label/label.server';
 import { Event as _Event } from './event';
 import { UId } from '$lib/controllers/uuid/uuid.server';
+import { SSLogger } from '$lib/controllers/logs/logs.server';
 
-const logger = new FileLogger('Event');
+const logger = new SSLogger('Event');
 
 namespace EventServer {
     interface RawEvent {

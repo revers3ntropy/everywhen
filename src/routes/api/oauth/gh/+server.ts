@@ -1,14 +1,14 @@
+import { error } from '@sveltejs/kit';
+import { z } from 'zod';
+import type { RequestHandler } from './$types';
 import { ghAPI } from '$lib/controllers/ghAPI/ghAPI.server';
 import { api404Handler, apiResponse } from '$lib/utils/apiResponse.server';
 import { invalidateCache } from '$lib/utils/cache.server';
-import { FileLogger } from '$lib/utils/log.server';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
-import { error } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
 import { Auth } from '$lib/controllers/auth/auth.server';
-import { z } from 'zod';
+import { SSLogger } from '$lib/controllers/logs/logs.server';
 
-const logger = new FileLogger('GHCB');
+const logger = new SSLogger('GitHubCB');
 
 export const POST = (async ({ request, cookies }) => {
     const auth = Auth.getAuthFromCookies(cookies);
