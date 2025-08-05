@@ -2,7 +2,6 @@
     import { Button } from '$lib/components/ui/button';
     import Logo from '$lib/components/ui/Logo.svelte';
     import ArrowRightThinCircleOutline from 'svelte-material-icons/ArrowRight.svelte';
-    import HeadHeart from 'svelte-material-icons/HeadHeart.svelte';
     import EmoticonOutline from 'svelte-material-icons/EmoticonOutline.svelte';
     import Poll from 'svelte-material-icons/Poll.svelte';
     import LockOutline from 'svelte-material-icons/LockOutline.svelte';
