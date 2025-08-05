@@ -100,6 +100,10 @@ export namespace OpenWeatherMapAPIServer {
             numRequestsPerDay.set(Day.today(0).fmtIso(), reqsToday + 1);
         }
 
+        if (day.eq(Day.today(0))) {
+            return Result.err('Cannot get weather for today');
+        }
+
         // will work up to 1.5 years into the future,
         // but should really only be for days in the past as days in the future
         // is prediction but would display like it's a fact
