@@ -36,13 +36,23 @@ export function getConfig(): mysql.ConnectionOptions {
     };
 }
 
-async function logQuery(query: string, params: unknown[], result: unknown, time: Milliseconds) {
+async function logQuery(
+    query: string,
+    params: unknown[],
+    result: QueryResult | null,
+    time: Milliseconds
+) {
     if (time > 500) {
+        let shortenedResult = result;
+        if (Array.isArray(shortenedResult) && shortenedResult.length > 5) {
+            shortenedResult = shortenedResult.slice(0, 5);
+        }
         await logger.warn(`very slow query`, {
             query: collapseWhitespace(query),
             time,
             params,
-            result
+            shortenedResult,
+            resultLength: result && 'length' in result ? result.length : null
         });
     }
 }
@@ -111,9 +121,7 @@ export const query = (async <Res extends QueryResult = never>(
     const [query, queryParams] = buildQuery(queryParts, params);
 
     const [result, _] = ((await dbConnection?.query(query, queryParams).catch((error: unknown) => {
-        const end = performance.now();
         void (async () => {
-            await logQuery(query, queryParams, null, end - start);
             await logger.error(`Error querying mysql db '${DB}'`, { error });
         })();
         throw error;
@@ -135,7 +143,6 @@ query.unlogged = (async <Res extends QueryResult = never>(
     const [query, queryParams] = buildQuery(queryParts, params);
 
     return ((await dbConnection?.query(query, queryParams).catch((error: unknown) => {
-        void logQuery(query, queryParams, error, -1);
         void logger.log(`Error querying mysql db '${DB}'`, { error });
         throw error;
     })) || [])[0] as Res;
