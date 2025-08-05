@@ -13,6 +13,7 @@
     import type { PageData } from './$types';
     import DatasetChart from './DatasetChart.svelte';
     import TableOfDatapoints from './TableOfDatapoints.svelte';
+    import { Checkbox } from '$lib/components/ui/checkbox';
 
     export let data: PageData;
 
@@ -27,6 +28,18 @@
             'dataset',
             { ...data.dataset },
             { ...data.dataset, name: nameInp.value }
+        );
+    }
+
+    async function updateShowInFeed() {
+        await new Promise(r => setTimeout(r, 0));
+        notify.onErr(
+            await api.put(apiPath(`/datasets/?`, data.dataset.id), { showInFeed: !!showInFeed })
+        );
+        await dispatch.update(
+            'dataset',
+            { ...data.dataset },
+            { ...data.dataset, showInFeed: !!showInFeed }
         );
     }
 
@@ -87,6 +100,8 @@
         if (datasetId !== data.dataset.id) return;
         rows = rows.filter(r => r.id !== rowId);
     });
+
+    let showInFeed = !!data.dataset.showInFeed;
 </script>
 
 <svelte:head>
@@ -123,6 +138,17 @@
             </div>
         </div>
 
+        {#if !data.dataset.preset}
+            <div class="flex items-center gap-2 h-fit pt-2">
+                Show in Feed (Journal)
+                <Checkbox
+                    bind:checked={showInFeed}
+                    on:click={updateShowInFeed}
+                    on:keydown={updateShowInFeed}
+                />
+            </div>
+        {/if}
+
         {#if data.dataset?.preset}
             <div class="flex justify-start items-center gap-2">
                 <TuneVariant size="20" />
@@ -132,7 +158,7 @@
 
         {#key data.dataset.columns}
             {#if rows}
-                <section>
+                <section class="pt-6">
                     {#if data.dataset && data.dataset.columns.length}
                         <DatasetChart dataset={data.dataset} {rows} />
                     {/if}

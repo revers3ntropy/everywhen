@@ -12,7 +12,7 @@
     import { notify } from '$lib/components/notifications/notifications';
     import type { Pixels, TimestampSecs } from '../../../types';
     import { makeStandardContextMenu } from './standardContextMenu';
-    import { CSLogger } from "$lib/controllers/logs/logger.client";
+    import { CSLogger } from '$lib/controllers/logs/logger.client';
 
     export let labels: Record<string, Label>;
 

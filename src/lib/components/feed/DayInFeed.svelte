@@ -12,12 +12,12 @@
     import ChevronUp from 'svelte-material-icons/ChevronUp.svelte';
     import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
     import EntryForm from '$lib/components/entryForm/EntryForm.svelte';
-    import EntryEditFeedItem from '$lib/components/feed/EntryEditFeedItem.svelte';
-    import EntryFeedItem from '$lib/components/feed/EntryFeedItem.svelte';
-    import EventEndFeedItem from '$lib/components/feed/EventEndFeedItem.svelte';
-    import EventStartFeedItem from '$lib/components/feed/EventStartFeedItem.svelte';
-    import HappinessFeedItem from '$lib/components/feed/HappinessFeedItem.svelte';
-    import SleepFeedItem from '$lib/components/feed/SleepFeedItem.svelte';
+    import EntryEditFeedItem from '$lib/components/feed/feedItems/EntryEditFeedItem.svelte';
+    import EntryFeedItem from '$lib/components/feed/feedItems/EntryFeedItem.svelte';
+    import EventEndFeedItem from '$lib/components/feed/feedItems/EventEndFeedItem.svelte';
+    import EventStartFeedItem from '$lib/components/feed/feedItems/EventStartFeedItem.svelte';
+    import HappinessFeedItem from '$lib/components/feed/feedItems/HappinessFeedItem.svelte';
+    import SleepFeedItem from '$lib/components/feed/feedItems/SleepFeedItem.svelte';
     import LocationsWithWeather from '$lib/components/location/LocationsWithWeather.svelte';
     import type { Entry } from '$lib/controllers/entry/entry';
     import { Feed } from '$lib/controllers/feed/feed';
@@ -33,6 +33,7 @@
     import HappinessDatasetShortcut from '$lib/components/dataset/HappinessDatasetShortcut.svelte';
     import type { Dataset } from '$lib/controllers/dataset/dataset';
     import type { OpenWeatherMapAPI } from '$lib/controllers/openWeatherMapAPI/openWeatherMapAPI';
+    import OtherDatasetFeemItem from '$lib/components/feed/feedItems/OtherDatasetFeemItem.svelte';
 
     export let locations: Location[];
     export let labels: Record<string, Label>;
@@ -203,6 +204,15 @@
                             timestamp={item.timestamp}
                             tzOffset={item.timestampTzOffset}
                             value={item.value}
+                        />
+                    {:else if item.type === 'otherDataset'}
+                        <OtherDatasetFeemItem
+                            {obfuscated}
+                            timestamp={item.timestamp}
+                            tzOffset={item.timestampTzOffset}
+                            values={item.values}
+                            datasetId={item.datasetId}
+                            datasetName={item.datasetName}
                         />
                     {/if}
                 {/each}

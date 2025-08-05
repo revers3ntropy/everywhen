@@ -1,6 +1,6 @@
 <script lang="ts">
-    import FeedItemIcon from '$lib/components/feed/FeedItemIcon.svelte';
-    import TimeInFeed from '$lib/components/feed/TimeInFeed.svelte';
+    import FeedItemIcon from '$lib/components/feed/feedItems/FeedItemIcon.svelte';
+    import TimeInFeed from '$lib/components/feed/feedItems/TimeInFeed.svelte';
     import { fmtDurationHourMin } from '$lib/utils/time';
 
     export let tzOffset: number;

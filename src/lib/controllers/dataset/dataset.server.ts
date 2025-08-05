@@ -9,13 +9,13 @@ import { query } from '$lib/db/mysql.server';
 import { range } from '$lib/utils';
 import { Result } from '$lib/utils/result';
 import type { Hours, TimestampSecs } from '../../../types';
-import type { DatasetDataFilter } from './dataset';
 import {
     Dataset as _Dataset,
     type DatasetColumn,
     type DatasetColumnType,
     type DatasetData,
-    type DatasetMetadata
+    type DatasetMetadata,
+    type DatasetDataFilter
 } from './dataset';
 import { nowUtc } from '$lib/utils/time';
 import { decrypt, encrypt } from '$lib/utils/encryption';
@@ -28,12 +28,13 @@ const logger = new SSLogger('Dataset');
 namespace DatasetServer {
     const Dataset = _Dataset;
     type Dataset = _Dataset;
+    import sortColumnsForJson = _Dataset.sortColumnsForJson;
 
     function allTypes(): Result<Record<string, DatasetColumnType<unknown>>> {
         return Result.ok(Dataset.builtInTypes);
     }
 
-    async function getUserDefinedColumns(
+    export async function getUserDefinedColumns(
         auth: Auth,
         datasetId?: string
     ): Promise<Result<DatasetColumn<unknown>[]>> {
@@ -86,6 +87,26 @@ namespace DatasetServer {
         );
     }
 
+    export async function getUserDefinedColumnsByDatasetOrderedForJson(
+        auth: Auth
+    ): Promise<Result<Record<string, DatasetColumn<unknown>[]>>> {
+        const colsByDataset: Record<string, DatasetColumn<unknown>[]> = {};
+        const cols = await getUserDefinedColumns(auth);
+        if (!cols.ok) return cols.cast();
+
+        for (const col of cols.val) {
+            const dsId = col.datasetId;
+            if (!(dsId in colsByDataset)) colsByDataset[dsId] = [];
+            colsByDataset[dsId].push(col);
+        }
+
+        return Result.ok(
+            Object.fromEntries(
+                Object.entries(colsByDataset).map(([key, val]) => [key, sortColumnsForJson(val)])
+            )
+        );
+    }
+
     export async function getDatasetFromPresetId(
         auth: Auth,
         presetId: PresetId
@@ -97,15 +118,16 @@ namespace DatasetServer {
                 created: TimestampSecs;
                 presetId: PresetId | null;
                 rowCount: number;
+                showInFeed: boolean;
             }[]
         >`
-            SELECT id, name, created, presetId, rowCount
+            SELECT id, name, created, presetId, rowCount, showInFeed
             FROM datasets
             WHERE userId = ${auth.id}
                 AND presetId = ${presetId}
         `.then(rows => {
             if (rows.length === 0) return Result.ok(null);
-            const [{ id, name, created, presetId, rowCount }] = rows;
+            const [{ id, name, created, presetId, rowCount, showInFeed }] = rows;
             const nameDecrypted = decrypt(name, auth.key);
             if (!nameDecrypted.ok) return nameDecrypted.cast();
             return Result.ok({
@@ -113,7 +135,8 @@ namespace DatasetServer {
                 name: nameDecrypted.val,
                 created,
                 preset: presetId ? datasetPresets[presetId] : null,
-                rowCount
+                rowCount,
+                showInFeed
             });
         });
     }
@@ -126,15 +149,16 @@ namespace DatasetServer {
                 created: TimestampSecs;
                 presetId: PresetId | null;
                 rowCount: number;
+                showInFeed: boolean;
             }[]
         >`
-            SELECT id, name, created, presetId, rowCount
+            SELECT id, name, created, presetId, rowCount, showInFeed
             FROM datasets
             WHERE userId = ${auth.id}
                 AND id = ${datasetId}
         `;
         if (rows.length === 0) return Result.err('Dataset not found');
-        const [{ id, name, created, presetId, rowCount }] = rows;
+        const [{ id, name, created, presetId, rowCount, showInFeed }] = rows;
         const nameDecrypted = decrypt(name, auth.key);
         if (!nameDecrypted.ok) return nameDecrypted.cast();
 
@@ -143,7 +167,8 @@ namespace DatasetServer {
             name: nameDecrypted.val,
             created,
             preset: presetId ? datasetPresets[presetId] : null,
-            rowCount
+            rowCount,
+            showInFeed
         });
     }
 
@@ -189,6 +214,7 @@ namespace DatasetServer {
                 created: number;
                 presetId: string | null;
                 rowCount: number;
+                showInFeed: boolean;
             }[]
         >`
             SELECT
@@ -196,14 +222,8 @@ namespace DatasetServer {
                 datasets.name,
                 datasets.created,
                 datasets.presetId,
-                -- I think faster than using a join,
-                -- 1.3ms vs 2.2ms so not a huge difference
-                (
-                    SELECT COUNT(*) AS rowCount
-                    FROM datasetRows
-                    WHERE datasetId = datasets.id
-                        AND userId = ${auth.id}
-                ) as rowCount
+                datasets.rowCount,
+                datasets.showInFeed
             FROM datasets
             WHERE datasets.userId = ${auth.id}
             ORDER BY created DESC
@@ -239,7 +259,8 @@ namespace DatasetServer {
                 created: dataset.created,
                 columns,
                 preset,
-                rowCount: dataset.rowCount
+                rowCount: dataset.rowCount,
+                showInFeed: dataset.showInFeed
             });
         }
 
@@ -401,7 +422,8 @@ namespace DatasetServer {
             name,
             created,
             preset: presetId ? datasetPresets[presetId as PresetId] : null,
-            rowCount: 0
+            rowCount: 0,
+            showInFeed: false
         });
     }
 
@@ -667,6 +689,19 @@ namespace DatasetServer {
         `;
 
         return Result.ok(null);
+    }
+
+    export async function updateShowInFeed(
+        auth: Auth,
+        datasetId: string,
+        showInFeed: boolean
+    ): Promise<void> {
+        await query`
+            UPDATE datasets
+            SET showInFeed = ${showInFeed}
+            WHERE id = ${datasetId}
+              AND userId = ${auth.id}
+        `;
     }
 
     export async function updateRows(

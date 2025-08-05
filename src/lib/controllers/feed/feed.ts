@@ -38,6 +38,15 @@ export type FeedItemTypes = {
         timestampTzOffset: number;
         value: number;
     };
+    otherDataset: {
+        type: 'otherDataset';
+        id: string;
+        timestamp: number;
+        timestampTzOffset: number;
+        datasetName: string;
+        datasetId: string;
+        values: Record<string, unknown>;
+    };
     entry: { type: 'entry' } & Entry;
     entryEdit: {
         type: 'entry-edit';
@@ -73,6 +82,7 @@ export namespace Feed {
             case 'entry-edit':
                 return item.created;
             case 'happiness':
+            case 'otherDataset':
                 return item.timestamp;
             case 'sleep':
             case 'event-start':

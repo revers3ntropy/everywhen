@@ -9,6 +9,7 @@ export interface Dataset {
     name: string;
     preset: DatasetPreset | null;
     rowCount: number;
+    showInFeed: boolean;
 }
 
 export interface DatasetMetadata extends Dataset {

@@ -1,6 +1,6 @@
 <script lang="ts">
-    import FeedItemIcon from '$lib/components/feed/FeedItemIcon.svelte';
-    import TimeInFeed from '$lib/components/feed/TimeInFeed.svelte';
+    import FeedItemIcon from '$lib/components/feed/feedItems/FeedItemIcon.svelte';
+    import TimeInFeed from '$lib/components/feed/feedItems/TimeInFeed.svelte';
     import LabelDot from '$lib/components/label/LabelDot.svelte';
     import { Auth } from '$lib/controllers/auth/auth';
     import type { FeedItem, FeedItemTypes } from '$lib/controllers/feed/feed';

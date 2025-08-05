@@ -13,7 +13,7 @@
     import { page } from '$app/stores';
     import * as Tooltip from '$lib/components/ui/tooltip';
     import * as Popover from '$lib/components/ui/popover';
-    import TimeInFeed from '$lib/components/feed/TimeInFeed.svelte';
+    import TimeInFeed from '$lib/components/feed/feedItems/TimeInFeed.svelte';
     import Lazy from '$lib/components/ui/Lazy.svelte';
     import { type EntryEdit } from '$lib/controllers/entry/entry';
     import { fmtUtcRelative, nowUtc } from '$lib/utils/time';

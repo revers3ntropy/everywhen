@@ -1,8 +1,8 @@
 <script lang="ts">
     import EmoticonOutline from 'svelte-material-icons/EmoticonOutline.svelte';
     import HappinessValueIcon from '$lib/components/dataset/HappinessValueIcon.svelte';
-    import FeedItemIcon from '$lib/components/feed/FeedItemIcon.svelte';
-    import TimeInFeed from '$lib/components/feed/TimeInFeed.svelte';
+    import FeedItemIcon from '$lib/components/feed/feedItems/FeedItemIcon.svelte';
+    import TimeInFeed from '$lib/components/feed/feedItems/TimeInFeed.svelte';
     import { settingsStore } from '$lib/stores';
 
     export let tzOffset: number;

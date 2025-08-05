@@ -1,11 +1,12 @@
 <script lang="ts">
-    import type { FeedItem } from '$lib/controllers/feed/feed';
+    import ChartLine from 'svelte-material-icons/ChartLine.svelte';
     import CalendarEnd from 'svelte-material-icons/CalendarEnd.svelte';
     import EmoticonOutline from 'svelte-material-icons/EmoticonOutline.svelte';
     import NoteEditOutline from 'svelte-material-icons/NoteEditOutline.svelte';
     import Calendar from 'svelte-material-icons/Calendar.svelte';
     import CalendarStart from 'svelte-material-icons/CalendarStart.svelte';
     import Sleep from 'svelte-material-icons/Sleep.svelte';
+    import type { FeedItem } from '$lib/controllers/feed/feed';
 
     export let type: FeedItem['type'] | 'event';
 </script>
@@ -26,6 +27,8 @@
             <Calendar size={24} />
         {:else if type === 'sleep'}
             <Sleep size={24} />
+        {:else if type === 'otherDataset'}
+            <ChartLine size={20} />
         {:else}
             ?
         {/if}

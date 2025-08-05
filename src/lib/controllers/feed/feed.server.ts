@@ -8,6 +8,7 @@ import { Result } from '$lib/utils/result';
 import { Feed as _Feed, type FeedItem, type FeedDay } from './feed';
 import { error } from '@sveltejs/kit';
 import type { Auth } from '$lib/controllers/auth/auth';
+import { otherDatasetsProvider } from '$lib/controllers/feed/otherDatasets';
 
 export interface FeedProvider {
     feedItemsOnDay(auth: Auth, day: Day): Promise<Result<FeedItem[]>>;
@@ -21,7 +22,8 @@ namespace FeedServer {
         entryEditsProvider,
         eventEndsProvider,
         eventStartsProvider,
-        happinessProvider
+        happinessProvider,
+        otherDatasetsProvider
     ];
 
     async function getNextDayInPast(auth: Auth, day: Day): Promise<Day | null> {

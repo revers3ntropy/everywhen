@@ -53,8 +53,9 @@ export const PUT = (async ({ cookies, request, params }) => {
     const auth = Auth.getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
-    const { name, rows } = await getUnwrappedReqBody(auth, request, {
+    const { name, rows, showInFeed } = await getUnwrappedReqBody(auth, request, {
         name: z.string().optional(),
+        showInFeed: z.boolean().optional(),
         rows: z
             .array(
                 z.union([
@@ -80,6 +81,10 @@ export const PUT = (async ({ cookies, request, params }) => {
 
     if (rows) {
         (await Dataset.updateRows(auth, params.datasetId, rows)).unwrap(e => error(400, e));
+    }
+
+    if (typeof showInFeed === 'boolean') {
+        await Dataset.updateShowInFeed(auth, params.datasetId, showInFeed);
     }
 
     return apiResponse(auth, {});
