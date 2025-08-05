@@ -16,7 +16,7 @@ export const PUT = (async ({ cookies, request, params }) => {
 
     const body = await getUnwrappedReqBody(auth, request, {
         name: z.string().optional(),
-        radius: z.number().optional(),
+        radius: z.number().min(1).max(10_000_000).optional(),
         latitude: z.number().optional(),
         longitude: z.number().optional()
     });
@@ -35,7 +35,7 @@ export const PUT = (async ({ cookies, request, params }) => {
         );
     }
 
-    if (body.latitude !== undefined && body.longitude !== undefined) {
+    if (typeof body.latitude === 'number' && typeof body.longitude === 'number') {
         (await Location.updateLocation(auth, location, body.latitude, body.longitude)).unwrap(e =>
             error(400, e)
         );
