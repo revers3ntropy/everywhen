@@ -106,18 +106,6 @@
                     Log your mood and get insights into your mental health over time
                 </p>
             </div>
-            <div class="border-t border-border pt-8 pb-20">
-                <div class="flex-center p-2">
-                    <span class="border border-borderLight rounded-full p-2">
-                        <HeadHeart size="40" />
-                    </span>
-                </div>
-                <p class="title-font text-2xl">Hand-crafted</p>
-                <p class="text-light">
-                    No Vibe Coding, Cursor or LLMs - high quality code written with love by an
-                    <a href="https://josephcoppin.com">experienced engineer</a>
-                </p>
-            </div>
         </div>
 
         <div class="pb-16 flex-center px-4">
