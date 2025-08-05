@@ -15,12 +15,15 @@
     import EntryDialog from '$lib/components/entry/EntryDialog.svelte';
     import type { Label } from '$lib/controllers/label/label';
     import { CSLogger } from '$lib/controllers/logs/logger.client';
+    import { dispatch } from '$lib/dataChangeEvents';
 
     // default to the UK :)
     export let defaultCenter: LngLatLike = { lat: -4, lng: 53 };
     export let defaultZoom = 4;
     export let bounds: LngLatBoundsLike | undefined = undefined;
 
+    // we can't listen for changes to this internally,
+    // so to update locations the entire component must be rerendered
     export let locations: Location[] = [];
     export let entries: { id: string; latitude: Degrees; longitude: Degrees }[] = [];
     export let labels: Record<string, Label> = {};
@@ -60,20 +63,38 @@
         locationId: string,
         newCenter: { lat: Degrees; lng: Degrees }
     ) {
+        const oldLocation = locations.find(l => l.id === locationId);
+        if (!oldLocation) {
+            void CSLogger.error('missing location', { locationId, locations, oldLocation });
+            notify.error('can not find location');
+            return;
+        }
         notify.onErr(
             await api.put(apiPath('/locations/?', locationId), {
                 latitude: newCenter.lat,
                 longitude: newCenter.lng
             })
         );
+        await dispatch.update('location', { ...oldLocation, latitude: newCenter.lat, longitude: newCenter.lng }, { ...oldLocation });
         notify.success('Updated location position');
     }
 
     async function updateLocationRadius(locationId: string, newRadius: Meters) {
+        const oldLocation = locations.find(l => l.id === locationId);
+        if (!oldLocation) {
+            void CSLogger.error('missing location', { locationId, locations, oldLocation });
+            notify.error('can not find location');
+            return;
+        }
         notify.onErr(
             await api.put(apiPath('/locations/?', locationId), {
                 radius: newRadius
             })
+        );
+        await dispatch.update(
+            'location',
+            { ...oldLocation, radius: newRadius },
+            { ...oldLocation }
         );
         notify.success('Updated location radius');
     }

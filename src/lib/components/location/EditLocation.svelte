@@ -1,7 +1,7 @@
 <script lang="ts">
     import { Button } from '$lib/components/ui/button';
     import Textbox from '$lib/components/ui/Textbox.svelte';
-    import { dispatch } from '$lib/dataChangeEvents';
+    import { dispatch, listen } from '$lib/dataChangeEvents';
     import Bin from 'svelte-material-icons/Delete.svelte';
     import type { ChangeEventHandler } from 'svelte/elements';
     import { Location } from '$lib/controllers/location/location';
@@ -41,7 +41,15 @@
 
     const onRadiusChange = (async () => {
         if (!radiusMeters) return;
+        if (parseFloat(radiusMeters) < 1) {
+            radiusMeters = '1';
+        }
+        if (parseFloat(radiusMeters) > 10_000_000) {
+            // Earth's circumference is 40k km
+            radiusMeters = '10000000';
+        }
         radius = Location.metersToDegreesPrecise(parseFloat(radiusMeters), 1, 1, latitude);
+
         await syncWithServer();
     }) satisfies ChangeEventHandler<HTMLInputElement>;
 
@@ -52,6 +60,15 @@
         notify.onErr(await api.delete(apiPath('/locations/?', id)));
         await dispatch.delete('location', id);
     }
+
+    listen.location.onUpdate(l => {
+        if (l.id !== id) return;
+        radius = l.radius;
+        latitude = l.latitude;
+        longitude = l.longitude;
+        name = l.name;
+        created = l.created;
+    });
 </script>
 
 <div>
