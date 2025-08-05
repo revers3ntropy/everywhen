@@ -24,7 +24,8 @@ export async function makeFromPreset(presetId: PresetId): Promise<Result<string>
         name: datasetPresets[presetId].defaultName,
         columns: preset.columns,
         created: nowUtc(),
-        rowCount: 0
+        rowCount: 0,
+        showInFeed: false
     });
 
     notify.success('Dataset created');
@@ -54,7 +55,8 @@ export async function makeBlank(usedNames: string[]): Promise<string> {
         name,
         columns: [],
         rowCount: 0,
-        created: nowUtc()
+        created: nowUtc(),
+        showInFeed: false
     });
 
     notify.success('Dataset created');

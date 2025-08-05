@@ -24,7 +24,8 @@
                 name: datasetPresets.happiness.defaultName,
                 created: nowUtc(),
                 preset: datasetPresets.happiness,
-                rowCount: 0
+                rowCount: 0,
+                showInFeed: false
             };
         }
 
