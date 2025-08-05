@@ -8,16 +8,8 @@ export class SSLogger {
         private userId: string | null = null
     ) {}
 
-    public withContext(context: Record<string, unknown>) {
-        return new SSLogger(this.name, { ...this.context, ...context }, this.userId);
-    }
-
     public withUserId(userId: string) {
         return new SSLogger(this.name, { ...this.context }, userId);
-    }
-
-    public addContext(key: string, value: string) {
-        this.context[key] = value;
     }
 
     public async writeLog(
@@ -27,7 +19,7 @@ export class SSLogger {
         fromClient: boolean
     ) {
         const contextFmt = JSON.stringify({ ...this.context, ...context });
-        await query`
+        await query.unlogged`
             INSERT INTO logs (userId, created, level, fromClient, message, context) 
             VALUES (
                 ${this.userId},
