@@ -86,4 +86,46 @@ describe('Day', () => {
         const tzOffset = -5; // EST
         expect(Day.timestampsAreSameDay(timestamp1, timestamp2, tzOffset)).toBe(true);
     });
+
+    it('should create a Day instance from a timestamp with a positive timezone offset', () => {
+        const timestamp = 1706580000; // 2024-01-30 02:00:00 UTC
+        const tzOffset = 8; // GMT+8
+        const day = Day.fromTimestamp(timestamp, tzOffset);
+        expect(day.fmtIso()).toBe('2024-01-30');
+    });
+
+    it('should get the UTC timestamp for the start of the day with a negative timezone offset', () => {
+        const day = new Day(2024, 1, 29);
+        const tzOffset = -5; // EST
+        const expectedTimestamp = new Date('2024-01-29T05:00:00Z').getTime() / 1000;
+        expect(day.utcTimestampStartOfDay(tzOffset)).toBe(expectedTimestamp);
+    });
+
+    it('should get the UTC timestamp for the end of the day with a negative timezone offset', () => {
+        const day = new Day(2024, 1, 29);
+        const tzOffset = -5; // EST
+        const expectedTimestamp = new Date('2024-01-30T04:59:59Z').getTime() / 1000;
+        expect(day.utcTimestampEndOfDay(tzOffset)).toBe(expectedTimestamp);
+    });
+
+    it('should get the UTC timestamp for the start of the day with a positive timezone offset', () => {
+        const day = new Day(2024, 1, 30);
+        const tzOffset = 8; // GMT+8
+        const expectedTimestamp = new Date('2024-01-29T16:00:00Z').getTime() / 1000;
+        expect(day.utcTimestampStartOfDay(tzOffset)).toBe(expectedTimestamp);
+    });
+
+    it('should get the UTC timestamp for the end of the day with a positive timezone offset', () => {
+        const day = new Day(2024, 1, 30);
+        const tzOffset = 8; // GMT+8
+        const expectedTimestamp = new Date('2024-01-30T15:59:59Z').getTime() / 1000;
+        expect(day.utcTimestampEndOfDay(tzOffset)).toBe(expectedTimestamp);
+    });
+
+    it('should determine if two timestamps are on different days with a positive timezone offset', () => {
+        const timestamp1 = 1706540400; // 2024-01-29 15:00:00 UTC
+        const timestamp2 = 1706547600; // 2024-01-29 17:00:00 UTC
+        const tzOffset = 8; // GMT+8
+        expect(Day.timestampsAreSameDay(timestamp1, timestamp2, tzOffset)).toBe(false);
+    });
 });
