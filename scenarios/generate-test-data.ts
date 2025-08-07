@@ -148,8 +148,12 @@ async function createEntries(
             Object.values(entry)
         );
 
-        await createEntryEdits(connection, key, userId, entryId, editsPerEntry);
+        await createEntryEdits(connection, key, userId, entryId, editsPerEntry, created);
         await createWordsInEntry(connection, key, userId, entryId, body);
+
+        if (i % 1000 === 0) {
+            console.log(c.grey`        - Create entries progress: ${i}/${entryCount}`);
+        }
     }
     console.log(c.gray`    - Created ${entryCount} entries.`);
 }
@@ -159,7 +163,8 @@ async function createEntryEdits(
     key: string,
     userId: string,
     entryId: string,
-    count: number
+    count: number,
+    entryCreated: number
 ): Promise<void> {
     if (count === 0) return;
     for (let i = 0; i < count; i++) {
@@ -167,8 +172,8 @@ async function createEntryEdits(
             id: generateId(),
             userId: userId,
             entryId: entryId,
-            created: now(),
-            createdTzOffset: -25200,
+            created: entryCreated + 60 * i,
+            createdTzOffset: 0,
             latitude: faker.location.latitude(),
             longitude: faker.location.longitude(),
             agentData: encrypt(
@@ -247,7 +252,7 @@ interface Config {
     scenarioKey: string;
 }
 
-async function getConfigFromuserInput(): Promise<Config> {
+async function getConfigFromUserInput(): Promise<Config> {
     const credentials = await inquirer.prompt([
         {
             type: 'input',
@@ -286,7 +291,7 @@ async function getConfigFromuserInput(): Promise<Config> {
 async function main() {
     console.log('Starting TypeScript Test Data Generator...');
 
-    const { scenarioKey, credentials } = await getConfigFromuserInput();
+    const { scenarioKey, credentials } = await getConfigFromUserInput();
 
     const scenario: Scenario = scenarios[scenarioKey];
     console.log(c.gray`\nRunning scenario: ${scenarioKey}`);
@@ -315,24 +320,30 @@ async function main() {
         await connection.beginTransaction();
         console.log(c.gray`Transaction started.`);
 
-        await connection.execute('DELETE FROM assets WHERE userId = ?', [userId]);
-        await connection.execute('DELETE FROM entries WHERE userId = ?', [userId]);
-        await connection.execute('DELETE FROM entryEdits WHERE userId = ?', [userId]);
-        await connection.execute('DELETE FROM wordsInEntries WHERE userId = ?', [userId]);
-        await connection.execute('DELETE FROM labels WHERE userId = ?', [userId]);
+        await Promise.all([
+            connection.execute('DELETE FROM assets WHERE userId = ?', [userId]),
+            connection.execute('DELETE FROM entries WHERE userId = ?', [userId]),
+            connection.execute('DELETE FROM entryEdits WHERE userId = ?', [userId]),
+            connection.execute('DELETE FROM wordsInEntries WHERE userId = ?', [userId]),
+            connection.execute('DELETE FROM labels WHERE userId = ?', [userId])
+        ]);
+
         console.log(c.green`Cleared data successfully`);
 
         console.log(c.gray`\nGenerating data for '${credentials.username}'...`);
         const labelIds = await createLabels(connection, encryptionKey, userId, scenario.labelCount);
-        await createEntries(
-            connection,
-            encryptionKey,
-            userId,
-            scenario.entryCount,
-            scenario.editsPerEntry,
-            labelIds
-        );
-        await createAssets(connection, encryptionKey, userId, scenario.assetCount);
+
+        await Promise.all([
+            createEntries(
+                connection,
+                encryptionKey,
+                userId,
+                scenario.entryCount,
+                scenario.editsPerEntry,
+                labelIds
+            ),
+            createAssets(connection, encryptionKey, userId, scenario.assetCount)
+        ]);
 
         await connection.commit();
         console.log(c.green('\nTransaction committed successfully'));

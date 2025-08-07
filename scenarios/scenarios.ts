@@ -18,9 +18,9 @@ export const scenarios: Record<string, Scenario> = {
     },
     realistic: {
         description: 'A realistic, somewhat new user account',
-        entryCount: 100,
-        editsPerEntry: 5,
-        labelCount: 20,
+        entryCount: 400,
+        editsPerEntry: 0,
+        labelCount: 10,
         assetCount: 50
     },
     max_everything: {
