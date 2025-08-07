@@ -29,7 +29,7 @@
 
 <Popover.Root>
     <Popover.Trigger
-        class="flex justify-between border-solid items-center gap-1 w-full py-1 hover:bg-lightAccent rounded-full border border-borderColor px-2"
+        class="flex justify-between border-solid items-center gap-1 w-full py-1 hover:bg-lightAccent rounded-full border border-borderColor pl-1 pr-3"
     >
         <AccountCircleOutline size="32" />
         <Streaks condensed />

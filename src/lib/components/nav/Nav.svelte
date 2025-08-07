@@ -41,17 +41,17 @@
             <div class="md:pb-2 w-full">
                 <AccountDropdown {activeSubscriptionType} />
             </div>
-            <div class="pl-2 md:pl-0 md:pb-2 flex items-center justify-between gap-1 w-full">
+            <div class="pl-1 md:pl-0 md:pb-2 flex items-center justify-between gap-1">
                 <span>
                     <Dialog.Root>
                         <Dialog.Trigger
                             aria-label="Search"
                             class={cn(
                                 buttonVariants({ variant: 'outline' }),
-                                'flex-center gap-2 rounded-full p-5'
+                                'flex-center gap-2 rounded-full px-2 py-5 aspect-square md:px-4'
                             )}
                         >
-                            Search
+                            <span class="hide-mobile">Search</span>
                             <Search size="20" />
                         </Dialog.Trigger>
                         <Dialog.Content>
