@@ -21,6 +21,7 @@
     import { api, apiPath } from '$lib/utils/apiRequest';
     import { decrypt } from '$lib/utils/encryption';
     import type { LineChartData } from '../../../types';
+    import { Skeleton } from '$lib/components/ui/skeleton';
 
     export let entryCount: number;
     export let uniqueWordCount: number;
@@ -143,6 +144,16 @@
                         </div>
                     {/if}
                 {/each}
+            </div>
+            <div slot="loader" class="flex flex-col gap-4 p-2">
+                <Skeleton class="w-full h-[35px]" />
+                <Skeleton class="w-full h-[35px]" />
+                <Skeleton class="w-full h-[35px]" />
+                <Skeleton class="w-full h-[35px]" />
+                <Skeleton class="w-full h-[35px]" />
+                <Skeleton class="w-full h-[35px]" />
+                <Skeleton class="w-full h-[35px]" />
+                <Skeleton class="w-full h-[35px]" />
             </div>
         </InfiniteScroller>
     </div>

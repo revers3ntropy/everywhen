@@ -33,6 +33,10 @@
 
 <slot />
 
+{#if currentlyLoading}
+    <slot name="loader"></slot>
+{/if}
+
 <div
     style="height: {margin + marginBelow}px; position: absolute; bottom: -{marginBelow}px"
     class="absolute left-0 right-0 pointer-events-none"
