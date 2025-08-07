@@ -6,6 +6,7 @@
     import { onMount } from 'svelte';
     import ToggleSwitch from 'svelte-material-icons/ToggleSwitch.svelte';
     import ToggleSwitchOff from 'svelte-material-icons/ToggleSwitchOff.svelte';
+    import { Skeleton } from '$lib/components/ui/skeleton';
 
     export let earliestEntryDay: Day;
     export let getBucketisedData: (
@@ -135,5 +136,10 @@
                 </Select.Root>
             </div>
         {/if}
+    </div>
+{:else}
+    <div class="flex flex-col gap-4">
+        <Skeleton class="w-full h-[160px]" />
+        <Skeleton class="w-full h-[60px]" />
     </div>
 {/if}
