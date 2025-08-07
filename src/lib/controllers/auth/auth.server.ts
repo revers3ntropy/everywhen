@@ -146,6 +146,14 @@ namespace AuthServer {
 
         sessions.set(sessionId, session);
 
+        void logger
+            .withUserId(userDetailsRes.val.id)
+            .log('user authentication', {
+                username: session.username,
+                created: session.created,
+                expires: session.expires
+            });
+
         return Result.ok(sessionId);
     }
 }

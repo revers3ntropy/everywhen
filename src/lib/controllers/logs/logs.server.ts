@@ -8,7 +8,7 @@ export class SSLogger {
         private userId: string | null = null
     ) {}
 
-    public withUserId(userId: string) {
+    public withUserId(userId: string | null) {
         return new SSLogger(this.name, { ...this.context }, userId);
     }
 

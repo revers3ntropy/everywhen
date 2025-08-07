@@ -3,7 +3,7 @@ import { sessionCookieOptions } from '$lib/utils/cookies';
 import type { Cookies, Handle } from '@sveltejs/kit';
 import { cleanupCache } from '$lib/utils/cache.server';
 import { Auth } from '$lib/controllers/auth/auth.server';
-import type { Mutable } from './types';
+import type { MaybePromise, Mutable } from './types';
 import { SSLogger } from '$lib/controllers/logs/logs.server';
 
 // makes time zone offset always 0
@@ -55,6 +55,8 @@ function getCookieWritableCookies(cookies: Cookies): App.Locals['__cookieWritabl
 }
 
 export const handle = (async ({ event, resolve }) => {
+    const start = performance.now();
+
     // has already been cloned, 'auth' is not a reference to the stored object
     const auth = Auth.tryGetAuthFromCookies(event.cookies);
     event.locals.auth = auth;
@@ -65,12 +67,34 @@ export const handle = (async ({ event, resolve }) => {
 
     event.locals.__cookieWritables = getCookieWritableCookies(event.cookies);
 
+    let res: MaybePromise<Response>;
     try {
-        return await resolve(event);
+        res = await resolve(event);
     } catch (error) {
-        await reqLogger.error('Uncaught error when resolving response', { error, event });
+        const end = performance.now();
+        // don't log user keys!
+        if (event.locals.auth) event.locals.auth.key = 'REDACTED';
+        await reqLogger.error('page load error', {
+            error,
+            event,
+            loadTimeMs: end - start
+        });
         return new Response('An Error has Occurred', {
             status: 500
         });
     }
+
+    const end = performance.now();
+    void reqLogger.withUserId(auth ? auth.id : null).log('page load', {
+        url: event.url,
+        routeId: event.route.id,
+        method: event.request.method,
+        loadTimeMs: end - start,
+        responseCode: res.status,
+        requestSize: String(event.request.body).length,
+        responseSize: String(res.body).length,
+        ipAddress: 0
+    });
+
+    return res;
 }) satisfies Handle;
