@@ -268,10 +268,6 @@
             <Label label={labelId ? labels[labelId] : null} {obfuscated} />
         {/if}
 
-        <div class="title" class:obfuscated>
-            {title}
-        </div>
-
         {#if !obfuscated}
             <div class="pl-2">
                 <button aria-label="Show entry" on:click={toggleObfuscation}>
@@ -309,7 +305,7 @@
             </div>
         </div>
     {/if}
-    <div class="text-lg only-mobile p-2" class:obfuscated>
+    <div class="text-lg font-bold p-2 md:px-4 pb-0" class:obfuscated>
         {title}
     </div>
 
