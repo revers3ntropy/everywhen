@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import inquirer from 'inquirer';
 import { v4 as uuidv4 } from 'uuid';
 import { faker } from '@faker-js/faker';
-import type { Scenario } from './scenarios.js';
+import type { CustomEntry, Scenario } from './scenarios.js';
 import { scenarios } from './scenarios.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -115,12 +115,30 @@ async function createEntries(
     userId: string,
     entryCount: number,
     editsPerEntry: number,
-    labelIds: string[]
+    labelIds: string[],
+    customEntries: CustomEntry[]
 ): Promise<void> {
     if (entryCount === 0) return;
     for (let i = 0; i < entryCount; i++) {
         const entryId = generateId();
-        const body = faker.lorem.paragraphs(3);
+        let title;
+        let body;
+        let labelId: string | null = null;
+
+        if (customEntries.length) {
+            title = customEntries[0].title || '';
+            body = customEntries[0].body;
+            if (labelIds.length && customEntries[0].label) {
+                labelId = faker.helpers.arrayElement(labelIds);
+            }
+            customEntries = [...customEntries.slice(1)];
+        } else {
+            title = faker.lorem.sentence();
+            body = faker.lorem.paragraphs(3);
+            if (labelIds.length) {
+                labelId = faker.helpers.arrayElement(labelIds);
+            }
+        }
         const wordCount = body.split(/\s+/).length;
 
         const created = now() - 60 * 60 * 24 * i;
@@ -134,9 +152,9 @@ async function createEntries(
             // random location in the south eath of the UK
             latitude: 52.3946613 + (Math.random() - 0.5) * 0.8,
             longitude: 0.2557761 + (Math.random() - 0.5) * 2,
-            title: encrypt(faker.lorem.sentence(), key),
+            title: encrypt(title, key),
             body: encrypt(body, key),
-            labelId: labelIds.length > 0 ? faker.helpers.arrayElement(labelIds) : null,
+            labelId,
             deleted: null,
             pinned: faker.helpers.arrayElement([null, now()]),
             agentData: encrypt(JSON.stringify({ device: 'ts-test-script', version: '1.0' }), key),
@@ -283,6 +301,17 @@ async function getConfigFromUserInput(): Promise<Config> {
     return { scenarioKey, credentials };
 }
 
+async function resetDb(connection: Connection, userId: string) {
+    await Promise.all([
+        connection.execute('DELETE FROM assets WHERE userId = ?', [userId]),
+        connection.execute('UPDATE events SET labelId = null', [userId]),
+        connection.execute('DELETE FROM entries WHERE userId = ?', [userId]),
+        connection.execute('DELETE FROM entryEdits WHERE userId = ?', [userId]),
+        connection.execute('DELETE FROM wordsInEntries WHERE userId = ?', [userId]),
+        connection.execute('DELETE FROM labels WHERE userId = ?', [userId])
+    ]);
+}
+
 // --- MAIN EXECUTION LOGIC ---
 
 /**
@@ -320,13 +349,7 @@ async function main() {
         await connection.beginTransaction();
         console.log(c.gray(`Transaction started.`));
 
-        await Promise.all([
-            connection.execute('DELETE FROM assets WHERE userId = ?', [userId]),
-            connection.execute('DELETE FROM entries WHERE userId = ?', [userId]),
-            connection.execute('DELETE FROM entryEdits WHERE userId = ?', [userId]),
-            connection.execute('DELETE FROM wordsInEntries WHERE userId = ?', [userId]),
-            connection.execute('DELETE FROM labels WHERE userId = ?', [userId])
-        ]);
+        await resetDb(connection, userId);
 
         console.log(c.green(`Cleared data successfully`));
 
@@ -340,7 +363,8 @@ async function main() {
                 userId,
                 scenario.entryCount,
                 scenario.editsPerEntry,
-                labelIds
+                labelIds,
+                scenario.entries ?? []
             ),
             createAssets(connection, encryptionKey, userId, scenario.assetCount)
         ]);
