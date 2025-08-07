@@ -64,7 +64,7 @@ async function findUserByCredentials(
     username: string,
     key: string
 ): Promise<string | null> {
-    console.log(c.gray`Searching for user: ${username}`);
+    console.log(c.gray(`Searching for user: ${username}`));
     // IMPORTANT: This is a plain-text password check, suitable only for a test script.
     // A real application would use a secure hashing and comparison mechanism (e.g., bcrypt).
     const [rows] = await connection.execute<RowDataPacket[]>(
@@ -105,7 +105,7 @@ async function createLabels(
         );
         labelIds.push(labelId);
     }
-    console.log(c.gray`    - Created ${count} labels.`);
+    console.log(c.gray(`    - Created ${count} labels.`));
     return labelIds;
 }
 
@@ -152,10 +152,10 @@ async function createEntries(
         await createWordsInEntry(connection, key, userId, entryId, body);
 
         if (i % 1000 === 0) {
-            console.log(c.grey`        - Create entries progress: ${i}/${entryCount}`);
+            console.log(c.grey(`        - Create entries progress: ${i}/${entryCount}`));
         }
     }
-    console.log(c.gray`    - Created ${entryCount} entries.`);
+    console.log(c.gray(`    - Created ${entryCount} entries.`));
 }
 
 async function createEntryEdits(
@@ -174,8 +174,8 @@ async function createEntryEdits(
             entryId: entryId,
             created: entryCreated + 60 * i,
             createdTzOffset: 0,
-            latitude: faker.location.latitude(),
-            longitude: faker.location.longitude(),
+            latitude: 52.3946613 + (Math.random() - 0.5) * 0.8,
+            longitude: 0.2557761 + (Math.random() - 0.5) * 2,
             agentData: encrypt(
                 JSON.stringify({ device: 'ts-test-script-edit', version: '1.0' }),
                 key
@@ -241,7 +241,7 @@ async function createAssets(
             Object.values(asset)
         );
     }
-    console.log(c.gray`    - Created ${count} assets.`);
+    console.log(c.gray(`    - Created ${count} assets.`));
 }
 
 interface Config {
@@ -294,7 +294,7 @@ async function main() {
     const { scenarioKey, credentials } = await getConfigFromUserInput();
 
     const scenario: Scenario = scenarios[scenarioKey];
-    console.log(c.gray`\nRunning scenario: ${scenarioKey}`);
+    console.log(c.gray(`\nRunning scenario: ${scenarioKey}`));
 
     let connection: Connection | undefined;
     try {
@@ -318,7 +318,7 @@ async function main() {
         }
 
         await connection.beginTransaction();
-        console.log(c.gray`Transaction started.`);
+        console.log(c.gray(`Transaction started.`));
 
         await Promise.all([
             connection.execute('DELETE FROM assets WHERE userId = ?', [userId]),
@@ -328,9 +328,9 @@ async function main() {
             connection.execute('DELETE FROM labels WHERE userId = ?', [userId])
         ]);
 
-        console.log(c.green`Cleared data successfully`);
+        console.log(c.green(`Cleared data successfully`));
 
-        console.log(c.gray`\nGenerating data for '${credentials.username}'...`);
+        console.log(c.gray(`\nGenerating data for '${credentials.username}'...`));
         const labelIds = await createLabels(connection, encryptionKey, userId, scenario.labelCount);
 
         await Promise.all([
@@ -357,7 +357,7 @@ async function main() {
     } finally {
         if (connection) {
             await connection.end();
-            console.log(c.gray`Database connection closed.`);
+            console.log(c.gray(`Database connection closed.`));
         }
     }
 }
