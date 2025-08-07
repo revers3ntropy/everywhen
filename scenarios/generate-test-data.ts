@@ -151,7 +151,7 @@ async function createEntries(
         await createEntryEdits(connection, key, userId, entryId, editsPerEntry, created);
         await createWordsInEntry(connection, key, userId, entryId, body);
 
-        if (i % 1000 === 0) {
+        if (i % 1000 === 0 && i > 0) {
             console.log(c.grey(`        - Create entries progress: ${i}/${entryCount}`));
         }
     }
