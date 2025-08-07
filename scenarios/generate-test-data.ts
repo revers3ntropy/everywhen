@@ -11,6 +11,8 @@ import { fileURLToPath } from 'url';
 import crypto from 'crypto-js';
 import { sha256 } from 'js-sha256';
 import { ENCRYPTED_TEXT_PREFIX } from '../src/lib/constants';
+import { Day } from '../src/lib/utils/day';
+import c from 'chalk';
 
 // Load environment variables from ../.env
 const __filename = fileURLToPath(import.meta.url);
@@ -62,7 +64,7 @@ async function findUserByCredentials(
     username: string,
     key: string
 ): Promise<string | null> {
-    console.log(`Searching for user: ${username}`);
+    console.log(c.gray`Searching for user: ${username}`);
     // IMPORTANT: This is a plain-text password check, suitable only for a test script.
     // A real application would use a secure hashing and comparison mechanism (e.g., bcrypt).
     const [rows] = await connection.execute<RowDataPacket[]>(
@@ -72,11 +74,11 @@ async function findUserByCredentials(
 
     if (rows.length > 0) {
         const userId = rows[0]['id'];
-        console.log(`  -> Found user with ID: ${userId}`);
+        console.log(c.green`  -> Found user with ID:`, c.cyan(userId));
         return userId;
     }
 
-    console.log(`  -> User not found or password incorrect.`);
+    console.log(c.red(`  -> User not found or password incorrect.`));
     return null;
 }
 
@@ -103,7 +105,7 @@ async function createLabels(
         );
         labelIds.push(labelId);
     }
-    console.log(`    - Created ${count} labels.`);
+    console.log(c.gray`    - Created ${count} labels.`);
     return labelIds;
 }
 
@@ -118,19 +120,21 @@ async function createEntries(
     if (entryCount === 0) return;
     for (let i = 0; i < entryCount; i++) {
         const entryId = generateId();
-        const title = faker.lorem.sentence();
         const body = faker.lorem.paragraphs(3);
         const wordCount = body.split(/\s+/).length;
 
+        const created = now() - 60 * 60 * 24 * i;
+
         const entry = {
             id: entryId,
-            userId: userId,
-            created: now(),
+            userId,
+            created,
             createdTzOffset: 0,
-            day: new Date().toISOString().slice(0, 10),
-            latitude: faker.location.latitude(),
-            longitude: faker.location.longitude(),
-            title: encrypt(title, key),
+            day: Day.fromTimestamp(created, 0).fmtIso(),
+            // random location in the south eath of the UK
+            latitude: 52.3946613 + (Math.random() - 0.5) * 0.8,
+            longitude: 0.2557761 + (Math.random() - 0.5) * 2,
+            title: encrypt(faker.lorem.sentence(), key),
             body: encrypt(body, key),
             labelId: labelIds.length > 0 ? faker.helpers.arrayElement(labelIds) : null,
             deleted: null,
@@ -147,7 +151,7 @@ async function createEntries(
         await createEntryEdits(connection, key, userId, entryId, editsPerEntry);
         await createWordsInEntry(connection, key, userId, entryId, body);
     }
-    console.log(`    - Created ${entryCount} entries.`);
+    console.log(c.gray`    - Created ${entryCount} entries.`);
 }
 
 async function createEntryEdits(
@@ -232,7 +236,7 @@ async function createAssets(
             Object.values(asset)
         );
     }
-    console.log(`    - Created ${count} assets.`);
+    console.log(c.gray`    - Created ${count} assets.`);
 }
 
 interface Config {
@@ -285,7 +289,7 @@ async function main() {
     const { scenarioKey, credentials } = await getConfigFromuserInput();
 
     const scenario: Scenario = scenarios[scenarioKey];
-    console.log(`\nRunning scenario: ${scenarioKey}`);
+    console.log(c.gray`\nRunning scenario: ${scenarioKey}`);
 
     let connection: Connection | undefined;
     try {
@@ -298,49 +302,42 @@ async function main() {
             charset: 'utf8mb4_bin'
         });
 
-        console.log('Successfully connected to the database.');
+        console.log(c.green('Successfully connected to database'));
 
         const encryptionKey = encryptionKeyFromPassword(credentials.password);
         const userId = await findUserByCredentials(connection, credentials.username, encryptionKey);
 
         if (!userId) {
-            console.error(
-                '\nExecution halted: Could not find user. Please check credentials and ensure the user exists.'
-            );
+            console.error(c.red('\nExecution halted: Could not find user'));
             return;
         }
 
         await connection.beginTransaction();
-        console.log('Transaction started.');
+        console.log(c.gray`Transaction started.`);
 
         await connection.execute('DELETE FROM assets WHERE userId = ?', [userId]);
         await connection.execute('DELETE FROM entries WHERE userId = ?', [userId]);
         await connection.execute('DELETE FROM entryEdits WHERE userId = ?', [userId]);
         await connection.execute('DELETE FROM wordsInEntries WHERE userId = ?', [userId]);
         await connection.execute('DELETE FROM labels WHERE userId = ?', [userId]);
-        console.log('Cleared data');
+        console.log(c.green`Cleared data successfully`);
 
-        console.log(`\nGenerating data for user ID: ${userId}...`);
-        const labelIds = await createLabels(
-            connection,
-            encryptionKey,
-            userId,
-            scenario.labelsPerUser
-        );
+        console.log(c.gray`\nGenerating data for '${credentials.username}'...`);
+        const labelIds = await createLabels(connection, encryptionKey, userId, scenario.labelCount);
         await createEntries(
             connection,
             encryptionKey,
             userId,
-            scenario.entriesPerUser,
+            scenario.entryCount,
             scenario.editsPerEntry,
             labelIds
         );
-        await createAssets(connection, encryptionKey, userId, scenario.assetsPerUser);
+        await createAssets(connection, encryptionKey, userId, scenario.assetCount);
 
         await connection.commit();
-        console.log('\nTransaction committed successfully!');
-    } catch (error: any) {
-        console.error('\nAn error occurred:', error.message);
+        console.log(c.green('\nTransaction committed successfully'));
+    } catch (error: unknown) {
+        console.error(c.red('\nAn error occurred:'), (error as { message: string }).message);
         if (connection) {
             console.log('Rolling back transaction...');
             await connection.rollback();
@@ -349,7 +346,7 @@ async function main() {
     } finally {
         if (connection) {
             await connection.end();
-            console.log('Database connection closed.');
+            console.log(c.gray`Database connection closed.`);
         }
     }
 }

@@ -1,37 +1,33 @@
-/**
- * @fileoverview Defines the data generation scenarios for an existing user.
- */
+import { UsageLimits } from '../src/lib/controllers/usageLimits/usageLimits';
 
-// Defines the structure for a single scenario configuration.
 export interface Scenario {
     description: string;
-    entriesPerUser: number;
+    entryCount: number;
     editsPerEntry: number;
-    labelsPerUser: number;
-    assetsPerUser: number;
+    labelCount: number;
+    assetCount: number;
 }
 
-// A record of available scenarios, mapping a key to a Scenario object.
 export const scenarios: Record<string, Scenario> = {
-    basic_data: {
-        description: 'Generate a small amount of data for the specified user.',
-        entriesPerUser: 5,
+    small: {
+        description: 'A small amount of data',
+        entryCount: 5,
         editsPerEntry: 1,
-        labelsPerUser: 3,
-        assetsPerUser: 2
+        labelCount: 3,
+        assetCount: 2
     },
-    power_user_data: {
-        description: 'Generate a large amount of data for the specified user.',
-        entriesPerUser: 100,
+    realistic: {
+        description: 'A realistic, somewhat new user account',
+        entryCount: 100,
         editsPerEntry: 5,
-        labelsPerUser: 20,
-        assetsPerUser: 50
+        labelCount: 20,
+        assetCount: 50
     },
-    fresh_start: {
-        description: 'Generate only labels and assets, no journal entries.',
-        entriesPerUser: 0,
-        editsPerEntry: 0,
-        labelsPerUser: 5,
-        assetsPerUser: 5
+    max_everything: {
+        description: 'TO THE MAX: up to Plus limits on everything - may take a while to run',
+        entryCount: UsageLimits.LIMITS_PLUS.entry.maxCount,
+        editsPerEntry: 5,
+        labelCount: UsageLimits.LIMITS_PLUS.label.maxCount,
+        assetCount: UsageLimits.LIMITS_PLUS.asset.maxCount
     }
 };
