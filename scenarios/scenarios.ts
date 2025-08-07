@@ -39,7 +39,7 @@ export const scenarios: Record<string, Scenario> = {
     },
     realistic: {
         description: 'A realistic, somewhat new user account',
-        entryCount: 432,
+        entryCount: 58,
         editsPerEntry: 0,
         labelCount: 10,
         assetCount: 48,
@@ -75,5 +75,12 @@ export const scenarios: Record<string, Scenario> = {
                     'We need a name swap summit.'
             }
         ]
+    },
+    mature: {
+        description: 'A mature account, going for over 3 years',
+        entryCount: 1011,
+        editsPerEntry: 0,
+        labelCount: 18,
+        assetCount: 57
     }
 };

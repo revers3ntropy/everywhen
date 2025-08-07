@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Select from '$lib/components/ui/Select.svelte';
+    import * as Select from '$lib/components/ui/select';
     import { By, Grouping, type StatsData } from '$lib/controllers/stats/stats';
     import { Day } from '$lib/utils/day';
     import Heatmap from '$lib/components/ui/heatmap/Heatmap.svelte';
@@ -99,26 +99,40 @@
             </button>
         </div>
         {#if Day.todayUsingNativeDate().year - earliestEntryDay.year > 0}
-            <div class="flex-center bg-vLightAccent rounded-xl px-3 py-1">
-                <Select
-                    value={showingYear}
-                    key={showingYear.toString()}
-                    onChange={value => void changeYear(value)}
-                    options={{
-                        'Last Year': 'Last Year',
-                        ...Object.fromEntries(
-                            Array.from(
-                                { length: Day.todayUsingNativeDate().year - earliestEntryDay.year },
-                                (_, i) => {
-                                    const yearStr = (
-                                        Day.todayUsingNativeDate().year - i
-                                    ).toString();
-                                    return [yearStr, yearStr];
-                                }
-                            )
-                        )
+            <div class="flex-center bg-vLightAccent rounded-xl">
+                <Select.Root
+                    name="showing year"
+                    selected={{ value: showingYear }}
+                    onSelectedChange={selected => {
+                        if (selected && 'value' in selected) changeYear(selected.value);
                     }}
-                />
+                >
+                    <Select.Trigger class="w-[180px]">{showingYear}</Select.Trigger>
+                    <Select.Content>
+                        <Select.Group>
+                            <Select.Item
+                                value={'Last Year'}
+                                label="Last Year"
+                                disabled={showingYear === 'Last Year'}
+                                class="data-[highlighted]:bg-backgroundColor"
+                            >
+                                Last Year ({Day.todayUsingNativeDate().year -
+                                    1}-{Day.todayUsingNativeDate().year}
+                            </Select.Item>
+                            {#each { length: Day.todayUsingNativeDate().year - earliestEntryDay.year } as _, i (i)}
+                                {@const yearStr = (Day.todayUsingNativeDate().year - i).toString()}
+                                <Select.Item
+                                    value={yearStr}
+                                    label={yearStr}
+                                    disabled={showingYear === yearStr}
+                                    class="data-[highlighted]:bg-backgroundColor"
+                                >
+                                    {yearStr}
+                                </Select.Item>
+                            {/each}
+                        </Select.Group>
+                    </Select.Content>
+                </Select.Root>
             </div>
         {/if}
     </div>

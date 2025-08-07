@@ -75,7 +75,11 @@
                 longitude: newCenter.lng
             })
         );
-        await dispatch.update('location', { ...oldLocation, latitude: newCenter.lat, longitude: newCenter.lng }, { ...oldLocation });
+        await dispatch.update(
+            'location',
+            { ...oldLocation, latitude: newCenter.lat, longitude: newCenter.lng },
+            { ...oldLocation }
+        );
         notify.success('Updated location position');
     }
 
