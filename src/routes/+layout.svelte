@@ -67,6 +67,9 @@
             void checkForUpdate();
         });
         checkRedactedFontIsLoaded();
+
+        // so popups and stuff have the right theme
+        document.body.setAttribute('data-theme', $theme);
     });
 
     let isNewVersionAvailable = false;
