@@ -16,7 +16,7 @@ jobs:
 
       - uses: mirromutth/mysql-action@v1.1
         with:
-          mysql database: 'halcyon_land_dev'
+          mysql database: 'everywhen_dev'
           mysql root password: 'Pass'
 
       - name: Install dependencies
@@ -26,7 +26,7 @@ jobs:
         run: sudo mysql -h 127.0.0.1 -u root -pPass -e "ALTER USER 'root'@'%' IDENTIFIED BY ''"
 
       - name: Run migrations
-        run: sudo mysql -h 127.0.0.1 -u root halcyon_land_dev < ./db/schema.sql
+        run: sudo mysql -h 127.0.0.1 -u root everywhen_dev < ./db/schema.sql
 
       - name: Install Playwright browsers
         run: npx playwright install msedge && npx playwright install chromium && npx playwright install firefox
