@@ -1,5 +1,6 @@
 <script lang="ts">
     import { page } from '$app/stores';
+    import { Button } from '$lib/components/ui/button';
     import InfiniteScroller from '$lib/components/ui/InfiniteScroller.svelte';
     import { notify } from '$lib/components/notifications/notifications';
     import { ANIMATION_DURATION } from '$lib/constants';
@@ -89,13 +90,14 @@
 
 {#if !noEntries}
     <div class="fixed only-mobile z-10 p-1 top-0 right-2">
-        <button
+        <Button
             aria-label="Show sidebar menu"
-            class="bg-lightAccent rounded-lg"
+            class="flex-center gap-2 rounded-full px-2 py-5 aspect-square"
             on:click={() => (openOnMobile = !openOnMobile)}
+            variant="secondary"
         >
-            <Menu size="40" />
-        </button>
+            <Menu size="24" />
+        </Button>
     </div>
 
     <div
