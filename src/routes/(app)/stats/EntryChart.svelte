@@ -20,6 +20,7 @@
     import { cssVarValue } from '$lib/utils/getCssVar';
     import { theme } from '$lib/stores';
     import { CSLogger } from '$lib/controllers/logs/logger.client';
+    import { Skeleton } from '$lib/components/ui/skeleton';
 
     Chart.register(
         Title,
@@ -200,6 +201,11 @@
                     />
                 </span>
             </div>
+        </div>
+    {:else}
+        <div class="flex flex-col gap-4 p-2">
+            <Skeleton class="w-full h-[200px]" />
+            <Skeleton class="w-full h-[60px]" />
         </div>
     {/if}
 {/key}
