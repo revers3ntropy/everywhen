@@ -98,25 +98,28 @@
                 <span class:text-light={by !== By.Entries}> By Entries </span>
             </button>
         </div>
-
-        <div class="flex-center bg-vLightAccent rounded-xl px-3 py-1">
-            <Select
-                value={showingYear}
-                key={showingYear.toString()}
-                onChange={value => void changeYear(value)}
-                options={{
-                    'Last Year': 'Last Year',
-                    ...Object.fromEntries(
-                        Array.from(
-                            { length: Day.todayUsingNativeDate().year - earliestEntryDay.year },
-                            (_, i) => {
-                                const yearStr = (Day.todayUsingNativeDate().year - i).toString();
-                                return [yearStr, yearStr];
-                            }
+        {#if Day.todayUsingNativeDate().year - earliestEntryDay.year > 0}
+            <div class="flex-center bg-vLightAccent rounded-xl px-3 py-1">
+                <Select
+                    value={showingYear}
+                    key={showingYear.toString()}
+                    onChange={value => void changeYear(value)}
+                    options={{
+                        'Last Year': 'Last Year',
+                        ...Object.fromEntries(
+                            Array.from(
+                                { length: Day.todayUsingNativeDate().year - earliestEntryDay.year },
+                                (_, i) => {
+                                    const yearStr = (
+                                        Day.todayUsingNativeDate().year - i
+                                    ).toString();
+                                    return [yearStr, yearStr];
+                                }
+                            )
                         )
-                    )
-                }}
-            />
-        </div>
+                    }}
+                />
+            </div>
+        {/if}
     </div>
 {/if}
