@@ -1,11 +1,11 @@
 <script>
     import InformationOutline from 'svelte-material-icons/InformationOutline.svelte';
     import BugOutline from 'svelte-material-icons/BugOutline.svelte';
+    import Instagram from 'svelte-material-icons/Instagram.svelte';
     import Github from 'svelte-material-icons/Github.svelte';
     import Security from 'svelte-material-icons/Security.svelte';
     import History from 'svelte-material-icons/History.svelte';
     import OpenInNew from 'svelte-material-icons/OpenInNew.svelte';
-    import DonateWidget from '$lib/components/DonateWidget.svelte';
     import Logo from '$lib/components/ui/Logo.svelte';
     import { PUBLIC_ENV } from '$env/static/public';
     import { isProd } from '$lib/utils/env';
@@ -20,39 +20,26 @@
         </div>
         <div class="info">
             <div>
-                <a aria-label="about" href="/about" class="with-icon icon-gradient-on-hover">
-                    <InformationOutline size="25" /> About Everywhen
-                </a>
-            </div>
-            <div>
                 <a
-                    aria-label="about"
-                    href="/about/privacy"
+                    aria-label="instagram"
+                    href="https://www.instagram.com/everywhenapp/"
+                    target="_blank"
                     class="with-icon icon-gradient-on-hover"
                 >
-                    <Security size="25" /> Privacy Policy
-                </a>
-            </div>
-            <div>
-                <a
-                    aria-label="version history"
-                    href="/about/history"
-                    class="with-icon icon-gradient-on-hover"
-                >
-                    <History size="25" /> Version History
+                    <Instagram size="25" />
+                    <span class="flex-center gap-2"> Follow us on Instagram <OpenInNew /> </span>
                 </a>
             </div>
             <div>
                 <a
                     aria-label="Report Bugs and Request Features"
-                    href="https://github.com/revers3ntropy/everywhen/issues"
-                    rel="noreferrer"
+                    href="https://docs.google.com/forms/d/e/1FAIpQLSfbcoJ45TZtB-XojgPTBvOlqHQffk-SSAyQSJCBjZngw_iLTQ/viewform?usp=dialog"
                     target="_blank"
                     class="with-icon icon-gradient-on-hover"
                 >
                     <BugOutline size="25" />
                     <span class="flex-center gap-2">
-                        Report Bugs / Request Features <OpenInNew />
+                        Feedback form <OpenInNew />
                     </span>
                 </a>
             </div>
@@ -69,7 +56,30 @@
                 </a>
             </div>
 
-            <div> <DonateWidget /> </div>
+            <div>
+                <a
+                    aria-label="about"
+                    href="/about/privacy"
+                    class="with-icon icon-gradient-on-hover"
+                >
+                    <Security size="25" /> Privacy Policy
+                </a>
+            </div>
+
+            <div>
+                <a
+                    aria-label="version history"
+                    href="/about/history"
+                    class="with-icon icon-gradient-on-hover"
+                >
+                    <History size="25" /> Version History
+                </a>
+            </div>
+            <div>
+                <a aria-label="about" href="/about" class="with-icon icon-gradient-on-hover">
+                    <InformationOutline size="25" /> About Everywhen
+                </a>
+            </div>
         </div>
     </div>
 
