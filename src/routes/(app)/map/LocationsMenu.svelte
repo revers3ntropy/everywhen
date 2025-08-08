@@ -11,23 +11,27 @@
     let creatingLocationLoading = false;
 </script>
 
-<div class="py-2 max-h-[350px] overflow-x-auto">
+<div class="py-2 max-h-[350px] max-w-[400px] overflow-y-auto">
     <p class="px-2 text-light font-bold">Locations</p>
 
     {#each locations as location}
         <div class="flex">
-            <a class="p-2 hover:bg-lightAccent" href="/map#{location.id}">
+            <a class="p-2 hover:bg-lightAccent flex-center rounded-full" href="/map#{location.id}">
                 <CrosshairsGps size={20} />
             </a>
             <a
-                class="p-2 hover:bg-lightAccent w-full flex items-center justify-between hover:no-underline"
+                class="p-2 hover:bg-lightAccent w-full flex items-center justify-between hover:no-underline rounded-xl"
                 href="/map/{location.id}"
             >
                 <span>
                     {location.name}
-                    <span class="text-light">({Location.degreesToMeters(location.radius)}m)</span>
+                    <span class="text-light">
+                        ({Location.degreesToMeters(location.radius).toFixed(1)}m)
+                    </span>
                 </span>
-                <PencilOutline size={18} />
+                <span class="w-[18px]">
+                    <PencilOutline size={18} />
+                </span>
             </a>
         </div>
     {/each}
