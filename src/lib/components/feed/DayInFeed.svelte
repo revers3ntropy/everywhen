@@ -78,7 +78,7 @@
         class:mb-2={!isToday && !$collapsed[day.day]}
     >
         <div class="flex justify-between">
-            <div class="flex">
+            <div class="flex overflow-x-auto no-scrollbar">
                 <button class="flex-center" on:click={toggleCollapse}>
                     {#if $collapsed[day.day]}
                         <ChevronDown size="25" />
