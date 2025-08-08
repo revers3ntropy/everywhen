@@ -6,7 +6,7 @@
     export let data;
 </script>
 
-<main class="md:p-4 md:pl-4 flex-center">
+<main class="p-2 md:p-4 md:pl-4 flex-center">
     <section class="w-full md:max-w-5xl">
         {#if data.hasPlusWithoutSub}
             <h3>Early Bird 🥳</h3>
