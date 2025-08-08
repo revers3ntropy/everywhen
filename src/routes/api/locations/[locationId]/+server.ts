@@ -16,7 +16,7 @@ export const PUT = (async ({ cookies, request, params }) => {
 
     const body = await getUnwrappedReqBody(auth, request, {
         name: z.string().optional(),
-        radius: z.number().min(1).max(10_000_000).optional(),
+        radius: z.number().min(0).max(360).optional(),
         latitude: z.number().optional(),
         longitude: z.number().optional()
     });
