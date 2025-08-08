@@ -9,7 +9,6 @@
     "dev": "scripts/dev",
     "fmt": "scripts/fmt",
     "make-tests": "scripts/make-tests",
-    "populate-local-acc": "scripts/populate-account",
     "precommit": "scripts/precommit",
     "reset-dev-db": "scripts/reset_db_dev",
     "setup": "scripts/setup",
