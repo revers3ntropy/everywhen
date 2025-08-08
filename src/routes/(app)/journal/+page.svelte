@@ -19,12 +19,13 @@
         return document.getElementsByClassName('root')[0] as HTMLElement;
     };
 
+    // scroll to top of page after navigating
     page.subscribe(() => {
         getScrollContainer()?.scrollTo(0, 0);
     });
 
     // could be fetched by sidebar...?
-    let onThisDayData: Record<string, EntrySummary[]> = {};
+    let onThisDayData: Record<string, EntrySummary[]> | null = null;
     onMount(async () => {
         onThisDayData = notify.onErr(
             await api.get('/entries/onThisDay', {

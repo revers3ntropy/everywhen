@@ -19,9 +19,10 @@
     import { Entry, type EntrySummary } from '$lib/controllers/entry/entry';
     import EntrySummaries from './EntrySummaries.svelte';
     import { slide } from 'svelte/transition';
+    import { Day } from '$lib/utils/day';
 
     export let obfuscated = false;
-    export let nYearsAgo: Record<string, EntrySummary[]>;
+    export let nYearsAgo: Record<string, EntrySummary[]> | null;
     export let pinnedEntriesSummaries: EntrySummary[];
     export let openOnMobile = false;
     export let locations: Location[];
@@ -39,16 +40,17 @@
         }
 
         loadedAny = true;
-        summaries = Entry.groupEntriesByDay(newEntrySummaries, summaries);
 
+        summaries = Entry.groupEntriesByDay(newEntrySummaries, summaries);
         titleIds = [...titleIds, ...newEntrySummaries.map(t => t.id)];
     }
 
+    // close sidebar after navigating
     page.subscribe(() => {
         openOnMobile = false;
     });
 
-    $: pinnedEntries = Entry.groupEntriesByDay(
+    $: pinnedEntrySummariesGroupedByDay = Entry.groupEntriesByDay(
         showingAllPinned
             ? pinnedEntriesSummaries
             : pinnedEntriesSummaries
@@ -59,21 +61,33 @@
         pinnedEntriesSummaries.length > showLimitPinnedEntries && !showingAllPinned;
 
     listen.entry.onCreate(entry => {
-        // if no pinned entries already, face to force the pinned entries to be shown
-        if (Entry.isPinned(entry) && !pinnedEntriesSummaries.length) {
-            pinnedEntriesSummaries = [Entry.summaryFromEntry(entry)];
-        }
+        const entrySummary = Entry.summaryFromEntry(entry);
         numTitles++;
         titleIds.push(entry.id);
+        const day = Day.fromTimestamp(entry.created, entry.createdTzOffset).fmtIso();
+        if (day in summaries) {
+            summaries[day] = [entrySummary, ...summaries[day]];
+        } else {
+            summaries[day] = [entrySummary];
+        }
+        if (Entry.isPinned(entry)) {
+            pinnedEntriesSummaries = [entrySummary, ...pinnedEntriesSummaries];
+        }
     });
     listen.entry.onUpdate(entry => {
-        if (Entry.isPinned(entry) && !pinnedEntriesSummaries.length) {
-            pinnedEntriesSummaries = [Entry.summaryFromEntry(entry)];
+        if (Entry.isPinned(entry)) {
+            pinnedEntriesSummaries = [Entry.summaryFromEntry(entry), ...pinnedEntriesSummaries];
         }
     });
     listen.entry.onDelete(entryId => {
         numTitles--;
         titleIds = titleIds.filter(id => id !== entryId);
+        pinnedEntriesSummaries = pinnedEntriesSummaries.filter(({ id }) => id !== entryId);
+
+        // remove from summaries
+        for (const day in summaries) {
+            summaries[day] = summaries[day].filter(({ id }) => id !== entryId);
+        }
     });
 
     onMount(() => {
@@ -128,7 +142,7 @@
         </div>
         <div>
             {#key [pinnedEntriesSummaries, showingAllPinned]}
-                {#if Object.keys(pinnedEntries).length}
+                {#if Object.keys(pinnedEntrySummariesGroupedByDay).length}
                     <div class="pb-2">
                         <div
                             class="p-2 border-b-2 border-borderColor"
@@ -143,10 +157,8 @@
                             </h3>
                             <div>
                                 <EntrySummaries
-                                    titles={pinnedEntries}
+                                    titles={pinnedEntrySummariesGroupedByDay}
                                     {obfuscated}
-                                    onCreateFilter={Entry.isPinned}
-                                    showOnUpdateAndNotAlreadyShownFilter={Entry.isPinned}
                                     hideBlurToggle
                                     {labels}
                                     {locations}
@@ -168,28 +180,31 @@
                     </div>
                 {/if}
             {/key}
-            {#if Object.entries(nYearsAgo).length}
-                <div class="flex flex-col gap-2 border-b-2 border-borderColor">
-                    {#each Object.entries(nYearsAgo) as [date, entries] (date)}
-                        <div class="p-2">
-                            <h3>
-                                {fmtUtcRelative(new Date(date), 'en-full')} since...
-                            </h3>
-                            <EntrySummaries
-                                titles={{
-                                    [date]: entries
-                                }}
-                                {obfuscated}
-                                showTimeAgo={false}
-                                hideDate
-                                onCreateFilter={() => false}
-                                hideBlurToggle
-                                {labels}
-                                {locations}
-                            />
-                        </div>
-                    {/each}
-                </div>
+            {#if nYearsAgo}
+                {#if Object.entries(nYearsAgo).length}
+                    <div class="flex flex-col gap-2 border-b-2 border-borderColor">
+                        {#each Object.entries(nYearsAgo) as [date, entries] (date)}
+                            <div class="p-2">
+                                <h3>
+                                    {fmtUtcRelative(new Date(date), 'en-full')} since...
+                                </h3>
+                                <EntrySummaries
+                                    titles={{
+                                        [date]: entries
+                                    }}
+                                    {obfuscated}
+                                    showTimeAgo={false}
+                                    hideDate
+                                    hideBlurToggle
+                                    {labels}
+                                    {locations}
+                                />
+                            </div>
+                        {/each}
+                    </div>
+                {/if}
+            {:else}
+                Loading...
             {/if}
             <div class="p-2 relative">
                 <InfiniteScroller

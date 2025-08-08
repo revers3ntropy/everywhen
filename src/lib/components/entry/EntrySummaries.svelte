@@ -23,50 +23,6 @@
     export let hideBlurToggle = false;
     export let locations: Location[];
     export let labels: Record<string, Label>;
-    export let onCreateFilter: (entry: Entry) => boolean = () => true;
-    export let showOnUpdateAndNotAlreadyShownFilter: (entry: Entry) => boolean = () => false;
-
-    listen.entry.onCreate(entry => {
-        if (!onCreateFilter(entry)) return;
-        if (!titles) titles = {};
-
-        const localDate = fmtUtc(entry.created, entry.createdTzOffset, 'YYYY-MM-DD');
-
-        titles = {
-            ...titles,
-            [localDate]: [Entry.summaryFromEntry(entry), ...(titles?.[localDate] || [])].sort(
-                (a, b) => b.created - a.created
-            )
-        };
-    });
-    listen.entry.onUpdate(entry => {
-        if (!titles) titles = {};
-
-        const localDate = fmtUtc(entry.created, entry.createdTzOffset, 'YYYY-MM-DD');
-
-        if (!(titles[localDate] || []).find(e => e.id === entry.id)) {
-            if (!showOnUpdateAndNotAlreadyShownFilter(entry)) {
-                return;
-            }
-        }
-
-        titles = {
-            ...titles,
-            [localDate]: [
-                Entry.summaryFromEntry(entry),
-                ...(titles[localDate] || []).filter(e => e.id !== entry.id)
-            ].sort((a, b) => b.created - a.created)
-        };
-    });
-    listen.entry.onDelete(id => {
-        if (!titles) return;
-        titles = Object.fromEntries(
-            Object.entries(titles).map(([date, entries]) => [
-                date,
-                entries.filter(e => e.id !== id)
-            ])
-        );
-    });
 
     let sortedTitles: [number, string][] | null;
     $: sortedTitles = titles
