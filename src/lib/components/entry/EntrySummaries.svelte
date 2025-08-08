@@ -9,9 +9,8 @@
     import type { Location } from '$lib/controllers/location/location';
     import LabelDot from '$lib/components/label/LabelDot.svelte';
     import { ANIMATION_DURATION } from '$lib/constants';
-    import { listen } from '$lib/dataChangeEvents';
     import { Entry, type EntrySummary } from '$lib/controllers/entry/entry';
-    import { currentTzOffset, fmtUtc, nowUtc, utcEq } from '$lib/utils/time';
+    import { currentTzOffset, nowUtc, utcEq } from '$lib/utils/time';
     import Dot from '../ui/Dot.svelte';
     import UtcTime from '../ui/UtcTime.svelte';
 

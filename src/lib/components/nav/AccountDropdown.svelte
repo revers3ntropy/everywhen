@@ -16,6 +16,7 @@
     import { Theme } from '$lib/constants';
     import { Auth } from '$lib/controllers/auth/auth';
     import * as Popover from '$lib/components/ui/popover';
+    import { page } from '$app/stores';
 
     export let activeSubscriptionType: SubscriptionType;
 
@@ -25,9 +26,16 @@
 
     const buttonClass =
         'flex justify-start items-center gap-2 p-2 hover:bg-vLightAccent hover:no-underline w-full';
+
+    let popoverOpen = false;
+
+    // close popover after navigation
+    page.subscribe(() => {
+        popoverOpen = false;
+    });
 </script>
 
-<Popover.Root>
+<Popover.Root bind:open={popoverOpen}>
     <Popover.Trigger
         class="flex justify-between border-solid items-center gap-1 w-full py-1 hover:bg-lightAccent rounded-full border border-borderColor pl-1 pr-3"
     >
