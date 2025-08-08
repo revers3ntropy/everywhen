@@ -30,6 +30,8 @@
     import AgentWidget from './UserAgentWidget.svelte';
     import Label from '$lib/components/label/Label.svelte';
     import LocationWidget from '../location/LocationWidget.svelte';
+    import { Button } from '$lib/components/ui/button';
+    import Close from 'svelte-material-icons/Close.svelte';
 
     export let id: string;
     export let title: string;
@@ -252,7 +254,11 @@
         {/if}
 
         {#if latitude && longitude}
-            <button on:click={() => (showingMap = !showingMap)} aria-label="Expand map">
+            <button
+                on:click={() => (showingMap = !showingMap)}
+                aria-label="Expand map"
+                class="bg-vLightAccent py-1 px-2 {showingMap ? 'rounded-t-xl' : 'rounded-xl'}"
+            >
                 <LocationWidget {locations} {showingMap} {latitude} {longitude} {obfuscated} />
             </button>
         {/if}
@@ -278,11 +284,24 @@
     </div>
 
     {#if showingMap && latitude && longitude}
-        <div transition:slide={{ duration: ANIMATION_DURATION, axis: 'y' }} class="map-container">
-            <i class="text-light text-sm pb-1">
-                lat {latitude.toFixed(5)}, lng {longitude.toFixed(5)}
-            </i>
-            <div class="h-[200px] md:h-[300px]">
+        <div
+            transition:slide={{ duration: ANIMATION_DURATION, axis: 'y' }}
+            class="bg-vLightAccent rounded-xl"
+        >
+            <div class="flex items-center justify-between">
+                <p class="italic text-light text-sm p-2">
+                    lat {latitude.toFixed(5)}, lng {longitude.toFixed(5)}
+                </p>
+                <Button
+                    on:click={() => (showingMap = false)}
+                    class="flex-center rounded-full px-2 py-5 aspect-square border-none bg-transparent"
+                    variant="outline"
+                >
+                    <Close size={22} />
+                </Button>
+            </div>
+
+            <div class="h-[200px] md:h-[300px] border-borderHeavy border-2 rounded-xl">
                 <Lazy
                     shouldLoad={showingMap}
                     key="$lib/components/map/Mapbox.svelte"
@@ -451,14 +470,6 @@
             &:hover {
                 background: var(--v-light-accent);
             }
-        }
-    }
-
-    .map-container {
-        margin: 0.5rem 1rem 1rem 1rem;
-
-        @media #{$mobile} {
-            margin: 0.5rem 0;
         }
     }
 </style>
