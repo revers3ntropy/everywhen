@@ -147,7 +147,7 @@
                     class:hover:bg-secondary={$page.url.pathname.startsWith('/datasets')}
                 >
                     <ChartLine size="30" />
-                    Strands
+                    <div class="text-sm md:text-base"> Strands </div>
                     <span
                         class="text-light font-bold border border-border rounded-full py-1 px-2 hide-mobile"
                     >
