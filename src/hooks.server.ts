@@ -1,6 +1,6 @@
 import { COOKIE_KEYS } from '$lib/constants';
 import { sessionCookieOptions } from '$lib/utils/cookies';
-import type { Cookies, Handle } from '@sveltejs/kit';
+import type { Cookies, Handle, RequestEvent } from '@sveltejs/kit';
 import { cleanupCache } from '$lib/utils/cache.server';
 import { Auth } from '$lib/controllers/auth/auth.server';
 import type { MaybePromise, Mutable } from './types';
@@ -54,6 +54,24 @@ function getCookieWritableCookies(cookies: Cookies): App.Locals['__cookieWritabl
     return result as App.Locals['__cookieWritables'];
 }
 
+function getIp(req: RequestEvent): string {
+    let ip = '';
+
+    // might be set by the apache reverse proxy
+    const xForwardHeader = req.request.headers.get('x-forwarded-for');
+    if (xForwardHeader) ip = xForwardHeader;
+
+    const cfConnectingIpHeader = req.request.headers.get('cf-connecting-ip');
+    if (!ip && cfConnectingIpHeader) ip = cfConnectingIpHeader;
+
+    if (ip) return ip;
+    try {
+        return req.getClientAddress() || '0';
+    } catch (_) {
+        return '0';
+    }
+}
+
 export const handle = (async ({ event, resolve }) => {
     const start = performance.now();
 
@@ -93,7 +111,8 @@ export const handle = (async ({ event, resolve }) => {
         responseCode: res.status,
         requestSize: String(event.request.body).length,
         responseSize: String(res.body).length,
-        ipAddress: 0
+        ipAddress: getIp(event),
+        userAgent: event.request.headers.get('user-agent') || ''
     });
 
     return res;
