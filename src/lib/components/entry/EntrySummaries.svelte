@@ -141,7 +141,7 @@
 
                             <LabelDot color={entry.labelId ? labels[entry.labelId]?.color : null} />
 
-                            <span class="ellipsis max-w-[20vw]" class:obfuscated>
+                            <span class="ellipsis md:max-w-[20vw]" class:obfuscated>
                                 {#if entry.titleShortened}
                                     {entry.titleShortened}
                                 {:else}
