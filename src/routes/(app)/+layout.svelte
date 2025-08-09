@@ -19,6 +19,7 @@
     import { currentTzOffset, fmtUtc, nowUtc } from '$lib/utils/time';
     import Nav from '$lib/components/nav/Nav.svelte';
     import PasscodeModal from '$lib/components/auth/PasscodeModal.svelte';
+    import { listen } from '$lib/dataChangeEvents';
 
     export let data: LayoutData;
 
@@ -115,6 +116,26 @@
         nowUtc() - ($passcodeLastEntered || 0) > $settingsStore?.passcodeTimeout?.value &&
         showPasscodeModal &&
         ($settingsStore?.passcodeTimeout?.value > 0 || !$passcodeLastEntered || !browser);
+
+    listen.location.onDelete(id => {
+        data.locations = data.locations.filter(l => l.id !== id);
+    });
+    listen.location.onCreate(location => {
+        data.locations = [location, ...data.locations];
+    });
+    listen.location.onUpdate(location => {
+        data.locations = data.locations.map(l => (l.id === location.id ? location : l));
+    });
+
+    listen.label.onDelete(id => {
+        delete data.labels[id];
+    });
+    listen.label.onCreate(label => {
+        data.labels[label.id] = label;
+    });
+    listen.label.onUpdate(label => {
+        data.labels[label.id] = label;
+    });
 </script>
 
 <svelte:window

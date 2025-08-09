@@ -36,7 +36,9 @@
         day: string,
         location: Location
     ): Promise<OpenWeatherMapAPI.WeatherForDay | null> {
-        if (day === '2025-08-03') return null;
+        if (Day.fromString(day).unwrap().gte(Day.todayUsingNativeDate())) {
+            return null;
+        }
         const cacheKey = `${day}#${location.id}`;
         if (weatherCache.has(cacheKey)) return weatherCache.get(cacheKey)!;
 

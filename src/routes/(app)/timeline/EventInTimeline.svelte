@@ -196,7 +196,7 @@
 
             if ($obfuscated) return;
 
-            const shortenedName = limitStrLen(tryDecryptText(name), 20)
+            const shortenedName = limitStrLen(tryDecryptText(name), 20);
             if (!isInstantEvent && (width > 50 || this.hovering)) {
                 state.text(
                     shortenedName,

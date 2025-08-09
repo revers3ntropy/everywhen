@@ -14,6 +14,8 @@
     import { api } from '$lib/utils/apiRequest';
     import { getLocation, nullLocation } from '$lib/utils/geolocation';
     import { goto } from '$app/navigation';
+    import { listen } from '$lib/dataChangeEvents';
+    import { tryEncryptText } from '$lib/utils/encryption.client';
 
     export let data: PageData;
 
@@ -45,11 +47,21 @@
                 latitude: currentLocation[0] ?? 0,
                 longitude: currentLocation[1] ?? 0,
                 radius: 0.1,
-                name: 'New Location'
+                name: tryEncryptText('New Location')
             })
         );
         await goto(`/map/${id}`);
     }
+
+    listen.location.onDelete(id => {
+        data.locations = data.locations.filter(l => l.id !== id);
+    });
+    listen.location.onCreate(location => {
+        data.locations = [location, ...data.locations];
+    });
+    listen.location.onUpdate(location => {
+        data.locations = data.locations.map(l => (l.id === location.id ? location : l));
+    });
 </script>
 
 <svelte:head>

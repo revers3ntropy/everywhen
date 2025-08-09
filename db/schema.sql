@@ -105,7 +105,7 @@ CREATE TABLE events
 (
     id       char(32)      NOT NULL,
     userId   char(32)      NOT NULL,
-    name     varchar(256)  NOT NULL,
+    name     varchar(258)  NOT NULL,
     start    bigint signed NOT NULL,
     end      bigint signed NOT NULL,
     tzOffset double        NOT NULL,
@@ -125,7 +125,7 @@ CREATE TABLE labels
 (
     id      char(32)     NOT NULL,
     userId  char(32)     NOT NULL,
-    name    varchar(256) NOT NULL,
+    name    varchar(258) NOT NULL,
     color   varchar(64)  NOT NULL,
     created int          NOT NULL,
     PRIMARY KEY (`id`),

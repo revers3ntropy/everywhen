@@ -25,6 +25,7 @@
     import MapMarker from 'svelte-material-icons/MapMarkerOutline.svelte';
     import { Location } from '$lib/controllers/location/location';
     import { browser } from '$app/environment';
+    import EncryptedText from '$lib/components/ui/EncryptedText.svelte';
 
     export let obfuscated = false;
     export let locations: Location[];
@@ -55,14 +56,14 @@
     {#if touching.length}
         <span>
             <a href="/map/{touching[0].id}" class="ellipsis" class:obfuscated>
-                {touching[0].name}
+                <EncryptedText text={touching[0].name} />
             </a>
         </span>
     {:else if near && near?.length}
         <span class="flex-center ellipsis" style="gap: 0.2rem">
             <span class="text-light"> near </span>
             <a href="/map/{near[0].id}" class="ellipsis" class:obfuscated>
-                {near[0].name}
+                <EncryptedText text={near[0].name} />
             </a>
         </span>
     {:else if lookedupAddress}

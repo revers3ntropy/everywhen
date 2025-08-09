@@ -4,6 +4,7 @@
     import Plus from 'svelte-material-icons/Plus.svelte';
     import { Button } from '$lib/components/ui/button';
     import { Location } from '$lib/controllers/location/location';
+    import EncryptedText from '$lib/components/ui/EncryptedText.svelte';
 
     export let locations: Location[];
     export let createLocation: () => Promise<void>;
@@ -24,7 +25,7 @@
                 href="/map/{location.id}"
             >
                 <span>
-                    {location.name}
+                    <EncryptedText text={location.name} />
                     <span class="text-light">
                         ({Location.degreesToMeters(location.radius).toFixed(1)}m)
                     </span>
@@ -35,7 +36,7 @@
             </a>
         </div>
     {/each}
-    <div class="p-2">
+    <div class="p-2 pb-0">
         {#if creatingLocationLoading}
             <Button disabled variant="outline" class="w-full text-left flex items-center gap-2">
                 Creating New Location...

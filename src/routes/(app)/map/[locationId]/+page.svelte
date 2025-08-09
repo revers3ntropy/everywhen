@@ -7,6 +7,7 @@
     import Mapbox from '$lib/components/map/Mapbox.svelte';
     import { Button } from '$lib/components/ui/button';
     import ChevronLeft from 'svelte-material-icons/ChevronLeft.svelte';
+    import { tryDecryptText } from '$lib/utils/encryption.client.js';
 
     export let data: PageData;
 
@@ -24,7 +25,7 @@
 </script>
 
 <svelte:head>
-    <title>{location.name} | Location</title>
+    <title>{tryDecryptText(location.name)} | Location</title>
 </svelte:head>
 <main class="md:p-4 md:pl-4 flex-center">
     <div class="w-full md:max-w-5xl">

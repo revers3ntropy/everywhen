@@ -2,7 +2,6 @@ import { Subscription } from '$lib/controllers/subscription/subscription.server'
 import { UsageLimits } from '$lib/controllers/usageLimits/usageLimits.server';
 import { query } from '$lib/db/mysql.server';
 import type { ResultSetHeader } from 'mysql2';
-import { decrypt, encrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
 import type { Degrees } from '../../../types';
 import { type AddressLookupResults, Location as _Location } from './location';
@@ -19,11 +18,7 @@ namespace LocationServer {
 
     async function canCreateWithName(auth: Auth, name: string): Promise<true | string> {
         if (!name) return 'Location name too short';
-        if (name.length > UsageLimits.LIMITS.location.nameLenMax)
-            return `Location name too long (> ${UsageLimits.LIMITS.location.nameLenMax} characters)`;
-
-        const encryptedName = encrypt(name, auth.key);
-        if (encryptedName.length > 256) return 'Location name too long';
+        if (name.length > UsageLimits.LIMITS.location.nameLenMax) return `Location name too long`;
 
         const [count, max] = await UsageLimits.locationUsage(
             auth,
@@ -51,57 +46,32 @@ namespace LocationServer {
 
         const id = await UId.generate();
 
-        const encryptedName = encrypt(name, auth.key);
-        if (encryptedName.length > 256) {
-            return Result.err('Name too long');
-        }
-
         await query`
             INSERT INTO locations (id, userId, created, name,
                                    latitude, longitude, radius)
-            VALUES (${id}, ${auth.id}, ${created}, ${encryptedName},
+            VALUES (${id}, ${auth.id}, ${created}, ${name},
                     ${latitude}, ${longitude}, ${radius})
         `;
 
         return Result.ok({ id, created, name, latitude, longitude, radius });
     }
 
-    export async function all(auth: Auth): Promise<Result<Location[]>> {
-        return fromRaw(
-            auth,
-            await query<
-                {
-                    id: string;
-                    created: number;
-                    name: string;
-                    latitude: number;
-                    longitude: number;
-                    radius: number;
-                }[]
-            >`
-                SELECT id, created, name, latitude, longitude, radius
-                FROM locations
-                WHERE userId = ${auth.id}
-                ORDER BY created DESC
-            `
-        );
-    }
-
-    function fromRaw(auth: Auth, rows: Location[]): Result<Location[]> {
-        return Result.collect(
-            rows.map(row => {
-                const name = decrypt(row.name, auth.key);
-                if (!name.ok) return name.cast();
-                return Result.ok({
-                    id: row.id,
-                    created: row.created,
-                    name: name.val,
-                    latitude: row.latitude,
-                    longitude: row.longitude,
-                    radius: row.radius
-                });
-            })
-        );
+    export async function all(auth: Auth): Promise<Location[]> {
+        return await query<
+            {
+                id: string;
+                created: number;
+                name: string;
+                latitude: number;
+                longitude: number;
+                radius: number;
+            }[]
+        >`
+            SELECT id, created, name, latitude, longitude, radius
+            FROM locations
+            WHERE userId = ${auth.id}
+            ORDER BY created DESC
+        `;
     }
 
     export async function search(
@@ -109,72 +79,33 @@ namespace LocationServer {
         lat: number,
         lng: number
     ): Promise<Result<{ locations: Location[]; nearby?: Location[] }>> {
-        const locations = fromRaw(
-            auth,
-            _Location.filterByDynCirclePrecise(
-                await query<
-                    {
-                        id: string;
-                        created: number;
-                        name: string;
-                        latitude: number;
-                        longitude: number;
-                        radius: number;
-                    }[]
-                >`
+        const locations = _Location.filterByDynCirclePrecise(
+            await query<
+                {
+                    id: string;
+                    created: number;
+                    name: string;
+                    latitude: number;
+                    longitude: number;
+                    radius: number;
+                }[]
+            >`
                     SELECT id, created, name, latitude, longitude, radius
                     FROM locations
                     WHERE userId = ${auth.id}
                       AND SQRT(POW(latitude - ${lat}, 2) + POW(longitude - ${lng}, 2)) <= radius * 2
                     ORDER BY radius, created DESC
                 `,
-                lat,
-                lng,
-                r => _Location.degreesToMeters(r)
-            )
+            lat,
+            lng,
+            r => _Location.degreesToMeters(r)
         );
 
-        if (!locations.ok) return locations.cast();
-        if (locations.val.length > 0) {
-            return Result.ok({ locations: locations.val });
+        if (locations.length > 0) {
+            return Result.ok({ locations });
         }
 
-        const nearby = fromRaw(
-            auth,
-            _Location.filterByDynCirclePrecise(
-                await query<
-                    {
-                        id: string;
-                        created: number;
-                        name: string;
-                        latitude: number;
-                        longitude: number;
-                        radius: number;
-                    }[]
-                >`
-                SELECT id, created, name, latitude, longitude, radius
-                FROM locations
-                WHERE userId = ${auth.id}
-                  AND SQRT(POW(latitude - ${lat}, 2) + POW(longitude - ${lng}, 2)) <=
-                      radius * 4
-                ORDER BY radius, created DESC
-            `,
-                lat,
-                lng,
-                r => _Location.degreesToMeters(r) * 2
-            )
-        );
-        if (!nearby.ok) return nearby.cast();
-
-        return Result.ok({
-            locations: locations.val,
-            nearby: nearby.val
-        });
-    }
-
-    export async function fromId(auth: Auth, id: string): Promise<Result<Location>> {
-        const location = fromRaw(
-            auth,
+        const nearby = _Location.filterByDynCirclePrecise(
             await query<
                 {
                     id: string;
@@ -188,12 +119,39 @@ namespace LocationServer {
                 SELECT id, created, name, latitude, longitude, radius
                 FROM locations
                 WHERE userId = ${auth.id}
-                  AND id = ${id}
-            `
+                  AND SQRT(POW(latitude - ${lat}, 2) + POW(longitude - ${lng}, 2)) <=
+                      radius * 4
+                ORDER BY radius, created DESC
+            `,
+            lat,
+            lng,
+            r => _Location.degreesToMeters(r) * 2
         );
-        if (!location.ok) return location.cast();
-        if (location.val.length !== 1) return Result.err('Location not found');
-        return Result.ok(location.val[0]);
+        return Result.ok({
+            locations,
+            nearby
+        });
+    }
+
+    export async function fromId(auth: Auth, id: string): Promise<Result<Location>> {
+        const location = await query<
+            {
+                id: string;
+                created: number;
+                name: string;
+                latitude: number;
+                longitude: number;
+                radius: number;
+            }[]
+        >`
+            SELECT id, created, name, latitude, longitude, radius
+            FROM locations
+            WHERE userId = ${auth.id}
+              AND id = ${id}
+        `;
+
+        if (location.length !== 1) return Result.err('Location not found');
+        return Result.ok(location[0]);
     }
 
     export async function updateName(
@@ -203,8 +161,6 @@ namespace LocationServer {
     ): Promise<Result<Location>> {
         if (!newName) return Result.err('Name must not be empty');
 
-        const encryptedName = encrypt(newName, auth.key);
-
         if (newName.length > UsageLimits.LIMITS.location.nameLenMax)
             return Result.err('Name too long');
         if (newName.length < UsageLimits.LIMITS.location.nameLenMin)
@@ -212,7 +168,7 @@ namespace LocationServer {
 
         await query`
             UPDATE locations
-            SET name = ${encryptedName}
+            SET name = ${newName}
             WHERE userId = ${auth.id}
               AND id = ${location.id}
         `;

@@ -15,7 +15,7 @@
     import EntryDialog from '$lib/components/entry/EntryDialog.svelte';
     import type { Label } from '$lib/controllers/label/label';
     import { CSLogger } from '$lib/controllers/logs/logger.client';
-    import { dispatch } from '$lib/dataChangeEvents';
+    import { dispatch, listen } from '$lib/dataChangeEvents';
 
     // default to the UK :)
     export let defaultCenter: LngLatLike = { lat: -4, lng: 53 };
@@ -337,6 +337,17 @@
     function _map(container: HTMLDivElement) {
         initMap(container);
     }
+
+    listen.location.onDelete(id => {
+        locations = locations.filter(l => l.id !== id);
+        if (id === locationForDialog?.id) locationForDialog = null;
+    });
+    listen.location.onCreate(location => {
+        locations = [location, ...locations];
+    });
+    listen.location.onUpdate(location => {
+        locations = locations.map(l => (l.id === location.id ? location : l));
+    });
 </script>
 
 <div use:_map class="w-full h-full overflow-hidden {className}" />

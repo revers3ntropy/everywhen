@@ -12,6 +12,7 @@
     import Spinner from '../ui/BookSpinner.svelte';
     import DayInFeed from '$lib/components/feed/DayInFeed.svelte';
     import type { OpenWeatherMapAPI } from '$lib/controllers/openWeatherMapAPI/openWeatherMapAPI';
+    import { Day } from '$lib/utils/day';
 
     interface IOptions extends EntryFilter {
         readonly count?: number;
@@ -29,7 +30,9 @@
         day: string,
         location: Location
     ): Promise<OpenWeatherMapAPI.WeatherForDay | null> {
-        if (day === '2025-08-03') return null;
+        if (Day.fromString(day).unwrap().gte(Day.todayUsingNativeDate())) {
+            return null;
+        }
         const cacheKey = `${day}#${location.id}`;
         if (weatherCache.has(cacheKey)) return weatherCache.get(cacheKey)!;
 

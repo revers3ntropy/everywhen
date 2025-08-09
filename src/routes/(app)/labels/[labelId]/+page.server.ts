@@ -13,6 +13,6 @@ export const load = cachedPageRoute(async (auth, { params }) => {
         label: (await Label.fromIdWithUsageCounts(auth, labelId)).unwrap(e => error(404, e)),
         events: (await Event.all(auth)).filter(event => event.labelId === labelId),
         labels: await Label.allIndexedById(auth),
-        locations: (await Location.all(auth)).unwrap(e => error(400, e))
+        locations: await Location.all(auth)
     };
 }) satisfies PageServerLoad;

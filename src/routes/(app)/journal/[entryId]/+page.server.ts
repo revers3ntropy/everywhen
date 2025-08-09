@@ -9,7 +9,7 @@ import type { PageServerLoad } from './$types';
 export const load = cachedPageRoute(async (auth, { params, url }) => {
     return {
         entry: (await Entry.getFromId(auth, params.entryId, false)).unwrap(e => error(404, e)),
-        locations: (await Location.all(auth)).unwrap(e => error(500, e)),
+        locations: await Location.all(auth),
         showHistory: GETParamIsTruthy(url.searchParams.get('history')),
         labels: await Label.allIndexedById(auth)
     };

@@ -7,6 +7,7 @@
     import WeatherWidget from '$lib/components/weather/WeatherWidget.svelte';
     import WeatherDialog from '$lib/components/dataset/WeatherDialog.svelte';
     import * as Popover from '$lib/components/ui/popover';
+    import EncryptedText from '$lib/components/ui/EncryptedText.svelte';
 
     export let obfuscated = false;
     export let locations: Location[];
@@ -38,7 +39,7 @@
                         <MapMarker size="20" />
                     </span>
                     <a href="/map/{location.id}" class="ellipsis pl-1" class:obfuscated>
-                        {location.name}
+                        <EncryptedText text={location.name} />
                     </a>
                     {#await getWeather(location)}
                         <span class="w-[4.5rem] h-8 flex-center"> ? </span>

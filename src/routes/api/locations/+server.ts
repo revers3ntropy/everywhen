@@ -13,7 +13,7 @@ export const GET = cachedApiRoute(async (auth, { url }) => {
     const lng = parseFloat(url.searchParams.get('lon') || '');
 
     if ((!lat && lat !== 0) || (!lng && lng !== 0)) {
-        return { locations: (await Location.all(auth)).unwrap(e => error(500, e)) };
+        return { locations: await Location.all(auth) };
     }
 
     return {
