@@ -296,7 +296,8 @@ namespace StatsServer {
      * based on how long ago the word was first used
      */
     export async function chartDataForWord(auth: Auth, word: string): Promise<BarChartData | null> {
-        const usages = await query<{ day: string; count: number }[]>`
+        const usages = (
+            await query<{ day: string; count: string }[]>`
             SELECT day, SUM(count) as count
             FROM wordsInEntries, entries
             WHERE entries.userId = ${auth.id}
@@ -306,7 +307,10 @@ namespace StatsServer {
                 AND entryIsDeleted = 0
             GROUP BY day
             ORDER BY STR_TO_DATE(day, '%Y-%m-%d')
-        `;
+        `
+        )
+            // not sure why it is returning a string for count!
+            .map(({ day, count }) => ({ day, count: parseInt(count) }));
 
         if (usages.length < 1) return null;
 
@@ -362,7 +366,7 @@ namespace StatsServer {
                             startOfMonthDay.utcTimestampMiddleOfDay(0),
                             0,
                             // show year for January and December
-                            1 === month || isFirst ? 'MMM YYYY' : 'MMM'
+                            month === 1 || isFirst ? 'MMM YYYY' : 'MMM'
                         )
                     );
                     const sumForMonth = usages.reduce((acc, stats) => {
