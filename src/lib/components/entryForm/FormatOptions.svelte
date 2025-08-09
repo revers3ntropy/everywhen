@@ -39,10 +39,11 @@
     <Popover.Trigger
         class={cn(
             buttonVariants({ variant: 'outline' }),
-            'bg-transparent px-2 text-md gap-1 hover:bg-vLightAccent rounded-full hover:text-textColor'
+            'bg-transparent px-2 text-md gap-1 hover:bg-vLightAccent rounded-full hover:text-textColor aspect-square'
         )}
     >
         <FormatText size="25" />
+        Format
     </Popover.Trigger>
     <Popover.Content class="py-3 px-0 flex flex-col">
         <button class={buttonClass} on:click={onClickFactory('**', '**', false)}>

@@ -65,6 +65,7 @@
         </div>
 
         <section class="pt-4 md:pl-2">
+            <p>Entries will only appear here if you had location enabled when you submitted it</p>
             {#key location}
                 <Entries
                     options={{

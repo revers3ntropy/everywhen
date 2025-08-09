@@ -19,6 +19,7 @@
     import { paste } from './paste';
     import { decrypt, encrypt } from '$lib/utils/encryption';
     import { CSLogger } from '$lib/controllers/logs/logger.client';
+    import { cn } from '$lib/utils';
 
     // as this form is used in entry editing and creating
     export let action: 'create' | 'edit' = 'create';
@@ -36,6 +37,9 @@
     export let newEntryLabelId = '';
     export let labels: Record<string, Label>;
     export let obfuscated = true;
+    let className = '';
+    export { className as class };
+    export let menuBarClass = '';
 
     function resetEntryForm() {
         newEntryTitle = '';
@@ -302,9 +306,15 @@
     }
 </script>
 
-<div class="md:bg-vLightAccent rounded-2xl">
-    <div class="pb-2 md:pb-4 md:px-2">
-        <MenuBar {labels} {wrapSelectedWith} bind:newEntryLabelId bind:entryTitle={newEntryTitle} />
+<div class={cn('md:bg-vLightAccent rounded-2xl', className)}>
+    <div class="pb-2 md:pb-4 md:px-1">
+        <MenuBar
+            {labels}
+            {wrapSelectedWith}
+            bind:newEntryLabelId
+            bind:entryTitle={newEntryTitle}
+            class={menuBarClass}
+        />
     </div>
     <div class="px-2">
         <div>
@@ -315,7 +325,7 @@
                 use:paste={{ handleText: pasteText, handleFiles: uploadAndPasteFiles }}
                 disabled={obfuscated || submitted}
                 aria-label="Entry Body"
-                placeholder={obfuscated ? '' : 'Start writing here...'}
+                placeholder={obfuscated ? '' : 'What’s on your mind?'}
                 class="text-lg py-2 resize-none w-full bg-transparent rounded-lg"
                 class:obfuscated
             />

@@ -11,15 +11,17 @@ export interface ThirdPartyDatasetProvider {
         settings: SettingsConfig,
         filter: DatasetDataFilter
     ): Promise<Result<DatasetRow[]>>;
-    addRows(auth: Auth,
-            datasetId: string,
-            rows: {
-                elements: unknown[];
-                timestamp?: TimestampSecs;
-                timestampTzOffset?: Hours;
-                created?: TimestampSecs;
-            }[],
-            onSameTimestamp: 'override' | 'append' | 'skip' | 'error'): Promise<Result<number[]>>;
+    addRows(
+        auth: Auth,
+        datasetId: string,
+        rows: {
+            elements: unknown[];
+            timestamp?: TimestampSecs;
+            timestampTzOffset?: Hours;
+            created?: TimestampSecs;
+        }[],
+        onSameTimestamp: 'override' | 'append' | 'skip' | 'error'
+    ): Promise<Result<number[]>>;
 }
 
 export const githubCommitsProvider = {

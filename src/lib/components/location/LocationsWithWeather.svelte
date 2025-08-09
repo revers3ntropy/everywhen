@@ -34,7 +34,7 @@
     <span class="flex items-center max-w-full text-sm">
         <span class="flex gap-2 pl-1">
             {#each touchingLocations as location}
-                <span class="bg-lightAccent pl-2 rounded-full flex items-center">
+                <span class="bg-vLightAccent pl-2 rounded-full flex items-center">
                     <span class="flex-center">
                         <MapMarker size="20" />
                     </span>

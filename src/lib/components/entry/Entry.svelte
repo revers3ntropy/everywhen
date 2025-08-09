@@ -324,9 +324,11 @@
             </div>
         </div>
     {/if}
-    <div class="text-lg font-bold p-2 md:px-4 pb-0" class:obfuscated>
-        {title}
-    </div>
+    {#if title}
+        <div class="text-lg font-bold p-2 md:px-4 pb-0" class:obfuscated>
+            {title}
+        </div>
+    {/if}
 
     {#if obfuscated}
         <Tooltip.Root>
@@ -383,6 +385,7 @@
                 margin: 0;
                 padding: 0;
                 border: none;
+                line-height: 1.6rem;
             }
 
             // generated from markdown

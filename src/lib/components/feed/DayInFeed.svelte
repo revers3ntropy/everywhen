@@ -71,12 +71,7 @@
 
 <div class="pb-4 w-full">
     <!-- only round top right on 'today' as the entry form always appears directly below -->
-    <div
-        class="bg-vLightAccent p-2 {isToday && !$collapsed[day.day]
-            ? 'rounded-tr-xl'
-            : 'rounded-r-xl'}"
-        class:mb-2={!isToday && !$collapsed[day.day]}
-    >
+    <div class="bg-lightAccent p-2 rounded-r-xl" class:mb-2={!isToday && !$collapsed[day.day]}>
         <div class="flex justify-between">
             <div class="flex overflow-x-auto no-scrollbar">
                 <button class="flex-center" on:click={toggleCollapse}>
@@ -152,8 +147,8 @@
             }}
         >
             {#if showForms && isToday}
-                <div class="bg-vLightAccent rounded-br-xl">
-                    <EntryForm {obfuscated} {labels} />
+                <div class="bg-vLightAccent rounded-r-xl">
+                    <EntryForm {obfuscated} {labels} menuBarClass="mt-1" />
                 </div>
             {/if}
             <div class="w-full">

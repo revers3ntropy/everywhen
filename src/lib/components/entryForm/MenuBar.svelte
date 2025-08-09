@@ -13,6 +13,7 @@
     import { ANIMATION_DURATION } from '$lib/constants';
     import { currentlyUploadingAssets } from '$lib/stores';
     import type { Label } from '$lib/controllers/label/label';
+    import { cn } from '$lib/utils';
 
     export let labels: Record<string, Label>;
     export let wrapSelectedWith: (
@@ -22,6 +23,8 @@
     ) => void;
     export let newEntryLabelId: string;
     export let entryTitle: string;
+    let className = '';
+    export { className as class };
 
     let userHasShownTitle = false;
 
@@ -38,8 +41,8 @@
     }
 </script>
 
-<div class="flex items-center bg-lightAccent md:rounded-full md:w-fit">
-    <div class="flex items-center py-1 md:px-2 w-fit">
+<div class={cn('flex items-center bg-lightAccent md:rounded-full md:w-fit', className)}>
+    <div class="flex items-center p-1 w-fit">
         <LocationToggle size={23} />
 
         <FormatOptions {makeWrapper} />

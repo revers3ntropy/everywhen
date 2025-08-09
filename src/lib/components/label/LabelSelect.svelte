@@ -74,9 +74,6 @@
                     Add Label
                 {/if}
             {/if}
-            {#if !condensed}
-                <MenuDown size="20" />
-            {/if}
         {/key}
     </Popover.Trigger>
     <Popover.Content class="py-1">
