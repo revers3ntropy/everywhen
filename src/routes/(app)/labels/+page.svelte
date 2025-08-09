@@ -9,10 +9,13 @@
     import { listen } from '$lib/dataChangeEvents';
     import LabelOptions from '$lib/components/label/LabelLink.svelte';
     import { omit } from '$lib/utils';
+    import { tryDecryptText } from '$lib/utils/encryption.client.js';
 
     export let data: PageData;
 
-    $: labelsList = Object.values(data.labels);
+    $: labelsList = Object.values(data.labels).sort((l1, l2) =>
+        tryDecryptText(l1.name).localeCompare(tryDecryptText(l2.name))
+    );
 
     async function newLabel() {
         let name = tryEncryptText('New Label');
