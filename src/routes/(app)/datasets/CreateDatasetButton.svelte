@@ -10,6 +10,7 @@
     import SleepCycleImport from './SleepCycleImport.svelte';
     import FitbitSleep from './FitbitSleep.svelte';
     import { makeBlank, makeFromPreset } from './importHelpers';
+    import { tryDecryptText } from '$lib/utils/encryption.client.js';
 
     export let datasets: DatasetMetadata[];
 
@@ -17,7 +18,7 @@
     $: unusedPresetIds = Object.keys(datasetPresets).filter(
         presetId => !usedPresetIds.includes(presetId)
     ) as PresetId[];
-    $: datasetNames = datasets.map(({ name }) => name);
+    $: datasetNamesDecrypted = datasets.map(({ name }) => tryDecryptText(name));
 </script>
 
 <Popover.Root>
@@ -30,7 +31,7 @@
     <Popover.Content class="py-2 px-0">
         <p class="font-bold p-2">Create new Strand</p>
         <button
-            on:click={() => makeBlank(datasetNames)}
+            on:click={() => makeBlank(datasetNamesDecrypted)}
             class="w-full flex justify-start items-center gap-2 hover:bg-vLightAccent p-2"
             aria-label="Create blank dataset"
         >

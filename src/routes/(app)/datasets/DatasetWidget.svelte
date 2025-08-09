@@ -3,6 +3,7 @@
     import * as Tooltip from '$lib/components/ui/tooltip';
     import Dot from '$lib/components/ui/Dot.svelte';
     import type { DatasetMetadata } from '$lib/controllers/dataset/dataset.server';
+    import EncryptedText from '$lib/components/ui/EncryptedText.svelte';
 
     export let dataset: DatasetMetadata;
 </script>
@@ -27,7 +28,7 @@
                 </Tooltip.Content>
             </Tooltip.Root>
         {/if}
-        {dataset.name}
+        <EncryptedText text={dataset.name} />
     </span>
     <span>
         <span class="text-textColorLight">

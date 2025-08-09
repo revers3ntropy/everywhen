@@ -9,6 +9,7 @@
     import HappinessValueIcon from '$lib/components/dataset/HappinessValueIcon.svelte';
     import { datasetPresets } from '$lib/controllers/dataset/presets';
     import * as Popover from '$lib/components/ui/popover';
+    import { tryEncryptText } from '$lib/utils/encryption.client.js';
 
     export let dataset: Dataset | null;
 
@@ -47,7 +48,7 @@
     async function makeFromPreset(): Promise<string> {
         return notify.onErr(
             await api.post('/datasets', {
-                name: datasetPresets.happiness.defaultName,
+                name: tryEncryptText(datasetPresets.happiness.defaultName),
                 presetId: 'happiness'
             })
         ).id;

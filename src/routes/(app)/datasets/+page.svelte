@@ -39,6 +39,8 @@
         <div class="py-4 flex gap-2 flex-wrap" aria-label="list of datasets">
             {#each data.datasets as dataset}
                 <DatasetWidget {dataset} />
+            {:else}
+                <p class="text-light italic">No Strands</p>
             {/each}
         </div>
     </div>

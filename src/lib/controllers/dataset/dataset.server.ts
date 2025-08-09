@@ -71,14 +71,11 @@ namespace DatasetServer {
                 const type = typesRes.val[column.typeId];
                 if (!type) return Result.err('Invalid column type found');
 
-                const decryptedName = decrypt(column.name, auth.key);
-                if (!decryptedName.ok) return decryptedName.cast();
-
                 return Result.ok({
                     id: column.id,
                     datasetId: column.datasetId,
                     created: column.created,
-                    name: decryptedName.val,
+                    name: column.name,
                     ordering: column.ordering,
                     jsonOrdering: column.ordering,
                     type
@@ -110,8 +107,8 @@ namespace DatasetServer {
     export async function getDatasetFromPresetId(
         auth: Auth,
         presetId: PresetId
-    ): Promise<Result<Dataset | null>> {
-        return await query<
+    ): Promise<Dataset | null> {
+        const rows = await query<
             {
                 id: string;
                 name: string;
@@ -125,20 +122,17 @@ namespace DatasetServer {
             FROM datasets
             WHERE userId = ${auth.id}
                 AND presetId = ${presetId}
-        `.then(rows => {
-            if (rows.length === 0) return Result.ok(null);
-            const [{ id, name, created, presetId, rowCount, showInFeed }] = rows;
-            const nameDecrypted = decrypt(name, auth.key);
-            if (!nameDecrypted.ok) return nameDecrypted.cast();
-            return Result.ok({
-                id,
-                name: nameDecrypted.val,
-                created,
-                preset: presetId ? datasetPresets[presetId] : null,
-                rowCount,
-                showInFeed
-            });
-        });
+        `;
+        if (rows.length === 0) return null;
+        const [{ id, name, created, rowCount, showInFeed }] = rows;
+        return {
+            id,
+            name,
+            created,
+            preset: datasetPresets[presetId],
+            rowCount,
+            showInFeed
+        };
     }
 
     export async function getDataset(auth: Auth, datasetId: string): Promise<Result<Dataset>> {
@@ -159,12 +153,10 @@ namespace DatasetServer {
         `;
         if (rows.length === 0) return Result.err('Dataset not found');
         const [{ id, name, created, presetId, rowCount, showInFeed }] = rows;
-        const nameDecrypted = decrypt(name, auth.key);
-        if (!nameDecrypted.ok) return nameDecrypted.cast();
 
         return Result.ok({
             id,
-            name: nameDecrypted.val,
+            name,
             created,
             preset: presetId ? datasetPresets[presetId] : null,
             rowCount,
@@ -233,8 +225,6 @@ namespace DatasetServer {
         if (!usersColumnsRes.ok) return usersColumnsRes.cast();
 
         for (const dataset of datasets) {
-            const decryptedName = decrypt(dataset.name, auth.key);
-            if (!decryptedName.ok) return decryptedName.cast();
             let preset: DatasetPreset | null = null;
             if (dataset.presetId) {
                 preset = datasetPresets[dataset.presetId as PresetId];
@@ -255,7 +245,7 @@ namespace DatasetServer {
 
             metadatas.push({
                 id: dataset.id,
-                name: decryptedName.val,
+                name: dataset.name,
                 created: dataset.created,
                 columns,
                 preset,
@@ -352,13 +342,13 @@ namespace DatasetServer {
 
     async function canCreateWithName(
         auth: Auth,
-        namePlaintext: string,
+        name: string,
         presetId: string | null
     ): Promise<string | true> {
-        if (namePlaintext.length < 1) {
+        if (name.length < 1) {
             return 'Name must be at least 1 character long';
         }
-        if (namePlaintext.length > 100) {
+        if (name.length > 100) {
             return 'Name must be at most 100 characters long';
         }
 
@@ -368,12 +358,10 @@ namespace DatasetServer {
         );
         if (count >= max) return `Maximum number of datasets (${max}) reached`;
 
-        const encryptedName = encrypt(namePlaintext, auth.key);
-
         const existingWithName = await query<{ name: string }[]>`
             SELECT name
             FROM datasets
-            WHERE name = ${encryptedName}
+            WHERE name = ${name}
               AND datasets.userId = ${auth.id}
         `;
         if (existingWithName.length > 0) {
@@ -414,7 +402,7 @@ namespace DatasetServer {
 
         await query`
             INSERT INTO datasets (id, userId, name, created, presetId, rowCount)
-            VALUES (${id}, ${auth.id}, ${encrypt(name, auth.key)}, ${created}, ${presetId}, 0)
+            VALUES (${id}, ${auth.id}, ${name}, ${created}, ${presetId}, 0)
         `;
 
         return Result.ok({
@@ -692,7 +680,7 @@ namespace DatasetServer {
 
         await query`
             UPDATE datasets
-            SET name = ${encrypt(name, auth.key)}
+            SET name = ${name}
             WHERE id = ${datasetId}
               AND userId = ${auth.id}
         `;
@@ -807,7 +795,6 @@ namespace DatasetServer {
         type: DatasetColumnType<unknown>
     ): Promise<Result<DatasetColumn<unknown>>> {
         const id = await UId.generate();
-        const encryptedName = encrypt(name, auth.key);
         const created = nowUtc();
 
         const dataset = await getDataset(auth, datasetId);
@@ -832,7 +819,7 @@ namespace DatasetServer {
                 id, userId, datasetId, ordering, jsonOrdering, name, typeId, created
             )
             VALUES (
-                ${id}, ${auth.id}, ${datasetId}, ${ordering}, ${jsonOrdering}, ${encryptedName}, ${type.id}, ${created}
+                ${id}, ${auth.id}, ${datasetId}, ${ordering}, ${jsonOrdering}, ${name}, ${type.id}, ${created}
             )
         `;
 
@@ -947,10 +934,9 @@ namespace DatasetServer {
         const col = cols.val.find(c => c.id === columnId);
         if (!col) return Result.err('Column not found');
 
-        const encryptedName = encrypt(name, auth.key);
         await query`
             UPDATE datasetColumns
-            SET name = ${encryptedName}
+            SET name = ${name}
             WHERE id = ${columnId}
               AND datasetId = ${datasetId}
               AND userId = ${auth.id}

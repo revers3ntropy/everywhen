@@ -14,6 +14,7 @@
     import DatasetChart from './DatasetChart.svelte';
     import TableOfDatapoints from './TableOfDatapoints.svelte';
     import { Checkbox } from '$lib/components/ui/checkbox';
+    import { tryDecryptText, tryEncryptText } from '$lib/utils/encryption.client.js';
 
     export let data: PageData;
 
@@ -21,14 +22,9 @@
     let rows: DatasetRow[];
 
     async function updateName() {
-        notify.onErr(
-            await api.put(apiPath(`/datasets/?`, data.dataset.id), { name: nameInp.value })
-        );
-        await dispatch.update(
-            'dataset',
-            { ...data.dataset },
-            { ...data.dataset, name: nameInp.value }
-        );
+        const name = tryEncryptText(nameInp.value);
+        notify.onErr(await api.put(apiPath(`/datasets/?`, data.dataset.id), { name }));
+        await dispatch.update('dataset', { ...data.dataset }, { ...data.dataset, name });
     }
 
     async function updateShowInFeed() {
@@ -105,7 +101,7 @@
 </script>
 
 <svelte:head>
-    <title>{data.dataset.name || 'Unknown'} | View Dataset</title>
+    <title>{tryDecryptText(data.dataset.name) || 'Unknown'} | View Dataset</title>
 </svelte:head>
 
 <main class="p-2 md:p-4 md:pl-4 flex-center">
@@ -121,7 +117,7 @@
             <div class="text-lg">
                 <Textbox
                     label="Name"
-                    value={data.dataset.name}
+                    value={tryDecryptText(data.dataset.name)}
                     onChange={updateName}
                     bind:element={nameInp}
                     ariaLabel="dataset name"

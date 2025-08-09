@@ -12,9 +12,7 @@ export const load = cachedPageRoute(async (auth, { parent }) => {
     return {
         pinnedEntriesList: (await Entry.getPinnedSummaries(auth)).unwrap(e => error(400, e)),
         datasets: (await Dataset.allMetaData(auth)).unwrap(e => error(400, e)),
-        happinessDataset: (await Dataset.getDatasetFromPresetId(auth, 'happiness')).unwrap(e =>
-            error(400, e)
-        ),
+        happinessDataset: await Dataset.getDatasetFromPresetId(auth, 'happiness'),
         labels: await Label.allIndexedById(auth),
         locations: await Location.all(auth)
     };

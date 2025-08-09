@@ -5,14 +5,16 @@ import { dispatch } from '$lib/dataChangeEvents';
 import { api, apiPath } from '$lib/utils/apiRequest';
 import { Result } from '$lib/utils/result';
 import { currentTzOffset, nowUtc } from '$lib/utils/time';
+import { tryEncryptText } from '$lib/utils/encryption.client';
 
 export async function makeFromPreset(presetId: PresetId): Promise<Result<string>> {
     const preset = datasetPresets[presetId];
     if (!preset) {
         return Result.err('Invalid preset');
     }
+    const name = tryEncryptText(datasetPresets[presetId].defaultName);
     const res = await api.post('/datasets', {
-        name: datasetPresets[presetId].defaultName,
+        name,
         presetId
     });
     if (!res.ok) return res.cast();
@@ -21,7 +23,7 @@ export async function makeFromPreset(presetId: PresetId): Promise<Result<string>
     await dispatch.create('dataset', {
         id,
         preset,
-        name: datasetPresets[presetId].defaultName,
+        name,
         columns: preset.columns,
         created: nowUtc(),
         rowCount: 0,
@@ -33,18 +35,18 @@ export async function makeFromPreset(presetId: PresetId): Promise<Result<string>
     return Result.ok(id);
 }
 
-export async function makeBlank(usedNames: string[]): Promise<string> {
+export async function makeBlank(usedNamesDecrypted: string[]): Promise<string> {
     let name = 'Blank';
 
     let i = 1;
-    while (usedNames.includes(name)) {
+    while (usedNamesDecrypted.includes(name)) {
         name = `Blank ${i}`;
         i++;
     }
 
     const { id } = notify.onErr(
         await api.post('/datasets', {
-            name,
+            name: tryEncryptText(name),
             presetId: null
         })
     );
@@ -52,7 +54,7 @@ export async function makeBlank(usedNames: string[]): Promise<string> {
     await dispatch.create('dataset', {
         id,
         preset: null,
-        name,
+        name: tryEncryptText(name),
         columns: [],
         rowCount: 0,
         created: nowUtc(),
