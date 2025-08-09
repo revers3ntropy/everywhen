@@ -4,13 +4,14 @@
     import Dot from '$lib/components/ui/Dot.svelte';
     import type { DatasetMetadata } from '$lib/controllers/dataset/dataset.server';
     import EncryptedText from '$lib/components/ui/EncryptedText.svelte';
+    import { tryDecryptText } from '$lib/utils/encryption.client.js';
 
     export let dataset: DatasetMetadata;
 </script>
 
 <a
     href="datasets/{dataset.id}"
-    aria-label="View dataset '{dataset.name}'"
+    aria-label="View dataset '{tryDecryptText(dataset.name)}'"
     class="bg-vLightAccent w-fit p-3 rounded-xl hover:bg-lightAccent hover:no-underline"
 >
     <span class="flex justify-start items-center gap-2 pb-2">
