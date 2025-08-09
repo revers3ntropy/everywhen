@@ -64,13 +64,15 @@
             <EncryptedText text={name} />
         </p>
     </div>
-    <p> There are entries, edits or events with this label. </p>
+    <p>
+        This label is being used, please pick a method for removing this from entries and events.
+    </p>
     <div class="py-2" in:slide={{ duration: ANIMATION_DURATION }}>
         <div
             class="flex items-center justify-between rounded-xl p-2 border border-border border-solid"
         >
+            <Button on:click={reassign} disabled={!changeLabelId}>Give different label</Button>
             <LabelSelect bind:value={changeLabelId} {filter} {labels} />
-            <Button on:click={reassign}>Give different label</Button>
         </div>
 
         <h2 class="py-4">OR</h2>
@@ -78,7 +80,6 @@
         <div
             class="flex items-center justify-between rounded-xl p-2 border border-border border-solid"
         >
-            <p />
             <Button on:click={rmLabel}>Remove label</Button>
         </div>
 
