@@ -522,6 +522,15 @@ namespace DatasetServer {
         if (!['override', 'append', 'skip', 'error'].includes(onSameTimestamp)) {
             return Result.err('Invalid onSameTimestamp value');
         }
+        const dataset = await getDataset(auth, datasetId);
+        if (!dataset.ok) return Result.err('No dataset found');
+        if (dataset.val.preset) {
+            const provider = thirdPartyDatasetProviders[dataset.val.preset.id as PresetId];
+            if (provider) {
+                return await provider.addRows(auth, datasetId, rows, onSameTimestamp);
+            }
+        }
+
         if (rows.length < 1) return Result.ok([]);
 
         const validateRowUsageRes = await validateRowUsage(auth, datasetId, rows.length);
