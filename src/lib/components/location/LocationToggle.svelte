@@ -65,7 +65,7 @@
     <button
         on:click={disableLocation}
         aria-label="Turn off Location"
-        class="hover:bg-vLightAccent rounded-full p-1.5 flex-center"
+        class="hover:bg-vLightAccent rounded-full p-1.5 flex-center border-solid border border-transparent"
     >
         <MapMarkerOutline {size} />
     </button>
@@ -73,7 +73,7 @@
     <button
         on:click={enableLocation}
         aria-label="Turn on Location"
-        class="hover:bg-vLightAccent rounded-full p-1.5 flex-center"
+        class="hover:bg-vLightAccent rounded-full p-1.5 flex-center border-accentDanger border border-solid"
     >
         <MapMarkerOffOutline {size} />
     </button>
