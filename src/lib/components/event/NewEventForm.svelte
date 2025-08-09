@@ -40,7 +40,7 @@
         const { id } = notify.onErr(
             await api.post('/events', {
                 name,
-                label: labelId,
+                labelId,
                 start,
                 end,
                 tzOffset: currentTzOffset()
@@ -50,7 +50,7 @@
         const event = {
             id,
             name,
-            label: labelId ? labels[labelId] : null,
+            labelId: labelId || null,
             start,
             end,
             tzOffset: currentTzOffset(),

@@ -28,7 +28,7 @@
     let instantEvents: EventWithYLevel[];
     let durationEvents: EventWithYLevel[];
     $: [instantEvents, durationEvents] = addYToEvents(
-        events.filter(event => selectedLabels.includes(event.label?.id || ''))
+        events.filter(event => selectedLabels.includes(event.labelId || ''))
     );
 
     onMount(() => {

@@ -2,12 +2,11 @@
     import FeedItemIcon from '$lib/components/feed/feedItems/FeedItemIcon.svelte';
     import TimeInFeed from '$lib/components/feed/feedItems/TimeInFeed.svelte';
     import LabelDot from '$lib/components/label/LabelDot.svelte';
-    import { Auth } from '$lib/controllers/auth/auth';
     import { Event } from '$lib/controllers/event/event';
     import type { FeedItem, FeedItemTypes } from '$lib/controllers/feed/feed';
     import type { Label } from '$lib/controllers/label/label';
-    import { encryptionKey } from '$lib/stores';
     import { Day } from '$lib/utils/day';
+    import EncryptedText from '$lib/components/ui/EncryptedText.svelte';
 
     export let item: FeedItemTypes['eventStart'];
     export let labels: Record<string, Label>;
@@ -15,7 +14,6 @@
     export let obfuscated: boolean;
 
     $: label = item.labelId ? labels[item.labelId] : null;
-    $: name = Auth.decryptOrLogOut(item.nameEncrypted, $encryptionKey);
 </script>
 
 <!-- if the event starts and then immediately ends, collapse into one item -->
@@ -23,12 +21,10 @@
     <FeedItemIcon type="event" />
     <div class="text-sm pt-2 pb-4 flex gap-4">
         <TimeInFeed timestamp={item.start} to={item.end} tzOffset={item.tzOffset} />
-        <div class:obfuscated>
-            {#if label}
-                <LabelDot color={label.color} />
-            {/if}
-            {name}
-        </div>
+        {#if label}
+            <LabelDot color={label.color} />
+        {/if}
+        <EncryptedText text={item.nameEncrypted} {obfuscated} />
     </div>
 {:else}
     <FeedItemIcon type={!Event.isInstantEvent(item) ? 'event-start' : 'event'} />
@@ -43,9 +39,8 @@
                     <LabelDot color={label.color} />
                 </span>
             {/if}
-            <span class:obfuscated>
-                {name}
-            </span>
+
+            <EncryptedText text={item.nameEncrypted} {obfuscated} />
         </div>
     </div>
 {/if}

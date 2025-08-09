@@ -16,7 +16,7 @@ export const PUT = (async ({ request, params, cookies }) => {
         name: z.string().optional(),
         start: z.number().optional(),
         end: z.number().optional(),
-        label: z.string().optional().nullable()
+        labelId: z.string().optional().nullable()
     });
 
     const event = (await Event.fromId(auth, params.eventId)).unwrap(e => error(404, e));
@@ -42,8 +42,8 @@ export const PUT = (async ({ request, params, cookies }) => {
         }
     }
 
-    if (body.label !== undefined) {
-        (await Event.updateLabel(auth, event, body.label)).unwrap(e => error(400, e));
+    if (body.labelId) {
+        (await Event.updateLabel(auth, event, body.labelId)).unwrap(e => error(400, e));
     }
 
     return apiResponse(auth, { event });

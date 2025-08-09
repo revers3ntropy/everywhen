@@ -13,15 +13,17 @@
     import type { Pixels, TimestampSecs } from '../../../types';
     import { makeStandardContextMenu } from './standardContextMenu';
     import { CSLogger } from '$lib/controllers/logs/logger.client';
+    import { tryEncryptText } from '$lib/utils/encryption.client';
 
     export let labels: Record<string, Label>;
 
     let eventInDialog: EventController | null = null;
 
     async function newEvent(start: TimestampSecs, end: TimestampSecs) {
+        const name = tryEncryptText(EventController.NEW_EVENT_NAME);
         const { id } = notify.onErr(
             await api.post('/events', {
-                name: EventController.NEW_EVENT_NAME,
+                name,
                 start,
                 end,
                 tzOffset: currentTzOffset()
@@ -29,12 +31,12 @@
         );
         const event = {
             id,
-            name: EventController.NEW_EVENT_NAME,
+            name,
             start,
             end,
             tzOffset: currentTzOffset(),
             created: nowUtc(), // not precise but fine
-            label: null
+            labelId: null
         } satisfies EventController;
         await dispatch.create('event', event);
         eventInDialog = event;

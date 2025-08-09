@@ -1,5 +1,4 @@
 import type { Hours, Seconds, TimestampSecs } from '../../../types';
-import type { Label } from '../label/label';
 
 export interface Event {
     id: string;
@@ -8,7 +7,7 @@ export interface Event {
     end: TimestampSecs;
     tzOffset: Hours;
     created: TimestampSecs;
-    label: Label | null;
+    labelId: string | null;
 }
 
 export namespace Event {

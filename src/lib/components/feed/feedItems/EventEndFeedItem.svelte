@@ -2,11 +2,10 @@
     import FeedItemIcon from '$lib/components/feed/feedItems/FeedItemIcon.svelte';
     import TimeInFeed from '$lib/components/feed/feedItems/TimeInFeed.svelte';
     import LabelDot from '$lib/components/label/LabelDot.svelte';
-    import { Auth } from '$lib/controllers/auth/auth';
     import type { FeedItem, FeedItemTypes } from '$lib/controllers/feed/feed';
     import type { Label } from '$lib/controllers/label/label';
-    import { encryptionKey } from '$lib/stores';
     import { Day } from '$lib/utils/day';
+    import EncryptedText from '$lib/components/ui/EncryptedText.svelte';
 
     export let item: FeedItemTypes['eventEnd'];
     export let labels: Record<string, Label>;
@@ -30,7 +29,7 @@
                 </span>
             {/if}
             <span class:obfuscated>
-                {Auth.decryptOrLogOut(item.nameEncrypted, $encryptionKey)}
+                <EncryptedText text={item.nameEncrypted} />
             </span>
         </div>
     </div>

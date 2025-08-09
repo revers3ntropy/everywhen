@@ -52,16 +52,16 @@
             eventCount -= 1;
         }
     });
-    listen.event.onCreate(({ label: l }) => {
-        if (l?.id === data.label.id) {
+    listen.event.onCreate(({ labelId }) => {
+        if (labelId === data.label.id) {
             eventCount += 1;
         }
     });
-    listen.event.onUpdate(({ label: l }, { label: oldLabel }) => {
+    listen.event.onUpdate(({ labelId }, { labelId: oldLabelId }) => {
         // As all events on this page have this label already,
         // they could only be removed from this label, not added
         // TODO: but what about changed twice...
-        if (l?.id !== data.label.id && oldLabel?.id === data.label.id) {
+        if (labelId !== data.label.id && oldLabelId === data.label.id) {
             eventCount -= 1;
         }
     });

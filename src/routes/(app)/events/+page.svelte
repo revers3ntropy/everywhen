@@ -10,6 +10,7 @@
     import { currentTzOffset, nowUtc } from '$lib/utils/time';
     import type { EventsSortKey } from '../../../types';
     import type { PageData } from './$types';
+    import { tryDecryptText, tryEncryptText } from '$lib/utils/encryption.client.js';
 
     export let data: PageData;
 
@@ -17,11 +18,14 @@
         events: T[],
         key: EventsSortKey & keyof T
     ): T[] {
-        if (events.length === 0) return [];
-        if (typeof events[0][key] === 'string') {
+        if (events.length < 2) return events;
+        if (key === 'name') {
             return events.sort((a, b) => {
-                return (a[key] as string).localeCompare(b[key] as string);
+                return tryDecryptText(a[key] as string).localeCompare(
+                    tryDecryptText(b[key] as string)
+                );
             });
+            // everything that isn't 'name' is a number
         } else if (typeof events[0][key] === 'number') {
             return events.sort((a, b) => {
                 return (b[key] as number) - (a[key] as number);
@@ -32,10 +36,11 @@
 
     async function newEvent() {
         const now = nowUtc();
+        const name = tryEncryptText(Event.NEW_EVENT_NAME);
 
         const { id } = notify.onErr(
             await api.post('/events', {
-                name: Event.NEW_EVENT_NAME,
+                name,
                 start: now,
                 end: now,
                 tzOffset: currentTzOffset()
@@ -44,12 +49,12 @@
 
         const event: Event = {
             id,
-            name: Event.NEW_EVENT_NAME,
+            name,
             start: now,
             end: now,
             tzOffset: currentTzOffset(),
             created: now,
-            label: null
+            labelId: null
         };
 
         await dispatch.create('event', event);

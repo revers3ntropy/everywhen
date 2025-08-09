@@ -13,6 +13,7 @@
     import { limitStrLen } from '$lib/utils/text';
     import type { Pixels, TimestampSecs } from '../../../types';
     import EventDragHandle from './EventDragHandle.svelte';
+    import { tryDecryptText } from '$lib/utils/encryption.client.js';
 
     export let labels: Record<string, Label>;
 
@@ -22,7 +23,7 @@
     export let end: number;
     export let tzOffset: number;
     export let name: string;
-    export let label: Label | null;
+    export let labelId: string | null;
     export let yLevel = 0;
     export let eventTextParityHeight: boolean;
 
@@ -48,7 +49,7 @@
             end,
             tzOffset,
             created,
-            label
+            labelId
         };
         const event: EventController = {
             ...oldEvent,
@@ -84,7 +85,7 @@
 
     $: duration = end - start;
     $: isInstantEvent = duration < 60;
-    $: labelColor = label?.color || $canvasState.colors.primary;
+    $: labelColor = labelId ? labels[labelId].color : $canvasState.colors.primary;
 
     const HEIGHT = 30;
     const LABEL_HEIGHT = 4;
@@ -171,7 +172,7 @@
                     color: this.hovering ? state.colors.lightAccent : state.colors.primary,
                     radius: 5
                 });
-                if (label) {
+                if (labelId) {
                     state.rect(x, y + HEIGHT - LABEL_HEIGHT, width, LABEL_HEIGHT, {
                         color: labelColor
                     });
@@ -195,9 +196,10 @@
 
             if ($obfuscated) return;
 
+            const shortenedName = limitStrLen(tryDecryptText(name), 20)
             if (!isInstantEvent && (width > 50 || this.hovering)) {
                 state.text(
-                    limitStrLen(name, 20),
+                    shortenedName,
                     Math.max(DURATION_TEXT_X_OFFSET, x + DURATION_TEXT_X_OFFSET),
                     y + DURATION_TEXT_Y_OFFSET,
                     {
@@ -206,7 +208,7 @@
                 );
             } else if (isInstantEvent && (state.zoom > START_ZOOM / 2 || this.hovering)) {
                 state.text(
-                    limitStrLen(name, 20),
+                    shortenedName,
                     x + 5,
                     y + HEIGHT / 2 + (eventTextParityHeight ? HEIGHT / 2 + 15 : -5),
                     {
@@ -268,7 +270,7 @@
                 end,
                 tzOffset,
                 name,
-                label,
+                labelId,
                 created
             }}
             {labels}

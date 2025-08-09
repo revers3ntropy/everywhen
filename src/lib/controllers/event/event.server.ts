@@ -1,7 +1,6 @@
 import { Subscription } from '$lib/controllers/subscription/subscription.server';
 import { UsageLimits } from '$lib/controllers/usageLimits/usageLimits.server';
 import { query } from '$lib/db/mysql.server';
-import { decrypt, encrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
 import { nowUtc } from '$lib/utils/time';
 import type { TimestampSecs } from '../../../types';
@@ -14,20 +13,10 @@ import { SSLogger } from '$lib/controllers/logs/logs.server';
 const logger = new SSLogger('Event');
 
 namespace EventServer {
-    interface RawEvent {
-        id: string;
-        name: string;
-        start: number;
-        end: number;
-        tzOffset: number;
-        created: number;
-        labelId: string | null;
-    }
+    type Event = _Event;
 
-    export async function all(auth: Auth): Promise<Result<Event[]>> {
-        const labels = await Label.allIndexedById(auth);
-
-        const rawEvents = await query<
+    export async function all(auth: Auth): Promise<Event[]> {
+        return await query<
             {
                 id: string;
                 name: string;
@@ -49,12 +38,10 @@ namespace EventServer {
             WHERE userId = ${auth.id}
             ORDER BY created DESC
         `;
-
-        return Result.collect(rawEvents.map(e => fromRaw(auth, e, labels)));
     }
 
     export async function fromId(auth: Auth, id: string): Promise<Result<Event>> {
-        const events = await query<RawEvent[]>`
+        const events = await query<Event[]>`
             SELECT id,
                    name,
                    start,
@@ -77,34 +64,7 @@ namespace EventServer {
         }
         const [event] = events;
 
-        return fromRaw(auth, event, await Label.allIndexedById(auth));
-    }
-
-    export function fromRaw(
-        auth: Auth,
-        rawEvent: RawEvent,
-        labels: Record<string, Label>
-    ): Result<Event> {
-        const nameDecrypted = decrypt(rawEvent.name, auth.key);
-        if (!nameDecrypted.ok) return nameDecrypted.cast();
-
-        let label: Label | null = null;
-        if (rawEvent.labelId) {
-            label = labels[rawEvent.labelId];
-            if (!label) {
-                return Result.err(`Label not found`);
-            }
-        }
-
-        return Result.ok({
-            id: rawEvent.id,
-            name: nameDecrypted.val,
-            start: rawEvent.start,
-            end: rawEvent.end,
-            tzOffset: rawEvent.tzOffset,
-            created: rawEvent.created,
-            label
-        });
+        return Result.ok(event);
     }
 
     function eventEndTooFarInFuture(end: number): boolean {
@@ -148,7 +108,7 @@ namespace EventServer {
         tzOffset: number,
         labelId: string | null,
         created: TimestampSecs | null
-    ): Promise<Result<RawEvent>> {
+    ): Promise<Result<Event>> {
         const canCreate = await canCreateEvent(auth, name, start, end);
         if (canCreate !== true) return Result.err(canCreate);
 
@@ -160,7 +120,7 @@ namespace EventServer {
                 (id, userId, name, start, end, tzOffset, created, labelId)
             VALUES (${id},
                     ${auth.id},
-                    ${encrypt(name, auth.key)},
+                    ${name},
                     ${start},
                     ${end},
                     ${tzOffset},
@@ -190,23 +150,16 @@ namespace EventServer {
     export async function updateName(
         auth: Auth,
         self: Event,
-        namePlaintext: string
+        name: string
     ): Promise<Result<Event>> {
-        if (!namePlaintext) {
-            return Result.err('Event name cannot be empty');
-        }
-        self.name = namePlaintext;
-
-        const nameEncrypted = encrypt(namePlaintext, auth.key);
-
-        if (nameEncrypted.length > 256) {
-            return Result.err('Name too long');
-        }
+        if (!name) return Result.err('Event name cannot be empty');
+        if (name.length > 256) return Result.err('Name too long');
+        self.name = name;
 
         await query`
             UPDATE events
-            SET name = ${nameEncrypted}
-            WHERE id = ${self.id}
+            SET name = ${name}
+            WHERE id = ${self.id} AND userId = ${auth.id}
         `;
         return Result.ok(self);
     }

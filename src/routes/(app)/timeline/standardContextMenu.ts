@@ -6,15 +6,17 @@ import { api } from '$lib/utils/apiRequest';
 import { currentTzOffset, nowUtc } from '$lib/utils/time';
 import type { Writable } from 'svelte/store';
 import type { TimestampSecs } from '../../../types';
+import { tryEncryptText } from '$lib/utils/encryption.client';
 
 export function makeStandardContextMenu(canvasState: Writable<CanvasState>): ContextMenuOptions {
     let state: CanvasState;
     canvasState.subscribe(s => (state = s));
 
     async function newEvent(start: TimestampSecs, end: TimestampSecs) {
+        const name = tryEncryptText(Event.NEW_EVENT_NAME);
         const { id } = notify.onErr(
             await api.post('/events', {
-                name: Event.NEW_EVENT_NAME,
+                name,
                 start,
                 end,
                 tzOffset: currentTzOffset()
@@ -22,12 +24,12 @@ export function makeStandardContextMenu(canvasState: Writable<CanvasState>): Con
         );
         const event: Event = {
             id,
-            name: Event.NEW_EVENT_NAME,
+            name,
             start,
             end,
             tzOffset: currentTzOffset(),
             created: nowUtc(), // not precise but fine,
-            label: null
+            labelId: null
         };
         await dispatch.create('event', event);
     }

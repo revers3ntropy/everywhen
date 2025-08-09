@@ -11,7 +11,7 @@ import { Auth } from '$lib/controllers/auth/auth.server';
 
 export const GET = cachedApiRoute(async auth => {
     return {
-        events: (await Event.all(auth)).unwrap(e => error(400, e))
+        events: await Event.all(auth)
     };
 }) satisfies RequestHandler;
 
@@ -25,12 +25,12 @@ export const POST = (async ({ request, cookies }) => {
         start: z.number(),
         end: z.number(),
         tzOffset: z.number(),
-        label: z.string().nullable().default(null)
+        labelId: z.string().nullable().default(null)
     });
 
     // check label exists
-    if (body.label) {
-        if (!(await Label.userHasLabelWithId(auth, body.label))) {
+    if (body.labelId) {
+        if (!(await Label.userHasLabelWithId(auth, body.labelId))) {
             error(400, `Label doesn't exist`);
         }
     }
@@ -42,7 +42,7 @@ export const POST = (async ({ request, cookies }) => {
             body.start,
             body.end,
             body.tzOffset,
-            body.label,
+            body.labelId,
             body.created ?? nowUtc()
         )
     ).unwrap(e => error(400, e));

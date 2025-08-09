@@ -22,6 +22,9 @@
         parseTimestampFromInputUtc
     } from '$lib/utils/time';
     import { slide, fly } from 'svelte/transition';
+    import { tryEncryptText } from '$lib/utils/encryption.client';
+    import EncryptedText from '$lib/components/ui/EncryptedText.svelte';
+    import { tryDecryptText } from '$lib/utils/encryption.client.js';
 
     export let labels: Record<string, Label>;
     export let obfuscated = true;
@@ -29,17 +32,14 @@
     export let event: Event & { deleted?: boolean };
     export let selectNameId: string | null = null;
 
-    let nameInput: HTMLInputElement;
-
     async function updateEvent(changes: {
         name?: string;
         start?: TimestampSecs;
         end?: TimestampSecs;
-        label?: Label['id'];
+        labelId?: string;
     }) {
         notify.onErr(await api.put(apiPath('/events/?', event.id), changes));
 
-        const label = changes.label ? labels[changes.label] || null : event.label;
         const oldEvent = { ...event };
         event = {
             ...event,
@@ -47,14 +47,14 @@
             start: changes.start || event.start,
             end: changes.end || event.end,
             tzOffset: event.tzOffset,
-            label
+            labelId: changes.labelId || event.labelId || null
         };
         await dispatch.update('event', event, oldEvent);
     }
 
-    const updateName = async (newName: string) => {
+    const updateName = async (plaintextName: string) => {
         await updateEvent({
-            name: newName
+            name: tryEncryptText(plaintextName)
         });
     };
 
@@ -100,7 +100,7 @@
                 end: event.end,
                 tzOffset: currentTzOffset(),
                 created: event.created,
-                labels: event.label?.id
+                labelId: event.labelId
             })
         );
         event = {
@@ -127,22 +127,18 @@
     }
 
     async function updateLabel({ detail: { id } }: CustomEvent<{ id: string }>) {
-        if (id === (event.label?.id || '')) return;
+        if (id === (event.labelId || '')) return;
         if (!labels) return;
 
-        event.label = labels[id] || null;
+        event.labelId = id || null;
         await updateEvent({
-            label: id
+            labelId: id
         });
     }
 
     function selectIfSelected(selectNameId: string | null, eventId: string): undefined {
         if (selectNameId !== eventId) return;
         obfuscated = false;
-        if (nameInput) {
-            nameInput.focus();
-            nameInput.select();
-        }
     }
 
     listen.label.onCreate(label => {
@@ -173,7 +169,7 @@
 
     // weird hack to have extra dependencies,
     // so selectIfSelected will run when nameInput changes
-    $: [obfuscated, nameInput, selectIfSelected(selectNameId, event.id)].toString();
+    $: [obfuscated, selectIfSelected(selectNameId, event.id)].toString();
 </script>
 
 {#if event.deleted}
@@ -194,11 +190,13 @@
     <div transition:slide|local={{ axis: 'y', duration: 0 }}>
         <div class="flex items-center justify-between">
             {#if obfuscated}
-                <p class=" obfuscated">
-                    {event.name}
-                </p>
+                <EncryptedText text={event.name} obfuscated />
             {:else}
-                <Textbox value={event.name} onChange={updateName} label="Event Name" />
+                <Textbox
+                    value={tryDecryptText(event.name)}
+                    onChange={updateName}
+                    label="Event Name"
+                />
             {/if}
             <Button
                 variant="outline"
@@ -223,7 +221,7 @@
                         delay: ANIMATION_DURATION / 2
                     }}
                 >
-                    <LabelSelect on:change={updateLabel} value={event.label?.id || ''} {labels} />
+                    <LabelSelect on:change={updateLabel} value={event.labelId || ''} {labels} />
                 </div>
             </div>
             <div class="block">
