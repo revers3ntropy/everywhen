@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Info from 'svelte-material-icons/InformationOutline.svelte';
     import { goto } from '$app/navigation';
     import EditLocation from '$lib/components/location/EditLocation.svelte';
     import Entries from '$lib/components/entry/Entries.svelte';
@@ -41,8 +42,9 @@
             <EditLocation {...location} />
         </section>
 
-        <div class="h-[50vh] md:rounded-lg py-4">
-            <p class="italic text-light">
+        <section class="h-[50vh] md:rounded-lg py-4">
+            <p class="text-sm text-light pt-4 pb-2 flex items-center gap-2">
+                <Info size={20} />
                 Drag the handles to change the size and placement of the Location
             </p>
             {#key location}
@@ -62,10 +64,13 @@
                     class="rounded-lg"
                 />
             {/key}
-        </div>
+        </section>
 
-        <section class="pt-4 md:pl-2">
-            <p>Entries will only appear here if you had location enabled when you submitted it</p>
+        <section class="mt-16 block">
+            <p class="text-sm text-light pb-2 flex items-center gap-2">
+                <Info size={20} />
+                Entries will only appear here if you had location enabled when you submitted it
+            </p>
             {#key location}
                 <Entries
                     options={{
