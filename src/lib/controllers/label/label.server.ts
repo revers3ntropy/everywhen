@@ -127,7 +127,7 @@ namespace LabelServer {
         const canCreate = await canCreateWithName(auth, json.name);
         if (canCreate !== true) return Result.err(canCreate);
 
-        const id = await UId.generate();
+        const id = UId.generate();
         const created = json.created ?? nowUtc();
 
         if (json.name.length > UsageLimits.LIMITS.label.nameLenMax)

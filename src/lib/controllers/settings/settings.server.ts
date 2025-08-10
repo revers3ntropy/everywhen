@@ -71,7 +71,7 @@ namespace SettingsServer {
             return Result.ok({ id, created: now, key, value });
         }
 
-        const id = await UId.generate();
+        const id = UId.generate();
 
         await query`
             INSERT INTO settings (id, userId, created, \`key\`, value)

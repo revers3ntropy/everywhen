@@ -112,7 +112,7 @@ namespace EventServer {
         const canCreate = await canCreateEvent(auth, name, start, end);
         if (canCreate !== true) return Result.err(canCreate);
 
-        const id = await UId.generate();
+        const id = UId.generate();
         created ??= nowUtc();
 
         await query`

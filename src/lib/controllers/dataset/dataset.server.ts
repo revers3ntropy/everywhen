@@ -395,7 +395,7 @@ namespace DatasetServer {
         created: TimestampSecs,
         presetId: string | null
     ): Promise<Result<Dataset>> {
-        const id = await UId.generate();
+        const id = UId.generate();
 
         const canCreate = await canCreateWithName(auth, name, presetId);
         if (canCreate !== true) return Result.err(canCreate);
@@ -794,7 +794,7 @@ namespace DatasetServer {
         name: string,
         type: DatasetColumnType<unknown>
     ): Promise<Result<DatasetColumn<unknown>>> {
-        const id = await UId.generate();
+        const id = UId.generate();
         const created = nowUtc();
 
         const dataset = await getDataset(auth, datasetId);

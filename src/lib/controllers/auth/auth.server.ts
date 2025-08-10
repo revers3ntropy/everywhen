@@ -108,7 +108,7 @@ namespace AuthServer {
     }
 
     async function generateSessionId() {
-        return `${await UId.generate()}-${crypto.randomBytes(32).toString('hex')}-${Date.now()}`;
+        return `${UId.generate()}-${crypto.randomBytes(32).toString('hex')}-${Date.now()}`;
     }
 
     export async function authenticateUserFromLogIn(

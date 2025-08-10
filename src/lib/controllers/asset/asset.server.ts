@@ -47,7 +47,7 @@ namespace AssetServer {
         created?: TimestampSecs,
         publicId?: string
     ): Promise<Result<{ publicId: string; id: string }>> {
-        publicId ??= await UId.generate();
+        publicId ??= UId.generate();
         fileNamePlainText ??= `${publicId}`;
 
         const canCreate = await canCreateAssetWithNameAndContent(
@@ -60,7 +60,7 @@ namespace AssetServer {
         const encryptedContents = encrypt(contentsPlainText, auth.key);
         const encryptedFileName = encrypt(fileNamePlainText, auth.key);
 
-        const id = await UId.generate();
+        const id = UId.generate();
 
         await query`
             INSERT INTO assets (id, publicId, userId, created, fileName, content)

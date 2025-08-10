@@ -56,7 +56,7 @@ namespace UserServer {
         if (newUserValid !== true) return Result.err(newUserValid);
 
         const salt = await generateSalt();
-        const id = await UId.generate();
+        const id = UId.generate();
 
         await query`
             INSERT INTO users (id, username, password, salt, created, versionLastLoggedIn)

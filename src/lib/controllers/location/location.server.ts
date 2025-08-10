@@ -44,7 +44,7 @@ namespace LocationServer {
         const canCreate = await canCreateWithName(auth, name);
         if (canCreate !== true) return Result.err(canCreate);
 
-        const id = await UId.generate();
+        const id = UId.generate();
 
         await query`
             INSERT INTO locations (id, userId, created, name,

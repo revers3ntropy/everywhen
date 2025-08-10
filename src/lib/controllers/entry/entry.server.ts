@@ -136,7 +136,7 @@ namespace EntryServer {
             return Result.err(`Maximum number of entries reached`);
         }
 
-        const id = await UId.generate();
+        const id = UId.generate();
 
         await updateWordIndex(auth, body, title, id, !!deleted, false);
 
@@ -165,7 +165,7 @@ namespace EntryServer {
         const editsWithIds: (RawEntryEdit & { id: string })[] = [];
 
         for (const edit of edits) {
-            const editId = await UId.generate();
+            const editId = UId.generate();
 
             editsWithIds.push({
                 ...edit,
@@ -256,7 +256,7 @@ namespace EntryServer {
         editTzOffset: number,
         editAgentData: string
     ): Promise<void> {
-        const editId = await UId.generate();
+        const editId = UId.generate();
 
         await query`
             INSERT INTO entryEdits

@@ -247,16 +247,6 @@ CREATE TABLE datasetRows
     DEFAULT CHARSET = utf8mb4
     COLLATE utf8mb4_bin;
 
-
-CREATE TABLE ids
-(
-    id char(32) NOT NULL,
-    PRIMARY KEY (id)
-)
-    ENGINE = InnoDB
-    DEFAULT CHARSET = utf8mb4
-    COLLATE utf8mb4_bin;
-
 CREATE TABLE logs
 (
     id         int          AUTO_INCREMENT,
