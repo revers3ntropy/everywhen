@@ -19,7 +19,7 @@
 </svelte:head>
 
 <main class="w-screen flex justify-center">
-    <div class="pt-20 md:pt-8">
+    <div class="pt-20 p-2 md:pt-8">
         <div class="flex flex-col md:flex-center gap-4 flex-wrap">
             <div class="flex-center">
                 <Logo scale={0.3} />
