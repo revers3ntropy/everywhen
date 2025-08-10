@@ -36,23 +36,23 @@
     }
 
     function checkRedactedFontIsLoaded() {
-        if (document && document.fonts) {
-            if (document.fonts.check('16px "Redacted Script"')) {
-                // Make font using elements visible
-                root.classList.add('redacted-font-loaded');
-                return;
-            }
-            // Do not block page loading
-            setTimeout(() => {
-                void document.fonts.load('16px "Redacted Script"').then(() => {
-                    // Make font using elements visible
-                    root.classList.add('redacted-font-loaded');
-                });
-            }, 0);
+        if (!document || !document.fonts) {
+            // Fallback if API does not exist
+            document.body.classList.add('redacted-font-loaded');
             return;
         }
-        // Fallback if API does not exist
-        root.classList.add('redacted-font-loaded');
+        if (document.fonts.check('16px "Redacted Script"')) {
+            // Make font using elements visible
+            document.body.classList.add('redacted-font-loaded');
+            return;
+        }
+        // Do not block page loading
+        setTimeout(() => {
+            void document.fonts.load('16px "Redacted Script"').then(() => {
+                // Make font using elements visible
+                document.body.classList.add('redacted-font-loaded');
+            });
+        }, 0);
     }
 
     onMount(() => {
