@@ -43,7 +43,6 @@
         )}
     >
         <FormatText size="25" />
-        Format
     </Popover.Trigger>
     <Popover.Content class="py-3 px-0 flex flex-col">
         <button class={buttonClass} on:click={onClickFactory('**', '**', false)}>

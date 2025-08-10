@@ -32,6 +32,9 @@
     export let latitude: number;
     export let longitude: number;
     export let showingMap: boolean;
+    export let noLink = false;
+    export let fullAddress = false;
+    export let noChevron = false;
 
     const { near, touching } = Location.filterLocationsByPoint(locations, {
         latitude,
@@ -47,34 +50,58 @@
 <span class="flex items-center max-w-full text-sm">
     <span class="flex-center">
         <MapMarker size="20" />
-        {#if showingMap}
-            <ChevronUp size="15" />
-        {:else}
-            <ChevronDown size="15" />
+        {#if !noChevron}
+            {#if showingMap}
+                <ChevronUp size="15" />
+            {:else}
+                <ChevronDown size="15" />
+            {/if}
         {/if}
     </span>
     {#if touching.length}
         <span>
-            <a href="/map/{touching[0].id}" class="ellipsis" class:obfuscated>
-                <EncryptedText text={touching[0].name} />
-            </a>
+            {#if noLink}
+                <EncryptedText text={touching[0].name} {obfuscated} />
+            {:else}
+                <a href="/map/{touching[0].id}" class="ellipsis">
+                    <EncryptedText text={touching[0].name} {obfuscated} />
+                </a>
+            {/if}
         </span>
     {:else if near && near?.length}
         <span class="flex-center ellipsis" style="gap: 0.2rem">
             <span class="text-light"> near </span>
-            <a href="/map/{near[0].id}" class="ellipsis" class:obfuscated>
-                <EncryptedText text={near[0].name} />
-            </a>
+            {#if noLink}
+                <EncryptedText text={near[0].name} {obfuscated} />
+            {:else}
+                <a href="/map/{near[0].id}" class="ellipsis">
+                    <EncryptedText text={near[0].name} {obfuscated} />
+                </a>
+            {/if}
         </span>
     {:else if lookedupAddress}
         {#await lookedupAddress}
             ?
         {:then addr}
             {#if addr}
-                <span class="text-light italic">
-                    {addr.place},
-                    {addr.country}
-                </span>
+                {#if fullAddress}
+                    <span class="text-light italic">
+                        {#if addr.number}
+                            {addr.number}
+                        {/if}
+                        {#if addr.street}
+                            {addr.street},
+                        {/if}
+                        {addr.place},
+                        {addr.postcode},
+                        {addr.country}
+                    </span>
+                {:else}
+                    <span class="text-light italic">
+                        {addr.place},
+                        {addr.country}
+                    </span>
+                {/if}
             {/if}
         {/await}
     {/if}

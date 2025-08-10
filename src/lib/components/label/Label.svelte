@@ -8,7 +8,10 @@
 </script>
 
 {#if label}
-    <a class="flex-center group" href="/labels/{label.id}">
+    <a
+        class="flex-center group rounded-full bg-vLightAccent hover:bg-lightAccent py-[5px] px-2"
+        href="/labels/{label.id}"
+    >
         <span
             class="h-[18px] w-[18px] rounded-full border border-solid border-border"
             style="background: {label.color}"

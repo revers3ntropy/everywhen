@@ -171,14 +171,14 @@
         {#if !isEdit}
             <Popover.Root>
                 <Popover.Trigger
-                    class="flex-center hover:bg-lightAccent rounded-full"
+                    class="flex-center bg-vLightAccent hover:bg-lightAccent rounded-full p-1"
                     aria-label="Open options for entry"
                 >
                     <DotsVertical size="22" />
                 </Popover.Trigger>
                 <Popover.Content class="p-0 -y-2">
                     <div class="text-light flex-center py-3">
-                        {wordCount} words
+                        {wordCount} word{#if wordCount !== 1}s{/if}
                     </div>
 
                     <div class="border-t border-backgroundColor"></div>
@@ -257,14 +257,26 @@
             <button
                 on:click={() => (showingMap = !showingMap)}
                 aria-label="Expand map"
-                class="bg-vLightAccent py-1 px-2 {showingMap ? 'rounded-t-xl' : 'rounded-xl'}"
+                class="bg-vLightAccent hover:bg-lightAccent py-[5px] px-2 {showingMap
+                    ? 'rounded-t-xl'
+                    : 'rounded-full'}"
             >
-                <LocationWidget {locations} {showingMap} {latitude} {longitude} {obfuscated} />
+                <LocationWidget
+                    {locations}
+                    {showingMap}
+                    {latitude}
+                    {longitude}
+                    {obfuscated}
+                    noLink
+                />
             </button>
         {/if}
 
         {#if !isEdit && edits?.length}
-            <a href="/journal/{id}?history=on" class="edits-link link flex-center">
+            <a
+                href="/journal/{id}?history=on"
+                class="flex-center bg-vLightAccent hover:bg-lightAccent rounded-full px-3 py-[7px]"
+            >
                 <Pencil />
                 {edits.length} edit{edits.length > 1 ? 's' : ''}
             </a>
@@ -275,11 +287,13 @@
         {/if}
 
         {#if !obfuscated}
-            <div class="pl-2">
-                <button aria-label="Show entry" on:click={toggleObfuscation}>
-                    <EyeOff size="20" />
-                </button>
-            </div>
+            <button
+                aria-label="Show entry"
+                on:click={toggleObfuscation}
+                class="bg-vLightAccent hover:bg-lightAccent p-[6px] rounded-full"
+            >
+                <EyeOff size="18" />
+            </button>
         {/if}
     </div>
 
@@ -289,9 +303,21 @@
             class="bg-vLightAccent rounded-xl"
         >
             <div class="flex items-center justify-between">
-                <p class="italic text-light text-sm p-2">
-                    lat {latitude.toFixed(5)}, lng {longitude.toFixed(5)}
-                </p>
+                <div class="p-2">
+                    <LocationWidget
+                        {locations}
+                        {showingMap}
+                        {latitude}
+                        {longitude}
+                        {obfuscated}
+                        noChevron
+                        fullAddress
+                    />
+                    <p class="italic text-light text-sm pt-2">
+                        lat {latitude.toFixed(5)}, lng {longitude.toFixed(5)}
+                    </p>
+                </div>
+
                 <Button
                     on:click={() => (showingMap = false)}
                     class="flex-center rounded-full px-2 py-5 aspect-square border-none bg-transparent"
@@ -447,11 +473,6 @@
                 padding: 0 0 0 1em;
             }
         }
-    }
-
-    .edits-link {
-        font-size: 0.95rem;
-        white-space: nowrap;
     }
 
     .options-dropdown {
