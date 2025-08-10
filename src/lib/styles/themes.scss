@@ -5,31 +5,31 @@
 }
 
 [data-theme='light'], :root {
-    --primary: rgb(118, 88, 66);
-    --secondary: rgb(200, 170, 150);
+    --primary: #40727e;
+    --secondary: #b9c4da;
 
-    --background-color: rgb(255, 255, 255);
+    --background-color: white;
     --nav-bg: var(--background-color);
     --blur-bg-color: rgba(255, 255, 255, 0.2);
     --transluscent-bg: rgba(200, 200, 200, 0.85);
 
     --accent-danger: rgba(255, 41, 41, 0.76);
     --accent-gradient: var(--primary);
-    --light-accent: rgb(224, 217, 208);
+    --light-accent: #e2e5ec;
     --v-light-accent: rgb(235, 235, 235);
 
-    --border-light: rgb(190, 190, 190);
-    --border-color: rgb(118, 88, 66);
-    --border-heavy: rgb(130, 130, 130);
+    --border-light: rgb(40, 50, 50);
+    --border-color: rgb(30, 30, 30);
+    --border-heavy: rgb(20, 20, 20);
 
-    --text-color: rgba(0, 0, 0);
-    --text-color-accent: rgb(118, 88, 66);
+    --text-color: black;
+    --text-color-accent: #393d3f;
     --text-color-light: rgb(60, 60, 60);
     --text-colour-on-gradient: rgb(255, 255, 255);
     --text-color-invert: rgb(255, 255, 255);
     --text-color-danger: rgb(255, 56, 56);
 
-    --timeline-accent: rgb(98, 73, 55);
+    --timeline-accent: var(--primary);
 
     --likert-red: #c32415;
     --likert-orange: rgb(255, 153, 0);
@@ -63,8 +63,8 @@
 }
 
 [data-theme='dark'] {
-    --primary: rgb(224, 190, 163);
-    --secondary: rgb(118, 88, 66);
+    --primary: #b9c4da;
+    --secondary: #40727e;
 
     --background-color: rgb(30, 30, 30);
     --nav-bg: var(--background-color);
@@ -73,7 +73,7 @@
 
     --accent-danger: rgb(255, 120, 120);
     --accent-gradient: var(--primary);
-    --light-accent: rgb(80, 70, 65);
+    --light-accent: rgb(60, 70, 75);
     --v-light-accent: rgb(50, 50, 50);
 
     --border-light: rgb(55, 55, 55);
@@ -82,7 +82,7 @@
 
     --text-color: white;
     --text-color-accent: var(--primary);
-    --text-color-light: rgb(200, 200, 200);
+    --text-color-light: rgb(210, 210, 210);
     --text-colour-on-gradient: black;
     --text-color-invert: black;
     --text-color-danger: rgb(255, 56, 56);
