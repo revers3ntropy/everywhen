@@ -11,7 +11,6 @@
     import LabelOffOutline from 'svelte-material-icons/LabelOffOutline.svelte';
     import LabelOutline from 'svelte-material-icons/LabelOutline.svelte';
     import type { Label } from '$lib/controllers/label/label';
-    import MenuDown from 'svelte-material-icons/MenuDown.svelte';
     import { cn } from '$lib/utils';
     import { buttonVariants } from '$lib/components/ui/button';
 
