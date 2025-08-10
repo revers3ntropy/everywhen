@@ -8,4 +8,4 @@
     export let scale = 1 / 4;
 </script>
 
-<img src="/logo-{$theme}.png" alt="Logo" height={HEIGHT * scale} width={WIDTH * scale} />
+<img src="/logo-{$theme}.svg" alt="Logo" height={HEIGHT * scale} width={WIDTH * scale} />
