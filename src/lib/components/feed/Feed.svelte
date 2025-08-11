@@ -11,7 +11,7 @@
     import { notify } from '$lib/components/notifications/notifications';
     import type { Dataset } from '$lib/controllers/dataset/dataset';
     import { fmtUtc } from '$lib/utils/time';
-    import { onMount, onDestroy, tick } from 'svelte';
+    import { onMount, tick } from 'svelte';
     import type { OpenWeatherMapAPI } from '$lib/controllers/openWeatherMapAPI/openWeatherMapAPI';
     import { CSLogger } from '$lib/controllers/logs/logger.client';
 
@@ -123,9 +123,6 @@
         scrollContainer = getScrollContainer();
         scrollContainer.onscroll = updateScroll;
     });
-    onDestroy(() => {
-        scrollContainerObserver?.disconnect();
-    });
 
     listen.entry.onCreate(entry => {
         const entryDayFmt = fmtUtc(entry.created, entry.createdTzOffset, 'YYYY-MM-DD');
@@ -170,7 +167,6 @@
     let isLoadingAtTop = false;
     let scrollHeight = 0;
     let scrollContainer: HTMLElement;
-    let scrollContainerObserver: MutationObserver;
     let days = {} as Record<string, FeedDay>;
     let prevDay: string | null = fromDay.fmtIso();
     let nextDay: string | null = fromDay.fmtIso();
