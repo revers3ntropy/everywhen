@@ -25,8 +25,8 @@
                 <Logo scale={0.3} />
             </div>
             <div class="flex flex-col items-center">
-                <!-- 50px so that the title is same width as tagline -->
-                <h1 class="title-font text-[86px] pb-4"> Everywhen </h1>
+                <!-- specific font size so that the title is same width as tagline -->
+                <h1 class="title-font text-[50px] md:text-[86px] pb-4"> Everywhen </h1>
                 <p class="pb-6 tracking-[1.2px] title-font">
                     Your private journal for every place, time, and story
                 </p>
