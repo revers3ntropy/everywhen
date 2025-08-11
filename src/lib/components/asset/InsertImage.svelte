@@ -15,6 +15,8 @@
     import * as Popover from '$lib/components/ui/popover';
     import { cn } from '$lib/utils';
     import { buttonVariants } from '$lib/components/ui/button';
+    import Image from '$lib/components/asset/Image.svelte';
+    import { tryDecryptText } from '$lib/utils/encryption.client.js';
 
     export let size = '30';
     // should NOT trigger a 'create' event
@@ -113,15 +115,18 @@
                                 class="asset hover:brightness-75"
                                 on:click={() => {
                                     onInput(
-                                        Asset.generateMarkdownLink(asset.fileName, asset.publicId)
+                                        Asset.generateMarkdownLink(
+                                            tryDecryptText(asset.fileName),
+                                            asset.publicId
+                                        )
                                     );
                                     popoverOpen = false;
                                 }}
                             >
-                                <img
-                                    src="/api/assets/{asset.publicId}"
-                                    alt={asset.fileName}
-                                    loading="lazy"
+                                <Image
+                                    publicId={asset.publicId}
+                                    id={asset.id}
+                                    fileName={asset.fileName}
                                 />
                             </button>
                         {/each}

@@ -4,6 +4,7 @@ import { api } from '$lib/utils/apiRequest';
 import { getFileContents } from '$lib/utils/files.client';
 import { Result } from '$lib/utils/result';
 import { CSLogger } from '$lib/controllers/logs/logger.client';
+import { tryEncryptText } from '$lib/utils/encryption.client';
 
 export interface Asset {
     id: string;
@@ -98,15 +99,17 @@ export namespace Asset {
                     return;
                 }
 
+                const encryptedFileName = tryEncryptText(file.name);
+                const encryptedContent = tryEncryptText(contentAsWebP.val);
                 finishedUpload(
                     (
                         await api.post('/assets', {
-                            fileName: file.name,
-                            content: contentAsWebP.val
+                            fileName: encryptedFileName,
+                            content: encryptedContent
                         })
                     ).map(val => ({
                         publicId: val.publicId,
-                        fileName: file.name,
+                        fileName: encryptedFileName,
                         id: val.id
                     }))
                 );

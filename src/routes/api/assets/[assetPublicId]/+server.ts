@@ -1,32 +1,13 @@
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
-import { api404Handler, apiResponse, type GenericResponse } from '$lib/utils/apiResponse.server';
-import { cacheResponse, getCachedResponse, invalidateCache } from '$lib/utils/cache.server';
+import { api404Handler, apiResponse } from '$lib/utils/apiResponse.server';
+import { cachedApiRoute, invalidateCache } from '$lib/utils/cache.server';
 import { Auth } from '$lib/controllers/auth/auth.server';
 import { Asset } from '$lib/controllers/asset/asset.server';
 
-export const GET = (async ({ params, url, cookies }) => {
-    const auth = Auth.getAuthFromCookies(cookies);
-
-    const cached = getCachedResponse<Response>(url.href, auth.id);
-    if (cached) return cached.clone() as GenericResponse<Buffer>;
-
-    const asset = (await Asset.fromPublicId(auth, params['assetPublicId'] || '')).unwrap(e =>
-        error(404, e)
-    );
-
-    const img = Buffer.from(asset.content, 'base64');
-    const response = new Response(img, {
-        status: 200,
-        headers: {
-            'Content-Type': 'image/webp',
-            'Cache-Control': 'max-age=31536000, immutable',
-            'Content-Length': `${img.length}`
-        }
-    }) as GenericResponse<Buffer>;
-
-    cacheResponse(url.href, auth.id, response.clone());
-    return response;
+export const GET = cachedApiRoute(async (auth, { params }) => {
+    if (!params['assetPublicId']) error(404, 'image not found');
+    return (await Asset.fromPublicId(auth, params['assetPublicId'])).unwrap(e => error(404, e));
 }) satisfies RequestHandler;
 
 export const DELETE = (async ({ params, cookies }) => {

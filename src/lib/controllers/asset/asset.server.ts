@@ -1,8 +1,6 @@
 import { Subscription } from '$lib/controllers/subscription/subscription.server';
 import { UsageLimits } from '$lib/controllers/usageLimits/usageLimits.server';
-import { decrypt, encrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
-import { fmtBytes } from '$lib/utils/text';
 import { nowUtc } from '$lib/utils/time';
 import type { ResultSetHeader } from 'mysql2';
 import type { TimestampSecs } from '../../../types';
@@ -19,16 +17,14 @@ namespace AssetServer {
 
     async function canCreateAssetWithNameAndContent(
         auth: Auth,
-        contentsPlainText: string,
-        fileNamePlainText: string
+        contents: string,
+        fileName: string
     ): Promise<string | true> {
-        if (contentsPlainText.length > UsageLimits.LIMITS.asset.contentLenMax)
-            return `File is too big (max ${fmtBytes(UsageLimits.LIMITS.asset.contentLenMax)})`;
+        if (contents.length > UsageLimits.LIMITS.asset.contentLenMax) return `File is too big`;
 
-        if (fileNamePlainText.length < UsageLimits.LIMITS.asset.nameLenMin)
-            return `File name too short`;
+        if (fileName.length < UsageLimits.LIMITS.asset.nameLenMin) return `File name too short`;
 
-        if (fileNamePlainText.length > UsageLimits.LIMITS.asset.nameLenMax)
+        if (fileName.length > UsageLimits.LIMITS.asset.nameLenMax)
             return `File name too long (max ${UsageLimits.LIMITS.asset.nameLenMax})`;
 
         const [count, max] = await UsageLimits.assetsUsage(
@@ -42,24 +38,16 @@ namespace AssetServer {
 
     export async function create(
         auth: Auth,
-        contentsPlainText: string,
-        fileNamePlainText?: string,
+        content: string,
+        fileName?: string,
         created?: TimestampSecs,
         publicId?: string
     ): Promise<Result<{ publicId: string; id: string }>> {
         publicId ??= UId.generate();
-        fileNamePlainText ??= `${publicId}`;
+        fileName ??= '';
 
-        const canCreate = await canCreateAssetWithNameAndContent(
-            auth,
-            contentsPlainText,
-            fileNamePlainText
-        );
+        const canCreate = await canCreateAssetWithNameAndContent(auth, content, fileName);
         if (canCreate !== true) return Result.err(canCreate);
-
-        const encryptedContents = encrypt(contentsPlainText, auth.key);
-        const encryptedFileName = encrypt(fileNamePlainText, auth.key);
-
         const id = UId.generate();
 
         await query`
@@ -68,8 +56,8 @@ namespace AssetServer {
                     ${publicId},
                     ${auth.id},
                     ${created ?? nowUtc()},
-                    ${encryptedFileName},
-                    ${encryptedContents})
+                    ${fileName},
+                    ${content})
         `;
 
         return Result.ok({ publicId, id });
@@ -89,6 +77,7 @@ namespace AssetServer {
               AND userId = ${auth.id}
         `;
         if (res.length !== 1) {
+            // should keep this error as low confidence that publicIds are unique per user
             if (res.length !== 0) {
                 await logger.error(
                     `Expected 1 asset with publicId ${publicId} but found ${res.length}`,
@@ -97,26 +86,13 @@ namespace AssetServer {
             }
             return Result.err('Asset not found');
         }
-
-        const [asset] = res;
-
-        const decryptedContent = decrypt(asset.content, auth.key);
-        if (!decryptedContent.ok) return decryptedContent.cast();
-
-        const decryptedFileName = decrypt(asset.fileName, auth.key);
-        if (!decryptedFileName.ok) return decryptedFileName.cast();
-
-        return Result.ok({
-            id: asset.id,
-            publicId: asset.publicId,
-            content: decryptedContent.val,
-            fileName: decryptedFileName.val,
-            created: asset.created
-        });
+        return Result.ok(res[0]);
     }
 
-    export async function all(auth: Auth): Promise<Result<Asset[]>> {
-        const res = await query<Asset[]>`
+    export async function all(auth: Auth): Promise<Asset[]> {
+        return await query<
+            { id: string; publicId: string; content: string; created: number; fileName: string }[]
+        >`
             SELECT id,
                    publicId,
                    content,
@@ -125,24 +101,6 @@ namespace AssetServer {
             FROM assets
             WHERE userId = ${auth.id}
         `;
-
-        return Result.collect(
-            res.map(row => {
-                const decryptedContent = decrypt(row.content, auth.key);
-                if (!decryptedContent.ok) return decryptedContent.cast();
-
-                const decryptedFileName = decrypt(row.fileName, auth.key);
-                if (!decryptedFileName.ok) return decryptedFileName.cast();
-
-                return Result.ok({
-                    id: row.id,
-                    publicId: row.publicId,
-                    content: decryptedContent.val,
-                    fileName: decryptedFileName.val,
-                    created: row.created
-                });
-            })
-        );
     }
 
     export async function pageOfMetaData(
@@ -155,7 +113,7 @@ namespace AssetServer {
         if (offset < 0) return Result.err('Offset must be positive');
         if (isNaN(offset)) return Result.err('Offset must be a number');
 
-        const res = await query<
+        const metadata = await query<
             { id: string; publicId: string; created: number; fileName: string }[]
         >`
             SELECT id,
@@ -169,28 +127,13 @@ namespace AssetServer {
             OFFSET ${offset}
         `;
 
-        const metadata = Result.collect(
-            res.map((row): Result<AssetMetadata> => {
-                const decryptedFileName = decrypt(row.fileName, auth.key);
-                if (!decryptedFileName.ok) return decryptedFileName.cast();
-
-                return Result.ok({
-                    id: row.id,
-                    publicId: row.publicId,
-                    fileName: decryptedFileName.val,
-                    created: row.created
-                });
-            })
-        );
-        if (!metadata.ok) return metadata.cast();
-
         const [assetCount] = await query<{ count: number }[]>`
             SELECT COUNT(*) as count
             FROM assets
             WHERE userId = ${auth.id}
         `;
 
-        return Result.ok([metadata.val, assetCount.count]);
+        return Result.ok([metadata, assetCount.count]);
     }
 
     export async function purgeAll(auth: Auth): Promise<void> {

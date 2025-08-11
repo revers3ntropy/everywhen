@@ -32,6 +32,7 @@
     import LocationWidget from '../location/LocationWidget.svelte';
     import { Button } from '$lib/components/ui/button';
     import Close from 'svelte-material-icons/Close.svelte';
+    import { tryDecryptText } from '$lib/utils/encryption.client';
 
     export let id: string;
     export let title: string;
@@ -120,6 +121,30 @@
         notify.success('Copied link to clipboard');
     }
 
+    async function decryptImages(html: string) {
+        // step 1: find images linking to encrypted everywhen assets
+        // TODO step 2: replace with loading placeholder
+        // step 3: fetch images
+        // step 4: replace image src with decrypted b64 data
+
+        const matches = html.matchAll(
+            /<img[^>]*alt="[^"]*"[^>]*src="\/api\/assets\/([a-zA-Z0-9-]*)">/gm
+        );
+
+        for (const match of matches) {
+            const id = match[1];
+            const imageRes = await api.get(apiPath('/assets/?', id));
+            if (!imageRes.ok) {
+                notify.error('failed to get image');
+                continue;
+            }
+            entryHtml = entryHtml.replace(
+                `src="/api/assets/${id}"`,
+                `src="data:image/webp;base64,${tryDecryptText(imageRes.val.content)}"`
+            );
+        }
+    }
+
     let showingMap = false;
     let containerDiv: HTMLDivElement;
 
@@ -146,6 +171,8 @@
             }, 0);
         }
     });
+
+    $: decryptImages(entryHtml);
 </script>
 
 <div

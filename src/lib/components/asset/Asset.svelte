@@ -10,6 +10,8 @@
     import { notify } from '$lib/components/notifications/notifications';
     import { Asset } from '$lib/controllers/asset/asset';
     import type { TimestampSecs } from '../../../types';
+    import { tryDecryptText } from '$lib/utils/encryption.client.js';
+    import Image from '$lib/components/asset/Image.svelte';
 
     const dispatch = createEventDispatcher();
 
@@ -38,7 +40,9 @@
     async function copyToClipBoard() {
         recentlyCopied = true;
 
-        await navigator.clipboard.writeText(Asset.generateMarkdownLink(fileName, publicId));
+        await navigator.clipboard.writeText(
+            Asset.generateMarkdownLink(tryDecryptText(fileName), publicId)
+        );
 
         notify.success('Copied to clipboard');
 
@@ -48,7 +52,7 @@
 
 {#if !deleted}
     <div class="flex-center m-1 relative overflow-hidden wrapper">
-        <img alt={fileName} class:obfuscated loading="lazy" src="/api/assets/{publicId}" {id} />
+        <Image {obfuscated} {publicId} {id} {fileName} />
         <div class="menu">
             <div>
                 <button

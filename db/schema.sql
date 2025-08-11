@@ -149,7 +149,7 @@ CREATE TABLE assets
     publicId    varchar(128) NOT NULL,
     userId      char(32)     NOT NULL,
     created     int          NOT NULL,
-    fileName    varchar(256) NOT NULL,
+    fileName    varchar(258) NOT NULL,
     content     longtext     NOT NULL,
     PRIMARY KEY (`id`),
     INDEX `idx_assets_userId`     (`userId`),
