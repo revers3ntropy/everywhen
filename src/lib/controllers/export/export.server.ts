@@ -150,7 +150,6 @@ export namespace Export {
     export async function generateHTML(auth: Auth): Promise<Result<[ReadableStream, number]>> {
         const { entryCount } = await Entry.counts(auth);
         const images = await Asset.all(auth);
-        if (!images.ok) return images.cast();
-        return generateHtmlInTempFile(auth, images.val, entryCount);
+        return generateHtmlInTempFile(auth, images, entryCount);
     }
 }
