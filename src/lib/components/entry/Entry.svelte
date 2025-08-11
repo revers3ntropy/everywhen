@@ -394,9 +394,7 @@
                     {@html entryHtml}
                 </button>
             </Tooltip.Trigger>
-            <Tooltip.Content>
-                <p>Click to show</p>
-            </Tooltip.Content>
+            <Tooltip.Content>Click to show</Tooltip.Content>
         </Tooltip.Root>
     {:else}
         <div class="body md:p-4 md:pb-0 p-2 whitespace-pre-wrap" class:md:pl-0={showFullDate}>

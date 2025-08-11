@@ -18,7 +18,10 @@
     {transition}
     {transitionConfig}
     {sideOffset}
-    class={cn('bg-primary z-50 overflow-hidden rounded-md px-3 py-1.5 text-xs', className)}
+    class={cn(
+        'bg-primary text-primary-foreground z-50 overflow-hidden rounded-md px-3 py-1.5 text-xs',
+        className
+    )}
     {...$$restProps}
 >
     <slot />
