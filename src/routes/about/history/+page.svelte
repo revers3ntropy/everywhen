@@ -18,7 +18,6 @@
                 <li>Datasets</li>
                 <li>Achievements/Badges</li>
                 <li>Mood attached to entries</li>
-                <li>Automatic mood tracking with Tone Analysis</li>
                 <li>Backup to Google Drive</li>
                 <li>Sync with Google Fit</li>
                 <li>Sync with GitHub</li>
