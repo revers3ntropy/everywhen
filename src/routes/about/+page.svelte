@@ -9,34 +9,22 @@
     <title>About | Everywhen</title>
 </svelte:head>
 
-<h1> About </h1>
+<h1 class="text-left"> About </h1>
 
 <section>
     <p>
-        Everywhen is an
-        <a
-            aria-label="Source code"
-            href="http://github.com/revers3ntropy/everywhen"
-            rel="noreferrer"
-            target="_blank"
-        >
-            open source
-            <OpenInNew size="12" />
-        </a>
-        journal / life logging app. It's a place to record your thoughts, feelings, experiences and keep
-        track of your life.
+        Everywhen is a journal / life logging app. It's a place to record your thoughts, feelings,
+        experiences and keep track of your life.
     </p>
     <p>
-        Please note that this is a work in progress, and bug reports and feature requests are
-        welcome on the
+        Please send us your thoughts (and any bugs you find) using
         <a
             aria-label="Report issues and feature requests"
-            href="http://github.com/revers3ntropy/everywhen/issues"
+            href="https://forms.gle/7BiaLnQhYsArYiEVA"
             rel="noreferrer"
             target="_blank"
         >
-            GitHub issues
-            <OpenInNew size="12" />
+            this form<OpenInNew size="12" />
         </a>.
     </p>
 
