@@ -2,7 +2,6 @@
     import InformationOutline from 'svelte-material-icons/InformationOutline.svelte';
     import BugOutline from 'svelte-material-icons/BugOutline.svelte';
     import Instagram from 'svelte-material-icons/Instagram.svelte';
-    import Github from 'svelte-material-icons/Github.svelte';
     import Security from 'svelte-material-icons/Security.svelte';
     import History from 'svelte-material-icons/History.svelte';
     import OpenInNew from 'svelte-material-icons/OpenInNew.svelte';
@@ -41,18 +40,6 @@
                     <span class="flex-center gap-2">
                         Feedback form <OpenInNew />
                     </span>
-                </a>
-            </div>
-            <div>
-                <a
-                    aria-label="Github"
-                    class="with-icon"
-                    href="https://github.com/revers3ntropy/everywhen"
-                    rel="noreferrer"
-                    target="_blank"
-                >
-                    <Github size="25" />
-                    <span class="flex-center gap-2"> Source Code <OpenInNew /> </span>
                 </a>
             </div>
 
