@@ -19,19 +19,34 @@ const envFileContent = fs.readFileSync(path.resolve(__dirname, `.env`), 'utf8');
  */
 const envFile = dotenv.parse(envFileContent);
 
-/** @typedef {{ isErr: boolean, timestamp: number, env: string, apiErrCode: number, data: string }} ErrState */
+/** @typedef {{
+ *     isErr: boolean,
+ *     timestamp: number,
+ *     env: string,
+ *     apiErrCode: number,
+ *     data: string,
+ *     emailSent: boolean
+ * }} ErrState */
 
 const emailAPI = new TransactionalEmailsApi();
 emailAPI.authentications.apiKey.apiKey = envFile['BREVO_API_KEY'];
 
 const alertMessage = new SendSmtpEmail();
-alertMessage.subject = `[EVERYWHEN ${ENV.toUpperCase()}] Downtime >1m detected`;
-alertMessage.textContent = 'Everywhen has been down for longer than 1 minute';
+alertMessage.subject = `[EVERYWHEN ${ENV.toUpperCase()}] Downtime detected`;
+alertMessage.textContent = `Everywhen ${envFile['ROOT_URL']} (env=${ENV.toUpperCase()}) is unreachable`;
 alertMessage.sender = { name: 'Joseph Coppin', email: 'alerts@everywhen.me' };
 alertMessage.to = [{ email: 'joseph.coppin@gmail.com', name: 'Joseph Coppin' }];
 
 async function sendAlertEmail() {
-    await emailAPI.sendTransacEmail(alertMessage);
+    console.log('SENDING EMAIL');
+    emailAPI
+        .sendTransacEmail(alertMessage)
+        .then(res => {
+            console.log(JSON.stringify(res.body));
+        })
+        .catch(err => {
+            console.error('Error sending email:', err.body);
+        });
 }
 
 /** @returns {ErrState | null} */
@@ -40,6 +55,7 @@ async function getCurrentState() {
 
     const res = await fetch(url);
     if (!res.ok) {
+        console.log('res was not ok', res);
         return {
             isErr: true,
             env: ENV,
@@ -49,27 +65,30 @@ async function getCurrentState() {
         };
     }
     const resTxt = await res.text();
-    if (resTxt) {
+    if (!resTxt) {
+        console.error('no text response found', resTxt);
         return {
             isErr: true,
             env: ENV,
             timestamp: Date.now(),
             apiErrCode: res.status,
-            data: resTxt
+            data: `resTxt:${resTxt}`
         };
     }
     try {
-        const resJson = JSON.stringify(resTxt);
+        const resJson = JSON.parse(resTxt);
         if (!resJson.v) {
+            console.error('no resJson.v found', resJson);
             return {
                 isErr: true,
                 env: ENV,
                 timestamp: Date.now(),
                 apiErrCode: res.status,
-                data: resTxt
+                data: `resJson.v:${resTxt}`
             };
         }
     } catch (e) {
+        console.log('could not parse JSON');
         return {
             isErr: true,
             env: ENV,
@@ -93,20 +112,33 @@ void (async () => {
     const prevState = getPrevState();
     const currentState = await getCurrentState();
 
-    if (!prevState && !currentState) return;
+    if (!prevState && !currentState) {
+        console.log('all ok');
+        return;
+    }
     if (prevState && !currentState) {
+        console.log('Downtime resolved');
         // clean up state file
         fs.unlinkSync(PREV_STATE_FILE_PATH);
         return;
     }
     if (!prevState && currentState) {
+        console.log('Downtime found, not sending alert yet');
         fs.writeFileSync(PREV_STATE_FILE_PATH, JSON.stringify(currentState));
         return;
     }
     if (prevState && currentState) {
         // ut oh.. :(
-        console.log('Downtime found, sending alert!');
-        await sendAlertEmail();
+        if (!prevState.emailSent) {
+            console.log('Downtime found, sending alert!');
+            await sendAlertEmail();
+            fs.writeFileSync(
+                PREV_STATE_FILE_PATH,
+                JSON.stringify({ ...prevState, emailSent: true })
+            );
+        } else {
+            console.log('Downtime found, alert already sent');
+        }
         return;
     }
     console.error('invalid state', { currentState, prevState });
