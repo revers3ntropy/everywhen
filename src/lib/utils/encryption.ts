@@ -39,10 +39,12 @@ export function decrypt(ciphertext: string, key: string | null): Result<string> 
             if (encryptedEmptyStr === ciphertext) {
                 return Result.ok(plaintext);
             }
+            console.trace('Failed to decrypt data');
             return Result.err('Failed to decrypt data');
         }
         return Result.ok(plaintext);
     } catch (error) {
+        console.trace('Failed to decrypt data');
         return Result.err('Failed to decrypt data');
     }
 }

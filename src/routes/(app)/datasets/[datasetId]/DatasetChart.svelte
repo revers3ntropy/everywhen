@@ -33,6 +33,8 @@
         ChartType,
         DefaultValueStrategy
     } from './generateChartData';
+    import { tryDecryptText } from '$lib/utils/encryption.client';
+    import EncryptedText from '$lib/components/ui/EncryptedText.svelte';
 
     export let dataset: DatasetMetadata;
     export let rows: DatasetRow[] | null;
@@ -107,12 +109,16 @@
         defaultValueStrategy
     );
 
-    $: yAxisOptions = Object.fromEntries(numericColumns.map((column, idx) => [column.name, idx]));
+    $: yAxisOptions = Object.fromEntries(
+        numericColumns.map((column, idx) => [tryDecryptText(column.name), idx])
+    );
 
     // TODO do not show the currently selected Y axis column in the X axis options
     $: xAxisOptions = {
         Time: timeIdxKey,
-        ...Object.fromEntries(numericColumns.map((column, idx) => [column.name, `col:${idx}`]))
+        ...Object.fromEntries(
+            numericColumns.map((column, idx) => [tryDecryptText(column.name), `col:${idx}`])
+        )
     };
 </script>
 
@@ -122,7 +128,7 @@
             {#if numericColumns.length === 0}
                 <span class="text-light"> [No columns] </span>
             {:else if numericColumns.length === 1}
-                <span> {dataset.columns[0].name} </span>
+                <span> <EncryptedText text={dataset.columns[0].name} /> </span>
             {:else}
                 <Select bind:value={yAxisSelectedColumnIdx} key={'0'} options={yAxisOptions} />
             {/if}

@@ -6,23 +6,24 @@
     import type { DatasetColumn, DatasetColumnType } from '$lib/controllers/dataset/dataset';
     import { dispatch } from '$lib/dataChangeEvents';
     import { api, apiPath } from '$lib/utils/apiRequest';
+    import { tryDecryptText, tryEncryptText } from '$lib/utils/encryption.client.js';
 
     export let datasetId: string;
     export let column: DatasetColumn<unknown>;
 
-    let newColumnName = column.name;
+    let newColumnNameDecrypted = tryDecryptText(column.name);
     let newColumnType = column.type;
 
     async function save() {
         notify.onErr(
             await api.put(apiPath(`/datasets/?/columns/?`, datasetId, column.id), {
                 type: newColumnType.id,
-                name: newColumnName
+                name: tryEncryptText(newColumnNameDecrypted)
             })
         );
         await dispatch.update('datasetCol', column, {
             ...column,
-            name: newColumnName,
+            name: tryEncryptText(newColumnNameDecrypted),
             type: newColumnType
         });
     }
@@ -35,11 +36,12 @@
     );
     const builtInTypesAsMap = builtInTypes as Record<string, DatasetColumnType<unknown>>;
 
-    $: areChanges = newColumnName !== column.name || newColumnType !== column.type;
+    $: areChanges =
+        tryEncryptText(newColumnNameDecrypted) !== column.name || newColumnType !== column.type;
 </script>
 
 <div>
-    <Textbox bind:value={newColumnName} label="Name" />
+    <Textbox bind:value={newColumnNameDecrypted} label="Name" />
 </div>
 <div class="pt-4">
     <p>Type</p>

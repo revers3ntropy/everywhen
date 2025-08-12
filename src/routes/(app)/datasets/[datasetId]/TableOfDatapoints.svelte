@@ -14,6 +14,8 @@
     } from '$lib/controllers/dataset/dataset';
     import { builtInTypes } from '$lib/controllers/dataset/columnTypes';
     import EditDatasetColumnDialog from './EditDatasetColumnDialog.svelte';
+    import { tryEncryptText } from '$lib/utils/encryption.client';
+    import EncryptedText from '$lib/components/ui/EncryptedText.svelte';
 
     export let dataset: DatasetMetadata;
     export let rows: DatasetRow[];
@@ -21,7 +23,7 @@
     async function addColumn() {
         const newColumn = notify.onErr(
             await api.post(apiPath(`/datasets/?/columns`, dataset.id), {
-                name: 'New Column',
+                name: tryEncryptText('New Column'),
                 type: 'number'
             })
         );
@@ -119,7 +121,7 @@
                         <Popover.Root>
                             <Popover.Trigger>
                                 <span class="group p-2 w-full">
-                                    {column.name}
+                                    <EncryptedText text={column.name} />
                                     <span class="invisible group-hover:visible">
                                         <Pencil size={18} />
                                     </span>
@@ -130,7 +132,7 @@
                             </Popover.Content>
                         </Popover.Root>
                     {:else}
-                        {column.name}
+                        <EncryptedText text={column.name} />
                     {/if}
                 </th>
             {/each}
