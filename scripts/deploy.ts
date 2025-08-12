@@ -34,13 +34,17 @@ const deploymentEnv = dotenv.parse<{
 }>(deploymentEnvFile);
 
 // values to replace in files,
-// eg. replaces all occurrences of '%ENV%' with 'prod'
+// eg. replaces all occurrences of '%ENV%' with 'prod'/'staging'
 const replacerValues = {
     '%ENV%': env
 };
 
 // files to search for and replace values in
-const pathsToUseReplacer = [`./server/remote.package.json`, `./server/makeBackup.js`];
+const pathsToUseReplacer = [
+    `./server/remote.package.json`,
+    `./server/makeBackup.js`,
+    `./server/downtimeMonitor.js`
+];
 
 const uploadPaths = {
     [`./secrets/${env}/remote.env`]: '/.env',
