@@ -46,7 +46,8 @@ const uploadPaths = {
     [`./secrets/${env}/remote.env`]: '/.env',
     ['./server/server.js']: '/server.js',
     [`./server/remote.package.json`]: '/package.json',
-    [`./server/makeBackup.js`]: '/makeBackup.js'
+    [`./server/makeBackup.js`]: '/makeBackup.js',
+    [`./server/downtimeMonitor.js`]: '/downtimeMonitor.js'
 };
 
 const LOG_PREFIX = c.blueBright('[deploy.js]');
