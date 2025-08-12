@@ -5,6 +5,7 @@
     import Bin from 'svelte-material-icons/Delete.svelte';
     import Restore from 'svelte-material-icons/DeleteRestore.svelte';
     import EyeOff from 'svelte-material-icons/EyeOff.svelte';
+    import Eye from 'svelte-material-icons/Eye.svelte';
     import NoteEditOutline from 'svelte-material-icons/NoteEditOutline.svelte';
     import DotsVertical from 'svelte-material-icons/DotsVertical.svelte';
     import Heart from 'svelte-material-icons/Heart.svelte';
@@ -188,10 +189,10 @@
             <UtcTime fmt={'h:mma ddd DD MMM YYYY'} timestamp={created} tzOffset={createdTzOffset} />
         </div>
     {/if}
-    <div class="flex items-center gap-2" style="max-width: calc(100% - 60px)">
+    <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
         {#if !showFullDate}
             <div class="h-full pr-2">
-                <TimeInFeed timestamp={created} tzOffset={createdTzOffset} />
+                <TimeInFeed timestamp={created} tzOffset={createdTzOffset} class="pl-2" />
             </div>
         {/if}
 
@@ -302,7 +303,7 @@
         {#if !isEdit && edits?.length}
             <a
                 href="/journal/{id}?history=on"
-                class="flex-center bg-vLightAccent hover:bg-lightAccent rounded-full px-3 py-[7px]"
+                class="flex-center bg-vLightAccent hover:bg-lightAccent rounded-full px-3 py-[7px] oneline"
             >
                 <Pencil />
                 {edits.length} edit{edits.length > 1 ? 's' : ''}
@@ -313,15 +314,17 @@
             <Label label={labelId ? labels[labelId] : null} {obfuscated} />
         {/if}
 
-        {#if !obfuscated}
-            <button
-                aria-label="Show entry"
-                on:click={toggleObfuscation}
-                class="bg-vLightAccent hover:bg-lightAccent p-[6px] rounded-full"
-            >
+        <button
+            aria-label={obfuscated ? 'hide entry' : 'show entry'}
+            on:click={toggleObfuscation}
+            class="bg-vLightAccent hover:bg-lightAccent p-[6px] rounded-full"
+        >
+            {#if obfuscated}
+                <Eye size="18" />
+            {:else}
                 <EyeOff size="18" />
-            </button>
-        {/if}
+            {/if}
+        </button>
     </div>
 
     {#if showingMap && latitude && longitude}

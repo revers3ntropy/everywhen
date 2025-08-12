@@ -11,12 +11,15 @@
     export let text: string;
     export let obfuscated = false;
 
+    $: decryptedText = tryDecryptText(text);
+
     let className: $$Props['class'] = undefined;
     export { className as class };
 </script>
 
 {#if obfuscated}
-    <span class={cn('obfuscated', className)}>{text}</span>
+    <!-- limit length of encrypted text as it is normally longer, so prevent layout shifts -->
+    <span class={cn('obfuscated', className)}>{text.substring(0, decryptedText.length)}</span>
 {:else}
-    <span class={cn(className)}>{tryDecryptText(text)}</span>
+    <span class={cn(className)}>{decryptedText}</span>
 {/if}

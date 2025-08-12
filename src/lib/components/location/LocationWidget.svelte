@@ -47,7 +47,7 @@
             : lookupAddress(latitude, longitude);
 </script>
 
-<span class="flex items-center max-w-full text-sm">
+<span class="flex items-center max-w-full text-sm oneline">
     <span class="flex-center">
         <MapMarker size="20" />
         {#if !noChevron}

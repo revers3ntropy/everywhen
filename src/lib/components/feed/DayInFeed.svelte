@@ -156,7 +156,7 @@
                     {#if item.type === 'entry'}
                         <div class="relative">
                             <span
-                                class="flex-center rounded-full absolute top-[10px] left-[5px] md:-left-[9px] bg-border w-4 h-4"
+                                class="hide-mobile flex-center rounded-full absolute top-[16px] -left-[9px] bg-border w-4 h-4"
                             />
                         </div>
                         <EntryFeedItem
