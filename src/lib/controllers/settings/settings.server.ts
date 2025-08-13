@@ -1,5 +1,4 @@
 import { query } from '$lib/db/mysql.server';
-import { decrypt, encrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
 import { nowUtc } from '$lib/utils/time';
 import {
@@ -51,7 +50,7 @@ namespace SettingsServer {
             return Result.err(validationErr);
         }
 
-        const valEncrypted = encrypt(JSON.stringify(value), auth.key);
+        const valStr = JSON.stringify(value);
 
         const alreadyInDb = await query<{ id: string }[]>`
             SELECT id from settings
@@ -64,7 +63,7 @@ namespace SettingsServer {
             await query`
                 UPDATE settings
                 SET 
-                    value = ${valEncrypted},
+                    value = ${valStr},
                     created = ${now}
                 WHERE id = ${id}
             `;
@@ -75,7 +74,7 @@ namespace SettingsServer {
 
         await query`
             INSERT INTO settings (id, userId, created, \`key\`, value)
-            VALUES (${id}, ${auth.id}, ${now}, ${key}, ${valEncrypted})
+            VALUES (${id}, ${auth.id}, ${now}, ${key}, ${valStr})
         `;
 
         return Result.ok({ id, created: now, key, value });
@@ -128,13 +127,11 @@ namespace SettingsServer {
 
         return Result.collect(
             settings.map(setting => {
-                const decryptRes = decrypt(setting.value, auth.key);
-                if (!decryptRes.ok) return decryptRes.cast();
                 return Result.ok({
                     id: setting.id,
                     created: setting.created,
                     key: setting.key,
-                    value: JSON.parse(decryptRes.val)
+                    value: JSON.parse(setting.value)
                 });
             })
         );
@@ -161,9 +158,9 @@ namespace SettingsServer {
         if (settings.length < 1) {
             return Result.ok(Settings.config[key].defaultValue);
         }
-        const valueRes = decrypt(settings[0].value, auth.key);
-        if (!valueRes.ok) return valueRes.cast();
-        return Result.ok(JSON.parse(valueRes.val) as (typeof Settings.config)[T]['defaultValue']);
+        return Result.ok(
+            JSON.parse(settings[0].value) as (typeof Settings.config)[T]['defaultValue']
+        );
     }
 
     export async function allAsMapWithDefaults(auth: Auth): Promise<Result<SettingsConfig>> {

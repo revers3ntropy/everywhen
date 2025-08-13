@@ -5,6 +5,7 @@ import { decrypt, encrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
 import { currentVersion, SemVer } from '$lib/utils/semVer';
 import { wordCount } from '$lib/utils/text';
+import { Settings } from '$lib/controllers/settings/settings.server';
 
 export async function migrateUser(user: User): Promise<Result<User>> {
     if (currentVersion.isEqual(user.versionLastLoggedIn)) {
@@ -101,6 +102,15 @@ const migrators: Record<string, (user: User) => Promise<Result<User>>> = {
             `;
         }
 
+        return Result.ok(user);
+    },
+    async '0.9.35'(user: User): Promise<Result<User>> {
+        // decrypt all settings
+        await Settings.updateEncryptedFields(
+            user.id,
+            s => decrypt(s, user.key),
+            s => s
+        );
         return Result.ok(user);
     }
 };
