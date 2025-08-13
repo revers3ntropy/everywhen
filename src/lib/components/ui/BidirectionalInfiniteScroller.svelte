@@ -1,6 +1,7 @@
 <script lang="ts">
     import { onDestroy, onMount } from 'svelte';
     import { inview } from 'svelte-inview';
+    import { browser } from '$app/environment';
 
     export let hasMore: (fromTop: boolean) => boolean;
     export let loadItems: (isTop: boolean) => Promise<void>;
@@ -18,6 +19,9 @@
             pageEndInViewTop = true;
         } else {
             pageEndInViewBottom = true;
+        }
+        if (browser && document.hidden) {
+            return;
         }
         if (currentlyLoading) {
             if (currentlyLoading !== (isFromTop ? 'top' : 'bottom')) {
@@ -41,11 +45,28 @@
         }, 10);
     }
 
+    function handleVisibilityChange() {
+        if (!document.hidden) {
+            if (pageEndInViewTop) {
+                void load(true);
+            }
+            if (pageEndInViewBottom) {
+                void load(false);
+            }
+        }
+    }
+
     onDestroy(() => {
         destroyed = true;
+        if (browser) {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        }
     });
 
     onMount(() => {
+        if (browser) {
+            document.addEventListener('visibilitychange', handleVisibilityChange);
+        }
         tryLoadOtherDirectionIfFinished = true;
         void load(false);
     });

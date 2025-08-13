@@ -60,19 +60,25 @@
         if (!loadingDay) throw new Error('day is null');
 
         const day = notify.onErr(await api.get(apiPath('/feed/?', loadingDay)));
-        const dayDay = Day.fromString(day.day).unwrap();
+
+        if (day.day !== loadingDay) {
+            void CSLogger.error('loaded wrong day', { loadingDay, day });
+            throw new Error('loaded wrong day');
+        }
+
         const nextDayInFuture = day.nextDayInFuture
             ? Day.fromString(day.nextDayInFuture).unwrap()
             : null;
-        if (nextDayInFuture && !nextDayInFuture.gt(dayDay)) {
-            void CSLogger.error('next day is not in future', { nextDayInFuture, dayDay, day });
+        if (nextDayInFuture && !nextDayInFuture.gt(Day.fromString(loadingDay).unwrap())) {
+            void CSLogger.error('next day is not in future', { nextDayInFuture, loadingDay, day });
             throw new Error('next day is not in future');
         }
         const nextDayInPast = day.nextDayInPast ? Day.fromString(day.nextDayInPast).unwrap() : null;
-        if (nextDayInPast && !nextDayInPast.lt(dayDay)) {
-            void CSLogger.error('next day is not in past', { nextDayInPast, dayDay, day });
+        if (nextDayInPast && !nextDayInPast.lt(Day.fromString(loadingDay).unwrap())) {
+            void CSLogger.error('next day is not in past', { nextDayInPast, loadingDay, day });
             throw new Error('next day is not in past');
         }
+
         if (atTop) {
             if (
                 (!nextDayInFuture || nextDayInFuture.gt(Day.todayUsingNativeDate())) &&
@@ -109,8 +115,9 @@
 
     function moreDaysToLoad(atTop: boolean): boolean {
         if (atTop) {
-            // prevent a loading icon/skeleton above 'today', as we never load future days
-            return nextDay !== null && nextDay !== Day.todayUsingNativeDate().fmtIso();
+            // we always want to load more days at the top, if we haven't loaded Today
+            // ance once we have loaded today, we don't want to load any more days.
+            return !days[Day.todayUsingNativeDate().fmtIso()];
         }
         return prevDay !== null;
     }
