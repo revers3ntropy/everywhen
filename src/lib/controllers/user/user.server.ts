@@ -108,6 +108,9 @@ namespace UserServer {
         oldPassword: string,
         newPassword: string
     ): Promise<Result<null>> {
+        // can't do this while moving over to frontend encryption...
+        // TODO how do we do this once encryption is all on the client..?
+        if (1 === 1) return Result.err('cannot perform this action act the moment');
         if (!oldPassword) return Result.err('Invalid password');
 
         if (newPassword.length < 5) {
