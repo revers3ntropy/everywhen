@@ -103,15 +103,23 @@ export const handle = (async ({ event, resolve }) => {
     }
 
     const end = performance.now();
+
+    const ipAddress = getIp(event);
+    const routeId = event.route.id;
+    if (routeId === '/api/version') {
+        // don't log api version requests, as they are just spam -
+        // downtimeMonitor and all active clients poll this endpoint
+        return res;
+    }
     void reqLogger.withUserId(auth ? auth.id : null).log('page load', {
         url: event.url,
-        routeId: event.route.id,
+        routeId,
         method: event.request.method,
         loadTimeMs: end - start,
         responseCode: res.status,
         requestSize: String(event.request.body).length,
         responseSize: String(res.body).length,
-        ipAddress: getIp(event),
+        ipAddress,
         userAgent: event.request.headers.get('user-agent') || ''
     });
 
