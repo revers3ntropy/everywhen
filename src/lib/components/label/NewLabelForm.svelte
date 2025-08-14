@@ -44,19 +44,19 @@
 </script>
 
 <div>
-    <div>
-        <h2>New Label</h2>
-    </div>
+    <p class="title-font text-xl"> New Label </p>
     <div class="content">
         <Textbox label="Name" bind:value={labelName} />
 
-        <label class="block mx-4 my-4 text-light">
-            Color <br />
-            <input bind:value={labelColor} type="color" class="mt-[0.2rem]" />
-            <input bind:value={labelColor} type="text" class="mt-[0.2rem]" />
+        <label class="block my-4 text-light">
+            Color
+            <span class="flex gap-2 items-center">
+                <input bind:value={labelColor} type="color" />
+                <input bind:value={labelColor} type="text" />
+            </span>
         </label>
     </div>
-    <div class="flex-center">
+    <div class="pb-4">
         <button class="primary" on:click={closeHandler} aria-label="Create"> Create </button>
     </div>
 </div>

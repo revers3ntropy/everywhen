@@ -76,61 +76,76 @@
         {/key}
     </Popover.Trigger>
     <Popover.Content class="py-1">
-        <div class="py-3 flex flex-col max-h-[440px] overflow-y-auto">
-            <a href="/labels" class="flex items-center gap-2 p-2 rounded-xl hover:bg-vLightAccent">
-                <CogOutline size="22" /> Manage Labels
-            </a>
-
-            {#if showAddButton}
-                <Popover.Root bind:open={createNewOpen}>
-                    <Popover.Trigger aria-label="Create new label" class="w-full">
-                        <span class="flex items-center gap-2 p-2 rounded-xl hover:bg-vLightAccent">
-                            <Plus size="25" /> New Label
-                        </span>
-                    </Popover.Trigger>
-                    <Popover.Content>
-                        <NewLabelForm
-                            on:submit={() => {
-                                open = false;
-                                createNewOpen = false;
-                            }}
-                        />
-                    </Popover.Content>
-                </Popover.Root>
-            {/if}
-
-            <hr class="border-backgroundColor m-2" />
-
-            <button
-                on:click={() => {
-                    value = '';
-                }}
-                class="flex items-center gap-2 p-2 rounded-xl hover:bg-vLightAccent"
-                aria-label="Remove label"
-            >
-                <LabelOffOutline size="25" />
-                No Label
-            </button>
-            {#each Object.values(labels)
-                .filter(filter)
-                .sort( (a, b) => tryDecryptText(a.name).localeCompare(tryDecryptText(b.name)) ) as label (label.id)}
-                <button
-                    on:click={() => (value = label.id)}
+        {#if Object.keys(labels).length}
+            <div class="py-3 flex flex-col max-h-[440px] overflow-y-auto">
+                <a
+                    href="/labels"
                     class="flex items-center gap-2 p-2 rounded-xl hover:bg-vLightAccent"
-                    aria-label="Select label {tryDecryptText(label.name)}"
                 >
-                    <span
-                        class="w-[20px] h-[20px] border-4 inline-block rounded-full"
-                        style="border-color: {label.color}; background-color: {value === label.id
-                            ? label.color
-                            : 'transparent'}"
-                    />
-                    <EncryptedText
-                        text={label.name}
-                        class={`text-left ${value === label.id ? 'text-bold' : ''}`}
-                    />
+                    <CogOutline size="22" /> Manage Labels
+                </a>
+
+                {#if showAddButton}
+                    <Popover.Root bind:open={createNewOpen}>
+                        <Popover.Trigger aria-label="Create new label" class="w-full">
+                            <span
+                                class="flex items-center gap-2 p-2 rounded-xl hover:bg-vLightAccent"
+                            >
+                                <Plus size="25" /> New Label
+                            </span>
+                        </Popover.Trigger>
+                        <Popover.Content>
+                            <NewLabelForm
+                                on:submit={() => {
+                                    open = false;
+                                    createNewOpen = false;
+                                }}
+                            />
+                        </Popover.Content>
+                    </Popover.Root>
+                {/if}
+
+                <hr class="border-backgroundColor m-2" />
+
+                <button
+                    on:click={() => {
+                        value = '';
+                    }}
+                    class="flex items-center gap-2 p-2 rounded-xl hover:bg-vLightAccent"
+                    aria-label="Remove label"
+                >
+                    <LabelOffOutline size="25" />
+                    No Label
                 </button>
-            {/each}
-        </div>
+                {#each Object.values(labels)
+                    .filter(filter)
+                    .sort( (a, b) => tryDecryptText(a.name).localeCompare(tryDecryptText(b.name)) ) as label (label.id)}
+                    <button
+                        on:click={() => (value = label.id)}
+                        class="flex items-center gap-2 p-2 rounded-xl hover:bg-vLightAccent"
+                        aria-label="Select label {tryDecryptText(label.name)}"
+                    >
+                        <span
+                            class="w-[20px] h-[20px] border-4 inline-block rounded-full"
+                            style="border-color: {label.color}; background-color: {value ===
+                            label.id
+                                ? label.color
+                                : 'transparent'}"
+                        />
+                        <EncryptedText
+                            text={label.name}
+                            class={`text-left ${value === label.id ? 'text-bold' : ''}`}
+                        />
+                    </button>
+                {/each}
+            </div>
+        {:else}
+            <NewLabelForm
+                on:submit={() => {
+                    open = false;
+                    createNewOpen = false;
+                }}
+            />
+        {/if}
     </Popover.Content>
 </Popover.Root>
