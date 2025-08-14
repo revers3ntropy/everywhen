@@ -1,10 +1,5 @@
 <script lang="ts">
     import AccountCircleOutline from 'svelte-material-icons/AccountCircleOutline.svelte';
-    import ChevronDown from 'svelte-material-icons/ChevronDown.svelte';
-    import LabelMultipleOutline from 'svelte-material-icons/LabelMultipleOutline.svelte';
-    import CalendarMultiple from 'svelte-material-icons/CalendarMultiple.svelte';
-    import Bin from 'svelte-material-icons/Delete.svelte';
-    import ImageArea from 'svelte-material-icons/ImageArea.svelte';
     import PlusThick from 'svelte-material-icons/PlusThick.svelte';
     import LightTheme from 'svelte-material-icons/WhiteBalanceSunny.svelte';
     import Logout from 'svelte-material-icons/Logout.svelte';
