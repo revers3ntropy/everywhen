@@ -17,7 +17,7 @@ export const load = cachedPageRoute(async auth => {
         >`
             SELECT id, created, createdTzOffset, title, labelId, wordCount
             FROM entries
-            WHERE userId = ${auth.id}
+            WHERE userId = ${auth.id} AND deleted IS NULL
         `,
         events: await Event.all(auth),
         labels: await Label.allIndexedById(auth)
