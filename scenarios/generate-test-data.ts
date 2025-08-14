@@ -251,8 +251,8 @@ async function createAssets(
             publicId: uuidv4(),
             userId: userId,
             created: now(),
-            fileName: encrypt(faker.system.fileName(), key),
-            content: encrypt(faker.image.dataUri(), key)
+            fileName: encryptOptionallyEncryptedField(faker.system.fileName(), key),
+            content: encryptOptionallyEncryptedField(faker.image.dataUri(), key)
         };
         await connection.execute(
             'INSERT INTO assets (id, publicId, userId, created, fileName, content) VALUES (?, ?, ?, ?, ?, ?)',

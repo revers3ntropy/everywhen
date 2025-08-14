@@ -78,7 +78,7 @@
         canvas {
             position: fixed;
             top: 0;
-            left: 12rem;
+            left: 6rem;
             z-index: 1;
         }
 

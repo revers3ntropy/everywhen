@@ -48,15 +48,17 @@
     <title>Insights</title>
 </svelte:head>
 
-<main class="md:p-4 md:pl-4 flex-center">
+<main class="p-2 md:p-4 md:pl-4 flex-center">
     <div class="w-full md:max-w-5xl">
         {#if data.entryCount < 1}
             <section>
-                <h1 class="flex-center"> No Entries </h1>
-                <div class="flex-center pt-4">
+                <h1 class="text-left title-font"> No Entries </h1>
+                <div class=" pt-4">
                     <p>
-                        You need to create some entries before you can see insights,
-                        <a href="/journal"> why not create one? </a>
+                        You need to create some entries before you can see insights.
+                        <a href="/journal" class="rounded-full bg-vLightAccent px-2 py-1">
+                            Write your first entry
+                        </a>
                     </p>
                 </div>
             </section>

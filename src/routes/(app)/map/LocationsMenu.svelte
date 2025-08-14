@@ -13,7 +13,9 @@
 </script>
 
 <div class="py-2 max-h-[350px] max-w-[400px] overflow-y-auto">
-    <p class="px-2 text-light font-bold">Locations</p>
+    {#if locations.length}
+        <p class="px-2 text-light font-bold">Locations</p>
+    {/if}
 
     {#each locations as location}
         <div class="flex">

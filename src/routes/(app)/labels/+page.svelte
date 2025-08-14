@@ -43,9 +43,9 @@
     <title>Labels</title>
 </svelte:head>
 
-<main class="md:p-4 md:pl-4 flex-center">
-    <div class="w-full md:max-w-5xl">
-        <div class="flex justify-between items-end pb-2 px-2">
+<main class="p-2 md:p-4 md:pl-4 flex-center">
+    <div class="w-full md:max-w-3xl">
+        <div class="flex justify-between items-end pb-2">
             <div>
                 <h2>Labels</h2>
             </div>

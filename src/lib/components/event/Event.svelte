@@ -175,16 +175,12 @@
 {#if event.deleted}
     <div class="flex flex-row justify-around items-center">
         <div>
-            <i>'{event.name}' has been deleted</i>
+            <i>'<EncryptedText text={event.name} />' has been deleted</i>
         </div>
-        <button
-            class="with-icon bordered rounded-xl"
-            on:click={restoreEvent}
-            aria-label="Restore Event"
-        >
+        <Button on:click={restoreEvent} aria-label="Restore Event" variant="outline">
             <Restore />
             Undo Deletion
-        </button>
+        </Button>
     </div>
 {:else}
     <div transition:slide|local={{ axis: 'y', duration: 0 }}>

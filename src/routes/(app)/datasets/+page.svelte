@@ -30,7 +30,7 @@
             <CreateDatasetButton datasets={data.datasets} />
             <p>
                 Strands of Everywhen
-                <span class="text-light font-bold border border-border rounded-full py-1 px-2">
+                <span class="text-primary font-bold border border-border rounded-full py-1 px-2">
                     beta
                 </span>
             </p>

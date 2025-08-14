@@ -156,7 +156,7 @@
     <span class="nav-loader" class:navigating class:finished-navigation={finishedNavigation} />
 </span>
 
-<div class="md:fixed top-0 md:left-0 right-0 md:bottom-0 md:h-full w-[12rem] z-[6]">
+<div class="md:fixed top-0 md:left-0 right-0 md:bottom-0 md:h-full w-[6rem] z-[6]">
     <Nav
         activeSubscriptionType={data.activeSubscriptionType}
         locations={data.locations}
@@ -171,7 +171,7 @@
 <style lang="scss">
     .page-content {
         min-height: 100vh;
-        padding: 0 0 200px 12rem;
+        padding: 0 0 200px 6rem;
 
         @media #{$mobile} {
             padding: 0 0 200px 0;

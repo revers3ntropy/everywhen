@@ -73,7 +73,7 @@
         {#if !$settingsStore.preferLocationOn.value || !$enabledLocation}
             <LocationDisabledBanner />
         {/if}
-        <div class="fixed top-0 left-0 md:left-[192px] h-screen w-full">
+        <div class="fixed top-0 left-0 md:left-[6rem] h-screen w-full">
             {#if focusedLocation}
                 <Mapbox
                     entries={showedEntries}

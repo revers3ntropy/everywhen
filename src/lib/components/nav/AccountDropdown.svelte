@@ -39,11 +39,8 @@
     <Popover.Trigger
         class="flex justify-between border-solid items-center gap-1 w-full py-1 hover:bg-lightAccent rounded-full border border-borderColor pl-1 pr-3"
     >
-        <AccountCircleOutline size="32" />
+        <AccountCircleOutline size="28" />
         <Streaks condensed />
-        <span class="hide-mobile">
-            <ChevronDown />
-        </span>
     </Popover.Trigger>
     <Popover.Content class="p-0 py-2">
         <div class="py-2 px-4">
@@ -59,6 +56,16 @@
 
         <hr />
 
+        <button on:click={switchTheme} class={buttonClass}>
+            {#if $theme === Theme.light}
+                <DarkTheme size="30" />
+                Dark Mode
+            {:else}
+                <LightTheme size="30" />
+                Light Mode
+            {/if}
+        </button>
+
         <a aria-label="manage subscription" href="/subscription/manage" class={buttonClass}>
             <PlusThick size="30" />
             {#if activeSubscriptionType === SubscriptionType.Plus}
@@ -73,39 +80,6 @@
             Settings
         </a>
 
-        <hr />
-
-        <a aria-label="deleted entries" href="/journal/deleted" class={buttonClass}>
-            <Bin size="30" />
-            Deleted Entries
-        </a>
-
-        <a aria-label="images" href="/assets" class={buttonClass}>
-            <ImageArea size="30" />
-            Images
-        </a>
-
-        <a aria-label="labels" href="/labels" class={buttonClass}>
-            <LabelMultipleOutline size="30" />
-            Labels
-        </a>
-
-        <a aria-label="events" href="/events" class={buttonClass}>
-            <CalendarMultiple size="30" />
-            Events
-        </a>
-
-        <hr />
-
-        <button on:click={switchTheme} class={buttonClass}>
-            {#if $theme === Theme.light}
-                <DarkTheme size="30" />
-                Dark Mode
-            {:else}
-                <LightTheme size="30" />
-                Light Mode
-            {/if}
-        </button>
         <button aria-label="log out" class={buttonClass} on:click={() => void Auth.logOut()}>
             <Logout size="30" />
             Sign Out
