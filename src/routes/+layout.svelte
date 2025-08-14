@@ -111,8 +111,7 @@
 >
     <svg class="accent-gradient-svg" height={0} width={0}>
         <linearGradient id="accent-gradient" x1={1} x2={1} y1={0} y2={1}>
-            <stop offset={0} stop-color="var(--foreground)" />
-            <stop offset={1} stop-color="var(--primary)" />
+            <stop offset={0} stop-color="var(--primary)" />
         </linearGradient>
     </svg>
 
