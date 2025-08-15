@@ -36,7 +36,7 @@ export async function genAuthFromUsernameAndPassword(
     const api = await ApiClient.fromSessionId('', '');
     const key = encryptionKeyFromPassword(password);
 
-    const authRes = await api.rawReq('get', `/auth?username=${username}&key=${key}`);
+    const authRes = await api.rawReq('post', `/auth`, { username, password });
     if (!authRes.ok()) {
         throw await authRes.text();
     }
@@ -44,13 +44,14 @@ export async function genAuthFromUsernameAndPassword(
     const resCookies = cookie.parse(authRes.headers()['set-cookie']);
     const sessionId = resCookies[COOKIE_KEYS.sessionId];
     expect(typeof sessionId).toBe('string');
-    expect(sessionId.length).toBeGreaterThan(UUID_LEN);
+    // session IDs should be longer than a standard ID
+    expect(sessionId!.length).toBeGreaterThan(UUID_LEN);
 
     return {
         key,
         username,
         password,
-        sessionId
+        sessionId: sessionId!
     };
 }
 
