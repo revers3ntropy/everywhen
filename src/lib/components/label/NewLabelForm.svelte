@@ -44,7 +44,7 @@
 </script>
 
 <div>
-    <p class="title-font text-xl"> New Label </p>
+    <p class="title-font text-xl pt-2"> New Label </p>
     <div class="content">
         <Textbox label="Name" bind:value={labelName} />
 

@@ -43,8 +43,6 @@
 
 <div class={cn('flex items-center bg-lightAccent md:rounded-full md:w-fit', className)}>
     <div class="flex items-center p-1 w-fit">
-        <LocationToggle size={23} />
-
         <FormatOptions {makeWrapper} />
 
         <InsertImage onInput={insertImage} />

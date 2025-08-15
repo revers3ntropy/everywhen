@@ -1,9 +1,10 @@
 <script lang="ts">
-    import MenuBar from '$lib/components/entryForm/MenuBar.svelte';
-    import { Button } from '$lib/components/ui/button';
-    import { browser } from '$app/environment';
     import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
+    import { browser } from '$app/environment';
+    import * as Tooltip from "$lib/components/ui/tooltip";
+    import MenuBar from '$lib/components/entryForm/MenuBar.svelte';
+    import { Button } from '$lib/components/ui/button';
     import { Asset } from '$lib/controllers/asset/asset';
     import { dispatch, listen } from '$lib/dataChangeEvents';
     import { Result } from '$lib/utils/result';
@@ -16,10 +17,13 @@
     import { notify } from '$lib/components/notifications/notifications';
     import { wordCount } from '$lib/utils/text';
     import { currentTzOffset, nowUtc } from '$lib/utils/time';
-    import { paste } from './paste';
     import { decrypt, encrypt } from '$lib/utils/encryption';
     import { CSLogger } from '$lib/controllers/logs/logger.client';
     import { cn } from '$lib/utils';
+    import LocationToggle from '$lib/components/location/LocationToggle.svelte';
+    import Enter from '$lib/components/ui/icons/Enter.svelte';
+    import { paste } from './paste';
+    import MacCommand from '$lib/components/ui/icons/MacCommand.svelte';
 
     // as this form is used in entry editing and creating
     export let action: 'create' | 'edit' = 'create';
@@ -326,7 +330,7 @@
                 disabled={obfuscated || submitted}
                 aria-label="Entry Body"
                 placeholder={obfuscated ? '' : 'What’s on your mind?'}
-                class="text-lg py-2 resize-none w-full bg-transparent rounded-lg"
+                class="text-lg py-2 resize-none w-full bg-transparent border-0 border-b border-solid border-border"
                 class:obfuscated
             />
 
@@ -337,21 +341,30 @@
             -->
             <textarea
                 bind:this={textAreaSizeTester}
-                class="text-lg py-2 resize-none w-full bg-transparent rounded-lg"
+                class="text-lg py-2 resize-none w-full bg-transparent"
                 class:obfuscated
                 style="position: absolute; top: 0; left: -9999px;"
             />
         </div>
 
-        <div class="flex py-2 justify-end">
-            <Button
-                aria-label="Submit Entry"
-                disabled={submitted}
-                on:click={submit}
-                class="rounded-full"
-            >
-                Submit Entry
-            </Button>
+        <div class="flex py-2 justify-end gap-2">
+            <LocationToggle size={23} />
+
+                <Tooltip.Root>
+                    <Tooltip.Trigger>
+                        <Button
+                            aria-label="Submit Entry"
+                            disabled={submitted}
+                            on:click={submit}
+                            class="rounded-full flex-center gap-2"
+                        >
+                            Submit Entry <Enter size='20'/>
+                        </Button>
+                    </Tooltip.Trigger>
+                    <Tooltip.Content>
+                        Ctrl/<MacCommand size='16' color="var(--primary-foreground)"/> + <Enter color="var(--primary-foreground)" size="16"/> for a new line
+                    </Tooltip.Content>
+                </Tooltip.Root>
         </div>
     </div>
 </div>

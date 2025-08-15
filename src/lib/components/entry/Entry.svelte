@@ -314,17 +314,18 @@
             <Label label={labelId ? labels[labelId] : null} {obfuscated} />
         {/if}
 
-        <button
+        <Button
             aria-label={obfuscated ? 'hide entry' : 'show entry'}
             on:click={toggleObfuscation}
-            class="bg-vLightAccent hover:bg-lightAccent p-[6px] rounded-full"
+            class="flex-center rounded-full p-0 aspect-square w-[30px] h-[30px]"
+            variant="outline"
         >
             {#if obfuscated}
                 <Eye size="18" />
             {:else}
                 <EyeOff size="18" />
             {/if}
-        </button>
+        </Button>
     </div>
 
     {#if showingMap && latitude && longitude}
@@ -390,7 +391,7 @@
         <Tooltip.Root>
             <Tooltip.Trigger>
                 <button
-                    class="body md:p-4 md:pb-0 p-2 whitespace-pre-wrap obfuscated text-left"
+                    class="body p-2 md:p-0 md:pt-1 md:pl-4 whitespace-pre-wrap obfuscated text-left"
                     class:md:pl-0={showFullDate}
                     on:click={toggleObfuscation}
                 >
@@ -400,7 +401,10 @@
             <Tooltip.Content>Click to show</Tooltip.Content>
         </Tooltip.Root>
     {:else}
-        <div class="body md:p-4 md:pb-0 p-2 whitespace-pre-wrap" class:md:pl-0={showFullDate}>
+        <div
+            class="body p-2 md:p-0 md:pt-1 md:pl-4 whitespace-pre-wrap"
+            class:md:pl-0={showFullDate}
+        >
             {@html entryHtml}
         </div>
     {/if}

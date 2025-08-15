@@ -57,24 +57,21 @@
     onMount(async () => {
         await watchLocationPermissions();
     });
+
+    const buttonClass =
+        'hover:bg-lightAccent rounded-full p-1.5 pr-3 flex-center gap-1 border-border border border-solid text-sm text-light';
 </script>
 
 {#if $enabledLocation === null}
     ...
 {:else if $enabledLocation === true}
-    <button
-        on:click={disableLocation}
-        aria-label="Turn off Location"
-        class="hover:bg-vLightAccent rounded-full p-1.5 flex-center border-solid border border-transparent"
-    >
+    <button on:click={disableLocation} aria-label="Turn off Location" class={buttonClass}>
         <MapMarkerOutline {size} />
+        Location enabled
     </button>
 {:else}
-    <button
-        on:click={enableLocation}
-        aria-label="Turn on Location"
-        class="hover:bg-vLightAccent rounded-full p-1.5 flex-center border-accentDanger border border-solid"
-    >
+    <button on:click={enableLocation} aria-label="Turn on Location" class={buttonClass}>
         <MapMarkerOffOutline {size} />
+        Location disabled
     </button>
 {/if}
