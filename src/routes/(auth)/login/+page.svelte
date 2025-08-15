@@ -43,7 +43,7 @@
         // set before making the request so the request is made as if we are logged in
         $encryptionKey = key;
 
-        const getAuthRes = await api.get(
+        const getAuthRes = await api.post(
             '/auth',
             {
                 key,

@@ -1,6 +1,5 @@
 import { invalidateCache } from '$lib/utils/cache.server';
 import { maxAgeFromShouldRememberMe, sessionCookieOptions } from '$lib/utils/cookies';
-import { GETParamIsTruthy } from '$lib/utils/GETArgs';
 import { getUnwrappedReqBody } from '$lib/utils/requestBody.server';
 import type { RequestHandler } from '@sveltejs/kit';
 import { error } from '@sveltejs/kit';
@@ -10,12 +9,23 @@ import { User } from '$lib/controllers/user/user.server';
 import { Auth } from '$lib/controllers/auth/auth.server';
 import { z } from 'zod';
 
-export const GET = (async ({ url, cookies }) => {
-    const key: string | null = url.searchParams.get('key');
-    const username: string | null = url.searchParams.get('username');
-    const rememberMe = GETParamIsTruthy(url.searchParams.get('rememberMe'));
+export const POST = (async ({ request, cookies }) => {
+    let bodyJson;
+    try {
+        bodyJson = await request.json();
+    } catch (e) {
+        error(400, 'Invalid login');
+    }
+    const body = z
+        .object({
+            key: z.string(),
+            username: z.string(),
+            rememberMe: z.boolean().optional().default(false)
+        })
+        .safeParse(bodyJson);
+    if (body.error) return error(401, 'Invalid login');
 
-    if (!key || !username) error(401, 'Invalid login');
+    const { username, key, rememberMe } = body.data;
 
     const sessionId = (
         await Auth.authenticateUserFromLogIn(username, key, maxAgeFromShouldRememberMe(rememberMe))
@@ -23,21 +33,7 @@ export const GET = (async ({ url, cookies }) => {
 
     cookies.set(COOKIE_KEYS.sessionId, sessionId, sessionCookieOptions(rememberMe));
 
-    return apiResponse(
-        key,
-        {
-            username
-        },
-        {
-            headers: {
-                'Set-Cookie': cookies.serialize(
-                    COOKIE_KEYS.sessionId,
-                    sessionId,
-                    sessionCookieOptions(rememberMe)
-                )
-            }
-        }
-    );
+    return apiResponse(key, {});
 }) satisfies RequestHandler;
 
 export const PUT = (async ({ request, cookies }) => {
@@ -69,4 +65,4 @@ export const DELETE = (({ cookies }) => {
     return apiResponse(null, {});
 }) satisfies RequestHandler;
 
-export const POST = api404Handler;
+export const GET = api404Handler;
