@@ -9,7 +9,6 @@
     import InsertImage from '$lib/components/asset/InsertImage.svelte';
     import FormatOptions from '$lib/components/entryForm/FormatOptions.svelte';
     import LabelSelect from '$lib/components/label/LabelSelect.svelte';
-    import LocationToggle from '$lib/components/location/LocationToggle.svelte';
     import { ANIMATION_DURATION } from '$lib/constants';
     import { currentlyUploadingAssets } from '$lib/stores';
     import type { Label } from '$lib/controllers/label/label';
