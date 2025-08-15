@@ -36,7 +36,7 @@ export async function genAuthFromUsernameAndPassword(
     const api = await ApiClient.fromSessionId('', '');
     const key = encryptionKeyFromPassword(password);
 
-    const authRes = await api.rawReq('post', `/auth`, { username, password });
+    const authRes = await api.rawReq('post', `/auth`, { username, key });
     if (!authRes.ok()) {
         throw await authRes.text();
     }
