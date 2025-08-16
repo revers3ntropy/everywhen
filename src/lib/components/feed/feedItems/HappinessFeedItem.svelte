@@ -4,11 +4,14 @@
     import FeedItemIcon from '$lib/components/feed/feedItems/FeedItemIcon.svelte';
     import TimeInFeed from '$lib/components/feed/feedItems/TimeInFeed.svelte';
     import { settingsStore } from '$lib/stores';
+    import { tryDecryptText } from '$lib/utils/encryption.client';
 
     export let tzOffset: number;
     export let timestamp: number;
-    export let value: number;
+    export let rowJson: string;
     export let obfuscated: boolean;
+
+    $: value = (JSON.parse(tryDecryptText(rowJson)) as [number])[0];
 </script>
 
 <FeedItemIcon type="happiness" />

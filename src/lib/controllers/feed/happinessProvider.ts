@@ -3,7 +3,6 @@ import type { FeedItem } from '$lib/controllers/feed/feed';
 import type { FeedProvider } from '$lib/controllers/feed/feed.server';
 import { query } from '$lib/db/mysql.server';
 import { Day } from '$lib/utils/day';
-import { decrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
 
 export const happinessProvider = {
@@ -24,18 +23,15 @@ export const happinessProvider = {
                 AND DATE_FORMAT(FROM_UNIXTIME(datasetRows.timestamp + (datasetRows.timestampTzOffset - TIMESTAMPDIFF(HOUR, UTC_TIMESTAMP(), NOW())) * 60 * 60), '%Y-%m-%d') 
                     = ${day.fmtIso()}
         `;
-        return Result.collect(
+        return Result.ok(
             happinesses.map(item => {
-                return decrypt(item.rowJson, auth.key).map(rowJson => {
-                    const [value] = JSON.parse(rowJson) as [number];
-                    return {
-                        type: 'happiness' as const,
-                        id: item.id,
-                        timestamp: item.timestamp,
-                        timestampTzOffset: item.timestampTzOffset,
-                        value
-                    } satisfies FeedItem;
-                });
+                return {
+                    type: 'happiness' as const,
+                    id: item.id,
+                    timestamp: item.timestamp,
+                    timestampTzOffset: item.timestampTzOffset,
+                    rowJson: item.rowJson
+                } satisfies FeedItem;
             })
         );
     },

@@ -31,7 +31,7 @@
         }
 
         const newRow = {
-            elements: [value],
+            rowJson: tryEncryptText(JSON.stringify([value])),
             created: nowUtc(),
             timestamp: nowUtc(),
             timestampTzOffset: currentTzOffset()

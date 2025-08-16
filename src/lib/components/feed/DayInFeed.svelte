@@ -198,7 +198,7 @@
                             {obfuscated}
                             timestamp={item.timestamp}
                             tzOffset={item.timestampTzOffset}
-                            value={item.value}
+                            rowJson={item.rowJson}
                         />
                     {:else if item.type === 'otherDataset'}
                         <OtherDatasetFeemItem

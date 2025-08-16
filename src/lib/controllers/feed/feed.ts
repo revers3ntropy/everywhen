@@ -36,7 +36,7 @@ export type FeedItemTypes = {
         id: string;
         timestamp: number;
         timestampTzOffset: number;
-        value: number;
+        rowJson: string;
     };
     otherDataset: {
         type: 'otherDataset';
