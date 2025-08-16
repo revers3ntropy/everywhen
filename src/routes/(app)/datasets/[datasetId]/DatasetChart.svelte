@@ -113,8 +113,6 @@
         numericColumns.map(column => [tryDecryptText(column.name), column.ordering])
     );
 
-    $: console.log(graphData?.datasets[0].data);
-
     // TODO do not show the currently selected Y axis column in the X axis options
     $: xAxisOptions = {
         Time: timeIdxKey,

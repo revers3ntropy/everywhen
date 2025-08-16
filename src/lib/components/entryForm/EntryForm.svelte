@@ -327,6 +327,7 @@
                 use:paste={{ handleText: pasteText, handleFiles: uploadAndPasteFiles }}
                 disabled={obfuscated || submitted}
                 aria-label="Entry Body"
+                name="entry body input"
                 placeholder={obfuscated ? '' : 'What’s on your mind?'}
                 class="text-lg py-2 resize-none w-full bg-transparent border-0 border-b border-solid border-border"
                 class:obfuscated
@@ -339,29 +340,29 @@
             -->
             <textarea
                 bind:this={textAreaSizeTester}
-                class="text-lg py-2 resize-none w-full bg-transparent"
+                class="text-lg py-2 resize-none w-full bg-transparent border-0 border-b border-solid border-border"
                 class:obfuscated
+                name="hidden entry body input"
+                tabindex="-1"
                 style="position: absolute; top: 0; left: -9999px;"
             />
         </div>
 
-        <div class="flex py-2 justify-end gap-2">
+        <div class="flex pb-2 justify-end gap-2">
             <LocationToggle size={23} />
 
-
-                    <Button
-                        aria-label="Submit Entry"
-                        disabled={submitted}
-                        on:click={submit}
-                        class="rounded-full flex-center gap-2"
-                        variant="default"
-                        data-tooltip-trigger
-                        data-melt-tooltip-trigger
-                        data-state="closed"
-                    >
-                        Submit <Enter size="20" />
-                    </Button>
-
+            <Button
+                aria-label="Submit Entry"
+                disabled={submitted}
+                on:click={submit}
+                class="rounded-full flex-center gap-2"
+                variant="default"
+                data-tooltip-trigger
+                data-melt-tooltip-trigger
+                data-state="closed"
+            >
+                Submit <Enter size="20" />
+            </Button>
         </div>
     </div>
 </div>

@@ -25,13 +25,13 @@
     $: columnsOrderedByJsonOrder = Dataset.sortColumnsForJson(dataset.columns);
 </script>
 
-<div class="pt-8">
+<div class="pt-8 text-left">
     <table class="w-full block border-borderColor border overflow-x-auto">
         <tr>
             <th class="p-2 border-r border-borderColor"> Timestamp </th>
             {#each Dataset.sortColumnsForDisplay(dataset.columns) as column}
                 <th
-                    class="border-r border-borderColor min-w-[150px] bg-vLightAccent"
+                    class="p-2 border-r border-borderColor min-w-[150px] bg-vLightAccent"
                     class:hover:bg-lightAccent={!dataset.preset}
                 >
                     {#if !dataset.preset}
@@ -165,7 +165,7 @@
         {:else if rows}
             <tr class="p-2 border-t border-borderColor">
                 <td
-                    class="p-2 border border-borderColor italic text-light"
+                    class="p-2 border-t border-borderColor italic text-light"
                     colspan={dataset.columns.length + 2}
                 >
                     No rows

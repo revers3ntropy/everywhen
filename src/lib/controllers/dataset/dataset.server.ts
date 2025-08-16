@@ -21,6 +21,7 @@ import { nowUtc } from '$lib/utils/time';
 import type { Auth } from '$lib/controllers/auth/auth';
 import { UId } from '$lib/controllers/uuid/uuid.server';
 import { SSLogger } from '$lib/controllers/logs/logs.server';
+import { NON_ENCRYPTED_TEXT_PREFIX } from '$lib/constants';
 
 const logger = new SSLogger('Dataset');
 
@@ -173,7 +174,10 @@ namespace DatasetServer {
         let columns = [];
 
         if (dataset.val.preset) {
-            columns = datasetPresets[dataset.val.preset.id as PresetId].columns;
+            columns = datasetPresets[dataset.val.preset.id as PresetId].columns.map(c => ({
+                ...c,
+                name: `${NON_ENCRYPTED_TEXT_PREFIX}${c.name}`
+            }));
         } else {
             const allCols = await getUserDefinedColumns(auth, datasetId);
             if (!allCols.ok) return allCols.cast();
@@ -182,10 +186,10 @@ namespace DatasetServer {
         }
 
         const [{ rowCount }] = await query<{ rowCount: number }[]>`
-            SELECT COUNT(*) AS rowCount
-            FROM datasetRows
-            WHERE datasetId = ${datasetId}
-            AND userId = ${auth.id}
+            SELECT rowCount
+            FROM datasets
+            WHERE id = ${datasetId}
+              AND userId = ${auth.id}
         `;
 
         return Result.ok({
