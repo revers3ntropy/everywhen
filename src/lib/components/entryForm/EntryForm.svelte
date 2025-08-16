@@ -2,7 +2,6 @@
     import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
     import { browser } from '$app/environment';
-    import * as Tooltip from '$lib/components/ui/tooltip';
     import MenuBar from '$lib/components/entryForm/MenuBar.svelte';
     import { Button } from '$lib/components/ui/button';
     import { Asset } from '$lib/controllers/asset/asset';
@@ -23,7 +22,6 @@
     import LocationToggle from '$lib/components/location/LocationToggle.svelte';
     import Enter from '$lib/components/ui/icons/Enter.svelte';
     import { paste } from './paste';
-    import MacCommand from '$lib/components/ui/icons/MacCommand.svelte';
 
     // as this form is used in entry editing and creating
     export let action: 'create' | 'edit' = 'create';
