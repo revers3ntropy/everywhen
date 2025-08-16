@@ -2,7 +2,7 @@
     import { onMount } from 'svelte';
     import { goto } from '$app/navigation';
     import { browser } from '$app/environment';
-    import * as Tooltip from "$lib/components/ui/tooltip";
+    import * as Tooltip from '$lib/components/ui/tooltip';
     import MenuBar from '$lib/components/entryForm/MenuBar.svelte';
     import { Button } from '$lib/components/ui/button';
     import { Asset } from '$lib/controllers/asset/asset';
@@ -350,21 +350,24 @@
         <div class="flex py-2 justify-end gap-2">
             <LocationToggle size={23} />
 
-                <Tooltip.Root>
-                    <Tooltip.Trigger>
-                        <Button
-                            aria-label="Submit Entry"
-                            disabled={submitted}
-                            on:click={submit}
-                            class="rounded-full flex-center gap-2"
-                        >
-                            Submit Entry <Enter size='20'/>
-                        </Button>
-                    </Tooltip.Trigger>
-                    <Tooltip.Content>
-                        Ctrl/<MacCommand size='16' color="var(--primary-foreground)"/> + <Enter color="var(--primary-foreground)" size="16"/> for a new line
-                    </Tooltip.Content>
-                </Tooltip.Root>
+            <Tooltip.Root>
+                <Tooltip.Trigger asChild>
+                    <Button
+                        aria-label="Submit Entry"
+                        disabled={submitted}
+                        on:click={submit}
+                        class="rounded-full flex-center gap-2"
+                    >
+                        Submit Entry <Enter size="20" />
+                    </Button>
+                </Tooltip.Trigger>
+                <Tooltip.Content>
+                    Ctrl/<MacCommand size="16" color="var(--primary-foreground)" /> + <Enter
+                        color="var(--primary-foreground)"
+                        size="16"
+                    /> for a new line
+                </Tooltip.Content>
+            </Tooltip.Root>
         </div>
     </div>
 </div>
