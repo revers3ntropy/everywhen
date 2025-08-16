@@ -99,11 +99,11 @@
             thinBorder
         />
     </div>
-    <div class="">
+    <div>
         <div>
             {#if isInDialog}
                 <button>
-                    <a class="flex-center p-1" href="/map/{id}"> See more about location </a>
+                    <a class="flex-center p-1 pt-2" href="/map/{id}"> View Location </a>
                 </button>
             {/if}
         </div>

@@ -62,10 +62,9 @@
                         >
                             <InfoOutline size="20" />
                         </Popover.Trigger>
-                        <Popover.Content class="">
+                        <Popover.Content>
                             Everywhen counts, encrypts and stores the words in your entry when you
-                            submit it, so it is able to analyse your while maintaining full
-                            encryption.
+                            submit it, to give you analytics while maintaining security.
                         </Popover.Content>
                     </Popover.Root>
                 </div>
