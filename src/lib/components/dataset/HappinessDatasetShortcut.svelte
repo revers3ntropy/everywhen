@@ -61,12 +61,12 @@
     <HappinessValueIcon value={submitted} size={24} />
 {:else}
     <Popover.Root>
-        <Popover.Trigger class="static">
+        <Popover.Trigger class="static" aria-label="enter happiness">
             <EmoticonOutline size={24} />
 
             <div
                 class="relative text-light top-0 left-0 h-0"
-                style="transform: translate(10px, -11px)"
+                style="transform: translate(10px, -14px)"
             >
                 <Plus size={16} />
             </div>

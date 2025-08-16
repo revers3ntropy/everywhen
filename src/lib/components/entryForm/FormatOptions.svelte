@@ -41,6 +41,7 @@
             buttonVariants({ variant: 'outline' }),
             'bg-transparent px-2 text-md gap-1 hover:bg-vLightAccent rounded-full hover:text-textColor aspect-square'
         )}
+        aria-label="format options"
     >
         <FormatText size="25" />
     </Popover.Trigger>

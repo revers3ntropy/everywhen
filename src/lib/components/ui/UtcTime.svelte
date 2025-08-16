@@ -1,5 +1,5 @@
 <script lang="ts">
-    import * as Tooltip from '$lib/components/ui/tooltip';
+    import { Popover, PopoverContent, PopoverTrigger } from '$lib/components/ui/popover';
     import type { Hours, Seconds } from '../../../types';
     import { numberAsSignedStr } from '$lib/utils/text';
     import { currentTzOffset, fmtUtc, fmtUtcRelative } from '$lib/utils/time';
@@ -12,30 +12,26 @@
 </script>
 
 {#if !noTooltip}
-    <Tooltip.Root>
-        <Tooltip.Trigger>
-            <span>
-                {#if relative}
-                    {fmtUtcRelative(timestamp)}
-                {:else}
-                    {fmtUtc(timestamp, tzOffset, fmt)}
-                {/if}
-            </span>
-        </Tooltip.Trigger>
-        <Tooltip.Content>
-            <div>
-                <p class="oneline">
-                    {fmtUtcRelative(timestamp)} (GMT {numberAsSignedStr(tzOffset)})
-                </p>
-                <p class="oneline">{fmtUtc(timestamp, 0, 'hh:mma')} GMT </p>
-                <p class="oneline">
-                    {fmtUtc(timestamp, currentTzOffset(), 'hh:mma')} local (GMT{numberAsSignedStr(
-                        currentTzOffset()
-                    )})
-                </p>
-            </div>
-        </Tooltip.Content>
-    </Tooltip.Root>
+    <Popover>
+        <PopoverTrigger aria-label="show time info">
+            {#if relative}
+                {fmtUtcRelative(timestamp)}
+            {:else}
+                {fmtUtc(timestamp, tzOffset, fmt)}
+            {/if}
+        </PopoverTrigger>
+        <PopoverContent>
+            <p class="oneline">
+                {fmtUtcRelative(timestamp)} (GMT {numberAsSignedStr(tzOffset)})
+            </p>
+            <p class="oneline">{fmtUtc(timestamp, 0, 'hh:mma')} GMT </p>
+            <p class="oneline">
+                {fmtUtc(timestamp, currentTzOffset(), 'hh:mma')} local (GMT{numberAsSignedStr(
+                    currentTzOffset()
+                )})
+            </p>
+        </PopoverContent>
+    </Popover>
 {:else}
     <span>
         {#if relative}

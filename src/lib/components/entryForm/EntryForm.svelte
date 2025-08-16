@@ -350,24 +350,20 @@
         <div class="flex py-2 justify-end gap-2">
             <LocationToggle size={23} />
 
-            <Tooltip.Root>
-                <Tooltip.Trigger asChild>
+
                     <Button
                         aria-label="Submit Entry"
                         disabled={submitted}
                         on:click={submit}
                         class="rounded-full flex-center gap-2"
+                        variant="default"
+                        data-tooltip-trigger
+                        data-melt-tooltip-trigger
+                        data-state="closed"
                     >
-                        Submit Entry <Enter size="20" />
+                        Submit <Enter size="20" />
                     </Button>
-                </Tooltip.Trigger>
-                <Tooltip.Content>
-                    Ctrl/<MacCommand size="16" color="var(--primary-foreground)" /> + <Enter
-                        color="var(--primary-foreground)"
-                        size="16"
-                    /> for a new line
-                </Tooltip.Content>
-            </Tooltip.Root>
+
         </div>
     </div>
 </div>

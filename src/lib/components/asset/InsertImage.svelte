@@ -75,6 +75,7 @@
             buttonVariants({ variant: 'outline' }),
             'bg-transparent px-2 text-md gap-1 hover:bg-vLightAccent rounded-full hover:text-textColor'
         )}
+        aria-label="insert image"
     >
         <ImageArea {size} />
     </Popover.Trigger>

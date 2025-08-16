@@ -5,7 +5,7 @@
     import Windows from 'svelte-material-icons/MicrosoftWindows.svelte';
     import Television from 'svelte-material-icons/Television.svelte';
     import Watch from 'svelte-material-icons/Watch.svelte';
-    import * as Tooltip from '$lib/components/ui/tooltip';
+    import { PopoverTrigger, Popover, PopoverContent } from '$lib/components/ui/popover';
     import { deviceDataFromEntry } from '$lib/utils/userAgent';
     import type { Pixels } from '../../../types';
 
@@ -16,8 +16,11 @@
 </script>
 
 {#if deviceData}
-    <Tooltip.Root>
-        <Tooltip.Trigger class="flex-center">
+    <Popover>
+        <PopoverTrigger
+            class="flex-center rounded-full p-0 aspect-square w-[30px] h-[30px] bg-vLightAccent hover:bg-lightAccent"
+            aria-label="user agent widget"
+        >
             {#if deviceData.osGroup === 'mobile'}
                 <Cellphone {size} />
             {:else if deviceData.osGroup === 'watch'}
@@ -35,8 +38,8 @@
             {:else}
                 ?
             {/if}
-        </Tooltip.Trigger>
-        <Tooltip.Content>
+        </PopoverTrigger>
+        <PopoverContent class="w-fit">
             {#if deviceData.deviceSpecific || deviceData.device}
                 <p class="oneline">
                     Created on {deviceData.deviceSpecific || deviceData.device}
@@ -54,6 +57,6 @@
                     {deviceData.browserVersion || ''}
                 </span>
             {/if}
-        </Tooltip.Content>
-    </Tooltip.Root>
+        </PopoverContent>
+    </Popover>
 {/if}
