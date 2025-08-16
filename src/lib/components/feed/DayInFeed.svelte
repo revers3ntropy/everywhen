@@ -147,8 +147,8 @@
             }}
         >
             {#if showForms && isToday}
-                <div class="bg-vLightAccent rounded-r-xl">
-                    <EntryForm {obfuscated} {labels} menuBarClass="mt-1" />
+                <div class="bg-vLightAccent rounded-r-xl pt-2">
+                    <EntryForm {obfuscated} {labels} />
                 </div>
             {/if}
             <div class="w-full">

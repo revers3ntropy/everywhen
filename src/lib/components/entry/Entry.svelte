@@ -303,7 +303,7 @@
         {#if !isEdit && edits?.length}
             <a
                 href="/journal/{id}?history=on"
-                class="flex-center bg-vLightAccent hover:bg-lightAccent rounded-full px-3 py-[7px] oneline"
+                class="flex-center bg-vLightAccent hover:bg-lightAccent rounded-full px-3 h-[30px] oneline"
             >
                 <Pencil />
                 {edits.length} edit{edits.length > 1 ? 's' : ''}

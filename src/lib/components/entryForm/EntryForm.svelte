@@ -18,7 +18,6 @@
     import { currentTzOffset, nowUtc } from '$lib/utils/time';
     import { decrypt, encrypt } from '$lib/utils/encryption';
     import { CSLogger } from '$lib/controllers/logs/logger.client';
-    import { cn } from '$lib/utils';
     import LocationToggle from '$lib/components/location/LocationToggle.svelte';
     import Enter from '$lib/components/ui/icons/Enter.svelte';
     import { paste } from './paste';
@@ -39,8 +38,7 @@
     export let newEntryLabelId = '';
     export let labels: Record<string, Label>;
     export let obfuscated = true;
-    let className = '';
-    export { className as class };
+
     export let menuBarClass = '';
 
     function resetEntryForm() {
@@ -308,7 +306,7 @@
     }
 </script>
 
-<div class={cn('md:bg-vLightAccent rounded-2xl', className)}>
+
     <div class="pb-2 md:pb-4 md:px-1">
         <MenuBar
             {labels}
@@ -365,4 +363,4 @@
             </Button>
         </div>
     </div>
-</div>
+
