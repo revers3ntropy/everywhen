@@ -14,7 +14,7 @@ import { CSLogger } from '$lib/controllers/logs/logger.client';
 import { Result } from '$lib/utils/result';
 
 export function decryptDatasetRows(
-    columns: DatasetColumn<unknown>[],
+    columns: { jsonOrdering: number; ordering: number }[],
     rows: DatasetRow[]
 ): DecryptedDatasetRow[] {
     return Dataset.sortRowsElementsForDisplay(

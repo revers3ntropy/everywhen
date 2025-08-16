@@ -74,7 +74,7 @@ export namespace Dataset {
 
     // maps rows from JSON-sorted to display-sorted
     export function sortRowsElementsForDisplay(
-        columns: DatasetColumn<unknown>[],
+        columns: { ordering: number; jsonOrdering: number }[],
         // these rows should be sorted by their 'JSON order' NOT their 'display' order
         rows: DecryptedDatasetRow[]
     ): DecryptedDatasetRow[] {

@@ -45,7 +45,8 @@ export type FeedItemTypes = {
         timestampTzOffset: number;
         datasetName: string;
         datasetId: string;
-        values: Record<string, unknown>;
+        rowJson: string;
+        columns: { name: string; ordering: number; jsonOrdering: number }[];
     };
     entry: { type: 'entry' } & Entry;
     entryEdit: {

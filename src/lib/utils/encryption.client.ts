@@ -11,6 +11,7 @@ export function tryDecryptText(text: string): string {
         return notify.onErr(decrypt(text.slice(ENCRYPTED_TEXT_PREFIX.length), get(encryptionKey)));
     if (text.startsWith(NON_ENCRYPTED_TEXT_PREFIX))
         return text.slice(NON_ENCRYPTED_TEXT_PREFIX.length);
+    console.trace('invalid text');
     throw 'invalid text';
 }
 

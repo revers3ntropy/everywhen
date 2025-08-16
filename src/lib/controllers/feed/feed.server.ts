@@ -1,14 +1,14 @@
 import { entriesProvider } from '$lib/controllers/feed/entriesProvider';
 import { entryEditsProvider } from '$lib/controllers/feed/entryEditsProvider';
 import { eventEndsProvider, eventStartsProvider } from '$lib/controllers/feed/eventsProvider';
-import { happinessProvider } from '$lib/controllers/feed/happinessProvidor';
+import { happinessProvider } from '$lib/controllers/feed/happinessProvider';
 import { sleepProvider } from '$lib/controllers/feed/sleepProvider';
 import type { Day } from '$lib/utils/day';
 import { Result } from '$lib/utils/result';
 import { Feed as _Feed, type FeedItem, type FeedDay } from './feed';
 import { error } from '@sveltejs/kit';
 import type { Auth } from '$lib/controllers/auth/auth';
-import { otherDatasetsProvider } from '$lib/controllers/feed/otherDatasets';
+import { otherDatasetsProvider } from '$lib/controllers/feed/otherDatasetsProvider';
 
 export interface FeedProvider {
     feedItemsOnDay(auth: Auth, day: Day): Promise<Result<FeedItem[]>>;

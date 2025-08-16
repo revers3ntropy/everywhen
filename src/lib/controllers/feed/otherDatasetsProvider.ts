@@ -3,7 +3,6 @@ import type { FeedItem } from '$lib/controllers/feed/feed';
 import type { FeedProvider } from '$lib/controllers/feed/feed.server';
 import { query } from '$lib/db/mysql.server';
 import { Day } from '$lib/utils/day';
-import { decrypt } from '$lib/utils/encryption';
 import { Result } from '$lib/utils/result';
 import { Dataset } from '$lib/controllers/dataset/dataset.server';
 
@@ -40,30 +39,22 @@ export const otherDatasetsProvider = {
         `;
         const columns = await Dataset.getUserDefinedColumnsByDatasetOrderedForJson(auth);
         if (!columns.ok) return columns.cast();
-        return Result.collect(
+        return Result.ok(
             rows.map(item => {
-                return decrypt(item.rowJson, auth.key).map(rowJson => {
-                    const values: Record<string, unknown> = {};
-                    const cols = columns.val[item.datasetId];
-                    if (!cols) throw 'colum not found';
-
-                    let i = 0;
-                    for (const val of JSON.parse(rowJson) as unknown[]) {
-                        const col = cols[i];
-                        values[col.name] = val;
-                        i++;
-                    }
-
-                    return {
-                        type: 'otherDataset' as const,
-                        id: item.id,
-                        timestamp: item.timestamp,
-                        timestampTzOffset: item.timestampTzOffset,
-                        datasetName: item.datasetName,
-                        datasetId: item.datasetId,
-                        values
-                    } satisfies FeedItem;
-                });
+                return {
+                    type: 'otherDataset' as const,
+                    id: item.id,
+                    timestamp: item.timestamp,
+                    timestampTzOffset: item.timestampTzOffset,
+                    datasetName: item.datasetName,
+                    datasetId: item.datasetId,
+                    rowJson: item.rowJson,
+                    columns: columns.val[item.datasetId].map(c => ({
+                        name: c.name,
+                        ordering: c.ordering,
+                        jsonOrdering: c.jsonOrdering
+                    }))
+                } satisfies FeedItem;
             })
         );
     },

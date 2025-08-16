@@ -205,9 +205,10 @@
                             {obfuscated}
                             timestamp={item.timestamp}
                             tzOffset={item.timestampTzOffset}
-                            values={item.values}
+                            rowJson={item.rowJson}
                             datasetId={item.datasetId}
                             datasetName={item.datasetName}
+                            columns={item.columns}
                         />
                     {/if}
                 {/each}
