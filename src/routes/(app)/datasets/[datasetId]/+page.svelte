@@ -8,13 +8,15 @@
     import { dispatch, listen } from '$lib/dataChangeEvents';
     import { goto } from '$app/navigation';
     import { notify } from '$lib/components/notifications/notifications';
-    import { Dataset, type DatasetRow } from '$lib/controllers/dataset/dataset';
+    import { type DatasetRow } from '$lib/controllers/dataset/dataset';
     import { api, apiPath } from '$lib/utils/apiRequest';
     import type { PageData } from './$types';
     import DatasetChart from './DatasetChart.svelte';
     import TableOfDatapoints from './TableOfDatapoints.svelte';
     import { Checkbox } from '$lib/components/ui/checkbox';
     import { tryDecryptText, tryEncryptText } from '$lib/utils/encryption.client.js';
+    import { decryptDatasetRows } from './datasetActions.client';
+    import { Skeleton } from '$lib/components/ui/skeleton';
 
     export let data: PageData;
 
@@ -46,8 +48,7 @@
     }
 
     async function getDatasetRows() {
-        const { rows } = notify.onErr(await api.get(apiPath(`/datasets/?`, data.dataset.id)));
-        return Dataset.sortRowsElementsForDisplay(data.dataset.columns, rows);
+        return notify.onErr(await api.get(apiPath(`/datasets/?`, data.dataset.id))).rows;
     }
 
     onMount(async () => {
@@ -68,7 +69,12 @@
         data.dataset.columns = [...data.dataset.columns, col];
         rows = rows.map(r => {
             const newRow = { ...r };
-            newRow.elements = [...newRow.elements, col.type.defaultValue];
+            newRow.rowJson = tryEncryptText(
+                JSON.stringify([
+                    ...(JSON.parse(tryDecryptText(newRow.rowJson)) as unknown[]),
+                    col.type.defaultValue
+                ])
+            );
             return newRow;
         });
     });
@@ -88,7 +94,7 @@
         rows = [row, ...rows];
         data.dataset.rowCount++;
     });
-    listen.datasetRow.onUpdate(async (_, { datasetId, row }) => {
+    listen.datasetRow.onUpdate(async ({ datasetId, row }) => {
         if (datasetId !== data.dataset.id) return;
         rows = rows.map(r => (r.id === row.id ? row : r));
     });
@@ -98,6 +104,8 @@
     });
 
     let showInFeed = !!data.dataset.showInFeed;
+
+    $: decryptedRows = rows ? decryptDatasetRows(data.dataset.columns, rows) : null;
 </script>
 
 <svelte:head>
@@ -156,13 +164,16 @@
             {#if rows}
                 <section class="pt-6">
                     {#if data.dataset && data.dataset.columns.length}
-                        <DatasetChart dataset={data.dataset} {rows} />
+                        <DatasetChart dataset={data.dataset} rows={decryptedRows} />
                     {/if}
                 </section>
 
-                <TableOfDatapoints dataset={data.dataset} {rows} />
+                {#if decryptedRows}
+                    <TableOfDatapoints dataset={data.dataset} rows={decryptedRows} />
+                {/if}
             {:else}
-                <div class="pt-8"> Loading... </div>
+                <Skeleton class="w-full h-[200px] mb-4" />
+                <Skeleton class="w-full h-[200px]" />
             {/if}
         {/key}
     </div>

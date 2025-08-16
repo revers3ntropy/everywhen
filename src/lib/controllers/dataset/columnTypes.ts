@@ -45,6 +45,6 @@ export const builtInTypes = {
         unit: '',
         defaultValue: false,
         validate: (value: unknown): value is boolean => typeof value === 'boolean',
-        castTo: (value: unknown) => Boolean(value)
+        castTo: (value: unknown) => !!value
     }
 } satisfies Record<string, DatasetColumnType<unknown>>;

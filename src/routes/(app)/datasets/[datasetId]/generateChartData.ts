@@ -1,4 +1,4 @@
-import type { DatasetRow } from '$lib/controllers/dataset/dataset';
+import type { DecryptedDatasetRow } from '$lib/controllers/dataset/dataset';
 import moment from 'moment/moment';
 import { dayUtcFromTimestamp, fmtUtc, nowUtc } from '$lib/utils/time';
 import type { ChartData, Seconds, TimestampSecs } from '../../../../types';
@@ -8,7 +8,7 @@ export const timeIdxKey = 'time';
 
 export type XAxisKey = typeof timeIdxKey | `col:${number}`;
 
-type Rows = DatasetRow<(number | null)[]>[];
+type Rows = DecryptedDatasetRow<(number | null)[]>[];
 
 type DatasetGenerationStrategy = (
     sortedEntries: Rows,
@@ -269,7 +269,7 @@ function datasetFactoryForStandardBuckets(selectedBucket: Bucket): DatasetGenera
 
 const generateDataset: Record<Bucket, DatasetGenerationStrategy> = {
     [Bucket.Hour]: (
-        sortedEntries: DatasetRow[],
+        sortedEntries: DecryptedDatasetRow[],
         columnIndex: number,
         reductionStrategy: ReductionStrategy,
         defaultValueStrategy: DefaultValueStrategy
@@ -359,20 +359,15 @@ export function generateScatterData(
         borderRadius?: number;
     } = {}
 ): ChartData {
-    let rowToDatapointMapper;
-
     if (xAxisKey === timeIdxKey) {
-        rowToDatapointMapper = (row: DatasetRow) => ({
-            x: row.timestamp,
-            y: row.elements[columnIndex] as number
-        });
-    } else {
-        const xIdx = parseInt(xAxisKey.split(':')[1]);
-        rowToDatapointMapper = (row: DatasetRow) => ({
-            x: row.elements[xIdx] as number,
-            y: row.elements[columnIndex] as number
-        });
+        throw 'unreachable';
     }
+
+    const xIdx = parseInt(xAxisKey.split(':')[1]);
+    const rowToDatapointMapper = (row: DecryptedDatasetRow) => ({
+        x: row.elements[xIdx] as number,
+        y: row.elements[columnIndex] as number
+    });
 
     const data = rows.map(rowToDatapointMapper);
 

@@ -12,9 +12,19 @@ export const POST = (async ({ cookies, request, params }) => {
     const auth = Auth.getAuthFromCookies(cookies);
     invalidateCache(auth.id);
 
-    const { name, type: typeId } = await getUnwrappedReqBody(auth, request, {
+    const {
+        name,
+        type: typeId,
+        updatedRows
+    } = await getUnwrappedReqBody(auth, request, {
         name: z.string(),
-        type: z.string().default('string')
+        type: z.string().default('string'),
+        updatedRows: z.array(
+            z.object({
+                id: z.number(),
+                rowJson: z.string()
+            })
+        )
     });
 
     if (!(typeId in builtInTypes)) {
@@ -22,8 +32,8 @@ export const POST = (async ({ cookies, request, params }) => {
     }
     const type = builtInTypes[typeId as keyof typeof builtInTypes];
 
-    const col = (await Dataset.addColumn(auth, params.datasetId, name, type)).unwrap(e =>
-        error(400, e)
+    const col = (await Dataset.addColumn(auth, params.datasetId, name, type, updatedRows)).unwrap(
+        e => error(400, e)
     );
 
     return apiResponse(auth, col);

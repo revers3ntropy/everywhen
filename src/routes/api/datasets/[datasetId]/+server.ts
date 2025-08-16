@@ -29,7 +29,7 @@ export const POST = (async ({ cookies, request, params }) => {
                 created: z.number().default(nowUtc()),
                 timestamp: z.number().optional(),
                 timestampTzOffset: z.number().optional(),
-                elements: z.array(z.unknown())
+                rowJson: z.string()
             })
         ),
         onSameTimestamp: z
@@ -64,7 +64,7 @@ export const PUT = (async ({ cookies, request, params }) => {
                         created: z.number().default(nowUtc()),
                         timestamp: z.number(),
                         timestampTzOffset: z.number(),
-                        elements: z.array(z.unknown())
+                        rowJson: z.string()
                     }),
                     z.object({
                         id: z.number(),

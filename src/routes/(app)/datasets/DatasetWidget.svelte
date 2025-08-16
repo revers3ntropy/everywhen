@@ -2,9 +2,9 @@
     import TuneVariant from 'svelte-material-icons/TuneVariant.svelte';
     import * as Tooltip from '$lib/components/ui/tooltip';
     import Dot from '$lib/components/ui/Dot.svelte';
-    import type { DatasetMetadata } from '$lib/controllers/dataset/dataset.server';
+    import type { DatasetMetadata } from '$lib/controllers/dataset/dataset';
     import EncryptedText from '$lib/components/ui/EncryptedText.svelte';
-    import { tryDecryptText } from '$lib/utils/encryption.client.js';
+    import { tryDecryptText } from '$lib/utils/encryption.client';
 
     export let dataset: DatasetMetadata;
 </script>

@@ -1,6 +1,5 @@
 import { builtInTypes as _builtInTypes } from '$lib/controllers/dataset/columnTypes';
 import type { DatasetPreset } from '$lib/controllers/dataset/presets';
-import { datasetPresets as _datasetPresets } from '$lib/controllers/dataset/presets';
 import type { Hours, TimestampSecs } from '../../../types';
 
 export interface Dataset {
@@ -38,18 +37,27 @@ export interface DatasetColumn<T> {
     type: DatasetColumnType<T>;
 }
 
-export interface DatasetRow<E extends unknown[] = unknown[]> {
+export interface DatasetRow {
     id: number;
     created: TimestampSecs;
     timestamp: TimestampSecs;
     timestampTzOffset: Hours;
+    rowJson: string;
+}
+
+export interface DecryptedDatasetRow<E extends unknown[] = unknown[]> {
+    id: number;
+    created: TimestampSecs;
+    timestamp: TimestampSecs;
+    timestampTzOffset: Hours;
+    // elements should always be sorted by their 'display order'
+    // NOT their 'JSON order'!
     elements: E;
 }
 
 export type DatasetDataFilter = object;
 
 export namespace Dataset {
-    export const datasetPresets = _datasetPresets;
     export const builtInTypes = _builtInTypes;
 
     export function sortColumnsForJson(
@@ -64,10 +72,12 @@ export namespace Dataset {
         return [...columns].sort((a, b) => a.ordering - b.ordering);
     }
 
+    // maps rows from JSON-sorted to display-sorted
     export function sortRowsElementsForDisplay(
         columns: DatasetColumn<unknown>[],
-        rows: DatasetRow[]
-    ): DatasetRow[] {
+        // these rows should be sorted by their 'JSON order' NOT their 'display' order
+        rows: DecryptedDatasetRow[]
+    ): DecryptedDatasetRow[] {
         return rows.map(row => ({
             ...row,
             elements: new Array(columns.length).fill(null).map((_, i) => {
@@ -77,6 +87,20 @@ export namespace Dataset {
             })
         }));
     }
-}
 
-export type DatasetPresetName = keyof typeof Dataset.datasetPresets;
+    // maps rows from display-sorted to JSON-sorted
+    export function sortRowsElementsForJson(
+        columns: DatasetColumn<unknown>[],
+        // normal decrypted rows, sorted by their display order
+        rows: DecryptedDatasetRow[]
+    ): DecryptedDatasetRow[] {
+        return rows.map(row => ({
+            ...row,
+            elements: new Array(columns.length).fill(null).map((_, i) => {
+                const col = columns.find(c => c.jsonOrdering === i);
+                if (!col) return null;
+                return row.elements[col.ordering];
+            })
+        }));
+    }
+}

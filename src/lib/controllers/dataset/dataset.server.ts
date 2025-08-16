@@ -18,7 +18,6 @@ import {
     type DatasetDataFilter
 } from './dataset';
 import { nowUtc } from '$lib/utils/time';
-import { decrypt, encrypt } from '$lib/utils/encryption';
 import type { Auth } from '$lib/controllers/auth/auth';
 import { UId } from '$lib/controllers/uuid/uuid.server';
 import { SSLogger } from '$lib/controllers/logs/logs.server';
@@ -294,15 +293,16 @@ namespace DatasetServer {
             return await thirdPartyProvider.fetchDataset(auth, settings, filter);
         }
 
-        const rows = await query<
-            {
-                id: number;
-                created: number;
-                timestamp: number;
-                timestampTzOffset: number;
-                rowJson: string;
-            }[]
-        >`
+        return Result.ok(
+            await query<
+                {
+                    id: number;
+                    created: number;
+                    timestamp: number;
+                    timestampTzOffset: number;
+                    rowJson: string;
+                }[]
+            >`
             SELECT
                 id,
                 created,
@@ -312,31 +312,7 @@ namespace DatasetServer {
             FROM datasetRows
             WHERE datasetId = ${datasetId}
             ORDER BY timestamp DESC
-        `;
-
-        return Result.collect(
-            rows.map(row => {
-                let elements: unknown[];
-                const decryptedJson = decrypt(row.rowJson, auth.key);
-                if (!decryptedJson.ok) return Result.err('Invalid data point');
-
-                try {
-                    const parsedRowData = JSON.parse(decryptedJson.val);
-                    if (!Array.isArray(parsedRowData)) {
-                        return Result.err('Invalid row JSON');
-                    }
-                    elements = parsedRowData;
-                } catch (_) {
-                    return Result.err('Invalid row JSON');
-                }
-                return Result.ok({
-                    id: row.id,
-                    created: row.created,
-                    timestamp: row.timestamp,
-                    timestampTzOffset: row.timestampTzOffset,
-                    elements
-                });
-            })
+        `
         );
     }
 
@@ -500,7 +476,7 @@ namespace DatasetServer {
         auth: Auth,
         datasetId: string,
         rows: {
-            elements: unknown[];
+            rowJson: string;
             timestamp?: TimestampSecs;
             timestampTzOffset?: Hours;
             created?: TimestampSecs;
@@ -524,13 +500,6 @@ namespace DatasetServer {
         const validateRowUsageRes = await validateRowUsage(auth, datasetId, rows.length);
         if (!validateRowUsageRes.ok) return validateRowUsageRes.cast();
 
-        const validateRowTypes = await validateTypesOfRows(
-            auth,
-            datasetId,
-            rows.map(r => r.elements)
-        );
-        if (!validateRowTypes.ok) return validateRowTypes.cast();
-
         const maxRowId = await query<{ id: number }[]>`
             SELECT MAX(datasetRows.id) AS id
             FROM datasetRows, datasets
@@ -548,8 +517,9 @@ namespace DatasetServer {
             const rowTimestamp = row.timestamp ?? nowUtc();
             const rowCreated = row.created ?? nowUtc();
             const rowTimestampTzOffset = row.timestampTzOffset ?? 0;
-            const rowJson = JSON.stringify(row.elements);
+            const rowJson = row.rowJson;
 
+            // TODO improve efficiency here
             if (onSameTimestamp !== 'append') {
                 const [{ count }] = await query<{ count: number }[]>`
                     SELECT COUNT(*) AS count
@@ -585,12 +555,17 @@ namespace DatasetServer {
                     ${rowCreated},
                     ${rowTimestamp},
                     ${rowTimestampTzOffset},
-                    ${encrypt(rowJson, auth.key)}
+                    ${rowJson}
                 )
             `;
         }
 
-        // update row count cache
+        await updateRowCountOnDataset(auth, datasetId);
+
+        return Result.ok(range(rows.length, firstRowId));
+    }
+
+    async function updateRowCountOnDataset(auth: Auth, datasetId: string) {
         await query`
             UPDATE datasets
             SET rowCount = (
@@ -602,8 +577,6 @@ namespace DatasetServer {
             WHERE id = ${datasetId}
               AND userId = ${auth.id}
         `;
-
-        return Result.ok(range(rows.length, firstRowId));
     }
 
     export async function updateDatasetColumnsEncryptedFields(
@@ -707,7 +680,7 @@ namespace DatasetServer {
         rows: (
             | {
                   id: number;
-                  elements: unknown[];
+                  rowJson: string;
                   timestamp: TimestampSecs;
                   timestampTzOffset: Hours;
                   created: TimestampSecs;
@@ -716,25 +689,6 @@ namespace DatasetServer {
         )[]
     ): Promise<Result<null>> {
         rows = [...rows].sort((a, b) => a.id - b.id);
-
-        const validateRowTypes = await validateTypesOfRows(
-            auth,
-            datasetId,
-            rows
-                .filter(
-                    (
-                        r
-                    ): r is {
-                        id: number;
-                        elements: unknown[];
-                        timestamp: TimestampSecs;
-                        timestampTzOffset: Hours;
-                        created: TimestampSecs;
-                    } => !('shouldDelete' in r)
-                )
-                .map(r => r.elements)
-        );
-        if (!validateRowTypes.ok) return validateRowTypes.cast();
 
         for (const row of rows) {
             if ('shouldDelete' in row) {
@@ -748,10 +702,9 @@ namespace DatasetServer {
                 }
                 continue;
             }
-            const updatedRowJson = encrypt(JSON.stringify(row.elements), auth.key);
             await query`
                 UPDATE datasetRows
-                SET rowJson = ${updatedRowJson},
+                SET rowJson = ${row.rowJson},
                     timestamp = ${row.timestamp},
                     timestampTzOffset = ${row.timestampTzOffset}
                 WHERE userId = ${auth.id}
@@ -763,19 +716,11 @@ namespace DatasetServer {
     }
 
     export async function deleteDataset(auth: Auth, datasetId: string): Promise<void> {
-        await query`
-            DELETE FROM datasets
-            WHERE id = ${datasetId}
-              AND userId = ${auth.id};
-
-            DELETE FROM datasetColumns
-            WHERE datasetId = ${datasetId}
-                AND userId = ${auth.id};
-
-            DELETE FROM datasetRows
-            WHERE datasetId = ${datasetId}
-                AND userId = ${auth.id};
-        `;
+        await Promise.all([
+            await query`DELETE FROM datasets WHERE id = ${datasetId} AND userId = ${auth.id}`,
+            await query`DELETE FROM datasetColumns WHERE datasetId = ${datasetId} AND userId = ${auth.id}`,
+            await query`DELETE FROM datasetRows WHERE datasetId = ${datasetId} AND userId = ${auth.id}`
+        ]);
     }
 
     export async function existsWithId(auth: Auth, datasetId: string): Promise<boolean> {
@@ -792,7 +737,8 @@ namespace DatasetServer {
         auth: Auth,
         datasetId: string,
         name: string,
-        type: DatasetColumnType<unknown>
+        type: DatasetColumnType<unknown>,
+        updatedRows: { id: number; rowJson: string }[]
     ): Promise<Result<DatasetColumn<unknown>>> {
         const id = UId.generate();
         const created = nowUtc();
@@ -823,30 +769,13 @@ namespace DatasetServer {
             )
         `;
 
-        // TODO scale this better
-        const rows = await query<{ id: number; rowJson: string }[]>`
-            SELECT id, rowJson
-            FROM datasetRows
-            WHERE datasetId = ${datasetId}
-            AND userId = ${auth.id}
-        `;
-
-        for (const row of rows) {
-            const decryptedJson = decrypt(row.rowJson, auth.key);
-            if (!decryptedJson.ok) return decryptedJson.cast();
-
-            const parsedRowData = JSON.parse(decryptedJson.val);
-            if (!Array.isArray(parsedRowData)) {
-                return Result.err('Invalid row JSON');
-            }
-
-            const updatedRowData = [...parsedRowData, type.defaultValue];
-            const updatedRowJson = encrypt(JSON.stringify(updatedRowData), auth.key);
-
+        for (const row of updatedRows) {
             await query`
                 UPDATE datasetRows
-                SET rowJson = ${updatedRowJson}
-                WHERE id = ${row.id}
+                SET rowJson = ${row.rowJson}
+                WHERE userId = ${auth.id}
+                  AND datasetId = ${datasetId}
+                  AND id = ${row.id}
             `;
         }
 
@@ -865,7 +794,8 @@ namespace DatasetServer {
         auth: Auth,
         datasetId: string,
         columnId: string,
-        type: DatasetColumnType<unknown>
+        type: DatasetColumnType<unknown>,
+        updatedRows: { id: number; rowJson: string }[]
     ): Promise<Result<null>> {
         const dataset = await getDataset(auth, datasetId);
         if (!dataset.ok) return dataset.cast();
@@ -887,32 +817,13 @@ namespace DatasetServer {
               AND userId = ${auth.id}
         `;
 
-        // TODO scale this better
-        const rows = await query<{ id: number; rowJson: string }[]>`
-            SELECT id, rowJson
-            FROM datasetRows
-            WHERE datasetId = ${datasetId}
-            AND userId = ${auth.id}
-        `;
-
-        for (const row of rows) {
-            const decryptedJson = decrypt(row.rowJson, auth.key);
-            if (!decryptedJson.ok) return decryptedJson.cast();
-
-            const parsedRowData = JSON.parse(decryptedJson.val);
-            if (!Array.isArray(parsedRowData)) {
-                return Result.err('Invalid row JSON');
-            }
-
-            const updatedRowData = [...parsedRowData];
-            updatedRowData[col.jsonOrdering] = type.castTo(updatedRowData[col.jsonOrdering]);
-
-            const updatedRowJson = encrypt(JSON.stringify(updatedRowData), auth.key);
-
+        for (const row of updatedRows) {
             await query`
                 UPDATE datasetRows
-                SET rowJson = ${updatedRowJson}
-                WHERE id = ${row.id}
+                SET rowJson = ${row.rowJson}
+                WHERE userId = ${auth.id}
+                  AND datasetId = ${datasetId}
+                  AND id = ${row.id}
             `;
         }
 
@@ -951,4 +862,3 @@ export const Dataset = {
     ...DatasetServer
 };
 export type Dataset = _Dataset;
-export type { DatasetColumn, DatasetColumnType, DatasetData, DatasetMetadata } from './dataset';

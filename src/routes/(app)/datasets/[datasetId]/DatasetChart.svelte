@@ -18,7 +18,7 @@
     import { Label } from '$lib/components/ui/label';
     import Select from '$lib/components/ui/Select.svelte';
     import { builtInTypes } from '$lib/controllers/dataset/columnTypes';
-    import type { DatasetMetadata, DatasetRow } from '$lib/controllers/dataset/dataset';
+    import type { DatasetMetadata, DecryptedDatasetRow } from '$lib/controllers/dataset/dataset';
     import { cssVarValue } from '$lib/utils/getCssVar';
     import { undefined } from 'zod';
     import {
@@ -37,7 +37,7 @@
     import EncryptedText from '$lib/components/ui/EncryptedText.svelte';
 
     export let dataset: DatasetMetadata;
-    export let rows: DatasetRow[] | null;
+    export let rows: DecryptedDatasetRow[] | null;
 
     Chart.register(
         Title,
@@ -71,7 +71,7 @@
             }
         }) satisfies ChartOptions;
 
-    function calculateDaysDatasetCovers(rows: DatasetRow[] | null): number {
+    function calculateDaysDatasetCovers(rows: DecryptedDatasetRow[] | null): number {
         if (!rows || !rows.length) return 0;
 
         const [min, max] = rows.reduce(
@@ -101,7 +101,7 @@
     );
 
     $: [graphType, graphData] = generateChartData(
-        (rows ?? []) as DatasetRow<(number | null)[]>[],
+        (rows ?? []) as DecryptedDatasetRow<(number | null)[]>[],
         selectedBucket,
         yAxisSelectedColumnIdx,
         xAxis,
@@ -110,14 +110,16 @@
     );
 
     $: yAxisOptions = Object.fromEntries(
-        numericColumns.map((column, idx) => [tryDecryptText(column.name), idx])
+        numericColumns.map(column => [tryDecryptText(column.name), column.ordering])
     );
+
+    $: console.log(graphData?.datasets[0].data);
 
     // TODO do not show the currently selected Y axis column in the X axis options
     $: xAxisOptions = {
         Time: timeIdxKey,
         ...Object.fromEntries(
-            numericColumns.map((column, idx) => [tryDecryptText(column.name), `col:${idx}`])
+            numericColumns.map(column => [tryDecryptText(column.name), `col:${column.ordering}`])
         )
     };
 </script>
@@ -190,11 +192,13 @@
 
     <div class="h-[70vh]">
         {#if graphData}
-            {#if graphType === ChartType.Scatter}
-                <Scatter data={graphData} options={options(fitScaleToData)} />
-            {:else if graphType === ChartType.Line}
-                <Line data={graphData} options={options(fitScaleToData)} />
-            {/if}
+            {#key [graphData, graphType]}
+                {#if graphType === ChartType.Scatter}
+                    <Scatter data={graphData} options={options(fitScaleToData)} />
+                {:else if graphType === ChartType.Line}
+                    <Line data={graphData} options={options(fitScaleToData)} />
+                {/if}
+            {/key}
         {/if}
     </div>
 {/if}

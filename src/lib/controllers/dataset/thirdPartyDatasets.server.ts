@@ -15,7 +15,7 @@ export interface ThirdPartyDatasetProvider {
         auth: Auth,
         datasetId: string,
         rows: {
-            elements: unknown[];
+            rowJson: string;
             timestamp?: TimestampSecs;
             timestampTzOffset?: Hours;
             created?: TimestampSecs;

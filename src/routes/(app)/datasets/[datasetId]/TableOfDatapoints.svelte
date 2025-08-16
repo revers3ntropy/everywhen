@@ -3,107 +3,24 @@
     import Delete from 'svelte-material-icons/DeleteOutline.svelte';
     import Pencil from 'svelte-material-icons/Pencil.svelte';
     import * as Popover from '$lib/components/ui/popover';
-    import { notify } from '$lib/components/notifications/notifications';
-    import { dispatch } from '$lib/dataChangeEvents';
-    import { api, apiPath } from '$lib/utils/apiRequest';
-    import { currentTzOffset, nowUtc } from '$lib/utils/time';
     import {
         Dataset,
         type DatasetMetadata,
-        type DatasetRow
+        type DecryptedDatasetRow
     } from '$lib/controllers/dataset/dataset';
     import { builtInTypes } from '$lib/controllers/dataset/columnTypes';
     import EditDatasetColumnDialog from './EditDatasetColumnDialog.svelte';
-    import { tryEncryptText } from '$lib/utils/encryption.client';
     import EncryptedText from '$lib/components/ui/EncryptedText.svelte';
+    import {
+        addRow,
+        deleteDatasetRow,
+        editDatasetRow,
+        editDatasetRowTimestamp,
+        addColumn
+    } from './datasetActions.client';
 
     export let dataset: DatasetMetadata;
-    export let rows: DatasetRow[];
-
-    async function addColumn() {
-        const newColumn = notify.onErr(
-            await api.post(apiPath(`/datasets/?/columns`, dataset.id), {
-                name: tryEncryptText('New Column'),
-                type: 'number'
-            })
-        );
-        await dispatch.create('datasetCol', newColumn);
-    }
-
-    async function addRow() {
-        const row = {
-            elements: columnsOrderedByJsonOrder.map(c => c.type.defaultValue),
-            created: nowUtc(),
-            timestamp: nowUtc(),
-            timestampTzOffset: currentTzOffset()
-        };
-
-        const { ids } = notify.onErr(
-            await api.post(apiPath(`/datasets/?`, dataset.id), {
-                rows: [row]
-            })
-        );
-        if (ids.length !== 1) {
-            notify.error('Failed to add row');
-            return;
-        }
-
-        await dispatch.create('datasetRow', {
-            datasetId: dataset.id,
-            row: { ...row, id: ids[0] }
-        });
-    }
-
-    async function editDatasetRow(row: DatasetRow, jsonIdx: number, newValue: unknown) {
-        const newRow = {
-            ...row,
-            elements: row.elements.map((val, i) => (i === jsonIdx ? newValue : val))
-        };
-        notify.onErr(
-            await api.put(apiPath(`/datasets/?`, dataset.id), {
-                rows: [newRow]
-            })
-        );
-        await dispatch.update(
-            'datasetRow',
-            { datasetId: dataset.id, row },
-            {
-                datasetId: dataset.id,
-                row: newRow
-            }
-        );
-    }
-
-    async function editDatasetRowTimestamp(row: DatasetRow, newTimestamp: number) {
-        const newRow = {
-            ...row,
-            timestampTzOffset: currentTzOffset(),
-            timestamp: newTimestamp
-        };
-        notify.onErr(
-            await api.put(apiPath(`/datasets/?`, dataset.id), {
-                rows: [newRow]
-            })
-        );
-        await dispatch.update(
-            'datasetRow',
-            { datasetId: dataset.id, row },
-            {
-                datasetId: dataset.id,
-                row: newRow
-            }
-        );
-    }
-
-    async function deleteDatasetRow(row: DatasetRow) {
-        if (!confirm('Are you sure you want to delete this row?')) return;
-        notify.onErr(
-            await api.put(apiPath(`/datasets/?`, dataset.id), {
-                rows: [{ id: row.id, shouldDelete: true }]
-            })
-        );
-        await dispatch.delete('datasetRow', { datasetId: dataset.id, rowId: row.id });
-    }
+    export let rows: DecryptedDatasetRow[];
 
     $: columnsOrderedByJsonOrder = Dataset.sortColumnsForJson(dataset.columns);
 </script>
@@ -128,7 +45,12 @@
                                 </span>
                             </Popover.Trigger>
                             <Popover.Content>
-                                <EditDatasetColumnDialog datasetId={dataset.id} {column} />
+                                <EditDatasetColumnDialog
+                                    columns={dataset.columns}
+                                    datasetId={dataset.id}
+                                    {column}
+                                    decryptedRows={rows}
+                                />
                             </Popover.Content>
                         </Popover.Root>
                     {:else}
@@ -140,7 +62,7 @@
                 {#if !dataset.preset}
                     <button
                         class="border-0 border-r border-solid border-borderColor h-full px-3 py-2.5 bg-vLightAccent hover:bg-lightAccent text-light hover:text-textColor"
-                        on:click={addColumn}
+                        on:click={() => addColumn(dataset.id, dataset.columns, rows)}
                     >
                         +
                     </button>
@@ -151,7 +73,7 @@
             <td>
                 <button
                     class="p-2 bg-vLightAccent hover:bg-lightAccent text-light hover:text-textColor"
-                    on:click={addRow}
+                    on:click={() => addRow(dataset.id, dataset.columns)}
                 >
                     + Add Row
                 </button>
@@ -167,7 +89,12 @@
                             class="editable-text px-2 focus:rounded-none"
                             on:change={e => {
                                 const date = new Date(e.currentTarget.value);
-                                return editDatasetRowTimestamp(row, date.getTime() / 1000);
+                                return editDatasetRowTimestamp(
+                                    dataset.id,
+                                    dataset.columns,
+                                    row,
+                                    date.getTime() / 1000
+                                );
                             }}
                         />
                     </td>
@@ -187,6 +114,8 @@
                                     on:change={e => {
                                         const num = parseFloat(e.currentTarget.value);
                                         return editDatasetRow(
+                                            dataset.id,
+                                            dataset.columns,
                                             row,
                                             column.jsonOrdering,
                                             isNaN(num) ? column.type.defaultValue : num
@@ -200,6 +129,8 @@
                                     class="editable-text px-2 focus:rounded-none"
                                     on:change={e =>
                                         editDatasetRow(
+                                            dataset.id,
+                                            dataset.columns,
                                             row,
                                             column.jsonOrdering,
                                             e.currentTarget.checked
@@ -211,6 +142,8 @@
                                     class="editable-text px-2 focus:rounded-none"
                                     on:change={e =>
                                         editDatasetRow(
+                                            dataset.id,
+                                            dataset.columns,
                                             row,
                                             column.jsonOrdering,
                                             e.currentTarget.value
@@ -221,7 +154,7 @@
                     {/each}
                     <td>
                         <button
-                            on:click={() => deleteDatasetRow(row)}
+                            on:click={() => deleteDatasetRow(dataset.id, row)}
                             class="block hover:bg-lightAccent h-full px-1 py-2"
                         >
                             <Delete size="25" />

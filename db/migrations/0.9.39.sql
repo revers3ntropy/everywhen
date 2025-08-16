@@ -1,0 +1,1 @@
+UPDATE datasetRows SET rowJson = CONCAT('~#', rowJson);

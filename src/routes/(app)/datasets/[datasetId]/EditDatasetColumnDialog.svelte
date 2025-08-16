@@ -1,32 +1,37 @@
 <script lang="ts">
-    import { notify } from '$lib/components/notifications/notifications';
+    import { slide } from 'svelte/transition';
     import Select from '$lib/components/ui/Select.svelte';
     import Textbox from '$lib/components/ui/Textbox.svelte';
     import { builtInTypes } from '$lib/controllers/dataset/columnTypes';
-    import type { DatasetColumn, DatasetColumnType } from '$lib/controllers/dataset/dataset';
-    import { dispatch } from '$lib/dataChangeEvents';
-    import { api, apiPath } from '$lib/utils/apiRequest';
+    import type {
+        DatasetColumn,
+        DatasetColumnType,
+        DecryptedDatasetRow
+    } from '$lib/controllers/dataset/dataset';
     import { tryDecryptText, tryEncryptText } from '$lib/utils/encryption.client.js';
+    import { updateDatasetColumn } from './datasetActions.client';
+    import { ANIMATION_DURATION } from '$lib/constants';
 
     export let datasetId: string;
+    export let columns: DatasetColumn<unknown>[];
     export let column: DatasetColumn<unknown>;
+    export let decryptedRows: DecryptedDatasetRow[];
+
+    async function update() {
+        error = undefined;
+        const res = await updateDatasetColumn(
+            datasetId,
+            columns,
+            column,
+            decryptedRows,
+            newColumnType,
+            newColumnNameDecrypted
+        );
+        if (!res.ok) error = res.err;
+    }
 
     let newColumnNameDecrypted = tryDecryptText(column.name);
     let newColumnType = column.type;
-
-    async function save() {
-        notify.onErr(
-            await api.put(apiPath(`/datasets/?/columns/?`, datasetId, column.id), {
-                type: newColumnType.id,
-                name: tryEncryptText(newColumnNameDecrypted)
-            })
-        );
-        await dispatch.update('datasetCol', column, {
-            ...column,
-            name: tryEncryptText(newColumnNameDecrypted),
-            type: newColumnType
-        });
-    }
 
     const columnTypesMap = Object.fromEntries(
         Object.keys(builtInTypes).map(key => [
@@ -38,6 +43,8 @@
 
     $: areChanges =
         tryEncryptText(newColumnNameDecrypted) !== column.name || newColumnType !== column.type;
+
+    let error: string | undefined;
 </script>
 
 <div>
@@ -52,5 +59,12 @@
     />
 </div>
 <div class="pt-4">
-    <button class="button primary" disabled={!areChanges} on:click={save}>Save</button>
+    <button class="button primary" disabled={!areChanges} on:click={update}> Save </button>
 </div>
+{#if error}
+    <div class="pt-4" transition:slide={{ axis: 'y', duration: ANIMATION_DURATION }}>
+        <p class="text-destructive-foreground bg-destructive p-2 rounded-xl">
+            {error}
+        </p>
+    </div>
+{/if}
